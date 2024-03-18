@@ -1,0 +1,37 @@
+<resources>
+    <string name="app_name">Aisleron</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Aisleron</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_search">Search</string>
+
+    <string name="menu_in_stock">In Stock</string>
+    <string name="menu_shopping_list">Shopping List</string>
+    <string name="menu_all_items">All Items</string>
+    <string name="menu_settings">Settings</string>
+    <string name="menu_all_shops">All Shops</string>
+    <string name="menu_shops">Shops</string>
+
+    <string name="home_fragment">This is home Fragment</string>
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Sync</string>
+    <string name="list_options_header">List Options</string>
+
+    <!-- List Preferences -->
+    <string name="list_item_count">List Item Count</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+</resources>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_in_stock">
+
+    <fragment
+        android:id="@+id/nav_in_stock"
+        android:name="com.aisleron.ui.productlist.ProductListFragment"
+        android:label="@string/menu_in_stock"
+        tools:layout="@layout/fragment_product_list" >
+        <argument
+            android:name="locationId"
+            app:argType="integer"
+            android:defaultValue="1" />
+        <argument
+            android:name="filterType"
+            app:argType="com.aisleron.model.FilterType"
+            android:defaultValue="INSTOCK" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_shopping_list"
+        android:name="com.aisleron.ui.productlist.ProductListFragment"
+        android:label="@string/menu_shopping_list"
+        tools:layout="@layout/fragment_product_list" >
+        <argument
+            android:name="locationId"
+            app:argType="integer"
+            android:defaultValue="1" />
+        <argument
+            android:name="filterType"
+            app:argType="com.aisleron.model.FilterType"
+            android:defaultValue="NEEDED" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_all_items"
+        android:name="com.aisleron.ui.productlist.ProductListFragment"
+        android:label="@string/menu_all_items"
+        tools:layout="@layout/fragment_product_list">
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_settings"
+        android:name="com.aisleron.ui.settings.SettingsFragment"
+        android:label="@string/menu_settings"
+        tools:layout="@xml/root_preferences" />
+
+    <fragment
+        android:id="@+id/nav_all_shops"
+        android:name="com.aisleron.ui.shoplist.ShopListFragment"
+        android:label="@string/menu_all_shops"
+        tools:layout="@layout/fragment_shop_list" >
+        <action
+            android:id="@+id/navigate_to_shop"
+            app:destination="@id/nav_shop"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_shop"
+        android:name="com.aisleron.ui.shop.ShopFragment"
+        tools:layout="@layout/fragment_shop" >
+        <action
+            android:id="@+id/navigate_to_shop_list"
+            app:destination="@id/nav_all_shops"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out"/>
+    </fragment>
+
+</navigation>
