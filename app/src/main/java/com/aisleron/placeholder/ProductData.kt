@@ -55,6 +55,5 @@ object ProductData {
                 name = "Bratwurst",
                 inStock = false
             ),
-
-            )
+        )
 }

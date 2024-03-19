@@ -43,6 +43,17 @@
     </fragment>
 
     <fragment
+        android:id="@+id/nav_shop_list"
+        android:name="com.aisleron.ui.productlist.ProductListFragment"
+        android:label="Shopity Shop"
+        tools:layout="@layout/fragment_product_list" >
+        <argument
+            android:name="filterType"
+            app:argType="com.aisleron.model.FilterType"
+            android:defaultValue="NEEDED" />
+    </fragment>
+
+    <fragment
         android:id="@+id/nav_settings"
         android:name="com.aisleron.ui.settings.SettingsFragment"
         android:label="@string/menu_settings"

@@ -22,13 +22,8 @@
         android:title="@string/menu_shops"
         android:id="@+id/nav_menu_shops">
         <menu>
-            <group android:checkableBehavior="single">
-                <item
-                    android:icon="@drawable/ic_menu_gallery"
-                    android:title="Shop 1" />
-                <item
-                    android:icon="@drawable/ic_menu_gallery"
-                    android:title="Shop 2" />
+            <group android:id="@+id/nav_group_shops" android:checkableBehavior="single">
+
             </group>
         </menu>
     </item>
@@ -36,7 +31,6 @@
         android:id="@+id/nav_all_shops"
         android:icon="@drawable/baseline_shopping_cart_24"
         android:title="@string/menu_all_shops" />
-
     <group
         android:id="@+id/menu_bottom"
         android:checkableBehavior="none">
