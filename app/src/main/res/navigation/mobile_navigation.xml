@@ -21,7 +21,7 @@
     </fragment>
 
     <fragment
-        android:id="@+id/nav_shopping_list"
+        android:id="@+id/nav_needed_list"
         android:name="com.aisleron.ui.productlist.ProductListFragment"
         android:label="@string/menu_shopping_list"
         tools:layout="@layout/fragment_product_list" >
@@ -43,14 +43,21 @@
     </fragment>
 
     <fragment
-        android:id="@+id/nav_shop_list"
+        android:id="@+id/nav_shopping_list"
         android:name="com.aisleron.ui.productlist.ProductListFragment"
-        android:label="Shopity Shop"
+        android:label="@string/menu_shopping_list"
         tools:layout="@layout/fragment_product_list" >
+        <argument
+            android:name="locationId"
+            app:argType="integer"
+            android:defaultValue="1" />
         <argument
             android:name="filterType"
             app:argType="com.aisleron.model.FilterType"
             android:defaultValue="NEEDED" />
+        <argument
+            android:name="locationTitle"
+            app:argType="string" />
     </fragment>
 
     <fragment
@@ -65,21 +72,17 @@
         android:label="@string/menu_all_shops"
         tools:layout="@layout/fragment_shop_list" >
         <action
-            android:id="@+id/navigate_to_shop"
-            app:destination="@id/nav_shop"
-            app:enterAnim="@android:anim/fade_in"
-            app:exitAnim="@android:anim/fade_out"/>
+            android:id="@+id/action_nav_all_shops_to_nav_shopping_list"
+            app:destination="@id/nav_shopping_list" >
+            <argument
+                android:name="filterType"
+                android:defaultValue="NEEDED" />
+        </action>
     </fragment>
 
     <fragment
         android:id="@+id/nav_shop"
         android:name="com.aisleron.ui.shop.ShopFragment"
-        tools:layout="@layout/fragment_shop" >
-        <action
-            android:id="@+id/navigate_to_shop_list"
-            app:destination="@id/nav_all_shops"
-            app:enterAnim="@android:anim/fade_in"
-            app:exitAnim="@android:anim/fade_out"/>
-    </fragment>
+        tools:layout="@layout/fragment_shop" />
 
 </navigation>

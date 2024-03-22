@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.SubMenu
-import android.widget.FrameLayout
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.navigation.NavigationView
 import androidx.navigation.findNavController
@@ -43,7 +42,7 @@ class MainActivity : AppCompatActivity() {
         // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.nav_in_stock, R.id.nav_shopping_list, R.id.nav_all_items, R.id.nav_all_shops, R.id.nav_shop_list
+                R.id.nav_in_stock, R.id.nav_needed_list, R.id.nav_all_items, R.id.nav_all_shops
             ), drawerLayout
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
@@ -52,7 +51,9 @@ class MainActivity : AppCompatActivity() {
         //Add Additional nav items
         val shopMenuGroup: SubMenu? = navView.menu.findItem(R.id.nav_menu_shops).subMenu
         for (shop in LocationData.locations.filter { l -> l.type == LocationType.SHOP }) {
-            shopMenuGroup?.add(R.id.nav_group_shops, R.id.nav_shop_list, Menu.NONE, shop.name)
+            val smi = shopMenuGroup?.add(R.id.nav_group_shops, Menu.NONE, Menu.NONE, shop.name)
+
+
         }
         // TODO: Set Navigation
 

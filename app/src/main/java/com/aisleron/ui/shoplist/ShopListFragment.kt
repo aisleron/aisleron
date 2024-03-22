@@ -29,11 +29,12 @@ class ShopListFragment : Fragment() {
         }
     }
 
-    private fun navigateToShop(item: Location) {
+    private fun navigateToShoppingList(item: Location) {
         val bundle = Bundle()
-        bundle.putSerializable("key", item)
-        findNavController().navigate(R.id.navigate_to_shop, bundle)
-            
+        bundle.putInt("locationId", item.id)
+        bundle.putSerializable("filterType", item.defaultFilter)
+        bundle.putString("locationTitle", item.name)
+        this.findNavController().navigate(R.id.action_nav_all_shops_to_nav_shopping_list, bundle)
     }
 
     override fun onCreateView(
@@ -52,7 +53,7 @@ class ShopListFragment : Fragment() {
                 adapter = ShopListItemRecyclerViewAdapter(LocationData.locations.filter { s -> s.type == LocationType.SHOP } , object :
                     ShopListItemRecyclerViewAdapter.ShopListItemListener {
                     override fun onItemClick(item: Location) {
-                        navigateToShop(item)
+                        navigateToShoppingList(item)
                     }
                 })
 

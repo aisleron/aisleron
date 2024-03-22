@@ -4,12 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.aisleron.R
 import com.aisleron.model.FilterType
+import com.aisleron.model.Location
 import com.aisleron.placeholder.ProductData
 
 /**
@@ -33,19 +35,12 @@ class ProductListFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_product_list, container, false)
         val bundle = arguments
-
         val locationId : Int = bundle?.getInt("locationId") ?: 1
         val filterType : FilterType = if (bundle != null) bundle.get("filterType") as FilterType else FilterType.ALL
-
-/*
-        if (bundle != null) {
-            locationId = bundle.getInt("locationId")
-            filterType = bundle.get("filterType") as FilterType
-        } else {
-            locationId = 1
-            filterType = FilterType.ALL
+        val locationTitle : String? = bundle?.getString("locationTitle")
+        if (locationTitle != null) {
+            (activity as AppCompatActivity).supportActionBar?.title = locationTitle
         }
-*/
 
         // Set the adapter
         if (view is RecyclerView) {
@@ -63,6 +58,12 @@ class ProductListFragment : Fragment() {
         }
         return view
     }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val bundle = arguments
+
+        }
 
     companion object {
 
