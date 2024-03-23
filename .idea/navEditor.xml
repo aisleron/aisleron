@@ -8,13 +8,13 @@
             <LayoutPositions>
               <option name="myPositions">
                 <map>
-                  <entry key="navListShopFragment">
+                  <entry key="aisleListFragment">
                     <value>
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="836" />
-                            <option name="y" value="84" />
+                            <option name="x" value="573" />
+                            <option name="y" value="-180" />
                           </Point>
                         </option>
                       </LayoutPositions>

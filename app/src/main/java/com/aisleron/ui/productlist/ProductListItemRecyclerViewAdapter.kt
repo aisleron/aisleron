@@ -31,7 +31,7 @@ class ProductListItemRecyclerViewAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = values[position]
         holder.idView.text = item.id.toString()
-        holder.contentView.text = item.name
+        holder.contentView.text = "${item.name} (${item.inStock})"
         holder.itemView.setOnClickListener {
             Toast.makeText(holder.contentView.context, "Click! Id: ${item.id}, Name: ${item.name}", Toast.LENGTH_SHORT).show()
         }
@@ -40,7 +40,7 @@ class ProductListItemRecyclerViewAdapter(
 
     inner class ViewHolder(binding: FragmentProductListItemBinding) : RecyclerView.ViewHolder(binding.root) {
         val idView: TextView = binding.itemNumber
-        val contentView: TextView = binding.content
+        val contentView: TextView = binding.txtAisleName
 
         override fun toString(): String {
             return super.toString() + " '" + contentView.text + "'"
