@@ -8,7 +8,7 @@ import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 
 import com.aisleron.databinding.FragmentAisleListItemBinding
-import com.aisleron.model.Aisle
+import com.aisleron.domain.model.Aisle
 import com.aisleron.ui.productlist.ProductListItemRecyclerViewAdapter
 
 /**
@@ -33,14 +33,13 @@ class MyAisleListItemRecyclerViewAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = values[position]
-        holder.contentView.text = item.name
+        holder.contentView.text = "${item.name} (Rank: ${item.rank})"
         holder.itemView.setOnClickListener {
             Toast.makeText(holder.contentView.context, "Aisle Click! Id: ${item.id}, Name: ${item.name}", Toast.LENGTH_SHORT).show()
         }
         val plirAdapter = item.products?.let { ProductListItemRecyclerViewAdapter(it) }
-        // aisle_product_list
 
-        holder.productList.layoutManager = LinearLayoutManager(holder.itemView.context, LinearLayoutManager.HORIZONTAL,false)
+        holder.productList.layoutManager = LinearLayoutManager(holder.itemView.context, LinearLayoutManager.VERTICAL,false)
         holder.productList.adapter = plirAdapter
     }
 

@@ -8,7 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.aisleron.databinding.FragmentShopBinding
-import com.aisleron.model.Location
+import com.aisleron.domain.model.Location
 
 
 class ShopFragment : Fragment() {

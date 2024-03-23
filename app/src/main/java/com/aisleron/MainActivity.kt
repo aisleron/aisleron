@@ -16,8 +16,8 @@ import androidx.navigation.NavController
 import androidx.navigation.ui.onNavDestinationSelected
 import androidx.recyclerview.widget.RecyclerView
 import com.aisleron.databinding.ActivityMainBinding
-import com.aisleron.model.Location
-import com.aisleron.model.LocationType
+import com.aisleron.domain.model.Location
+import com.aisleron.domain.model.LocationType
 import com.aisleron.placeholder.LocationData
 import com.aisleron.ui.navlistshop.NavListShopRecyclerViewAdapter
 

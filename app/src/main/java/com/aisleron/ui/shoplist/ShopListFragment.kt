@@ -10,8 +10,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import com.aisleron.R
-import com.aisleron.model.Location
-import com.aisleron.model.LocationType
+import com.aisleron.domain.model.Location
+import com.aisleron.domain.model.LocationType
 import com.aisleron.placeholder.LocationData
 
 /**

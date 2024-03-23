@@ -10,8 +10,8 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.aisleron.R
-import com.aisleron.model.FilterType
-import com.aisleron.model.Location
+import com.aisleron.domain.model.FilterType
+import com.aisleron.domain.model.Location
 import com.aisleron.placeholder.ProductData
 
 /**

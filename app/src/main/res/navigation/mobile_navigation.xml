@@ -16,7 +16,7 @@
             android:defaultValue="1" />
         <argument
             android:name="filterType"
-            app:argType="com.aisleron.model.FilterType"
+            app:argType="com.aisleron.domain.model.FilterType"
             android:defaultValue="INSTOCK" />
     </fragment>
 
@@ -31,7 +31,7 @@
             android:defaultValue="1" />
         <argument
             android:name="filterType"
-            app:argType="com.aisleron.model.FilterType"
+            app:argType="com.aisleron.domain.model.FilterType"
             android:defaultValue="NEEDED" />
     </fragment>
 
@@ -53,7 +53,7 @@
             android:defaultValue="1" />
         <argument
             android:name="filterType"
-            app:argType="com.aisleron.model.FilterType"
+            app:argType="com.aisleron.domain.model.FilterType"
             android:defaultValue="NEEDED" />
         <argument
             android:name="locationTitle"

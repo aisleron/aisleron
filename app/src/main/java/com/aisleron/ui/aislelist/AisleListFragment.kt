@@ -10,7 +10,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import com.aisleron.R
-import com.aisleron.model.FilterType
+import com.aisleron.domain.model.Aisle
+import com.aisleron.domain.model.FilterType
 import com.aisleron.placeholder.LocationData
 
 /**
@@ -50,7 +51,8 @@ class AisleListFragment : Fragment() {
                 }
                 adapter = (LocationData.locations.filter{ l -> l.id == locationId })[0].aisles?.let {
                     MyAisleListItemRecyclerViewAdapter(
-                        it
+                        it.sortedWith(compareBy(Aisle::rank, Aisle::name))
+                        //it.sortedWith(compareBy<Aisle> { a -> a.rank}.thenBy { a-> a.name } )
                     )
                 }
             }

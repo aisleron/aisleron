@@ -1,4 +1,4 @@
-package com.aisleron.model
+package com.aisleron.domain.model
 
 data class Aisle(
     val name: String,

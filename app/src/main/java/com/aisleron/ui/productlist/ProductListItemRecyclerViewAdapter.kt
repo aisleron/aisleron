@@ -7,7 +7,7 @@ import android.widget.TextView
 import android.widget.Toast
 
 import com.aisleron.databinding.FragmentProductListItemBinding
-import com.aisleron.model.Product
+import com.aisleron.domain.model.Product
 
 /**
  * [RecyclerView.Adapter] that can display a [Product].
@@ -31,7 +31,7 @@ class ProductListItemRecyclerViewAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = values[position]
         holder.idView.text = item.id.toString()
-        holder.contentView.text = "${item.name} (${item.inStock})"
+        holder.contentView.text = "${item.name} (In Stock: ${item.inStock})"
         holder.itemView.setOnClickListener {
             Toast.makeText(holder.contentView.context, "Click! Id: ${item.id}, Name: ${item.name}", Toast.LENGTH_SHORT).show()
         }

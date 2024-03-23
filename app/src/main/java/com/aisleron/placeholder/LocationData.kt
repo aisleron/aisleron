@@ -1,10 +1,10 @@
 package com.aisleron.placeholder
 
-import com.aisleron.model.Aisle
-import com.aisleron.model.FilterType
-import com.aisleron.model.Location
-import com.aisleron.model.LocationType
-import com.aisleron.model.Product
+import com.aisleron.domain.model.Aisle
+import com.aisleron.domain.model.FilterType
+import com.aisleron.domain.model.Location
+import com.aisleron.domain.model.LocationType
+import com.aisleron.domain.model.Product
 
 object LocationData {
     val locations: List<Location> =
@@ -15,8 +15,18 @@ object LocationData {
                 type = LocationType.GENERIC,
                 defaultFilter = FilterType.NEEDED,
                 aisles = listOf(
-                    Aisle ("Fridge", productsRandom(), null, 2, 1),
-                    Aisle ("Pantry", productsRandom(), null, 1, 2)
+                    Aisle (
+                        "Fridge",
+                        listOf(ProductData.products[1], ProductData.products[2], ProductData.products[3], ProductData.products[4]),
+                        null,
+                        2,
+                        1),
+                    Aisle (
+                        "Pantry",
+                        listOf(ProductData.products[5], ProductData.products[6], ProductData.products[7], ProductData.products[8]),
+                        null,
+                        1,
+                        2)
                 )
             ),
             Location(
