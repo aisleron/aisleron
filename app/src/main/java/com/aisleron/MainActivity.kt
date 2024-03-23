@@ -62,7 +62,7 @@ class MainActivity : AppCompatActivity() {
 
          */
         val navShopAdapter = NavListShopRecyclerViewAdapter(LocationData.locations.filter { s -> s.type == LocationType.SHOP } , object :
-            NavListShopRecyclerViewAdapter.ShopListItemListener {
+            NavListShopRecyclerViewAdapter.NavListShopItemListener {
             override fun onItemClick(item: Location) {
                 navigateToShoppingList(item, navController, drawerLayout)
             }

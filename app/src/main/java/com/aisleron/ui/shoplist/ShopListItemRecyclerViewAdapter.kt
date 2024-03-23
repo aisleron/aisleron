@@ -30,24 +30,15 @@ class ShopListItemRecyclerViewAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = values[position]
-        //holder.idView.text = item.id
         holder.contentView.text = item.name
-        // Finally add an onclickListener to the item.
         holder.itemView.setOnClickListener {
             listener.onItemClick(values[position])
         }
-        /*
-        holder.itemView.setOnClickListener {
-            Toast.makeText(holder.contentView.context, "Click Id: ${item.id}, Name: ${item.content}", 5).show()
-        }
-
-         */
     }
 
     override fun getItemCount(): Int = values.size
 
     inner class ViewHolder(binding: FragmentShopListItemBinding) : RecyclerView.ViewHolder(binding.root) {
-        //val idView: TextView = binding.itemNumber
         val contentView: TextView = binding.content
 
         override fun toString(): String {

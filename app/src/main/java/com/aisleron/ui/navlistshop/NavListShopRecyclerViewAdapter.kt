@@ -5,17 +5,16 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
 
-import com.aisleron.placeholder.PlaceholderContent.PlaceholderItem
 import com.aisleron.databinding.FragmentNavListShopBinding
 import com.aisleron.model.Location
 
 /**
- * [RecyclerView.Adapter] that can display a [PlaceholderItem].
+ * [RecyclerView.Adapter] that can display a [Location].
  * TODO: Replace the implementation with code for your data type.
  */
 class NavListShopRecyclerViewAdapter(
     private val values: List<Location>,
-    private val listener: ShopListItemListener
+    private val listener: NavListShopItemListener
 ) : RecyclerView.Adapter<NavListShopRecyclerViewAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -27,7 +26,6 @@ class NavListShopRecyclerViewAdapter(
                 false
             )
         )
-
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -40,8 +38,7 @@ class NavListShopRecyclerViewAdapter(
 
     override fun getItemCount(): Int = values.size
 
-    inner class ViewHolder(binding: FragmentNavListShopBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+    inner class ViewHolder(binding: FragmentNavListShopBinding) : RecyclerView.ViewHolder(binding.root) {
         val contentView: TextView = binding.content
 
         override fun toString(): String {
@@ -49,7 +46,7 @@ class NavListShopRecyclerViewAdapter(
         }
     }
 
-    interface ShopListItemListener {
+    interface NavListShopItemListener {
         fun onItemClick(item: Location)
     }
 

@@ -24,7 +24,7 @@ class ShopFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.Name = "Bob"
+        viewModel.name = "Bob"
 
         // TODO: Use the ViewModel
     }
