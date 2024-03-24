@@ -41,4 +41,5 @@
     <string name="save">Save</string>
     <string name="shop_name">Shop Name</string>
     <string name="add_shop">Add Shop</string>
+    <string name="edit_product">Edit Product</string>
 </resources>

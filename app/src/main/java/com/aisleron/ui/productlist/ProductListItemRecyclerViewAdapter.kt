@@ -5,8 +5,10 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.CheckedTextView
+import android.widget.PopupMenu
 import android.widget.TextView
 import android.widget.Toast
+import com.aisleron.R
 
 import com.aisleron.databinding.FragmentProductListItemBinding
 import com.aisleron.domain.model.Product
@@ -35,7 +37,9 @@ class ProductListItemRecyclerViewAdapter(
     }
     override fun getItemCount(): Int = values.size
 
-    inner class ViewHolder(binding: FragmentProductListItemBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class ViewHolder(
+        binding: FragmentProductListItemBinding
+    ) : RecyclerView.ViewHolder(binding.root) {
         private val idView: TextView = binding.txtProductId
         private val contentView: TextView = binding.txtProductName
         private val inStockView: CheckBox = binding.chkInStock
@@ -53,6 +57,14 @@ class ProductListItemRecyclerViewAdapter(
                     Toast.LENGTH_SHORT
                 ).show()
             }
+
+            itemView.setOnLongClickListener {
+                val pop = PopupMenu(itemView.context, it)
+                pop.inflate(R.menu.product_list_context)
+                pop.show()
+                true
+            }
+
             inStockView.setOnCheckedChangeListener { _, isChecked ->
                 product.inStock = isChecked
                 setAttributes(product)
