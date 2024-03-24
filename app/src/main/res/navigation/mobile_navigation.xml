@@ -22,9 +22,9 @@
 
     <fragment
         android:id="@+id/nav_needed_list"
-        android:name="com.aisleron.ui.aislelist.AisleListFragment"
+        android:name="com.aisleron.ui.shoppinglist.ShoppingListFragment"
         android:label="@string/menu_shopping_list"
-        tools:layout="@layout/fragment_aisle_list" >
+        tools:layout="@layout/fragment_shopping_list" >
         <argument
             android:name="locationId"
             app:argType="integer"
@@ -44,9 +44,9 @@
 
     <fragment
         android:id="@+id/nav_shopping_list"
-        android:name="com.aisleron.ui.aislelist.AisleListFragment"
+        android:name="com.aisleron.ui.shoppinglist.ShoppingListFragment"
         android:label="@string/menu_shopping_list"
-        tools:layout="@layout/fragment_aisle_list" >
+        tools:layout="@layout/fragment_shopping_list" >
         <argument
             android:name="locationId"
             app:argType="integer"

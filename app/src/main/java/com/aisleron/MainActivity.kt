@@ -19,7 +19,7 @@ import com.aisleron.databinding.ActivityMainBinding
 import com.aisleron.domain.model.Location
 import com.aisleron.domain.model.LocationType
 import com.aisleron.placeholder.LocationData
-import com.aisleron.ui.navlistshop.NavListShopRecyclerViewAdapter
+import com.aisleron.ui.navshoplist.NavShopListRecyclerViewAdapter
 
 class MainActivity : AppCompatActivity() {
 
@@ -61,8 +61,8 @@ class MainActivity : AppCompatActivity() {
         }
 
          */
-        val navShopAdapter = NavListShopRecyclerViewAdapter(LocationData.locations.filter { s -> s.type == LocationType.SHOP } , object :
-            NavListShopRecyclerViewAdapter.NavListShopItemListener {
+        val navShopAdapter = NavShopListRecyclerViewAdapter(LocationData.locations.filter { s -> s.type == LocationType.SHOP } , object :
+            NavShopListRecyclerViewAdapter.NavListShopItemListener {
             override fun onItemClick(item: Location) {
                 navigateToShoppingList(item, navController, drawerLayout)
             }
