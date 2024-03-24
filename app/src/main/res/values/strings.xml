@@ -36,4 +36,9 @@
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
     <string name="aisle">Aisle</string>
     <string name="product">Product</string>
+    <string name="add_product">Add Product</string>
+    <string name="product_name">Product Name</string>
+    <string name="save">Save</string>
+    <string name="shop_name">Shop Name</string>
+    <string name="add_shop">Add Shop</string>
 </resources>

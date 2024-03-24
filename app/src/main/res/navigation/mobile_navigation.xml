@@ -81,8 +81,15 @@
     </fragment>
 
     <fragment
-        android:id="@+id/nav_shop"
+        android:id="@+id/nav_add_shop"
         android:name="com.aisleron.ui.shop.ShopFragment"
+        android:label="@string/add_shop"
         tools:layout="@layout/fragment_shop" />
+
+    <fragment
+        android:id="@+id/nav_add_product"
+        android:name="com.aisleron.ui.product.ProductFragment"
+        android:label="@string/add_product"
+        tools:layout="@layout/fragment_product" />
 
 </navigation>

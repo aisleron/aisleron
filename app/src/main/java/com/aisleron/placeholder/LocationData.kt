@@ -7,8 +7,8 @@ import com.aisleron.domain.model.LocationType
 import com.aisleron.domain.model.Product
 
 object LocationData {
-    val locations: List<Location> =
-        listOf(
+    val locations: MutableList<Location> =
+        mutableListOf(
             Location(
                 id = 1,
                 name = "Home",

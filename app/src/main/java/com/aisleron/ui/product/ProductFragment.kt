@@ -6,7 +6,11 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.aisleron.R
+import android.widget.Button
+import com.aisleron.databinding.FragmentProductBinding
+import com.aisleron.domain.model.Product
+import com.aisleron.placeholder.ProductData
+
 
 class ProductFragment : Fragment() {
 
@@ -15,17 +19,36 @@ class ProductFragment : Fragment() {
     }
 
     private val viewModel: ProductViewModel by viewModels()
+    private var _binding: FragmentProductBinding? =null
+
+    private val binding get() = _binding!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // TODO: Use the ViewModel
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        return inflater.inflate(R.layout.fragment_product, container, false)
+        _binding = FragmentProductBinding.inflate(inflater, container, false)
+        val button: Button = binding.btnSaveProduct
+        button.setOnClickListener{
+            ProductData.products.add(
+                Product(
+                    id = ProductData.products.size + 1,
+                    name = binding.edtProductName.text.toString(),
+                    inStock = binding.swcProductInStock.isChecked
+                ),
+            )
+            requireActivity().onBackPressedDispatcher.onBackPressed ()
+        }
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

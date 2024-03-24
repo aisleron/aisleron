@@ -12,6 +12,9 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentTransaction
 import androidx.navigation.NavController
 import androidx.navigation.ui.onNavDestinationSelected
 import androidx.recyclerview.widget.RecyclerView
@@ -19,6 +22,7 @@ import com.aisleron.databinding.ActivityMainBinding
 import com.aisleron.domain.model.Location
 import com.aisleron.domain.model.LocationType
 import com.aisleron.placeholder.LocationData
+import com.aisleron.ui.navshoplist.NavShopListFragment
 import com.aisleron.ui.navshoplist.NavShopListRecyclerViewAdapter
 
 class MainActivity : AppCompatActivity() {
@@ -52,15 +56,6 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
 
         //Add Additional nav items
-        /*
-        val shopMenuGroup: SubMenu? = navView.menu.findItem(R.id.nav_menu_shops).subMenu
-        for (shop in LocationData.locations.filter { l -> l.type == LocationType.SHOP }) {
-            val smi = shopMenuGroup?.add(R.id.nav_group_shops, Menu.NONE, Menu.NONE, shop.name)
-
-
-        }
-
-         */
         val navShopAdapter = NavShopListRecyclerViewAdapter(LocationData.locations.filter { s -> s.type == LocationType.SHOP } , object :
             NavShopListRecyclerViewAdapter.NavListShopItemListener {
             override fun onItemClick(item: Location) {
@@ -71,8 +66,6 @@ class MainActivity : AppCompatActivity() {
         val shopMenuItem: MenuItem? = navView.menu.findItem(R.id.nav_list_shop_list)
         val recyclerView: RecyclerView? = shopMenuItem?.actionView as RecyclerView?
         recyclerView?.adapter = navShopAdapter
-        // TODO: Set Navigation
-
     }
 
     private fun navigateToShoppingList(

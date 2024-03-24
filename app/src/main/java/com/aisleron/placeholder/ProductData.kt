@@ -3,8 +3,8 @@ package com.aisleron.placeholder
 import com.aisleron.domain.model.Product
 
 object ProductData {
-    val products: List<Product> =
-        listOf(
+    val products: MutableList<Product> =
+        mutableListOf(
             Product(
                 id = 1,
                 name = "Sausage Roll",

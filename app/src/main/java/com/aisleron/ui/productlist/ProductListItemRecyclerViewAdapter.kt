@@ -31,8 +31,7 @@ class ProductListItemRecyclerViewAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = values[position]
-        holder.bind(item)
+        holder.bind(values[position])
     }
     override fun getItemCount(): Int = values.size
 
@@ -41,9 +40,9 @@ class ProductListItemRecyclerViewAdapter(
         private val contentView: TextView = binding.txtProductName
         private val inStockView: CheckBox = binding.chkInStock
 
-//        override fun toString(): String {
-  //          return super.toString() + " '" + contentView.text + "'"
-    //    }
+        override fun toString(): String {
+            return super.toString() + " '" + contentView.text + "'"
+        }
 
         fun bind(product: Product){
             setAttributes(product)

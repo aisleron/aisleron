@@ -32,27 +32,33 @@ class ShoppingListItemRecyclerViewAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = values[position]
-        holder.contentView.text = String.format("${item.name} (Rank: ${item.rank})")
-        holder.itemView.setOnClickListener {
-            Toast.makeText(holder.contentView.context, "Aisle Click! Id: ${item.id}, Name: ${item.name}", Toast.LENGTH_SHORT).show()
-        }
-
-        holder.productList.layoutManager = LinearLayoutManager(holder.itemView.context, LinearLayoutManager.VERTICAL,false)
-        holder.productList.adapter = item.products?.let { ProductListItemRecyclerViewAdapter(it) }
+        holder.bind(values[position])
     }
 
     override fun getItemCount(): Int = values.size
 
     inner class ViewHolder(binding: FragmentShoppingListItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        val contentView: TextView = binding.txtAisleName
-        val productList: RecyclerView = binding.aisleProductList
-
-
+        private val contentView: TextView = binding.txtAisleName
+        private val productList: RecyclerView = binding.aisleProductList
 
         override fun toString(): String {
             return super.toString() + " '" + contentView.text + "'"
+        }
+
+        fun bind(aisle: Aisle) {
+            contentView.text = String.format("${aisle.name} (Rank: ${aisle.rank})")
+            itemView.setOnClickListener {
+                Toast.makeText(
+                    contentView.context,
+                    "Aisle Click! Id: ${aisle.id}, Name: ${aisle.name}",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+
+            productList.layoutManager =
+                LinearLayoutManager(itemView.context, LinearLayoutManager.VERTICAL, false)
+            productList.adapter = aisle.products?.let { ProductListItemRecyclerViewAdapter(it) }
         }
     }
 
