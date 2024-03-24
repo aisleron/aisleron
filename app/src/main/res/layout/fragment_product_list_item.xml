@@ -7,16 +7,31 @@
     <TextView
         android:id="@+id/txt_product_id"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/text_margin"
+        android:layout_height="match_parent"
+        android:layout_weight="0"
+        android:layout_marginEnd="@dimen/text_margin"
+        android:gravity="center_vertical"
+        android:text="0"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
     <TextView
         android:id="@+id/txt_product_name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/text_margin"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:text="@string/product"/>
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:checkMark="?android:attr/listChoiceIndicatorMultiple"
+        android:checked="true"
+        android:gravity="center_vertical"
+        android:text="@string/product"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+
+    <CheckBox
+        android:id="@+id/chk_in_stock"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="0"
+        android:checkMark="?android:attr/listChoiceIndicatorMultiple"
+        android:checked="true"
+        />
 
 </LinearLayout>

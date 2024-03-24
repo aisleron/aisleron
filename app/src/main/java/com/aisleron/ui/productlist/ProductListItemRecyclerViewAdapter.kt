@@ -3,6 +3,8 @@ package com.aisleron.ui.productlist
 import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.CheckBox
+import android.widget.CheckedTextView
 import android.widget.TextView
 import android.widget.Toast
 
@@ -30,20 +32,38 @@ class ProductListItemRecyclerViewAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = values[position]
-        holder.idView.text = item.id.toString()
-        holder.contentView.text = String.format("${item.name} (In Stock: ${item.inStock})")
-        holder.itemView.setOnClickListener {
-            Toast.makeText(holder.contentView.context, "Click! Id: ${item.id}, Name: ${item.name}", Toast.LENGTH_SHORT).show()
-        }
+        holder.bind(item)
     }
     override fun getItemCount(): Int = values.size
 
     inner class ViewHolder(binding: FragmentProductListItemBinding) : RecyclerView.ViewHolder(binding.root) {
-        val idView: TextView = binding.txtProductId
-        val contentView: TextView = binding.txtProductName
+        private val idView: TextView = binding.txtProductId
+        private val contentView: TextView = binding.txtProductName
+        private val inStockView: CheckBox = binding.chkInStock
 
-        override fun toString(): String {
-            return super.toString() + " '" + contentView.text + "'"
+//        override fun toString(): String {
+  //          return super.toString() + " '" + contentView.text + "'"
+    //    }
+
+        fun bind(product: Product){
+            setAttributes(product)
+            itemView.setOnClickListener {
+                Toast.makeText(
+                    contentView.context,
+                    "Id: ${product.id}, Name: ${product.name}, In Stock: ${product.inStock}",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+            inStockView.setOnCheckedChangeListener { _, isChecked ->
+                product.inStock = isChecked
+                setAttributes(product)
+            }
+        }
+
+        private fun setAttributes(product: Product) {
+            idView.text = product.id.toString()
+            contentView.text = product.name
+            inStockView.isChecked = product.inStock
         }
     }
 
