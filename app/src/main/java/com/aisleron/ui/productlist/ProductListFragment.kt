@@ -1,9 +1,13 @@
 package com.aisleron.ui.productlist
 
 import android.os.Bundle
+import android.view.ContextMenu
 import android.view.LayoutInflater
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
@@ -11,13 +15,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.aisleron.R
 import com.aisleron.domain.model.FilterType
-import com.aisleron.domain.model.Location
 import com.aisleron.placeholder.ProductData
+import com.aisleron.widgets.ContextMenuRecyclerView
 
 /**
  * A fragment representing a list of Items.
  */
-class ProductListFragment : Fragment() {
+class ProductListFragment : Fragment(){
 
     private var columnCount = 1
 
@@ -44,6 +48,7 @@ class ProductListFragment : Fragment() {
 
         // Set the adapter
         if (view is RecyclerView) {
+            registerForContextMenu(view)
             with(view) {
                 layoutManager = when {
                     columnCount <= 1 -> LinearLayoutManager(context)
@@ -64,6 +69,30 @@ class ProductListFragment : Fragment() {
         val bundle = arguments
 
         }
+
+    override fun onCreateContextMenu(menu: ContextMenu, v: View,
+                                     menuInfo: ContextMenu.ContextMenuInfo?) {
+        super.onCreateContextMenu(menu, v, menuInfo)
+        val inflater: MenuInflater = requireActivity().menuInflater
+        inflater.inflate(R.menu.product_list_context, menu)
+    }
+
+    override fun onContextItemSelected(item: MenuItem): Boolean {
+        val info = item.menuInfo as ContextMenuRecyclerView.RecyclerViewContextMenuInfo
+
+        return when (item.itemId) {
+            R.id.nav_edit_product -> {
+                Toast.makeText(
+                    context,
+                      "Edit Item ${info.position}",
+                    Toast.LENGTH_SHORT
+                ).show()
+                true
+            }
+            else -> super.onContextItemSelected(item)
+        }
+    }
+
 
     companion object {
 

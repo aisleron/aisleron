@@ -18,7 +18,7 @@
         app:layout_constraintTop_toTopOf="parent"
         />
 
-    <androidx.recyclerview.widget.RecyclerView
+    <com.aisleron.widgets.ContextMenuRecyclerView
         android:id="@+id/aisle_product_list"
         tools:listitem="@layout/fragment_product_list_item"
         android:layout_width="match_parent"
@@ -28,6 +28,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/txt_aisle_name"
         android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp" />
+        android:layout_marginRight="16dp"
+        android:longClickable="true"
+        tools:context=".ui.productlist.ProductListFragment"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

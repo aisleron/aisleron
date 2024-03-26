@@ -1,7 +1,11 @@
 package com.aisleron.ui.productlist
 
+import android.app.PendingIntent.getActivity
+import android.view.ContextMenu
 import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
+import android.view.MenuInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.CheckedTextView
@@ -32,14 +36,20 @@ class ProductListItemRecyclerViewAdapter(
         )
     }
 
+    override fun getItemId(position: Int): Long {
+        return values[position].id.toLong()
+    }
+
+
+
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(values[position])
     }
     override fun getItemCount(): Int = values.size
 
-    inner class ViewHolder(
-        binding: FragmentProductListItemBinding
-    ) : RecyclerView.ViewHolder(binding.root) {
+    inner class ViewHolder(binding: FragmentProductListItemBinding)
+        : RecyclerView.ViewHolder(binding.root)
+    {
         private val idView: TextView = binding.txtProductId
         private val contentView: TextView = binding.txtProductName
         private val inStockView: CheckBox = binding.chkInStock
@@ -49,6 +59,9 @@ class ProductListItemRecyclerViewAdapter(
         }
 
         fun bind(product: Product){
+            itemView.isLongClickable = true
+
+
             setAttributes(product)
             itemView.setOnClickListener {
                 Toast.makeText(
@@ -56,13 +69,6 @@ class ProductListItemRecyclerViewAdapter(
                     "Id: ${product.id}, Name: ${product.name}, In Stock: ${product.inStock}",
                     Toast.LENGTH_SHORT
                 ).show()
-            }
-
-            itemView.setOnLongClickListener {
-                val pop = PopupMenu(itemView.context, it)
-                pop.inflate(R.menu.product_list_context)
-                pop.show()
-                true
             }
 
             inStockView.setOnCheckedChangeListener { _, isChecked ->
