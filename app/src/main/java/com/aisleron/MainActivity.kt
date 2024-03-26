@@ -74,7 +74,7 @@ class MainActivity : AppCompatActivity() {
         drawerLayout: DrawerLayout
     ) {
         val bundle = Bundle()
-        bundle.putInt("locationId", item.id)
+        bundle.putInt("locationId", item.id.toInt())
         bundle.putSerializable("filterType", item.defaultFilter)
         bundle.putString("locationTitle", item.name)
         navController.navigate(R.id.nav_shopping_list, bundle)

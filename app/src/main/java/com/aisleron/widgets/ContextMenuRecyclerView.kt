@@ -25,12 +25,13 @@ class ContextMenuRecyclerView: RecyclerView {
         val longPressPosition = getChildAdapterPosition(originalView!!)
         if (longPressPosition >= 0) {
             val longPressId = adapter!!.getItemId(longPressPosition)
-            mContextMenuInfo = RecyclerViewContextMenuInfo(originalView, longPressPosition, longPressId)
+            val longPressType = adapter!!.getItemViewType(longPressPosition)
+            mContextMenuInfo = RecyclerViewContextMenuInfo(longPressPosition, longPressId, longPressType)
             return super.showContextMenuForChild(originalView)
         }
         return false
     }
 
-    class RecyclerViewContextMenuInfo(val targetView: View, val position: Int, val id: Long?) : ContextMenu.ContextMenuInfo
+    class RecyclerViewContextMenuInfo(val position: Int, val id: Long?, val type: Int) : ContextMenu.ContextMenuInfo
 
 }

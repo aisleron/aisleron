@@ -31,7 +31,7 @@ class ShopListFragment : Fragment() {
 
     private fun navigateToShoppingList(item: Location) {
         val bundle = Bundle()
-        bundle.putInt("locationId", item.id)
+        bundle.putInt("locationId", item.id.toInt())
         bundle.putSerializable("filterType", item.defaultFilter)
         bundle.putString("locationTitle", item.name)
         this.findNavController().navigate(R.id.action_nav_all_shops_to_nav_shopping_list, bundle)

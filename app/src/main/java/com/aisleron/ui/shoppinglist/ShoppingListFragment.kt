@@ -11,17 +11,11 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.aisleron.R
-import com.aisleron.domain.model.Aisle
 import com.aisleron.domain.model.FilterType
-import com.aisleron.domain.model.Location
-import com.aisleron.domain.model.Product
 import com.aisleron.placeholder.LocationData
-import com.aisleron.ui.productlist.ProductListItemRecyclerViewAdapter
-import com.aisleron.ui.shoplist.ShopListItemRecyclerViewAdapter
 import com.aisleron.widgets.ContextMenuRecyclerView
 
 /**
@@ -45,7 +39,7 @@ class ShoppingListFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_shopping_list, container, false)
         val bundle = arguments
-        val locationId : Int = bundle?.getInt("locationId") ?: 1
+        val locationId : Long = bundle?.getInt("locationId")?.toLong() ?: 1
         val filterType : FilterType = if (bundle != null) bundle.get("filterType") as FilterType else FilterType.ALL
         val locationTitle : String? = bundle?.getString("locationTitle")
         if (locationTitle != null) {
@@ -60,17 +54,37 @@ class ShoppingListFragment : Fragment() {
                     columnCount <= 1 -> LinearLayoutManager(context)
                     else -> GridLayoutManager(context, columnCount)
                 }
-                adapter = (LocationData.locations.filter{ l -> l.id == locationId })[0].aisles?.let {
-                    ShoppingListItemRecyclerViewAdapter(
-                        it.sortedWith(compareBy(Aisle::rank, Aisle::name)),
-                        object :
-                            ShoppingListItemRecyclerViewAdapter.ShoppingListItemListener {
-                        }
-                    )
-                }
+
+                val shoppingListItems = getShoppingListItems(locationId, filterType)
+
+                adapter = ShoppingListItemRecyclerViewAdapter(
+                    shoppingListItems.sortedWith(compareBy(ShoppingListItemViewModel::aisleRank, ShoppingListItemViewModel::productRank)),
+                    object :
+                        ShoppingListItemRecyclerViewAdapter.ShoppingListItemListener {
+                    }
+                )
             }
         }
         return view
+    }
+
+    private fun getShoppingListItems(locationId: Long, filterType: FilterType): List<ShoppingListItemViewModel> {
+        val shoppingList = mutableListOf<ShoppingListItemViewModel>()
+
+        val aisles = LocationData.locations.filter{ l -> l.id == locationId }.first().aisles
+        aisles?.forEach {a ->
+            shoppingList.add(ShoppingListItemViewModel(ShoppingListItemType.AISLE, a.rank, -1, a))
+            a.products?.filter { p ->
+                (p.inStock && filterType == FilterType.INSTOCK)
+                        || (!p.inStock && filterType == FilterType.NEEDED)
+                        || (filterType == FilterType.ALL)
+            }?.forEach { p ->
+                shoppingList.add(ShoppingListItemViewModel(ShoppingListItemType.PRODUCT, a.rank, p.id.toInt(), p))
+            }
+
+        }
+
+        return shoppingList
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -89,11 +103,13 @@ class ShoppingListFragment : Fragment() {
     override fun onContextItemSelected(item: MenuItem): Boolean {
         val info = item.menuInfo as ContextMenuRecyclerView.RecyclerViewContextMenuInfo
 
+        //Todo: Convert info type to ShoppingListItemType
+
         return when (item.itemId) {
             R.id.nav_edit_product -> {
                 Toast.makeText(
                     context,
-                    "Edit Item ${info.position}",
+                    "Type: ${info.type} Edit Id: ${info.id}; Position ${info.position}",
                     Toast.LENGTH_SHORT
                 ).show()
                 true

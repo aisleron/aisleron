@@ -44,7 +44,7 @@ class ShopFragment : Fragment() {
         button.setOnClickListener{
             LocationData.locations.add(
                 Location(
-                    id = LocationData.locations.size + 1,
+                    id = (LocationData.locations.size + 1).toLong(),
                     name = binding.edtShopName.text.toString(),
                     defaultFilter = FilterType.NEEDED,
                     type = LocationType.SHOP
