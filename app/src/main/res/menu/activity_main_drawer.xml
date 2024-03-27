@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_in_stock"
+            android:icon="@drawable/baseline_home_24"
+            android:title="@string/menu_in_stock" />
+        <item
+            android:id="@+id/nav_needed_list"
+            android:icon="@drawable/baseline_checklist_24"
+            android:title="@string/menu_shopping_list" />
+        <item
+            android:id="@+id/nav_all_items"
+            android:icon="@drawable/baseline_format_list_bulleted_24"
+            android:title="@string/menu_all_items" />
+    </group>
+    <item
+        android:title="@string/menu_shops"
+        android:id="@+id/nav_menu_shops">
+        <menu>
+            <group android:id="@+id/nav_group_shops" android:checkableBehavior="single">
+                <item
+                    android:id="@+id/nav_list_shop_list"
+                    app:actionLayout="@layout/fragment_nav_shop_list"
+                    app:labelVisibilityMode="unlabeled"
+                    tools:ignore="MenuTitle" />
+            </group>
+        </menu>
+    </item>
+    <item
+        android:id="@+id/nav_all_shops"
+        android:icon="@drawable/baseline_shopping_cart_24"
+        android:title="@string/menu_all_shops" />
+    <group
+        android:id="@+id/menu_bottom"
+        android:checkableBehavior="none">
+        <item
+            android:id="@+id/nav_settings"
+            android:icon="@drawable/ic_menu_settings"
+            android:title="@string/menu_settings" >
+        </item>
+    </group>
+</menu>
