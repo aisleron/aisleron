@@ -10,7 +10,9 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.aisleron.R
@@ -48,12 +50,55 @@ class ProductListFragment : Fragment(){
 
         // Set the adapter
         if (view is RecyclerView) {
-            registerForContextMenu(view)
+            view.addItemDecoration( DividerItemDecoration(context,  DividerItemDecoration.VERTICAL) )
+
+            val callback = object : ItemTouchHelper.SimpleCallback(
+                ItemTouchHelper.UP or ItemTouchHelper.DOWN, //bitwise OR
+                ItemTouchHelper.START or ItemTouchHelper.END //bitwise OR
+            ) {
+                override fun onMove(
+                    recyclerView: RecyclerView,
+                    viewHolder: RecyclerView.ViewHolder,
+                    target: RecyclerView.ViewHolder
+                ): Boolean {
+                    val fromPosition = viewHolder.absoluteAdapterPosition
+                    val toPosition = target.absoluteAdapterPosition
+
+                    //modifying the dataset as well is optional for this tutorial
+                    //                val movedItem = dataset.removeAt(fromPosition)
+                    //                dataset.add(toPosition, movedItem)
+
+                    //push specific event
+                    recyclerView.adapter?.notifyItemMoved(fromPosition, toPosition)
+
+                    return true
+                }
+
+                override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                    val position = viewHolder.absoluteAdapterPosition
+
+                    //Actually removes the item from the dataset
+                    //dataset.removeAt(position)
+
+                    //push specific event
+                    view.adapter?.notifyItemRemoved(position)
+                }
+
+            }
+
             with(view) {
+
+                //Creates touch helper with callback
+                val touchHelper = ItemTouchHelper(callback)
+
+                //attaches the helper to the recyclerView
+                touchHelper.attachToRecyclerView(this)
+
                 layoutManager = when {
                     columnCount <= 1 -> LinearLayoutManager(context)
                     else -> GridLayoutManager(context, columnCount)
                 }
+
                 adapter = ProductListItemRecyclerViewAdapter(ProductData.products.filter { p ->
                     (p.inStock && filterType == FilterType.INSTOCK )
                             || (!p.inStock && filterType == FilterType.NEEDED )
@@ -69,30 +114,6 @@ class ProductListFragment : Fragment(){
         val bundle = arguments
 
         }
-
-    override fun onCreateContextMenu(menu: ContextMenu, v: View,
-                                     menuInfo: ContextMenu.ContextMenuInfo?) {
-        super.onCreateContextMenu(menu, v, menuInfo)
-        val inflater: MenuInflater = requireActivity().menuInflater
-        inflater.inflate(R.menu.product_list_context, menu)
-    }
-
-    override fun onContextItemSelected(item: MenuItem): Boolean {
-        val info = item.menuInfo as ContextMenuRecyclerView.RecyclerViewContextMenuInfo
-
-        return when (item.itemId) {
-            R.id.nav_edit_product -> {
-                Toast.makeText(
-                    context,
-                      "Edit Item ${info.position}",
-                    Toast.LENGTH_SHORT
-                ).show()
-                true
-            }
-            else -> super.onContextItemSelected(item)
-        }
-    }
-
 
     companion object {
 
