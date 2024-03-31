@@ -12,9 +12,7 @@ import com.aisleron.databinding.FragmentShopBinding
 import com.aisleron.domain.model.FilterType
 import com.aisleron.domain.model.Location
 import com.aisleron.domain.model.LocationType
-import com.aisleron.domain.model.Product
 import com.aisleron.placeholder.LocationData
-import com.aisleron.placeholder.ProductData
 
 
 class ShopFragment : Fragment() {
@@ -47,7 +45,8 @@ class ShopFragment : Fragment() {
                     id = (LocationData.locations.size + 1).toLong(),
                     name = binding.edtShopName.text.toString(),
                     defaultFilter = FilterType.NEEDED,
-                    type = LocationType.SHOP
+                    type = LocationType.SHOP,
+                    pinned = binding.swcShopPinned.isChecked
                 ),
             )
             requireActivity().onBackPressedDispatcher.onBackPressed()
@@ -64,6 +63,7 @@ class ShopFragment : Fragment() {
         if (bundle != null) {
             shopListItem = bundle.getSerializable("key") as Location
             binding.edtShopName.setText(shopListItem.name)
+            binding.swcShopPinned.isChecked = shopListItem.pinned
             (activity as AppCompatActivity?)!!.supportActionBar!!.title = shopListItem.name
         }
 

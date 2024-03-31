@@ -21,6 +21,13 @@
         android:inputType="text"
         android:minHeight="48dp" />
 
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/swc_shop_pinned"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/pin_shop"
+        android:minHeight="48dp"/>
+
     <Button
         android:id="@+id/btn_save_shop"
         android:layout_width="match_parent"

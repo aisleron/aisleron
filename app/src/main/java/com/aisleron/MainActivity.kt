@@ -12,9 +12,6 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentTransaction
 import androidx.navigation.NavController
 import androidx.navigation.ui.onNavDestinationSelected
 import androidx.recyclerview.widget.RecyclerView
@@ -22,7 +19,6 @@ import com.aisleron.databinding.ActivityMainBinding
 import com.aisleron.domain.model.Location
 import com.aisleron.domain.model.LocationType
 import com.aisleron.placeholder.LocationData
-import com.aisleron.ui.navshoplist.NavShopListFragment
 import com.aisleron.ui.navshoplist.NavShopListRecyclerViewAdapter
 
 class MainActivity : AppCompatActivity() {
@@ -56,7 +52,9 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
 
         //Add Additional nav items
-        val navShopAdapter = NavShopListRecyclerViewAdapter(LocationData.locations.filter { s -> s.type == LocationType.SHOP } , object :
+        val navShopAdapter = NavShopListRecyclerViewAdapter(
+            LocationData.locations.filter { s -> s.type == LocationType.SHOP && s.pinned } ,
+            object :
             NavShopListRecyclerViewAdapter.NavListShopItemListener {
             override fun onItemClick(item: Location) {
                 navigateToShoppingList(item, navController, drawerLayout)

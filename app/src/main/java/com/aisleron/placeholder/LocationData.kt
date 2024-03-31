@@ -4,7 +4,6 @@ import com.aisleron.domain.model.Aisle
 import com.aisleron.domain.model.FilterType
 import com.aisleron.domain.model.Location
 import com.aisleron.domain.model.LocationType
-import com.aisleron.domain.model.Product
 
 object LocationData {
     val locations: MutableList<Location> =
@@ -14,6 +13,7 @@ object LocationData {
                 name = "Home",
                 type = LocationType.GENERIC,
                 defaultFilter = FilterType.NEEDED,
+                pinned = true,
                 aisles = listOf(
                     Aisle (
                         "Fridge",
@@ -34,6 +34,7 @@ object LocationData {
                 name = "New World Cromwell",
                 type = LocationType.SHOP,
                 defaultFilter = FilterType.NEEDED,
+                pinned = true,
                 aisles = listOf(
                     Aisle ("One", productsRandom(), null, 2, 3),
                     Aisle ("Two", productsRandom(), null, 1, 4)
@@ -44,6 +45,7 @@ object LocationData {
                 name = "Fresh Choice Cromwell",
                 type = LocationType.SHOP,
                 defaultFilter = FilterType.NEEDED,
+                pinned = true,
                 aisles = listOf(
                     Aisle ("Three", productsRandom(), null, 2, 5),
                     Aisle ("Four", productsRandom(), null, 1, 6)
@@ -54,6 +56,7 @@ object LocationData {
                 name = "Countdown Queenstown",
                 type = LocationType.SHOP,
                 defaultFilter = FilterType.NEEDED,
+                pinned = false,
                 aisles = listOf(
                     Aisle ("Five", productsRandom(), null, 2, 7),
                     Aisle ("Six", productsRandom(), null, 1, 8)
@@ -64,6 +67,7 @@ object LocationData {
                 name = "4 Square Arrowtown",
                 type = LocationType.SHOP,
                 defaultFilter = FilterType.NEEDED,
+                pinned = true,
                 aisles = listOf(
                     Aisle ("Seven", productsRandom(), null, 2, 9),
                     Aisle ("Eight", productsRandom(), null, 1, 10)
@@ -74,6 +78,7 @@ object LocationData {
                 name = "New World Queenstown",
                 type = LocationType.SHOP,
                 defaultFilter = FilterType.NEEDED,
+                pinned = false,
                 aisles = listOf(
                     Aisle ("Nine", productsRandom(), null, 2, 11),
                     Aisle ("Ten", productsRandom(), null, 1, 12 )
@@ -84,6 +89,7 @@ object LocationData {
                 name = "Torpedo 7 Queenstown",
                 type = LocationType.SHOP,
                 defaultFilter = FilterType.NEEDED,
+                pinned = false,
                 aisles = listOf(
                     Aisle ("One", productsRandom(), null, 2, 13),
                     Aisle ("Two", productsRandom(), null, 1, 14)

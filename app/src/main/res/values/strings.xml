@@ -42,4 +42,5 @@
     <string name="shop_name">Shop Name</string>
     <string name="add_shop">Add Shop</string>
     <string name="edit_product">Edit Product</string>
+    <string name="pin_shop">Pin Shop to Drawer</string>
 </resources>
