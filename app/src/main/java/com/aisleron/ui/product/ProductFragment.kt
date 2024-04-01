@@ -39,10 +39,15 @@ class ProductFragment : Fragment() {
                 Product(
                     id = (ProductData.products.size + 1).toLong(),
                     name = binding.edtProductName.text.toString(),
-                    inStock = binding.swcProductInStock.isChecked
+                    inStock = binding.chkProductInStock.isChecked
                 ),
             )
             requireActivity().onBackPressedDispatcher.onBackPressed ()
+        }
+
+        val chk = binding.chkProductInStock
+        chk.setOnClickListener{
+           chk.isChecked = !chk.isChecked
         }
         return binding.root
     }

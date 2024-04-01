@@ -3,7 +3,6 @@ package com.aisleron.ui.shoppinglist
 import android.os.Bundle
 import android.view.ContextMenu
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
@@ -15,7 +14,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.aisleron.R
 import com.aisleron.domain.model.FilterType
-import com.aisleron.placeholder.LocationData
+import com.aisleron.domain.model.LocationType
 import com.aisleron.widgets.ContextMenuRecyclerView
 
 /**
@@ -24,6 +23,7 @@ import com.aisleron.widgets.ContextMenuRecyclerView
 class ShoppingListFragment : Fragment() {
 
     private var columnCount = 1
+    private lateinit var viewModel: ShoppingListViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,24 +41,16 @@ class ShoppingListFragment : Fragment() {
         val bundle = arguments
         val locationId : Long = bundle?.getInt("locationId")?.toLong() ?: 1
         val filterType : FilterType = if (bundle != null) bundle.get("filterType") as FilterType else FilterType.ALL
-        val locationTitle : String? = bundle?.getString("locationTitle")
-        if (locationTitle != null) {
-            (activity as AppCompatActivity).supportActionBar?.title = locationTitle
-        }
+
+        viewModel = ShoppingListViewModel(locationId, filterType)
 
         // Set the adapter
         if (view is RecyclerView) {
             registerForContextMenu(view)
             with(view) {
-                layoutManager = when {
-                    columnCount <= 1 -> LinearLayoutManager(context)
-                    else -> GridLayoutManager(context, columnCount)
-                }
-
-                val shoppingListItems = getShoppingListItems(locationId, filterType)
-
+               LinearLayoutManager(context)
                 adapter = ShoppingListItemRecyclerViewAdapter(
-                    shoppingListItems.sortedWith(compareBy(ShoppingListItemViewModel::aisleRank, ShoppingListItemViewModel::productRank)),
+                    viewModel.items.sortedWith(compareBy(ShoppingListItemViewModel::aisleRank, ShoppingListItemViewModel::productRank)),
                     object :
                         ShoppingListItemRecyclerViewAdapter.ShoppingListItemListener {
                     }
@@ -68,28 +60,11 @@ class ShoppingListFragment : Fragment() {
         return view
     }
 
-    private fun getShoppingListItems(locationId: Long, filterType: FilterType): List<ShoppingListItemViewModel> {
-        val shoppingList = mutableListOf<ShoppingListItemViewModel>()
-
-        val aisles = LocationData.locations.filter{ l -> l.id == locationId }.first().aisles
-        aisles?.forEach {a ->
-            shoppingList.add(ShoppingListItemViewModel(ShoppingListItemType.AISLE, a.rank, -1, a))
-            a.products?.filter { p ->
-                (p.inStock && filterType == FilterType.INSTOCK)
-                        || (!p.inStock && filterType == FilterType.NEEDED)
-                        || (filterType == FilterType.ALL)
-            }?.forEach { p ->
-                shoppingList.add(ShoppingListItemViewModel(ShoppingListItemType.PRODUCT, a.rank, p.id.toInt(), p))
-            }
-
-        }
-
-        return shoppingList
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val bundle = arguments
+
+
     }
 
 
@@ -116,6 +91,18 @@ class ShoppingListFragment : Fragment() {
             }
             else -> super.onContextItemSelected(item)
         }
+    }
+
+    override fun onResume() {
+        (activity as AppCompatActivity).supportActionBar?.title = when (viewModel.locationType) {
+            LocationType.GENERIC -> when (viewModel.filterType){
+                FilterType.INSTOCK -> resources.getString(R.string.menu_in_stock)
+                FilterType.NEEDED -> resources.getString(R.string.menu_shopping_list)
+                FilterType.ALL -> resources.getString(R.string.menu_all_items)
+            }
+            LocationType.SHOP -> viewModel.locationName
+        }
+        super.onResume()
     }
 
     companion object {
