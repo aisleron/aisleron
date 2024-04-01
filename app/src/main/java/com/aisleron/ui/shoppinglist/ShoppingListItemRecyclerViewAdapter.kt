@@ -4,18 +4,16 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.aisleron.databinding.FragmentAisleListItemBinding
 import com.aisleron.databinding.FragmentProductListItemBinding
-import com.aisleron.domain.model.Product
 
 /**
  * [RecyclerView.Adapter] that can display a [ShoppingListItemViewModel].
  * TODO: Replace the implementation with code for your data type.
  */
 class ShoppingListItemRecyclerViewAdapter(
-    private val values: List<ShoppingListItemViewModel>,
+    private val values: MutableList<ShoppingListItemViewModel>,
     private val listener: ShoppingListItemListener
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -50,7 +48,7 @@ class ShoppingListItemRecyclerViewAdapter(
     }
 
     override fun getItemId(position: Int): Long {
-        return values[position].item.id
+        return values[position].id
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -73,13 +71,9 @@ class ShoppingListItemRecyclerViewAdapter(
 
         fun bind(item: ShoppingListItemViewModel) {
             itemView.isLongClickable = true
-            contentView.text = String.format("${item.item.name} (Rank: ${item.aisleRank})")
+            contentView.text = String.format("${item.name} (Rank: ${item.aisleRank})")
             itemView.setOnClickListener {
-                Toast.makeText(
-                    contentView.context,
-                    "Aisle Click! Id: ${item.item.id}, Name: ${item.item.name}",
-                    Toast.LENGTH_SHORT
-                ).show()
+                listener.onAisleClick(item)
             }
         }
     }
@@ -96,31 +90,34 @@ class ShoppingListItemRecyclerViewAdapter(
         }
 
         fun bind(item: ShoppingListItemViewModel) {
-            val product = item.item as Product
             itemView.isLongClickable = true
-            setAttributes(product)
+            setAttributes(item)
             itemView.setOnClickListener {
-                Toast.makeText(
-                    contentView.context,
-                    "Id: ${product.id}, Name: ${product.name}, In Stock: ${product.inStock}",
-                    Toast.LENGTH_SHORT
-                ).show()
+                listener.onProductClick(item)
             }
 
             inStockView.setOnCheckedChangeListener { _, isChecked ->
-                product.inStock = isChecked
-                setAttributes(product)
+                item.inStock = isChecked
+                listener.onProductStatusChange(item)
+                values.remove(item)
+                notifyItemRemoved(absoluteAdapterPosition)
+                //ToDo: Handle deletion based on filter; move logic to fragment
+
+
             }
         }
 
-        private fun setAttributes(product: Product) {
-            idView.text = product.id.toString()
-            contentView.text = product.name
-            inStockView.isChecked = product.inStock
+        private fun setAttributes(item: ShoppingListItemViewModel) {
+            idView.text = item.id.toString()
+            contentView.text = item.name
+            inStockView.isChecked = item.inStock!!
         }
-
-
     }
 
-    interface ShoppingListItemListener
+    interface ShoppingListItemListener{
+        fun onAisleClick(item: ShoppingListItemViewModel)
+        fun onProductClick(item: ShoppingListItemViewModel)
+        fun onProductStatusChange(item: ShoppingListItemViewModel)
+
+    }
 }

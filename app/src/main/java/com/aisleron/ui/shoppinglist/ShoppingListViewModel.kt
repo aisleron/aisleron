@@ -9,7 +9,7 @@ import java.util.Date
 
 class ShoppingListViewModel(
     private val locationId: Long,
-    var filterType: FilterType = FilterType.NEEDED
+    val filterType: FilterType
 ): ViewModel() {
     val locationName: String
     val items = mutableListOf<ShoppingListItemViewModel>()
@@ -21,15 +21,16 @@ class ShoppingListViewModel(
         locationName =  location?.name.toString()
 
         location?.aisles?.forEach {a ->
-            items.add(ShoppingListItemViewModel(ShoppingListItemType.AISLE, a.rank, -1, a))
+            items.add(ShoppingListItemViewModel(ShoppingListItemType.AISLE, a.rank, -1,a.id, a.name, null))
             a.products?.filter { p ->
                 (p.inStock && filterType == FilterType.INSTOCK)
                         || (!p.inStock && filterType == FilterType.NEEDED)
                         || (filterType == FilterType.ALL)
             }?.forEach { p ->
-                items.add(ShoppingListItemViewModel(ShoppingListItemType.PRODUCT, a.rank, p.id.toInt(), p))
+                items.add(ShoppingListItemViewModel(ShoppingListItemType.PRODUCT, a.rank, p.id.toInt(), p.id, p.name, p.inStock))
             }
         }
+        items.sortWith(compareBy(ShoppingListItemViewModel::aisleRank, ShoppingListItemViewModel::productRank))
     }
 
 

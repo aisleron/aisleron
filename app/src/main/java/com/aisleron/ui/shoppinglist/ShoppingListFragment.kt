@@ -12,9 +12,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.DividerItemDecoration
 import com.aisleron.R
 import com.aisleron.domain.model.FilterType
 import com.aisleron.domain.model.LocationType
+import com.aisleron.placeholder.ProductData
 import com.aisleron.widgets.ContextMenuRecyclerView
 
 /**
@@ -34,6 +36,12 @@ class ShoppingListFragment : Fragment() {
         viewModel = ShoppingListViewModel(locationId, filterType)
     }
 
+    private fun updateProduct(item: ShoppingListItemViewModel) {
+        if (item.inStock != null) {
+            ProductData.products.find { p -> p.id == item.id }?.inStock = item.inStock == true
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -42,13 +50,44 @@ class ShoppingListFragment : Fragment() {
 
         // Set the adapter
         if (view is RecyclerView) {
+            view.addItemDecoration( DividerItemDecoration(context,  DividerItemDecoration.VERTICAL) )
             registerForContextMenu(view)
+
             with(view) {
                LinearLayoutManager(context)
                 adapter = ShoppingListItemRecyclerViewAdapter(
-                    viewModel.items.sortedWith(compareBy(ShoppingListItemViewModel::aisleRank, ShoppingListItemViewModel::productRank)),
+                    viewModel.items,
                     object :
                         ShoppingListItemRecyclerViewAdapter.ShoppingListItemListener {
+                        override fun onAisleClick(item: ShoppingListItemViewModel) {
+                            Toast.makeText(
+                                context,
+                                "Aisle Click! Id: ${item.id}, Name: ${item.name}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+
+                        override fun onProductClick(item: ShoppingListItemViewModel) {
+                            Toast.makeText(
+                                context,
+                                "Id: ${item.id}, Name: ${item.name}, In Stock: ${item.inStock}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+
+                        override fun onProductStatusChange(item: ShoppingListItemViewModel) {
+                            updateProduct(item)
+
+                            /*
+                            Toast.makeText(
+                                context,
+                                "Checked Item Id: ${item.id}, Name: ${item.name}, In Stock: ${item.inStock}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+
+                             */
+                        }
+
                     }
                 )
             }
