@@ -33,7 +33,6 @@ class NavShopListFragment : Fragment() {
         val bundle = Bundle()
         bundle.putLong("locationId", item.id)
         bundle.putSerializable("filterType", item.defaultFilter)
-        bundle.putString("locationTitle", item.name)
         this.findNavController().navigate(R.id.action_nav_all_shops_to_nav_shopping_list, bundle)
     }
 

@@ -18,19 +18,20 @@ import com.aisleron.domain.model.LocationType
 import com.aisleron.widgets.ContextMenuRecyclerView
 
 /**
- * A fragment representing a list of Items.
+ * A fragment representing a list of [ShoppingListItemViewModel].
  */
 class ShoppingListFragment : Fragment() {
 
-    private var columnCount = 1
     private lateinit var viewModel: ShoppingListViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        arguments?.let {
-            columnCount = it.getInt(ARG_COLUMN_COUNT)
-        }
+        val bundle = arguments
+        val locationId : Long = bundle?.getInt(ARG_LOCATION_ID)?.toLong() ?: 1
+        val filterType : FilterType = if (bundle != null) bundle.getSerializable(ARG_FILTER_TYPE) as FilterType else FilterType.ALL
+
+        viewModel = ShoppingListViewModel(locationId, filterType)
     }
 
     override fun onCreateView(
@@ -38,11 +39,6 @@ class ShoppingListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_shopping_list, container, false)
-        val bundle = arguments
-        val locationId : Long = bundle?.getInt("locationId")?.toLong() ?: 1
-        val filterType : FilterType = if (bundle != null) bundle.get("filterType") as FilterType else FilterType.ALL
-
-        viewModel = ShoppingListViewModel(locationId, filterType)
 
         // Set the adapter
         if (view is RecyclerView) {
@@ -107,15 +103,15 @@ class ShoppingListFragment : Fragment() {
 
     companion object {
 
-        // TODO: Customize parameter argument names
-        const val ARG_COLUMN_COUNT = "column-count"
+        const val ARG_LOCATION_ID = "locationId"
+        const val ARG_FILTER_TYPE = "filterType"
 
-        // TODO: Customize parameter initialization
         @JvmStatic
-        fun newInstance(columnCount: Int) =
+        fun newInstance(locationId: Long, filterType: FilterType) =
             ShoppingListFragment().apply {
                 arguments = Bundle().apply {
-                    putInt(ARG_COLUMN_COUNT, columnCount)
+                    putInt(ARG_LOCATION_ID, locationId.toInt())
+                    putSerializable (ARG_FILTER_TYPE, filterType)
                 }
             }
     }

@@ -53,9 +53,6 @@
             android:name="filterType"
             app:argType="com.aisleron.domain.model.FilterType"
             android:defaultValue="NEEDED" />
-        <argument
-            android:name="locationTitle"
-            app:argType="string" />
     </fragment>
 
     <fragment
