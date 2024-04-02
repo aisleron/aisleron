@@ -10,7 +10,7 @@
             android:icon="@drawable/baseline_home_24"
             android:title="@string/menu_in_stock" />
         <item
-            android:id="@+id/nav_needed_list"
+            android:id="@+id/nav_needed"
             android:icon="@drawable/baseline_checklist_24"
             android:title="@string/menu_shopping_list" />
         <item

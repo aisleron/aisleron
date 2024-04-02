@@ -58,8 +58,8 @@ class ShoppingListFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        viewModel.refreshListItems()
         val view = inflater.inflate(R.layout.fragment_shopping_list, container, false)
-
 
         // Set the adapter
         if (view is RecyclerView) {
@@ -138,11 +138,12 @@ class ShoppingListFragment : Fragment() {
 
     override fun onResume() {
         (activity as AppCompatActivity).supportActionBar?.title = when (viewModel.locationType) {
-            LocationType.GENERIC -> when (viewModel.filterType){
-                FilterType.INSTOCK -> resources.getString(R.string.menu_in_stock)
-                FilterType.NEEDED -> resources.getString(R.string.menu_shopping_list)
-                FilterType.ALL -> resources.getString(R.string.menu_all_items)
-            }
+            LocationType.GENERIC ->
+                when (viewModel.filterType){
+                    FilterType.INSTOCK -> resources.getString(R.string.menu_in_stock)
+                    FilterType.NEEDED -> resources.getString(R.string.menu_shopping_list)
+                    FilterType.ALL -> resources.getString(R.string.menu_all_items)
+                }
             LocationType.SHOP -> viewModel.locationName
         }
         super.onResume()

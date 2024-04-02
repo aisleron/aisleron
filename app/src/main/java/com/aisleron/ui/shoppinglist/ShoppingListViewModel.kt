@@ -5,27 +5,25 @@ import com.aisleron.domain.model.Location
 import com.aisleron.domain.model.LocationType
 import com.aisleron.placeholder.LocationData
 import com.aisleron.placeholder.ProductData
-import java.util.Date
-
 
 class ShoppingListViewModel(
     private val locationId: Long,
     val filterType: FilterType
 ): ViewModel() {
+    private val location: Location? = LocationData.locations.find { l -> l.id == locationId}
+    val locationName: String get() = location?.name.toString()
+    val locationType: LocationType get() = location?.type ?: LocationType.GENERIC
+
+    val items = mutableListOf<ShoppingListItemViewModel>()
+
     fun updateProduct(item: ShoppingListItemViewModel) {
         item.inStock?.let {
             ProductData.products.find { p -> p.id == item.id }?.inStock = it
         }
     }
 
-    val locationName: String
-    val items = mutableListOf<ShoppingListItemViewModel>()
-    val locationType: LocationType
-    val lastInit = Date()
-    init {
-        val location: Location? = LocationData.locations.find { l -> l.id == locationId}
-        locationType = location?.type ?: LocationType.GENERIC
-        locationName =  location?.name.toString()
+    fun refreshListItems(){
+        items.clear()
 
         location?.aisles?.forEach {a ->
             items.add(ShoppingListItemViewModel(ShoppingListItemType.AISLE, a.rank, -1,a.id, a.name, null))
@@ -37,7 +35,9 @@ class ShoppingListViewModel(
                 items.add(ShoppingListItemViewModel(ShoppingListItemType.PRODUCT, a.rank, p.id.toInt(), p.id, p.name, p.inStock))
             }
         }
-        items.sortWith(compareBy(ShoppingListItemViewModel::aisleRank, ShoppingListItemViewModel::productRank))
+
+        items.sortWith( compareBy({it.aisleRank}, {it.productRank}))
+        //TODO: Add Aisle ID and/or Aisle & Product items to view model list
     }
 
 
