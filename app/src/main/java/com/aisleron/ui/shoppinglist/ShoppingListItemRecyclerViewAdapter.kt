@@ -20,12 +20,6 @@ class ShoppingListItemRecyclerViewAdapter(
     companion object {
         const val AISLE_VIEW = 1
         const val PRODUCT_VIEW = 2
-        /*
-        fun getObjectType(): ShoppingListItemType{
-            return null
-        }
-
-         */
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -91,33 +85,27 @@ class ShoppingListItemRecyclerViewAdapter(
 
         fun bind(item: ShoppingListItemViewModel) {
             itemView.isLongClickable = true
-            setAttributes(item)
+            idView.text = item.id.toString()
+            contentView.text = item.name
+            inStockView.isChecked = item.inStock!!
             itemView.setOnClickListener {
                 listener.onProductClick(item)
             }
 
             inStockView.setOnCheckedChangeListener { _, isChecked ->
-                item.inStock = isChecked
-                listener.onProductStatusChange(item)
-                values.remove(item)
-                notifyItemRemoved(absoluteAdapterPosition)
-                //ToDo: Handle deletion based on filter; move logic to fragment
-
-
+                listener.onProductStatusChange(item, isChecked, absoluteAdapterPosition)
             }
-        }
-
-        private fun setAttributes(item: ShoppingListItemViewModel) {
-            idView.text = item.id.toString()
-            contentView.text = item.name
-            inStockView.isChecked = item.inStock!!
         }
     }
 
     interface ShoppingListItemListener{
         fun onAisleClick(item: ShoppingListItemViewModel)
         fun onProductClick(item: ShoppingListItemViewModel)
-        fun onProductStatusChange(item: ShoppingListItemViewModel)
+        fun onProductStatusChange(
+            item: ShoppingListItemViewModel,
+            inStock: Boolean,
+            absoluteAdapterPosition: Int
+        )
 
     }
 }

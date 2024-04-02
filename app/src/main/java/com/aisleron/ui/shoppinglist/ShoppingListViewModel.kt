@@ -4,6 +4,7 @@ import com.aisleron.domain.model.FilterType
 import com.aisleron.domain.model.Location
 import com.aisleron.domain.model.LocationType
 import com.aisleron.placeholder.LocationData
+import com.aisleron.placeholder.ProductData
 import java.util.Date
 
 
@@ -11,6 +12,12 @@ class ShoppingListViewModel(
     private val locationId: Long,
     val filterType: FilterType
 ): ViewModel() {
+    fun updateProduct(item: ShoppingListItemViewModel) {
+        item.inStock?.let {
+            ProductData.products.find { p -> p.id == item.id }?.inStock = it
+        }
+    }
+
     val locationName: String
     val items = mutableListOf<ShoppingListItemViewModel>()
     val locationType: LocationType

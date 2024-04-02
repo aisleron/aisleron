@@ -16,7 +16,6 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import com.aisleron.R
 import com.aisleron.domain.model.FilterType
 import com.aisleron.domain.model.LocationType
-import com.aisleron.placeholder.ProductData
 import com.aisleron.widgets.ContextMenuRecyclerView
 
 /**
@@ -36,9 +35,22 @@ class ShoppingListFragment : Fragment() {
         viewModel = ShoppingListViewModel(locationId, filterType)
     }
 
-    private fun updateProduct(item: ShoppingListItemViewModel) {
-        if (item.inStock != null) {
-            ProductData.products.find { p -> p.id == item.id }?.inStock = item.inStock == true
+    private fun updateProduct(
+        item: ShoppingListItemViewModel,
+        adapter: ShoppingListItemRecyclerViewAdapter,
+        inStock: Boolean,
+        absoluteAdapterPosition: Int
+    ) {
+        item.inStock = inStock
+        viewModel.updateProduct(item)
+
+        if ((viewModel.filterType == FilterType.INSTOCK && item.inStock == false)
+            ||(viewModel.filterType == FilterType.NEEDED && item.inStock == true)) {
+            viewModel.items.remove(item)
+            adapter.notifyItemRemoved(absoluteAdapterPosition)
+        } else {
+
+            adapter.notifyItemChanged(absoluteAdapterPosition)
         }
     }
 
@@ -47,6 +59,7 @@ class ShoppingListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_shopping_list, container, false)
+
 
         // Set the adapter
         if (view is RecyclerView) {
@@ -75,17 +88,12 @@ class ShoppingListFragment : Fragment() {
                             ).show()
                         }
 
-                        override fun onProductStatusChange(item: ShoppingListItemViewModel) {
-                            updateProduct(item)
-
-                            /*
-                            Toast.makeText(
-                                context,
-                                "Checked Item Id: ${item.id}, Name: ${item.name}, In Stock: ${item.inStock}",
-                                Toast.LENGTH_SHORT
-                            ).show()
-
-                             */
+                        override fun onProductStatusChange(
+                            item: ShoppingListItemViewModel,
+                            inStock: Boolean,
+                            absoluteAdapterPosition: Int
+                        ) {
+                            updateProduct(item, view.adapter as ShoppingListItemRecyclerViewAdapter, inStock, absoluteAdapterPosition)
                         }
 
                     }
