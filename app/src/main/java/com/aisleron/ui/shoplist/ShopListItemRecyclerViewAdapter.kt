@@ -10,7 +10,7 @@ import com.aisleron.domain.model.Location
 
 /**
  * [RecyclerView.Adapter] that can display a [Location].
- * TODO: Replace the implementation with code for your data type.
+ *
  */
 class ShopListItemRecyclerViewAdapter(
     private val values: List<Location>,

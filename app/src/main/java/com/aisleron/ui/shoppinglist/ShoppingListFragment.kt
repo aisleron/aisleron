@@ -23,6 +23,7 @@ import com.aisleron.widgets.ContextMenuRecyclerView
  */
 class ShoppingListFragment : Fragment() {
 
+    //private val viewModel: ShoppingListViewModel by viewModels()
     private lateinit var viewModel: ShoppingListViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {

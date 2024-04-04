@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import com.aisleron.R
+import com.aisleron.domain.model.FilterType
 import com.aisleron.domain.model.Location
 import com.aisleron.domain.model.LocationType
 import com.aisleron.placeholder.LocationData
@@ -31,8 +32,8 @@ class ShopListFragment : Fragment() {
 
     private fun navigateToShoppingList(item: Location) {
         val bundle = Bundle()
-        bundle.putInt("locationId", item.id.toInt())
-        bundle.putSerializable("filterType", item.defaultFilter)
+        bundle.putInt(ARG_LOCATION_ID, item.id.toInt())
+        bundle.putSerializable(ARG_FILTER_TYPE, item.defaultFilter)
         this.findNavController().navigate(R.id.action_nav_all_shops_to_nav_shopping_list, bundle)
     }
 
@@ -65,15 +66,17 @@ class ShopListFragment : Fragment() {
 
     companion object {
 
-        // TODO: Customize parameter argument names
         const val ARG_COLUMN_COUNT = "column-count"
+        const val ARG_LOCATION_ID = "locationId"
+        const val ARG_FILTER_TYPE = "filterType"
 
-        // TODO: Customize parameter initialization
         @JvmStatic
-        fun newInstance(columnCount: Int) =
+        fun newInstance(columnCount: Int, locationId: Long, filterType: FilterType) =
             ShopListFragment().apply {
                 arguments = Bundle().apply {
                     putInt(ARG_COLUMN_COUNT, columnCount)
+                    putInt(ARG_LOCATION_ID, locationId.toInt())
+                    putSerializable (ARG_FILTER_TYPE, filterType)
                 }
             }
     }

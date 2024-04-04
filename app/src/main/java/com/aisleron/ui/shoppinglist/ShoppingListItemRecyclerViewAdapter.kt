@@ -10,7 +10,7 @@ import com.aisleron.databinding.FragmentProductListItemBinding
 
 /**
  * [RecyclerView.Adapter] that can display a [ShoppingListItemViewModel].
- * TODO: Replace the implementation with code for your data type.
+ *
  */
 class ShoppingListItemRecyclerViewAdapter(
     private val values: MutableList<ShoppingListItemViewModel>,
