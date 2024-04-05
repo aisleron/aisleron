@@ -13,7 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:labelFor="@+id/edt_product_name"
-        android:text="@string/product_name"/>
+        android:text="@string/product_name" />
 
     <EditText
         android:id="@+id/edt_product_name"
@@ -31,7 +31,7 @@
         android:minHeight="48dp"
         android:gravity="center_vertical"
         android:checked="false"
-        android:checkMark="?android:attr/listChoiceIndicatorMultiple"/>
+        android:checkMark="?android:attr/listChoiceIndicatorMultiple" />
 
 
     <Button

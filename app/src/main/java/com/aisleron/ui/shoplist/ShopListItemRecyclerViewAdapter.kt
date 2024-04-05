@@ -38,7 +38,8 @@ class ShopListItemRecyclerViewAdapter(
 
     override fun getItemCount(): Int = values.size
 
-    inner class ViewHolder(binding: FragmentShopListItemBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class ViewHolder(binding: FragmentShopListItemBinding) :
+        RecyclerView.ViewHolder(binding.root) {
         val contentView: TextView = binding.txtAisleName
 
         override fun toString(): String {

@@ -5,7 +5,7 @@
             app:defaultValue="25"
             app:key="listItems"
             app:title="@string/list_item_count"
-            app:useSimpleSummaryProvider="true"/>
+            app:useSimpleSummaryProvider="true" />
 
     </PreferenceCategory>
 

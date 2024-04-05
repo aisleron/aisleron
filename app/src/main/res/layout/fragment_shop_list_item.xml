@@ -22,6 +22,6 @@
         android:layout_margin="@dimen/text_margin"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:text="@string/shop_name"/>
+        android:text="@string/shop_name" />
 
 </LinearLayout>

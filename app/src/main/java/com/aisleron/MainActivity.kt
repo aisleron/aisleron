@@ -53,13 +53,13 @@ class MainActivity : AppCompatActivity() {
 
         //Add Additional nav items
         val navShopAdapter = NavShopListRecyclerViewAdapter(
-            LocationData.locations.filter { s -> s.type == LocationType.SHOP && s.pinned } ,
+            LocationData.locations.filter { s -> s.type == LocationType.SHOP && s.pinned },
             object :
-            NavShopListRecyclerViewAdapter.NavListShopItemListener {
-            override fun onItemClick(item: Location) {
-                navigateToShoppingList(item, navController, drawerLayout)
-            }
-        })
+                NavShopListRecyclerViewAdapter.NavListShopItemListener {
+                override fun onItemClick(item: Location) {
+                    navigateToShoppingList(item, navController, drawerLayout)
+                }
+            })
 
         val shopMenuItem: MenuItem? = navView.menu.findItem(R.id.nav_list_shop_list)
         val recyclerView: RecyclerView? = shopMenuItem?.actionView as RecyclerView?

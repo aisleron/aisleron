@@ -50,12 +50,14 @@ class NavShopListFragment : Fragment() {
                     columnCount <= 1 -> LinearLayoutManager(context)
                     else -> GridLayoutManager(context, columnCount)
                 }
-                adapter = NavShopListRecyclerViewAdapter(LocationData.locations.filter { s -> s.type == LocationType.SHOP } , object :
-                    NavShopListRecyclerViewAdapter.NavListShopItemListener {
-                    override fun onItemClick(item: Location) {
-                        navigateToShoppingList(item)
-                    }
-                })
+                adapter =
+                    NavShopListRecyclerViewAdapter(LocationData.locations.filter { s -> s.type == LocationType.SHOP },
+                        object :
+                            NavShopListRecyclerViewAdapter.NavListShopItemListener {
+                            override fun onItemClick(item: Location) {
+                                navigateToShoppingList(item)
+                            }
+                        })
 
             }
         }
@@ -63,9 +65,7 @@ class NavShopListFragment : Fragment() {
     }
 
 
-
     companion object {
-
 
         const val ARG_COLUMN_COUNT = "column-count"
         const val ARG_LOCATION_ID = "locationId"
@@ -77,7 +77,7 @@ class NavShopListFragment : Fragment() {
                 arguments = Bundle().apply {
                     putInt(ARG_COLUMN_COUNT, columnCount)
                     putInt(ARG_LOCATION_ID, locationId.toInt())
-                    putSerializable (ARG_FILTER_TYPE, filterType)
+                    putSerializable(ARG_FILTER_TYPE, filterType)
                 }
             }
     }

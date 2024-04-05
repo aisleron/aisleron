@@ -19,7 +19,7 @@ class ProductFragment : Fragment() {
     }
 
     private val viewModel: ProductViewModel by viewModels()
-    private var _binding: FragmentProductBinding? =null
+    private var _binding: FragmentProductBinding? = null
 
     private val binding get() = _binding!!
 
@@ -34,7 +34,7 @@ class ProductFragment : Fragment() {
     ): View {
         _binding = FragmentProductBinding.inflate(inflater, container, false)
         val button: Button = binding.btnSaveProduct
-        button.setOnClickListener{
+        button.setOnClickListener {
             ProductData.products.add(
                 Product(
                     id = (ProductData.products.size + 1).toLong(),
@@ -42,13 +42,11 @@ class ProductFragment : Fragment() {
                     inStock = binding.chkProductInStock.isChecked
                 ),
             )
-            requireActivity().onBackPressedDispatcher.onBackPressed ()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
         val chk = binding.chkProductInStock
-        chk.setOnClickListener{
-           chk.isChecked = !chk.isChecked
-        }
+        chk.setOnClickListener { chk.isChecked = !chk.isChecked }
         return binding.root
     }
 

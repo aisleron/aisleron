@@ -5,7 +5,8 @@
     android:layout_height="wrap_content"
     android:layout_marginVertical="12dp"
     android:clickable="true"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:focusable="true">
 
     <ImageView
         android:id="@+id/imageView2"
@@ -20,6 +21,6 @@
         android:layout_marginStart="@dimen/text_margin"
         android:gravity="center_vertical"
         android:singleLine="true"
-        android:text="navlistshop long text long text long text long text long "
-        android:textAppearance="?attr/textAppearanceListItem"/>
+        android:text="@string/shop_name"
+        android:textAppearance="?attr/textAppearanceListItem" />
 </LinearLayout>

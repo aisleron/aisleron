@@ -7,13 +7,17 @@ import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 
 
-class ContextMenuRecyclerView: RecyclerView {
+class ContextMenuRecyclerView : RecyclerView {
 
-    constructor(context: Context) :super (context)
+    constructor(context: Context) : super(context)
 
-    constructor(context: Context, attrs: AttributeSet?) :super (context, attrs)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
 
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super (context, attrs, defStyleAttr)
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    )
 
     private var mContextMenuInfo: RecyclerViewContextMenuInfo? = null
 
@@ -26,12 +30,14 @@ class ContextMenuRecyclerView: RecyclerView {
         if (longPressPosition >= 0) {
             val longPressId = adapter!!.getItemId(longPressPosition)
             val longPressType = adapter!!.getItemViewType(longPressPosition)
-            mContextMenuInfo = RecyclerViewContextMenuInfo(longPressPosition, longPressId, longPressType)
+            mContextMenuInfo =
+                RecyclerViewContextMenuInfo(longPressPosition, longPressId, longPressType)
             return super.showContextMenuForChild(originalView)
         }
         return false
     }
 
-    class RecyclerViewContextMenuInfo(val position: Int, val id: Long?, val type: Int) : ContextMenu.ContextMenuInfo
+    class RecyclerViewContextMenuInfo(val position: Int, val id: Long?, val type: Int) :
+        ContextMenu.ContextMenuInfo
 
 }

@@ -25,12 +25,20 @@ class ShoppingListItemRecyclerViewAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         if (viewType == AISLE_VIEW) {
             return AisleViewHolder(
-                FragmentAisleListItemBinding.inflate(LayoutInflater.from(parent.context), parent,false)
+                FragmentAisleListItemBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false
+                )
             )
         }
 
         return ProductListItemViewHolder(
-            FragmentProductListItemBinding.inflate(LayoutInflater.from(parent.context),parent,false)
+            FragmentProductListItemBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false
+            )
         )
     }
 
@@ -51,7 +59,6 @@ class ShoppingListItemRecyclerViewAdapter(
             ShoppingListItemType.PRODUCT -> PRODUCT_VIEW
         }
     }
-
 
     override fun getItemCount(): Int = values.size
 
@@ -98,7 +105,7 @@ class ShoppingListItemRecyclerViewAdapter(
         }
     }
 
-    interface ShoppingListItemListener{
+    interface ShoppingListItemListener {
         fun onAisleClick(item: ShoppingListItemViewModel)
         fun onProductClick(item: ShoppingListItemViewModel)
         fun onProductStatusChange(

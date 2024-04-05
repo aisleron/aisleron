@@ -16,5 +16,5 @@ enum class LocationType {
 }
 
 enum class FilterType {
-    INSTOCK, NEEDED, ALL
+    IN_STOCK, NEEDED, ALL
 }

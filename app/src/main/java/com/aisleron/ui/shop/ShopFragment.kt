@@ -39,7 +39,7 @@ class ShopFragment : Fragment() {
         _binding = FragmentShopBinding.inflate(inflater, container, false)
 
         val button: Button = binding.btnSaveShop
-        button.setOnClickListener{
+        button.setOnClickListener {
             LocationData.locations.add(
                 Location(
                     id = (LocationData.locations.size + 1).toLong(),

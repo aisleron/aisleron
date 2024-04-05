@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:labelFor="@+id/edt_shop_name"
-        android:text="@string/shop_name"/>
+        android:text="@string/shop_name" />
 
     <EditText
         android:id="@+id/edt_shop_name"
@@ -26,7 +26,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/pin_shop"
-        android:minHeight="48dp"/>
+        android:minHeight="48dp" />
 
     <Button
         android:id="@+id/btn_save_shop"

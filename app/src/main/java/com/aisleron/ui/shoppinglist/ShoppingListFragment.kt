@@ -30,8 +30,9 @@ class ShoppingListFragment : Fragment() {
         super.onCreate(savedInstanceState)
 
         val bundle = arguments
-        val locationId : Long = bundle?.getInt(ARG_LOCATION_ID)?.toLong() ?: 1
-        val filterType : FilterType = if (bundle != null) bundle.getSerializable(ARG_FILTER_TYPE) as FilterType else FilterType.ALL
+        val locationId: Long = bundle?.getInt(ARG_LOCATION_ID)?.toLong() ?: 1
+        val filterType: FilterType =
+            if (bundle != null) bundle.getSerializable(ARG_FILTER_TYPE) as FilterType else FilterType.ALL
 
         viewModel = ShoppingListViewModel(locationId, filterType)
     }
@@ -45,8 +46,9 @@ class ShoppingListFragment : Fragment() {
         item.inStock = inStock
         viewModel.updateProduct(item)
 
-        if ((viewModel.filterType == FilterType.INSTOCK && item.inStock == false)
-            ||(viewModel.filterType == FilterType.NEEDED && item.inStock == true)) {
+        if ((viewModel.filterType == FilterType.IN_STOCK && item.inStock == false)
+            || (viewModel.filterType == FilterType.NEEDED && item.inStock == true)
+        ) {
             viewModel.items.remove(item)
             adapter.notifyItemRemoved(absoluteAdapterPosition)
         } else {
@@ -64,11 +66,11 @@ class ShoppingListFragment : Fragment() {
 
         // Set the adapter
         if (view is RecyclerView) {
-            view.addItemDecoration( DividerItemDecoration(context,  DividerItemDecoration.VERTICAL) )
+            view.addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
             registerForContextMenu(view)
 
             with(view) {
-               LinearLayoutManager(context)
+                LinearLayoutManager(context)
                 adapter = ShoppingListItemRecyclerViewAdapter(
                     viewModel.items,
                     object :
@@ -94,9 +96,13 @@ class ShoppingListFragment : Fragment() {
                             inStock: Boolean,
                             absoluteAdapterPosition: Int
                         ) {
-                            updateProduct(item, view.adapter as ShoppingListItemRecyclerViewAdapter, inStock, absoluteAdapterPosition)
+                            updateProduct(
+                                item,
+                                view.adapter as ShoppingListItemRecyclerViewAdapter,
+                                inStock,
+                                absoluteAdapterPosition
+                            )
                         }
-
                     }
                 )
             }
@@ -107,13 +113,12 @@ class ShoppingListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val bundle = arguments
-
-
     }
 
 
-    override fun onCreateContextMenu(menu: ContextMenu, v: View,
-                                     menuInfo: ContextMenu.ContextMenuInfo?) {
+    override fun onCreateContextMenu(
+        menu: ContextMenu, v: View, menuInfo: ContextMenu.ContextMenuInfo?
+    ) {
         super.onCreateContextMenu(menu, v, menuInfo)
         val inflater: MenuInflater = requireActivity().menuInflater
         inflater.inflate(R.menu.product_list_context, menu)
@@ -133,6 +138,7 @@ class ShoppingListFragment : Fragment() {
                 ).show()
                 true
             }
+
             else -> super.onContextItemSelected(item)
         }
     }
@@ -140,11 +146,12 @@ class ShoppingListFragment : Fragment() {
     override fun onResume() {
         (activity as AppCompatActivity).supportActionBar?.title = when (viewModel.locationType) {
             LocationType.GENERIC ->
-                when (viewModel.filterType){
-                    FilterType.INSTOCK -> resources.getString(R.string.menu_in_stock)
+                when (viewModel.filterType) {
+                    FilterType.IN_STOCK -> resources.getString(R.string.menu_in_stock)
                     FilterType.NEEDED -> resources.getString(R.string.menu_shopping_list)
                     FilterType.ALL -> resources.getString(R.string.menu_all_items)
                 }
+
             LocationType.SHOP -> viewModel.locationName
         }
         super.onResume()
@@ -160,7 +167,7 @@ class ShoppingListFragment : Fragment() {
             ShoppingListFragment().apply {
                 arguments = Bundle().apply {
                     putInt(ARG_LOCATION_ID, locationId.toInt())
-                    putSerializable (ARG_FILTER_TYPE, filterType)
+                    putSerializable(ARG_FILTER_TYPE, filterType)
                 }
             }
     }

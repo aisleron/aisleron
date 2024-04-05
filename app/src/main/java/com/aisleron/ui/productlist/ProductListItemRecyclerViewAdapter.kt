@@ -1,18 +1,11 @@
 package com.aisleron.ui.productlist
 
-import android.app.PendingIntent.getActivity
-import android.view.ContextMenu
 import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
-import android.view.MenuInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
-import android.widget.CheckedTextView
-import android.widget.PopupMenu
 import android.widget.TextView
 import android.widget.Toast
-import com.aisleron.R
 
 import com.aisleron.databinding.FragmentProductListItemBinding
 import com.aisleron.domain.model.Product
@@ -37,19 +30,17 @@ class ProductListItemRecyclerViewAdapter(
     }
 
     override fun getItemId(position: Int): Long {
-        return values[position].id.toLong()
+        return values[position].id
     }
-
-
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(values[position])
     }
+
     override fun getItemCount(): Int = values.size
 
-    inner class ViewHolder(binding: FragmentProductListItemBinding)
-        : RecyclerView.ViewHolder(binding.root)
-    {
+    inner class ViewHolder(binding: FragmentProductListItemBinding) :
+        RecyclerView.ViewHolder(binding.root) {
         private val idView: TextView = binding.txtProductId
         private val contentView: TextView = binding.txtProductName
         private val inStockView: CheckBox = binding.chkInStock
@@ -58,9 +49,8 @@ class ProductListItemRecyclerViewAdapter(
             return super.toString() + " '" + contentView.text + "'"
         }
 
-        fun bind(product: Product){
+        fun bind(product: Product) {
             itemView.isLongClickable = true
-
 
             setAttributes(product)
             itemView.setOnClickListener {

@@ -18,7 +18,7 @@ import com.aisleron.placeholder.ProductData
 /**
  * A fragment representing a list of Items.
  */
-class ProductListFragment : Fragment(){
+class ProductListFragment : Fragment() {
 
     private var columnCount = 1
 
@@ -36,16 +36,17 @@ class ProductListFragment : Fragment(){
     ): View? {
         val view = inflater.inflate(R.layout.fragment_product_list, container, false)
         val bundle = arguments
-        val locationId : Int = bundle?.getInt(ARG_LOCATION_ID) ?: 1
-        val filterType : FilterType = if (bundle != null) bundle.get(ARG_FILTER_TYPE) as FilterType else FilterType.ALL
-        val locationTitle : String? = bundle?.getString("locationTitle")
+        val locationId: Int = bundle?.getInt(ARG_LOCATION_ID) ?: 1
+        val filterType: FilterType =
+            if (bundle != null) bundle.get(ARG_FILTER_TYPE) as FilterType else FilterType.ALL
+        val locationTitle: String? = bundle?.getString("locationTitle")
         if (locationTitle != null) {
             (activity as AppCompatActivity).supportActionBar?.title = locationTitle
         }
 
         // Set the adapter
         if (view is RecyclerView) {
-            view.addItemDecoration( DividerItemDecoration(context,  DividerItemDecoration.VERTICAL) )
+            view.addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
 
             val callback = object : ItemTouchHelper.SimpleCallback(
                 ItemTouchHelper.UP or ItemTouchHelper.DOWN, //bitwise OR
@@ -95,8 +96,8 @@ class ProductListFragment : Fragment(){
                 }
 
                 adapter = ProductListItemRecyclerViewAdapter(ProductData.products.filter { p ->
-                    (p.inStock && filterType == FilterType.INSTOCK )
-                            || (!p.inStock && filterType == FilterType.NEEDED )
+                    (p.inStock && filterType == FilterType.IN_STOCK)
+                            || (!p.inStock && filterType == FilterType.NEEDED)
                             || (filterType == FilterType.ALL)
                 })
             }
@@ -107,11 +108,9 @@ class ProductListFragment : Fragment(){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val bundle = arguments
-
-        }
+    }
 
     companion object {
-
 
         const val ARG_COLUMN_COUNT = "column-count"
         const val ARG_LOCATION_ID = "locationId"
@@ -124,7 +123,7 @@ class ProductListFragment : Fragment(){
                 arguments = Bundle().apply {
                     putInt(ARG_COLUMN_COUNT, columnCount)
                     putInt(ARG_LOCATION_ID, locationId.toInt())
-                    putSerializable (ARG_FILTER_TYPE, filterType)
+                    putSerializable(ARG_FILTER_TYPE, filterType)
                 }
             }
     }

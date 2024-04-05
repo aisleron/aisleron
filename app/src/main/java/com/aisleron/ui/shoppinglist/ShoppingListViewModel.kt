@@ -1,4 +1,5 @@
 package com.aisleron.ui.shoppinglist
+
 import androidx.lifecycle.ViewModel
 import com.aisleron.domain.model.FilterType
 import com.aisleron.domain.model.Location
@@ -9,8 +10,8 @@ import com.aisleron.placeholder.ProductData
 class ShoppingListViewModel(
     private val locationId: Long,
     val filterType: FilterType
-): ViewModel() {
-    private val location: Location? = LocationData.locations.find { l -> l.id == locationId}
+) : ViewModel() {
+    private val location: Location? = LocationData.locations.find { l -> l.id == locationId }
     val locationName: String get() = location?.name.toString()
     val locationType: LocationType get() = location?.type ?: LocationType.GENERIC
 
@@ -22,24 +23,39 @@ class ShoppingListViewModel(
         }
     }
 
-    fun refreshListItems(){
+    fun refreshListItems() {
         items.clear()
 
-        location?.aisles?.forEach {a ->
-            items.add(ShoppingListItemViewModel(ShoppingListItemType.AISLE, a.rank, -1,a.id, a.name, null))
-            a.products?.filter { p ->
-                (p.inStock && filterType == FilterType.INSTOCK)
+        location?.aisles?.forEach { a ->
+            items.add(
+                ShoppingListItemViewModel(
+                    ShoppingListItemType.AISLE,
+                    a.rank,
+                    -1,
+                    a.id,
+                    a.name,
+                    null
+                )
+            )
+            a.products.filter { p ->
+                (p.inStock && filterType == FilterType.IN_STOCK)
                         || (!p.inStock && filterType == FilterType.NEEDED)
                         || (filterType == FilterType.ALL)
-            }?.forEach { p ->
-                items.add(ShoppingListItemViewModel(ShoppingListItemType.PRODUCT, a.rank, p.id.toInt(), p.id, p.name, p.inStock))
+            }.forEach { p ->
+                items.add(
+                    ShoppingListItemViewModel(
+                        ShoppingListItemType.PRODUCT,
+                        a.rank,
+                        p.id.toInt(),
+                        p.id,
+                        p.name,
+                        p.inStock
+                    )
+                )
             }
         }
 
-        items.sortWith( compareBy({it.aisleRank}, {it.productRank}))
+        items.sortWith(compareBy({ it.aisleRank }, { it.productRank }))
         //TODO: Add Aisle ID and/or Aisle & Product items to view model list
     }
-
-
-
 }

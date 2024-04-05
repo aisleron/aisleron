@@ -31,7 +31,6 @@
         android:layout_height="match_parent"
         android:layout_weight="0"
         android:checkMark="?android:attr/listChoiceIndicatorMultiple"
-        android:checked="true"
-        />
+        android:checked="true" />
 
 </LinearLayout>

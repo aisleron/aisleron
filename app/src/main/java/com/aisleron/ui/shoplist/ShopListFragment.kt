@@ -50,19 +50,19 @@ class ShopListFragment : Fragment() {
                     columnCount <= 1 -> LinearLayoutManager(context)
                     else -> GridLayoutManager(context, columnCount)
                 }
-                adapter = ShopListItemRecyclerViewAdapter(LocationData.locations.filter { s -> s.type == LocationType.SHOP } , object :
-                    ShopListItemRecyclerViewAdapter.ShopListItemListener {
-                    override fun onItemClick(item: Location) {
-                        navigateToShoppingList(item)
-                    }
-                })
+                adapter =
+                    ShopListItemRecyclerViewAdapter(LocationData.locations.filter { s -> s.type == LocationType.SHOP },
+                        object :
+                            ShopListItemRecyclerViewAdapter.ShopListItemListener {
+                            override fun onItemClick(item: Location) {
+                                navigateToShoppingList(item)
+                            }
+                        })
 
             }
         }
         return view
     }
-
-
 
     companion object {
 
@@ -76,7 +76,7 @@ class ShopListFragment : Fragment() {
                 arguments = Bundle().apply {
                     putInt(ARG_COLUMN_COUNT, columnCount)
                     putInt(ARG_LOCATION_ID, locationId.toInt())
-                    putSerializable (ARG_FILTER_TYPE, filterType)
+                    putSerializable(ARG_FILTER_TYPE, filterType)
                 }
             }
     }

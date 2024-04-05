@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/nav_in_stock"
         android:name="com.aisleron.ui.shoppinglist.ShoppingListFragment"
-        tools:layout="@layout/fragment_shopping_list" >
+        tools:layout="@layout/fragment_shopping_list">
         <argument
             android:name="locationId"
             app:argType="integer"
@@ -16,13 +16,13 @@
         <argument
             android:name="filterType"
             app:argType="com.aisleron.domain.model.FilterType"
-            android:defaultValue="INSTOCK" />
+            android:defaultValue="IN_STOCK" />
     </fragment>
 
     <fragment
         android:id="@+id/nav_needed"
         android:name="com.aisleron.ui.shoppinglist.ShoppingListFragment"
-        tools:layout="@layout/fragment_shopping_list" >
+        tools:layout="@layout/fragment_shopping_list">
         <argument
             android:name="locationId"
             app:argType="integer"
@@ -50,7 +50,7 @@
     <fragment
         android:id="@+id/nav_shopping_list"
         android:name="com.aisleron.ui.shoppinglist.ShoppingListFragment"
-        tools:layout="@layout/fragment_shopping_list" >
+        tools:layout="@layout/fragment_shopping_list">
         <argument
             android:name="locationId"
             app:argType="integer"
@@ -71,10 +71,10 @@
         android:id="@+id/nav_all_shops"
         android:name="com.aisleron.ui.shoplist.ShopListFragment"
         android:label="@string/menu_all_shops"
-        tools:layout="@layout/fragment_shop_list" >
+        tools:layout="@layout/fragment_shop_list">
         <action
             android:id="@+id/action_nav_all_shops_to_nav_shopping_list"
-            app:destination="@id/nav_shopping_list" >
+            app:destination="@id/nav_shopping_list">
             <argument
                 android:name="filterType"
                 android:defaultValue="NEEDED" />
