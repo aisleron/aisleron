@@ -56,6 +56,6 @@ class ShoppingListViewModel(
         }
 
         items.sortWith(compareBy({ it.aisleRank }, { it.productRank }))
-        //TODO: Add Aisle ID and/or Aisle & Product items to view model list
+        //TODO: Add AisleEntity ID and/or AisleEntity & ProductEntity items to view model list
     }
 }

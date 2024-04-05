@@ -10,11 +10,3 @@ data class Location(
     var pinned: Boolean,
     var aisles: List<Aisle>? = null
 ) : Serializable
-
-enum class LocationType {
-    GENERIC, SHOP
-}
-
-enum class FilterType {
-    IN_STOCK, NEEDED, ALL
-}

@@ -78,7 +78,7 @@ class ShoppingListFragment : Fragment() {
                         override fun onAisleClick(item: ShoppingListItemViewModel) {
                             Toast.makeText(
                                 context,
-                                "Aisle Click! Id: ${item.id}, Name: ${item.name}",
+                                "AisleEntity Click! Id: ${item.id}, Name: ${item.name}",
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
