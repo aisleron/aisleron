@@ -8,5 +8,5 @@ data class Aisle(
     val products: List<Product>,
     val location: Location?,
     var rank: Int,
-    val id: Long,
+    val id: Int,
 )

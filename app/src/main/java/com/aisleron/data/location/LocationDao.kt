@@ -1,9 +1,11 @@
 package com.aisleron.data.location
 
+import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
 import com.aisleron.data.base.BaseDao
 
+@Dao
 interface LocationDao : BaseDao<LocationEntity> {
 
     /**
@@ -11,7 +13,7 @@ interface LocationDao : BaseDao<LocationEntity> {
      */
     @Transaction
     @Query("SELECT * FROM Location WHERE id = :locationId")
-    fun getLocation(locationId: Int): LocationEntity
+    fun getLocation(locationId: Int): LocationEntity?
 
     @Transaction
     @Query("SELECT * FROM Location WHERE id IN (:locationId)")

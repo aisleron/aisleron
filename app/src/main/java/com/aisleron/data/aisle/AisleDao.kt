@@ -1,9 +1,11 @@
 package com.aisleron.data.aisle
 
+import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
 import com.aisleron.data.base.BaseDao
 
+@Dao
 interface AisleDao : BaseDao<AisleEntity> {
     /**
      * Aisle

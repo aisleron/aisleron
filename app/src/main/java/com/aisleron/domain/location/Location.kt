@@ -5,7 +5,7 @@ import com.aisleron.domain.FilterType
 import java.io.Serializable
 
 data class Location(
-    val id: Long,
+    val id: Int,
     val type: LocationType,
     val defaultFilter: FilterType,
     var name: String,

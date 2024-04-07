@@ -32,7 +32,7 @@ class NavShopListFragment : Fragment() {
 
     private fun navigateToShoppingList(item: Location) {
         val bundle = Bundle()
-        bundle.putLong(ARG_LOCATION_ID, item.id)
+        bundle.putInt(ARG_LOCATION_ID, item.id)
         bundle.putSerializable(ARG_FILTER_TYPE, item.defaultFilter)
         this.findNavController().navigate(R.id.action_nav_all_shops_to_nav_shopping_list, bundle)
     }

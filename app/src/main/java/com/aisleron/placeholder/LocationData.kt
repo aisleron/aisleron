@@ -11,7 +11,7 @@ object LocationData {
             Location(
                 id = 1,
                 name = "Home",
-                type = LocationType.GENERIC,
+                type = LocationType.HOME,
                 defaultFilter = FilterType.NEEDED,
                 pinned = true,
                 aisles = listOf(

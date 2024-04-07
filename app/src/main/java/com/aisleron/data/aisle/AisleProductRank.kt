@@ -6,5 +6,5 @@ import com.aisleron.data.product.ProductEntity
 
 data class AisleProductRank(
     @Embedded val aisleProduct: AisleProductEntity,
-    @Relation(parentColumn = "productId", entityColumn = "Id") val products: List<ProductEntity>
+    @Relation(parentColumn = "productId", entityColumn = "id") val products: List<ProductEntity>
 )

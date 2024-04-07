@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.LocationType
 
-@Entity (tableName = "Location")
+@Entity(tableName = "Location")
 data class LocationEntity(
     @PrimaryKey(autoGenerate = true) val id: Int,
     val type: LocationType,

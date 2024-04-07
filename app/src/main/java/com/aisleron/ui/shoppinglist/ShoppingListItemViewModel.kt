@@ -4,11 +4,7 @@ data class ShoppingListItemViewModel(
     val lineItemType: ShoppingListItemType,
     val aisleRank: Int,
     val productRank: Int,
-    val id: Long,
+    val id: Int,
     val name: String,
     var inStock: Boolean?
 )
-
-enum class ShoppingListItemType {
-    AISLE, PRODUCT
-}

@@ -29,6 +29,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -72,7 +74,7 @@ class MainActivity : AppCompatActivity() {
         drawerLayout: DrawerLayout
     ) {
         val bundle = Bundle()
-        bundle.putInt("locationId", item.id.toInt())
+        bundle.putInt("locationId", item.id)
         bundle.putSerializable("filterType", item.defaultFilter)
         navController.navigate(R.id.nav_shopping_list, bundle)
         drawerLayout.closeDrawers()

@@ -1,10 +1,10 @@
 package com.aisleron.domain.base
 
 interface BaseRepository<T> {
-    fun get(id: Long): T
+    fun get(id: Int): T?
     fun getAll(): List<T>
     fun add(item: T)
     fun update(item: T)
     fun remove(item: T)
-    fun remove(id: Long)
+    fun remove(id: Int)
 }

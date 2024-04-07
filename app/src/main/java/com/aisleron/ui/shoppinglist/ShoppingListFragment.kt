@@ -17,24 +17,25 @@ import com.aisleron.R
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.LocationType
 import com.aisleron.widgets.ContextMenuRecyclerView
+import org.koin.android.ext.android.get
+import org.koin.core.parameter.parametersOf
 
 /**
  * A fragment representing a list of [ShoppingListItemViewModel].
  */
 class ShoppingListFragment : Fragment() {
 
-    //private val viewModel: ShoppingListViewModel by viewModels()
-    private lateinit var viewModel: ShoppingListViewModel
+    private lateinit var viewModel: ShoppingListViewModel // by inject<ShoppingListViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val bundle = arguments
-        val locationId: Long = bundle?.getInt(ARG_LOCATION_ID)?.toLong() ?: 1
+        val locationId: Int = bundle?.getInt(ARG_LOCATION_ID) ?: 1
         val filterType: FilterType =
             if (bundle != null) bundle.getSerializable(ARG_FILTER_TYPE) as FilterType else FilterType.ALL
 
-        viewModel = ShoppingListViewModel(locationId, filterType)
+        viewModel = get<ShoppingListViewModel> { parametersOf(locationId, filterType) }
     }
 
     private fun updateProduct(
@@ -145,7 +146,7 @@ class ShoppingListFragment : Fragment() {
 
     override fun onResume() {
         (activity as AppCompatActivity).supportActionBar?.title = when (viewModel.locationType) {
-            LocationType.GENERIC ->
+            LocationType.HOME ->
                 when (viewModel.filterType) {
                     FilterType.IN_STOCK -> resources.getString(R.string.menu_in_stock)
                     FilterType.NEEDED -> resources.getString(R.string.menu_shopping_list)

@@ -3,17 +3,20 @@ package com.aisleron.ui.shoppinglist
 import androidx.lifecycle.ViewModel
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.Location
+import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.location.LocationType
-import com.aisleron.placeholder.LocationData
 import com.aisleron.placeholder.ProductData
 
 class ShoppingListViewModel(
-    private val locationId: Long,
+    repository: LocationRepository,
+    locationId: Int,
     val filterType: FilterType
 ) : ViewModel() {
-    private val location: Location? = LocationData.locations.find { l -> l.id == locationId }
+
+    private val location: Location? = repository.get(locationId)
+
     val locationName: String get() = location?.name.toString()
-    val locationType: LocationType get() = location?.type ?: LocationType.GENERIC
+    val locationType: LocationType get() = location?.type ?: LocationType.HOME
 
     val items = mutableListOf<ShoppingListItemViewModel>()
 
@@ -46,7 +49,7 @@ class ShoppingListViewModel(
                     ShoppingListItemViewModel(
                         ShoppingListItemType.PRODUCT,
                         a.rank,
-                        p.id.toInt(),
+                        p.id,
                         p.id,
                         p.name,
                         p.inStock

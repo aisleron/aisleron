@@ -30,7 +30,7 @@ class ProductListItemRecyclerViewAdapter(
     }
 
     override fun getItemId(position: Int): Long {
-        return values[position].id
+        return values[position].id.toLong()
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {

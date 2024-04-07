@@ -37,7 +37,7 @@ class ProductFragment : Fragment() {
         button.setOnClickListener {
             ProductData.products.add(
                 Product(
-                    id = (ProductData.products.size + 1).toLong(),
+                    id = (ProductData.products.size + 1),
                     name = binding.edtProductName.text.toString(),
                     inStock = binding.chkProductInStock.isChecked
                 ),
