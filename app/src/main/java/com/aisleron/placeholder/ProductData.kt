@@ -1,6 +1,6 @@
 package com.aisleron.placeholder
 
-import com.aisleron.domain.model.Product
+import com.aisleron.domain.product.Product
 
 object ProductData {
     val products: MutableList<Product> =

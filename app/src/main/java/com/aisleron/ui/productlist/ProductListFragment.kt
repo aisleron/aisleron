@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.aisleron.R
-import com.aisleron.domain.model.FilterType
+import com.aisleron.domain.FilterType
 import com.aisleron.placeholder.ProductData
 
 /**

@@ -1,9 +1,9 @@
 package com.aisleron.ui.shoppinglist
 
 import androidx.lifecycle.ViewModel
-import com.aisleron.domain.model.FilterType
-import com.aisleron.domain.model.Location
-import com.aisleron.domain.model.LocationType
+import com.aisleron.domain.FilterType
+import com.aisleron.domain.location.Location
+import com.aisleron.domain.location.LocationType
 import com.aisleron.placeholder.LocationData
 import com.aisleron.placeholder.ProductData
 

@@ -8,7 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import com.aisleron.databinding.FragmentProductBinding
-import com.aisleron.domain.model.Product
+import com.aisleron.domain.product.Product
 import com.aisleron.placeholder.ProductData
 
 

@@ -9,9 +9,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.aisleron.databinding.FragmentShopBinding
-import com.aisleron.domain.model.FilterType
-import com.aisleron.domain.model.Location
-import com.aisleron.domain.model.LocationType
+import com.aisleron.domain.FilterType
+import com.aisleron.domain.location.Location
+import com.aisleron.domain.location.LocationType
 import com.aisleron.placeholder.LocationData
 
 

@@ -14,8 +14,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.aisleron.R
-import com.aisleron.domain.model.FilterType
-import com.aisleron.domain.model.LocationType
+import com.aisleron.domain.FilterType
+import com.aisleron.domain.location.LocationType
 import com.aisleron.widgets.ContextMenuRecyclerView
 
 /**

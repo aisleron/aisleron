@@ -1,4 +1,7 @@
-package com.aisleron.domain.model
+package com.aisleron.domain.aisle
+
+import com.aisleron.domain.location.Location
+import com.aisleron.domain.product.Product
 
 data class Aisle(
     val name: String,

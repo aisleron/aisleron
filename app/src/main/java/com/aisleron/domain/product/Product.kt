@@ -1,4 +1,4 @@
-package com.aisleron.domain.model
+package com.aisleron.domain.product
 
 data class Product(
     val id: Long,

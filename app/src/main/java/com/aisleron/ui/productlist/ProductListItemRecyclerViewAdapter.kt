@@ -8,7 +8,7 @@ import android.widget.TextView
 import android.widget.Toast
 
 import com.aisleron.databinding.FragmentProductListItemBinding
-import com.aisleron.domain.model.Product
+import com.aisleron.domain.product.Product
 
 /**
  * [RecyclerView.Adapter] that can display a [Product].

@@ -1,9 +1,9 @@
 package com.aisleron.placeholder
 
-import com.aisleron.domain.model.Aisle
-import com.aisleron.domain.model.FilterType
-import com.aisleron.domain.model.Location
-import com.aisleron.domain.model.LocationType
+import com.aisleron.domain.aisle.Aisle
+import com.aisleron.domain.FilterType
+import com.aisleron.domain.location.Location
+import com.aisleron.domain.location.LocationType
 
 object LocationData {
     val locations: MutableList<Location> =

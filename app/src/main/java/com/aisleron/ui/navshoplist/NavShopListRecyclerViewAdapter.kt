@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
 import com.aisleron.databinding.FragmentNavShopListItemBinding
-import com.aisleron.domain.model.Location
+import com.aisleron.domain.location.Location
 
 /**
  * [RecyclerView.Adapter] that can display a [Location].

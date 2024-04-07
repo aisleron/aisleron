@@ -1,4 +1,4 @@
-package com.aisleron.domain.repository
+package com.aisleron.domain.base
 
 interface BaseRepository<T> {
     fun get(id: Long): T

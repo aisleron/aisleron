@@ -1,7 +1,7 @@
-package com.aisleron.domain.repository
+package com.aisleron.domain.aisle
 
-import com.aisleron.domain.model.Aisle
-import com.aisleron.domain.model.Location
+import com.aisleron.domain.base.BaseRepository
+import com.aisleron.domain.location.Location
 
 interface AisleRepository : BaseRepository<Aisle> {
     fun getForLocation(locationId: Long): List<Aisle>

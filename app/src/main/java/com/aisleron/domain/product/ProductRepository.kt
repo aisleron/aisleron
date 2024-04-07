@@ -1,8 +1,8 @@
-package com.aisleron.domain.repository
+package com.aisleron.domain.product
 
-import com.aisleron.domain.model.Aisle
-import com.aisleron.domain.model.FilterType
-import com.aisleron.domain.model.Product
+import com.aisleron.domain.base.BaseRepository
+import com.aisleron.domain.aisle.Aisle
+import com.aisleron.domain.FilterType
 
 interface ProductRepository : BaseRepository<Product> {
     fun getInStock(): List<Product>

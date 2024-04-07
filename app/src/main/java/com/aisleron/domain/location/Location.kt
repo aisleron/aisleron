@@ -1,5 +1,7 @@
-package com.aisleron.domain.model
+package com.aisleron.domain.location
 
+import com.aisleron.domain.aisle.Aisle
+import com.aisleron.domain.FilterType
 import java.io.Serializable
 
 data class Location(
