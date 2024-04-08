@@ -12,43 +12,43 @@ interface AisleDao : BaseDao<AisleEntity> {
      */
     @Transaction
     @Query("SELECT * FROM Aisle WHERE id = :aisleId")
-    fun getAisle(aisleId: Int): AisleEntity
+    suspend fun getAisle(aisleId: Int): AisleEntity
 
     @Transaction
     @Query("SELECT * FROM Aisle WHERE id in (:aisleId)")
-    fun getAisles(vararg aisleId: Int): List<AisleEntity>
+    suspend fun getAisles(vararg aisleId: Int): List<AisleEntity>
 
     @Transaction
     @Query("SELECT * FROM Aisle")
-    fun getAisles(): List<AisleEntity>
+    suspend fun getAisles(): List<AisleEntity>
 
     /**
      * Aisle With Location
      */
     @Transaction
     @Query("SELECT * FROM Aisle WHERE id = :aisleId")
-    fun getAisleWithLocation(aisleId: Int): AisleWithLocation
+    suspend fun getAisleWithLocation(aisleId: Int): AisleWithLocation
 
     @Transaction
     @Query("SELECT * FROM Aisle WHERE id in (:aisleId)")
-    fun getAislesWithLocation(vararg aisleId: Int): List<AisleWithLocation>
+    suspend fun getAislesWithLocation(vararg aisleId: Int): List<AisleWithLocation>
 
     @Transaction
     @Query("SELECT * FROM Aisle")
-    fun getAislesWithLocation(): List<AisleWithLocation>
+    suspend fun getAislesWithLocation(): List<AisleWithLocation>
 
     /**
      * Aisle With Product
      */
     @Transaction
     @Query("SELECT * FROM Aisle WHERE id = :aisleId")
-    fun getAisleWithProducts(aisleId: Int): AisleWithProducts
+    suspend fun getAisleWithProducts(aisleId: Int): AisleWithProducts
 
     @Transaction
     @Query("SELECT * FROM Aisle WHERE id in (:aisleId)")
-    fun getAislesWithProducts(vararg aisleId: Int): List<AisleWithProducts>
+    suspend fun getAislesWithProducts(vararg aisleId: Int): List<AisleWithProducts>
 
     @Transaction
     @Query("SELECT * FROM Aisle")
-    fun getAislesWithProducts(): List<AisleWithProducts>
+    suspend fun getAislesWithProducts(): List<AisleWithProducts>
 }

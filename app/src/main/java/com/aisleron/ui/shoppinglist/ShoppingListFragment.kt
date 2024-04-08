@@ -160,8 +160,8 @@ class ShoppingListFragment : Fragment() {
 
     companion object {
 
-        const val ARG_LOCATION_ID = "locationId"
-        const val ARG_FILTER_TYPE = "filterType"
+        private const val ARG_LOCATION_ID = "locationId"
+        private const val ARG_FILTER_TYPE = "filterType"
 
         @JvmStatic
         fun newInstance(locationId: Long, filterType: FilterType) =

@@ -7,21 +7,14 @@ import android.view.ViewGroup
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import com.aisleron.databinding.FragmentShopBinding
-import com.aisleron.domain.FilterType
-import com.aisleron.domain.location.Location
-import com.aisleron.domain.location.LocationType
-import com.aisleron.placeholder.LocationData
+import com.aisleron.ui.shoppinglist.ShoppingListFragment
+import org.koin.android.ext.android.inject
 
 
 class ShopFragment : Fragment() {
 
-    companion object {
-        fun newInstance() = ShopFragment()
-    }
-
-    private val viewModel: ShopViewModel by viewModels()
+    private val viewModel: ShopViewModel by inject<ShopViewModel>()
     private var _binding: FragmentShopBinding? = null
 
     private val binding get() = _binding!!
@@ -29,7 +22,12 @@ class ShopFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // TODO: Use the ViewModel
+        val bundle = arguments
+
+        val locationId: Int? = bundle?.getInt(ARG_LOCATION_ID)
+        if (locationId != null) {
+            viewModel.loadLocation(locationId)
+        }
     }
 
     override fun onCreateView(
@@ -40,14 +38,9 @@ class ShopFragment : Fragment() {
 
         val button: Button = binding.btnSaveShop
         button.setOnClickListener {
-            LocationData.locations.add(
-                Location(
-                    id = (LocationData.locations.size + 1),
-                    name = binding.edtShopName.text.toString(),
-                    defaultFilter = FilterType.NEEDED,
-                    type = LocationType.SHOP,
-                    pinned = binding.swcShopPinned.isChecked
-                ),
+            viewModel.saveLocation(
+                binding.edtShopName.text.toString(),
+                binding.swcShopPinned.isChecked
             )
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
@@ -57,20 +50,28 @@ class ShopFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val bundle = arguments
-        lateinit var shopListItem: Location
-        //the data passing with bundle and serializable
-        if (bundle != null) {
-            shopListItem = bundle.getSerializable("key") as Location
-            binding.edtShopName.setText(shopListItem.name)
-            binding.swcShopPinned.isChecked = shopListItem.pinned
-            (activity as AppCompatActivity?)!!.supportActionBar!!.title = shopListItem.name
+        binding.edtShopName.setText(viewModel.locationName)
+        binding.swcShopPinned.isChecked = viewModel.pinned
+        if (viewModel.locationName != "") {
+            (activity as AppCompatActivity?)!!.supportActionBar!!.title = viewModel.locationName
         }
-
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+
+        private const val ARG_LOCATION_ID = "locationId"
+
+        @JvmStatic
+        fun newInstance(locationId: Int) =
+            ShoppingListFragment().apply {
+                arguments = Bundle().apply {
+                    putInt(ARG_LOCATION_ID, locationId)
+                }
+            }
     }
 }

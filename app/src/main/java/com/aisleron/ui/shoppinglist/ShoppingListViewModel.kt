@@ -15,17 +15,15 @@ class ShoppingListViewModel(
     val filterType: FilterType
 ) : ViewModel() {
 
-    val location: Location? = getLocationFromRepo()
+    private val location: Location? = getLocationFromRepo()
 
-
-    private fun getLocationFromRepo() : Location? {
+    private fun getLocationFromRepo(): Location? {
         var result: Location? = null
         viewModelScope.launch() {
             result = repository.get(locationId)
         }
         return result
     }
-
 
 
     val locationName: String get() = location?.name.toString()

@@ -12,13 +12,13 @@ interface ProductDao : BaseDao<ProductEntity> {
      */
     @Transaction
     @Query("SELECT * FROM Product WHERE id = :productId")
-    fun getProduct(productId: Int): ProductEntity
+    suspend fun getProduct(productId: Int): ProductEntity
 
     @Transaction
     @Query("SELECT * FROM Product WHERE id IN (:productId)")
-    fun getProducts(vararg productId: Int): List<ProductEntity>
+    suspend fun getProducts(vararg productId: Int): List<ProductEntity>
 
     @Transaction
     @Query("SELECT * FROM Product")
-    fun getProducts(): List<ProductEntity>
+    suspend fun getProducts(): List<ProductEntity>
 }
