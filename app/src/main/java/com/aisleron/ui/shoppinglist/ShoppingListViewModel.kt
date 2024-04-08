@@ -1,19 +1,32 @@
 package com.aisleron.ui.shoppinglist
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.location.LocationType
 import com.aisleron.placeholder.ProductData
+import kotlinx.coroutines.launch
 
 class ShoppingListViewModel(
-    repository: LocationRepository,
-    locationId: Int,
+    private val repository: LocationRepository,
+    private val locationId: Int,
     val filterType: FilterType
 ) : ViewModel() {
 
-    private val location: Location? = repository.get(locationId)
+    val location: Location? = getLocationFromRepo()
+
+
+    private fun getLocationFromRepo() : Location? {
+        var result: Location? = null
+        viewModelScope.launch() {
+            result = repository.get(locationId)
+        }
+        return result
+    }
+
+
 
     val locationName: String get() = location?.name.toString()
     val locationType: LocationType get() = location?.type ?: LocationType.HOME

@@ -13,7 +13,7 @@ interface LocationDao : BaseDao<LocationEntity> {
      */
     @Transaction
     @Query("SELECT * FROM Location WHERE id = :locationId")
-    fun getLocation(locationId: Int): LocationEntity?
+    suspend fun getLocation(locationId: Int): LocationEntity?
 
     @Transaction
     @Query("SELECT * FROM Location WHERE id IN (:locationId)")

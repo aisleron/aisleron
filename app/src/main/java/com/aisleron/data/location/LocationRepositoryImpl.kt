@@ -4,7 +4,6 @@ import com.aisleron.data.AisleronDatabase
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.location.LocationType
-import com.aisleron.placeholder.LocationData
 
 class LocationRepositoryImpl(private val db: AisleronDatabase) : LocationRepository {
 
@@ -21,9 +20,9 @@ class LocationRepositoryImpl(private val db: AisleronDatabase) : LocationReposit
         TODO("Not yet implemented")
     }
 
-    override fun get(id: Int): Location? {
-        //return db.locationDao().getLocation(id)?.toLocation()
-        return LocationData.locations.find { l -> l.id == id }
+    override suspend fun get(id: Int): Location? {
+        return db.locationDao().getLocation(id)?.toLocation()
+        //return LocationData.locations.find { l -> l.id == id }
     }
 
     override fun getAll(): List<Location> {

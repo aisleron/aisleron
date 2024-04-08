@@ -1,7 +1,7 @@
 package com.aisleron.domain.base
 
 interface BaseRepository<T> {
-    fun get(id: Int): T?
+    suspend fun get(id: Int): T?
     fun getAll(): List<T>
     fun add(item: T)
     fun update(item: T)

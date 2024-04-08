@@ -15,7 +15,7 @@ val appModule = module {
         Room.databaseBuilder(
             androidApplication(),
             AisleronDatabase::class.java,
-            "aisleron_database"
+            "aisleron.db"
         ).build()
     }
 

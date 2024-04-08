@@ -71,5 +71,9 @@ dependencies {
     //Koin
     implementation("io.insert-koin:koin-android:3.2.0")
 
+    //Coroutines
+    implementation("androidx.room:room-ktx:2.6.1")
+
+
 }
 
