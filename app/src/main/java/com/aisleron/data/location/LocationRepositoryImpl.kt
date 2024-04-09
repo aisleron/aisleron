@@ -12,8 +12,8 @@ class LocationRepositoryImpl(private val db: AisleronDatabase) : LocationReposit
 
     }
 
-    override fun getShops(): List<Location> {
-        TODO("Not yet implemented")
+    override suspend fun getShops(): List<Location> {
+        return db.locationDao().getShops().map { it.toLocation() }
     }
 
     override fun getHome(): Location {
@@ -29,8 +29,8 @@ class LocationRepositoryImpl(private val db: AisleronDatabase) : LocationReposit
         TODO("Not yet implemented")
     }
 
-    override suspend fun add(item: Location) {
-        db.locationDao().upsert(item.toLocationEntity())
+    override suspend fun add(item: Location): Int {
+        return db.locationDao().upsert(item.toLocationEntity())[0].toInt()
     }
 
     override suspend fun update(item: Location) {
@@ -50,13 +50,14 @@ class LocationRepositoryImpl(private val db: AisleronDatabase) : LocationReposit
         defaultFilter = defaultFilter,
         name = name,
         type = type,
-        pinned = true
+        pinned = pinned
     )
 
     private fun Location.toLocationEntity() = LocationEntity(
         id = id,
         defaultFilter = defaultFilter,
         name = name,
-        type = type
+        type = type,
+        pinned = pinned
     )
 }

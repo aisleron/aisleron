@@ -22,11 +22,8 @@ class ShopFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val bundle = arguments
-
-        val locationId: Int? = bundle?.getInt(ARG_LOCATION_ID)
-        if (locationId != null) {
-            viewModel.loadLocation(locationId)
+        arguments?.let {
+            viewModel.hydrate(it.getInt(ARG_LOCATION_ID))
         }
     }
 
@@ -51,15 +48,19 @@ class ShopFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.edtShopName.setText(viewModel.locationName)
-        binding.swcShopPinned.isChecked = viewModel.pinned
-        if (viewModel.locationName != "") {
-            (activity as AppCompatActivity?)!!.supportActionBar!!.title = viewModel.locationName
-        }
+        binding.swcShopPinned.isChecked = viewModel.pinned ?: true
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onResume() {
+        if (viewModel.locationName != null) {
+            (activity as AppCompatActivity?)!!.supportActionBar!!.title = viewModel.locationName
+        }
+        super.onResume()
     }
 
     companion object {

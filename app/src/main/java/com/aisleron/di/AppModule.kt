@@ -6,6 +6,7 @@ import com.aisleron.data.location.LocationRepositoryImpl
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.ui.shop.ShopViewModel
+import com.aisleron.ui.shoplist.ShopListViewModel
 import com.aisleron.ui.shoppinglist.ShoppingListViewModel
 import org.koin.android.ext.koin.androidApplication
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -29,4 +30,6 @@ val appModule = module {
     }
 
     viewModel { ShopViewModel(get()) }
+
+    viewModel { ShopListViewModel(get()) }
 }

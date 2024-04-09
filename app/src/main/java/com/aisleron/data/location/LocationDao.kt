@@ -52,4 +52,18 @@ interface LocationDao : BaseDao<LocationEntity> {
     @Transaction
     @Query("SELECT * FROM Location")
     suspend fun getLocationsWithAislesWithProducts(): List<LocationWithAislesWithProducts>
+
+    /**
+     * Shop Specific Queries
+     */
+    @Transaction
+    @Query("SELECT * FROM Location WHERE type = 'SHOP'")
+    suspend fun getShops(): List<LocationEntity>
+
+    /**
+     * Home Specific Queries
+     */
+    @Transaction
+    @Query("SELECT * FROM Location WHERE type = 'HOME'")
+    suspend fun getHome(): LocationEntity
 }

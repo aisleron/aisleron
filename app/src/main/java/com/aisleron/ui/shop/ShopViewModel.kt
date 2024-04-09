@@ -9,29 +9,49 @@ import com.aisleron.domain.location.LocationType
 import kotlinx.coroutines.launch
 
 class ShopViewModel(private val repository: LocationRepository) : ViewModel() {
-    var pinned: Boolean = true
-    val locationName: String get() = location?.name ?: ""
-    private var defaultFilter: FilterType = FilterType.NEEDED
-    private var type: LocationType = LocationType.SHOP
+    val pinned: Boolean? get() = location?.pinned
+    val defaultFilter: FilterType? get() = location?.defaultFilter
+    val type: LocationType? get() = location?.type
+    val locationName: String? get() = location?.name
+
     private var location: Location? = null
 
-    fun loadLocation(locationId: Int) {
+    fun hydrate(locationId: Int) {
         viewModelScope.launch() {
             location = repository.get(locationId)
         }
     }
 
     fun saveLocation(name: String, pinned: Boolean) {
+        if (location == null) {
+            addLocation(name, pinned)
+        } else {
+            updateLocation(name, pinned)
+        }
+    }
+
+    private fun updateLocation(name: String, pinned: Boolean) {
+        location!!.let {
+            it.name = name
+            it.pinned = pinned
+        }
         viewModelScope.launch() {
-            repository.add(
+            repository.update(location!!)
+        }
+    }
+
+    private fun addLocation(name: String, pinned: Boolean) {
+        viewModelScope.launch() {
+            val id = repository.add(
                 Location(
-                    type = type,
-                    defaultFilter = defaultFilter,
+                    type = LocationType.SHOP,
+                    defaultFilter = FilterType.NEEDED,
                     name = name,
                     pinned = pinned,
                     id = 0
                 )
             )
+            hydrate(id)
         }
     }
 }

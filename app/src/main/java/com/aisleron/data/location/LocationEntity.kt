@@ -10,5 +10,6 @@ data class LocationEntity(
     @PrimaryKey(autoGenerate = true) val id: Int,
     val type: LocationType,
     val defaultFilter: FilterType,
-    val name: String
+    val name: String,
+    val pinned: Boolean
 )

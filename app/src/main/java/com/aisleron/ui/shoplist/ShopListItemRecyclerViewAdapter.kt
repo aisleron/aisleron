@@ -4,16 +4,14 @@ import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
-
 import com.aisleron.databinding.FragmentShopListItemBinding
-import com.aisleron.domain.location.Location
 
 /**
- * [RecyclerView.Adapter] that can display a [Location].
+ * [RecyclerView.Adapter] that can display a [ShopListItemViewModel].
  *
  */
 class ShopListItemRecyclerViewAdapter(
-    private val values: List<Location>,
+    private val values: List<ShopListItemViewModel>,
     private val listener: ShopListItemListener
 ) : RecyclerView.Adapter<ShopListItemRecyclerViewAdapter.ViewHolder>() {
 
@@ -48,7 +46,7 @@ class ShopListItemRecyclerViewAdapter(
     }
 
     interface ShopListItemListener {
-        fun onItemClick(item: Location)
+        fun onItemClick(item: ShopListItemViewModel)
     }
 
 }

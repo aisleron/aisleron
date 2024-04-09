@@ -8,12 +8,10 @@ import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.aisleron.R
-import com.aisleron.domain.FilterType
-import com.aisleron.domain.location.Location
-import com.aisleron.domain.location.LocationType
-import com.aisleron.placeholder.LocationData
+import org.koin.android.ext.android.inject
 
 /**
  * A fragment representing a list of Items.
@@ -21,6 +19,7 @@ import com.aisleron.placeholder.LocationData
 class ShopListFragment : Fragment() {
 
     private var columnCount = 3
+    private val viewModel: ShopListViewModel by inject<ShopListViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,9 +27,11 @@ class ShopListFragment : Fragment() {
         arguments?.let {
             columnCount = it.getInt(ARG_COLUMN_COUNT)
         }
+
+        viewModel.hydrate()
     }
 
-    private fun navigateToShoppingList(item: Location) {
+    private fun navigateToShoppingList(item: ShopListItemViewModel) {
         val bundle = Bundle()
         bundle.putInt(ARG_LOCATION_ID, item.id)
         bundle.putSerializable(ARG_FILTER_TYPE, item.defaultFilter)
@@ -45,20 +46,27 @@ class ShopListFragment : Fragment() {
 
         // Set the adapter
         if (view is RecyclerView) {
+            lifecycleScope.launchWhenStarted {
+                viewModel.shopListUiState.collect {
+                    when (it) {
+                        is ShopListViewModel.ShopListUiState.Success -> view.adapter?.notifyDataSetChanged()
+                        else -> Unit
+                    }
+                }
+            }
             with(view) {
                 layoutManager = when {
                     columnCount <= 1 -> LinearLayoutManager(context)
                     else -> GridLayoutManager(context, columnCount)
                 }
                 adapter =
-                    ShopListItemRecyclerViewAdapter(LocationData.locations.filter { s -> s.type == LocationType.SHOP },
+                    ShopListItemRecyclerViewAdapter(viewModel.shops,
                         object :
                             ShopListItemRecyclerViewAdapter.ShopListItemListener {
-                            override fun onItemClick(item: Location) {
+                            override fun onItemClick(item: ShopListItemViewModel) {
                                 navigateToShoppingList(item)
                             }
                         })
-
             }
         }
         return view
@@ -71,12 +79,10 @@ class ShopListFragment : Fragment() {
         const val ARG_FILTER_TYPE = "filterType"
 
         @JvmStatic
-        fun newInstance(columnCount: Int, locationId: Long, filterType: FilterType) =
+        fun newInstance(columnCount: Int) =
             ShopListFragment().apply {
                 arguments = Bundle().apply {
                     putInt(ARG_COLUMN_COUNT, columnCount)
-                    putInt(ARG_LOCATION_ID, locationId.toInt())
-                    putSerializable(ARG_FILTER_TYPE, filterType)
                 }
             }
     }
