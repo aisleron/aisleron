@@ -27,7 +27,7 @@
                 android:checkableBehavior="single">
                 <item
                     android:id="@+id/nav_list_shop_list"
-                    app:actionLayout="@layout/fragment_nav_shop_list"
+                    app:actionLayout="@layout/fragment_shop_menu_container"
                     app:labelVisibilityMode="unlabeled"
                     tools:ignore="MenuTitle" />
             </group>

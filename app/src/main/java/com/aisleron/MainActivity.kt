@@ -12,14 +12,8 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.NavController
 import androidx.navigation.ui.onNavDestinationSelected
-import androidx.recyclerview.widget.RecyclerView
 import com.aisleron.databinding.ActivityMainBinding
-import com.aisleron.domain.location.Location
-import com.aisleron.domain.location.LocationType
-import com.aisleron.placeholder.LocationData
-import com.aisleron.ui.navshoplist.NavShopListRecyclerViewAdapter
 
 class MainActivity : AppCompatActivity() {
 
@@ -53,31 +47,11 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
-        //Add Additional nav items
-        val navShopAdapter = NavShopListRecyclerViewAdapter(
-            LocationData.locations.filter { s -> s.type == LocationType.SHOP && s.pinned },
-            object :
-                NavShopListRecyclerViewAdapter.NavListShopItemListener {
-                override fun onItemClick(item: Location) {
-                    navigateToShoppingList(item, navController, drawerLayout)
-                }
-            })
-
-        val shopMenuItem: MenuItem? = navView.menu.findItem(R.id.nav_list_shop_list)
-        val recyclerView: RecyclerView? = shopMenuItem?.actionView as RecyclerView?
-        recyclerView?.adapter = navShopAdapter
-    }
-
-    private fun navigateToShoppingList(
-        item: Location,
-        navController: NavController,
-        drawerLayout: DrawerLayout
-    ) {
-        val bundle = Bundle()
-        bundle.putInt("locationId", item.id)
-        bundle.putSerializable("filterType", item.defaultFilter)
-        navController.navigate(R.id.nav_shopping_list, bundle)
-        drawerLayout.closeDrawers()
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            if (destination.id == R.id.nav_shopping_list) {
+                drawerLayout.closeDrawers()
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
