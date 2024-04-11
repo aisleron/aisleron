@@ -60,10 +60,15 @@ interface LocationDao : BaseDao<LocationEntity> {
     @Query("SELECT * FROM Location WHERE type = 'SHOP'")
     suspend fun getShops(): List<LocationEntity>
 
+    @Transaction
+    @Query("SELECT * FROM Location WHERE type = 'SHOP' AND pinned = 1")
+    suspend fun getPinnedShops(): List<LocationEntity>
+
     /**
      * Home Specific Queries
      */
     @Transaction
     @Query("SELECT * FROM Location WHERE type = 'HOME'")
     suspend fun getHome(): LocationEntity
+
 }

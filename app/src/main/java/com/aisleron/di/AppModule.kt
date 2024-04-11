@@ -3,8 +3,11 @@ package com.aisleron.di
 import androidx.room.Room
 import com.aisleron.data.AisleronDatabase
 import com.aisleron.data.location.LocationRepositoryImpl
+import com.aisleron.data.product.ProductRepositoryImpl
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.LocationRepository
+import com.aisleron.domain.product.ProductRepository
+import com.aisleron.ui.product.ProductViewModel
 import com.aisleron.ui.shop.ShopViewModel
 import com.aisleron.ui.shoplist.ShopListViewModel
 import com.aisleron.ui.shoppinglist.ShoppingListViewModel
@@ -25,6 +28,10 @@ val appModule = module {
         LocationRepositoryImpl(get())
     }
 
+    factory<ProductRepository> {
+        ProductRepositoryImpl(get())
+    }
+
     viewModel { (locationId: Int, filterType: FilterType) ->
         ShoppingListViewModel(get(), locationId, filterType)
     }
@@ -32,4 +39,6 @@ val appModule = module {
     viewModel { ShopViewModel(get()) }
 
     viewModel { ShopListViewModel(get()) }
+
+    viewModel { ProductViewModel(get()) }
 }

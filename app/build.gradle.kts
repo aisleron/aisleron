@@ -58,7 +58,7 @@ dependencies {
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     implementation("androidx.datastore:datastore-preferences:1.0.0")
     implementation("androidx.fragment:fragment-ktx:1.6.2")
-    implementation("androidx.databinding:databinding-runtime:8.3.1")
+    implementation("androidx.databinding:databinding-runtime:8.3.2")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
@@ -69,7 +69,7 @@ dependencies {
     ksp("androidx.room:room-compiler:2.6.1")
 
     //Koin
-    implementation("io.insert-koin:koin-android:3.2.0")
+    implementation("io.insert-koin:koin-android:3.5.4")
 
     //Coroutines
     implementation("androidx.room:room-ktx:2.6.1")

@@ -32,7 +32,6 @@ class ShopFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentShopBinding.inflate(inflater, container, false)
-
         val button: Button = binding.btnSaveShop
         button.setOnClickListener {
             viewModel.saveLocation(

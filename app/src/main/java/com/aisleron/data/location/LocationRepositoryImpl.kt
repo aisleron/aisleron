@@ -7,7 +7,7 @@ import com.aisleron.domain.location.LocationType
 
 class LocationRepositoryImpl(private val db: AisleronDatabase) : LocationRepository {
 
-    override fun getByType(type: LocationType): List<Location> {
+    override suspend fun getByType(type: LocationType): List<Location> {
         TODO("Not yet implemented")
 
     }
@@ -16,13 +16,16 @@ class LocationRepositoryImpl(private val db: AisleronDatabase) : LocationReposit
         return db.locationDao().getShops().map { it.toLocation() }
     }
 
-    override fun getHome(): Location {
+    override suspend fun getHome(): Location {
         TODO("Not yet implemented")
+    }
+
+    override suspend fun getPinnedShops(): List<Location> {
+        return db.locationDao().getPinnedShops().map { it.toLocation() }
     }
 
     override suspend fun get(id: Int): Location? {
         return db.locationDao().getLocation(id)?.toLocation()
-        //return LocationData.locations.find { l -> l.id == id }
     }
 
     override suspend fun getAll(): List<Location> {
@@ -34,7 +37,7 @@ class LocationRepositoryImpl(private val db: AisleronDatabase) : LocationReposit
     }
 
     override suspend fun update(item: Location) {
-        TODO("Not yet implemented")
+        db.locationDao().upsert(item.toLocationEntity())
     }
 
     override suspend fun remove(item: Location) {

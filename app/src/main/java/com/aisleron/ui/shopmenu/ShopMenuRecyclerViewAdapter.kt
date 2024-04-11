@@ -6,14 +6,15 @@ import android.view.ViewGroup
 import android.widget.TextView
 import com.aisleron.databinding.FragmentShopMenuItemBinding
 import com.aisleron.domain.location.Location
+import com.aisleron.ui.shoplist.ShopListItemViewModel
 
 /**
  * [RecyclerView.Adapter] that can display a [Location].
  *
  */
 class ShopMenuRecyclerViewAdapter(
-    private val values: List<Location>,
-    private val listener: NavListShopItemListener
+    private val values: List<ShopListItemViewModel>,
+    private val listener: ShopMenuItemListener
 ) : RecyclerView.Adapter<ShopMenuRecyclerViewAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -46,8 +47,8 @@ class ShopMenuRecyclerViewAdapter(
         }
     }
 
-    interface NavListShopItemListener {
-        fun onItemClick(item: Location)
+    interface ShopMenuItemListener {
+        fun onItemClick(item: ShopListItemViewModel)
     }
 
 }

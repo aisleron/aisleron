@@ -5,9 +5,9 @@ import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.FilterType
 
 interface ProductRepository : BaseRepository<Product> {
-    fun getInStock(): List<Product>
-    fun getNeeded(): List<Product>
-    fun getByFilter(filter: FilterType): List<Product>
-    fun getByAisle(aisle: Aisle): List<Product>
-    fun getByAisle(aisleId: Long): List<Product>
+    suspend fun getInStock(): List<Product>
+    suspend fun getNeeded(): List<Product>
+    suspend fun getByFilter(filter: FilterType): List<Product>
+    suspend fun getByAisle(aisle: Aisle): List<Product>
+    suspend fun getByAisle(aisleId: Long): List<Product>
 }

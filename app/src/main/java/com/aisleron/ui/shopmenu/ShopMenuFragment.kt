@@ -8,12 +8,13 @@ import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.aisleron.R
 import com.aisleron.domain.FilterType
-import com.aisleron.domain.location.Location
-import com.aisleron.domain.location.LocationType
-import com.aisleron.placeholder.LocationData
+import com.aisleron.ui.shoplist.ShopListItemViewModel
+import com.aisleron.ui.shoplist.ShopListViewModel
+import org.koin.android.ext.android.inject
 
 /**
  * A fragment representing a list of Items.
@@ -21,6 +22,7 @@ import com.aisleron.placeholder.LocationData
 class ShopMenuFragment : Fragment() {
 
     private var columnCount = 1
+    private val viewModel: ShopListViewModel by inject<ShopListViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,9 +30,11 @@ class ShopMenuFragment : Fragment() {
         arguments?.let {
             columnCount = it.getInt(ARG_COLUMN_COUNT)
         }
+
+        viewModel.hydratePinnedShops()
     }
 
-    private fun navigateToShoppingList(item: Location) {
+    private fun navigateToShoppingList(item: ShopListItemViewModel) {
         val bundle = Bundle()
         bundle.putInt(ARG_LOCATION_ID, item.id)
         bundle.putSerializable(ARG_FILTER_TYPE, item.defaultFilter)
@@ -41,20 +45,28 @@ class ShopMenuFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_shop_list, container, false)
+        val view = inflater.inflate(R.layout.fragment_shop_menu, container, false)
 
         // Set the adapter
         if (view is RecyclerView) {
+            lifecycleScope.launchWhenStarted {
+                viewModel.shopListUiState.collect {
+                    when (it) {
+                        is ShopListViewModel.ShopListUiState.Success -> view.adapter?.notifyDataSetChanged()
+                        else -> Unit
+                    }
+                }
+            }
             with(view) {
                 layoutManager = when {
                     columnCount <= 1 -> LinearLayoutManager(context)
                     else -> GridLayoutManager(context, columnCount)
                 }
                 adapter =
-                    ShopMenuRecyclerViewAdapter(LocationData.locations.filter { s -> s.type == LocationType.SHOP && s.pinned },
+                    ShopMenuRecyclerViewAdapter(viewModel.shops,
                         object :
-                            ShopMenuRecyclerViewAdapter.NavListShopItemListener {
-                            override fun onItemClick(item: Location) {
+                            ShopMenuRecyclerViewAdapter.ShopMenuItemListener {
+                            override fun onItemClick(item: ShopListItemViewModel) {
                                 navigateToShoppingList(item)
                             }
                         })

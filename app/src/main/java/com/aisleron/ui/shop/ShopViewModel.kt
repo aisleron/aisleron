@@ -31,11 +31,11 @@ class ShopViewModel(private val repository: LocationRepository) : ViewModel() {
     }
 
     private fun updateLocation(name: String, pinned: Boolean) {
-        location!!.let {
-            it.name = name
-            it.pinned = pinned
-        }
         viewModelScope.launch() {
+            location!!.let {
+                it.name = name
+                it.pinned = pinned
+            }
             repository.update(location!!)
         }
     }

@@ -12,7 +12,7 @@ interface ProductDao : BaseDao<ProductEntity> {
      */
     @Transaction
     @Query("SELECT * FROM Product WHERE id = :productId")
-    suspend fun getProduct(productId: Int): ProductEntity
+    suspend fun getProduct(productId: Int): ProductEntity?
 
     @Transaction
     @Query("SELECT * FROM Product WHERE id IN (:productId)")

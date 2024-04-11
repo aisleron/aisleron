@@ -28,7 +28,7 @@ class ShopListFragment : Fragment() {
             columnCount = it.getInt(ARG_COLUMN_COUNT)
         }
 
-        viewModel.hydrate()
+        viewModel.hydrateAllShops()
     }
 
     private fun navigateToShoppingList(item: ShopListItemViewModel) {
