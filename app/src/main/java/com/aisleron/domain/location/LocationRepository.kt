@@ -7,4 +7,5 @@ interface LocationRepository : BaseRepository<Location> {
     suspend fun getShops(): List<Location>
     suspend fun getHome(): Location
     suspend fun getPinnedShops(): List<Location>
+    suspend fun getLocationWithAislesWithProducts(id: Int): Location?
 }

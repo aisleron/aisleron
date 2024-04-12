@@ -2,7 +2,9 @@ package com.aisleron.di
 
 import androidx.room.Room
 import com.aisleron.data.AisleronDatabase
+import com.aisleron.data.location.LocationMapper
 import com.aisleron.data.location.LocationRepositoryImpl
+import com.aisleron.data.product.ProductMapper
 import com.aisleron.data.product.ProductRepositoryImpl
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.LocationRepository
@@ -24,14 +26,20 @@ val appModule = module {
         ).build()
     }
 
+    /**
+     * Repositories
+     */
     factory<LocationRepository> {
-        LocationRepositoryImpl(get())
+        LocationRepositoryImpl(get(), LocationMapper())
     }
 
     factory<ProductRepository> {
-        ProductRepositoryImpl(get())
+        ProductRepositoryImpl(get(), ProductMapper())
     }
 
+    /**
+     * ViewModels
+     */
     viewModel { (locationId: Int, filterType: FilterType) ->
         ShoppingListViewModel(get(), locationId, filterType)
     }

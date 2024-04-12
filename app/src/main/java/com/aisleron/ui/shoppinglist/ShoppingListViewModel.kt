@@ -52,18 +52,18 @@ class ShoppingListViewModel(
                 )
             )
             a.products.filter { p ->
-                (p.inStock && filterType == FilterType.IN_STOCK)
-                        || (!p.inStock && filterType == FilterType.NEEDED)
+                (p.product.inStock && filterType == FilterType.IN_STOCK)
+                        || (!p.product.inStock && filterType == FilterType.NEEDED)
                         || (filterType == FilterType.ALL)
             }.forEach { p ->
                 items.add(
                     ShoppingListItemViewModel(
                         ShoppingListItemType.PRODUCT,
                         a.rank,
-                        p.id,
-                        p.id,
-                        p.name,
-                        p.inStock
+                        p.rank,
+                        p.product.id,
+                        p.product.name,
+                        p.product.inStock
                     )
                 )
             }
