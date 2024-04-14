@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class ShopListViewModel (private val repository: LocationRepository) : ViewModel() {
+class ShopListViewModel(private val repository: LocationRepository) : ViewModel() {
     private var _shops = mutableListOf<ShopListItemViewModel>()
     val shops: List<ShopListItemViewModel> = _shops
 
@@ -16,7 +16,7 @@ class ShopListViewModel (private val repository: LocationRepository) : ViewModel
     val shopListUiState: StateFlow<ShopListUiState> = _shopListUiState
 
     fun hydratePinnedShops() {
-        viewModelScope.launch() {
+        viewModelScope.launch {
             _shops.clear()
             _shopListUiState.value = ShopListUiState.Loading
             _shops += repository.getPinnedShops().map {
@@ -28,7 +28,7 @@ class ShopListViewModel (private val repository: LocationRepository) : ViewModel
     }
 
     fun hydrateAllShops() {
-        viewModelScope.launch() {
+        viewModelScope.launch {
             _shops.clear()
             _shopListUiState.value = ShopListUiState.Loading
             _shops += repository.getShops().map {

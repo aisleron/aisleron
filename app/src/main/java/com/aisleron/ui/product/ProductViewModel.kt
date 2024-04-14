@@ -14,7 +14,7 @@ class ProductViewModel(private val repository: ProductRepository) : ViewModel() 
     private var product: Product? = null
 
     fun hydrate(productId: Int) {
-        viewModelScope.launch() {
+        viewModelScope.launch {
             product = repository.get(productId)
         }
     }
@@ -29,7 +29,7 @@ class ProductViewModel(private val repository: ProductRepository) : ViewModel() 
     }
 
     private fun updateProduct(name: String, inStock: Boolean) {
-        viewModelScope.launch() {
+        viewModelScope.launch {
             product!!.let {
                 it.name = name
                 it.inStock = inStock
@@ -39,7 +39,7 @@ class ProductViewModel(private val repository: ProductRepository) : ViewModel() 
     }
 
     private fun addProduct(name: String, inStock: Boolean) {
-        viewModelScope.launch() {
+        viewModelScope.launch {
             val id = repository.add(
                 Product(
                     name = name,

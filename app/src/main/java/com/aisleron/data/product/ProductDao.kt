@@ -23,6 +23,10 @@ interface ProductDao : BaseDao<ProductEntity> {
     suspend fun getProducts(): List<ProductEntity>
 
     @Transaction
+    @Query("SELECT * FROM Product p WHERE EXISTS(SELECT NULL FROM AisleProduct ap WHERE aisleId = :aisleId and p.id = ap.productId)")
+    suspend fun getProductsForAisle(aisleId: Int): List<ProductEntity>
+
+    @Transaction
     @Query("SELECT * FROM Product WHERE inStock = 1")
     suspend fun getInStockProducts(): List<ProductEntity>
 

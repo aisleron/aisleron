@@ -19,7 +19,7 @@ class ShoppingListViewModel(
 
     private fun getLocationFromRepo(): Location? {
         var result: Location? = null
-        viewModelScope.launch() {
+        viewModelScope.launch {
             result = repository.get(locationId)
         }
         return result
@@ -29,7 +29,8 @@ class ShoppingListViewModel(
     val locationName: String get() = location?.name.toString()
     val locationType: LocationType get() = location?.type ?: LocationType.HOME
 
-    val items = mutableListOf<ShoppingListItemViewModel>()
+    private val _items = mutableListOf<ShoppingListItemViewModel>()
+    val items: List<ShoppingListItemViewModel> = _items
 
     fun updateProduct(item: ShoppingListItemViewModel) {
         item.inStock?.let {
@@ -38,38 +39,40 @@ class ShoppingListViewModel(
     }
 
     fun refreshListItems() {
-        items.clear()
+        _items.clear()
 
         location?.aisles?.forEach { a ->
-            items.add(
+            _items.add(
                 ShoppingListItemViewModel(
-                    ShoppingListItemType.AISLE,
-                    a.rank,
-                    -1,
-                    a.id,
-                    a.name,
-                    null
+                    lineItemType = ShoppingListItemType.AISLE,
+                    aisleRank = a.rank,
+                    productRank = -1,
+                    id = a.id,
+                    name = a.name,
+                    inStock = null
                 )
             )
-            a.products.filter { p ->
+            _items += a.products.filter { p ->
                 (p.product.inStock && filterType == FilterType.IN_STOCK)
                         || (!p.product.inStock && filterType == FilterType.NEEDED)
                         || (filterType == FilterType.ALL)
-            }.forEach { p ->
-                items.add(
-                    ShoppingListItemViewModel(
-                        ShoppingListItemType.PRODUCT,
-                        a.rank,
-                        p.rank,
-                        p.product.id,
-                        p.product.name,
-                        p.product.inStock
-                    )
+            }.map { p ->
+                ShoppingListItemViewModel(
+                    lineItemType = ShoppingListItemType.PRODUCT,
+                    aisleRank = a.rank,
+                    productRank = p.rank,
+                    id = p.product.id,
+                    name = p.product.name,
+                    inStock = p.product.inStock
                 )
             }
         }
 
-        items.sortWith(compareBy({ it.aisleRank }, { it.productRank }))
-        //TODO: Add AisleEntity ID and/or AisleEntity & ProductEntity items to view model list
+        _items.sortWith(compareBy({ it.aisleRank }, { it.productRank }))
+        //TODO: Add Aisle Id and/or Aisle Object & Product Object items to view model list
+    }
+
+    fun removeItem(item: ShoppingListItemViewModel) {
+        _items.remove(item)
     }
 }

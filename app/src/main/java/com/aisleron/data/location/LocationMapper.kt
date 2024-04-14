@@ -10,6 +10,7 @@ class LocationMapper : MapperBaseImpl<LocationEntity, Location>() {
         defaultFilter = value.defaultFilter,
         pinned = value.pinned,
         type = value.type,
+        aisles = emptyList()
     )
 
     override fun fromModel(value: Location) = LocationEntity(

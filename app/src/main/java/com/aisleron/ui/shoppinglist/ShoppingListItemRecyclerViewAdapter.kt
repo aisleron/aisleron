@@ -13,7 +13,7 @@ import com.aisleron.databinding.FragmentProductListItemBinding
  *
  */
 class ShoppingListItemRecyclerViewAdapter(
-    private val values: MutableList<ShoppingListItemViewModel>,
+    private val values: List<ShoppingListItemViewModel>,
     private val listener: ShoppingListItemListener
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 

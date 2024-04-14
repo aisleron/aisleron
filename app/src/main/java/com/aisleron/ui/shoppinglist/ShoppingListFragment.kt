@@ -50,7 +50,7 @@ class ShoppingListFragment : Fragment() {
         if ((viewModel.filterType == FilterType.IN_STOCK && item.inStock == false)
             || (viewModel.filterType == FilterType.NEEDED && item.inStock == true)
         ) {
-            viewModel.items.remove(item)
+            viewModel.removeItem(item)
             adapter.notifyItemRemoved(absoluteAdapterPosition)
         } else {
 

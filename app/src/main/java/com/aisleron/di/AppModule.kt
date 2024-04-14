@@ -2,11 +2,14 @@ package com.aisleron.di
 
 import androidx.room.Room
 import com.aisleron.data.AisleronDatabase
+import com.aisleron.data.aisle.AisleMapper
+import com.aisleron.data.aisle.AisleRepositoryImpl
 import com.aisleron.data.location.LocationMapper
 import com.aisleron.data.location.LocationRepositoryImpl
 import com.aisleron.data.product.ProductMapper
 import com.aisleron.data.product.ProductRepositoryImpl
 import com.aisleron.domain.FilterType
+import com.aisleron.domain.aisle.AisleRepository
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.product.ProductRepository
 import com.aisleron.ui.product.ProductViewModel
@@ -35,6 +38,10 @@ val appModule = module {
 
     factory<ProductRepository> {
         ProductRepositoryImpl(get(), ProductMapper())
+    }
+
+    factory<AisleRepository> {
+        AisleRepositoryImpl(get(), AisleMapper())
     }
 
     /**

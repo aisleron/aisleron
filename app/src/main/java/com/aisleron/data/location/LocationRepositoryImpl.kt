@@ -1,7 +1,6 @@
 package com.aisleron.data.location
 
 import com.aisleron.data.AisleronDatabase
-import com.aisleron.data.aisle.AisleWithProductsMapper
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.location.LocationType
@@ -12,8 +11,10 @@ class LocationRepositoryImpl(
 ) : LocationRepository {
 
     override suspend fun getByType(type: LocationType): List<Location> {
-        TODO("Not yet implemented")
-
+        return when (type) {
+            LocationType.HOME -> listOf(getHome())
+            LocationType.SHOP -> getShops()
+        }
     }
 
     override suspend fun getShops(): List<Location> {
@@ -29,11 +30,17 @@ class LocationRepositoryImpl(
     }
 
     override suspend fun getLocationWithAislesWithProducts(id: Int): Location? {
-        return db.locationDao().getLocationWithAislesWithProducts(id)?.toLocation()
+        return db.locationDao().getLocationWithAislesWithProducts(id)
+            ?.let { LocationWithAislesWithProductsMapper().toModel(it) }
     }
 
     override suspend fun get(id: Int): Location? {
         return db.locationDao().getLocation(id)?.let { locationMapper.toModel(it) }
+    }
+
+    override suspend fun getMultiple(vararg id: Int): List<Location> {
+        // '*' is a spread operator required to pass vararg down
+        return locationMapper.toModelList(db.locationDao().getLocations(*id))
     }
 
     override suspend fun getAll(): List<Location> {
@@ -50,16 +57,6 @@ class LocationRepositoryImpl(
 
     override suspend fun remove(item: Location) {
         db.locationDao().delete(locationMapper.fromModel(item))
-    }
-
-    override suspend fun remove(id: Int) {
-        TODO("Not yet implemented")
-    }
-
-    private fun LocationWithAislesWithProducts.toLocation(): Location {
-        val location = locationMapper.toModel(this.location)
-        location.aisles = AisleWithProductsMapper().toModelList(this.aisles, location)
-        return location
     }
 }
 

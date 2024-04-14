@@ -10,5 +10,5 @@ data class Location(
     val defaultFilter: FilterType,
     var name: String,
     var pinned: Boolean,
-    var aisles: List<Aisle>? = null
+    var aisles: List<Aisle>
 ) : Serializable

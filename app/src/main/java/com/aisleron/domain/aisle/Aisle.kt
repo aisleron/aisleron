@@ -1,11 +1,10 @@
 package com.aisleron.domain.aisle
 
-import com.aisleron.domain.location.Location
-
 data class Aisle(
     val name: String,
     val products: List<AisleProduct>,
-    val location: Location?,
+    val locationId: Int,
     var rank: Int,
     val id: Int,
+    val isDefault: Boolean
 )

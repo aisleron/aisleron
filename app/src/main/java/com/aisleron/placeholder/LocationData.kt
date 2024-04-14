@@ -24,9 +24,10 @@ object LocationData {
                             AisleProduct(300, 1, ProductData.products[3]),
                             AisleProduct(400, 1, ProductData.products[4])
                         ),
-                        null,
+                        1,
                         2,
-                        1
+                        1,
+                        false
                     ),
                     Aisle(
                         "Pantry",
@@ -36,9 +37,10 @@ object LocationData {
                             AisleProduct(300, 2, ProductData.products[7]),
                             AisleProduct(400, 2, ProductData.products[8])
                         ),
-                        null,
                         1,
-                        2
+                        1,
+                        2,
+                        true
                     )
                 )
             ),
@@ -49,8 +51,8 @@ object LocationData {
                 defaultFilter = FilterType.NEEDED,
                 pinned = true,
                 aisles = listOf(
-                    Aisle("One", productsRandom(2), null, 2, 3),
-                    Aisle("Two", productsRandom(2), null, 1, 4)
+                    Aisle("One", productsRandom(2), 2, 2, 3, false),
+                    Aisle("Two", productsRandom(2), 2, 1, 4, true)
                 )
             ),
             Location(
@@ -60,8 +62,8 @@ object LocationData {
                 defaultFilter = FilterType.NEEDED,
                 pinned = true,
                 aisles = listOf(
-                    Aisle("Three", productsRandom(3), null, 2, 5),
-                    Aisle("Four", productsRandom(3), null, 1, 6)
+                    Aisle("Three", productsRandom(3), 3, 2, 5, false),
+                    Aisle("Four", productsRandom(3), 3, 1, 6, true)
                 )
             ),
             Location(
@@ -71,8 +73,8 @@ object LocationData {
                 defaultFilter = FilterType.NEEDED,
                 pinned = false,
                 aisles = listOf(
-                    Aisle("Five", productsRandom(4), null, 2, 7),
-                    Aisle("Six", productsRandom(4), null, 1, 8)
+                    Aisle("Five", productsRandom(4), 4, 2, 7, false),
+                    Aisle("Six", productsRandom(4), 4, 1, 8, true)
                 )
             ),
             Location(
@@ -82,8 +84,8 @@ object LocationData {
                 defaultFilter = FilterType.NEEDED,
                 pinned = true,
                 aisles = listOf(
-                    Aisle("Seven", productsRandom(5), null, 2, 9),
-                    Aisle("Eight", productsRandom(5), null, 1, 10)
+                    Aisle("Seven", productsRandom(5), 5, 2, 9, false),
+                    Aisle("Eight", productsRandom(5), 5, 1, 10, true)
                 )
             ),
             Location(
@@ -93,8 +95,8 @@ object LocationData {
                 defaultFilter = FilterType.NEEDED,
                 pinned = false,
                 aisles = listOf(
-                    Aisle("Nine", productsRandom(6), null, 2, 11),
-                    Aisle("Ten", productsRandom(6), null, 1, 12)
+                    Aisle("Nine", productsRandom(6), 6, 2, 11, false),
+                    Aisle("Ten", productsRandom(6), 6, 1, 12, true)
                 )
             ),
             Location(
@@ -104,8 +106,8 @@ object LocationData {
                 defaultFilter = FilterType.NEEDED,
                 pinned = false,
                 aisles = listOf(
-                    Aisle("One", productsRandom(7), null, 2, 13),
-                    Aisle("Two", productsRandom(7), null, 1, 14)
+                    Aisle("One", productsRandom(7), 7, 2, 13, false),
+                    Aisle("Two", productsRandom(7), 7, 1, 14, true)
                 )
             )
         )

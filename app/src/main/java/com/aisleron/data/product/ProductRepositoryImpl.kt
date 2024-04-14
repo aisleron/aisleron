@@ -19,19 +19,28 @@ class ProductRepositoryImpl(
     }
 
     override suspend fun getByFilter(filter: FilterType): List<Product> {
-        TODO("Not yet implemented")
+        return when (filter) {
+            FilterType.IN_STOCK -> getInStock()
+            FilterType.NEEDED -> getNeeded()
+            FilterType.ALL -> getAll()
+        }
     }
 
     override suspend fun getByAisle(aisle: Aisle): List<Product> {
-        TODO("Not yet implemented")
+        return getByAisle(aisle.id)
     }
 
-    override suspend fun getByAisle(aisleId: Long): List<Product> {
-        TODO("Not yet implemented")
+    override suspend fun getByAisle(aisleId: Int): List<Product> {
+        return productMapper.toModelList(db.productDao().getProductsForAisle(aisleId))
     }
 
     override suspend fun get(id: Int): Product? {
         return db.productDao().getProduct(id)?.let { productMapper.toModel(it) }
+    }
+
+    override suspend fun getMultiple(vararg id: Int): List<Product> {
+        // '*' is a spread operator required to pass vararg down
+        return productMapper.toModelList(db.productDao().getProducts(*id))
     }
 
     override suspend fun getAll(): List<Product> {
@@ -48,9 +57,5 @@ class ProductRepositoryImpl(
 
     override suspend fun remove(item: Product) {
         db.productDao().delete(productMapper.fromModel(item))
-    }
-
-    override suspend fun remove(id: Int) {
-        TODO("Not yet implemented")
     }
 }

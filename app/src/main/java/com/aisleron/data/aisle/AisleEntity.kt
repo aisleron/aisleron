@@ -8,5 +8,6 @@ data class AisleEntity(
     @PrimaryKey(autoGenerate = true) val id: Int,
     val name: String,
     val locationId: Int,
-    val rank: Int
+    val rank: Int,
+    val isDefault: Boolean = false
 )

@@ -9,5 +9,5 @@ interface ProductRepository : BaseRepository<Product> {
     suspend fun getNeeded(): List<Product>
     suspend fun getByFilter(filter: FilterType): List<Product>
     suspend fun getByAisle(aisle: Aisle): List<Product>
-    suspend fun getByAisle(aisleId: Long): List<Product>
+    suspend fun getByAisle(aisleId: Int): List<Product>
 }

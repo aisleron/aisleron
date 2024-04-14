@@ -17,7 +17,7 @@ class ShopViewModel(private val repository: LocationRepository) : ViewModel() {
     private var location: Location? = null
 
     fun hydrate(locationId: Int) {
-        viewModelScope.launch() {
+        viewModelScope.launch {
             location = repository.get(locationId)
         }
     }
@@ -31,7 +31,7 @@ class ShopViewModel(private val repository: LocationRepository) : ViewModel() {
     }
 
     private fun updateLocation(name: String, pinned: Boolean) {
-        viewModelScope.launch() {
+        viewModelScope.launch {
             location!!.let {
                 it.name = name
                 it.pinned = pinned
@@ -41,13 +41,14 @@ class ShopViewModel(private val repository: LocationRepository) : ViewModel() {
     }
 
     private fun addLocation(name: String, pinned: Boolean) {
-        viewModelScope.launch() {
+        viewModelScope.launch {
             val id = repository.add(
                 Location(
                     type = LocationType.SHOP,
                     defaultFilter = FilterType.NEEDED,
                     name = name,
                     pinned = pinned,
+                    aisles = emptyList(),
                     id = 0
                 )
             )
