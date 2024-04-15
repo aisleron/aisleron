@@ -6,35 +6,47 @@ import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.location.LocationType
-import com.aisleron.placeholder.ProductData
+import com.aisleron.domain.product.ProductRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class ShoppingListViewModel(
-    private val repository: LocationRepository,
-    private val locationId: Int,
-    val filterType: FilterType
+    private val locationRepository: LocationRepository,
+    private val productRepository: ProductRepository
 ) : ViewModel() {
 
-    private val location: Location? = getLocationFromRepo()
-
-    private fun getLocationFromRepo(): Location? {
-        var result: Location? = null
-        viewModelScope.launch {
-            result = repository.get(locationId)
-        }
-        return result
-    }
-
+    private var location: Location? = null
 
     val locationName: String get() = location?.name.toString()
     val locationType: LocationType get() = location?.type ?: LocationType.HOME
 
+    var filterType: FilterType = FilterType.NEEDED
+        private set
+
     private val _items = mutableListOf<ShoppingListItemViewModel>()
     val items: List<ShoppingListItemViewModel> = _items
 
-    fun updateProduct(item: ShoppingListItemViewModel) {
-        item.inStock?.let {
-            ProductData.products.find { p -> p.id == item.id }?.inStock = it
+    private val _shoppingListUiState = MutableStateFlow<ShoppingListUiState>(
+        ShoppingListUiState.Empty,
+    )
+    val shoppingListUiState: StateFlow<ShoppingListUiState> = _shoppingListUiState
+
+    fun hydrate(locationId: Int, filterType: FilterType) {
+        viewModelScope.launch {
+            this@ShoppingListViewModel.filterType = filterType
+            _shoppingListUiState.value = ShoppingListUiState.Loading
+            location = locationRepository.getLocationWithAislesWithProducts(locationId)
+            refreshListItems()
+            _shoppingListUiState.value = ShoppingListUiState.Success(items)
+        }
+    }
+
+    fun updateProductStatus(item: ShoppingListItemViewModel) {
+        viewModelScope.launch {
+            item.inStock?.let {
+                productRepository.updateStatus(item.id, it)
+            }
         }
     }
 
@@ -74,5 +86,14 @@ class ShoppingListViewModel(
 
     fun removeItem(item: ShoppingListItemViewModel) {
         _items.remove(item)
+    }
+
+    sealed class ShoppingListUiState {
+        data object Empty : ShoppingListUiState()
+        data object Loading : ShoppingListUiState()
+
+        //data object Error : ShoppingListUiState()
+        data class Success(val shoppingList: List<ShoppingListItemViewModel>) :
+            ShoppingListUiState()
     }
 }

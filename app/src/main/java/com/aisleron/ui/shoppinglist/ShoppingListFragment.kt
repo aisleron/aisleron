@@ -12,20 +12,20 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.aisleron.R
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.LocationType
 import com.aisleron.widgets.ContextMenuRecyclerView
-import org.koin.android.ext.android.get
-import org.koin.core.parameter.parametersOf
+import org.koin.android.ext.android.inject
 
 /**
  * A fragment representing a list of [ShoppingListItemViewModel].
  */
 class ShoppingListFragment : Fragment() {
 
-    private lateinit var viewModel: ShoppingListViewModel // by inject<ShoppingListViewModel>()
+    private val viewModel: ShoppingListViewModel by inject<ShoppingListViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,7 +35,7 @@ class ShoppingListFragment : Fragment() {
         val filterType: FilterType =
             if (bundle != null) bundle.getSerializable(ARG_FILTER_TYPE) as FilterType else FilterType.ALL
 
-        viewModel = get<ShoppingListViewModel> { parametersOf(locationId, filterType) }
+        viewModel.hydrate(locationId, filterType)
     }
 
     private fun updateProduct(
@@ -45,7 +45,7 @@ class ShoppingListFragment : Fragment() {
         absoluteAdapterPosition: Int
     ) {
         item.inStock = inStock
-        viewModel.updateProduct(item)
+        viewModel.updateProductStatus(item)
 
         if ((viewModel.filterType == FilterType.IN_STOCK && item.inStock == false)
             || (viewModel.filterType == FilterType.NEEDED && item.inStock == true)
@@ -62,13 +62,26 @@ class ShoppingListFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        viewModel.refreshListItems()
         val view = inflater.inflate(R.layout.fragment_shopping_list, container, false)
 
         // Set the adapter
         if (view is RecyclerView) {
             view.addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
             registerForContextMenu(view)
+
+            lifecycleScope.launchWhenStarted {
+                viewModel.shoppingListUiState.collect {
+                    when (it) {
+                        is ShoppingListViewModel.ShoppingListUiState.Success -> {
+                            view.adapter?.notifyDataSetChanged()
+                            updateTitle()
+                        }
+
+                        ShoppingListViewModel.ShoppingListUiState.Empty -> Unit
+                        ShoppingListViewModel.ShoppingListUiState.Loading -> Unit
+                    }
+                }
+            }
 
             with(view) {
                 LinearLayoutManager(context)
@@ -111,6 +124,19 @@ class ShoppingListFragment : Fragment() {
         return view
     }
 
+    private fun updateTitle() {
+        (activity as AppCompatActivity).supportActionBar?.title = when (viewModel.locationType) {
+            LocationType.HOME ->
+                when (viewModel.filterType) {
+                    FilterType.IN_STOCK -> resources.getString(R.string.menu_in_stock)
+                    FilterType.NEEDED -> resources.getString(R.string.menu_shopping_list)
+                    FilterType.ALL -> resources.getString(R.string.menu_all_items)
+                }
+
+            LocationType.SHOP -> viewModel.locationName
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val bundle = arguments
@@ -142,20 +168,6 @@ class ShoppingListFragment : Fragment() {
 
             else -> super.onContextItemSelected(item)
         }
-    }
-
-    override fun onResume() {
-        (activity as AppCompatActivity).supportActionBar?.title = when (viewModel.locationType) {
-            LocationType.HOME ->
-                when (viewModel.filterType) {
-                    FilterType.IN_STOCK -> resources.getString(R.string.menu_in_stock)
-                    FilterType.NEEDED -> resources.getString(R.string.menu_shopping_list)
-                    FilterType.ALL -> resources.getString(R.string.menu_all_items)
-                }
-
-            LocationType.SHOP -> viewModel.locationName
-        }
-        super.onResume()
     }
 
     companion object {

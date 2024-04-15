@@ -8,7 +8,6 @@ import com.aisleron.data.location.LocationMapper
 import com.aisleron.data.location.LocationRepositoryImpl
 import com.aisleron.data.product.ProductMapper
 import com.aisleron.data.product.ProductRepositoryImpl
-import com.aisleron.domain.FilterType
 import com.aisleron.domain.aisle.AisleRepository
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.product.ProductRepository
@@ -47,9 +46,7 @@ val appModule = module {
     /**
      * ViewModels
      */
-    viewModel { (locationId: Int, filterType: FilterType) ->
-        ShoppingListViewModel(get(), locationId, filterType)
-    }
+    viewModel { ShoppingListViewModel(get(), get()) }
 
     viewModel { ShopViewModel(get()) }
 
