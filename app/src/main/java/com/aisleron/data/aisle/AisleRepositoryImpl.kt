@@ -2,6 +2,7 @@ package com.aisleron.data.aisle
 
 import com.aisleron.data.AisleronDatabase
 import com.aisleron.domain.aisle.Aisle
+import com.aisleron.domain.aisle.AisleProduct
 import com.aisleron.domain.aisle.AisleRepository
 import com.aisleron.domain.location.Location
 
@@ -15,6 +16,11 @@ class AisleRepositoryImpl(
 
     override suspend fun getForLocation(location: Location): List<Aisle> {
         return getForLocation(location.id)
+    }
+
+    override suspend fun addAisleProducts(aisleProducts: List<AisleProduct>) {
+        val ape = AisleProductRankMapper().fromModelList(aisleProducts).map { it.aisleProduct }
+        db.aisleProductDao().upsert(*ape.map { it }.toTypedArray())
     }
 
     override suspend fun get(id: Int): Aisle? {
@@ -31,7 +37,17 @@ class AisleRepositoryImpl(
     }
 
     override suspend fun add(item: Aisle): Int {
-        return db.aisleDao().upsert(aisleMapper.fromModel(item))[0].toInt()
+        val aisleId = db.aisleDao().upsert(aisleMapper.fromModel(item))[0].toInt()
+        if (item.products.isNotEmpty()) {
+            addAisleProducts(item.products.map {
+                AisleProduct(
+                    rank = it.rank,
+                    aisleId = aisleId,
+                    product = it.product
+                )
+            })
+        }
+        return aisleId
     }
 
     override suspend fun update(item: Aisle) {

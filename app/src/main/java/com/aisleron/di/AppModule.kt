@@ -9,8 +9,13 @@ import com.aisleron.data.location.LocationRepositoryImpl
 import com.aisleron.data.product.ProductMapper
 import com.aisleron.data.product.ProductRepositoryImpl
 import com.aisleron.domain.aisle.AisleRepository
+import com.aisleron.domain.aisle.usecases.AddAisleUseCase
 import com.aisleron.domain.location.LocationRepository
+import com.aisleron.domain.location.usecases.AddLocationUseCase
+import com.aisleron.domain.location.usecases.GetLocationUseCase
+import com.aisleron.domain.location.usecases.UpdateLocationUseCase
 import com.aisleron.domain.product.ProductRepository
+import com.aisleron.domain.product.usecases.GetProductsUseCase
 import com.aisleron.ui.product.ProductViewModel
 import com.aisleron.ui.shop.ShopViewModel
 import com.aisleron.ui.shoplist.ShopListViewModel
@@ -40,7 +45,43 @@ val appModule = module {
     }
 
     factory<AisleRepository> {
-        AisleRepositoryImpl(get(), AisleMapper())
+        AisleRepositoryImpl(
+            db = get(),
+            aisleMapper = AisleMapper()
+        )
+    }
+
+    /**
+     * Location Use Cases
+     */
+    factory<AddLocationUseCase> {
+        AddLocationUseCase(
+            locationRepository = get(),
+            addAisleUseCase = get(),
+            getProductsUseCase = get()
+        )
+    }
+
+    factory<UpdateLocationUseCase> {
+        UpdateLocationUseCase(locationRepository = get())
+    }
+
+    factory<GetLocationUseCase> {
+        GetLocationUseCase(locationRepository = get())
+    }
+
+    /**
+     * Aisle Use Cases
+     */
+    factory<AddAisleUseCase> {
+        AddAisleUseCase(aisleRepository = get())
+    }
+
+    /**
+     * Product Use Cases
+     */
+    factory<GetProductsUseCase> {
+        GetProductsUseCase(productRepository = get())
     }
 
     /**
@@ -48,7 +89,13 @@ val appModule = module {
      */
     viewModel { ShoppingListViewModel(get(), get()) }
 
-    viewModel { ShopViewModel(get()) }
+    viewModel {
+        ShopViewModel(
+            addLocation = get(),
+            updateLocation = get(),
+            getLocation = get()
+        )
+    }
 
     viewModel { ShopListViewModel(get()) }
 
