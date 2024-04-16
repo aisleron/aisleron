@@ -38,6 +38,7 @@ class ShopFragment : Fragment() {
                 binding.edtShopName.text.toString(),
                 binding.swcShopPinned.isChecked
             )
+            //TODO: Add UI State to back listener
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 

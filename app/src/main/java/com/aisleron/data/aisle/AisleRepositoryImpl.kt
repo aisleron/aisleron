@@ -19,8 +19,15 @@ class AisleRepositoryImpl(
     }
 
     override suspend fun addAisleProducts(aisleProducts: List<AisleProduct>) {
-        val ape = AisleProductRankMapper().fromModelList(aisleProducts).map { it.aisleProduct }
-        db.aisleProductDao().upsert(*ape.map { it }.toTypedArray())
+        db.aisleProductDao()
+            .upsert(*AisleProductRankMapper().fromModelList(aisleProducts)
+                .map { it.aisleProduct }
+                .map { it }.toTypedArray()
+            )
+    }
+
+    override suspend fun getDefaultAisles(): List<Aisle> {
+        return aisleMapper.toModelList(db.aisleDao().getDefaultAisles())
     }
 
     override suspend fun get(id: Int): Aisle? {

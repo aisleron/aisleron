@@ -9,13 +9,18 @@ import com.aisleron.data.location.LocationRepositoryImpl
 import com.aisleron.data.product.ProductMapper
 import com.aisleron.data.product.ProductRepositoryImpl
 import com.aisleron.domain.aisle.AisleRepository
-import com.aisleron.domain.aisle.usecases.AddAisleUseCase
+import com.aisleron.domain.aisle.usecase.AddAisleProductsUseCase
+import com.aisleron.domain.aisle.usecase.AddAisleUseCase
+import com.aisleron.domain.aisle.usecase.GetDefaultAislesUseCase
 import com.aisleron.domain.location.LocationRepository
-import com.aisleron.domain.location.usecases.AddLocationUseCase
-import com.aisleron.domain.location.usecases.GetLocationUseCase
-import com.aisleron.domain.location.usecases.UpdateLocationUseCase
+import com.aisleron.domain.location.usecase.AddLocationUseCase
+import com.aisleron.domain.location.usecase.GetLocationUseCase
+import com.aisleron.domain.location.usecase.UpdateLocationUseCase
 import com.aisleron.domain.product.ProductRepository
-import com.aisleron.domain.product.usecases.GetProductsUseCase
+import com.aisleron.domain.product.usecase.AddProductUseCase
+import com.aisleron.domain.product.usecase.GetProductUseCase
+import com.aisleron.domain.product.usecase.GetProductsUseCase
+import com.aisleron.domain.product.usecase.UpdateProductUseCase
 import com.aisleron.ui.product.ProductViewModel
 import com.aisleron.ui.shop.ShopViewModel
 import com.aisleron.ui.shoplist.ShopListViewModel
@@ -58,31 +63,40 @@ val appModule = module {
         AddLocationUseCase(
             locationRepository = get(),
             addAisleUseCase = get(),
-            getProductsUseCase = get()
+            getProductsUseCase = get(),
+            addAisleProductsUseCase = get()
         )
     }
 
-    factory<UpdateLocationUseCase> {
-        UpdateLocationUseCase(locationRepository = get())
-    }
+    factory<UpdateLocationUseCase> { UpdateLocationUseCase(locationRepository = get()) }
 
-    factory<GetLocationUseCase> {
-        GetLocationUseCase(locationRepository = get())
-    }
+    factory<GetLocationUseCase> { GetLocationUseCase(locationRepository = get()) }
 
     /**
      * Aisle Use Cases
      */
-    factory<AddAisleUseCase> {
-        AddAisleUseCase(aisleRepository = get())
-    }
+    factory<AddAisleUseCase> { AddAisleUseCase(aisleRepository = get()) }
+
+    factory<AddAisleProductsUseCase> { AddAisleProductsUseCase(aisleRepository = get()) }
+
+    factory<GetDefaultAislesUseCase> { GetDefaultAislesUseCase(aisleRepository = get()) }
 
     /**
      * Product Use Cases
      */
-    factory<GetProductsUseCase> {
-        GetProductsUseCase(productRepository = get())
+    factory<GetProductsUseCase> { GetProductsUseCase(productRepository = get()) }
+
+    factory<GetProductUseCase> { GetProductUseCase(productRepository = get()) }
+
+    factory<AddProductUseCase> {
+        AddProductUseCase(
+            productRepository = get(),
+            getDefaultAislesUseCase = get(),
+            addAisleProductsUseCase = get()
+        )
     }
+
+    factory<UpdateProductUseCase> { UpdateProductUseCase(productRepository = get()) }
 
     /**
      * ViewModels
@@ -91,13 +105,19 @@ val appModule = module {
 
     viewModel {
         ShopViewModel(
-            addLocation = get(),
-            updateLocation = get(),
-            getLocation = get()
+            addLocationUseCase = get(),
+            updateLocationUseCase = get(),
+            getLocationUseCase = get()
         )
     }
 
     viewModel { ShopListViewModel(get()) }
 
-    viewModel { ProductViewModel(get()) }
+    viewModel {
+        ProductViewModel(
+            addProductUseCase = get(),
+            updateProductUseCase = get(),
+            getProductUseCase = get()
+        )
+    }
 }

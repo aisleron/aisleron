@@ -142,6 +142,10 @@ class ShoppingListFragment : Fragment() {
         val bundle = arguments
     }
 
+    override fun onResume() {
+        super.onResume()
+    }
+
 
     override fun onCreateContextMenu(
         menu: ContextMenu, v: View, menuInfo: ContextMenu.ContextMenuInfo?

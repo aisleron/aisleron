@@ -5,15 +5,15 @@ import androidx.lifecycle.viewModelScope
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationType
-import com.aisleron.domain.location.usecases.AddLocationUseCase
-import com.aisleron.domain.location.usecases.GetLocationUseCase
-import com.aisleron.domain.location.usecases.UpdateLocationUseCase
+import com.aisleron.domain.location.usecase.AddLocationUseCase
+import com.aisleron.domain.location.usecase.GetLocationUseCase
+import com.aisleron.domain.location.usecase.UpdateLocationUseCase
 import kotlinx.coroutines.launch
 
 class ShopViewModel(
-    private val addLocation: AddLocationUseCase,
-    private val updateLocation: UpdateLocationUseCase,
-    private val getLocation: GetLocationUseCase
+    private val addLocationUseCase: AddLocationUseCase,
+    private val updateLocationUseCase: UpdateLocationUseCase,
+    private val getLocationUseCase: GetLocationUseCase
 ) : ViewModel() {
     val pinned: Boolean? get() = location?.pinned
     val defaultFilter: FilterType? get() = location?.defaultFilter
@@ -24,7 +24,7 @@ class ShopViewModel(
 
     fun hydrate(locationId: Int) {
         viewModelScope.launch {
-            location = getLocation(locationId)
+            location = getLocationUseCase(locationId)
         }
     }
 
@@ -42,13 +42,13 @@ class ShopViewModel(
                 it.name = name
                 it.pinned = pinned
             }
-            updateLocation(location!!)
+            updateLocationUseCase(location!!)
         }
     }
 
     private fun addLocation(name: String, pinned: Boolean) {
         viewModelScope.launch {
-            val id = addLocation(
+            val id = addLocationUseCase(
                 Location(
                     type = LocationType.SHOP,
                     defaultFilter = FilterType.NEEDED,
