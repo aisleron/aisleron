@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.aisleron.databinding.FragmentShopBinding
 import com.aisleron.ui.shoppinglist.ShoppingListFragment
 import org.koin.android.ext.android.inject
@@ -38,8 +39,22 @@ class ShopFragment : Fragment() {
                 binding.edtShopName.text.toString(),
                 binding.swcShopPinned.isChecked
             )
-            //TODO: Add UI State to back listener
-            requireActivity().onBackPressedDispatcher.onBackPressed()
+
+            lifecycleScope.launchWhenStarted {
+                viewModel.shopUiState.collect {
+                    when (it) {
+                        is ShopViewModel.ShopUiState.Success -> {
+                            requireActivity().onBackPressedDispatcher.onBackPressed()
+                        }
+
+                        ShopViewModel.ShopUiState.Empty -> Unit
+                        ShopViewModel.ShopUiState.Error -> Unit
+                        ShopViewModel.ShopUiState.Loading -> Unit
+                    }
+                }
+            }
+
+
         }
 
         return binding.root

@@ -28,7 +28,7 @@ class ShoppingListViewModel(
     val items: List<ShoppingListItemViewModel> = _items
 
     private val _shoppingListUiState = MutableStateFlow<ShoppingListUiState>(
-        ShoppingListUiState.Empty,
+        ShoppingListUiState.Empty
     )
     val shoppingListUiState: StateFlow<ShoppingListUiState> = _shoppingListUiState
 

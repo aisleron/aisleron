@@ -1,12 +1,13 @@
 package com.aisleron.ui.product
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.aisleron.databinding.FragmentProductBinding
 import org.koin.android.ext.android.inject
 
@@ -36,7 +37,19 @@ class ProductFragment : Fragment() {
                 binding.edtProductName.text.toString(),
                 binding.chkProductInStock.isChecked
             )
-            requireActivity().onBackPressedDispatcher.onBackPressed()
+            lifecycleScope.launchWhenStarted {
+                viewModel.productUiState.collect {
+                    when (it) {
+                        is ProductViewModel.ProductUiState.Success -> {
+                            requireActivity().onBackPressedDispatcher.onBackPressed()
+                        }
+
+                        ProductViewModel.ProductUiState.Empty -> Unit
+                        ProductViewModel.ProductUiState.Error -> Unit
+                        ProductViewModel.ProductUiState.Loading -> Unit
+                    }
+                }
+            }
         }
 
         val chk = binding.chkProductInStock

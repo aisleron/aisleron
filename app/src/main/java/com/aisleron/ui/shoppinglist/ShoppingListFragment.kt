@@ -68,6 +68,7 @@ class ShoppingListFragment : Fragment() {
         if (view is RecyclerView) {
             view.addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
             registerForContextMenu(view)
+            //TODO: Refresh the data when view is reloaded, e.g. after adding a new product
 
             lifecycleScope.launchWhenStarted {
                 viewModel.shoppingListUiState.collect {

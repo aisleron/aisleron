@@ -8,6 +8,8 @@ import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.location.usecase.AddLocationUseCase
 import com.aisleron.domain.location.usecase.GetLocationUseCase
 import com.aisleron.domain.location.usecase.UpdateLocationUseCase
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class ShopViewModel(
@@ -22,43 +24,55 @@ class ShopViewModel(
 
     private var location: Location? = null
 
+    private val _shopUiState = MutableStateFlow<ShopUiState>(ShopUiState.Empty)
+    val shopUiState: StateFlow<ShopUiState> = _shopUiState
+
     fun hydrate(locationId: Int) {
         viewModelScope.launch {
+            _shopUiState.value = ShopUiState.Loading
             location = getLocationUseCase(locationId)
+            _shopUiState.value = ShopUiState.Success(this@ShopViewModel)
         }
     }
 
     fun saveLocation(name: String, pinned: Boolean) {
-        if (location == null) {
-            addLocation(name, pinned)
-        } else {
-            updateLocation(name, pinned)
-        }
-    }
-
-    private fun updateLocation(name: String, pinned: Boolean) {
         viewModelScope.launch {
-            location!!.let {
-                it.name = name
-                it.pinned = pinned
+            _shopUiState.value = ShopUiState.Loading
+            if (location == null) {
+                addLocation(name, pinned)
+            } else {
+                updateLocation(name, pinned)
             }
-            updateLocationUseCase(location!!)
+            _shopUiState.value = ShopUiState.Success(this@ShopViewModel)
         }
     }
 
-    private fun addLocation(name: String, pinned: Boolean) {
-        viewModelScope.launch {
-            val id = addLocationUseCase(
-                Location(
-                    type = LocationType.SHOP,
-                    defaultFilter = FilterType.NEEDED,
-                    name = name,
-                    pinned = pinned,
-                    aisles = emptyList(),
-                    id = 0
-                )
-            )
-            hydrate(id)
+    private suspend fun updateLocation(name: String, pinned: Boolean) {
+        location!!.let {
+            it.name = name
+            it.pinned = pinned
         }
+        updateLocationUseCase(location!!)
+    }
+
+    private suspend fun addLocation(name: String, pinned: Boolean) {
+        val id = addLocationUseCase(
+            Location(
+                type = LocationType.SHOP,
+                defaultFilter = FilterType.NEEDED,
+                name = name,
+                pinned = pinned,
+                aisles = emptyList(),
+                id = 0
+            )
+        )
+        hydrate(id)
+    }
+
+    sealed class ShopUiState {
+        data object Empty : ShopUiState()
+        data object Loading : ShopUiState()
+        data object Error : ShopUiState()
+        data class Success(val shop: ShopViewModel) : ShopUiState()
     }
 }
