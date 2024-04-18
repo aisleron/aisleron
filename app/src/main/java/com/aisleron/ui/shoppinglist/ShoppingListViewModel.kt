@@ -84,8 +84,8 @@ class ShoppingListViewModel(
             }
         }
 
-        _items.sortWith(compareByDescending<ShoppingListItemViewModel> { it.aisleRank }.thenByDescending
-        { it.productRank }.thenBy { it.name })
+        _items.sortWith(compareByDescending<ShoppingListItemViewModel> { it.aisleRank }.thenBy { it.lineItemType }
+            .thenByDescending { it.productRank }.thenBy { it.name })
         //TODO: Add Aisle Id and/or Aisle Object & Product Object items to view model list
     }
 
