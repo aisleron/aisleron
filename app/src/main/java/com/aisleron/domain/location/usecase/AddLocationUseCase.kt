@@ -6,12 +6,12 @@ import com.aisleron.domain.aisle.usecase.AddAisleProductsUseCase
 import com.aisleron.domain.aisle.usecase.AddAisleUseCase
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationRepository
-import com.aisleron.domain.product.usecase.GetProductsUseCase
+import com.aisleron.domain.product.usecase.GetAllProductsUseCase
 
 class AddLocationUseCase(
     private val locationRepository: LocationRepository,
     private val addAisleUseCase: AddAisleUseCase,
-    private val getProductsUseCase: GetProductsUseCase,
+    private val getAllProductsUseCase: GetAllProductsUseCase,
     private val addAisleProductsUseCase: AddAisleProductsUseCase
 
 ) {
@@ -29,7 +29,7 @@ class AddLocationUseCase(
         )
 
         addAisleProductsUseCase(
-            getProductsUseCase().sortedBy { it.name }.mapIndexed { i, p ->
+            getAllProductsUseCase().sortedBy { it.name }.mapIndexed { i, p ->
                 AisleProduct(
                     rank = (i + 1) * 100,
                     aisleId = newAisleId,

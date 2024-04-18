@@ -1,24 +1,33 @@
 package com.aisleron.ui.shoppinglist
 
+import android.content.Context
 import android.os.Bundle
 import android.view.ContextMenu
-import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
+import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.aisleron.R
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.LocationType
 import com.aisleron.widgets.ContextMenuRecyclerView
+import com.google.android.material.textfield.TextInputEditText
 import org.koin.android.ext.android.inject
+
 
 /**
  * A fragment representing a list of [ShoppingListItemViewModel].
@@ -141,6 +150,48 @@ class ShoppingListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val bundle = arguments
+
+        val menuHost: MenuHost = requireActivity()
+        menuHost.addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.shopping_list_fragment_main, menu)
+            }
+
+            //NOTE: If you override onMenuItemSelected, OnSupportNavigateUp will only be called when returning false
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                if (menuItem.itemId == R.id.nav_add_aisle) {
+                    addAisle(view.context)
+                    return true
+                }
+                return false
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+    }
+
+    private fun addAisle(context: Context) {
+        val inflater = requireActivity().layoutInflater
+        val aisleDialogView = inflater.inflate(R.layout.dialog_aisle, null)
+        val txtAisleName = aisleDialogView.findViewById<TextInputEditText>(R.id.edt_aisle_name)
+        val builder: AlertDialog.Builder = AlertDialog.Builder(context)
+
+        builder
+            .setTitle(R.string.add_aisle)
+            .setView(aisleDialogView)
+            .setPositiveButton(R.string.add) { _, _ ->
+                viewModel.addAisle(txtAisleName.text.toString())
+            }
+            .setNegativeButton(R.string.cancel, null)
+
+        val dialog: AlertDialog = builder.create()
+
+        txtAisleName.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+            }
+        }
+
+        txtAisleName.requestFocus()
+        dialog.show()
     }
 
     override fun onResume() {

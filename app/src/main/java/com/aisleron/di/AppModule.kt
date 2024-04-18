@@ -19,8 +19,10 @@ import com.aisleron.domain.location.usecase.UpdateLocationUseCase
 import com.aisleron.domain.product.ProductRepository
 import com.aisleron.domain.product.usecase.AddProductUseCase
 import com.aisleron.domain.product.usecase.GetProductUseCase
-import com.aisleron.domain.product.usecase.GetProductsUseCase
+import com.aisleron.domain.product.usecase.GetAllProductsUseCase
+import com.aisleron.domain.product.usecase.UpdateProductStatusUseCase
 import com.aisleron.domain.product.usecase.UpdateProductUseCase
+import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
 import com.aisleron.ui.product.ProductViewModel
 import com.aisleron.ui.shop.ShopViewModel
 import com.aisleron.ui.shoplist.ShopListViewModel
@@ -63,7 +65,7 @@ val appModule = module {
         AddLocationUseCase(
             locationRepository = get(),
             addAisleUseCase = get(),
-            getProductsUseCase = get(),
+            getAllProductsUseCase = get(),
             addAisleProductsUseCase = get()
         )
     }
@@ -84,9 +86,11 @@ val appModule = module {
     /**
      * Product Use Cases
      */
-    factory<GetProductsUseCase> { GetProductsUseCase(productRepository = get()) }
+    factory<GetAllProductsUseCase> { GetAllProductsUseCase(productRepository = get()) }
 
     factory<GetProductUseCase> { GetProductUseCase(productRepository = get()) }
+
+    factory<UpdateProductUseCase> { UpdateProductUseCase(productRepository = get()) }
 
     factory<AddProductUseCase> {
         AddProductUseCase(
@@ -96,12 +100,28 @@ val appModule = module {
         )
     }
 
-    factory<UpdateProductUseCase> { UpdateProductUseCase(productRepository = get()) }
+    factory<UpdateProductStatusUseCase> {
+        UpdateProductStatusUseCase(
+            getProductUseCase = get(),
+            updateProductUseCase = get()
+        )
+    }
+
+    /**
+     * Shopping List Use Cases
+     */
+    factory<GetShoppingListUseCase> { GetShoppingListUseCase(locationRepository = get()) }
 
     /**
      * ViewModels
      */
-    viewModel { ShoppingListViewModel(get(), get()) }
+    viewModel {
+        ShoppingListViewModel(
+            getShoppingListUseCase = get(),
+            updateProductStatusUseCase = get(),
+            addAisleUseCase = get()
+        )
+    }
 
     viewModel {
         ShopViewModel(

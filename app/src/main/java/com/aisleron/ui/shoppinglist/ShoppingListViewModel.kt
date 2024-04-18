@@ -3,17 +3,20 @@ package com.aisleron.ui.shoppinglist
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aisleron.domain.FilterType
+import com.aisleron.domain.aisle.Aisle
+import com.aisleron.domain.aisle.usecase.AddAisleUseCase
 import com.aisleron.domain.location.Location
-import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.location.LocationType
-import com.aisleron.domain.product.ProductRepository
+import com.aisleron.domain.product.usecase.UpdateProductStatusUseCase
+import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class ShoppingListViewModel(
-    private val locationRepository: LocationRepository,
-    private val productRepository: ProductRepository
+    private val getShoppingListUseCase: GetShoppingListUseCase,
+    private val updateProductStatusUseCase: UpdateProductStatusUseCase,
+    private val addAisleUseCase: AddAisleUseCase
 ) : ViewModel() {
 
     private var location: Location? = null
@@ -36,8 +39,7 @@ class ShoppingListViewModel(
         viewModelScope.launch {
             this@ShoppingListViewModel.filterType = filterType
             _shoppingListUiState.value = ShoppingListUiState.Loading
-            location = locationRepository.getLocationWithAislesWithProducts(locationId)
-            refreshListItems()
+            refreshListItems(locationId)
             _shoppingListUiState.value = ShoppingListUiState.Success(items)
         }
     }
@@ -45,12 +47,14 @@ class ShoppingListViewModel(
     fun updateProductStatus(item: ShoppingListItemViewModel) {
         viewModelScope.launch {
             item.inStock?.let {
-                productRepository.updateStatus(item.id, it)
+                updateProductStatusUseCase(item.id, it)
             }
         }
     }
 
-    fun refreshListItems() {
+    private suspend fun refreshListItems(locationId: Int) {
+        location = getShoppingListUseCase(locationId, filterType)
+
         _items.clear()
 
         location?.aisles?.forEach { a ->
@@ -80,12 +84,34 @@ class ShoppingListViewModel(
             }
         }
 
-        _items.sortWith(compareBy({ it.aisleRank }, { it.productRank }))
+        _items.sortWith(compareByDescending<ShoppingListItemViewModel> { it.aisleRank }.thenByDescending
+        { it.productRank }.thenBy { it.name })
         //TODO: Add Aisle Id and/or Aisle Object & Product Object items to view model list
     }
 
     fun removeItem(item: ShoppingListItemViewModel) {
         _items.remove(item)
+    }
+
+    fun addAisle(aisleName: String) {
+        if (location != null) {
+            viewModelScope.launch {
+                _shoppingListUiState.value = ShoppingListUiState.Loading
+                addAisleUseCase(
+                    Aisle(
+                        name = aisleName,
+                        products = emptyList(),
+                        locationId = location!!.id,
+                        isDefault = false,
+                        rank = 1,
+                        id = 0
+                    )
+                )
+                refreshListItems(location!!.id)
+                _shoppingListUiState.value = ShoppingListUiState.Success(items)
+            }
+        }
+
     }
 
     sealed class ShoppingListUiState {

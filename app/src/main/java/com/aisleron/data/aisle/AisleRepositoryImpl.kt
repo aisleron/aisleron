@@ -44,17 +44,7 @@ class AisleRepositoryImpl(
     }
 
     override suspend fun add(item: Aisle): Int {
-        val aisleId = db.aisleDao().upsert(aisleMapper.fromModel(item))[0].toInt()
-        if (item.products.isNotEmpty()) {
-            addAisleProducts(item.products.map {
-                AisleProduct(
-                    rank = it.rank,
-                    aisleId = aisleId,
-                    product = it.product
-                )
-            })
-        }
-        return aisleId
+        return db.aisleDao().upsert(aisleMapper.fromModel(item))[0].toInt()
     }
 
     override suspend fun update(item: Aisle) {

@@ -43,4 +43,8 @@
     <string name="add_shop">Add Shop</string>
     <string name="edit_product">Edit Product</string>
     <string name="pin_shop">Pin Shop to Drawer</string>
+    <string name="add_aisle">Add Aisle</string>
+    <string name="add">Add</string>
+    <string name="cancel">Cancel</string>
+    <string name="aisle_name">Aisle Name</string>
 </resources>

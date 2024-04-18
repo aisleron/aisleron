@@ -7,26 +7,26 @@
     android:layout_margin="@dimen/text_margin"
     tools:context=".ui.shop.ShopFragment">
 
-    <TextView
+    <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:labelFor="@+id/edt_shop_name"
-        android:text="@string/shop_name" />
+        android:hint="@string/shop_name"
+        android:labelFor="@id/edt_shop_name"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
 
-    <EditText
-        android:id="@+id/edt_shop_name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:autofillHints=""
-        android:inputType="text"
-        android:minHeight="48dp" />
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/edt_shop_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text" />
+    </com.google.android.material.textfield.TextInputLayout>
 
     <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/swc_shop_pinned"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/pin_shop"
-        android:minHeight="48dp" />
+        android:padding="@dimen/text_margin" />
 
     <Button
         android:id="@+id/btn_save_shop"
