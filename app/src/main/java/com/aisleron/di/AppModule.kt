@@ -1,7 +1,10 @@
 package com.aisleron.di
 
 import androidx.room.Room
+import androidx.room.RoomDatabase
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.aisleron.data.AisleronDatabase
+import com.aisleron.data.DbInitializer
 import com.aisleron.data.aisle.AisleMapper
 import com.aisleron.data.aisle.AisleRepositoryImpl
 import com.aisleron.data.location.LocationMapper
@@ -18,8 +21,8 @@ import com.aisleron.domain.location.usecase.GetLocationUseCase
 import com.aisleron.domain.location.usecase.UpdateLocationUseCase
 import com.aisleron.domain.product.ProductRepository
 import com.aisleron.domain.product.usecase.AddProductUseCase
-import com.aisleron.domain.product.usecase.GetProductUseCase
 import com.aisleron.domain.product.usecase.GetAllProductsUseCase
+import com.aisleron.domain.product.usecase.GetProductUseCase
 import com.aisleron.domain.product.usecase.UpdateProductStatusUseCase
 import com.aisleron.domain.product.usecase.UpdateProductUseCase
 import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
@@ -37,7 +40,12 @@ val appModule = module {
             androidApplication(),
             AisleronDatabase::class.java,
             "aisleron.db"
-        ).build()
+        ).addCallback(object : RoomDatabase.Callback() {
+            override fun onCreate(db: SupportSQLiteDatabase) {
+                super.onCreate(db)
+                DbInitializer().invoke(get())
+            }
+        }).build()
     }
 
     /**
