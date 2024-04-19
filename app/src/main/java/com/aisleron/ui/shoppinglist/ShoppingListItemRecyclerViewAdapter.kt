@@ -7,15 +7,16 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.aisleron.databinding.FragmentAisleListItemBinding
 import com.aisleron.databinding.FragmentProductListItemBinding
+import java.util.Collections
 
 /**
  * [RecyclerView.Adapter] that can display a [ShoppingListItemViewModel].
  *
  */
 class ShoppingListItemRecyclerViewAdapter(
-    private val values: List<ShoppingListItemViewModel>,
+    private val values: MutableList<ShoppingListItemViewModel>,
     private val listener: ShoppingListItemListener
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), ShoppingListItemMoveCallbackListener.Listener {
 
     companion object {
         const val AISLE_VIEW = 1
@@ -114,5 +115,31 @@ class ShoppingListItemRecyclerViewAdapter(
             absoluteAdapterPosition: Int
         )
 
+    }
+
+    override fun onRowMoved(fromPosition: Int, toPosition: Int) {
+        if (fromPosition < toPosition) {
+            for (i in fromPosition until toPosition) {
+                Collections.swap(values, i, i + 1)
+            }
+        } else {
+            for (i in fromPosition downTo toPosition + 1) {
+                Collections.swap(values, i, i - 1)
+            }
+        }
+        notifyItemMoved(fromPosition, toPosition)
+    }
+
+    override fun onRowSelected(viewHolder: RecyclerView.ViewHolder) {
+       // TODO("Not yet implemented")
+    }
+
+    override fun onRowClear(viewHolder: RecyclerView.ViewHolder) {
+       // TODO("Not yet implemented")
+    }
+
+    override fun onRowSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+        values.removeAt(viewHolder.absoluteAdapterPosition)
+        notifyItemRemoved(viewHolder.absoluteAdapterPosition)
     }
 }

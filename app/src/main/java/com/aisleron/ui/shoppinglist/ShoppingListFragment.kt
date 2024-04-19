@@ -2,7 +2,6 @@ package com.aisleron.ui.shoppinglist
 
 import android.content.Context
 import android.os.Bundle
-import android.view.ContextMenu
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -19,12 +18,12 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.aisleron.R
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.LocationType
-import com.aisleron.widgets.ContextMenuRecyclerView
 import com.google.android.material.textfield.TextInputEditText
 import org.koin.android.ext.android.inject
 
@@ -47,7 +46,7 @@ class ShoppingListFragment : Fragment() {
         viewModel.hydrate(locationId, filterType)
     }
 
-    private fun updateProduct(
+    private fun updateProductStatus(
         item: ShoppingListItemViewModel,
         adapter: ShoppingListItemRecyclerViewAdapter,
         inStock: Boolean,
@@ -76,7 +75,7 @@ class ShoppingListFragment : Fragment() {
         // Set the adapter
         if (view is RecyclerView) {
             view.addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
-            registerForContextMenu(view)
+
             //TODO: Refresh the data when view is reloaded, e.g. after adding a new product
 
             lifecycleScope.launchWhenStarted {
@@ -120,7 +119,7 @@ class ShoppingListFragment : Fragment() {
                             inStock: Boolean,
                             absoluteAdapterPosition: Int
                         ) {
-                            updateProduct(
+                            updateProductStatus(
                                 item,
                                 view.adapter as ShoppingListItemRecyclerViewAdapter,
                                 inStock,
@@ -129,6 +128,13 @@ class ShoppingListFragment : Fragment() {
                         }
                     }
                 )
+
+                val callback: ItemTouchHelper.Callback = ShoppingListItemMoveCallbackListener(
+                    view.adapter as ShoppingListItemRecyclerViewAdapter
+                )
+                val touchHelper = ItemTouchHelper(callback)
+                touchHelper.attachToRecyclerView(view)
+
             }
         }
         return view
@@ -196,34 +202,6 @@ class ShoppingListFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-    }
-
-
-    override fun onCreateContextMenu(
-        menu: ContextMenu, v: View, menuInfo: ContextMenu.ContextMenuInfo?
-    ) {
-        super.onCreateContextMenu(menu, v, menuInfo)
-        val inflater: MenuInflater = requireActivity().menuInflater
-        inflater.inflate(R.menu.product_list_context, menu)
-    }
-
-    override fun onContextItemSelected(item: MenuItem): Boolean {
-        val info = item.menuInfo as ContextMenuRecyclerView.RecyclerViewContextMenuInfo
-
-        //Todo: Convert info type to ShoppingListItemType
-
-        return when (item.itemId) {
-            R.id.nav_edit_product -> {
-                Toast.makeText(
-                    context,
-                    "Type: ${info.type} Edit Id: ${info.id}; Position ${info.position}",
-                    Toast.LENGTH_SHORT
-                ).show()
-                true
-            }
-
-            else -> super.onContextItemSelected(item)
-        }
     }
 
     companion object {
