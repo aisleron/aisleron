@@ -4,8 +4,8 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.aisleron.data.aisle.AisleDao
 import com.aisleron.data.aisle.AisleEntity
-import com.aisleron.data.aisle.AisleProductDao
-import com.aisleron.data.aisle.AisleProductEntity
+import com.aisleron.data.aisleproduct.AisleProductDao
+import com.aisleron.data.aisleproduct.AisleProductEntity
 import com.aisleron.data.location.LocationDao
 import com.aisleron.data.location.LocationEntity
 import com.aisleron.data.product.ProductDao

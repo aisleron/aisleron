@@ -95,7 +95,7 @@ class ShoppingListItemRecyclerViewAdapter(
             itemView.isLongClickable = true
             idView.text = item.id.toString()
             contentView.text = item.name
-            inStockView.isChecked = item.inStock!!
+            inStockView.isChecked = item.inStock
             itemView.setOnClickListener {
                 listener.onProductClick(item)
             }
@@ -115,31 +115,71 @@ class ShoppingListItemRecyclerViewAdapter(
             absoluteAdapterPosition: Int
         )
 
+        fun onProductMoved(item: ShoppingListItemViewModel)
+        fun onAisleMoved(item: ShoppingListItemViewModel)
+
     }
 
     override fun onRowMoved(fromPosition: Int, toPosition: Int) {
         if (fromPosition < toPosition) {
-            for (i in fromPosition until toPosition) {
-                Collections.swap(values, i, i + 1)
+            for (originalPosition in fromPosition until toPosition) {
+                swapListEntries(originalPosition, originalPosition + 1)
             }
         } else {
-            for (i in fromPosition downTo toPosition + 1) {
-                Collections.swap(values, i, i - 1)
+            for (originalPosition in fromPosition downTo toPosition + 1) {
+                swapListEntries(originalPosition, originalPosition - 1)
             }
         }
         notifyItemMoved(fromPosition, toPosition)
+        println("Moved item from $fromPosition to $toPosition")
+    }
+
+    private fun swapListEntries(originalPosition: Int, newPosition: Int) {
+        Collections.swap(values, originalPosition, newPosition)
+        setItemRank(values[newPosition], newPosition + 1)
+        if (values[newPosition].lineItemType == values[originalPosition].lineItemType) {
+            //Only update rank of swapped item if it is the same type as the moved item
+            setItemRank(values[originalPosition], originalPosition + 1)
+        }
+    }
+
+    private fun setItemRank(item: ShoppingListItemViewModel, newRank: Int) {
+        println("Updating rank for ${item.name} from ${item.rank} to $newRank")
+        item.rank = newRank
+        item.modified = true
+        if (item.lineItemType == ShoppingListItemType.AISLE) {
+            values.filter { it.aisleId == item.id }
+                .forEach {
+                    it.aisleRank = newRank
+                    it.modified = true
+                }
+        }
     }
 
     override fun onRowSelected(viewHolder: RecyclerView.ViewHolder) {
-       // TODO("Not yet implemented")
+        // TODO("Not yet implemented")
     }
 
     override fun onRowClear(viewHolder: RecyclerView.ViewHolder) {
-       // TODO("Not yet implemented")
+        if (viewHolder.absoluteAdapterPosition < 0) return
+
+        val item = values[viewHolder.absoluteAdapterPosition]
+
+        when (viewHolder.itemViewType) {
+            PRODUCT_VIEW -> {
+                println("Updating aisle for ${item.name} from ${item.aisleId} to ${values[viewHolder.absoluteAdapterPosition - 1].aisleId} ")
+                item.aisleId = values[viewHolder.absoluteAdapterPosition - 1].aisleId
+                println("Updating aisle rank for ${item.name} from ${item.aisleRank} to ${values[viewHolder.absoluteAdapterPosition - 1].aisleRank} ")
+                item.aisleRank = values[viewHolder.absoluteAdapterPosition - 1].aisleRank
+                listener.onProductMoved(item)
+            }
+
+            AISLE_VIEW -> listener.onAisleMoved(item)
+        }
     }
 
     override fun onRowSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-        values.removeAt(viewHolder.absoluteAdapterPosition)
-        notifyItemRemoved(viewHolder.absoluteAdapterPosition)
+        val item = values[viewHolder.absoluteAdapterPosition]
+        listener.onProductStatusChange(item, !item.inStock, viewHolder.absoluteAdapterPosition)
     }
 }

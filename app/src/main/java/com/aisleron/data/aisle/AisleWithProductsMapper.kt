@@ -1,5 +1,6 @@
 package com.aisleron.data.aisle
 
+import com.aisleron.data.aisleproduct.AisleProductRankMapper
 import com.aisleron.data.base.MapperBaseImpl
 import com.aisleron.domain.aisle.Aisle
 

@@ -61,7 +61,7 @@ class ShoppingListFragment : Fragment() {
             viewModel.removeItem(item)
             adapter.notifyItemRemoved(absoluteAdapterPosition)
         } else {
-
+            //TODO: Figure out why 'all' crashes the app after the second swipe.
             adapter.notifyItemChanged(absoluteAdapterPosition)
         }
     }
@@ -125,6 +125,14 @@ class ShoppingListFragment : Fragment() {
                                 inStock,
                                 absoluteAdapterPosition
                             )
+                        }
+
+                        override fun onProductMoved(item: ShoppingListItemViewModel) {
+                            viewModel.updateProductRanks(item)
+                        }
+
+                        override fun onAisleMoved(item: ShoppingListItemViewModel) {
+                            viewModel.updateAisleRanks(item)
                         }
                     }
                 )

@@ -5,8 +5,12 @@ import androidx.lifecycle.viewModelScope
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.aisle.usecase.AddAisleUseCase
+import com.aisleron.domain.aisle.usecase.UpdateAislesUseCase
+import com.aisleron.domain.aisleproduct.AisleProduct
+import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductsUseCase
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationType
+import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.usecase.UpdateProductStatusUseCase
 import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +20,9 @@ import kotlinx.coroutines.launch
 class ShoppingListViewModel(
     private val getShoppingListUseCase: GetShoppingListUseCase,
     private val updateProductStatusUseCase: UpdateProductStatusUseCase,
-    private val addAisleUseCase: AddAisleUseCase
+    private val addAisleUseCase: AddAisleUseCase,
+    private val updateAisleProductsUseCase: UpdateAisleProductsUseCase,
+    private val updateAislesUseCase: UpdateAislesUseCase
 ) : ViewModel() {
 
     private var location: Location? = null
@@ -46,9 +52,7 @@ class ShoppingListViewModel(
 
     fun updateProductStatus(item: ShoppingListItemViewModel) {
         viewModelScope.launch {
-            item.inStock?.let {
-                updateProductStatusUseCase(item.id, it)
-            }
+            updateProductStatusUseCase(item.id, item.inStock)
         }
     }
 
@@ -62,10 +66,12 @@ class ShoppingListViewModel(
                 ShoppingListItemViewModel(
                     lineItemType = ShoppingListItemType.AISLE,
                     aisleRank = a.rank,
-                    productRank = -1,
+                    rank = a.rank,
                     id = a.id,
                     name = a.name,
-                    inStock = null
+                    inStock = a.isDefault,  //inStock holds the aisle default value in the shopping list
+                    aisleId = a.id,
+                    mappingId = 0
                 )
             )
             _items += a.products.filter { p ->
@@ -76,17 +82,24 @@ class ShoppingListViewModel(
                 ShoppingListItemViewModel(
                     lineItemType = ShoppingListItemType.PRODUCT,
                     aisleRank = a.rank,
-                    productRank = p.rank,
+                    rank = p.rank,
                     id = p.product.id,
                     name = p.product.name,
-                    inStock = p.product.inStock
+                    inStock = p.product.inStock,
+                    aisleId = p.aisleId,
+                    mappingId = p.id
                 )
             }
         }
 
-        _items.sortWith(compareByDescending<ShoppingListItemViewModel> { it.aisleRank }.thenBy { it.lineItemType }
-            .thenByDescending { it.productRank }.thenBy { it.name })
-        //TODO: Add Aisle Id and/or Aisle Object & Product Object items to view model list
+        _items.sortWith(
+            compareBy(
+                { it.aisleRank },
+                { it.aisleId },
+                { it.lineItemType },
+                { it.rank },
+                { it.name })
+        )
     }
 
     fun removeItem(item: ShoppingListItemViewModel) {
@@ -103,7 +116,7 @@ class ShoppingListViewModel(
                         products = emptyList(),
                         locationId = location!!.id,
                         isDefault = false,
-                        rank = 1,
+                        rank = 0,
                         id = 0
                     )
                 )
@@ -112,6 +125,40 @@ class ShoppingListViewModel(
             }
         }
 
+    }
+
+    fun updateProductRanks(item: ShoppingListItemViewModel) {
+        viewModelScope.launch {
+            updateAisleProductsUseCase(_items.filter { it.lineItemType == ShoppingListItemType.PRODUCT && it.modified }
+                .map {
+                    AisleProduct(
+                        rank = it.rank,
+                        aisleId = it.aisleId,
+                        product = Product(id = it.id, name = it.name, inStock = it.inStock),
+                        id = it.id
+                    )
+                })
+            refreshListItems(location!!.id)
+        }
+    }
+
+    fun updateAisleRanks(item: ShoppingListItemViewModel) {
+        viewModelScope.launch {
+            _shoppingListUiState.value = ShoppingListUiState.Loading
+            updateAislesUseCase(_items.filter { it.lineItemType == ShoppingListItemType.AISLE && it.modified }
+                .map {
+                    Aisle(
+                        rank = it.rank,
+                        id = it.id,
+                        name = it.name,
+                        products = emptyList(),
+                        locationId = location!!.id,
+                        isDefault = it.inStock,
+                    )
+                })
+            refreshListItems(location!!.id)
+            _shoppingListUiState.value = ShoppingListUiState.Success(items)
+        }
     }
 
     sealed class ShoppingListUiState {

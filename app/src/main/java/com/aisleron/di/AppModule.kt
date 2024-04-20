@@ -7,14 +7,19 @@ import com.aisleron.data.AisleronDatabase
 import com.aisleron.data.DbInitializer
 import com.aisleron.data.aisle.AisleMapper
 import com.aisleron.data.aisle.AisleRepositoryImpl
+import com.aisleron.data.aisleproduct.AisleProductRankMapper
+import com.aisleron.data.aisleproduct.AisleProductRepositoryImpl
 import com.aisleron.data.location.LocationMapper
 import com.aisleron.data.location.LocationRepositoryImpl
 import com.aisleron.data.product.ProductMapper
 import com.aisleron.data.product.ProductRepositoryImpl
 import com.aisleron.domain.aisle.AisleRepository
-import com.aisleron.domain.aisle.usecase.AddAisleProductsUseCase
 import com.aisleron.domain.aisle.usecase.AddAisleUseCase
 import com.aisleron.domain.aisle.usecase.GetDefaultAislesUseCase
+import com.aisleron.domain.aisle.usecase.UpdateAislesUseCase
+import com.aisleron.domain.aisleproduct.AisleProductRepository
+import com.aisleron.domain.aisleproduct.usecase.AddAisleProductsUseCase
+import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductsUseCase
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.location.usecase.AddLocationUseCase
 import com.aisleron.domain.location.usecase.GetLocationUseCase
@@ -66,6 +71,13 @@ val appModule = module {
         )
     }
 
+    factory<AisleProductRepository> {
+        AisleProductRepositoryImpl(
+            db = get(),
+            aisleProductRankMapper = AisleProductRankMapper()
+        )
+    }
+
     /**
      * Location Use Cases
      */
@@ -87,9 +99,16 @@ val appModule = module {
      */
     factory<AddAisleUseCase> { AddAisleUseCase(aisleRepository = get()) }
 
-    factory<AddAisleProductsUseCase> { AddAisleProductsUseCase(aisleRepository = get()) }
-
     factory<GetDefaultAislesUseCase> { GetDefaultAislesUseCase(aisleRepository = get()) }
+
+    factory<UpdateAislesUseCase> { UpdateAislesUseCase(aisleRepository = get()) }
+
+    /**
+     * Aisle Product Use Cases
+     */
+    factory<AddAisleProductsUseCase> { AddAisleProductsUseCase(aisleProductRepository = get()) }
+
+    factory<UpdateAisleProductsUseCase> { UpdateAisleProductsUseCase(aisleProductRepository = get()) }
 
     /**
      * Product Use Cases
@@ -127,7 +146,9 @@ val appModule = module {
         ShoppingListViewModel(
             getShoppingListUseCase = get(),
             updateProductStatusUseCase = get(),
-            addAisleUseCase = get()
+            addAisleUseCase = get(),
+            updateAisleProductsUseCase = get(),
+            updateAislesUseCase = get()
         )
     }
 

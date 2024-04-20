@@ -2,7 +2,6 @@ package com.aisleron.data.aisle
 
 import com.aisleron.data.AisleronDatabase
 import com.aisleron.domain.aisle.Aisle
-import com.aisleron.domain.aisle.AisleProduct
 import com.aisleron.domain.aisle.AisleRepository
 import com.aisleron.domain.location.Location
 
@@ -16,14 +15,6 @@ class AisleRepositoryImpl(
 
     override suspend fun getForLocation(location: Location): List<Aisle> {
         return getForLocation(location.id)
-    }
-
-    override suspend fun addAisleProducts(aisleProducts: List<AisleProduct>) {
-        db.aisleProductDao()
-            .upsert(*AisleProductRankMapper().fromModelList(aisleProducts)
-                .map { it.aisleProduct }
-                .map { it }.toTypedArray()
-            )
     }
 
     override suspend fun getDefaultAisles(): List<Aisle> {
@@ -51,7 +42,18 @@ class AisleRepositoryImpl(
         db.aisleDao().upsert(aisleMapper.fromModel(item))
     }
 
+    override suspend fun update(items: List<Aisle>) {
+        upsertAisles(items)
+    }
+
     override suspend fun remove(item: Aisle) {
         db.aisleDao().delete(aisleMapper.fromModel(item))
+    }
+
+    private suspend fun upsertAisles(aisles: List<Aisle>) {
+        db.aisleDao()
+            .upsert(
+                *aisleMapper.fromModelList(aisles).map { it }.toTypedArray()
+            )
     }
 }

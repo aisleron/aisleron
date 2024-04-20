@@ -22,8 +22,21 @@ class ShoppingListItemMoveCallbackListener(private val adapter: ShoppingListItem
         viewHolder: RecyclerView.ViewHolder,
         target: RecyclerView.ViewHolder
     ): Boolean {
-        adapter.onRowMoved(viewHolder.absoluteAdapterPosition, target.absoluteAdapterPosition)
+
         return true
+    }
+
+    override fun onMoved(
+        recyclerView: RecyclerView,
+        viewHolder: RecyclerView.ViewHolder,
+        fromPos: Int,
+        target: RecyclerView.ViewHolder,
+        toPos: Int,
+        x: Int,
+        y: Int
+    ) {
+        super.onMoved(recyclerView, viewHolder, fromPos, target, toPos, x, y)
+        adapter.onRowMoved(fromPos, toPos)
     }
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
@@ -52,9 +65,15 @@ class ShoppingListItemMoveCallbackListener(private val adapter: ShoppingListItem
         current: RecyclerView.ViewHolder,
         target: RecyclerView.ViewHolder
     ): Boolean {
-        return !(target is ShoppingListItemRecyclerViewAdapter.AisleViewHolder
-                && current is ShoppingListItemRecyclerViewAdapter.ProductListItemViewHolder
-                && target.absoluteAdapterPosition == 0)
+        val allowProductDrop =
+            current is ShoppingListItemRecyclerViewAdapter.ProductListItemViewHolder
+                    && !(target is ShoppingListItemRecyclerViewAdapter.AisleViewHolder && target.absoluteAdapterPosition == 0)
+
+        val allowAisleDrop =
+            current is ShoppingListItemRecyclerViewAdapter.AisleViewHolder
+                    && target is ShoppingListItemRecyclerViewAdapter.AisleViewHolder
+
+        return allowProductDrop || allowAisleDrop
     }
 
     interface Listener {

@@ -6,6 +6,5 @@ import com.aisleron.domain.location.Location
 interface AisleRepository : BaseRepository<Aisle> {
     suspend fun getForLocation(locationId: Int): List<Aisle>
     suspend fun getForLocation(location: Location): List<Aisle>
-    suspend fun addAisleProducts(aisleProducts: List<AisleProduct>)
     suspend fun getDefaultAisles(): List<Aisle>
 }

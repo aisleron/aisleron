@@ -25,7 +25,7 @@ class DbInitializer {
                 id = 0,
                 name = "No Aisle",
                 locationId = homeId,
-                rank = 0,
+                rank = 1000,
                 isDefault = true
             )
 

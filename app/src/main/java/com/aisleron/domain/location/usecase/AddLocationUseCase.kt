@@ -1,9 +1,9 @@
 package com.aisleron.domain.location.usecase
 
 import com.aisleron.domain.aisle.Aisle
-import com.aisleron.domain.aisle.AisleProduct
-import com.aisleron.domain.aisle.usecase.AddAisleProductsUseCase
 import com.aisleron.domain.aisle.usecase.AddAisleUseCase
+import com.aisleron.domain.aisleproduct.AisleProduct
+import com.aisleron.domain.aisleproduct.usecase.AddAisleProductsUseCase
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.product.usecase.GetAllProductsUseCase
@@ -17,12 +17,13 @@ class AddLocationUseCase(
 ) {
     suspend operator fun invoke(location: Location): Int {
         val newLocationId = locationRepository.add(location)
+        //Add location default Aisle. Set Rank high so it shows at the end of the shopping list
         val newAisleId = addAisleUseCase(
             Aisle(
                 id = 0,
                 name = "No Aisle",
                 locationId = newLocationId,
-                rank = 0,
+                rank = 1000,
                 isDefault = true,
                 products = emptyList()
             )
@@ -31,9 +32,10 @@ class AddLocationUseCase(
         addAisleProductsUseCase(
             getAllProductsUseCase().sortedBy { it.name }.mapIndexed { i, p ->
                 AisleProduct(
-                    rank = (i + 1) * 100,
+                    rank = 0,
                     aisleId = newAisleId,
-                    product = p
+                    product = p,
+                    id = 0
                 )
             })
 

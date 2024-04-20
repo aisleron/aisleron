@@ -1,8 +1,8 @@
 package com.aisleron.placeholder
 
-import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.FilterType
-import com.aisleron.domain.aisle.AisleProduct
+import com.aisleron.domain.aisle.Aisle
+import com.aisleron.domain.aisleproduct.AisleProduct
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationType
 
@@ -19,10 +19,10 @@ object LocationData {
                     Aisle(
                         "Fridge",
                         listOf(
-                            AisleProduct(100, 1, ProductData.products[1]),
-                            AisleProduct(200, 1, ProductData.products[2]),
-                            AisleProduct(300, 1, ProductData.products[3]),
-                            AisleProduct(400, 1, ProductData.products[4])
+                            AisleProduct(100, 1, ProductData.products[1], 1),
+                            AisleProduct(200, 1, ProductData.products[2], 2),
+                            AisleProduct(300, 1, ProductData.products[3], 3),
+                            AisleProduct(400, 1, ProductData.products[4], 4)
                         ),
                         1,
                         2,
@@ -32,10 +32,10 @@ object LocationData {
                     Aisle(
                         "Pantry",
                         listOf(
-                            AisleProduct(100, 2, ProductData.products[5]),
-                            AisleProduct(200, 2, ProductData.products[6]),
-                            AisleProduct(300, 2, ProductData.products[7]),
-                            AisleProduct(400, 2, ProductData.products[8])
+                            AisleProduct(100, 2, ProductData.products[5], 5),
+                            AisleProduct(200, 2, ProductData.products[6], 6),
+                            AisleProduct(300, 2, ProductData.products[7], 7),
+                            AisleProduct(400, 2, ProductData.products[8], 8)
                         ),
                         1,
                         1,
@@ -119,7 +119,7 @@ object LocationData {
         var cnt = 0
         for (product in products) {
             cnt += cnt
-            result.add(AisleProduct(cnt * 100, aisleId, product))
+            result.add(AisleProduct(cnt * 100, aisleId, product, cnt))
         }
         return result
     }

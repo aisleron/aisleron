@@ -1,8 +1,8 @@
 package com.aisleron.domain.product.usecase
 
-import com.aisleron.domain.aisle.AisleProduct
-import com.aisleron.domain.aisle.usecase.AddAisleProductsUseCase
 import com.aisleron.domain.aisle.usecase.GetDefaultAislesUseCase
+import com.aisleron.domain.aisleproduct.AisleProduct
+import com.aisleron.domain.aisleproduct.usecase.AddAisleProductsUseCase
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
 
@@ -23,7 +23,8 @@ class AddProductUseCase(
             AisleProduct(
                 aisleId = it.id,
                 product = newProduct,
-                rank = newProduct.id * 100 //TODO: How to get the max Id for an aisle?
+                rank = 0,
+                id = 0
             )
         })
 
