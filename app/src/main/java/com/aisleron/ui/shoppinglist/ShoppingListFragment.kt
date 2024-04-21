@@ -17,6 +17,7 @@ import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -25,6 +26,7 @@ import com.aisleron.R
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.LocationType
 import com.google.android.material.textfield.TextInputEditText
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 
 
@@ -77,16 +79,18 @@ class ShoppingListFragment : Fragment() {
 
             //TODO: Refresh the data when view is reloaded, e.g. after adding a new product
 
-            lifecycleScope.launchWhenStarted {
-                viewModel.shoppingListUiState.collect {
-                    when (it) {
-                        is ShoppingListViewModel.ShoppingListUiState.Success -> {
-                            view.adapter?.notifyDataSetChanged()
-                            updateTitle()
-                        }
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    viewModel.shoppingListUiState.collect {
+                        when (it) {
+                            is ShoppingListViewModel.ShoppingListUiState.Success -> {
+                                view.adapter?.notifyDataSetChanged()
+                                updateTitle()
+                            }
 
-                        ShoppingListViewModel.ShoppingListUiState.Empty -> Unit
-                        ShoppingListViewModel.ShoppingListUiState.Loading -> Unit
+                            ShoppingListViewModel.ShoppingListUiState.Empty -> Unit
+                            ShoppingListViewModel.ShoppingListUiState.Loading -> Unit
+                        }
                     }
                 }
             }
@@ -162,7 +166,6 @@ class ShoppingListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val bundle = arguments
 
         val menuHost: MenuHost = requireActivity()
         menuHost.addMenuProvider(object : MenuProvider {
