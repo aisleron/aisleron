@@ -1,4 +1,4 @@
-package com.aisleron.widgets
+package com.aisleron.ui.widgets
 
 import android.content.Context
 import android.util.AttributeSet

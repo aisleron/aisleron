@@ -76,12 +76,10 @@ class ShopMenuFragment : Fragment() {
                                 navigateToShoppingList(item)
                             }
                         })
-
             }
         }
         return view
     }
-
 
     companion object {
 

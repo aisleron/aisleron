@@ -1,9 +1,9 @@
 package com.aisleron.ui.shoplist
 
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import com.aisleron.databinding.FragmentShopListItemBinding
 
 /**
@@ -38,7 +38,7 @@ class ShopListItemRecyclerViewAdapter(
 
     inner class ViewHolder(binding: FragmentShopListItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        val contentView: TextView = binding.txtAisleName
+        val contentView: TextView = binding.txtShopName
 
         override fun toString(): String {
             return super.toString() + " '" + contentView.text + "'"
