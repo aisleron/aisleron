@@ -6,7 +6,7 @@ import com.aisleron.domain.aisleproduct.AisleProductRepository
 class AddAisleProductsUseCase(
     private val aisleProductRepository: AisleProductRepository
 ) {
-    suspend operator fun invoke(aisleProducts: List<AisleProduct>) {
-        return aisleProductRepository.addAisleProducts(aisleProducts)
+    suspend operator fun invoke(aisleProducts: List<AisleProduct>): List<Int> {
+        return aisleProductRepository.add(aisleProducts)
     }
 }

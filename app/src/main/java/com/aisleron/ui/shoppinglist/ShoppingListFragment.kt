@@ -55,8 +55,7 @@ class ShoppingListFragment : Fragment() {
         item.inStock = inStock
         viewModel.updateProductStatus(item)
 
-        if ((viewModel.filterType == FilterType.IN_STOCK && item.inStock == false)
-            || (viewModel.filterType == FilterType.NEEDED && item.inStock == true)
+        if ((viewModel.filterType == FilterType.IN_STOCK && !item.inStock) || (viewModel.filterType == FilterType.NEEDED && item.inStock)
         ) {
             viewModel.removeItem(item)
             adapter.notifyItemRemoved(absoluteAdapterPosition)
@@ -206,10 +205,6 @@ class ShoppingListFragment : Fragment() {
 
         txtAisleName.requestFocus()
         dialog.show()
-    }
-
-    override fun onResume() {
-        super.onResume()
     }
 
     companion object {

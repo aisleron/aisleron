@@ -38,6 +38,10 @@ class AisleRepositoryImpl(
         return db.aisleDao().upsert(aisleMapper.fromModel(item))[0].toInt()
     }
 
+    override suspend fun add(items: List<Aisle>): List<Int> {
+        return upsertAisles(items)
+    }
+
     override suspend fun update(item: Aisle) {
         db.aisleDao().upsert(aisleMapper.fromModel(item))
     }
@@ -50,10 +54,10 @@ class AisleRepositoryImpl(
         db.aisleDao().delete(aisleMapper.fromModel(item))
     }
 
-    private suspend fun upsertAisles(aisles: List<Aisle>) {
-        db.aisleDao()
+    private suspend fun upsertAisles(aisles: List<Aisle>): List<Int> {
+        return db.aisleDao()
             .upsert(
                 *aisleMapper.fromModelList(aisles).map { it }.toTypedArray()
-            )
+            ).map { it.toInt() }
     }
 }

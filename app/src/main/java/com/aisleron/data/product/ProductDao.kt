@@ -33,8 +33,4 @@ interface ProductDao : BaseDao<ProductEntity> {
     @Transaction
     @Query("SELECT * FROM Product WHERE inStock = 0")
     suspend fun getNeededProducts(): List<ProductEntity>
-
-    @Transaction
-    @Query("UPDATE Product SET inStock = :inStock WHERE id = :id")
-    suspend fun updateStatus(id: Int, inStock: Boolean)
 }

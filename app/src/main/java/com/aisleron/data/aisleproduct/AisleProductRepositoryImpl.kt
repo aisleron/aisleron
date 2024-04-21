@@ -8,17 +8,6 @@ class AisleProductRepositoryImpl(
     private val db: AisleronDatabase,
     private val aisleProductRankMapper: AisleProductRankMapper
 ) : AisleProductRepository {
-    override suspend fun addAisleProducts(aisleProducts: List<AisleProduct>) {
-        upsertAisleProducts(aisleProducts)
-    }
-
-    private suspend fun upsertAisleProducts(aisleProducts: List<AisleProduct>) {
-        db.aisleProductDao()
-            .upsert(*aisleProductRankMapper.fromModelList(aisleProducts)
-                .map { it.aisleProduct }
-                .map { it }.toTypedArray()
-            )
-    }
 
     override suspend fun get(id: Int): AisleProduct? {
         return db.aisleProductDao().getAisleProduct(id)?.let { aisleProductRankMapper.toModel(it) }
@@ -37,6 +26,19 @@ class AisleProductRepositoryImpl(
         return db.aisleProductDao()
             .upsert(aisleProductRankMapper.fromModel(item).aisleProduct)[0].toInt()
     }
+
+    override suspend fun add(items: List<AisleProduct>): List<Int> {
+        return upsertAisleProducts(items)
+    }
+
+    private suspend fun upsertAisleProducts(aisleProducts: List<AisleProduct>): List<Int> {
+        return db.aisleProductDao()
+            .upsert(*aisleProductRankMapper.fromModelList(aisleProducts)
+                .map { it.aisleProduct }
+                .map { it }.toTypedArray()
+            ).map { it.toInt() }
+    }
+
 
     override suspend fun update(item: AisleProduct) {
         db.aisleProductDao().upsert(aisleProductRankMapper.fromModel(item).aisleProduct)

@@ -51,6 +51,10 @@ class LocationRepositoryImpl(
         return db.locationDao().upsert(locationMapper.fromModel(item))[0].toInt()
     }
 
+    override suspend fun add(items: List<Location>): List<Int> {
+        return upsertLocations(items)
+    }
+
     override suspend fun update(item: Location) {
         db.locationDao().upsert(locationMapper.fromModel(item))
     }
@@ -59,9 +63,10 @@ class LocationRepositoryImpl(
         upsertLocations(items)
     }
 
-    private suspend fun upsertLocations(locations: List<Location>) {
-        db.locationDao()
+    private suspend fun upsertLocations(locations: List<Location>): List<Int> {
+        return db.locationDao()
             .upsert(*locationMapper.fromModelList(locations).map { it }.toTypedArray())
+            .map { it.toInt() }
     }
 
     override suspend fun remove(item: Location) {

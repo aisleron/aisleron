@@ -14,7 +14,7 @@ import java.util.Collections
  *
  */
 class ShoppingListItemRecyclerViewAdapter(
-    private val values: MutableList<ShoppingListItemViewModel>,
+    private val values: List<ShoppingListItemViewModel>,
     private val listener: ShoppingListItemListener
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), ShoppingListItemMoveCallbackListener.Listener {
 
@@ -131,7 +131,6 @@ class ShoppingListItemRecyclerViewAdapter(
             }
         }
         notifyItemMoved(fromPosition, toPosition)
-        println("Moved item from $fromPosition to $toPosition")
     }
 
     private fun swapListEntries(originalPosition: Int, newPosition: Int) {
@@ -144,16 +143,8 @@ class ShoppingListItemRecyclerViewAdapter(
     }
 
     private fun setItemRank(item: ShoppingListItemViewModel, newRank: Int) {
-        println("Updating rank for ${item.name} from ${item.rank} to $newRank")
         item.rank = newRank
         item.modified = true
-        if (item.lineItemType == ShoppingListItemType.AISLE) {
-            values.filter { it.aisleId == item.id }
-                .forEach {
-                    it.aisleRank = newRank
-                    it.modified = true
-                }
-        }
     }
 
     override fun onRowSelected(viewHolder: RecyclerView.ViewHolder) {
@@ -167,9 +158,7 @@ class ShoppingListItemRecyclerViewAdapter(
 
         when (viewHolder.itemViewType) {
             PRODUCT_VIEW -> {
-                println("Updating aisle for ${item.name} from ${item.aisleId} to ${values[viewHolder.absoluteAdapterPosition - 1].aisleId} ")
                 item.aisleId = values[viewHolder.absoluteAdapterPosition - 1].aisleId
-                println("Updating aisle rank for ${item.name} from ${item.aisleRank} to ${values[viewHolder.absoluteAdapterPosition - 1].aisleRank} ")
                 item.aisleRank = values[viewHolder.absoluteAdapterPosition - 1].aisleRank
                 listener.onProductMoved(item)
             }

@@ -51,6 +51,10 @@ class ProductRepositoryImpl(
         return db.productDao().upsert(productMapper.fromModel(item))[0].toInt()
     }
 
+    override suspend fun add(items: List<Product>): List<Int> {
+        return upsertProducts(items)
+    }
+
     override suspend fun update(item: Product) {
         db.productDao().upsert(productMapper.fromModel(item))
     }
@@ -59,16 +63,13 @@ class ProductRepositoryImpl(
         upsertProducts(items)
     }
 
-    private suspend fun upsertProducts(products: List<Product>) {
-        db.productDao().upsert(*productMapper.fromModelList(products).map { it }.toTypedArray())
+    private suspend fun upsertProducts(products: List<Product>): List<Int> {
+        return db.productDao()
+            .upsert(*productMapper.fromModelList(products).map { it }.toTypedArray())
+            .map { it.toInt() }
     }
 
     override suspend fun remove(item: Product) {
         db.productDao().delete(productMapper.fromModel(item))
-    }
-
-    override suspend fun updateStatus(id: Int, inStock: Boolean) {
-        db.productDao().updateStatus(id, inStock)
-
     }
 }

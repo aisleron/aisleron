@@ -13,7 +13,7 @@
         android:layout_weight="0"
         android:layout_marginEnd="@dimen/text_margin"
         android:gravity="center_vertical"
-        android:text="0"
+        android:text="@string/id_label"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
     <TextView

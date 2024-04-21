@@ -7,6 +7,6 @@ class UpdateAisleProductsUseCase(
     private val aisleProductRepository: AisleProductRepository
 ) {
     suspend operator fun invoke(aisleProducts: List<AisleProduct>) {
-        return aisleProductRepository.addAisleProducts(aisleProducts)
+        aisleProductRepository.update(aisleProducts)
     }
 }

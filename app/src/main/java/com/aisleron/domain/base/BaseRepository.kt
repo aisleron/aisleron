@@ -5,6 +5,7 @@ interface BaseRepository<T> {
     suspend fun getMultiple(vararg id: Int): List<T>
     suspend fun getAll(): List<T>
     suspend fun add(item: T): Int
+    suspend fun add(items: List<T>): List<Int>
     suspend fun update(item: T)
     suspend fun update(items: List<T>)
     suspend fun remove(item: T)
