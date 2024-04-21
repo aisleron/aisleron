@@ -3,15 +3,17 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:longClickable="true">
+    android:longClickable="true"
 
+    android:background="@color/design_default_color_background">
+    <!-- android:background="?android:attr/selectableItemBackground" -->
     <TextView
         android:id="@+id/txt_aisle_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginVertical="@dimen/activity_vertical_margin"
         android:text="@string/aisle"
         android:gravity="center_vertical"
+        android:padding="@dimen/text_margin"
         android:textAppearance="?attr/textAppearanceListItem" />
 
 </LinearLayout>

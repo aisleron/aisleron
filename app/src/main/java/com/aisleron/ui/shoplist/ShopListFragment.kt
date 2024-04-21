@@ -54,7 +54,8 @@ class ShopListFragment : Fragment() {
                     viewModel.shopListUiState.collect {
                         when (it) {
                             is ShopListViewModel.ShopListUiState.Success -> view.adapter?.notifyDataSetChanged()
-                            else -> Unit
+                            ShopListViewModel.ShopListUiState.Empty -> Unit
+                            ShopListViewModel.ShopListUiState.Loading -> Unit
                         }
                     }
                 }
