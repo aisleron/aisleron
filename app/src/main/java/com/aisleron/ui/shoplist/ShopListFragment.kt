@@ -1,16 +1,19 @@
 package com.aisleron.ui.shoplist
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.aisleron.R
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 
 /**
@@ -46,11 +49,13 @@ class ShopListFragment : Fragment() {
 
         // Set the adapter
         if (view is RecyclerView) {
-            lifecycleScope.launchWhenStarted {
-                viewModel.shopListUiState.collect {
-                    when (it) {
-                        is ShopListViewModel.ShopListUiState.Success -> view.adapter?.notifyDataSetChanged()
-                        else -> Unit
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    viewModel.shopListUiState.collect {
+                        when (it) {
+                            is ShopListViewModel.ShopListUiState.Success -> view.adapter?.notifyDataSetChanged()
+                            else -> Unit
+                        }
                     }
                 }
             }

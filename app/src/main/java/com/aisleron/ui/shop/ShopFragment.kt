@@ -7,9 +7,12 @@ import android.view.ViewGroup
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.aisleron.databinding.FragmentShopBinding
 import com.aisleron.ui.shoppinglist.ShoppingListFragment
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 
 
@@ -40,16 +43,18 @@ class ShopFragment : Fragment() {
                 binding.swcShopPinned.isChecked
             )
 
-            lifecycleScope.launchWhenStarted {
-                viewModel.shopUiState.collect {
-                    when (it) {
-                        is ShopViewModel.ShopUiState.Success -> {
-                            requireActivity().onBackPressedDispatcher.onBackPressed()
-                        }
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    viewModel.shopUiState.collect {
+                        when (it) {
+                            is ShopViewModel.ShopUiState.Success -> {
+                                requireActivity().onBackPressedDispatcher.onBackPressed()
+                            }
 
-                        ShopViewModel.ShopUiState.Empty -> Unit
-                        ShopViewModel.ShopUiState.Error -> Unit
-                        ShopViewModel.ShopUiState.Loading -> Unit
+                            ShopViewModel.ShopUiState.Empty -> Unit
+                            ShopViewModel.ShopUiState.Error -> Unit
+                            ShopViewModel.ShopUiState.Loading -> Unit
+                        }
                     }
                 }
             }

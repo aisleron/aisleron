@@ -7,8 +7,11 @@ import android.view.ViewGroup
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.aisleron.databinding.FragmentProductBinding
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 
 class ProductFragment : Fragment() {
@@ -37,16 +40,18 @@ class ProductFragment : Fragment() {
                 binding.edtProductName.text.toString(),
                 binding.chkProductInStock.isChecked
             )
-            lifecycleScope.launchWhenStarted {
-                viewModel.productUiState.collect {
-                    when (it) {
-                        is ProductViewModel.ProductUiState.Success -> {
-                            requireActivity().onBackPressedDispatcher.onBackPressed()
-                        }
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    viewModel.productUiState.collect {
+                        when (it) {
+                            is ProductViewModel.ProductUiState.Success -> {
+                                requireActivity().onBackPressedDispatcher.onBackPressed()
+                            }
 
-                        ProductViewModel.ProductUiState.Empty -> Unit
-                        ProductViewModel.ProductUiState.Error -> Unit
-                        ProductViewModel.ProductUiState.Loading -> Unit
+                            ProductViewModel.ProductUiState.Empty -> Unit
+                            ProductViewModel.ProductUiState.Error -> Unit
+                            ProductViewModel.ProductUiState.Loading -> Unit
+                        }
                     }
                 }
             }
