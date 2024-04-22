@@ -23,6 +23,8 @@ import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductsUseCase
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.location.usecase.AddLocationUseCase
 import com.aisleron.domain.location.usecase.GetLocationUseCase
+import com.aisleron.domain.location.usecase.GetPinnedShopsUseCase
+import com.aisleron.domain.location.usecase.GetShopsUseCase
 import com.aisleron.domain.location.usecase.UpdateLocationUseCase
 import com.aisleron.domain.product.ProductRepository
 import com.aisleron.domain.product.usecase.AddProductUseCase
@@ -94,6 +96,10 @@ val appModule = module {
 
     factory<GetLocationUseCase> { GetLocationUseCase(locationRepository = get()) }
 
+    factory<GetShopsUseCase> { GetShopsUseCase(locationRepository = get()) }
+
+    factory<GetPinnedShopsUseCase> { GetPinnedShopsUseCase(locationRepository = get()) }
+
     /**
      * Aisle Use Cases
      */
@@ -160,7 +166,7 @@ val appModule = module {
         )
     }
 
-    viewModel { ShopListViewModel(get()) }
+    viewModel { ShopListViewModel(getShopsUseCase = get(), getPinnedShopsUseCase = get()) }
 
     viewModel {
         ProductViewModel(

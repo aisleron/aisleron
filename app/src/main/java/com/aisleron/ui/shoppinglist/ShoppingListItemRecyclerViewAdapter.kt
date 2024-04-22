@@ -135,14 +135,14 @@ class ShoppingListItemRecyclerViewAdapter(
 
     private fun swapListEntries(originalPosition: Int, newPosition: Int) {
         Collections.swap(values, originalPosition, newPosition)
-        setItemRank(values[newPosition], newPosition + 1)
+        updateMovedItemValues(values[newPosition], newPosition + 1)
         if (values[newPosition].lineItemType == values[originalPosition].lineItemType) {
             //Only update rank of swapped item if it is the same type as the moved item
-            setItemRank(values[originalPosition], originalPosition + 1)
+            updateMovedItemValues(values[originalPosition], originalPosition + 1)
         }
     }
 
-    private fun setItemRank(item: ShoppingListItemViewModel, newRank: Int) {
+    private fun updateMovedItemValues(item: ShoppingListItemViewModel, newRank: Int) {
         item.rank = newRank
         item.modified = true
     }
@@ -158,6 +158,9 @@ class ShoppingListItemRecyclerViewAdapter(
 
         when (viewHolder.itemViewType) {
             PRODUCT_VIEW -> {
+                //Collect the aisle details from the row above the moved item; the item above will always be
+                //in the same aisle as the item was dropped in.
+                //Maybe there's a better way to do this.
                 item.aisleId = values[viewHolder.absoluteAdapterPosition - 1].aisleId
                 item.aisleRank = values[viewHolder.absoluteAdapterPosition - 1].aisleRank
                 listener.onProductMoved(item)

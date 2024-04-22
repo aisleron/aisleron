@@ -1,11 +1,12 @@
 package com.aisleron.domain.location
 
 import com.aisleron.domain.base.BaseRepository
+import kotlinx.coroutines.flow.Flow
 
 interface LocationRepository : BaseRepository<Location> {
-    suspend fun getByType(type: LocationType): List<Location>
-    suspend fun getShops(): List<Location>
+    //fun getByType(type: LocationType): Flow<List<Location>>
+    fun getShops(): Flow<List<Location>>
     suspend fun getHome(): Location
-    suspend fun getPinnedShops(): List<Location>
+    fun getPinnedShops(): Flow<List<Location>>
     suspend fun getLocationWithAislesWithProducts(id: Int): Location?
 }

@@ -27,6 +27,8 @@ class ShopMenuFragment : Fragment() {
     private var columnCount = 1
     private val viewModel: ShopListViewModel by inject<ShopListViewModel>()
 
+    private val items = mutableListOf<ShopListItemViewModel>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -56,9 +58,15 @@ class ShopMenuFragment : Fragment() {
                 viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                     viewModel.shopListUiState.collect {
                         when (it) {
-                            is ShopListViewModel.ShopListUiState.Success -> view.adapter?.notifyDataSetChanged()
                             ShopListViewModel.ShopListUiState.Empty -> Unit
                             ShopListViewModel.ShopListUiState.Loading -> Unit
+                            ShopListViewModel.ShopListUiState.Error -> Unit
+                            is ShopListViewModel.ShopListUiState.Success -> {
+                                items.clear()
+                                items += it.shops
+                                view.adapter?.notifyDataSetChanged()
+                            }
+
                         }
                     }
                 }
@@ -69,7 +77,7 @@ class ShopMenuFragment : Fragment() {
                     else -> GridLayoutManager(context, columnCount)
                 }
                 adapter =
-                    ShopMenuRecyclerViewAdapter(viewModel.shops,
+                    ShopMenuRecyclerViewAdapter(items,
                         object :
                             ShopMenuRecyclerViewAdapter.ShopMenuItemListener {
                             override fun onItemClick(item: ShopListItemViewModel) {

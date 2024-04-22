@@ -27,7 +27,7 @@ import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.LocationType
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.launch
-import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 /**
@@ -35,7 +35,7 @@ import org.koin.android.ext.android.inject
  */
 class ShoppingListFragment : Fragment() {
 
-    private val viewModel: ShoppingListViewModel by inject<ShoppingListViewModel>()
+    private val shoppingListViewModel: ShoppingListViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,7 +45,7 @@ class ShoppingListFragment : Fragment() {
         val filterType: FilterType =
             if (bundle != null) bundle.getSerializable(ARG_FILTER_TYPE) as FilterType else FilterType.ALL
 
-        viewModel.hydrate(locationId, filterType)
+        shoppingListViewModel.hydrate(locationId, filterType)
     }
 
     private fun updateProductStatus(
@@ -55,11 +55,11 @@ class ShoppingListFragment : Fragment() {
         absoluteAdapterPosition: Int
     ) {
         item.inStock = inStock
-        viewModel.updateProductStatus(item)
+        shoppingListViewModel.updateProductStatus(item)
 
-        if ((viewModel.filterType == FilterType.IN_STOCK && !item.inStock) || (viewModel.filterType == FilterType.NEEDED && item.inStock)
+        if ((shoppingListViewModel.filterType == FilterType.IN_STOCK && !item.inStock) || (shoppingListViewModel.filterType == FilterType.NEEDED && item.inStock)
         ) {
-            viewModel.removeItem(item)
+            shoppingListViewModel.removeItem(item)
             adapter.notifyItemRemoved(absoluteAdapterPosition)
         } else {
             //TODO: Figure out why 'all' crashes the app after the second swipe.
@@ -81,7 +81,7 @@ class ShoppingListFragment : Fragment() {
 
             viewLifecycleOwner.lifecycleScope.launch {
                 viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    viewModel.shoppingListUiState.collect {
+                    shoppingListViewModel.shoppingListUiState.collect {
                         when (it) {
                             is ShoppingListViewModel.ShoppingListUiState.Success -> {
                                 view.adapter?.notifyDataSetChanged()
@@ -98,7 +98,7 @@ class ShoppingListFragment : Fragment() {
             with(view) {
                 LinearLayoutManager(context)
                 adapter = ShoppingListItemRecyclerViewAdapter(
-                    viewModel.items,
+                    shoppingListViewModel.items,
                     object :
                         ShoppingListItemRecyclerViewAdapter.ShoppingListItemListener {
                         override fun onAisleClick(item: ShoppingListItemViewModel) {
@@ -131,11 +131,11 @@ class ShoppingListFragment : Fragment() {
                         }
 
                         override fun onProductMoved(item: ShoppingListItemViewModel) {
-                            viewModel.updateProductRanks(item)
+                            shoppingListViewModel.updateProductRanks()
                         }
 
                         override fun onAisleMoved(item: ShoppingListItemViewModel) {
-                            viewModel.updateAisleRanks(item)
+                            shoppingListViewModel.updateAisleRanks()
                         }
                     }
                 )
@@ -152,16 +152,16 @@ class ShoppingListFragment : Fragment() {
     }
 
     private fun updateTitle() {
-        (activity as AppCompatActivity).supportActionBar?.title = when (viewModel.locationType) {
-            LocationType.HOME ->
-                when (viewModel.filterType) {
-                    FilterType.IN_STOCK -> resources.getString(R.string.menu_in_stock)
-                    FilterType.NEEDED -> resources.getString(R.string.menu_shopping_list)
-                    FilterType.ALL -> resources.getString(R.string.menu_all_items)
-                }
+        (activity as AppCompatActivity).supportActionBar?.title = when (shoppingListViewModel.locationType) {
+                LocationType.HOME ->
+                    when (shoppingListViewModel.filterType) {
+                        FilterType.IN_STOCK -> resources.getString(R.string.menu_in_stock)
+                        FilterType.NEEDED -> resources.getString(R.string.menu_shopping_list)
+                        FilterType.ALL -> resources.getString(R.string.menu_all_items)
+                    }
 
-            LocationType.SHOP -> viewModel.locationName
-        }
+                LocationType.SHOP -> shoppingListViewModel.locationName
+            }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -194,7 +194,7 @@ class ShoppingListFragment : Fragment() {
             .setTitle(R.string.add_aisle)
             .setView(aisleDialogView)
             .setPositiveButton(R.string.add) { _, _ ->
-                viewModel.addAisle(txtAisleName.text.toString())
+                shoppingListViewModel.addAisle(txtAisleName.text.toString())
             }
             .setNegativeButton(R.string.cancel, null)
 

@@ -48,4 +48,6 @@
     <string name="cancel">Cancel</string>
     <string name="aisle_name">Aisle Name</string>
     <string name="id_label">id</string>
+    <string name="display_options_header">Display Options</string>
+    <string name="show_on_lock_screen">Show on lock screen</string>
 </resources>

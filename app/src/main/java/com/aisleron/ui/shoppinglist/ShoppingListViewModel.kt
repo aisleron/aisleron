@@ -124,25 +124,28 @@ class ShoppingListViewModel(
                 _shoppingListUiState.value = ShoppingListUiState.Success(items)
             }
         }
-
     }
 
-    fun updateProductRanks(item: ShoppingListItemViewModel) {
-        viewModelScope.launch {
-            updateAisleProductsUseCase(_items.filter { it.lineItemType == ShoppingListItemType.PRODUCT && it.modified }
+    fun updateProductRanks() {
+
+        val updateItems =
+            _items.filter { it.lineItemType == ShoppingListItemType.PRODUCT && it.modified }
                 .map {
                     AisleProduct(
                         rank = it.rank,
                         aisleId = it.aisleId,
                         product = Product(id = it.id, name = it.name, inStock = it.inStock),
-                        id = it.id
+                        id = it.mappingId
                     )
-                })
+                }
+
+        viewModelScope.launch {
+            updateAisleProductsUseCase(updateItems)
             refreshListItems(location!!.id)
         }
     }
 
-    fun updateAisleRanks(item: ShoppingListItemViewModel) {
+    fun updateAisleRanks() {
         viewModelScope.launch {
             _shoppingListUiState.value = ShoppingListUiState.Loading
             updateAislesUseCase(_items.filter { it.lineItemType == ShoppingListItemType.AISLE && it.modified }

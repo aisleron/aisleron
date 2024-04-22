@@ -5,7 +5,7 @@
     android:orientation="horizontal"
     android:longClickable="true"
     android:id="@+id/frg_product_list_item"
-    android:background="@color/design_default_color_background">
+    android:background="?android:attr/colorBackground">
 
     <TextView
         android:id="@+id/txt_product_id"

@@ -9,3 +9,5 @@
     android:name="com.aisleron.ui.NavShopListFragment"
     tools:context=".ui.shopmenu.ShopMenuFragment"
     tools:listitem="@layout/fragment_shop_menu_item" />
+
+

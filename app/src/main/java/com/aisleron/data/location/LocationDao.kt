@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
 import com.aisleron.data.base.BaseDao
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface LocationDao : BaseDao<LocationEntity> {
@@ -58,11 +59,11 @@ interface LocationDao : BaseDao<LocationEntity> {
      */
     @Transaction
     @Query("SELECT * FROM Location WHERE type = 'SHOP'")
-    suspend fun getShops(): List<LocationEntity>
+    fun getShops(): Flow<List<LocationEntity>>
 
     @Transaction
     @Query("SELECT * FROM Location WHERE type = 'SHOP' AND pinned = 1")
-    suspend fun getPinnedShops(): List<LocationEntity>
+    fun getPinnedShops(): Flow<List<LocationEntity>>
 
     /**
      * Home Specific Queries

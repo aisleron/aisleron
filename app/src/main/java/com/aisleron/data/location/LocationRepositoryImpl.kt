@@ -3,30 +3,36 @@ package com.aisleron.data.location
 import com.aisleron.data.AisleronDatabase
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationRepository
-import com.aisleron.domain.location.LocationType
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class LocationRepositoryImpl(
     private val db: AisleronDatabase,
     private val locationMapper: LocationMapper
 ) : LocationRepository {
 
-    override suspend fun getByType(type: LocationType): List<Location> {
+    /*
+    override fun getByType(type: LocationType): Flow<List<Location>> {
         return when (type) {
-            LocationType.HOME -> listOf(getHome())
+            LocationType.HOME -> flowOf<List<Location>>(listOf(getHome()))
             LocationType.SHOP -> getShops()
         }
     }
 
-    override suspend fun getShops(): List<Location> {
-        return locationMapper.toModelList(db.locationDao().getShops())
+     */
+
+    override fun getShops(): Flow<List<Location>> {
+        val locationEntities = db.locationDao().getShops()
+        return locationEntities.map { locationMapper.toModelList(it) }
     }
 
     override suspend fun getHome(): Location {
         return db.locationDao().getHome().let { locationMapper.toModel(it) }
     }
 
-    override suspend fun getPinnedShops(): List<Location> {
-        return locationMapper.toModelList(db.locationDao().getPinnedShops())
+    override fun getPinnedShops(): Flow<List<Location>> {
+        val locationEntities = db.locationDao().getPinnedShops()
+        return locationEntities.map { locationMapper.toModelList(it) }
     }
 
     override suspend fun getLocationWithAislesWithProducts(id: Int): Location? {

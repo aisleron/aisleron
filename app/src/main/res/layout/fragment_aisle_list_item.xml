@@ -5,7 +5,7 @@
     android:orientation="horizontal"
     android:longClickable="true"
 
-    android:background="@color/design_default_color_background">
+    android:background="?android:attr/colorBackground">
     <!-- android:background="?android:attr/selectableItemBackground" -->
     <TextView
         android:id="@+id/txt_aisle_name"

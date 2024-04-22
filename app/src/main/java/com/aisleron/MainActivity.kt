@@ -1,5 +1,6 @@
 package com.aisleron
 
+import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -12,9 +13,11 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.onNavDestinationSelected
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import androidx.preference.PreferenceManager
 import com.aisleron.databinding.ActivityMainBinding
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -56,7 +59,19 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
 
+        val displayOnLockScreen = prefs.getBoolean("display_lockscreen", false)
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            setShowWhenLocked(displayOnLockScreen)
+        }
+        /*
+        val shopMenuItem: MenuItem = navView.menu.findItem(R.id.nav_list_shop_list)
+        shopMenuItem.setActionView(R.layout.fragment_shop_menu_container)
+
+        */
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
