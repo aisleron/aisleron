@@ -66,6 +66,7 @@ class ShoppingListItemRecyclerViewAdapter(
     inner class AisleViewHolder(binding: FragmentAisleListItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         private val contentView: TextView = binding.txtAisleName
+        private val productCountView: TextView = binding.txtProductCnt
 
         override fun toString(): String {
             return super.toString() + " '" + contentView.text + "'"
@@ -73,7 +74,11 @@ class ShoppingListItemRecyclerViewAdapter(
 
         fun bind(item: ShoppingListItemViewModel) {
             itemView.isLongClickable = true
-            contentView.text = String.format("${item.name} (Rank: ${item.aisleRank})")
+            contentView.text = String.format("${item.name} ")
+            productCountView.text = ""
+            // values.count { it.lineItemType == ShoppingListItemType.PRODUCT && it.aisleId == values[absoluteAdapterPosition].aisleId }
+            //   .toString()
+            // Commented until a refresh can be applied to Aisle after changing product state
             itemView.setOnClickListener {
                 listener.onAisleClick(item)
             }

@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.aisleron.R
 import kotlinx.coroutines.launch
-import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**
  * A fragment representing a list of Items.
@@ -22,7 +22,7 @@ import org.koin.android.ext.android.inject
 class ShopListFragment : Fragment() {
 
     private var columnCount = 3
-    private val viewModel: ShopListViewModel by inject<ShopListViewModel>()
+    private val shopListViewModel: ShopListViewModel by viewModel()
 
     private val items = mutableListOf<ShopListItemViewModel>()
 
@@ -33,7 +33,7 @@ class ShopListFragment : Fragment() {
             columnCount = it.getInt(ARG_COLUMN_COUNT)
         }
 
-        viewModel.hydrateAllShops()
+        shopListViewModel.hydrateAllShops()
     }
 
     private fun navigateToShoppingList(item: ShopListItemViewModel) {
@@ -53,7 +53,7 @@ class ShopListFragment : Fragment() {
         if (view is RecyclerView) {
             viewLifecycleOwner.lifecycleScope.launch {
                 viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    viewModel.shopListUiState.collect {
+                    shopListViewModel.shopListUiState.collect {
                         when (it) {
                             ShopListViewModel.ShopListUiState.Empty -> Unit
                             ShopListViewModel.ShopListUiState.Loading -> Unit

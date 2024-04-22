@@ -12,11 +12,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.aisleron.databinding.FragmentProductBinding
 import kotlinx.coroutines.launch
-import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ProductFragment : Fragment() {
 
-    private val viewModel: ProductViewModel by inject<ProductViewModel>()
+    private val productViewModel: ProductViewModel by viewModel()
     private var _binding: FragmentProductBinding? = null
 
     private val binding get() = _binding!!
@@ -25,7 +25,7 @@ class ProductFragment : Fragment() {
         super.onCreate(savedInstanceState)
 
         arguments?.let {
-            viewModel.hydrate(it.getInt(ARG_PRODUCT_ID))
+            productViewModel.hydrate(it.getInt(ARG_PRODUCT_ID))
         }
     }
 
@@ -36,13 +36,13 @@ class ProductFragment : Fragment() {
         _binding = FragmentProductBinding.inflate(inflater, container, false)
         val button: Button = binding.btnSaveProduct
         button.setOnClickListener {
-            viewModel.saveProduct(
+            productViewModel.saveProduct(
                 binding.edtProductName.text.toString(),
                 binding.chkProductInStock.isChecked
             )
             viewLifecycleOwner.lifecycleScope.launch {
                 viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    viewModel.productUiState.collect {
+                    productViewModel.productUiState.collect {
                         when (it) {
                             is ProductViewModel.ProductUiState.Success -> {
                                 requireActivity().onBackPressedDispatcher.onBackPressed()
@@ -64,8 +64,8 @@ class ProductFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.edtProductName.setText(viewModel.productName)
-        binding.chkProductInStock.isChecked = viewModel.inStock ?: true
+        binding.edtProductName.setText(productViewModel.productName)
+        binding.chkProductInStock.isChecked = productViewModel.inStock ?: true
     }
 
     override fun onDestroyView() {
@@ -74,8 +74,8 @@ class ProductFragment : Fragment() {
     }
 
     override fun onResume() {
-        if (viewModel.productName != null) {
-            (activity as AppCompatActivity?)!!.supportActionBar!!.title = viewModel.productName
+        if (productViewModel.productName != null) {
+            (activity as AppCompatActivity?)!!.supportActionBar!!.title = productViewModel.productName
         }
         super.onResume()
     }

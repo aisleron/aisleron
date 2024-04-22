@@ -14,6 +14,17 @@
         android:text="@string/aisle"
         android:gravity="center_vertical"
         android:padding="@dimen/text_margin"
+        android:layout_weight="1"
+        android:textAppearance="?attr/textAppearanceListItem" />
+
+    <TextView
+        android:id="@+id/txt_product_cnt"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="0"
+        android:padding="@dimen/text_margin"
+        android:gravity="center_vertical"
+        android:text=""
         android:textAppearance="?attr/textAppearanceListItem" />
 
 </LinearLayout>

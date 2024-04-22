@@ -17,7 +17,7 @@ import com.aisleron.domain.FilterType
 import com.aisleron.ui.shoplist.ShopListItemViewModel
 import com.aisleron.ui.shoplist.ShopListViewModel
 import kotlinx.coroutines.launch
-import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**
  * A fragment representing a list of Items.
@@ -25,7 +25,7 @@ import org.koin.android.ext.android.inject
 class ShopMenuFragment : Fragment() {
 
     private var columnCount = 1
-    private val viewModel: ShopListViewModel by inject<ShopListViewModel>()
+    private val shopListViewModel: ShopListViewModel by viewModel()
 
     private val items = mutableListOf<ShopListItemViewModel>()
 
@@ -36,7 +36,7 @@ class ShopMenuFragment : Fragment() {
             columnCount = it.getInt(ARG_COLUMN_COUNT)
         }
 
-        viewModel.hydratePinnedShops()
+        shopListViewModel.hydratePinnedShops()
     }
 
     private fun navigateToShoppingList(item: ShopListItemViewModel) {
@@ -56,7 +56,7 @@ class ShopMenuFragment : Fragment() {
         if (view is RecyclerView) {
             viewLifecycleOwner.lifecycleScope.launch {
                 viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    viewModel.shopListUiState.collect {
+                    shopListViewModel.shopListUiState.collect {
                         when (it) {
                             ShopListViewModel.ShopListUiState.Empty -> Unit
                             ShopListViewModel.ShopListUiState.Loading -> Unit
