@@ -7,15 +7,10 @@
     android:id="@+id/frg_product_list_item"
     android:background="?android:attr/colorBackground">
 
-    <TextView
-        android:id="@+id/txt_product_id"
-        android:layout_width="wrap_content"
+    <Space
+        android:layout_width="@dimen/text_margin"
         android:layout_height="match_parent"
-        android:layout_weight="0"
-        android:padding="@dimen/text_margin"
-        android:gravity="center_vertical"
-        android:text="@string/id_label"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+        android:layout_weight="0" />
 
     <TextView
         android:id="@+id/txt_product_name"

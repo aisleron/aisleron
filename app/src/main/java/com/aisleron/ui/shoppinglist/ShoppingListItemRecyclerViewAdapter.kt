@@ -1,5 +1,6 @@
 package com.aisleron.ui.shoppinglist
 
+import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.CheckBox
@@ -75,6 +76,8 @@ class ShoppingListItemRecyclerViewAdapter(
         fun bind(item: ShoppingListItemViewModel) {
             itemView.isLongClickable = true
             contentView.text = String.format("${item.name} ")
+            if (item.inStock) contentView.setTypeface(null, Typeface.ITALIC)
+
             productCountView.text = ""
             // values.count { it.lineItemType == ShoppingListItemType.PRODUCT && it.aisleId == values[absoluteAdapterPosition].aisleId }
             //   .toString()
@@ -88,7 +91,6 @@ class ShoppingListItemRecyclerViewAdapter(
     inner class ProductListItemViewHolder(binding: FragmentProductListItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        private val idView: TextView = binding.txtProductId
         private val contentView: TextView = binding.txtProductName
         private val inStockView: CheckBox = binding.chkInStock
 
@@ -98,7 +100,6 @@ class ShoppingListItemRecyclerViewAdapter(
 
         fun bind(item: ShoppingListItemViewModel) {
             itemView.isLongClickable = true
-            idView.text = item.id.toString()
             contentView.text = item.name
             inStockView.isChecked = item.inStock
             itemView.setOnClickListener {

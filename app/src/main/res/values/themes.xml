@@ -21,5 +21,7 @@
 
     <style name="Theme.Aisleron.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
-    <style name="Theme.Aisleron.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="Theme.Aisleron.PopupOverlay" parent="ThemeOverlay.AppCompat.Light">
+        <item name="android:textColor">@color/black</item>
+    </style>
 </resources>

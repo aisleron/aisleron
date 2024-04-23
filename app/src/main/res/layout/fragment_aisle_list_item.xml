@@ -24,7 +24,8 @@
         android:layout_weight="0"
         android:padding="@dimen/text_margin"
         android:gravity="center_vertical"
-        android:text=""
+        android:text="34"
+        android:textColor="@color/ic_aisleron_background"
         android:textAppearance="?attr/textAppearanceListItem" />
 
 </LinearLayout>
