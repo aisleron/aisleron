@@ -17,6 +17,7 @@
             android:name="filterType"
             app:argType="com.aisleron.domain.FilterType"
             android:defaultValue="IN_STOCK" />
+
     </fragment>
 
     <fragment
@@ -76,7 +77,7 @@
             android:id="@+id/action_nav_all_shops_to_nav_shopping_list"
             app:destination="@id/nav_shopping_list">
             <argument
-                android:name="filterType"
+                android:name="com.aisleron.domain.FilterType"
                 android:defaultValue="NEEDED" />
         </action>
     </fragment>
@@ -91,6 +92,14 @@
         android:id="@+id/nav_add_product"
         android:name="com.aisleron.ui.product.ProductFragment"
         android:label="@string/add_product"
-        tools:layout="@layout/fragment_product" />
-
+        tools:layout="@layout/fragment_product">
+        <argument
+            android:name="productId"
+            app:argType="integer"
+            android:defaultValue="0" />
+        <argument
+            android:name="filterType"
+            app:argType="com.aisleron.domain.FilterType"
+            android:defaultValue="ALL" />
+    </fragment>
 </navigation>

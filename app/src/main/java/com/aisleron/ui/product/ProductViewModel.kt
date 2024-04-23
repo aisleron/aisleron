@@ -2,6 +2,7 @@ package com.aisleron.ui.product
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.aisleron.domain.FilterType
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.usecase.AddProductUseCase
 import com.aisleron.domain.product.usecase.GetProductUseCase
@@ -17,15 +18,18 @@ class ProductViewModel(
 ) : ViewModel() {
     val id: Int? get() = product?.id
     val productName: String? get() = product?.name
-    val inStock: Boolean? get() = product?.inStock
+    val inStock: Boolean get() = product?.inStock ?: (_filterType == FilterType.IN_STOCK)
 
     private var product: Product? = null
+
+    private var _filterType: FilterType = FilterType.ALL
 
     private val _productUiState = MutableStateFlow<ProductUiState>(ProductUiState.Empty)
     val productUiState: StateFlow<ProductUiState> = _productUiState
 
 
-    fun hydrate(productId: Int) {
+    fun hydrate(productId: Int, filterType: FilterType) {
+        _filterType = filterType
         viewModelScope.launch {
             _productUiState.value = ProductUiState.Loading
             product = getProductUseCase(productId)
@@ -61,7 +65,7 @@ class ProductViewModel(
                 id = 0
             )
         )
-        hydrate(id)
+        hydrate(id, _filterType)
     }
 
     sealed class ProductUiState {

@@ -4,13 +4,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.aisleron.databinding.FragmentProductBinding
+import com.aisleron.domain.FilterType
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -23,9 +26,10 @@ class ProductFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         arguments?.let {
-            productViewModel.hydrate(it.getInt(ARG_PRODUCT_ID))
+            val productId: Int = it.getInt(ARG_PRODUCT_ID)
+            val filterType: FilterType = it.getSerializable(ARG_FILTER_TYPE) as FilterType
+            productViewModel.hydrate(productId, filterType)
         }
     }
 
@@ -64,8 +68,20 @@ class ProductFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.edtProductName.setText(productViewModel.productName)
-        binding.chkProductInStock.isChecked = productViewModel.inStock ?: true
+
+        binding.chkProductInStock.isChecked = productViewModel.inStock
+
+        val edtProductName = binding.edtProductName
+        edtProductName.setText(productViewModel.productName)
+        edtProductName.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                val imm =
+                    ContextCompat.getSystemService(requireContext(), InputMethodManager::class.java)
+                imm?.showSoftInput(edtProductName, InputMethodManager.SHOW_IMPLICIT)
+            }
+        }
+
+        edtProductName.requestFocus()
     }
 
     override fun onDestroyView() {
@@ -83,10 +99,13 @@ class ProductFragment : Fragment() {
     companion object {
 
         private const val ARG_PRODUCT_ID = "productId"
-        fun newInstance(productId: Int) =
+        private const val ARG_FILTER_TYPE = "filterType"
+
+        fun newInstance(productId: Int, filterType: FilterType) =
             ProductFragment().apply {
                 arguments = Bundle().apply {
                     putInt(ARG_PRODUCT_ID, productId)
+                    putSerializable(ARG_FILTER_TYPE, filterType)
                 }
             }
     }

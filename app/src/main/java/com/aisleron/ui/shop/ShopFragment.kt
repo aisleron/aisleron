@@ -4,8 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -36,6 +38,7 @@ class ShopFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentShopBinding.inflate(inflater, container, false)
+
         val button: Button = binding.btnSaveShop
         button.setOnClickListener {
             shopViewModel.saveLocation(
@@ -67,8 +70,19 @@ class ShopFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.edtShopName.setText(shopViewModel.locationName)
+
         binding.swcShopPinned.isChecked = shopViewModel.pinned ?: true
+
+        val edtShopName = binding.edtShopName
+        edtShopName.setText(shopViewModel.locationName)
+        edtShopName.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                val imm = getSystemService(requireContext(), InputMethodManager::class.java)
+                imm?.showSoftInput(edtShopName, InputMethodManager.SHOW_IMPLICIT)
+            }
+        }
+
+        edtShopName.requestFocus()
     }
 
     override fun onDestroyView() {

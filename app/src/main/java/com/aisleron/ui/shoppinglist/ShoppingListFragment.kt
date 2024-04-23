@@ -18,6 +18,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -164,6 +165,12 @@ class ShoppingListFragment : Fragment() {
             }
     }
 
+    private fun navigateToAddProduct(filterType: FilterType) {
+        val bundle = Bundle()
+        bundle.putSerializable(ARG_FILTER_TYPE, filterType)
+        this.findNavController().navigate(R.id.nav_add_product, bundle)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -175,16 +182,24 @@ class ShoppingListFragment : Fragment() {
 
             //NOTE: If you override onMenuItemSelected, OnSupportNavigateUp will only be called when returning false
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                if (menuItem.itemId == R.id.nav_add_aisle) {
-                    addAisle(view.context)
-                    return true
+                return when (menuItem.itemId) {
+                    R.id.mnu_add_aisle -> {
+                        showAddAisleDialog(view.context)
+                        true
+                    }
+
+                    R.id.mnu_add_product -> {
+                        navigateToAddProduct(shoppingListViewModel.filterType)
+                        true
+                    }
+
+                    else -> false
                 }
-                return false
             }
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
-    private fun addAisle(context: Context) {
+    private fun showAddAisleDialog(context: Context) {
         val inflater = requireActivity().layoutInflater
         val aisleDialogView = inflater.inflate(R.layout.dialog_aisle, null)
         val txtAisleName = aisleDialogView.findViewById<TextInputEditText>(R.id.edt_aisle_name)
@@ -193,10 +208,14 @@ class ShoppingListFragment : Fragment() {
         builder
             .setTitle(R.string.add_aisle)
             .setView(aisleDialogView)
-            .setPositiveButton(R.string.add) { _, _ ->
-                shoppingListViewModel.addAisle(txtAisleName.text.toString())
+            .setNegativeButton(R.string.add_another) { _, _ ->
+                addNewAisle(txtAisleName.text.toString())
+                showAddAisleDialog(context)
             }
-            .setNegativeButton(R.string.cancel, null)
+            .setPositiveButton(R.string.done) { _, _ ->
+                addNewAisle(txtAisleName.text.toString())
+            }
+            .setNeutralButton(R.string.cancel, null)
 
         val dialog: AlertDialog = builder.create()
 
@@ -208,6 +227,12 @@ class ShoppingListFragment : Fragment() {
 
         txtAisleName.requestFocus()
         dialog.show()
+    }
+
+    private fun addNewAisle(aisleName: String) {
+        if (aisleName.isNotBlank()) {
+            shoppingListViewModel.addAisle(aisleName)
+        }
     }
 
     companion object {
