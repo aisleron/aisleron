@@ -8,7 +8,7 @@ class AisleWithProductsMapper : MapperBaseImpl<AisleWithProducts, Aisle>() {
     override fun toModel(value: AisleWithProducts) = Aisle(
         id = value.aisle.id,
         rank = value.aisle.rank,
-        name = value.aisle.name,
+        name = value.aisle.name.trim(),
         locationId = value.aisle.locationId,
         products = AisleProductRankMapper().toModelList(value.products),
         isDefault = value.aisle.isDefault

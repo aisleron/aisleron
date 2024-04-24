@@ -5,7 +5,7 @@ import com.aisleron.domain.aisle.Aisle
 
 class AisleMapper : MapperBaseImpl<AisleEntity, Aisle>() {
     override fun toModel(value: AisleEntity) = Aisle(
-        name = value.name,
+        name = value.name.trim(),
         id = value.id,
         rank = value.rank,
         locationId = value.locationId,
@@ -14,7 +14,7 @@ class AisleMapper : MapperBaseImpl<AisleEntity, Aisle>() {
     )
 
     override fun fromModel(value: Aisle) = AisleEntity(
-        name = value.name,
+        name = value.name.trim(),
         id = value.id,
         rank = value.rank,
         locationId = value.locationId,

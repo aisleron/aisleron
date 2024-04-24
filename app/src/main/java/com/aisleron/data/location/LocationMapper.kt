@@ -6,7 +6,7 @@ import com.aisleron.domain.location.Location
 class LocationMapper : MapperBaseImpl<LocationEntity, Location>() {
     override fun toModel(value: LocationEntity) = Location(
         id = value.id,
-        name = value.name,
+        name = value.name.trim(),
         defaultFilter = value.defaultFilter,
         pinned = value.pinned,
         type = value.type,
@@ -15,7 +15,7 @@ class LocationMapper : MapperBaseImpl<LocationEntity, Location>() {
 
     override fun fromModel(value: Location) = LocationEntity(
         id = value.id,
-        name = value.name,
+        name = value.name.trim(),
         defaultFilter = value.defaultFilter,
         pinned = value.pinned,
         type = value.type,

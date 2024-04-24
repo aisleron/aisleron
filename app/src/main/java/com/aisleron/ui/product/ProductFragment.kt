@@ -73,15 +73,6 @@ class ProductFragment : Fragment() {
 
         val edtProductName = binding.edtProductName
         edtProductName.setText(productViewModel.productName)
-        edtProductName.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) {
-                val imm =
-                    ContextCompat.getSystemService(requireContext(), InputMethodManager::class.java)
-                imm?.showSoftInput(edtProductName, InputMethodManager.SHOW_IMPLICIT)
-            }
-        }
-
-        edtProductName.requestFocus()
     }
 
     override fun onDestroyView() {
@@ -94,6 +85,14 @@ class ProductFragment : Fragment() {
             (activity as AppCompatActivity?)!!.supportActionBar!!.title = productViewModel.productName
         }
         super.onResume()
+
+        val edtProductName = binding.edtProductName
+        edtProductName.postDelayed({
+            edtProductName.requestFocus()
+            val imm =
+                ContextCompat.getSystemService(requireContext(), InputMethodManager::class.java)
+            imm?.showSoftInput(edtProductName, InputMethodManager.SHOW_IMPLICIT)
+        }, 50)
     }
 
     companion object {
