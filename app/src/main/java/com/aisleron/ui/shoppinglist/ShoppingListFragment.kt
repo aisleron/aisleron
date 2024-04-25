@@ -19,7 +19,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -49,8 +48,6 @@ class ShoppingListFragment : Fragment() {
         shoppingListViewModel.hydrate(locationId, filterType)
     }
 
-
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -59,10 +56,6 @@ class ShoppingListFragment : Fragment() {
 
         // Set the adapter
         if (view is RecyclerView) {
-            view.addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
-
-            //TODO: Refresh the data when view is reloaded, e.g. after adding a new product
-
             viewLifecycleOwner.lifecycleScope.launch {
                 viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                     shoppingListViewModel.shoppingListUiState.collect {

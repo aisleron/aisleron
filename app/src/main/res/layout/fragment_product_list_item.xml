@@ -20,6 +20,7 @@
         android:padding="@dimen/text_margin"
         android:gravity="center_vertical"
         android:text="@string/product"
+        android:singleLine="true"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
     <CheckBox
