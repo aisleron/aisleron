@@ -8,5 +8,5 @@ interface LocationRepository : BaseRepository<Location> {
     fun getShops(): Flow<List<Location>>
     suspend fun getHome(): Location
     fun getPinnedShops(): Flow<List<Location>>
-    suspend fun getLocationWithAislesWithProducts(id: Int): Location?
+    fun getLocationWithAislesWithProducts(id: Int): Flow<Location?>
 }

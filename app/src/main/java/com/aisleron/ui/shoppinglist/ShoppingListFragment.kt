@@ -49,24 +49,7 @@ class ShoppingListFragment : Fragment() {
         shoppingListViewModel.hydrate(locationId, filterType)
     }
 
-    private fun updateProductStatus(
-        item: ShoppingListItemViewModel,
-        adapter: ShoppingListItemRecyclerViewAdapter,
-        inStock: Boolean,
-        absoluteAdapterPosition: Int
-    ) {
-        item.inStock = inStock
-        shoppingListViewModel.updateProductStatus(item)
 
-        if ((shoppingListViewModel.filterType == FilterType.IN_STOCK && !item.inStock) || (shoppingListViewModel.filterType == FilterType.NEEDED && item.inStock)
-        ) {
-            shoppingListViewModel.removeItem(item)
-            adapter.notifyItemRemoved(absoluteAdapterPosition)
-        } else {
-            //TODO: Figure out why 'all' crashes the app after the second swipe.
-            adapter.notifyItemChanged(absoluteAdapterPosition)
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -84,13 +67,17 @@ class ShoppingListFragment : Fragment() {
                 viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                     shoppingListViewModel.shoppingListUiState.collect {
                         when (it) {
-                            is ShoppingListViewModel.ShoppingListUiState.Success -> {
-                                view.adapter?.notifyDataSetChanged()
-                                updateTitle()
-                            }
-
                             ShoppingListViewModel.ShoppingListUiState.Empty -> Unit
                             ShoppingListViewModel.ShoppingListUiState.Loading -> Unit
+                            ShoppingListViewModel.ShoppingListUiState.Error -> Unit
+                            ShoppingListViewModel.ShoppingListUiState.Success -> Unit
+                            is ShoppingListViewModel.ShoppingListUiState.Updated -> {
+                                updateTitle()
+
+                                (view.adapter as ShoppingListItemRecyclerViewAdapter).submitList(
+                                    it.shoppingList
+                                )
+                            }
                         }
                     }
                 }
@@ -99,13 +86,12 @@ class ShoppingListFragment : Fragment() {
             with(view) {
                 LinearLayoutManager(context)
                 adapter = ShoppingListItemRecyclerViewAdapter(
-                    shoppingListViewModel.items,
                     object :
                         ShoppingListItemRecyclerViewAdapter.ShoppingListItemListener {
                         override fun onAisleClick(item: ShoppingListItemViewModel) {
                             Toast.makeText(
                                 context,
-                                "AisleEntity Click! Id: ${item.id}, Name: ${item.name}",
+                                "Aisle; Id: ${item.id}, Name: ${item.name}, Rank: ${item.rank}",
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
@@ -113,30 +99,24 @@ class ShoppingListFragment : Fragment() {
                         override fun onProductClick(item: ShoppingListItemViewModel) {
                             Toast.makeText(
                                 context,
-                                "Id: ${item.id}, Name: ${item.name}, In Stock: ${item.inStock}",
+                                "Product; Id: ${item.id}, Name: ${item.name}, Rank: ${item.rank}, In Stock: ${item.inStock}",
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
 
                         override fun onProductStatusChange(
                             item: ShoppingListItemViewModel,
-                            inStock: Boolean,
-                            absoluteAdapterPosition: Int
+                            inStock: Boolean
                         ) {
-                            updateProductStatus(
-                                item,
-                                view.adapter as ShoppingListItemRecyclerViewAdapter,
-                                inStock,
-                                absoluteAdapterPosition
-                            )
+                            shoppingListViewModel.updateProductStatus(item, inStock)
                         }
 
-                        override fun onProductMoved(item: ShoppingListItemViewModel) {
-                            shoppingListViewModel.updateProductRanks()
+                        override fun onProductMoved(updatedList: List<ShoppingListItemViewModel>) {
+                            shoppingListViewModel.updateProductRanks(updatedList)
                         }
 
-                        override fun onAisleMoved(item: ShoppingListItemViewModel) {
-                            shoppingListViewModel.updateAisleRanks()
+                        override fun onAisleMoved(updatedList: List<ShoppingListItemViewModel>) {
+                            shoppingListViewModel.updateAisleRanks(updatedList)
                         }
                     }
                 )

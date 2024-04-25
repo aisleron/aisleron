@@ -35,9 +35,9 @@ class LocationRepositoryImpl(
         return locationEntities.map { locationMapper.toModelList(it) }
     }
 
-    override suspend fun getLocationWithAislesWithProducts(id: Int): Location? {
-        return db.locationDao().getLocationWithAislesWithProducts(id)
-            ?.let { LocationWithAislesWithProductsMapper().toModel(it) }
+    override fun getLocationWithAislesWithProducts(id: Int): Flow<Location?> {
+        val locationEntity = db.locationDao().getLocationWithAislesWithProducts(id)
+        return locationEntity.map { it?.let { LocationWithAislesWithProductsMapper().toModel(it) } }
     }
 
     override suspend fun get(id: Int): Location? {

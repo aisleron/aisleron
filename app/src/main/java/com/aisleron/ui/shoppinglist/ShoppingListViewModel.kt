@@ -14,7 +14,7 @@ import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.usecase.UpdateProductStatusUseCase
 import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class ShoppingListViewModel(
@@ -33,83 +33,83 @@ class ShoppingListViewModel(
     var filterType: FilterType = FilterType.NEEDED
         private set
 
-    private val _items = mutableListOf<ShoppingListItemViewModel>()
-    val items: List<ShoppingListItemViewModel> = _items
-
     private val _shoppingListUiState = MutableStateFlow<ShoppingListUiState>(
         ShoppingListUiState.Empty
     )
-    val shoppingListUiState: StateFlow<ShoppingListUiState> = _shoppingListUiState
+    val shoppingListUiState = _shoppingListUiState.asStateFlow()
 
     fun hydrate(locationId: Int, filterType: FilterType) {
+        this.filterType = filterType
+        refreshListItems(locationId)
+    }
+
+    private fun refreshListItems(locationId: Int) {
         viewModelScope.launch {
-            this@ShoppingListViewModel.filterType = filterType
             _shoppingListUiState.value = ShoppingListUiState.Loading
-            refreshListItems(locationId)
-            _shoppingListUiState.value = ShoppingListUiState.Success(items)
-        }
-    }
+            getShoppingListUseCase(locationId, filterType).collect { loc ->
+                location = loc
 
-    fun updateProductStatus(item: ShoppingListItemViewModel) {
-        viewModelScope.launch {
-            updateProductStatusUseCase(item.id, item.inStock)
-        }
-    }
+                val shoppingList = mutableListOf<ShoppingListItemViewModel>()
 
-    private suspend fun refreshListItems(locationId: Int) {
-        location = getShoppingListUseCase(locationId, filterType)
+                location?.aisles?.forEach { a ->
+                    shoppingList.add(
+                        ShoppingListItemViewModel(
+                            lineItemType = ShoppingListItemType.AISLE,
+                            aisleRank = a.rank,
+                            rank = a.rank,
+                            id = a.id,
+                            name = a.name,
+                            inStock = a.isDefault,  //inStock holds the aisle default value in the shopping list
+                            aisleId = a.id,
+                            mappingId = 0,
+                            childCount = a.products.count { p ->
+                                (p.product.inStock && filterType == FilterType.IN_STOCK)
+                                        || (!p.product.inStock && filterType == FilterType.NEEDED)
+                                        || (filterType == FilterType.ALL)
+                            }
+                        )
+                    )
+                    shoppingList += a.products.filter { p ->
+                        (p.product.inStock && filterType == FilterType.IN_STOCK)
+                                || (!p.product.inStock && filterType == FilterType.NEEDED)
+                                || (filterType == FilterType.ALL)
+                    }.map { p ->
+                        ShoppingListItemViewModel(
+                            lineItemType = ShoppingListItemType.PRODUCT,
+                            aisleRank = a.rank,
+                            rank = p.rank,
+                            id = p.product.id,
+                            name = p.product.name,
+                            inStock = p.product.inStock,
+                            aisleId = p.aisleId,
+                            mappingId = p.id,
+                            childCount = 0
+                        )
+                    }
+                }
 
-        _items.clear()
-
-        location?.aisles?.forEach { a ->
-            _items.add(
-                ShoppingListItemViewModel(
-                    lineItemType = ShoppingListItemType.AISLE,
-                    aisleRank = a.rank,
-                    rank = a.rank,
-                    id = a.id,
-                    name = a.name,
-                    inStock = a.isDefault,  //inStock holds the aisle default value in the shopping list
-                    aisleId = a.id,
-                    mappingId = 0
+                shoppingList.sortWith(
+                    compareBy(
+                        { it.aisleRank },
+                        { it.aisleId },
+                        { it.lineItemType },
+                        { it.rank },
+                        { it.name })
                 )
-            )
-            _items += a.products.filter { p ->
-                (p.product.inStock && filterType == FilterType.IN_STOCK)
-                        || (!p.product.inStock && filterType == FilterType.NEEDED)
-                        || (filterType == FilterType.ALL)
-            }.map { p ->
-                ShoppingListItemViewModel(
-                    lineItemType = ShoppingListItemType.PRODUCT,
-                    aisleRank = a.rank,
-                    rank = p.rank,
-                    id = p.product.id,
-                    name = p.product.name,
-                    inStock = p.product.inStock,
-                    aisleId = p.aisleId,
-                    mappingId = p.id
-                )
+                _shoppingListUiState.value = ShoppingListUiState.Updated(shoppingList.toList())
             }
         }
-
-        _items.sortWith(
-            compareBy(
-                { it.aisleRank },
-                { it.aisleId },
-                { it.lineItemType },
-                { it.rank },
-                { it.name })
-        )
     }
 
-    fun removeItem(item: ShoppingListItemViewModel) {
-        _items.remove(item)
+    fun updateProductStatus(item: ShoppingListItemViewModel, inStock: Boolean) {
+        viewModelScope.launch {
+            updateProductStatusUseCase(item.id, inStock)
+        }
     }
 
     fun addAisle(aisleName: String) {
         if (location != null) {
             viewModelScope.launch {
-                _shoppingListUiState.value = ShoppingListUiState.Loading
                 addAisleUseCase(
                     Aisle(
                         name = aisleName,
@@ -120,16 +120,13 @@ class ShoppingListViewModel(
                         id = 0
                     )
                 )
-                refreshListItems(location!!.id)
-                _shoppingListUiState.value = ShoppingListUiState.Success(items)
             }
         }
     }
 
-    fun updateProductRanks() {
-
-        val updateItems =
-            _items.filter { it.lineItemType == ShoppingListItemType.PRODUCT && it.modified }
+    fun updateProductRanks(shoppingList: List<ShoppingListItemViewModel>) {
+        viewModelScope.launch {
+            updateAisleProductsUseCase(shoppingList.filter { it.lineItemType == ShoppingListItemType.PRODUCT && it.modified }
                 .map {
                     AisleProduct(
                         rank = it.rank,
@@ -137,18 +134,13 @@ class ShoppingListViewModel(
                         product = Product(id = it.id, name = it.name, inStock = it.inStock),
                         id = it.mappingId
                     )
-                }
-
-        viewModelScope.launch {
-            updateAisleProductsUseCase(updateItems)
-            refreshListItems(location!!.id)
+                })
         }
     }
 
-    fun updateAisleRanks() {
+    fun updateAisleRanks(shoppingList: List<ShoppingListItemViewModel>) {
         viewModelScope.launch {
-            _shoppingListUiState.value = ShoppingListUiState.Loading
-            updateAislesUseCase(_items.filter { it.lineItemType == ShoppingListItemType.AISLE && it.modified }
+            updateAislesUseCase(shoppingList.filter { it.lineItemType == ShoppingListItemType.AISLE && it.modified }
                 .map {
                     Aisle(
                         rank = it.rank,
@@ -159,17 +151,15 @@ class ShoppingListViewModel(
                         isDefault = it.inStock,
                     )
                 })
-            refreshListItems(location!!.id)
-            _shoppingListUiState.value = ShoppingListUiState.Success(items)
         }
     }
 
     sealed class ShoppingListUiState {
         data object Empty : ShoppingListUiState()
         data object Loading : ShoppingListUiState()
-
-        //data object Error : ShoppingListUiState()
-        data class Success(val shoppingList: List<ShoppingListItemViewModel>) :
+        data object Error : ShoppingListUiState()
+        data object Success : ShoppingListUiState()
+        data class Updated(val shoppingList: List<ShoppingListItemViewModel>) :
             ShoppingListUiState()
     }
 }
