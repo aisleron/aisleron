@@ -53,10 +53,8 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
-        navController.addOnDestinationChangedListener { _, destination, _ ->
-            if (destination.id == R.id.nav_shopping_list) {
-                drawerLayout.closeDrawers()
-            }
+        navController.addOnDestinationChangedListener { _, _, _ ->
+            drawerLayout.closeDrawers()
         }
 
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
@@ -67,11 +65,6 @@ class MainActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
             setShowWhenLocked(displayOnLockScreen)
         }
-        /*
-        val shopMenuItem: MenuItem = navView.menu.findItem(R.id.nav_list_shop_list)
-        shopMenuItem.setActionView(R.layout.fragment_shop_menu_container)
-
-        */
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

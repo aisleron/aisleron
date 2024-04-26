@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ui.menu.NavigationDrawerFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <include
+            android:id="@+id/nav_header_main"
+            layout="@layout/nav_header_main"
+            android:layout_width="match_parent"
+            android:layout_height="150dp" />
+
+        <TextView
+            android:id="@+id/nav_in_stock"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/menu_in_stock"
+            app:drawableStartCompat="@drawable/baseline_home_24"
+            android:drawablePadding="12dp"
+            android:padding="12dp"
+            android:textAppearance="?attr/textAppearanceListItem" />
+
+        <TextView
+            android:id="@+id/nav_needed"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/menu_shopping_list"
+            app:drawableStartCompat="@drawable/baseline_checklist_24"
+            android:drawablePadding="12dp"
+            android:padding="12dp"
+            android:textAppearance="?attr/textAppearanceListItem" />
+
+        <TextView
+            android:id="@+id/nav_all_items"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/menu_all_items"
+            app:drawableStartCompat="@drawable/baseline_format_list_bulleted_24"
+            android:drawablePadding="12dp"
+            android:padding="12dp"
+            android:textAppearance="?attr/textAppearanceListItem" />
+
+        <View
+            android:id="@+id/divider2"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/menu_shops"
+            android:padding="12dp"
+            android:textAppearance="?attr/textAppearancePopupMenuHeader" />
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/fragment_shop_menu_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:name="com.aisleron.ui.shopmenu.ShopMenuFragment"
+            tools:layout="@layout/fragment_shop_menu_item"/>
+
+        <TextView
+            android:id="@+id/nav_all_shops"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/menu_all_shops"
+            app:drawableStartCompat="@drawable/baseline_shopping_cart_24"
+            android:drawablePadding="12dp"
+            android:padding="12dp"
+            android:textAppearance="?attr/textAppearanceListItem" />
+
+        <View
+            android:id="@+id/divider3"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider" />
+
+        <TextView
+            android:id="@+id/nav_settings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/menu_settings"
+            app:drawableStartCompat="@drawable/ic_menu_settings"
+            android:drawablePadding="12dp"
+            android:padding="12dp"
+            android:textAppearance="?attr/textAppearanceListItem" />
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>
