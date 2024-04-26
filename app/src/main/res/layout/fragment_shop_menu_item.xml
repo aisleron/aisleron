@@ -4,9 +4,7 @@
     android:id="@+id/txt_shop_name"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:singleLine="true"
     android:text="@string/shop_name"
+    android:theme="@style/Theme.Aisleron.NavigationDrawer"
     app:drawableStartCompat="@drawable/baseline_store_24"
-    android:drawablePadding="12dp"
-    android:padding="12dp"
     android:textAppearance="?attr/textAppearanceListItem" />

@@ -12,6 +12,7 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
+        <item name="colorMenuDrawable">@color/white</item>
     </style>
 
     <style name="Theme.Aisleron.PopupOverlay" parent="ThemeOverlay.AppCompat.Light">
