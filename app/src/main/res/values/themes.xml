@@ -28,8 +28,8 @@
 
     <style name="Theme.Aisleron.NavigationDrawer" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
         <item name="android:drawableTint">?attr/colorMenuDrawable</item>
-        <item name="android:drawablePadding">12dp</item>
-        <item name="android:padding">12dp</item>
+        <item name="android:drawablePadding">@dimen/menu_padding</item>
+        <item name="android:padding">@dimen/menu_padding</item>
         <item name="android:singleLine">true</item>
     </style>
 
