@@ -11,7 +11,7 @@
         android:id="@+id/imageView2"
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        app:tint="?attr/colorMenuDrawable"
+        app:tint="?attr/colorOnSurface"
         app:srcCompat="@drawable/baseline_store_24"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -19,13 +19,8 @@
         android:id="@+id/txt_shop_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="6dp"
-        android:textAlignment="center"
-
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:textColor="@color/white"
-        android:background="@drawable/text_background_rounded"
+        android:theme="@style/Theme.Aisleron.OverlayText"
         android:text="@string/shop_name" />
 
 
