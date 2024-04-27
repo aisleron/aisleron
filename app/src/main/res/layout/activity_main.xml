@@ -25,7 +25,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:name="com.aisleron.ui.menu.NavigationDrawerFragment"
-            tools:layout="@layout/fragment_navigation_drawer"/>
+            tools:layout="@layout/fragment_navigation_drawer" />
 
     </com.google.android.material.navigation.NavigationView>
 </androidx.drawerlayout.widget.DrawerLayout>

@@ -10,7 +10,7 @@
         <item name="colorSecondaryVariant">@color/teal_700</item>
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+        <item name="android:statusBarColor">?attr/colorPrimary</item>
         <!-- Customize your theme here. -->
     </style>
 
@@ -21,22 +21,21 @@
 
     <style name="Theme.Aisleron.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
-    <style name="Theme.Aisleron.PopupOverlay" parent="ThemeOverlay.AppCompat.Light">
+    <style name="Theme.Aisleron.PopupOverlay" parent="Theme.Aisleron">
         <item name="android:textColor">?attr/colorOnSurface</item>
     </style>
 
-    <style name="Theme.Aisleron.NavigationDrawer" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
-        <item name="android:drawableTint">?attr/colorOnSurface</item>
+    <style name="Theme.Aisleron.NavigationDrawer" parent="Theme.Aisleron">
         <item name="android:drawablePadding">@dimen/menu_padding</item>
         <item name="android:padding">@dimen/menu_padding</item>
         <item name="android:singleLine">true</item>
     </style>
 
-    <style name="Theme.Aisleron.OverlayText" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+    <style name="Theme.Aisleron.OverlayText" parent="Theme.Aisleron">
         <item name="android:padding">6dp</item>
         <item name="android:textAlignment">center</item>
         <item name="android:textAppearance">@style/TextAppearance.AppCompat.Body1</item>
-        <item name="android:textColor">@color/white</item>
+        <item name="android:textColor">@android:color/white</item>
         <item name="android:background">@drawable/text_background_rounded</item>
 
     </style>
