@@ -21,11 +21,12 @@
     </style>
 
     <style name="Theme.Aisleron.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
-        <!--        <item name="android:background">?attr/colorPrimary</item>-->
+        <item name="android:background">?attr/colorPrimary</item>
     </style>
 
     <style name="Theme.Aisleron.PopupOverlay" parent="Theme.Aisleron">
         <item name="android:textColor">?attr/colorOnSurface</item>
+        <item name="android:background"></item>
     </style>
 
     <style name="Theme.Aisleron.NavigationDrawer" parent="Theme.Aisleron">

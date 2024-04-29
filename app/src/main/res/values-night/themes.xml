@@ -2,16 +2,21 @@
     <!-- Base application theme. -->
     <style name="Theme.Aisleron" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/black_blue</item>
-        <item name="colorPrimaryVariant">@color/black_blue</item>
-        <item name="colorOnPrimary">?attr/colorOnSurface</item>
+        <item name="colorPrimary">@color/orange_600</item>
+        <item name="colorPrimaryVariant">@color/blue_600</item>
+        <item name="colorOnPrimary">@color/black</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/orange_500</item>
-        <item name="colorSecondaryVariant">@color/orange_500</item>
+        <item name="colorSecondary">@color/orange_600</item>
+        <item name="colorSecondaryVariant">@color/blue_600</item>
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor">?attr/colorPrimary</item>
+        <item name="android:statusBarColor">@color/black_blue</item>
         <!-- Customize your theme here. -->
         <item name="android:colorBackground">@color/black</item>
     </style>
+
+    <style name="Theme.Aisleron.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="android:background">@color/black_blue</item>
+    </style>
+
 </resources>
