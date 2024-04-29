@@ -24,7 +24,7 @@
         android:layout_height="1dp"
         android:layout_gravity="center_vertical"
         android:layout_weight="1"
-        android:background="?android:attr/listDivider" />
+        android:background="?attr/colorSecondary" />
 
     <TextView
         android:id="@+id/txt_product_cnt"
@@ -34,7 +34,6 @@
         android:padding="@dimen/text_margin"
         android:gravity="center_vertical"
         android:text=""
-        android:textColor="@color/ic_aisleron_background"
         android:textAppearance="?attr/textAppearanceListItem" />
 
 </LinearLayout>

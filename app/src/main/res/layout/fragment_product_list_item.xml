@@ -1,35 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
+    android:padding="@dimen/text_margin"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="@dimen/text_margin"
+    android:layout_marginStart="32dp"
+    android:layout_marginEnd="@dimen/text_margin"
+    android:layout_marginVertical="6dp"
     android:longClickable="true"
-    android:id="@+id/frg_product_list_item"
-    android:background="?android:attr/colorBackground">
+    app:cardElevation="3dp"
+    android:id="@+id/frg_product_list_item">
 
-    <Space
-        android:layout_width="@dimen/text_margin"
-        android:layout_height="match_parent"
-        android:layout_weight="0" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
-    <TextView
-        android:id="@+id/txt_product_name"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:padding="@dimen/text_margin"
-        android:gravity="center_vertical"
-        android:text="@string/product"
-        android:singleLine="true"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+        <TextView
+            android:id="@+id/txt_product_name"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:padding="@dimen/text_margin"
+            android:gravity="center_vertical"
+            android:text="@string/product"
+            android:singleLine="true"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
-    <CheckBox
-        android:id="@+id/chk_in_stock"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_weight="0"
-        android:padding="@dimen/text_margin"
-        android:checkMark="?android:attr/listChoiceIndicatorMultiple"
-        android:checked="true" />
+        <CheckBox
+            android:id="@+id/chk_in_stock"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="0"
+            android:padding="@dimen/text_margin"
+            android:checkMark="?android:attr/listChoiceIndicatorMultiple"
+            android:buttonTint="?attr/colorSecondary"
+            android:checked="false" />
 
-</LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>
