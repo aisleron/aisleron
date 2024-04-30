@@ -3,11 +3,16 @@ package com.aisleron.ui.shoppinglist
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -139,6 +144,34 @@ class ShoppingListFragment : Fragment() {
         val bundle = Bundle()
         bundle.putSerializable(ARG_FILTER_TYPE, filterType)
         this.findNavController().navigate(R.id.nav_add_product, bundle)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val menuHost: MenuHost = requireActivity()
+        menuHost.addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.shopping_list_fragment_main, menu)
+            }
+
+            //NOTE: If you override onMenuItemSelected, OnSupportNavigateUp will only be called when returning false
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                return when (menuItem.itemId) {
+                    /*R.id.mnu_add_aisle -> {
+                        showAddAisleDialog(view.context)
+                        true
+                    }
+
+                    R.id.mnu_add_product -> {
+                        navigateToAddProduct(shoppingListViewModel.filterType)
+                        true
+                    }*/
+
+                    else -> false
+                }
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
     private fun showAddAisleDialog(context: Context) {
