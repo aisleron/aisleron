@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.aisleron.R
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -43,10 +45,25 @@ class ShopListFragment : Fragment() {
         this.findNavController().navigate(R.id.action_nav_all_shops_to_nav_shopping_list, bundle)
     }
 
+    private fun navigateToAddShop() {
+        val bundle = Bundle()
+        this.findNavController().navigate(R.id.nav_add_shop, bundle)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        val fab = this.activity?.findViewById<View>(R.id.fab) as FloatingActionButton
+        fab.setImageDrawable(
+            ResourcesCompat.getDrawable(
+                resources, R.drawable.baseline_add_business_24, context?.theme
+            )
+        )
+        fab.setOnClickListener { _ ->
+            navigateToAddShop()
+        }
+
         val view = inflater.inflate(R.layout.fragment_shop_list, container, false)
 
         // Set the adapter

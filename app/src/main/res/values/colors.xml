@@ -4,6 +4,7 @@
     <!-- Blacks.   -->
     <color name="black">#FF000000</color>
     <color name="black_blue">#FF050B14</color>
+    <color name="black_orange">#FF140703</color>
     <color name="black_opaque_60">#99000000</color>
     <!-- Blues.   -->
     <color name="blue_100">#FF448aff</color>

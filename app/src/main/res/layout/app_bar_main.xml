@@ -30,4 +30,74 @@
         android:layout_marginBottom="16dp"
         app:srcCompat="@android:drawable/ic_input_add" />
 
+    <TextView
+        android:id="@+id/add_shop_fab_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="85dp"
+        android:text="@string/add_shop"
+        app:layout_anchor="@id/fab_add_shop"
+        style="@style/Theme.Aisleron.OverlayText"
+        app:layout_anchorGravity="center_vertical" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_add_shop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:fabSize="mini"
+        android:layout_marginEnd="21dp"
+        android:layout_marginBottom="80dp"
+        app:layout_anchor="@id/fab"
+        app:layout_anchorGravity="end"
+        android:layout_gravity="top"
+        app:srcCompat="@drawable/baseline_add_business_24" />
+
+    <TextView
+        android:id="@+id/add_aisle_fab_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="85dp"
+        android:text="@string/add_aisle"
+        app:layout_anchor="@id/fab_add_aisle"
+        style="@style/Theme.Aisleron.OverlayText"
+        app:layout_anchorGravity="center_vertical" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_add_aisle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:fabSize="mini"
+        app:layout_anchor="@id/fab_add_shop"
+        app:layout_anchorGravity="top"
+        android:layout_gravity="top|end"
+        app:srcCompat="@drawable/baseline_add_aisle_24" />
+
+
+    <TextView
+        android:id="@+id/add_product_fab_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="85dp"
+        android:text="@string/add_product"
+        app:layout_anchor="@id/fab_add_product"
+        style="@style/Theme.Aisleron.OverlayText"
+        app:layout_anchorGravity="center_vertical" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_add_product"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:fabSize="mini"
+        app:layout_anchor="@id/fab_add_aisle"
+        app:layout_anchorGravity="end"
+        android:layout_gravity="top"
+        app:srcCompat="@drawable/baseline_add_product_24" />
+
+
+
+
+
+
+
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

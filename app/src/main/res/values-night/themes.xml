@@ -10,13 +10,13 @@
         <item name="colorSecondaryVariant">@color/blue_600</item>
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor">@color/black_blue</item>
+        <item name="android:statusBarColor">@color/black_orange</item>
         <!-- Customize your theme here. -->
         <item name="android:colorBackground">@color/black</item>
     </style>
 
     <style name="Theme.Aisleron.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
-        <item name="android:background">@color/black_blue</item>
+        <item name="android:background">@color/black_orange</item>
     </style>
 
 </resources>
