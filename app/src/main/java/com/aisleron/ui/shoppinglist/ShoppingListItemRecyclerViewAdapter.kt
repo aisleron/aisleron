@@ -132,42 +132,23 @@ class ShoppingListItemRecyclerViewAdapter(
         fun onAisleClick(item: ShoppingListItemViewModel)
         fun onProductClick(item: ShoppingListItemViewModel)
         fun onProductStatusChange(item: ShoppingListItemViewModel, inStock: Boolean)
-        fun onProductMoved(updatedList: List<ShoppingListItemViewModel>)
-        fun onAisleMoved(updatedList: List<ShoppingListItemViewModel>)
+        fun onProductMoved(product: ShoppingListItemViewModel)
+        fun onAisleMoved(aisle: ShoppingListItemViewModel)
 
     }
 
     override fun onRowMoved(fromPosition: Int, toPosition: Int) {
         val swapList = currentList.toMutableList()
-        println("Moving item from $fromPosition tp $toPosition...")
         if (fromPosition < toPosition) {
             for (originalPosition in fromPosition until toPosition) {
-                swapListEntries(swapList, originalPosition, originalPosition + 1)
+                Collections.swap(swapList, originalPosition, originalPosition + 1)
             }
         } else {
             for (originalPosition in fromPosition downTo toPosition + 1) {
-                swapListEntries(swapList, originalPosition, originalPosition - 1)
+                Collections.swap(swapList, originalPosition, originalPosition - 1)
             }
         }
         submitList(swapList)
-    }
-
-    private fun swapListEntries(
-        swapList: MutableList<ShoppingListItemViewModel>,
-        originalPosition: Int,
-        newPosition: Int
-    ) {
-        Collections.swap(swapList, originalPosition, newPosition)
-        updateMovedItemValues(swapList[newPosition], newPosition + 1)
-        if (swapList[newPosition].lineItemType == swapList[originalPosition].lineItemType) {
-            //Only update rank of swapped item if it is the same type as the moved item
-            updateMovedItemValues(swapList[originalPosition], originalPosition + 1)
-        }
-    }
-
-    private fun updateMovedItemValues(item: ShoppingListItemViewModel, newRank: Int) {
-        item.rank = newRank
-        item.modified = true
     }
 
     override fun onRowSelected(viewHolder: RecyclerView.ViewHolder) {
@@ -180,15 +161,29 @@ class ShoppingListItemRecyclerViewAdapter(
         val item = getItem(viewHolder.absoluteAdapterPosition)
         when (viewHolder.itemViewType) {
             PRODUCT_VIEW -> {
-                //Collect the aisle details from the row above the moved item; the item above will always be
-                //in the same aisle as the item was dropped in.
+                //Collect the aisle details from the row above the moved item; the item above will
+                //always be an aisle or in the same aisle as the item was dropped in.
                 //Maybe there's a better way to do this.
-                item.aisleId = getItem(viewHolder.absoluteAdapterPosition - 1).aisleId
-                item.aisleRank = getItem(viewHolder.absoluteAdapterPosition - 1).aisleRank
-                listener.onProductMoved(currentList)
+                val precedingItem = getItem(viewHolder.absoluteAdapterPosition - 1)
+                item.aisleId = precedingItem.aisleId
+                item.aisleRank = precedingItem.aisleRank
+                item.rank =
+                    if (precedingItem.lineItemType == ShoppingListItemType.PRODUCT) precedingItem.rank + 1 else 1
+                listener.onProductMoved(item)
             }
 
-            AISLE_VIEW -> listener.onAisleMoved(currentList)
+            AISLE_VIEW -> {
+                if (viewHolder.absoluteAdapterPosition == 0) {
+                    item.rank = 1
+                } else {
+                    //Find the max rank of all aisles above the current item in the list
+                    val aisles = currentList.subList(0, viewHolder.absoluteAdapterPosition)
+                        .filter { a -> a.lineItemType == ShoppingListItemType.AISLE }
+                    item.rank = aisles.maxOf { a -> a.rank } + 1
+                }
+
+                listener.onAisleMoved(item)
+            }
         }
     }
 

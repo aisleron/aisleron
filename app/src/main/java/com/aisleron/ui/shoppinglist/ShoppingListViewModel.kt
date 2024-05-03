@@ -5,9 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.aisle.usecase.AddAisleUseCase
+import com.aisleron.domain.aisle.usecase.UpdateAisleRankUseCase
 import com.aisleron.domain.aisle.usecase.UpdateAislesUseCase
 import com.aisleron.domain.aisleproduct.AisleProduct
-import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductsUseCase
+import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductRankUseCase
 import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.usecase.UpdateProductStatusUseCase
@@ -20,11 +21,10 @@ class ShoppingListViewModel(
     private val getShoppingListUseCase: GetShoppingListUseCase,
     private val updateProductStatusUseCase: UpdateProductStatusUseCase,
     private val addAisleUseCase: AddAisleUseCase,
-    private val updateAisleProductsUseCase: UpdateAisleProductsUseCase,
-    private val updateAislesUseCase: UpdateAislesUseCase
+    private val updateAislesUseCase: UpdateAislesUseCase,
+    private val updateAisleProductRankUseCase: UpdateAisleProductRankUseCase,
+    private val updateAisleRankUseCase: UpdateAisleRankUseCase
 ) : ViewModel() {
-
-    //private var location: Location? = null
 
     private var _locationName: String = ""
     val locationName: String get() = _locationName
@@ -61,7 +61,8 @@ class ShoppingListViewModel(
                                     (!sli.inStock && filter == FilterType.NEEDED) ||
                                     (filter == FilterType.ALL)
                             )
-                    )}
+                    )
+        }
     }
 
     private fun refreshListItems(locationId: Int) {
@@ -145,40 +146,43 @@ class ShoppingListViewModel(
         }
     }
 
-    fun updateProductRanks(shoppingList: List<ShoppingListItemViewModel>) {
+    fun updateProductRank(product: ShoppingListItemViewModel) {
         viewModelScope.launch {
-            updateAisleProductsUseCase(shoppingList.filter { it.lineItemType == ShoppingListItemType.PRODUCT && it.modified }
-                .map {
-                    AisleProduct(
-                        rank = it.rank,
-                        aisleId = it.aisleId,
-                        product = Product(id = it.id, name = it.name, inStock = it.inStock),
-                        id = it.mappingId
+            updateAisleProductRankUseCase(
+                AisleProduct(
+                    rank = product.rank,
+                    aisleId = product.aisleId,
+                    id = product.mappingId,
+                    product = Product(
+                        id = product.id,
+                        name = product.name,
+                        inStock = product.inStock
                     )
-                })
+                )
+            )
         }
     }
 
-    fun updateAisleRanks(shoppingList: List<ShoppingListItemViewModel>) {
+    fun updateAisleRanks(aisle: ShoppingListItemViewModel) {
         viewModelScope.launch {
-            updateAislesUseCase(shoppingList.filter { it.lineItemType == ShoppingListItemType.AISLE && it.modified }
-                .map {
-                    Aisle(
-                        rank = it.rank,
-                        id = it.id,
-                        name = it.name,
-                        products = emptyList(),
-                        locationId = _locationId,
-                        isDefault = it.inStock,
-                    )
-                })
+            updateAisleRankUseCase(
+                Aisle(
+                    id = aisle.id,
+                    name = aisle.name,
+                    products = emptyList(),
+                    locationId = _locationId,
+                    rank = aisle.rank,
+                    isDefault = aisle.inStock
+                )
+            )
         }
     }
 
     fun submitProductSearchResults(query: String) {
         _listFilter = { sli ->
             (sli.lineItemType == ShoppingListItemType.AISLE) || (
-                    (sli.lineItemType == ShoppingListItemType.PRODUCT) && (sli.name.contains(query, true))
+                    (sli.lineItemType == ShoppingListItemType.PRODUCT)
+                            && (sli.name.contains(query, true))
                     )
         }
         viewModelScope.launch {

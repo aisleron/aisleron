@@ -7,4 +7,5 @@ interface AisleRepository : BaseRepository<Aisle> {
     suspend fun getForLocation(locationId: Int): List<Aisle>
     suspend fun getForLocation(location: Location): List<Aisle>
     suspend fun getDefaultAisles(): List<Aisle>
+    suspend fun updateAisleRank(aisle: Aisle)
 }

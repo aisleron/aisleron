@@ -8,6 +8,9 @@ class AisleProductRepositoryImpl(
     private val db: AisleronDatabase,
     private val aisleProductRankMapper: AisleProductRankMapper
 ) : AisleProductRepository {
+    override suspend fun updateAisleProductRank(item: AisleProduct) {
+        db.aisleProductDao().updateRank(aisleProductRankMapper.fromModel(item).aisleProduct)
+    }
 
     override suspend fun get(id: Int): AisleProduct? {
         return db.aisleProductDao().getAisleProduct(id)?.let { aisleProductRankMapper.toModel(it) }

@@ -21,6 +21,10 @@ class AisleRepositoryImpl(
         return aisleMapper.toModelList(db.aisleDao().getDefaultAisles())
     }
 
+    override suspend fun updateAisleRank(aisle: Aisle) {
+        db.aisleDao().updateRank(aisleMapper.fromModel(aisle))
+    }
+
     override suspend fun get(id: Int): Aisle? {
         return db.aisleDao().getAisle(id)?.let { aisleMapper.toModel(it) }
     }

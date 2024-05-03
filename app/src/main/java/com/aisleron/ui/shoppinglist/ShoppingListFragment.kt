@@ -96,12 +96,12 @@ class ShoppingListFragment : Fragment(), SearchView.OnQueryTextListener {
                             shoppingListViewModel.updateProductStatus(item, inStock)
                         }
 
-                        override fun onProductMoved(updatedList: List<ShoppingListItemViewModel>) {
-                            shoppingListViewModel.updateProductRanks(updatedList)
+                        override fun onProductMoved(product: ShoppingListItemViewModel) {
+                            shoppingListViewModel.updateProductRank(product)
                         }
 
-                        override fun onAisleMoved(updatedList: List<ShoppingListItemViewModel>) {
-                            shoppingListViewModel.updateAisleRanks(updatedList)
+                        override fun onAisleMoved(aisle: ShoppingListItemViewModel) {
+                            shoppingListViewModel.updateAisleRanks(aisle)
                         }
                     }
                 )

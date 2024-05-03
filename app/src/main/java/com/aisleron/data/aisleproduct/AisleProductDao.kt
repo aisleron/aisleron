@@ -19,4 +19,13 @@ interface AisleProductDao : BaseDao<AisleProductEntity> {
     @Transaction
     @Query("SELECT * FROM AisleProduct")
     suspend fun getAisleProducts(): List<AisleProductRank>
+
+    @Transaction
+    suspend fun updateRank(aisleProduct: AisleProductEntity) {
+        moveRanks(aisleProduct.aisleId, aisleProduct.rank)
+        upsert(aisleProduct)
+    }
+
+    @Query("UPDATE AisleProduct SET rank = rank + 1 WHERE aisleId = :aisleId and rank >= :fromRank")
+    suspend fun moveRanks(aisleId: Int, fromRank: Int)
 }
