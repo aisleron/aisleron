@@ -48,6 +48,7 @@
         app:layout_anchor="@id/fab"
         app:layout_anchorGravity="top|end"
         android:layout_gravity="top"
+        android:layout_marginEnd="@dimen/mini_fab_margin"
         app:srcCompat="@drawable/baseline_add_business_24" />
 
     <TextView

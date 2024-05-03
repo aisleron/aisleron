@@ -26,7 +26,7 @@ class ShoppingListItemRecyclerViewAdapter(
         const val PRODUCT_VIEW = 2
     }
 
-    class ShoppingListItemDiffCallback: DiffUtil.ItemCallback<ShoppingListItemViewModel>() {
+    class ShoppingListItemDiffCallback : DiffUtil.ItemCallback<ShoppingListItemViewModel>() {
         override fun areItemsTheSame(
             oldItem: ShoppingListItemViewModel,
             newItem: ShoppingListItemViewModel
@@ -97,12 +97,6 @@ class ShoppingListItemRecyclerViewAdapter(
             }
 
             productCountView.text = if (item.childCount > 0) item.childCount.toString() else ""
-
-            if (item.childCount > 0) {
-                productCountView.text = item.childCount.toString()
-            } else {
-                productCountView.text = ""
-            }
 
             itemView.setOnClickListener {
                 listener.onAisleClick(item)

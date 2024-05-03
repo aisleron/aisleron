@@ -1,5 +1,6 @@
 package com.aisleron.ui.shoppinglist
 
+import android.app.SearchManager
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,8 +10,11 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.widget.ImageView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
@@ -33,7 +37,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 /**
  * A fragment representing a list of [ShoppingListItemViewModel].
  */
-class ShoppingListFragment : Fragment() {
+class ShoppingListFragment : Fragment(), SearchView.OnQueryTextListener {
 
     private val shoppingListViewModel: ShoppingListViewModel by viewModel()
 
@@ -119,7 +123,7 @@ class ShoppingListFragment : Fragment() {
         if (fabHandler != null) {
             fabHandler.setModeShowAllFab()
             fabHandler.setFabOnClickListener(FabHandler.FabOption.ADD_PRODUCT) {
-                navigateToAddProduct(shoppingListViewModel.filterType)
+                navigateToAddProduct(shoppingListViewModel.defaultFilter)
             }
             fabHandler.setFabOnClickListener(FabHandler.FabOption.ADD_AISLE) {
                 showAddAisleDialog(requireView().context)
@@ -128,9 +132,10 @@ class ShoppingListFragment : Fragment() {
     }
 
     private fun updateTitle() {
-        (activity as AppCompatActivity).supportActionBar?.title = when (shoppingListViewModel.locationType) {
+        (activity as AppCompatActivity).supportActionBar?.title =
+            when (shoppingListViewModel.locationType) {
                 LocationType.HOME ->
-                    when (shoppingListViewModel.filterType) {
+                    when (shoppingListViewModel.defaultFilter) {
                         FilterType.IN_STOCK -> resources.getString(R.string.menu_in_stock)
                         FilterType.NEEDED -> resources.getString(R.string.menu_shopping_list)
                         FilterType.ALL -> resources.getString(R.string.menu_all_items)
@@ -153,21 +158,32 @@ class ShoppingListFragment : Fragment() {
         menuHost.addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 menuInflater.inflate(R.menu.shopping_list_fragment_main, menu)
+
+                val searchManager =
+                    getSystemService(requireContext(), SearchManager::class.java) as SearchManager
+                val searchableInfo =
+                    searchManager.getSearchableInfo(requireActivity().componentName)
+
+                val searchView = menu.findItem(R.id.action_search).actionView as SearchView
+                searchView.setSearchableInfo(searchableInfo)
+                searchView.setOnQueryTextListener(this@ShoppingListFragment)
+                searchView.setOnCloseListener {
+                    shoppingListViewModel.requestDefaultList()
+                    false
+                }
+
+                val searchCloseButtonId =
+                    searchView.findViewById<View>(androidx.appcompat.R.id.search_close_btn).id
+                val closeButton = searchView.findViewById<ImageView>(searchCloseButtonId)
+                closeButton?.setOnClickListener {
+                    searchView.onActionViewCollapsed()
+                    shoppingListViewModel.requestDefaultList()
+                }
             }
 
             //NOTE: If you override onMenuItemSelected, OnSupportNavigateUp will only be called when returning false
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 return when (menuItem.itemId) {
-                    /*R.id.mnu_add_aisle -> {
-                        showAddAisleDialog(view.context)
-                        true
-                    }
-
-                    R.id.mnu_add_product -> {
-                        navigateToAddProduct(shoppingListViewModel.filterType)
-                        true
-                    }*/
-
                     else -> false
                 }
             }
@@ -208,6 +224,15 @@ class ShoppingListFragment : Fragment() {
         if (aisleName.isNotBlank()) {
             shoppingListViewModel.addAisle(aisleName)
         }
+    }
+
+    override fun onQueryTextSubmit(query: String?): Boolean {
+        return false
+    }
+
+    override fun onQueryTextChange(newText: String?): Boolean {
+        shoppingListViewModel.submitProductSearchResults(query = newText ?: "")
+        return false
     }
 
     companion object {
