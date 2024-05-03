@@ -37,8 +37,9 @@ class ShoppingListViewModel(
 
     private val shoppingList = mutableListOf<ShoppingListItemViewModel>()
 
-
     private var _locationId: Int = 0
+
+    private var _listFilter: (ShoppingListItemViewModel) -> Boolean = { _ -> false }
 
     private val _shoppingListUiState = MutableStateFlow<ShoppingListUiState>(
         ShoppingListUiState.Empty
@@ -47,26 +48,27 @@ class ShoppingListViewModel(
 
     fun hydrate(locationId: Int, filterType: FilterType) {
         _defaultFilter = filterType
+        _listFilter = getListFilterByProductFilter(_defaultFilter)
         refreshListItems(locationId)
     }
 
-    private fun getShoppingListByFilter(filter: FilterType): List<ShoppingListItemViewModel> {
-        return shoppingList.filter { sli ->
+
+    private fun getListFilterByProductFilter(filter: FilterType): (ShoppingListItemViewModel) -> Boolean {
+        return { sli: ShoppingListItemViewModel ->
             (sli.lineItemType == ShoppingListItemType.AISLE) || (
                     (sli.lineItemType == ShoppingListItemType.PRODUCT) && (
                             (sli.inStock && filter == FilterType.IN_STOCK) ||
                                     (!sli.inStock && filter == FilterType.NEEDED) ||
                                     (filter == FilterType.ALL)
                             )
-                    )
-        }
+                    )}
     }
 
     private fun refreshListItems(locationId: Int) {
         viewModelScope.launch {
             _shoppingListUiState.value = ShoppingListUiState.Loading
-            getShoppingListUseCase(locationId, defaultFilter).collect { loc ->
-                loc?.let {
+            getShoppingListUseCase(locationId).collect { location ->
+                location?.let {
                     _locationName = it.name
                     _locationType = it.type
                     _locationId = it.id
@@ -74,7 +76,7 @@ class ShoppingListViewModel(
 
                 shoppingList.clear()
 
-                loc?.aisles?.forEach { a ->
+                location?.aisles?.forEach { a ->
                     shoppingList.add(
                         ShoppingListItemViewModel(
                             lineItemType = ShoppingListItemType.AISLE,
@@ -116,10 +118,11 @@ class ShoppingListViewModel(
                         { it.name })
                 )
                 _shoppingListUiState.value =
-                    ShoppingListUiState.Updated(getShoppingListByFilter(_defaultFilter))
+                    ShoppingListUiState.Updated(shoppingList.filter(_listFilter))
             }
         }
     }
+
 
     fun updateProductStatus(item: ShoppingListItemViewModel, inStock: Boolean) {
         viewModelScope.launch {
@@ -173,22 +176,24 @@ class ShoppingListViewModel(
     }
 
     fun submitProductSearchResults(query: String) {
+        _listFilter = { sli ->
+            (sli.lineItemType == ShoppingListItemType.AISLE) || (
+                    (sli.lineItemType == ShoppingListItemType.PRODUCT) && (sli.name.contains(query, true))
+                    )
+        }
         viewModelScope.launch {
             _shoppingListUiState.value = ShoppingListUiState.Loading
-            val searchResults = shoppingList.filter { sli ->
-                (sli.lineItemType == ShoppingListItemType.AISLE) || (
-                        (sli.lineItemType == ShoppingListItemType.PRODUCT) && (sli.name.contains(query, true))
-                        )
-            }
+            val searchResults = shoppingList.filter(_listFilter)
             _shoppingListUiState.value = ShoppingListUiState.Updated(searchResults)
         }
     }
 
     fun requestDefaultList() {
+        _listFilter = getListFilterByProductFilter(_defaultFilter)
         viewModelScope.launch {
             _shoppingListUiState.value = ShoppingListUiState.Loading
             _shoppingListUiState.value =
-                ShoppingListUiState.Updated(getShoppingListByFilter(_defaultFilter))
+                ShoppingListUiState.Updated(shoppingList.filter(_listFilter))
         }
     }
 
