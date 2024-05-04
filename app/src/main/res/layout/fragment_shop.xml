@@ -28,11 +28,4 @@
         android:text="@string/pin_shop"
         android:padding="@dimen/text_margin" />
 
-    <Button
-        android:id="@+id/btn_save_shop"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/save" />
-
-
 </LinearLayout>

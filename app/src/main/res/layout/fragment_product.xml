@@ -32,10 +32,4 @@
         android:padding="@dimen/text_margin"
         android:checkMark="?android:attr/listChoiceIndicatorMultiple" />
 
-    <Button
-        android:id="@+id/btn_save_product"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/save" />
-
 </LinearLayout>

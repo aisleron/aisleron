@@ -2,16 +2,21 @@ package com.aisleron.ui.shop
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat.getSystemService
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.aisleron.R
 import com.aisleron.databinding.FragmentShopBinding
 import com.aisleron.ui.shoppinglist.ShoppingListFragment
 import kotlinx.coroutines.launch
@@ -39,33 +44,29 @@ class ShopFragment : Fragment() {
     ): View {
         _binding = FragmentShopBinding.inflate(inflater, container, false)
 
-        val button: Button = binding.btnSaveShop
-        button.setOnClickListener {
-            shopViewModel.saveLocation(
-                binding.edtShopName.text.toString(),
-                binding.swcShopPinned.isChecked
-            )
+        return binding.root
+    }
 
-            viewLifecycleOwner.lifecycleScope.launch {
-                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    shopViewModel.shopUiState.collect {
-                        when (it) {
-                            is ShopViewModel.ShopUiState.Success -> {
-                                requireActivity().onBackPressedDispatcher.onBackPressed()
-                            }
+    private fun saveShop(shopName: String, pinned: Boolean) {
+        if (shopName.isBlank()) return
 
-                            ShopViewModel.ShopUiState.Empty -> Unit
-                            ShopViewModel.ShopUiState.Error -> Unit
-                            ShopViewModel.ShopUiState.Loading -> Unit
+        shopViewModel.saveLocation(shopName, pinned)
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                shopViewModel.shopUiState.collect {
+                    when (it) {
+                        is ShopViewModel.ShopUiState.Success -> {
+                            requireActivity().onBackPressedDispatcher.onBackPressed()
                         }
+
+                        ShopViewModel.ShopUiState.Empty -> Unit
+                        ShopViewModel.ShopUiState.Error -> Unit
+                        ShopViewModel.ShopUiState.Loading -> Unit
                     }
                 }
             }
-
-
         }
-
-        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -83,6 +84,28 @@ class ShopFragment : Fragment() {
         }
 
         edtShopName.requestFocus()
+
+        val menuHost: MenuHost = requireActivity()
+        menuHost.addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.add_edit_fragment_main, menu)
+            }
+
+            //NOTE: If you override onMenuItemSelected, OnSupportNavigateUp will only be called when returning false
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                return when (menuItem.itemId) {
+                    R.id.mnu_btn_save -> {
+                        saveShop(
+                            edtShopName.text.toString(),
+                            binding.swcShopPinned.isChecked
+                        )
+                        true
+                    }
+
+                    else -> false
+                }
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
     override fun onDestroyView() {
