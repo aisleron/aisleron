@@ -76,7 +76,6 @@ class ProductFragment : Fragment() {
 
     private fun saveProduct(productName: String, inStock: Boolean) {
         if (productName.isBlank()) return
-
         productViewModel.saveProduct(productName, inStock)
     }
 
@@ -130,7 +129,7 @@ class ProductFragment : Fragment() {
 
     companion object {
         @JvmStatic
-        fun newInstance(name: String, inStock: Boolean) =
+        fun newInstance(name: String?, inStock: Boolean) =
             ProductFragment().apply {
                 arguments = Bundler().makeAddProductBundle(name, inStock)
             }

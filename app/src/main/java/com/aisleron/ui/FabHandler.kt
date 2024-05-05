@@ -6,6 +6,7 @@ import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
 import androidx.navigation.findNavController
 import com.aisleron.R
+import com.aisleron.ui.bundles.Bundler
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class FabHandler(private val activity: Activity) {
@@ -68,8 +69,9 @@ class FabHandler(private val activity: Activity) {
         hideAllFab()
 
         fabAddShop.setOnClickListener {
+            val bundle = Bundler().makeAddLocationBundle()
             activity.findNavController(R.id.nav_host_fragment_content_main)
-                .navigate(R.id.nav_add_shop, null)
+                .navigate(R.id.nav_add_shop, bundle)
             hideAllFab()
         }
 

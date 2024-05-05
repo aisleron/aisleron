@@ -3,6 +3,7 @@ package com.aisleron.ui.bundles
 import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
+import com.aisleron.domain.location.LocationType
 
 class Bundler {
 
@@ -30,10 +31,10 @@ class Bundler {
         return makeParcelableBundle(ADD_EDIT_PRODUCT, editProductBundle)
     }
 
-    fun makeAddProductBundle(name: String?, inStock: Boolean?): Bundle {
+    fun makeAddProductBundle(name: String? = null, inStock: Boolean = false): Bundle {
         val addProductBundle = AddEditProductBundle(
             name = name,
-            inStock = inStock ?: false,
+            inStock = inStock,
             actionType = AddEditProductBundle.ProductAction.ADD
         )
         return makeParcelableBundle(ADD_EDIT_PRODUCT, addProductBundle)
@@ -44,7 +45,32 @@ class Bundler {
         return result ?: AddEditProductBundle()
     }
 
+    fun makeEditLocationBundle(locationId: Int): Bundle {
+        val editLocationBundle = AddEditLocationBundle(
+            locationId = locationId,
+            actionType = AddEditLocationBundle.LocationAction.EDIT,
+            locationType = LocationType.SHOP
+        )
+        return makeParcelableBundle(ADD_EDIT_LOCATION, editLocationBundle)
+    }
+
+    fun makeAddLocationBundle(name: String? = null): Bundle {
+        val addLocationBundle = AddEditLocationBundle(
+            name = name,
+            locationType = LocationType.SHOP,
+            actionType = AddEditLocationBundle.LocationAction.ADD
+        )
+        return makeParcelableBundle(ADD_EDIT_LOCATION, addLocationBundle)
+    }
+
+    fun getAddEditLocationBundle(bundle: Bundle?): AddEditLocationBundle {
+        val result = getParcelableBundle(bundle, ADD_EDIT_LOCATION, AddEditLocationBundle::class.java)
+        return result ?: AddEditLocationBundle()
+    }
+
+
     private companion object BundleType {
         const val ADD_EDIT_PRODUCT = "addEditProduct"
+        const val ADD_EDIT_LOCATION = "addEditLocation"
     }
 }

@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.aisleron.R
+import com.aisleron.ui.bundles.Bundler
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -46,7 +47,7 @@ class ShopListFragment : Fragment() {
     }
 
     private fun navigateToAddShop() {
-        val bundle = Bundle()
+        val bundle = Bundler().makeAddLocationBundle()
         this.findNavController().navigate(R.id.nav_add_shop, bundle)
     }
 

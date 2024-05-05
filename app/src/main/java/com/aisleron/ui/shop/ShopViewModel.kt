@@ -17,7 +17,7 @@ class ShopViewModel(
     private val updateLocationUseCase: UpdateLocationUseCase,
     private val getLocationUseCase: GetLocationUseCase
 ) : ViewModel() {
-    val pinned: Boolean? get() = location?.pinned
+    val pinned: Boolean get() = location?.pinned ?: false
     val defaultFilter: FilterType? get() = location?.defaultFilter
     val type: LocationType? get() = location?.type
     val locationName: String? get() = location?.name
@@ -31,7 +31,7 @@ class ShopViewModel(
         viewModelScope.launch {
             _shopUiState.value = ShopUiState.Loading
             location = getLocationUseCase(locationId)
-            _shopUiState.value = ShopUiState.Success(this@ShopViewModel)
+            _shopUiState.value = ShopUiState.Updated(this@ShopViewModel)
         }
     }
 
@@ -43,7 +43,7 @@ class ShopViewModel(
             } else {
                 updateLocation(name, pinned)
             }
-            _shopUiState.value = ShopUiState.Success(this@ShopViewModel)
+            _shopUiState.value = ShopUiState.Success
         }
     }
 
@@ -73,6 +73,7 @@ class ShopViewModel(
         data object Empty : ShopUiState()
         data object Loading : ShopUiState()
         data object Error : ShopUiState()
-        data class Success(val shop: ShopViewModel) : ShopUiState()
+        data object Success : ShopUiState()
+        data class Updated(val product: ShopViewModel) : ShopUiState()
     }
 }

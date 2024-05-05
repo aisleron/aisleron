@@ -9,7 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat.getSystemService
+import androidx.core.content.ContextCompat
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
@@ -18,6 +18,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.aisleron.R
 import com.aisleron.databinding.FragmentShopBinding
+import com.aisleron.ui.bundles.AddEditLocationBundle
+import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.shoppinglist.ShoppingListFragment
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -30,12 +32,15 @@ class ShopFragment : Fragment() {
 
     private val binding get() = _binding!!
 
+    private var editMode: Boolean = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        arguments?.let {
-            shopViewModel.hydrate(it.getInt(ARG_LOCATION_ID))
-        }
+        val addEditLocationBundle = Bundler().getAddEditLocationBundle(arguments)
+        editMode = addEditLocationBundle.actionType == AddEditLocationBundle.LocationAction.EDIT
+
+        shopViewModel.hydrate(addEditLocationBundle.locationId)
     }
 
     override fun onCreateView(
@@ -49,20 +54,23 @@ class ShopFragment : Fragment() {
 
     private fun saveShop(shopName: String, pinned: Boolean) {
         if (shopName.isBlank()) return
-
         shopViewModel.saveLocation(shopName, pinned)
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 shopViewModel.shopUiState.collect {
                     when (it) {
-                        is ShopViewModel.ShopUiState.Success -> {
+                        ShopViewModel.ShopUiState.Success -> {
                             requireActivity().onBackPressedDispatcher.onBackPressed()
                         }
 
                         ShopViewModel.ShopUiState.Empty -> Unit
                         ShopViewModel.ShopUiState.Error -> Unit
                         ShopViewModel.ShopUiState.Loading -> Unit
+                        is ShopViewModel.ShopUiState.Updated -> {
+                            binding.edtShopName.setText(shopViewModel.locationName)
+                            binding.swcShopPinned.isChecked = shopViewModel.pinned
+                        }
                     }
                 }
             }
@@ -71,19 +79,6 @@ class ShopFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        binding.swcShopPinned.isChecked = shopViewModel.pinned ?: true
-
-        val edtShopName = binding.edtShopName
-        edtShopName.setText(shopViewModel.locationName)
-        edtShopName.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) {
-                val imm = getSystemService(requireContext(), InputMethodManager::class.java)
-                imm?.showSoftInput(edtShopName, InputMethodManager.SHOW_IMPLICIT)
-            }
-        }
-
-        edtShopName.requestFocus()
 
         val menuHost: MenuHost = requireActivity()
         menuHost.addMenuProvider(object : MenuProvider {
@@ -96,7 +91,7 @@ class ShopFragment : Fragment() {
                 return when (menuItem.itemId) {
                     R.id.mnu_btn_save -> {
                         saveShop(
-                            edtShopName.text.toString(),
+                            binding.edtShopName.text.toString(),
                             binding.swcShopPinned.isChecked
                         )
                         true
@@ -114,22 +109,28 @@ class ShopFragment : Fragment() {
     }
 
     override fun onResume() {
-        if (shopViewModel.locationName != null) {
-            (activity as AppCompatActivity?)!!.supportActionBar!!.title = shopViewModel.locationName
-        }
         super.onResume()
+
+        (activity as AppCompatActivity?)!!.supportActionBar!!.title = when (editMode) {
+            true -> getString(R.string.edit_location)
+            false -> getString(R.string.add_location)
+        }
+
+        val edtLocationName = binding.edtShopName
+        edtLocationName.postDelayed({
+            edtLocationName.requestFocus()
+            val imm =
+                ContextCompat.getSystemService(requireContext(), InputMethodManager::class.java)
+            imm?.showSoftInput(edtLocationName, InputMethodManager.SHOW_IMPLICIT)
+        }, 100)
     }
 
     companion object {
 
-        private const val ARG_LOCATION_ID = "locationId"
-
         @JvmStatic
-        fun newInstance(locationId: Int) =
+        fun newInstance(name: String?) =
             ShoppingListFragment().apply {
-                arguments = Bundle().apply {
-                    putInt(ARG_LOCATION_ID, locationId)
-                }
+                arguments = Bundler().makeAddLocationBundle(name)
             }
     }
 }

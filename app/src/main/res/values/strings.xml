@@ -40,7 +40,7 @@
     <string name="product_name">Product Name</string>
     <string name="save">Save</string>
     <string name="shop_name">Shop Name</string>
-    <string name="add_shop">Add Shop</string>
+    <string name="add_location">Add Shop</string>
     <string name="edit_product">Edit Product</string>
     <string name="pin_shop">Pin Shop to Drawer</string>
     <string name="add_aisle">Add Aisle</string>
@@ -56,4 +56,5 @@
     <string name="delete_confirmation">Delete %1$s?</string>
     <string name="edit_aisle">Edit Aisle</string>
     <string name="cannot_delete_default_aisle">%1$s is a Default Aisle and can\'t be removed</string>
+    <string name="edit_location">Edit Shop</string>
 </resources>

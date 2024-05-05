@@ -34,7 +34,7 @@
         android:id="@+id/add_shop_fab_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/add_shop"
+        android:text="@string/add_location"
         app:layout_anchor="@id/fab_add_shop"
         android:layout_gravity="start|center_vertical"
         style="@style/Theme.Aisleron.OverlayText"
