@@ -9,6 +9,13 @@ class RemoveAisleUseCase(
 ) {
     suspend operator fun invoke(aisleId: Int) {
         val aisle = aisleRepository.getWithProducts(aisleId)
+
+        //TODO: Throw isDefault exception here; catch error in viewmodel, not in fragment, because
+        // this is running in a coroutine
+        /*if (aisle.isDefault) {
+            throw AisleException.DeleteDefaultAisleException()
+        }*/
+
         val defaultAisle = aisleRepository.getDefaultAisleFor(aisle.locationId)
         val aisleProducts = aisle.products
         aisleProducts.forEach { it.aisleId = defaultAisle.id }

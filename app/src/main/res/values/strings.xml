@@ -45,7 +45,6 @@
     <string name="pin_shop">Pin Shop to Drawer</string>
     <string name="add_aisle">Add Aisle</string>
     <string name="add_another">Add Another</string>
-    <string name="cancel">Cancel</string>
     <string name="aisle_name">Aisle Name</string>
     <string name="id_label">id</string>
     <string name="display_options_header">Display Options</string>
@@ -54,8 +53,7 @@
     <string name="search_product_hint">Search Products…</string>
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
-    <string name="ok">Ok</string>
     <string name="delete_confirmation">Delete %1$s?</string>
     <string name="edit_aisle">Edit Aisle</string>
-    <string name="cannot_delete_default_aisle">Default Aisle can\'t be removed</string>
+    <string name="cannot_delete_default_aisle">%1$s is a Default Aisle and can\'t be removed</string>
 </resources>

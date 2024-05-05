@@ -225,7 +225,7 @@ class ShoppingListFragment : Fragment(), SearchView.OnQueryTextListener, ActionM
 
         builder
             .setView(aisleDialogView)
-            .setNeutralButton(R.string.cancel, null)
+            .setNeutralButton(android.R.string.cancel, null)
 
         if (aisle == null) {
             //Add a new Aisle
@@ -271,6 +271,8 @@ class ShoppingListFragment : Fragment(), SearchView.OnQueryTextListener, ActionM
     }
 
     private fun confirmDelete(context: Context, item: ShoppingListItemViewModel) {
+        //TODO: Handle the isDefault check in domain; catch error in viewmodel, not in fragment,
+        // because this is running in a coroutine
         if ((item.lineItemType == ShoppingListItemType.AISLE) && (item.inStock)) {
             Snackbar.make(
                 requireView(),
@@ -284,8 +286,8 @@ class ShoppingListFragment : Fragment(), SearchView.OnQueryTextListener, ActionM
 
         builder
             .setTitle(getString(R.string.delete_confirmation, item.name))
-            .setNegativeButton(R.string.cancel, null)
-            .setPositiveButton(R.string.ok) { _, _ ->
+            .setNegativeButton(android.R.string.cancel, null)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
                 shoppingListViewModel.removeItem(item)
             }
 
@@ -325,7 +327,8 @@ class ShoppingListFragment : Fragment(), SearchView.OnQueryTextListener, ActionM
 
     override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
         mode.title = actionModeItem?.name
-        menu.findItem(R.id.mnu_delete_shopping_list_item).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
+        menu.findItem(R.id.mnu_delete_shopping_list_item)
+            .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
         return false // Return false if nothing is done
     }
 
