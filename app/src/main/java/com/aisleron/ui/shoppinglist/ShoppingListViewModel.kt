@@ -12,6 +12,7 @@ import com.aisleron.domain.aisleproduct.AisleProduct
 import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductRankUseCase
 import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.product.Product
+import com.aisleron.domain.product.usecase.RemoveProductUseCase
 import com.aisleron.domain.product.usecase.UpdateProductStatusUseCase
 import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,7 +26,8 @@ class ShoppingListViewModel(
     private val updateAisleUseCase: UpdateAisleUseCase,
     private val updateAisleProductRankUseCase: UpdateAisleProductRankUseCase,
     private val updateAisleRankUseCase: UpdateAisleRankUseCase,
-    private val removeAisleUseCase: RemoveAisleUseCase
+    private val removeAisleUseCase: RemoveAisleUseCase,
+    private val removeProductUseCase: RemoveProductUseCase
 ) : ViewModel() {
 
     private var _locationName: String = ""
@@ -222,7 +224,7 @@ class ShoppingListViewModel(
         viewModelScope.launch {
             when (item.lineItemType) {
                 ShoppingListItemType.AISLE -> removeAisleUseCase(item.id)
-                ShoppingListItemType.PRODUCT -> TODO()
+                ShoppingListItemType.PRODUCT -> removeProductUseCase(item.id)
             }
         }
 

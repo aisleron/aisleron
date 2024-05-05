@@ -9,6 +9,7 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import android.view.View.OnAttachStateChangeListener
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.Toast
@@ -198,6 +199,15 @@ class ShoppingListFragment : Fragment(), SearchView.OnQueryTextListener, ActionM
                     shoppingListViewModel.requestDefaultList()
                     false
                 }
+
+                //OnAttachStateChange is here as a workaround because OnCloseListener doesn't fire
+                searchView.addOnAttachStateChangeListener(object : OnAttachStateChangeListener {
+                    override fun onViewAttachedToWindow(v: View) {}
+
+                    override fun onViewDetachedFromWindow(v: View) {
+                        shoppingListViewModel.requestDefaultList()
+                    }
+                })
             }
 
             //NOTE: If you override onMenuItemSelected, OnSupportNavigateUp will only be called when returning false
@@ -225,9 +235,7 @@ class ShoppingListFragment : Fragment(), SearchView.OnQueryTextListener, ActionM
                     addNewAisle(txtAisleName.text.toString())
                     showAisleDialog(context)
                 }
-                .setPositiveButton(R.string.done) { _, _ ->
-                    addNewAisle(txtAisleName.text.toString())
-                }
+                .setPositiveButton(R.string.done) { _, _ -> addNewAisle(txtAisleName.text.toString()) }
         } else {
             //Edit an Aisle
             txtAisleName.setText(aisle.name)

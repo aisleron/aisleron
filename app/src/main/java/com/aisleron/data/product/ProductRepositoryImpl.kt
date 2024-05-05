@@ -70,6 +70,6 @@ class ProductRepositoryImpl(
     }
 
     override suspend fun remove(item: Product) {
-        db.productDao().delete(productMapper.fromModel(item))
+        db.productDao().remove(item.id)
     }
 }

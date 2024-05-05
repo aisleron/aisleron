@@ -33,6 +33,7 @@ import com.aisleron.domain.product.ProductRepository
 import com.aisleron.domain.product.usecase.AddProductUseCase
 import com.aisleron.domain.product.usecase.GetAllProductsUseCase
 import com.aisleron.domain.product.usecase.GetProductUseCase
+import com.aisleron.domain.product.usecase.RemoveProductUseCase
 import com.aisleron.domain.product.usecase.UpdateProductStatusUseCase
 import com.aisleron.domain.product.usecase.UpdateProductUseCase
 import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
@@ -139,6 +140,8 @@ val appModule = module {
 
     factory<UpdateProductUseCase> { UpdateProductUseCase(productRepository = get()) }
 
+    factory<RemoveProductUseCase> { RemoveProductUseCase(productRepository = get()) }
+
     factory<AddProductUseCase> {
         AddProductUseCase(
             productRepository = get(),
@@ -170,7 +173,8 @@ val appModule = module {
             updateAisleUseCase = get(),
             updateAisleProductRankUseCase = get(),
             updateAisleRankUseCase = get(),
-            removeAisleUseCase = get()
+            removeAisleUseCase = get(),
+            removeProductUseCase = get()
         )
     }
 
