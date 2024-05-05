@@ -12,7 +12,6 @@ import android.view.View
 import android.view.View.OnAttachStateChangeListener
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
@@ -31,6 +30,7 @@ import com.aisleron.R
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.LocationType
 import com.aisleron.ui.FabHandler
+import com.aisleron.ui.bundles.Bundler
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.launch
@@ -173,8 +173,12 @@ class ShoppingListFragment : Fragment(), SearchView.OnQueryTextListener, ActionM
     }
 
     private fun navigateToAddProduct(filterType: FilterType) {
-        val bundle = Bundle()
-        bundle.putSerializable(ARG_FILTER_TYPE, filterType)
+        val bundle = Bundler().makeAddProductBundle(null, filterType == FilterType.IN_STOCK)
+        this.findNavController().navigate(R.id.nav_add_product, bundle)
+    }
+
+    private fun navigateToEditProduct(productId: Int) {
+        val bundle = Bundler().makeEditProductBundle(productId)
         this.findNavController().navigate(R.id.nav_add_product, bundle)
     }
 
@@ -297,15 +301,9 @@ class ShoppingListFragment : Fragment(), SearchView.OnQueryTextListener, ActionM
     }
 
     private fun editShoppingListItem(item: ShoppingListItemViewModel) {
-
-
         when (item.lineItemType) {
             ShoppingListItemType.AISLE -> showAisleDialog(requireContext(), item)
-            ShoppingListItemType.PRODUCT -> Toast.makeText(
-                requireContext(),
-                "Editing ${item.name}...",
-                Toast.LENGTH_SHORT
-            ).show()
+            ShoppingListItemType.PRODUCT -> navigateToEditProduct(item.id)
         }
     }
 

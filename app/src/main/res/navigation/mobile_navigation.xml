@@ -94,12 +94,7 @@
         android:label="@string/add_product"
         tools:layout="@layout/fragment_product">
         <argument
-            android:name="productId"
-            app:argType="integer"
-            android:defaultValue="0" />
-        <argument
-            android:name="filterType"
-            app:argType="com.aisleron.domain.FilterType"
-            android:defaultValue="ALL" />
+            android:name="addEditProductBundle"
+            app:argType="com.aisleron.ui.bundles.AddEditProductBundle" />
     </fragment>
 </navigation>

@@ -30,6 +30,7 @@
         android:gravity="center_vertical"
         android:checked="false"
         android:padding="@dimen/text_margin"
-        android:checkMark="?android:attr/listChoiceIndicatorMultiple" />
+        android:checkMark="?android:attr/listChoiceIndicatorMultiple"
+        android:checkMarkTint="?attr/colorSecondary" />
 
 </LinearLayout>

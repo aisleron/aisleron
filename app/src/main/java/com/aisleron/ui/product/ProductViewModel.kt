@@ -2,7 +2,6 @@ package com.aisleron.ui.product
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.aisleron.domain.FilterType
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.usecase.AddProductUseCase
 import com.aisleron.domain.product.usecase.GetProductUseCase
@@ -16,24 +15,23 @@ class ProductViewModel(
     private val updateProductUseCase: UpdateProductUseCase,
     private val getProductUseCase: GetProductUseCase
 ) : ViewModel() {
-    val id: Int? get() = product?.id
     val productName: String? get() = product?.name
-    val inStock: Boolean get() = product?.inStock ?: (_filterType == FilterType.IN_STOCK)
+
+    private var _inStock: Boolean = false
+    val inStock: Boolean get() = _inStock
 
     private var product: Product? = null
-
-    private var _filterType: FilterType = FilterType.ALL
 
     private val _productUiState = MutableStateFlow<ProductUiState>(ProductUiState.Empty)
     val productUiState: StateFlow<ProductUiState> = _productUiState
 
 
-    fun hydrate(productId: Int, filterType: FilterType) {
-        _filterType = filterType
+    fun hydrate(productId: Int, inStock: Boolean) {
         viewModelScope.launch {
             _productUiState.value = ProductUiState.Loading
             product = getProductUseCase(productId)
-            _productUiState.value = ProductUiState.Success(this@ProductViewModel)
+            _inStock = product?.inStock ?: inStock
+            _productUiState.value = ProductUiState.Updated(this@ProductViewModel)
         }
     }
 
@@ -45,7 +43,7 @@ class ProductViewModel(
             } else {
                 updateProduct(name, inStock)
             }
-            _productUiState.value = ProductUiState.Success(this@ProductViewModel)
+            _productUiState.value = ProductUiState.Success
         }
     }
 
@@ -65,14 +63,15 @@ class ProductViewModel(
                 id = 0
             )
         )
-        hydrate(id, _filterType)
+        hydrate(id, _inStock)
     }
 
     sealed class ProductUiState {
         data object Empty : ProductUiState()
         data object Loading : ProductUiState()
         data object Error : ProductUiState()
-        data class Success(val product: ProductViewModel) : ProductUiState()
+        data object Success : ProductUiState()
+        data class Updated(val product: ProductViewModel) : ProductUiState()
     }
 
 }

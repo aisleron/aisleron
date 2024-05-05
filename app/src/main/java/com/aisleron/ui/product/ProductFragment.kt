@@ -18,24 +18,28 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.aisleron.R
 import com.aisleron.databinding.FragmentProductBinding
-import com.aisleron.domain.FilterType
+import com.aisleron.ui.bundles.AddEditProductBundle
+import com.aisleron.ui.bundles.Bundler
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class ProductFragment : Fragment(){
+class ProductFragment : Fragment() {
 
     private val productViewModel: ProductViewModel by viewModel()
     private var _binding: FragmentProductBinding? = null
 
     private val binding get() = _binding!!
 
+    private var editMode: Boolean = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            val productId: Int = it.getInt(ARG_PRODUCT_ID)
-            val filterType: FilterType = it.getSerializable(ARG_FILTER_TYPE) as FilterType
-            productViewModel.hydrate(productId, filterType)
-        }
+        val addEditProductBundle = Bundler().getAddEditProductBundle(arguments)
+        editMode = addEditProductBundle.actionType == AddEditProductBundle.ProductAction.EDIT
+        productViewModel.hydrate(
+            addEditProductBundle.productId,
+            addEditProductBundle.inStock ?: false
+        )
     }
 
     override fun onCreateView(
@@ -43,6 +47,27 @@ class ProductFragment : Fragment(){
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentProductBinding.inflate(inflater, container, false)
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                productViewModel.productUiState.collect {
+                    when (it) {
+                        ProductViewModel.ProductUiState.Success -> {
+                            requireActivity().onBackPressedDispatcher.onBackPressed()
+                        }
+
+                        ProductViewModel.ProductUiState.Empty -> Unit
+                        ProductViewModel.ProductUiState.Error -> Unit
+                        ProductViewModel.ProductUiState.Loading -> Unit
+                        is ProductViewModel.ProductUiState.Updated -> {
+                            binding.chkProductInStock.isChecked = productViewModel.inStock
+                            binding.edtProductName.setText(productViewModel.productName)
+
+                        }
+                    }
+                }
+            }
+        }
 
         val chk = binding.chkProductInStock
         chk.setOnClickListener { chk.isChecked = !chk.isChecked }
@@ -53,31 +78,10 @@ class ProductFragment : Fragment(){
         if (productName.isBlank()) return
 
         productViewModel.saveProduct(productName, inStock)
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                productViewModel.productUiState.collect {
-                    when (it) {
-                        is ProductViewModel.ProductUiState.Success -> {
-                            requireActivity().onBackPressedDispatcher.onBackPressed()
-                        }
-
-                        ProductViewModel.ProductUiState.Empty -> Unit
-                        ProductViewModel.ProductUiState.Error -> Unit
-                        ProductViewModel.ProductUiState.Loading -> Unit
-                    }
-                }
-            }
-        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        binding.chkProductInStock.isChecked = productViewModel.inStock
-
-        val edtProductName = binding.edtProductName
-        edtProductName.setText(productViewModel.productName)
 
         val menuHost: MenuHost = requireActivity()
         menuHost.addMenuProvider(object : MenuProvider {
@@ -90,7 +94,7 @@ class ProductFragment : Fragment(){
                 return when (menuItem.itemId) {
                     R.id.mnu_btn_save -> {
                         saveProduct(
-                            edtProductName.text.toString(),
+                            binding.edtProductName.text.toString(),
                             binding.chkProductInStock.isChecked
                         )
                         true
@@ -108,10 +112,12 @@ class ProductFragment : Fragment(){
     }
 
     override fun onResume() {
-        if (productViewModel.productName != null) {
-            (activity as AppCompatActivity?)!!.supportActionBar!!.title = productViewModel.productName
-        }
         super.onResume()
+
+        (activity as AppCompatActivity?)!!.supportActionBar!!.title = when (editMode) {
+            true -> getString(R.string.edit_product)
+            false -> getString(R.string.add_product)
+        }
 
         val edtProductName = binding.edtProductName
         edtProductName.postDelayed({
@@ -123,16 +129,10 @@ class ProductFragment : Fragment(){
     }
 
     companion object {
-
-        private const val ARG_PRODUCT_ID = "productId"
-        private const val ARG_FILTER_TYPE = "filterType"
-
-        fun newInstance(productId: Int, filterType: FilterType) =
+        @JvmStatic
+        fun newInstance(name: String, inStock: Boolean) =
             ProductFragment().apply {
-                arguments = Bundle().apply {
-                    putInt(ARG_PRODUCT_ID, productId)
-                    putSerializable(ARG_FILTER_TYPE, filterType)
-                }
+                arguments = Bundler().makeAddProductBundle(name, inStock)
             }
     }
 }
