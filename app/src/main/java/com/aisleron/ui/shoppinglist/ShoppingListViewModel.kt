@@ -5,8 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.aisle.usecase.AddAisleUseCase
+import com.aisleron.domain.aisle.usecase.RemoveAisleUseCase
 import com.aisleron.domain.aisle.usecase.UpdateAisleRankUseCase
-import com.aisleron.domain.aisle.usecase.UpdateAislesUseCase
+import com.aisleron.domain.aisle.usecase.UpdateAisleUseCase
 import com.aisleron.domain.aisleproduct.AisleProduct
 import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductRankUseCase
 import com.aisleron.domain.location.LocationType
@@ -21,9 +22,10 @@ class ShoppingListViewModel(
     private val getShoppingListUseCase: GetShoppingListUseCase,
     private val updateProductStatusUseCase: UpdateProductStatusUseCase,
     private val addAisleUseCase: AddAisleUseCase,
-    private val updateAislesUseCase: UpdateAislesUseCase,
+    private val updateAisleUseCase: UpdateAisleUseCase,
     private val updateAisleProductRankUseCase: UpdateAisleProductRankUseCase,
-    private val updateAisleRankUseCase: UpdateAisleRankUseCase
+    private val updateAisleRankUseCase: UpdateAisleRankUseCase,
+    private val removeAisleUseCase: RemoveAisleUseCase
 ) : ViewModel() {
 
     private var _locationName: String = ""
@@ -146,6 +148,21 @@ class ShoppingListViewModel(
         }
     }
 
+    fun updateAisle(aisle: ShoppingListItemViewModel) {
+        viewModelScope.launch {
+            updateAisleUseCase(
+                Aisle(
+                    name = aisle.name,
+                    products = emptyList(),
+                    locationId = _locationId,
+                    isDefault = aisle.inStock,
+                    rank = aisle.rank,
+                    id = aisle.id
+                )
+            )
+        }
+    }
+
     fun updateProductRank(product: ShoppingListItemViewModel) {
         viewModelScope.launch {
             updateAisleProductRankUseCase(
@@ -199,6 +216,16 @@ class ShoppingListViewModel(
             _shoppingListUiState.value =
                 ShoppingListUiState.Updated(shoppingList.filter(_listFilter))
         }
+    }
+
+    fun removeItem(item: ShoppingListItemViewModel) {
+        viewModelScope.launch {
+            when (item.lineItemType) {
+                ShoppingListItemType.AISLE -> removeAisleUseCase(item.id)
+                ShoppingListItemType.PRODUCT -> TODO()
+            }
+        }
+
     }
 
     sealed class ShoppingListUiState {

@@ -52,4 +52,10 @@
     <string name="show_on_lock_screen">Show on lock screen</string>
     <string name="done">Done</string>
     <string name="search_product_hint">Search Products…</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="ok">Ok</string>
+    <string name="delete_confirmation">Delete %1$s?</string>
+    <string name="edit_aisle">Edit Aisle</string>
+    <string name="cannot_delete_default_aisle">Default Aisle can\'t be removed</string>
 </resources>

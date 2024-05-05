@@ -13,6 +13,9 @@
         <item name="android:statusBarColor">@color/black_orange</item>
         <!-- Customize your theme here. -->
         <item name="android:colorBackground">@color/black</item>
+        <item name="windowActionModeOverlay">true</item>
+        <item name="actionModeStyle">@style/Theme.Aisleron.ActionMode</item>
+        <item name="actionBarPopupTheme">@style/Theme.Aisleron.PopupOverlay</item>
     </style>
 
     <style name="Theme.Aisleron.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar">

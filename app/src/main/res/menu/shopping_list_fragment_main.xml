@@ -6,6 +6,6 @@
         android:orderInCategory="100"
         android:title="@string/action_search"
         android:icon="@drawable/baseline_search_24"
-        app:showAsAction="always"
+        app:showAsAction="always|collapseActionView"
         app:actionViewClass="androidx.appcompat.widget.SearchView" />
 </menu>

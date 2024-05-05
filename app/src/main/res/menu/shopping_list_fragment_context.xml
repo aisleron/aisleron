@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/mnu_edit_shopping_list_item"
+        android:title="@string/edit"
+        android:icon="@drawable/baseline_edit_24"
+        app:showAsAction="ifRoom"
+        android:menuCategory="container"/>
+    <item
+        android:id="@+id/mnu_delete_shopping_list_item"
+        android:title="@string/delete"
+        android:icon="@drawable/baseline_delete_24"
+        app:showAsAction="never"
+        android:menuCategory="secondary" />
+</menu>

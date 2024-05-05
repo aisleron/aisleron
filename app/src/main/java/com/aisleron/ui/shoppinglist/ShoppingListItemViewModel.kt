@@ -8,7 +8,6 @@ data class ShoppingListItemViewModel(
     val name: String,
     val inStock: Boolean, //Product: inStock; Aisle: isDefault
     var aisleId: Int,
-    var modified: Boolean = false,
     val mappingId: Int, //Product: ProductAisle Id, Aisle: 0
     val childCount: Int //Product: 0, Aisle: Count of Products
 )

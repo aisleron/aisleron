@@ -13,6 +13,9 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimary</item>
         <!-- Customize your theme here. -->
+        <item name="windowActionModeOverlay">true</item>
+        <item name="actionModeStyle">@style/Theme.Aisleron.ActionMode</item>
+        <item name="actionBarPopupTheme">@style/Theme.Aisleron.PopupOverlay</item>
     </style>
 
     <style name="Theme.Aisleron.NoActionBar">
@@ -28,6 +31,11 @@
         <item name="android:textColor">?attr/colorOnSurface</item>
         <item name="android:background"></item>
     </style>
+
+    <style name="Theme.Aisleron.ActionMode" parent="Widget.AppCompat.ActionMode">
+        <item name="background">@drawable/action_mode_background</item>
+    </style>
+
 
     <style name="Theme.Aisleron.NavigationDrawer" parent="Theme.Aisleron">
         <item name="android:drawablePadding">@dimen/menu_padding</item>

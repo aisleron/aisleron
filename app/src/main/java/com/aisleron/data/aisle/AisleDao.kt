@@ -30,6 +30,10 @@ interface AisleDao : BaseDao<AisleEntity> {
     @Query("SELECT * FROM Aisle WHERE isDefault = 1")
     suspend fun getDefaultAisles(): List<AisleEntity>
 
+    @Transaction
+    @Query("SELECT * FROM Aisle WHERE isDefault = 1 AND locationId = :locationId")
+    suspend fun getDefaultAisleFor(locationId: Int): AisleEntity
+
     /**
      * Aisle With Location
      */

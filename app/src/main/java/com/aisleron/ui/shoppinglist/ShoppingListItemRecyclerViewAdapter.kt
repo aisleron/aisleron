@@ -98,8 +98,13 @@ class ShoppingListItemRecyclerViewAdapter(
 
             productCountView.text = if (item.childCount > 0) item.childCount.toString() else ""
 
+            itemView.setOnLongClickListener { v ->
+                //v.isSelected = true
+                listener.onLongClick(item)
+            }
+
             itemView.setOnClickListener {
-                listener.onAisleClick(item)
+                listener.onClick(item)
             }
         }
     }
@@ -119,7 +124,12 @@ class ShoppingListItemRecyclerViewAdapter(
             contentView.text = item.name
             inStockView.isChecked = item.inStock
             itemView.setOnClickListener {
-                listener.onProductClick(item)
+                listener.onClick(item)
+            }
+
+            itemView.setOnLongClickListener { v ->
+                //v.isSelected = true
+                listener.onLongClick(item)
             }
 
             inStockView.setOnClickListener { _ ->
@@ -129,16 +139,16 @@ class ShoppingListItemRecyclerViewAdapter(
     }
 
     interface ShoppingListItemListener {
-        fun onAisleClick(item: ShoppingListItemViewModel)
-        fun onProductClick(item: ShoppingListItemViewModel)
+        fun onClick(item: ShoppingListItemViewModel)
         fun onProductStatusChange(item: ShoppingListItemViewModel, inStock: Boolean)
-        fun onProductMoved(product: ShoppingListItemViewModel)
-        fun onAisleMoved(aisle: ShoppingListItemViewModel)
-
+        fun onCleared(item: ShoppingListItemViewModel)
+        fun onLongClick(item: ShoppingListItemViewModel): Boolean
+        fun onMoved(item: ShoppingListItemViewModel)
     }
 
     override fun onRowMoved(fromPosition: Int, toPosition: Int) {
         val swapList = currentList.toMutableList()
+        val item = getItem(fromPosition)
         if (fromPosition < toPosition) {
             for (originalPosition in fromPosition until toPosition) {
                 Collections.swap(swapList, originalPosition, originalPosition + 1)
@@ -149,6 +159,7 @@ class ShoppingListItemRecyclerViewAdapter(
             }
         }
         submitList(swapList)
+        listener.onMoved(item)
     }
 
     override fun onRowSelected(viewHolder: RecyclerView.ViewHolder) {
@@ -169,7 +180,6 @@ class ShoppingListItemRecyclerViewAdapter(
                 item.aisleRank = precedingItem.aisleRank
                 item.rank =
                     if (precedingItem.lineItemType == ShoppingListItemType.PRODUCT) precedingItem.rank + 1 else 1
-                listener.onProductMoved(item)
             }
 
             AISLE_VIEW -> {
@@ -181,10 +191,9 @@ class ShoppingListItemRecyclerViewAdapter(
                         .filter { a -> a.lineItemType == ShoppingListItemType.AISLE }
                     item.rank = aisles.maxOf { a -> a.rank } + 1
                 }
-
-                listener.onAisleMoved(item)
             }
         }
+        listener.onCleared(item)
     }
 
     override fun onRowSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
