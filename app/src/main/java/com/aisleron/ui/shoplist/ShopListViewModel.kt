@@ -3,8 +3,10 @@ package com.aisleron.ui.shoplist
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aisleron.domain.location.Location
+import com.aisleron.domain.location.usecase.GetLocationUseCase
 import com.aisleron.domain.location.usecase.GetPinnedShopsUseCase
 import com.aisleron.domain.location.usecase.GetShopsUseCase
+import com.aisleron.domain.location.usecase.RemoveLocationUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,7 +14,9 @@ import kotlinx.coroutines.launch
 
 class ShopListViewModel(
     private val getShopsUseCase: GetShopsUseCase,
-    private val getPinnedShopsUseCase: GetPinnedShopsUseCase
+    private val getPinnedShopsUseCase: GetPinnedShopsUseCase,
+    private val removeLocationUseCase: RemoveLocationUseCase,
+    private val getLocationUseCase: GetLocationUseCase
 ) : ViewModel() {
 
     private val _shopListUiState = MutableStateFlow<ShopListUiState>(ShopListUiState.Empty)
@@ -43,7 +47,10 @@ class ShopListViewModel(
     }
 
     fun removeItem(item: ShopListItemViewModel) {
-        TODO("Not yet implemented")
+        viewModelScope.launch {
+            val location = getLocationUseCase(item.id)
+            location?.let { removeLocationUseCase(location) }
+        }
     }
 
     sealed class ShopListUiState {

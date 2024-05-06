@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.aisle.usecase.AddAisleUseCase
+import com.aisleron.domain.aisle.usecase.GetAisleUseCase
 import com.aisleron.domain.aisle.usecase.RemoveAisleUseCase
 import com.aisleron.domain.aisle.usecase.UpdateAisleRankUseCase
 import com.aisleron.domain.aisle.usecase.UpdateAisleUseCase
@@ -27,7 +28,8 @@ class ShoppingListViewModel(
     private val updateAisleProductRankUseCase: UpdateAisleProductRankUseCase,
     private val updateAisleRankUseCase: UpdateAisleRankUseCase,
     private val removeAisleUseCase: RemoveAisleUseCase,
-    private val removeProductUseCase: RemoveProductUseCase
+    private val removeProductUseCase: RemoveProductUseCase,
+    private val getAisleUseCase: GetAisleUseCase
 ) : ViewModel() {
 
     private var _locationName: String = ""
@@ -223,7 +225,11 @@ class ShoppingListViewModel(
     fun removeItem(item: ShoppingListItemViewModel) {
         viewModelScope.launch {
             when (item.lineItemType) {
-                ShoppingListItemType.AISLE -> removeAisleUseCase(item.id)
+                ShoppingListItemType.AISLE -> {
+                    val aisle = getAisleUseCase(item.id)
+                    aisle?.let { removeAisleUseCase(it) }
+                }
+
                 ShoppingListItemType.PRODUCT -> removeProductUseCase(item.id)
             }
         }

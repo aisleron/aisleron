@@ -31,4 +31,7 @@ interface AisleProductDao : BaseDao<AisleProductEntity> {
 
     @Query("UPDATE AisleProduct SET rank = rank + 1 WHERE aisleId = :aisleId and rank >= :fromRank")
     suspend fun moveRanks(aisleId: Int, fromRank: Int)
+
+    @Query("DELETE FROM AisleProduct WHERE aisleId = :aisleId")
+    suspend fun removeProductsFromAisle(aisleId: Int)
 }

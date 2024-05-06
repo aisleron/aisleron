@@ -40,6 +40,10 @@ class LocationRepositoryImpl(
         return locationEntity.map { it?.let { LocationWithAislesWithProductsMapper().toModel(it) } }
     }
 
+    override suspend fun getLocationWithAisles(id: Int): Location {
+        return LocationWithAislesMapper().toModel(db.locationDao().getLocationWithAisles(id))
+    }
+
     override suspend fun get(id: Int): Location? {
         return db.locationDao().getLocation(id)?.let { locationMapper.toModel(it) }
     }

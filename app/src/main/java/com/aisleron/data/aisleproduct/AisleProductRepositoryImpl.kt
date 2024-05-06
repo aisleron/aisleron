@@ -12,6 +12,10 @@ class AisleProductRepositoryImpl(
         db.aisleProductDao().updateRank(aisleProductRankMapper.fromModel(item).aisleProduct)
     }
 
+    override suspend fun removeProductsFromAisle(aisleId: Int) {
+        db.aisleProductDao().removeProductsFromAisle(aisleId)
+    }
+
     override suspend fun get(id: Int): AisleProduct? {
         return db.aisleProductDao().getAisleProduct(id)?.let { aisleProductRankMapper.toModel(it) }
     }

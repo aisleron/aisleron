@@ -21,8 +21,8 @@ class AisleRepositoryImpl(
         return aisleMapper.toModelList(db.aisleDao().getDefaultAisles())
     }
 
-    override suspend fun getDefaultAisleFor(locationId: Int): Aisle {
-        return aisleMapper.toModel(db.aisleDao().getDefaultAisleFor(locationId))
+    override suspend fun getDefaultAisleFor(locationId: Int): Aisle? {
+        return db.aisleDao().getDefaultAisleFor(locationId)?.let { aisleMapper.toModel(it) }
     }
 
     override suspend fun updateAisleRank(aisle: Aisle) {

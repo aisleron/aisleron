@@ -280,7 +280,7 @@ class ShoppingListFragment : Fragment(), SearchView.OnQueryTextListener, ActionM
         if ((item.lineItemType == ShoppingListItemType.AISLE) && (item.inStock)) {
             Snackbar.make(
                 requireView(),
-                R.string.cannot_delete_default_aisle,
+                getString(R.string.cannot_delete_default_aisle, item.name),
                 Snackbar.LENGTH_SHORT
             ).show()
             return
