@@ -42,6 +42,10 @@ android {
     buildFeatures {
         viewBinding = true
     }
+
+    tasks.withType<Test> {
+        useJUnitPlatform() // Make all tests use JUnit 5
+    }
 }
 
 dependencies {
@@ -61,7 +65,8 @@ dependencies {
     implementation("androidx.fragment:fragment-ktx:1.7.0")
     implementation("androidx.databinding:databinding-runtime:8.4.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
-    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 

@@ -1,5 +1,6 @@
 package com.aisleron.data.product
 
+import androidx.room.withTransaction
 import com.aisleron.data.AisleronDatabase
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.aisle.Aisle
@@ -70,6 +71,10 @@ class ProductRepositoryImpl(
     }
 
     override suspend fun remove(item: Product) {
-        db.productDao().remove(item.id)
+        db.withTransaction {
+            val aisleProducts = db.aisleProductDao().getAisleProductsByProduct(item.id)
+            db.aisleProductDao().delete(*aisleProducts.map { it }.toTypedArray())
+            db.productDao().delete(productMapper.fromModel(item))
+        }
     }
 }
