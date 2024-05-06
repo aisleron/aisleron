@@ -91,12 +91,12 @@ class ShopListFragment : Fragment(), ActionMode.Callback {
                             ShopListViewModel.ShopListUiState.Empty -> Unit
                             ShopListViewModel.ShopListUiState.Loading -> Unit
                             ShopListViewModel.ShopListUiState.Error -> Unit
-                            is ShopListViewModel.ShopListUiState.Success -> {
+                            is ShopListViewModel.ShopListUiState.Success -> Unit
+                            is ShopListViewModel.ShopListUiState.Updated -> {
                                 items.clear()
                                 items += it.shops
                                 view.adapter?.notifyDataSetChanged()
                             }
-
                         }
                     }
                 }

@@ -41,7 +41,7 @@ class ShopListViewModel(
                         name = l.name
                     )
                 }
-                _shopListUiState.value = ShopListUiState.Success(items)
+                _shopListUiState.value = ShopListUiState.Updated(items)
             }
         }
     }
@@ -57,6 +57,7 @@ class ShopListViewModel(
         data object Empty : ShopListUiState()
         data object Loading : ShopListUiState()
         data object Error : ShopListUiState()
-        data class Success(val shops: List<ShopListItemViewModel>) : ShopListUiState()
+        data object Success : ShopListUiState()
+        data class Updated(val shops: List<ShopListItemViewModel>) : ShopListUiState()
     }
 }
