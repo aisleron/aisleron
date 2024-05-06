@@ -5,12 +5,16 @@ import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.aisleron.data.AisleronDatabase
 import com.aisleron.data.DbInitializer
+import com.aisleron.data.aisle.AisleDao
 import com.aisleron.data.aisle.AisleMapper
 import com.aisleron.data.aisle.AisleRepositoryImpl
+import com.aisleron.data.aisleproduct.AisleProductDao
 import com.aisleron.data.aisleproduct.AisleProductRankMapper
 import com.aisleron.data.aisleproduct.AisleProductRepositoryImpl
+import com.aisleron.data.location.LocationDao
 import com.aisleron.data.location.LocationMapper
 import com.aisleron.data.location.LocationRepositoryImpl
+import com.aisleron.data.product.ProductDao
 import com.aisleron.data.product.ProductMapper
 import com.aisleron.data.product.ProductRepositoryImpl
 import com.aisleron.domain.aisle.AisleRepository
@@ -64,6 +68,17 @@ val appModule = module {
     }
 
     /**
+     * Data Access Objects
+     */
+    single<LocationDao> { get<AisleronDatabase>().locationDao() }
+
+    single<AisleDao> { get<AisleronDatabase>().aisleDao() }
+
+    single<AisleProductDao> { get<AisleronDatabase>().aisleProductDao() }
+
+    single<ProductDao> { get<AisleronDatabase>().productDao() }
+
+    /**
      * Repositories
      */
     factory<LocationRepository> {
@@ -71,7 +86,11 @@ val appModule = module {
     }
 
     factory<ProductRepository> {
-        ProductRepositoryImpl(get(), ProductMapper())
+        ProductRepositoryImpl(
+            productDao = get(),
+            aisleProductDao = get(),
+            productMapper = ProductMapper()
+        )
     }
 
     factory<AisleRepository> {
@@ -143,7 +162,6 @@ val appModule = module {
             removeProductsFromAisleUseCase = get()
         )
     }
-
 
     /**
      * Aisle Product Use Cases

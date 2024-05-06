@@ -2,6 +2,8 @@ package com.aisleron.data.product
 
 import androidx.room.Dao
 import androidx.room.Query
+import androidx.room.Transaction
+import com.aisleron.data.aisleproduct.AisleProductDao
 import com.aisleron.data.base.BaseDao
 
 @Dao
@@ -26,4 +28,11 @@ interface ProductDao : BaseDao<ProductEntity> {
 
     @Query("SELECT * FROM Product WHERE inStock = 0")
     suspend fun getNeededProducts(): List<ProductEntity>
+
+    @Transaction
+    suspend fun remove(product: ProductEntity, aisleProductDao: AisleProductDao) {
+        val aisleProducts = aisleProductDao.getAisleProductsByProduct(product.id)
+        aisleProductDao.delete(*aisleProducts.map { it }.toTypedArray())
+        delete(product)
+    }
 }
