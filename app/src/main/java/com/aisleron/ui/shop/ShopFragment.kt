@@ -49,13 +49,6 @@ class ShopFragment : Fragment() {
     ): View {
         _binding = FragmentShopBinding.inflate(inflater, container, false)
 
-        return binding.root
-    }
-
-    private fun saveShop(shopName: String, pinned: Boolean) {
-        if (shopName.isBlank()) return
-        shopViewModel.saveLocation(shopName, pinned)
-
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 shopViewModel.shopUiState.collect {
@@ -75,6 +68,13 @@ class ShopFragment : Fragment() {
                 }
             }
         }
+
+        return binding.root
+    }
+
+    private fun saveShop(shopName: String, pinned: Boolean) {
+        if (shopName.isBlank()) return
+        shopViewModel.saveLocation(shopName, pinned)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

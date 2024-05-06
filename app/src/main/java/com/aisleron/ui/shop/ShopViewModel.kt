@@ -74,6 +74,6 @@ class ShopViewModel(
         data object Loading : ShopUiState()
         data object Error : ShopUiState()
         data object Success : ShopUiState()
-        data class Updated(val product: ShopViewModel) : ShopUiState()
+        data class Updated(val shop: ShopViewModel) : ShopUiState()
     }
 }

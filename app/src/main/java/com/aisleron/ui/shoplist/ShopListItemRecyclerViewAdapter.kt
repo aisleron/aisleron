@@ -30,7 +30,10 @@ class ShopListItemRecyclerViewAdapter(
         val item = values[position]
         holder.contentView.text = item.name
         holder.itemView.setOnClickListener {
-            listener.onItemClick(values[position])
+            listener.onClick(values[position])
+        }
+        holder.itemView.setOnLongClickListener {
+            listener.onLongClick(values[position])
         }
     }
 
@@ -46,7 +49,9 @@ class ShopListItemRecyclerViewAdapter(
     }
 
     interface ShopListItemListener {
-        fun onItemClick(item: ShopListItemViewModel)
+        fun onClick(item: ShopListItemViewModel)
+        fun onLongClick(item: ShopListItemViewModel): Boolean
+
     }
 
 }

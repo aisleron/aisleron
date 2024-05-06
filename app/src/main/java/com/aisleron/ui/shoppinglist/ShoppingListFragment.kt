@@ -350,6 +350,7 @@ class ShoppingListFragment : Fragment(), SearchView.OnQueryTextListener, ActionM
 
     override fun onDestroyActionMode(mode: ActionMode) {
         actionMode = null
+        actionModeItem = null
     }
 
     companion object {

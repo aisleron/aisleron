@@ -1,9 +1,15 @@
 package com.aisleron.ui.shoplist
 
+import android.content.Context
 import android.os.Bundle
+import android.view.ActionMode
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
@@ -22,7 +28,11 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 /**
  * A fragment representing a list of Items.
  */
-class ShopListFragment : Fragment() {
+class ShopListFragment : Fragment(), ActionMode.Callback {
+
+    private var actionMode: ActionMode? = null
+    private var actionModeItem: ShopListItemViewModel? = null
+
 
     private var columnCount = 3
     private val shopListViewModel: ShopListViewModel by viewModel()
@@ -48,6 +58,11 @@ class ShopListFragment : Fragment() {
 
     private fun navigateToAddShop() {
         val bundle = Bundler().makeAddLocationBundle()
+        this.findNavController().navigate(R.id.nav_add_shop, bundle)
+    }
+
+    private fun navigateToEditShop(locationId: Int) {
+        val bundle = Bundler().makeEditLocationBundle(locationId)
         this.findNavController().navigate(R.id.nav_add_shop, bundle)
     }
 
@@ -95,13 +110,83 @@ class ShopListFragment : Fragment() {
                     ShopListItemRecyclerViewAdapter(items,
                         object :
                             ShopListItemRecyclerViewAdapter.ShopListItemListener {
-                            override fun onItemClick(item: ShopListItemViewModel) {
+                            override fun onClick(item: ShopListItemViewModel) {
                                 navigateToShoppingList(item)
+                            }
+
+                            override fun onLongClick(item: ShopListItemViewModel): Boolean {
+                                actionModeItem = item
+                                return when (actionMode) {
+                                    null -> {
+                                        // Start the CAB using the ActionMode.Callback defined earlier.
+                                        actionMode =
+                                            requireActivity().startActionMode(this@ShopListFragment)
+                                        true
+                                    }
+
+                                    else -> false
+                                }
                             }
                         })
             }
         }
         return view
+    }
+
+    override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
+        // Inflate a menu resource providing context menu items.
+        val inflater: MenuInflater = mode.menuInflater
+        inflater.inflate(R.menu.shopping_list_fragment_context, menu)
+        return true
+    }
+
+    override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
+        mode.title = actionModeItem?.name
+        menu.findItem(R.id.mnu_delete_shopping_list_item)
+            .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
+        return false // Return false if nothing is done
+    }
+
+    override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.mnu_edit_shopping_list_item -> {
+                actionModeItem?.let { editShopListItem(it) }
+                mode.finish()
+                true // Action picked, so close the CAB.
+            }
+
+            R.id.mnu_delete_shopping_list_item -> {
+                actionModeItem?.let { confirmDelete(requireContext(), it) }
+                mode.finish()
+                true
+            }
+
+            else -> false
+        }
+    }
+
+    private fun confirmDelete(context: Context, item: ShopListItemViewModel) {
+        val builder: AlertDialog.Builder = AlertDialog.Builder(context)
+
+        builder
+            .setTitle(getString(R.string.delete_confirmation, item.name))
+            .setNegativeButton(android.R.string.cancel, null)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                shopListViewModel.removeItem(item)
+            }
+
+        val dialog: AlertDialog = builder.create()
+
+        dialog.show()
+    }
+
+    private fun editShopListItem(item: ShopListItemViewModel) {
+        navigateToEditShop(item.id)
+    }
+
+    override fun onDestroyActionMode(mode: ActionMode?) {
+        actionMode = null
+        actionModeItem = null
     }
 
     companion object {

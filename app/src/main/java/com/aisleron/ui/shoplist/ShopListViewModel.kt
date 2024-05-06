@@ -42,6 +42,10 @@ class ShopListViewModel(
         }
     }
 
+    fun removeItem(item: ShopListItemViewModel) {
+        TODO("Not yet implemented")
+    }
+
     sealed class ShopListUiState {
         data object Empty : ShopListUiState()
         data object Loading : ShopListUiState()
