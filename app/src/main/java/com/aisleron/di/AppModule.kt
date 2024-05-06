@@ -82,7 +82,18 @@ val appModule = module {
      * Repositories
      */
     factory<LocationRepository> {
-        LocationRepositoryImpl(get(), LocationMapper())
+        LocationRepositoryImpl(locationDao = get(), locationMapper = LocationMapper())
+    }
+
+    factory<AisleRepository> {
+        AisleRepositoryImpl(aisleDao = get(), aisleMapper = AisleMapper())
+    }
+
+    factory<AisleProductRepository> {
+        AisleProductRepositoryImpl(
+            aisleProductDao = get(),
+            aisleProductRankMapper = AisleProductRankMapper()
+        )
     }
 
     factory<ProductRepository> {
@@ -90,20 +101,6 @@ val appModule = module {
             productDao = get(),
             aisleProductDao = get(),
             productMapper = ProductMapper()
-        )
-    }
-
-    factory<AisleRepository> {
-        AisleRepositoryImpl(
-            db = get(),
-            aisleMapper = AisleMapper()
-        )
-    }
-
-    factory<AisleProductRepository> {
-        AisleProductRepositoryImpl(
-            db = get(),
-            aisleProductRankMapper = AisleProductRankMapper()
         )
     }
 

@@ -1,13 +1,12 @@
 package com.aisleron.data.location
 
-import com.aisleron.data.AisleronDatabase
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class LocationRepositoryImpl(
-    private val db: AisleronDatabase,
+    private val locationDao: LocationDao,
     private val locationMapper: LocationMapper
 ) : LocationRepository {
 
@@ -22,43 +21,43 @@ class LocationRepositoryImpl(
      */
 
     override fun getShops(): Flow<List<Location>> {
-        val locationEntities = db.locationDao().getShops()
+        val locationEntities = locationDao.getShops()
         return locationEntities.map { locationMapper.toModelList(it) }
     }
 
     override suspend fun getHome(): Location {
-        return db.locationDao().getHome().let { locationMapper.toModel(it) }
+        return locationDao.getHome().let { locationMapper.toModel(it) }
     }
 
     override fun getPinnedShops(): Flow<List<Location>> {
-        val locationEntities = db.locationDao().getPinnedShops()
+        val locationEntities = locationDao.getPinnedShops()
         return locationEntities.map { locationMapper.toModelList(it) }
     }
 
     override fun getLocationWithAislesWithProducts(id: Int): Flow<Location?> {
-        val locationEntity = db.locationDao().getLocationWithAislesWithProducts(id)
+        val locationEntity = locationDao.getLocationWithAislesWithProducts(id)
         return locationEntity.map { it?.let { LocationWithAislesWithProductsMapper().toModel(it) } }
     }
 
     override suspend fun getLocationWithAisles(id: Int): Location {
-        return LocationWithAislesMapper().toModel(db.locationDao().getLocationWithAisles(id))
+        return LocationWithAislesMapper().toModel(locationDao.getLocationWithAisles(id))
     }
 
     override suspend fun get(id: Int): Location? {
-        return db.locationDao().getLocation(id)?.let { locationMapper.toModel(it) }
+        return locationDao.getLocation(id)?.let { locationMapper.toModel(it) }
     }
 
     override suspend fun getMultiple(vararg id: Int): List<Location> {
         // '*' is a spread operator required to pass vararg down
-        return locationMapper.toModelList(db.locationDao().getLocations(*id))
+        return locationMapper.toModelList(locationDao.getLocations(*id))
     }
 
     override suspend fun getAll(): List<Location> {
-        return locationMapper.toModelList(db.locationDao().getLocations())
+        return locationMapper.toModelList(locationDao.getLocations())
     }
 
     override suspend fun add(item: Location): Int {
-        return db.locationDao().upsert(locationMapper.fromModel(item))[0].toInt()
+        return locationDao.upsert(locationMapper.fromModel(item))[0].toInt()
     }
 
     override suspend fun add(items: List<Location>): List<Int> {
@@ -66,7 +65,7 @@ class LocationRepositoryImpl(
     }
 
     override suspend fun update(item: Location) {
-        db.locationDao().upsert(locationMapper.fromModel(item))
+        locationDao.upsert(locationMapper.fromModel(item))
     }
 
     override suspend fun update(items: List<Location>) {
@@ -74,13 +73,13 @@ class LocationRepositoryImpl(
     }
 
     private suspend fun upsertLocations(locations: List<Location>): List<Int> {
-        return db.locationDao()
+        return locationDao
             .upsert(*locationMapper.fromModelList(locations).map { it }.toTypedArray())
             .map { it.toInt() }
     }
 
     override suspend fun remove(item: Location) {
-        db.locationDao().delete(locationMapper.fromModel(item))
+        locationDao.delete(locationMapper.fromModel(item))
     }
 }
 
