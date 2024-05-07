@@ -21,6 +21,8 @@ import com.aisleron.databinding.FragmentShopBinding
 import com.aisleron.ui.bundles.AddEditLocationBundle
 import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.shoppinglist.ShoppingListFragment
+import com.aisleron.ui.widgets.ErrorSnackBar
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -58,8 +60,11 @@ class ShopFragment : Fragment() {
                         }
 
                         ShopViewModel.ShopUiState.Empty -> Unit
-                        ShopViewModel.ShopUiState.Error -> Unit
                         ShopViewModel.ShopUiState.Loading -> Unit
+                        is ShopViewModel.ShopUiState.Error -> {
+                            displayErrorSnackBar(it.errorCode, it.errorMessage)
+                        }
+
                         is ShopViewModel.ShopUiState.Updated -> {
                             binding.edtShopName.setText(shopViewModel.locationName)
                             binding.swcShopPinned.isChecked = shopViewModel.pinned
@@ -70,6 +75,18 @@ class ShopFragment : Fragment() {
         }
 
         return binding.root
+    }
+
+    private fun displayErrorSnackBar(errorCode: String, errorMessage: String?) {
+        val resourceId = resources.getIdentifier(errorCode, "string", requireContext().packageName)
+
+        val snackBarMessage: String = if (resourceId > 0) {
+            getString(resourceId)
+        } else {
+            getString(R.string.generic_error, errorMessage)
+        }
+
+        ErrorSnackBar().make(requireView(), snackBarMessage, Snackbar.LENGTH_SHORT).show()
     }
 
     private fun saveShop(shopName: String, pinned: Boolean) {

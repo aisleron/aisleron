@@ -35,6 +35,10 @@ class ProductRepositoryImpl(
         return productMapper.toModelList(productDao.getProductsForAisle(aisleId))
     }
 
+    override suspend fun getByName(name: String): Product? {
+        return productDao.getProductByName(name.trim())?.let { return productMapper.toModel(it) }
+    }
+
     override suspend fun get(id: Int): Product? {
         return productDao.getProduct(id)?.let { productMapper.toModel(it) }
     }
@@ -72,6 +76,5 @@ class ProductRepositoryImpl(
 
     override suspend fun remove(item: Product) {
         productDao.remove(productMapper.fromModel(item), aisleProductDao)
-
     }
 }

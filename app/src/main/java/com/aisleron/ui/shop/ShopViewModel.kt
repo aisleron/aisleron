@@ -3,6 +3,7 @@ package com.aisleron.ui.shop
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aisleron.domain.FilterType
+import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.location.usecase.AddLocationUseCase
@@ -38,12 +39,19 @@ class ShopViewModel(
     fun saveLocation(name: String, pinned: Boolean) {
         viewModelScope.launch {
             _shopUiState.value = ShopUiState.Loading
-            if (location == null) {
-                addLocation(name, pinned)
-            } else {
-                updateLocation(name, pinned)
+            try {
+                if (location == null) {
+                    addLocation(name, pinned)
+                } else {
+                    updateLocation(name, pinned)
+                }
+                _shopUiState.value = ShopUiState.Success
+            } catch (e: AisleronException) {
+                _shopUiState.value = ShopUiState.Error(e.exceptionCode, e.message)
+            } catch (e: Exception) {
+                _shopUiState.value =
+                    ShopUiState.Error(AisleronException.GENERIC_EXCEPTION, e.message)
             }
-            _shopUiState.value = ShopUiState.Success
         }
     }
 
@@ -72,8 +80,8 @@ class ShopViewModel(
     sealed class ShopUiState {
         data object Empty : ShopUiState()
         data object Loading : ShopUiState()
-        data object Error : ShopUiState()
         data object Success : ShopUiState()
+        data class Error(val errorCode: String, val errorMessage: String?) : ShopUiState()
         data class Updated(val shop: ShopViewModel) : ShopUiState()
     }
 }

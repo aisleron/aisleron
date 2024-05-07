@@ -32,4 +32,8 @@ class ProductDaoImpl : ProductDao {
     override suspend fun getNeededProducts(): List<ProductEntity> {
         TODO("Not yet implemented")
     }
+
+    override suspend fun getProductByName(name: String): ProductEntity? {
+        TODO("Not yet implemented")
+    }
 }

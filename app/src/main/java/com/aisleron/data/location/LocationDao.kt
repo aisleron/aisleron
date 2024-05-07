@@ -12,17 +12,17 @@ interface LocationDao : BaseDao<LocationEntity> {
     /**
      * Location
      */
-    @Transaction
     @Query("SELECT * FROM Location WHERE id = :locationId")
     suspend fun getLocation(locationId: Int): LocationEntity?
 
-    @Transaction
     @Query("SELECT * FROM Location WHERE id IN (:locationId)")
     suspend fun getLocations(vararg locationId: Int): List<LocationEntity>
 
-    @Transaction
     @Query("SELECT * FROM Location")
     suspend fun getLocations(): List<LocationEntity>
+
+    @Query("SELECT * FROM Location WHERE name = :name COLLATE NOCASE")
+    suspend fun getLocationByName(name: String): LocationEntity?
 
     /**
      * Location With Aisles
@@ -57,19 +57,15 @@ interface LocationDao : BaseDao<LocationEntity> {
     /**
      * Shop Specific Queries
      */
-    @Transaction
     @Query("SELECT * FROM Location WHERE type = 'SHOP'")
     fun getShops(): Flow<List<LocationEntity>>
 
-    @Transaction
     @Query("SELECT * FROM Location WHERE type = 'SHOP' AND pinned = 1")
     fun getPinnedShops(): Flow<List<LocationEntity>>
 
     /**
      * Home Specific Queries
      */
-    @Transaction
     @Query("SELECT * FROM Location WHERE type = 'HOME'")
     suspend fun getHome(): LocationEntity
-
 }

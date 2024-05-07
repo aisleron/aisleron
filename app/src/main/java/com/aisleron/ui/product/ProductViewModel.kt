@@ -2,6 +2,7 @@ package com.aisleron.ui.product
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.usecase.AddProductUseCase
 import com.aisleron.domain.product.usecase.GetProductUseCase
@@ -38,12 +39,19 @@ class ProductViewModel(
     fun saveProduct(name: String, inStock: Boolean) {
         viewModelScope.launch {
             _productUiState.value = ProductUiState.Loading
-            if (product == null) {
-                addProduct(name, inStock)
-            } else {
-                updateProduct(name, inStock)
+            try {
+                if (product == null) {
+                    addProduct(name, inStock)
+                } else {
+                    updateProduct(name, inStock)
+                }
+                _productUiState.value = ProductUiState.Success
+            } catch (e: AisleronException) {
+                _productUiState.value = ProductUiState.Error(e.exceptionCode, e.message)
+            } catch (e: Exception) {
+                _productUiState.value =
+                    ProductUiState.Error(AisleronException.GENERIC_EXCEPTION, e.message)
             }
-            _productUiState.value = ProductUiState.Success
         }
     }
 
@@ -69,8 +77,8 @@ class ProductViewModel(
     sealed class ProductUiState {
         data object Empty : ProductUiState()
         data object Loading : ProductUiState()
-        data object Error : ProductUiState()
         data object Success : ProductUiState()
+        data class Error(val errorCode: String, val errorMessage: String?) : ProductUiState()
         data class Updated(val product: ProductViewModel) : ProductUiState()
     }
 

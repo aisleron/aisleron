@@ -20,6 +20,8 @@ import com.aisleron.R
 import com.aisleron.databinding.FragmentProductBinding
 import com.aisleron.ui.bundles.AddEditProductBundle
 import com.aisleron.ui.bundles.Bundler
+import com.aisleron.ui.widgets.ErrorSnackBar
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -57,8 +59,11 @@ class ProductFragment : Fragment() {
                         }
 
                         ProductViewModel.ProductUiState.Empty -> Unit
-                        ProductViewModel.ProductUiState.Error -> Unit
                         ProductViewModel.ProductUiState.Loading -> Unit
+                        is ProductViewModel.ProductUiState.Error -> {
+                            displayErrorSnackBar(it.errorCode, it.errorMessage)
+                        }
+
                         is ProductViewModel.ProductUiState.Updated -> {
                             binding.chkProductInStock.isChecked = productViewModel.inStock
                             binding.edtProductName.setText(productViewModel.productName)
@@ -72,6 +77,18 @@ class ProductFragment : Fragment() {
         val chk = binding.chkProductInStock
         chk.setOnClickListener { chk.isChecked = !chk.isChecked }
         return binding.root
+    }
+
+    private fun displayErrorSnackBar(errorCode: String, errorMessage: String?) {
+        val resourceId = resources.getIdentifier(errorCode, "string", requireContext().packageName)
+
+        val snackBarMessage: String = if (resourceId > 0) {
+            getString(resourceId)
+        } else {
+            getString(R.string.generic_error, errorMessage)
+        }
+
+        ErrorSnackBar().make(requireView(), snackBarMessage, Snackbar.LENGTH_SHORT).show()
     }
 
     private fun saveProduct(productName: String, inStock: Boolean) {

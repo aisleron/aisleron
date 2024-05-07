@@ -4,6 +4,7 @@ import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.aisle.usecase.AddAisleUseCase
 import com.aisleron.domain.aisleproduct.AisleProduct
 import com.aisleron.domain.aisleproduct.usecase.AddAisleProductsUseCase
+import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.product.usecase.GetAllProductsUseCase
@@ -12,10 +13,16 @@ class AddLocationUseCase(
     private val locationRepository: LocationRepository,
     private val addAisleUseCase: AddAisleUseCase,
     private val getAllProductsUseCase: GetAllProductsUseCase,
-    private val addAisleProductsUseCase: AddAisleProductsUseCase
+    private val addAisleProductsUseCase: AddAisleProductsUseCase,
+    private val checkLocationNameIsUniqueUseCase: CheckLocationNameIsUniqueUseCase
 
 ) {
     suspend operator fun invoke(location: Location): Int {
+
+        if (!checkLocationNameIsUniqueUseCase(location)) {
+            throw AisleronException.DuplicateLocationNameException("Location Name must be unique")
+        }
+
         val newLocationId = locationRepository.add(location)
         //Add location default Aisle. Set Rank high so it shows at the end of the shopping list
         val newAisleId = addAisleUseCase(
@@ -30,7 +37,7 @@ class AddLocationUseCase(
         )
 
         addAisleProductsUseCase(
-            getAllProductsUseCase().sortedBy { it.name }.mapIndexed { i, p ->
+            getAllProductsUseCase().sortedBy { it.name }.mapIndexed { _, p ->
                 AisleProduct(
                     rank = 0,
                     aisleId = newAisleId,

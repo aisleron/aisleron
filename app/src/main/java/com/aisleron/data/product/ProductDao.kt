@@ -35,4 +35,7 @@ interface ProductDao : BaseDao<ProductEntity> {
         aisleProductDao.delete(*aisleProducts.map { it }.toTypedArray())
         delete(product)
     }
+
+    @Query("SELECT * FROM Product WHERE name = :name COLLATE NOCASE")
+    suspend fun getProductByName(name: String): ProductEntity?
 }

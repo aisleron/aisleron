@@ -43,6 +43,10 @@ class LocationRepositoryImpl(
         return LocationWithAislesMapper().toModel(locationDao.getLocationWithAisles(id))
     }
 
+    override suspend fun getByName(name: String): Location? {
+        return locationDao.getLocationByName(name.trim())?.let { locationMapper.toModel(it) }
+    }
+
     override suspend fun get(id: Int): Location? {
         return locationDao.getLocation(id)?.let { locationMapper.toModel(it) }
     }
