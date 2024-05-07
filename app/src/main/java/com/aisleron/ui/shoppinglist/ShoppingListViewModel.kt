@@ -11,6 +11,7 @@ import com.aisleron.domain.aisle.usecase.UpdateAisleRankUseCase
 import com.aisleron.domain.aisle.usecase.UpdateAisleUseCase
 import com.aisleron.domain.aisleproduct.AisleProduct
 import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductRankUseCase
+import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.usecase.RemoveProductUseCase
@@ -224,13 +225,21 @@ class ShoppingListViewModel(
 
     fun removeItem(item: ShoppingListItemViewModel) {
         viewModelScope.launch {
-            when (item.lineItemType) {
-                ShoppingListItemType.AISLE -> {
-                    val aisle = getAisleUseCase(item.id)
-                    aisle?.let { removeAisleUseCase(it) }
-                }
+            try {
+                when (item.lineItemType) {
+                    ShoppingListItemType.AISLE -> {
+                        val aisle = getAisleUseCase(item.id)
+                        aisle?.let { removeAisleUseCase(it) }
+                    }
 
-                ShoppingListItemType.PRODUCT -> removeProductUseCase(item.id)
+                    ShoppingListItemType.PRODUCT -> removeProductUseCase(item.id)
+                }
+            } catch (e: AisleronException) {
+                _shoppingListUiState.value = ShoppingListUiState.Error(e.exceptionCode, e.message)
+
+            } catch (e: Exception) {
+                _shoppingListUiState.value =
+                    ShoppingListUiState.Error(AisleronException.GENERIC_EXCEPTION, e.message)
             }
         }
 
@@ -239,8 +248,8 @@ class ShoppingListViewModel(
     sealed class ShoppingListUiState {
         data object Empty : ShoppingListUiState()
         data object Loading : ShoppingListUiState()
-        data object Error : ShoppingListUiState()
         data object Success : ShoppingListUiState()
+        data class Error(val errorCode: String, val errorMessage: String?) : ShoppingListUiState()
         data class Updated(val shoppingList: List<ShoppingListItemViewModel>) :
             ShoppingListUiState()
     }

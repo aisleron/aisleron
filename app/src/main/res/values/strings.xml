@@ -34,6 +34,14 @@
     <string name="attachment_summary_on">Automatically download attachments for incoming emails
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
+
+    <!-- Exception Messages   -->
+    <string name="delete_default_aisle_exception">ERROR: Default Aisle can\'t be removed</string>
+    <string name="duplicate_product_name_exception">ERROR: Product Name must be unique</string>
+    <string name="duplicate_location_name_exception">ERROR: Location Name must be unique</string>
+
+
+
     <string name="aisle">Aisle</string>
     <string name="product">Product</string>
     <string name="add_product">Add Product</string>
@@ -55,6 +63,8 @@
     <string name="delete">Delete</string>
     <string name="delete_confirmation">Delete %1$s?</string>
     <string name="edit_aisle">Edit Aisle</string>
-    <string name="cannot_delete_default_aisle">%1$s is a Default Aisle and can\'t be removed</string>
     <string name="edit_location">Edit Shop</string>
+    <string name="generic_error">ERROR: %1$s</string>
+
+
 </resources>

@@ -20,4 +20,9 @@
     <color name="orange_400">#FFff956b</color>
     <color name="orange_500">#FFffa783</color>
     <color name="orange_600">#FFffb99b</color>
+
+    <!-- Reds.   -->
+    <color name="red_light">#FFE69490</color>
+    <color name="red_dark">#FF4C100D</color>
+    <color name="red_dark_opaque_60">#994C100D</color>
 </resources>

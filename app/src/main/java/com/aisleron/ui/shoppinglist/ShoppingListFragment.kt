@@ -31,6 +31,7 @@ import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.LocationType
 import com.aisleron.ui.FabHandler
 import com.aisleron.ui.bundles.Bundler
+import com.aisleron.ui.widgets.ErrorSnackBar
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.launch
@@ -74,8 +75,11 @@ class ShoppingListFragment : Fragment(), SearchView.OnQueryTextListener, ActionM
                         when (it) {
                             ShoppingListViewModel.ShoppingListUiState.Empty -> Unit
                             ShoppingListViewModel.ShoppingListUiState.Loading -> Unit
-                            ShoppingListViewModel.ShoppingListUiState.Error -> Unit
                             ShoppingListViewModel.ShoppingListUiState.Success -> Unit
+                            is ShoppingListViewModel.ShoppingListUiState.Error -> {
+                                displayErrorSnackBar(it.errorCode, it.errorMessage)
+                            }
+
                             is ShoppingListViewModel.ShoppingListUiState.Updated -> {
                                 updateTitle()
 
@@ -142,6 +146,18 @@ class ShoppingListFragment : Fragment(), SearchView.OnQueryTextListener, ActionM
             }
         }
         return view
+    }
+
+    private fun displayErrorSnackBar(errorCode: String, errorMessage: String?) {
+        val resourceId = resources.getIdentifier(errorCode, "string", requireContext().packageName)
+
+        val snackBarMessage: String = if (resourceId > 0) {
+            getString(resourceId)
+        } else {
+            getString(R.string.generic_error, errorMessage)
+        }
+
+        ErrorSnackBar().make(requireView(), snackBarMessage, Snackbar.LENGTH_SHORT).show()
     }
 
     private fun initializeFab() {
@@ -275,19 +291,7 @@ class ShoppingListFragment : Fragment(), SearchView.OnQueryTextListener, ActionM
     }
 
     private fun confirmDelete(context: Context, item: ShoppingListItemViewModel) {
-        //TODO: Handle the isDefault check in domain; catch error in viewmodel, not in fragment,
-        // because this is running in a coroutine
-        if ((item.lineItemType == ShoppingListItemType.AISLE) && (item.inStock)) {
-            Snackbar.make(
-                requireView(),
-                getString(R.string.cannot_delete_default_aisle, item.name),
-                Snackbar.LENGTH_SHORT
-            ).show()
-            return
-        }
-
         val builder: AlertDialog.Builder = AlertDialog.Builder(context)
-
         builder
             .setTitle(getString(R.string.delete_confirmation, item.name))
             .setNegativeButton(android.R.string.cancel, null)

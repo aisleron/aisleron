@@ -4,6 +4,7 @@ import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.aisle.AisleRepository
 import com.aisleron.domain.aisleproduct.usecase.RemoveProductsFromAisleUseCase
 import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductsUseCase
+import com.aisleron.domain.base.AisleronException
 
 class RemoveAisleUseCase(
     private val aisleRepository: AisleRepository,
@@ -11,11 +12,9 @@ class RemoveAisleUseCase(
     private val removeProductsFromAisleUseCase: RemoveProductsFromAisleUseCase
 ) {
     suspend operator fun invoke(aisle: Aisle) {
-        //TODO: Throw isDefault exception here; catch error in viewmodel, not in fragment, because
-        // this is running in a coroutine
-        /*if (aisle.isDefault) {
-            throw AisleException.DeleteDefaultAisleException()
-        }*/
+        if (aisle.isDefault) {
+            throw AisleronException.DeleteDefaultAisleException("Cannot delete default Aisle")
+        }
 
         val aisleWithProducts = aisleRepository.getWithProducts(aisle.id)
 

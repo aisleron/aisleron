@@ -12,6 +12,11 @@
 
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimary</item>
+
+        <!-- Error color. -->
+        <item name="colorError">@color/red_dark</item>
+        <item name="colorOnError">@color/white</item>
+
         <!-- Customize your theme here. -->
         <item name="windowActionModeOverlay">true</item>
         <item name="actionModeStyle">@style/Theme.Aisleron.ActionMode</item>
