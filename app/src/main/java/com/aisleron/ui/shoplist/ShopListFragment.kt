@@ -21,7 +21,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.aisleron.R
 import com.aisleron.ui.bundles.Bundler
+import com.aisleron.ui.widgets.ErrorSnackBar
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -90,8 +92,10 @@ class ShopListFragment : Fragment(), ActionMode.Callback {
                         when (it) {
                             ShopListViewModel.ShopListUiState.Empty -> Unit
                             ShopListViewModel.ShopListUiState.Loading -> Unit
-                            ShopListViewModel.ShopListUiState.Error -> Unit
-                            is ShopListViewModel.ShopListUiState.Success -> Unit
+                            ShopListViewModel.ShopListUiState.Success -> Unit
+                            is ShopListViewModel.ShopListUiState.Error -> {
+                                displayErrorSnackBar(it.errorCode, it.errorMessage)
+                            }
                             is ShopListViewModel.ShopListUiState.Updated -> {
                                 items.clear()
                                 items += it.shops
@@ -131,6 +135,18 @@ class ShopListFragment : Fragment(), ActionMode.Callback {
             }
         }
         return view
+    }
+
+    private fun displayErrorSnackBar(errorCode: String, errorMessage: String?) {
+        val resourceId = resources.getIdentifier(errorCode, "string", requireContext().packageName)
+
+        val snackBarMessage: String = if (resourceId > 0) {
+            getString(resourceId)
+        } else {
+            getString(R.string.generic_error, errorMessage)
+        }
+
+        ErrorSnackBar().make(requireView(), snackBarMessage, Snackbar.LENGTH_SHORT).show()
     }
 
     override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {

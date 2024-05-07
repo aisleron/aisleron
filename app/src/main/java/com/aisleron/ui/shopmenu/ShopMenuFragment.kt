@@ -60,8 +60,8 @@ class ShopMenuFragment : Fragment() {
                         when (it) {
                             ShopListViewModel.ShopListUiState.Empty -> Unit
                             ShopListViewModel.ShopListUiState.Loading -> Unit
-                            ShopListViewModel.ShopListUiState.Error -> Unit
                             ShopListViewModel.ShopListUiState.Success -> Unit
+                            is ShopListViewModel.ShopListUiState.Error -> Unit
 
                             is ShopListViewModel.ShopListUiState.Updated -> {
                                 items.clear()

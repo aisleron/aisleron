@@ -2,6 +2,7 @@ package com.aisleron.ui.shoplist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.usecase.GetLocationUseCase
 import com.aisleron.domain.location.usecase.GetPinnedShopsUseCase
@@ -48,16 +49,21 @@ class ShopListViewModel(
 
     fun removeItem(item: ShopListItemViewModel) {
         viewModelScope.launch {
-            val location = getLocationUseCase(item.id)
-            location?.let { removeLocationUseCase(location) }
+            try {
+                val location = getLocationUseCase(item.id)
+                location?.let { removeLocationUseCase(location) }
+            } catch (e: Exception) {
+                _shopListUiState.value =
+                    ShopListUiState.Error(AisleronException.GENERIC_EXCEPTION, e.message)
+            }
         }
     }
 
     sealed class ShopListUiState {
         data object Empty : ShopListUiState()
         data object Loading : ShopListUiState()
-        data object Error : ShopListUiState()
         data object Success : ShopListUiState()
+        data class Error(val errorCode: String, val errorMessage: String?) : ShopListUiState()
         data class Updated(val shops: List<ShopListItemViewModel>) : ShopListUiState()
     }
 }
