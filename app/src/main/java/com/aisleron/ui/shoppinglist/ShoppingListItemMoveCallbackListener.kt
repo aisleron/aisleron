@@ -2,6 +2,9 @@ package com.aisleron.ui.shoppinglist
 
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import kotlin.math.sign
+
+private const val OUT_OF_BOUNDS_SCROLL_MULTIPLIER = 10
 
 class ShoppingListItemMoveCallbackListener(private val adapter: ShoppingListItemRecyclerViewAdapter) :
     ItemTouchHelper.Callback() {
@@ -74,6 +77,19 @@ class ShoppingListItemMoveCallbackListener(private val adapter: ShoppingListItem
                     && target is ShoppingListItemRecyclerViewAdapter.AisleViewHolder
 
         return allowProductDrop || allowAisleDrop
+    }
+
+    override fun interpolateOutOfBoundsScroll(
+        recyclerView: RecyclerView,
+        viewSize: Int,
+        viewSizeOutOfBounds: Int,
+        totalSize: Int,
+        msSinceStartScroll: Long
+    ): Int {
+        //Controls the scroll speed of the recycler view when dragging to the top or bottom edge
+        val direction = sign(viewSizeOutOfBounds.toDouble()).toInt()
+        return OUT_OF_BOUNDS_SCROLL_MULTIPLIER * direction
+
     }
 
     interface Listener {
