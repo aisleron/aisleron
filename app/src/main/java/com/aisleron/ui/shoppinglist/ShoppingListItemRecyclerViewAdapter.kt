@@ -2,6 +2,7 @@ package com.aisleron.ui.shoppinglist
 
 import android.graphics.Typeface
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
@@ -26,6 +27,10 @@ class ShoppingListItemRecyclerViewAdapter(
         const val PRODUCT_VIEW = 2
     }
 
+    //private var selectedPos = RecyclerView.NO_POSITION
+    private var selectedView: View? = null
+    private var itemMoved: Boolean = false
+
     class ShoppingListItemDiffCallback : DiffUtil.ItemCallback<ShoppingListItemViewModel>() {
         override fun areItemsTheSame(
             oldItem: ShoppingListItemViewModel,
@@ -44,9 +49,18 @@ class ShoppingListItemRecyclerViewAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        if (viewType == AISLE_VIEW) {
-            return AisleViewHolder(
+
+        val newViewHolder = when (viewType) {
+            AISLE_VIEW -> AisleViewHolder(
                 FragmentAisleListItemBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false
+                )
+            )
+
+            else -> ProductListItemViewHolder(
+                FragmentProductListItemBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false
@@ -54,17 +68,32 @@ class ShoppingListItemRecyclerViewAdapter(
             )
         }
 
-        return ProductListItemViewHolder(
-            FragmentProductListItemBinding.inflate(
-                LayoutInflater.from(parent.context),
-                parent,
-                false
-            )
-        )
+        newViewHolder.itemView.setOnLongClickListener { v ->
+            //Deselect the previous view, if one exists
+            selectedView?.isSelected = false
+
+            //Allocate the current view as the selected view
+            selectedView = v
+            selectedView?.isSelected = true
+
+            listener.onLongClick(getItem(newViewHolder.absoluteAdapterPosition))
+            true
+        }
+
+        newViewHolder.itemView.setOnClickListener { v ->
+            if (v == selectedView) {
+                v.isSelected = false
+                selectedView = null
+            }
+            listener.onClick(getItem(newViewHolder.absoluteAdapterPosition))
+        }
+
+        return newViewHolder
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val item = getItem(position)
+
         when (item.lineItemType) {
             ShoppingListItemType.AISLE -> (holder as AisleViewHolder).bind(item)
             ShoppingListItemType.PRODUCT -> (holder as ProductListItemViewHolder).bind(item)
@@ -97,15 +126,6 @@ class ShoppingListItemRecyclerViewAdapter(
             }
 
             productCountView.text = if (item.childCount > 0) item.childCount.toString() else ""
-
-            itemView.setOnLongClickListener { v ->
-                //v.isSelected = true
-                listener.onLongClick(item)
-            }
-
-            itemView.setOnClickListener {
-                listener.onClick(item)
-            }
         }
     }
 
@@ -123,14 +143,6 @@ class ShoppingListItemRecyclerViewAdapter(
             itemView.isLongClickable = true
             contentView.text = item.name
             inStockView.isChecked = item.inStock
-            itemView.setOnClickListener {
-                listener.onClick(item)
-            }
-
-            itemView.setOnLongClickListener { v ->
-                //v.isSelected = true
-                listener.onLongClick(item)
-            }
 
             inStockView.setOnClickListener { _ ->
                 listener.onProductStatusChange(item, inStockView.isChecked)
@@ -147,6 +159,7 @@ class ShoppingListItemRecyclerViewAdapter(
     }
 
     override fun onRowMoved(fromPosition: Int, toPosition: Int) {
+        itemMoved = true
         val swapList = currentList.toMutableList()
         val item = getItem(fromPosition)
         if (fromPosition < toPosition) {
@@ -162,12 +175,11 @@ class ShoppingListItemRecyclerViewAdapter(
         listener.onMoved(item)
     }
 
-    override fun onRowSelected(viewHolder: RecyclerView.ViewHolder) {
-        // TODO("Not yet implemented")
-    }
+    override fun onRowSelected(viewHolder: RecyclerView.ViewHolder) {}
 
     override fun onRowClear(viewHolder: RecyclerView.ViewHolder) {
-        if (viewHolder.absoluteAdapterPosition < 0) return
+
+        if (!itemMoved || viewHolder.absoluteAdapterPosition < 0) return
 
         val item = getItem(viewHolder.absoluteAdapterPosition)
         when (viewHolder.itemViewType) {
@@ -183,16 +195,20 @@ class ShoppingListItemRecyclerViewAdapter(
             }
 
             AISLE_VIEW -> {
-                if (viewHolder.absoluteAdapterPosition == 0) {
-                    item.rank = 1
-                } else {
-                    //Find the max rank of all aisles above the current item in the list
-                    val aisles = currentList.subList(0, viewHolder.absoluteAdapterPosition)
-                        .filter { a -> a.lineItemType == ShoppingListItemType.AISLE }
+                //Find the max rank of all aisles above the current item in the list
+                val aisles = currentList.subList(0, viewHolder.absoluteAdapterPosition)
+                    .filter { a -> a.lineItemType == ShoppingListItemType.AISLE }
+                if (aisles.isNotEmpty()) {
                     item.rank = aisles.maxOf { a -> a.rank } + 1
+                } else {
+                    item.rank = 1
                 }
             }
         }
+        selectedView?.isSelected = false
+        selectedView = null
+        itemMoved = false
+
         listener.onCleared(item)
     }
 

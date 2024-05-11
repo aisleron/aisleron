@@ -97,7 +97,10 @@ class ShoppingListFragment : Fragment(), SearchView.OnQueryTextListener, ActionM
                 adapter = ShoppingListItemRecyclerViewAdapter(
                     object :
                         ShoppingListItemRecyclerViewAdapter.ShoppingListItemListener {
-                        override fun onClick(item: ShoppingListItemViewModel) {}
+                        override fun onClick(item: ShoppingListItemViewModel) {
+                            actionMode?.finish()
+                        }
+
                         override fun onProductStatusChange(
                             item: ShoppingListItemViewModel,
                             inStock: Boolean

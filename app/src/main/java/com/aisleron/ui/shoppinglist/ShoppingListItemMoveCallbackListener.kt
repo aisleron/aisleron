@@ -89,7 +89,6 @@ class ShoppingListItemMoveCallbackListener(private val adapter: ShoppingListItem
         //Controls the scroll speed of the recycler view when dragging to the top or bottom edge
         val direction = sign(viewSizeOutOfBounds.toDouble()).toInt()
         return OUT_OF_BOUNDS_SCROLL_MULTIPLIER * direction
-
     }
 
     interface Listener {

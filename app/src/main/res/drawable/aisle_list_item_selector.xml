@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <color android:color="?android:attr/colorBackground" />
+    </item>
+    <item>
+        <selector>
+            <item android:state_selected="true">
+                <color android:color="?attr/colorSelectedListItem" />
+            </item>
+        </selector>
+    </item>
+</layer-list>
