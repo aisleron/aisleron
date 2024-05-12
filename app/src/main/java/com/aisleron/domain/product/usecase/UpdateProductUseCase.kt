@@ -6,11 +6,11 @@ import com.aisleron.domain.product.ProductRepository
 
 class UpdateProductUseCase(
     private val productRepository: ProductRepository,
-    private val checkProductNameIsUniqueUseCase: CheckProductNameIsUniqueUseCase
+    private val isProductNameUniqueUseCase: IsProductNameUniqueUseCase
 ) {
     suspend operator fun invoke(product: Product) {
 
-        if (!checkProductNameIsUniqueUseCase(product)) {
+        if (!isProductNameUniqueUseCase(product)) {
             throw AisleronException.DuplicateProductNameException("Product Name must be unique")
         }
 

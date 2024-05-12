@@ -11,12 +11,12 @@ class AddProductUseCase(
     private val productRepository: ProductRepository,
     private val getDefaultAislesUseCase: GetDefaultAislesUseCase,
     private val addAisleProductsUseCase: AddAisleProductsUseCase,
-    private val checkProductNameIsUniqueUseCase: CheckProductNameIsUniqueUseCase
+    private val isProductNameUniqueUseCase: IsProductNameUniqueUseCase
 
 ) {
     suspend operator fun invoke(product: Product): Int {
 
-        if (!checkProductNameIsUniqueUseCase(product)) {
+        if (!isProductNameUniqueUseCase(product)) {
             throw AisleronException.DuplicateLocationNameException("Product Name must be unique")
         }
 

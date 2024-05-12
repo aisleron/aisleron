@@ -6,11 +6,11 @@ import com.aisleron.domain.location.LocationRepository
 
 class UpdateLocationUseCase(
     private val locationRepository: LocationRepository,
-    private val checkLocationNameIsUniqueUseCase: CheckLocationNameIsUniqueUseCase
+    private val isLocationNameUniqueUseCase: IsLocationNameUniqueUseCase
 ) {
     suspend operator fun invoke(location: Location) {
 
-        if (!checkLocationNameIsUniqueUseCase(location)) {
+        if (!isLocationNameUniqueUseCase(location)) {
             throw AisleronException.DuplicateProductNameException("Location Name must be unique")
         }
 

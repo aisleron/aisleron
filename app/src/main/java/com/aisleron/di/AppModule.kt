@@ -32,7 +32,7 @@ import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductRankUseCase
 import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductsUseCase
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.location.usecase.AddLocationUseCase
-import com.aisleron.domain.location.usecase.CheckLocationNameIsUniqueUseCase
+import com.aisleron.domain.location.usecase.IsLocationNameUniqueUseCase
 import com.aisleron.domain.location.usecase.GetLocationUseCase
 import com.aisleron.domain.location.usecase.GetPinnedShopsUseCase
 import com.aisleron.domain.location.usecase.GetShopsUseCase
@@ -40,7 +40,7 @@ import com.aisleron.domain.location.usecase.RemoveLocationUseCase
 import com.aisleron.domain.location.usecase.UpdateLocationUseCase
 import com.aisleron.domain.product.ProductRepository
 import com.aisleron.domain.product.usecase.AddProductUseCase
-import com.aisleron.domain.product.usecase.CheckProductNameIsUniqueUseCase
+import com.aisleron.domain.product.usecase.IsProductNameUniqueUseCase
 import com.aisleron.domain.product.usecase.GetAllProductsUseCase
 import com.aisleron.domain.product.usecase.GetProductUseCase
 import com.aisleron.domain.product.usecase.RemoveProductUseCase
@@ -115,12 +115,12 @@ val appModule = module {
 
     factory<GetPinnedShopsUseCase> { GetPinnedShopsUseCase(locationRepository = get()) }
 
-    factory<CheckLocationNameIsUniqueUseCase> { CheckLocationNameIsUniqueUseCase(locationRepository = get()) }
+    factory<IsLocationNameUniqueUseCase> { IsLocationNameUniqueUseCase(locationRepository = get()) }
 
     factory<UpdateLocationUseCase> {
         UpdateLocationUseCase(
             locationRepository = get(),
-            checkLocationNameIsUniqueUseCase = get()
+            isLocationNameUniqueUseCase = get()
         )
     }
 
@@ -138,7 +138,7 @@ val appModule = module {
             addAisleUseCase = get(),
             getAllProductsUseCase = get(),
             addAisleProductsUseCase = get(),
-            checkLocationNameIsUniqueUseCase = get()
+            isLocationNameUniqueUseCase = get()
         )
     }
 
@@ -190,12 +190,12 @@ val appModule = module {
 
     factory<RemoveProductUseCase> { RemoveProductUseCase(productRepository = get()) }
 
-    factory<CheckProductNameIsUniqueUseCase> { CheckProductNameIsUniqueUseCase(productRepository = get()) }
+    factory<IsProductNameUniqueUseCase> { IsProductNameUniqueUseCase(productRepository = get()) }
 
     factory<UpdateProductUseCase> {
         UpdateProductUseCase(
             productRepository = get(),
-            checkProductNameIsUniqueUseCase = get()
+            isProductNameUniqueUseCase = get()
         )
     }
 
@@ -204,7 +204,7 @@ val appModule = module {
             productRepository = get(),
             getDefaultAislesUseCase = get(),
             addAisleProductsUseCase = get(),
-            checkProductNameIsUniqueUseCase = get()
+            isProductNameUniqueUseCase = get()
         )
     }
 

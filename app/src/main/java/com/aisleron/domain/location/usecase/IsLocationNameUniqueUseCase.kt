@@ -3,7 +3,7 @@ package com.aisleron.domain.location.usecase
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationRepository
 
-class CheckLocationNameIsUniqueUseCase(private val locationRepository: LocationRepository) {
+class IsLocationNameUniqueUseCase(private val locationRepository: LocationRepository) {
     suspend operator fun invoke(location: Location): Boolean {
         val existingLocation: Location? = locationRepository.getByName(location.name.trim())
         //Location name is unique if no existing location was found, the existing location has

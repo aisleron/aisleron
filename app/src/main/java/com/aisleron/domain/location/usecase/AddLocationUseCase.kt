@@ -14,12 +14,12 @@ class AddLocationUseCase(
     private val addAisleUseCase: AddAisleUseCase,
     private val getAllProductsUseCase: GetAllProductsUseCase,
     private val addAisleProductsUseCase: AddAisleProductsUseCase,
-    private val checkLocationNameIsUniqueUseCase: CheckLocationNameIsUniqueUseCase
+    private val isLocationNameUniqueUseCase: IsLocationNameUniqueUseCase
 
 ) {
     suspend operator fun invoke(location: Location): Int {
 
-        if (!checkLocationNameIsUniqueUseCase(location)) {
+        if (!isLocationNameUniqueUseCase(location)) {
             throw AisleronException.DuplicateLocationNameException("Location Name must be unique")
         }
 
