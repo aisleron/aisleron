@@ -179,7 +179,7 @@ val appModule = module {
 
     factory<UpdateAisleProductRankUseCase> { UpdateAisleProductRankUseCase(aisleProductRepository = get()) }
 
-    factory<RemoveProductsFromAisleUseCase> {RemoveProductsFromAisleUseCase(aisleProductRepository = get() )}
+    factory<RemoveProductsFromAisleUseCase> { RemoveProductsFromAisleUseCase(aisleProductRepository = get()) }
 
     /**
      * Product Use Cases

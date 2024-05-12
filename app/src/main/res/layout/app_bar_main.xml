@@ -28,6 +28,7 @@
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="@dimen/fab_margin"
         android:layout_marginBottom="16dp"
+        android:contentDescription="@string/main_fab"
         app:srcCompat="@android:drawable/ic_input_add" />
 
     <TextView
@@ -44,6 +45,7 @@
         android:id="@+id/fab_add_shop"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:contentDescription="@string/add_shop_fab"
         app:fabSize="mini"
         app:layout_anchor="@id/fab"
         app:layout_anchorGravity="top|end"
@@ -65,6 +67,7 @@
         android:id="@+id/fab_add_aisle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:contentDescription="@string/add_aisle_fab"
         app:fabSize="mini"
         app:layout_anchor="@id/fab_add_shop"
         app:layout_anchorGravity="top"
@@ -86,17 +89,12 @@
         android:id="@+id/fab_add_product"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:contentDescription="@string/add_product_fab"
         app:fabSize="mini"
         app:layout_anchor="@id/fab_add_aisle"
         app:layout_anchorGravity="end"
         android:layout_gravity="top"
         app:srcCompat="@drawable/baseline_add_product_24" />
-
-
-
-
-
-
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -96,6 +96,7 @@ class ShopListFragment : Fragment(), ActionMode.Callback {
                             is ShopListViewModel.ShopListUiState.Error -> {
                                 displayErrorSnackBar(it.errorCode, it.errorMessage)
                             }
+
                             is ShopListViewModel.ShopListUiState.Updated -> {
                                 items.clear()
                                 items += it.shops

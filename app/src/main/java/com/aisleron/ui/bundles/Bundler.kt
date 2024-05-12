@@ -64,7 +64,8 @@ class Bundler {
     }
 
     fun getAddEditLocationBundle(bundle: Bundle?): AddEditLocationBundle {
-        val result = getParcelableBundle(bundle, ADD_EDIT_LOCATION, AddEditLocationBundle::class.java)
+        val result =
+            getParcelableBundle(bundle, ADD_EDIT_LOCATION, AddEditLocationBundle::class.java)
         return result ?: AddEditLocationBundle()
     }
 

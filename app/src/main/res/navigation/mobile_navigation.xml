@@ -86,7 +86,7 @@
         android:id="@+id/nav_add_shop"
         android:name="com.aisleron.ui.shop.ShopFragment"
         android:label="@string/add_location"
-        tools:layout="@layout/fragment_shop" >
+        tools:layout="@layout/fragment_shop">
         <argument
             android:name="addEditLocationBundle"
             app:argType="com.aisleron.ui.bundles.AddEditLocationBundle" />

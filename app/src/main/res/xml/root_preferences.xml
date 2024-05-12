@@ -10,7 +10,6 @@
     <PreferenceCategory app:title="@string/sync_header">
 
 
-
     </PreferenceCategory>
 
 </PreferenceScreen>

@@ -7,7 +7,7 @@
         android:title="@string/edit"
         android:icon="@drawable/baseline_edit_24"
         app:showAsAction="ifRoom"
-        android:menuCategory="container"/>
+        android:menuCategory="container" />
     <item
         android:id="@+id/mnu_delete_shopping_list_item"
         android:title="@string/delete"

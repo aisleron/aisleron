@@ -6,8 +6,6 @@
     android:longClickable="true"
     android:background="@drawable/aisle_list_item_selector">
 
-<!--    android:background="?android:attr/colorBackground">-->
-    <!-- android:background="?android:attr/selectableItemBackground" -->
     <TextView
         android:id="@+id/txt_aisle_name"
         android:layout_width="wrap_content"
