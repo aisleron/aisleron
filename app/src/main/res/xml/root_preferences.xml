@@ -1,15 +1,17 @@
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <PreferenceCategory app:title="@string/display_options_header">
         <SwitchPreferenceCompat
             app:key="display_lockscreen"
             app:title="@string/show_on_lock_screen" />
-
-    </PreferenceCategory>
-
-    <PreferenceCategory app:title="@string/sync_header">
-
-
+        <ListPreference
+            android:defaultValue="system_theme"
+            android:entries="@array/theme_names"
+            android:entryValues="@array/theme_values"
+            android:key="application_theme"
+            android:title="@string/theme"
+            app:summary="%s" />
     </PreferenceCategory>
 
 </PreferenceScreen>

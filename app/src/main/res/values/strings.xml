@@ -58,6 +58,10 @@
     <string name="add_shop_fab">Add Shop FAB</string>
     <string name="add_aisle_fab">Add Aisle FAB</string>
     <string name="add_product_fab">Add Product FAB</string>
+    <string name="system_theme">System Theme</string>
+    <string name="light_theme">Light Theme</string>
+    <string name="dark_theme">Dark Theme</string>
+    <string name="theme">Theme</string>
 
 
 </resources>

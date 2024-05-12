@@ -1,4 +1,13 @@
 <resources>
-    <!-- Reply Preference -->
+    <array name="theme_names">
+        <item>@string/system_theme</item>
+        <item>@string/light_theme</item>
+        <item>@string/dark_theme</item>
+    </array>
 
+    <array name="theme_values">
+        <item>system_theme</item>
+        <item>light_theme</item>
+        <item>dark_theme</item>
+    </array>
 </resources>
