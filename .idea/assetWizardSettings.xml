@@ -80,7 +80,7 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
-                                                <entry key="imagePath" value="$USER_HOME$/Nextcloud/Code/Aisleron/UX/Icons/xxxhdpi2_objects.png" />
+                                                <entry key="imagePath" value="$USER_HOME$/Nextcloud/Code/Aisleron/UX/Aisleron_512_optimized.svg" />
                                                 <entry key="scalingPercent" value="85" />
                                               </map>
                                             </option>
@@ -320,8 +320,9 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="outputName" value="baseline_error_24" />
-                            <entry key="sourceFile" value="$USER_HOME$/Downloads/add_product.svg" />
+                            <entry key="assetSourceType" value="FILE" />
+                            <entry key="outputName" value="aisleron_24" />
+                            <entry key="sourceFile" value="$USER_HOME$/Nextcloud/Code/Aisleron/UX/Aisleron_24_optimized.svg" />
                           </map>
                         </option>
                       </PersistentState>
