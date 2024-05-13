@@ -8,4 +8,5 @@
     <dimen name="mini_fab_margin">20dp</dimen>
     <dimen name="text_margin">16dp</dimen>
     <dimen name="menu_padding">12dp</dimen>
+    <dimen name="icon_size">80dp</dimen>
 </resources>
