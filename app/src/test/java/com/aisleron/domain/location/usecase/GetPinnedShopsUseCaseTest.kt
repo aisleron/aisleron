@@ -49,7 +49,7 @@ class GetPinnedShopsUseCaseTest {
                         name = "Shop 2",
                         pinned = false,
                         aisles = emptyList()
-                    ),
+                    )
                 )
             )
         }
