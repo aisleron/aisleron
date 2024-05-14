@@ -9,13 +9,23 @@ class LocationDaoTestImpl : LocationDao {
     override suspend fun upsert(vararg entity: LocationEntity): List<Long> {
         val result = mutableListOf<Long>()
         entity.forEach {
+            val id: Int
+            val existingEntity = getLocation(it.id)
+            if (existingEntity == null) {
+                id = (locationList.maxOfOrNull { e -> e.id }?.toInt() ?: 0) + 1
+            } else {
+                id = existingEntity.id
+                locationList.removeAt(locationList.indexOf(existingEntity))
+            }
+
             val newEntity = LocationEntity(
-                id = (locationList.maxOfOrNull { e -> e.id }?.toInt() ?: 0) + 1,
+                id = id,
                 type = it.type,
                 defaultFilter = it.defaultFilter,
                 name = it.name,
                 pinned = it.pinned
             )
+
             locationList.add(newEntity)
             result.add(newEntity.id.toLong())
         }
@@ -31,11 +41,11 @@ class LocationDaoTestImpl : LocationDao {
     }
 
     override suspend fun getLocations(vararg locationId: Int): List<LocationEntity> {
-        TODO("Not yet implemented")
+        return locationList.filter { it.id in locationId }
     }
 
     override suspend fun getLocations(): List<LocationEntity> {
-        TODO("Not yet implemented")
+        return locationList
     }
 
     override suspend fun getLocationByName(name: String): LocationEntity? {

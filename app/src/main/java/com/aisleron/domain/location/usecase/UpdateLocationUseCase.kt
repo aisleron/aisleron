@@ -11,7 +11,7 @@ class UpdateLocationUseCase(
     suspend operator fun invoke(location: Location) {
 
         if (!isLocationNameUniqueUseCase(location)) {
-            throw AisleronException.DuplicateProductNameException("Location Name must be unique")
+            throw AisleronException.DuplicateLocationNameException("Location Name must be unique")
         }
 
         locationRepository.update(location)
