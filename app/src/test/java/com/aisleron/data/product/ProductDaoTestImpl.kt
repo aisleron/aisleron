@@ -7,11 +7,21 @@ class ProductDaoTestImpl : ProductDao {
     override suspend fun upsert(vararg entity: ProductEntity): List<Long> {
         val result = mutableListOf<Long>()
         entity.forEach {
+            val id: Int
+            val existingEntity = getProduct(it.id)
+            if (existingEntity == null) {
+                id = (productList.maxOfOrNull { e -> e.id }?.toInt() ?: 0) + 1
+            } else {
+                id = existingEntity.id
+                productList.removeAt(productList.indexOf(existingEntity))
+            }
+
             val newEntity = ProductEntity(
-                id = (productList.maxOfOrNull { e -> e.id }?.toInt() ?: 0) + 1,
+                id = id,
                 name = it.name,
                 inStock = it.inStock
             )
+
             productList.add(newEntity)
             result.add(newEntity.id.toLong())
         }
@@ -31,7 +41,7 @@ class ProductDaoTestImpl : ProductDao {
     }
 
     override suspend fun getProducts(): List<ProductEntity> {
-        TODO("Not yet implemented")
+        return productList
     }
 
     override suspend fun getProductsForAisle(aisleId: Int): List<ProductEntity> {
