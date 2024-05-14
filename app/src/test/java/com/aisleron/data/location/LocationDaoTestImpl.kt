@@ -1,6 +1,8 @@
 package com.aisleron.data.location
 
+import com.aisleron.domain.location.LocationType
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 
 class LocationDaoTestImpl : LocationDao {
 
@@ -33,7 +35,7 @@ class LocationDaoTestImpl : LocationDao {
     }
 
     override suspend fun delete(vararg entity: LocationEntity) {
-        TODO("Not yet implemented")
+        locationList.removeIf { it in entity }
     }
 
     override suspend fun getLocation(locationId: Int): LocationEntity? {
@@ -77,14 +79,14 @@ class LocationDaoTestImpl : LocationDao {
     }
 
     override fun getShops(): Flow<List<LocationEntity>> {
-        TODO("Not yet implemented")
+        return flowOf(locationList.filter { it.type == LocationType.SHOP })
     }
 
     override fun getPinnedShops(): Flow<List<LocationEntity>> {
-        TODO("Not yet implemented")
+        return flowOf(locationList.filter { it.type == LocationType.SHOP && it.pinned })
     }
 
     override suspend fun getHome(): LocationEntity {
-        TODO("Not yet implemented")
+        return locationList.first { it.type == LocationType.HOME }
     }
 }
