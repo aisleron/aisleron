@@ -219,11 +219,4 @@ class AddLocationUseCaseTest {
         assertEquals(productCount, aisleProducts.count())
         assertEquals(aisleProductCountBefore + productCount, aisleProductCountAfter)
     }
-
-
-
-    //Check products assigned to default aisle
-    //Check only one default aisle exists for product
-    //Check products are only allocated once
-
 }
