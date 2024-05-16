@@ -1,10 +1,17 @@
 package com.aisleron.data.location
 
+import com.aisleron.data.aisle.AisleDaoTestImpl
 import com.aisleron.domain.location.LocationType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
-class LocationDaoTestImpl : LocationDao {
+class LocationDaoTestImpl() : LocationDao {
+
+    constructor(aisleDao: AisleDaoTestImpl) : this() {
+        _aisleDao = aisleDao
+    }
+
+    private var _aisleDao: AisleDaoTestImpl? = null
 
     private val locationList = mutableListOf<LocationEntity>()
 
@@ -55,7 +62,10 @@ class LocationDaoTestImpl : LocationDao {
     }
 
     override suspend fun getLocationWithAisles(locationId: Int): LocationWithAisles {
-        TODO("Not yet implemented")
+        return LocationWithAisles(
+            location = getLocation(locationId)!!,
+            aisles = _aisleDao?.getAislesForLocation(locationId) ?: emptyList()
+        )
     }
 
     override suspend fun getLocationsWithAisles(vararg locationId: Int): List<LocationWithAisles> {
