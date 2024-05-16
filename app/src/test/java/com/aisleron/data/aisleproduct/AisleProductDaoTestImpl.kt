@@ -1,6 +1,11 @@
 package com.aisleron.data.aisleproduct
 
+import com.aisleron.data.product.ProductEntity
+
 class AisleProductDaoTestImpl : AisleProductDao {
+
+    private val aisleProductList = mutableListOf<AisleProductEntity>()
+
     override suspend fun getAisleProduct(aisleProductId: Int): AisleProductRank? {
         TODO("Not yet implemented")
     }
@@ -14,7 +19,12 @@ class AisleProductDaoTestImpl : AisleProductDao {
     }
 
     override suspend fun getAisleProducts(): List<AisleProductRank> {
-        TODO("Not yet implemented")
+        return aisleProductList.map {
+            AisleProductRank(
+                aisleProduct = it,
+                product = ProductEntity(1, "Dummy Product", false)
+            )
+        }
     }
 
     override suspend fun moveRanks(aisleId: Int, fromRank: Int) {
@@ -22,14 +32,35 @@ class AisleProductDaoTestImpl : AisleProductDao {
     }
 
     override suspend fun removeProductsFromAisle(aisleId: Int) {
-        TODO("Not yet implemented")
+        aisleProductList.removeIf { it.aisleId == aisleId }
     }
 
     override suspend fun upsert(vararg entity: AisleProductEntity): List<Long> {
-        TODO("Not yet implemented")
+        val result = mutableListOf<Long>()
+        entity.forEach {
+            val id: Int
+            val existingEntity = aisleProductList.find { ap -> ap.id == it.id }
+            if (existingEntity == null) {
+                id = (aisleProductList.maxOfOrNull { ap -> ap.id }?.toInt() ?: 0) + 1
+            } else {
+                id = existingEntity.id
+                delete(existingEntity)
+            }
+
+            val newEntity = AisleProductEntity(
+                id = id,
+                rank = it.rank,
+                aisleId = it.aisleId,
+                productId = it.productId
+            )
+
+            aisleProductList.add(newEntity)
+            result.add(newEntity.id.toLong())
+        }
+        return result
     }
 
     override suspend fun delete(vararg entity: AisleProductEntity) {
-        TODO("Not yet implemented")
+        aisleProductList.removeIf { it in entity }
     }
 }

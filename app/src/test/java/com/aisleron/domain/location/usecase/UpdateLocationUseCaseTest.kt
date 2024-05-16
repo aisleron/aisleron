@@ -73,7 +73,7 @@ class UpdateLocationUseCaseTest {
     }
 
     @Test
-    fun updateLocation_LocationExists_RecordUpdated() {
+    fun updateLocation_IsExistingLocation_LocationUpdated() {
         val updateLocation =
             existingLocation.copy(
                 name = existingLocation.name + " Updated",
@@ -98,7 +98,7 @@ class UpdateLocationUseCaseTest {
     }
 
     @Test
-    fun updateLocation_LocationDoesNotExist_RecordCreated() {
+    fun updateLocation_IsNewLocation_RecordCreated() {
         val newLocation = existingLocation.copy(
             id = existingLocation.id + 1,
             name = existingLocation.name + " Inserted"
