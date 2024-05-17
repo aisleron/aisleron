@@ -40,7 +40,7 @@ class TestDataManager {
         initializeTestData()
     }
 
-    fun initializeTestData() {
+    private fun initializeTestData() {
         val addLocationUseCase = AddLocationUseCase(
             locationRepository,
             AddAisleUseCase(aisleRepository),
