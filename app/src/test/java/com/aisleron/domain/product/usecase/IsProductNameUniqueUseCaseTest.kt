@@ -1,9 +1,6 @@
 package com.aisleron.domain.product.usecase
 
-import com.aisleron.data.aisleproduct.AisleProductDaoTestImpl
-import com.aisleron.data.product.ProductDaoTestImpl
-import com.aisleron.data.product.ProductMapper
-import com.aisleron.data.product.ProductRepositoryImpl
+import com.aisleron.data.TestDataManager
 import com.aisleron.domain.product.Product
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.AfterEach
@@ -18,7 +15,7 @@ class IsProductNameUniqueUseCaseTest {
 
     @BeforeEach
     fun setUp() {
-        isProductNameUniqueUseCase = IsProductNameUniqueUseCase(productRepository)
+        isProductNameUniqueUseCase = IsProductNameUniqueUseCase(testData.productRepository)
     }
 
     @AfterEach
@@ -28,7 +25,7 @@ class IsProductNameUniqueUseCaseTest {
 
     @Test
     fun isNameUnique_NoMatchingNameExists_ReturnTrue() {
-        val newProduct = existingProduct.copy(id = 0, name = "Product 2")
+        val newProduct = existingProduct.copy(id = 0, name = "Product Unique Name")
         val result = runBlocking {
             isProductNameUniqueUseCase(newProduct)
         }
@@ -59,27 +56,16 @@ class IsProductNameUniqueUseCaseTest {
 
     companion object {
 
-        private lateinit var productRepository: ProductRepositoryImpl
+        private lateinit var testData: TestDataManager
         private lateinit var existingProduct: Product
 
         @JvmStatic
         @BeforeAll
         fun beforeSpec() {
-            productRepository = ProductRepositoryImpl(
-                ProductDaoTestImpl(),
-                AisleProductDaoTestImpl(),
-                ProductMapper()
-            )
+            testData = TestDataManager()
 
             existingProduct = runBlocking {
-                val id = productRepository.add(
-                    Product(
-                        id = 1,
-                        name = "Product 1",
-                        inStock = false
-                    )
-                )
-                productRepository.get(id)!!
+                testData.productRepository.get(1)!!
             }
         }
     }

@@ -26,7 +26,7 @@ import kotlinx.coroutines.runBlocking
 class TestDataManager {
 
     private val productDao = ProductDaoTestImpl()
-    private val aisleProductDao = AisleProductDaoTestImpl()
+    private val aisleProductDao = AisleProductDaoTestImpl(productDao)
     private val aisleDao = AisleDaoTestImpl()
     private val locationDao = LocationDaoTestImpl(aisleDao)
 

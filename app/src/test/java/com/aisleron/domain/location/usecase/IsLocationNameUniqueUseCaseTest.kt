@@ -1,9 +1,6 @@
 package com.aisleron.domain.location.usecase
 
-import com.aisleron.data.location.LocationDaoTestImpl
-import com.aisleron.data.location.LocationMapper
-import com.aisleron.data.location.LocationRepositoryImpl
-import com.aisleron.domain.FilterType
+import com.aisleron.data.TestDataManager
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationType
 import kotlinx.coroutines.runBlocking
@@ -22,7 +19,7 @@ class IsLocationNameUniqueUseCaseTest {
 
     @BeforeEach
     fun setUp() {
-        isLocationNameUniqueUseCase = IsLocationNameUniqueUseCase(locationRepository)
+        isLocationNameUniqueUseCase = IsLocationNameUniqueUseCase(testData.locationRepository)
     }
 
     @AfterEach
@@ -32,7 +29,7 @@ class IsLocationNameUniqueUseCaseTest {
 
     @Test
     fun isNameUnique_NoMatchingNameExists_ReturnTrue() {
-        val newLocation = existingLocation.copy(id = 0, name = "Shop 2")
+        val newLocation = existingLocation.copy(id = 0, name = "Shop Test Unique Name")
         val result = runBlocking {
             isLocationNameUniqueUseCase(newLocation)
         }
@@ -74,27 +71,14 @@ class IsLocationNameUniqueUseCaseTest {
 
     companion object {
 
-        private lateinit var locationRepository: LocationRepositoryImpl
+        private lateinit var testData: TestDataManager
         private lateinit var existingLocation: Location
 
         @JvmStatic
         @BeforeAll
         fun beforeSpec() {
-            locationRepository = LocationRepositoryImpl(LocationDaoTestImpl(), LocationMapper())
-
-            existingLocation = runBlocking {
-                val id = locationRepository.add(
-                    Location(
-                        id = 1,
-                        type = LocationType.SHOP,
-                        defaultFilter = FilterType.NEEDED,
-                        name = "Shop 1",
-                        pinned = false,
-                        aisles = emptyList()
-                    )
-                )
-                locationRepository.get(id)!!
-            }
+            testData = TestDataManager()
+            existingLocation = runBlocking { testData.locationRepository.get(1)!! }
         }
     }
 }

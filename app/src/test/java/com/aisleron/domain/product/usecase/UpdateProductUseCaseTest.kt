@@ -1,9 +1,6 @@
 package com.aisleron.domain.product.usecase
 
-import com.aisleron.data.aisleproduct.AisleProductDaoTestImpl
-import com.aisleron.data.product.ProductDaoTestImpl
-import com.aisleron.data.product.ProductMapper
-import com.aisleron.data.product.ProductRepositoryImpl
+import com.aisleron.data.TestDataManager
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.product.Product
 import kotlinx.coroutines.runBlocking
@@ -16,30 +13,19 @@ import org.junit.jupiter.api.assertThrows
 
 class UpdateProductUseCaseTest {
 
+    private lateinit var testData: TestDataManager
     private lateinit var updateProductUseCase: UpdateProductUseCase
-    private lateinit var productRepository: ProductRepositoryImpl
     private lateinit var existingProduct: Product
 
     @BeforeEach
     fun setUp() {
-        productRepository = ProductRepositoryImpl(
-            ProductDaoTestImpl(), AisleProductDaoTestImpl(), ProductMapper()
-        )
+        testData = TestDataManager()
 
-        runBlocking {
-            val id = productRepository.add(
-                Product(
-                    id = 1,
-                    name = "Product 1",
-                    inStock = false,
-                )
-            )
-            existingProduct = productRepository.get(id)!!
-        }
+        existingProduct = runBlocking { testData.productRepository.get(1)!! }
 
         updateProductUseCase = UpdateProductUseCase(
-            productRepository,
-            IsProductNameUniqueUseCase(productRepository)
+            testData.productRepository,
+            IsProductNameUniqueUseCase(testData.productRepository)
         )
     }
 
@@ -50,7 +36,7 @@ class UpdateProductUseCaseTest {
     @Test
     fun updateProduct_IsDuplicateName_ThrowsException() {
         runBlocking {
-            val id = productRepository.add(
+            val id = testData.productRepository.add(
                 Product(
                     id = 2,
                     name = "Product 2",
@@ -58,7 +44,7 @@ class UpdateProductUseCaseTest {
                 )
             )
 
-            val updateProduct = productRepository.get(id)!!.copy(name = existingProduct.name)
+            val updateProduct = testData.productRepository.get(id)!!.copy(name = existingProduct.name)
             assertThrows<AisleronException.DuplicateProductNameException> {
                 updateProductUseCase(updateProduct)
             }
@@ -76,10 +62,10 @@ class UpdateProductUseCaseTest {
         val countBefore: Int
         val countAfter: Int
         runBlocking {
-            countBefore = productRepository.getAll().count()
+            countBefore = testData.productRepository.getAll().count()
             updateProductUseCase(updateProduct)
-            updatedProduct = productRepository.getByName(updateProduct.name)
-            countAfter = productRepository.getAll().count()
+            updatedProduct = testData.productRepository.getByName(updateProduct.name)
+            countAfter = testData.productRepository.getAll().count()
         }
         assertNotNull(updatedProduct)
         assertEquals(countBefore, countAfter)
@@ -91,17 +77,17 @@ class UpdateProductUseCaseTest {
     @Test
     fun updateProduct_ProductDoesNotExist_RecordCreated() {
         val newProduct = existingProduct.copy(
-            id = existingProduct.id + 1,
+            id = 1030535,
             name = existingProduct.name + " Inserted"
         )
         val updatedProduct: Product?
         val countBefore: Int
         val countAfter: Int
         runBlocking {
-            countBefore = productRepository.getAll().count()
+            countBefore = testData.productRepository.getAll().count()
             updateProductUseCase(newProduct)
-            updatedProduct = productRepository.getByName(newProduct.name)
-            countAfter = productRepository.getAll().count()
+            updatedProduct = testData.productRepository.getByName(newProduct.name)
+            countAfter = testData.productRepository.getAll().count()
         }
         assertNotNull(updatedProduct)
         assertEquals(countBefore + 1, countAfter)

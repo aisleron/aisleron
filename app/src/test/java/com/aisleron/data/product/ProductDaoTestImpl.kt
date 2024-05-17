@@ -29,7 +29,7 @@ class ProductDaoTestImpl : ProductDao {
     }
 
     override suspend fun delete(vararg entity: ProductEntity) {
-        TODO("Not yet implemented")
+        productList.removeIf { it in entity }
     }
 
     override suspend fun getProduct(productId: Int): ProductEntity? {

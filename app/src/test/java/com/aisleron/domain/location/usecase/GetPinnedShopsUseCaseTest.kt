@@ -1,8 +1,6 @@
 package com.aisleron.domain.location.usecase
 
-import com.aisleron.data.location.LocationDaoTestImpl
-import com.aisleron.data.location.LocationMapper
-import com.aisleron.data.location.LocationRepositoryImpl
+import com.aisleron.data.TestDataManager
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationType
@@ -14,47 +12,15 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class GetPinnedShopsUseCaseTest {
+
+    private lateinit var testData: TestDataManager
+
     private lateinit var getPinnedShopsUseCase: GetPinnedShopsUseCase
-    private lateinit var locationRepository: LocationRepositoryImpl
 
     @BeforeEach
     fun setUp() {
-        locationRepository = LocationRepositoryImpl(
-            LocationDaoTestImpl(), LocationMapper()
-        )
-
-        runBlocking {
-            locationRepository.add(
-                listOf(
-                    Location(
-                        id = 1,
-                        type = LocationType.HOME,
-                        defaultFilter = FilterType.NEEDED,
-                        name = "Home",
-                        pinned = false,
-                        aisles = emptyList()
-                    ),
-                    Location(
-                        id = 2,
-                        type = LocationType.SHOP,
-                        defaultFilter = FilterType.NEEDED,
-                        name = "Shop 1",
-                        pinned = false,
-                        aisles = emptyList()
-                    ),
-                    Location(
-                        id = 3,
-                        type = LocationType.SHOP,
-                        defaultFilter = FilterType.NEEDED,
-                        name = "Shop 2",
-                        pinned = false,
-                        aisles = emptyList()
-                    )
-                )
-            )
-        }
-
-        getPinnedShopsUseCase = GetPinnedShopsUseCase(locationRepository)
+        testData = TestDataManager()
+        getPinnedShopsUseCase = GetPinnedShopsUseCase(testData.locationRepository)
     }
 
     @AfterEach
@@ -74,7 +40,7 @@ class GetPinnedShopsUseCaseTest {
     fun getShops_PinnedShopsDefined_ReturnPinnedShopsList() {
         val resultList: List<Location> =
             runBlocking {
-                locationRepository.add(
+                testData.locationRepository.add(
                     listOf(
                         Location(
                             id = 4,

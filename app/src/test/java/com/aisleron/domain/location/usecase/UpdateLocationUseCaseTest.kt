@@ -1,8 +1,6 @@
 package com.aisleron.domain.location.usecase
 
-import com.aisleron.data.location.LocationDaoTestImpl
-import com.aisleron.data.location.LocationMapper
-import com.aisleron.data.location.LocationRepositoryImpl
+import com.aisleron.data.TestDataManager
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.location.Location
@@ -17,33 +15,19 @@ import org.junit.jupiter.api.assertThrows
 
 class UpdateLocationUseCaseTest {
 
+    private lateinit var testData: TestDataManager
     private lateinit var updateLocationUseCase: UpdateLocationUseCase
-    private lateinit var locationRepository: LocationRepositoryImpl
     private lateinit var existingLocation: Location
 
     @BeforeEach
     fun setUp() {
-        locationRepository = LocationRepositoryImpl(
-            LocationDaoTestImpl(), LocationMapper()
-        )
+        testData = TestDataManager()
 
-        runBlocking {
-            val id = locationRepository.add(
-                Location(
-                    id = 1,
-                    type = LocationType.SHOP,
-                    defaultFilter = FilterType.NEEDED,
-                    name = "Shop 1",
-                    pinned = false,
-                    aisles = emptyList()
-                )
-            )
-            existingLocation = locationRepository.get(id)!!
-        }
+        existingLocation = runBlocking { testData.locationRepository.get(1)!! }
 
         updateLocationUseCase = UpdateLocationUseCase(
-            locationRepository,
-            IsLocationNameUniqueUseCase(locationRepository)
+            testData.locationRepository,
+            IsLocationNameUniqueUseCase(testData.locationRepository)
         )
     }
 
@@ -54,7 +38,7 @@ class UpdateLocationUseCaseTest {
     @Test
     fun updateLocation_IsDuplicateName_ThrowsException() {
         runBlocking {
-            val id = locationRepository.add(
+            val id = testData.locationRepository.add(
                 Location(
                     id = 2,
                     type = LocationType.SHOP,
@@ -65,7 +49,7 @@ class UpdateLocationUseCaseTest {
                 )
             )
 
-            val updateLocation = locationRepository.get(id)!!.copy(name = existingLocation.name)
+            val updateLocation = testData.locationRepository.get(id)!!.copy(name = existingLocation.name)
             assertThrows<AisleronException.DuplicateLocationNameException> {
                 updateLocationUseCase(updateLocation)
             }
@@ -83,10 +67,10 @@ class UpdateLocationUseCaseTest {
         val countBefore: Int
         val countAfter: Int
         runBlocking {
-            countBefore = locationRepository.getAll().count()
+            countBefore = testData.locationRepository.getAll().count()
             updateLocationUseCase(updateLocation)
-            updatedLocation = locationRepository.getByName(updateLocation.name)
-            countAfter = locationRepository.getAll().count()
+            updatedLocation = testData.locationRepository.getByName(updateLocation.name)
+            countAfter = testData.locationRepository.getAll().count()
         }
         assertNotNull(updatedLocation)
         assertEquals(countBefore, countAfter)
@@ -100,17 +84,17 @@ class UpdateLocationUseCaseTest {
     @Test
     fun updateLocation_IsNewLocation_RecordCreated() {
         val newLocation = existingLocation.copy(
-            id = existingLocation.id + 1,
+            id = 0,
             name = existingLocation.name + " Inserted"
         )
         val updatedLocation: Location?
         val countBefore: Int
         val countAfter: Int
         runBlocking {
-            countBefore = locationRepository.getAll().count()
+            countBefore = testData.locationRepository.getAll().count()
             updateLocationUseCase(newLocation)
-            updatedLocation = locationRepository.getByName(newLocation.name)
-            countAfter = locationRepository.getAll().count()
+            updatedLocation = testData.locationRepository.getByName(newLocation.name)
+            countAfter = testData.locationRepository.getAll().count()
         }
         assertNotNull(updatedLocation)
         assertEquals(countBefore + 1, countAfter)
