@@ -13,6 +13,7 @@ import com.aisleron.data.product.ProductDaoTestImpl
 import com.aisleron.data.product.ProductMapper
 import com.aisleron.data.product.ProductRepositoryImpl
 import com.aisleron.domain.FilterType
+import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.aisle.usecase.AddAisleUseCase
 import com.aisleron.domain.aisleproduct.usecase.AddAisleProductsUseCase
 import com.aisleron.domain.location.Location
@@ -41,6 +42,39 @@ class TestDataManager {
     }
 
     private fun initializeTestData() {
+        runBlocking {
+            addProducts()
+            addLocations()
+            addAisles()
+        }
+    }
+
+    private suspend fun addAisles() {
+        val location = locationRepository.getAll().first()
+
+        aisleRepository.add(
+            listOf(
+                Aisle(
+                    id = 0,
+                    name = "Aisle 1",
+                    products = emptyList(),
+                    locationId = location.id,
+                    rank = 1,
+                    isDefault = false
+                ),
+                Aisle(
+                    id = 0,
+                    name = "Aisle 2",
+                    products = emptyList(),
+                    locationId = location.id,
+                    rank = 2,
+                    isDefault = false
+                )
+            )
+        )
+    }
+
+    private suspend fun addLocations(): Int {
         val addLocationUseCase = AddLocationUseCase(
             locationRepository,
             AddAisleUseCase(aisleRepository),
@@ -49,38 +83,37 @@ class TestDataManager {
             IsLocationNameUniqueUseCase(locationRepository)
         )
 
-        runBlocking {
-            productRepository.add(
-                listOf(
-                    Product(1, "Product 1", false),
-                    Product(2, "Product 2", true),
-                    Product(3, "Product 3", true),
-                    Product(4, "Product 4", false)
-                )
+        addLocationUseCase(
+            Location(
+                id = 1,
+                type = LocationType.SHOP,
+                defaultFilter = FilterType.NEEDED,
+                name = "Shop 1",
+                pinned = false,
+                aisles = emptyList()
             )
-            addLocationUseCase(
-                Location(
-                    id = 1,
-                    type = LocationType.SHOP,
-                    defaultFilter = FilterType.NEEDED,
-                    name = "Shop 1",
-                    pinned = false,
-                    aisles = emptyList()
-                )
-            )
+        )
 
-            addLocationUseCase(
-                Location(
-                    id = 2,
-                    type = LocationType.SHOP,
-                    defaultFilter = FilterType.NEEDED,
-                    name = "Shop 2",
-                    pinned = false,
-                    aisles = emptyList()
-                )
+        return addLocationUseCase(
+            Location(
+                id = 2,
+                type = LocationType.SHOP,
+                defaultFilter = FilterType.NEEDED,
+                name = "Shop 2",
+                pinned = false,
+                aisles = emptyList()
             )
-        }
-        return
+        )
+    }
 
+    private suspend fun addProducts() {
+        productRepository.add(
+            listOf(
+                Product(1, "Product 1", false),
+                Product(2, "Product 2", true),
+                Product(3, "Product 3", true),
+                Product(4, "Product 4", false)
+            )
+        )
     }
 }

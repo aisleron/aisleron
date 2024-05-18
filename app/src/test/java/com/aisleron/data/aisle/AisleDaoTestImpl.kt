@@ -41,7 +41,10 @@ class AisleDaoTestImpl : AisleDao {
     }
 
     override suspend fun getAisleWithProducts(aisleId: Int): AisleWithProducts {
-        TODO("Not yet implemented")
+        return AisleWithProducts(
+            aisle = getAisle(aisleId)!!,
+            products = emptyList()
+        )
     }
 
     override suspend fun getAislesWithProducts(vararg aisleId: Int): List<AisleWithProducts> {
