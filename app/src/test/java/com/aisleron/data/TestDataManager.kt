@@ -50,28 +50,28 @@ class TestDataManager {
     }
 
     private suspend fun addAisles() {
-        val location = locationRepository.getAll().first()
-
-        aisleRepository.add(
-            listOf(
-                Aisle(
-                    id = 0,
-                    name = "Aisle 1",
-                    products = emptyList(),
-                    locationId = location.id,
-                    rank = 1,
-                    isDefault = false
-                ),
-                Aisle(
-                    id = 0,
-                    name = "Aisle 2",
-                    products = emptyList(),
-                    locationId = location.id,
-                    rank = 2,
-                    isDefault = false
+        locationRepository.getAll().forEach {
+            aisleRepository.add(
+                listOf(
+                    Aisle(
+                        id = 0,
+                        name = "Aisle 1",
+                        products = emptyList(),
+                        locationId = it.id,
+                        rank = 1,
+                        isDefault = false
+                    ),
+                    Aisle(
+                        id = 0,
+                        name = "Aisle 2",
+                        products = emptyList(),
+                        locationId = it.id,
+                        rank = 2,
+                        isDefault = false
+                    )
                 )
             )
-        )
+        }
     }
 
     private suspend fun addLocations(): Int {

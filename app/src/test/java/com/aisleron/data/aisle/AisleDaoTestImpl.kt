@@ -56,7 +56,12 @@ class AisleDaoTestImpl : AisleDao {
     }
 
     override suspend fun moveRanks(locationId: Int, fromRank: Int) {
-        TODO("Not yet implemented")
+        val locationAisles = aisleList.filter { it.locationId == locationId && it.rank >= fromRank }
+        locationAisles.forEach {
+            val newAisle = it.copy(rank = it.rank + 1)
+            aisleList.removeAt(aisleList.indexOf(it))
+            aisleList.add(newAisle)
+        }
     }
 
     override suspend fun upsert(vararg entity: AisleEntity): List<Long> {
