@@ -26,14 +26,14 @@ class GetProductUseCaseTest {
     }
 
     @Test
-    fun getLocation_NonExistentId_ReturnNull() {
+    fun getProduct_NonExistentId_ReturnNull() {
         Assertions.assertNull(runBlocking { getProductUseCase(2001) })
     }
 
     @Test
-    fun getLocation_ExistingId_ReturnLocation() {
-        val location = runBlocking { getProductUseCase(1) }
-        Assertions.assertNotNull(location)
-        Assertions.assertEquals(1, location!!.id)
+    fun getProduct_ExistingId_ReturnProduct() {
+        val product = runBlocking { getProductUseCase(1) }
+        Assertions.assertNotNull(product)
+        Assertions.assertEquals(1, product!!.id)
     }
 }
