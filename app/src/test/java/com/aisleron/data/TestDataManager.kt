@@ -28,7 +28,7 @@ class TestDataManager {
 
     private val productDao = ProductDaoTestImpl()
     private val aisleProductDao = AisleProductDaoTestImpl(productDao)
-    private val aisleDao = AisleDaoTestImpl()
+    private val aisleDao = AisleDaoTestImpl(aisleProductDao)
     private val locationDao = LocationDaoTestImpl(aisleDao)
 
     val productRepository = ProductRepositoryImpl(productDao, aisleProductDao, ProductMapper())

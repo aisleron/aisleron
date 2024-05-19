@@ -4,6 +4,7 @@ import com.aisleron.data.aisle.AisleDaoTestImpl
 import com.aisleron.domain.location.LocationType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.runBlocking
 
 class LocationDaoTestImpl(private val aisleDao: AisleDaoTestImpl) : LocationDao {
 
@@ -71,7 +72,18 @@ class LocationDaoTestImpl(private val aisleDao: AisleDaoTestImpl) : LocationDao 
     }
 
     override fun getLocationWithAislesWithProducts(locationId: Int): Flow<LocationWithAislesWithProducts?> {
-        TODO("Not yet implemented")
+        val location = locationList.firstOrNull { it.id == locationId }
+        var result: LocationWithAislesWithProducts? = null
+
+        location?.let {
+            result = LocationWithAislesWithProducts(
+                location = location,
+                aisles = runBlocking {
+                    aisleDao.getAislesWithProducts().filter { it.aisle.locationId == locationId }
+                }
+            )
+        }
+        return flowOf(result)
     }
 
     override suspend fun getLocationsWithAislesWithProducts(vararg locationId: Int): List<LocationWithAislesWithProducts> {

@@ -1,6 +1,8 @@
 package com.aisleron.data.aisle
 
-class AisleDaoTestImpl : AisleDao {
+import com.aisleron.data.aisleproduct.AisleProductDaoTestImpl
+
+class AisleDaoTestImpl(private val aisleProductDao: AisleProductDaoTestImpl) : AisleDao {
 
     private val aisleList = mutableListOf<AisleEntity>()
 
@@ -52,7 +54,13 @@ class AisleDaoTestImpl : AisleDao {
     }
 
     override suspend fun getAislesWithProducts(): List<AisleWithProducts> {
-        TODO("Not yet implemented")
+        return aisleList.map {
+            AisleWithProducts(
+                aisle = it,
+                products = aisleProductDao.getAisleProducts()
+                    .filter { ap -> ap.aisleProduct.aisleId == it.id }
+            )
+        }
     }
 
     override suspend fun moveRanks(locationId: Int, fromRank: Int) {
