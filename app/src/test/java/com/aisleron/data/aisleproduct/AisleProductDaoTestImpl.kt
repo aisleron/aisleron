@@ -7,7 +7,15 @@ class AisleProductDaoTestImpl(private val productDao: ProductDaoTestImpl) : Aisl
     private val aisleProductList = mutableListOf<AisleProductEntity>()
 
     override suspend fun getAisleProduct(aisleProductId: Int): AisleProductRank? {
-        TODO("Not yet implemented")
+        val aisleProduct = aisleProductList.find { it.id == aisleProductId }
+        var result: AisleProductRank? = null
+        aisleProduct?.let {
+            result = AisleProductRank(
+                aisleProduct = aisleProduct,
+                product = productDao.getProduct(aisleProduct.productId)!!
+            )
+        }
+        return result
     }
 
     override suspend fun getAisleProducts(vararg aisleProductId: Int): List<AisleProductRank> {
