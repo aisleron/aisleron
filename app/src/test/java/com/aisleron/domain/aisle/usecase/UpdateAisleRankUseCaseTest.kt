@@ -18,11 +18,11 @@ class UpdateAisleRankUseCaseTest {
     fun setUp() {
         testData = TestDataManager()
         updateAisleRankUseCase = UpdateAisleRankUseCase(testData.aisleRepository)
-        existingAisle = runBlocking { testData.aisleRepository.getAll().first{ !it.isDefault } }
+        existingAisle = runBlocking { testData.aisleRepository.getAll().first { !it.isDefault } }
     }
 
     @Test
-    fun updateAisleRank_NewRankProvided_AisleUpdated() {
+    fun updateAisleRank_NewRankProvided_AisleRankUpdated() {
         val updateAisle = existingAisle.copy(rank = 1001)
         val updatedAisle: Aisle?
         runBlocking {
@@ -34,7 +34,7 @@ class UpdateAisleRankUseCaseTest {
     }
 
     @Test
-    fun updateAisleRank_AisleRankChanged_OtherAislesMoved() {
+    fun updateAisleRank_AisleRankUpdated_OtherAislesMoved() {
         val updateAisle = existingAisle.copy(rank = existingAisle.rank + 1)
         val maxAisleRankBefore: Int
         val maxAisleRankAfter: Int

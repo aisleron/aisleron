@@ -36,7 +36,12 @@ class AisleProductDaoTestImpl(private val productDao: ProductDaoTestImpl) : Aisl
     }
 
     override suspend fun moveRanks(aisleId: Int, fromRank: Int) {
-        TODO("Not yet implemented")
+        val aisleProducts = aisleProductList.filter { it.aisleId == aisleId && it.rank >= fromRank }
+        aisleProducts.forEach {
+            val newAisleProduct = it.copy(rank = it.rank + 1)
+            aisleProductList.removeAt(aisleProductList.indexOf(it))
+            aisleProductList.add(newAisleProduct)
+        }
     }
 
     override suspend fun removeProductsFromAisle(aisleId: Int) {
