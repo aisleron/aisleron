@@ -5,6 +5,8 @@ plugins {
     id("org.jetbrains.kotlin.plugin.parcelize")
 }
 
+apply("../gradle/jacoco.gradle")
+
 android {
     namespace = "com.aisleron"
     compileSdk = 34
@@ -31,6 +33,11 @@ android {
                 "proguard-rules.pro"
             )
         }
+
+        debug {
+            enableAndroidTestCoverage = true
+            enableUnitTestCoverage = true
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -45,6 +52,15 @@ android {
 
     tasks.withType<Test> {
         useJUnitPlatform() // Make all tests use JUnit 5
+    }
+
+    packaging {
+        resources.excludes.addAll(
+            listOf(
+                "META-INF/LICENSE.md",
+                "META-INF/LICENSE-notice.md"
+            )
+        )
     }
 }
 
@@ -63,9 +79,10 @@ dependencies {
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     implementation("androidx.datastore:datastore-preferences:1.1.1")
     implementation("androidx.fragment:fragment-ktx:1.7.1")
-    implementation("androidx.databinding:databinding-runtime:8.4.0")
+    implementation("androidx.databinding:databinding-runtime:8.4.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.0")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
+
+    //Testing
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -79,7 +96,5 @@ dependencies {
 
     //Coroutines
     implementation("androidx.room:room-ktx:2.6.1")
-
-
 }
 
