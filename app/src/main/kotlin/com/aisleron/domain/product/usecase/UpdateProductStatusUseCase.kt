@@ -7,9 +7,9 @@ class UpdateProductStatusUseCase(
     private val updateProductUseCase: UpdateProductUseCase
 ) {
     suspend operator fun invoke(id: Int, inStock: Boolean): Product? {
-        val product = getProductUseCase(id)
+        val product = getProductUseCase(id)?.copy(inStock = inStock)
+
         if (product != null) {
-            product.inStock = inStock
             updateProductUseCase(product)
         }
         return product
