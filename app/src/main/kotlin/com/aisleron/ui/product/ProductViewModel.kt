@@ -59,11 +59,9 @@ class ProductViewModel(
     }
 
     private suspend fun updateProduct(name: String, inStock: Boolean) {
-        product!!.let {
-            it.name = name
-            it.inStock = inStock
-        }
-        updateProductUseCase(product!!)
+        val updateProduct = product!!.copy(name = name, inStock = inStock)
+        updateProductUseCase(updateProduct)
+        hydrate(updateProduct.id, updateProduct.inStock)
     }
 
     private suspend fun addProduct(name: String, inStock: Boolean) {
