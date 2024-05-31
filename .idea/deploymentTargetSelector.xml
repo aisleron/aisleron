@@ -13,10 +13,19 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="testMakeEditProductBundle_ProductIdProvided_EditObjectBundled()">
+      <SelectionState runConfigName="testMakeAddProductBundle_NameProvided_AddObjectBundleHasName()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="Tests in 'com.aisleron.ui.bundles'">
+      <SelectionState runConfigName="testMakeAddProductBundle_InStockTrue_AddObjectBundleIsInStock()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="testGetAddEditProductBundle_ValidBundle_ReturnBundle()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="testGetAddEditProductBundle_InvalidBundle_ReturnDefaultProductBundle()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="BundlerTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

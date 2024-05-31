@@ -6,7 +6,7 @@ data class Aisle(
     val name: String,
     val products: List<AisleProduct>,
     val locationId: Int,
-    var rank: Int,
+    val rank: Int,
     val id: Int,
     val isDefault: Boolean
 )
