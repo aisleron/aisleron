@@ -65,7 +65,7 @@ class ProductViewModelTest {
     }
 
     @Test
-    fun testSaveProduct_ProductDoesNotExists_CreateProduct() = runTest{
+    fun testSaveProduct_ProductDoesNotExists_CreateProduct() = runTest {
         val newProductName = "New Product Name"
         val inStock = false
 
