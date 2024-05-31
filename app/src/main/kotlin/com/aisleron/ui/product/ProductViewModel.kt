@@ -7,6 +7,7 @@ import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.usecase.AddProductUseCase
 import com.aisleron.domain.product.usecase.GetProductUseCase
 import com.aisleron.domain.product.usecase.UpdateProductUseCase
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -14,8 +15,10 @@ import kotlinx.coroutines.launch
 class ProductViewModel(
     private val addProductUseCase: AddProductUseCase,
     private val updateProductUseCase: UpdateProductUseCase,
-    private val getProductUseCase: GetProductUseCase
+    private val getProductUseCase: GetProductUseCase,
+    coroutineScopeProvider: CoroutineScope? = null
 ) : ViewModel() {
+    private val coroutineScope = coroutineScopeProvider ?: this.viewModelScope
     val productName: String? get() = product?.name
 
     private var _inStock: Boolean = false
@@ -28,7 +31,7 @@ class ProductViewModel(
 
 
     fun hydrate(productId: Int, inStock: Boolean) {
-        viewModelScope.launch {
+        coroutineScope.launch {
             _productUiState.value = ProductUiState.Loading
             product = getProductUseCase(productId)
             _inStock = product?.inStock ?: inStock
@@ -37,7 +40,7 @@ class ProductViewModel(
     }
 
     fun saveProduct(name: String, inStock: Boolean) {
-        viewModelScope.launch {
+        coroutineScope.launch {
             _productUiState.value = ProductUiState.Loading
             try {
                 if (product == null) {

@@ -13,16 +13,13 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="testMakeAddProductBundle_InStockTrue_AddObjectBundleIsInStock()">
+      <SelectionState runConfigName="testSaveProduct_ProductExists_UpdateProduct()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="testGetAddEditProductBundle_ValidBundle_ReturnBundle()">
+      <SelectionState runConfigName="testSaveProduct_ProductDoesNotExists_CreateProduct()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="testGetAddEditProductBundle_InvalidBundle_ReturnDefaultProductBundle()">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
-      <SelectionState runConfigName="BundlerTest">
+      <SelectionState runConfigName="ProductViewModelTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
