@@ -15,3 +15,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Aisleron"
 include(":app")
+include(":testData")

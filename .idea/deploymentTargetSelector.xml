@@ -13,9 +13,6 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="testMakeAddProductBundle_NameProvided_AddObjectBundleHasName()">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
       <SelectionState runConfigName="testMakeAddProductBundle_InStockTrue_AddObjectBundleIsInStock()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>

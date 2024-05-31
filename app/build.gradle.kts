@@ -84,8 +84,10 @@ dependencies {
 
     //Testing
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
+    testImplementation(project(":testData"))
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation(project(":testData"))
 
     //Room
     implementation("androidx.room:room-runtime:2.6.1")

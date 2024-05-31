@@ -123,7 +123,7 @@ class AddProductUseCaseTest {
         runBlocking {
             locationCount = testData.locationRepository.getAll().count()
             aisleProductCountBefore = testData.aisleProductRepository.getAll().count()
-            val id = addProductUseCase(newProduct)
+            addProductUseCase(newProduct)
             aisleProductCountAfter = testData.aisleProductRepository.getAll().count()
         }
         Assertions.assertEquals(aisleProductCountBefore + locationCount, aisleProductCountAfter)
