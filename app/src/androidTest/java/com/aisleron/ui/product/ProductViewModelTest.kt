@@ -84,18 +84,39 @@ class ProductViewModelTest {
     }
 
     @Test
-    fun getProductName() {
+    fun testSaveProduct_SaveSuccessful_UiStateIsSuccess() = runTest {
+        val updatedProductName = "Updated Product Name"
+        val existingProduct: Product = testData.productRepository.getAll().first()
+
+        productViewModel.hydrate(existingProduct.id, existingProduct.inStock)
+        productViewModel.saveProduct(updatedProductName, !existingProduct.inStock)
+
+        Assert.assertEquals(
+            ProductViewModel.ProductUiState.Updated(productViewModel),
+            productViewModel.productUiState.value
+        )
     }
 
     @Test
-    fun getInStock() {
+    fun testSaveProduct_AisleronErrorOnSave_UiStateIsError() = runTest {
+        val existingProduct: Product = testData.productRepository.getAll().first()
+
+        productViewModel.hydrate(0, false)
+        productViewModel.saveProduct(existingProduct.name, false)
+
+        Assert.assertTrue(productViewModel.productUiState.value is ProductViewModel.ProductUiState.Error)
     }
 
     @Test
-    fun getProductUiState() {
+    fun testGetProductName_ProductExists_ReturnsProductName() = runTest {
+        val existingProduct: Product = testData.productRepository.getAll().first()
+        productViewModel.hydrate(existingProduct.id, existingProduct.inStock)
+        Assert.assertEquals(existingProduct.name, productViewModel.productName)
     }
 
     @Test
-    fun hydrate() {
+    fun testGetProductName_ProductDoesNotExists_ReturnsNullProductName() = runTest {
+        productViewModel.hydrate(0, false)
+        Assert.assertNull(productViewModel.productName)
     }
 }

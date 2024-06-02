@@ -43,11 +43,7 @@ class ProductViewModel(
         coroutineScope.launch {
             _productUiState.value = ProductUiState.Loading
             try {
-                if (product == null) {
-                    addProduct(name, inStock)
-                } else {
-                    updateProduct(name, inStock)
-                }
+                product?.let { updateProduct(it, name, inStock) } ?: addProduct(name, inStock)
                 _productUiState.value = ProductUiState.Success
             } catch (e: AisleronException) {
                 _productUiState.value = ProductUiState.Error(e.exceptionCode, e.message)
@@ -58,8 +54,8 @@ class ProductViewModel(
         }
     }
 
-    private suspend fun updateProduct(name: String, inStock: Boolean) {
-        val updateProduct = product!!.copy(name = name, inStock = inStock)
+    private suspend fun updateProduct(product: Product, name: String, inStock: Boolean) {
+        val updateProduct = product.copy(name = name, inStock = inStock)
         updateProductUseCase(updateProduct)
         hydrate(updateProduct.id, updateProduct.inStock)
     }

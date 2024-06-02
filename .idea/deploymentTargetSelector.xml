@@ -22,6 +22,12 @@
       <SelectionState runConfigName="ProductViewModelTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
+      <SelectionState runConfigName="testSaveProduct_SaveSuccessful_UiStateIsSuccess()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="testSaveProduct_AisleronErrorOnSave_UiStateIsError()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
     </selectionStates>
   </component>
 </project>
