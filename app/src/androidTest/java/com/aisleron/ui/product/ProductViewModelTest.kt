@@ -15,9 +15,12 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
 
 
-class ProductViewModelTest {
+@RunWith(value = Parameterized::class)
+class ProductViewModelTest(private val inStock: Boolean) {
     private lateinit var testData: TestDataManager
     private lateinit var productViewModel: ProductViewModel
 
@@ -53,21 +56,20 @@ class ProductViewModelTest {
         val countBefore: Int = testData.productRepository.getAll().count()
 
         productViewModel.hydrate(existingProduct.id, existingProduct.inStock)
-        productViewModel.saveProduct(updatedProductName, !existingProduct.inStock)
+        productViewModel.saveProduct(updatedProductName, inStock)
 
         val updatedProduct = testData.productRepository.get(existingProduct.id)
         val countAfter: Int = testData.productRepository.getAll().count()
 
         Assert.assertNotNull(updatedProduct)
         Assert.assertEquals(updatedProductName, updatedProduct?.name)
-        Assert.assertEquals(!existingProduct.inStock, updatedProduct?.inStock)
+        Assert.assertEquals(inStock, updatedProduct?.inStock)
         Assert.assertEquals(countBefore, countAfter)
     }
 
     @Test
     fun testSaveProduct_ProductDoesNotExists_CreateProduct() = runTest {
         val newProductName = "New Product Name"
-        val inStock = false
 
         productViewModel.hydrate(0, inStock)
         val countBefore: Int = testData.productRepository.getAll().count()
@@ -89,7 +91,7 @@ class ProductViewModelTest {
         val existingProduct: Product = testData.productRepository.getAll().first()
 
         productViewModel.hydrate(existingProduct.id, existingProduct.inStock)
-        productViewModel.saveProduct(updatedProductName, !existingProduct.inStock)
+        productViewModel.saveProduct(updatedProductName, inStock)
 
         Assert.assertEquals(
             ProductViewModel.ProductUiState.Updated(productViewModel),
@@ -102,7 +104,7 @@ class ProductViewModelTest {
         val existingProduct: Product = testData.productRepository.getAll().first()
 
         productViewModel.hydrate(0, false)
-        productViewModel.saveProduct(existingProduct.name, false)
+        productViewModel.saveProduct(existingProduct.name, inStock)
 
         Assert.assertTrue(productViewModel.productUiState.value is ProductViewModel.ProductUiState.Error)
     }
@@ -118,5 +120,16 @@ class ProductViewModelTest {
     fun testGetProductName_ProductDoesNotExists_ReturnsNullProductName() = runTest {
         productViewModel.hydrate(0, false)
         Assert.assertNull(productViewModel.productName)
+    }
+
+    companion object {
+        @JvmStatic
+        @Parameterized.Parameters
+        fun data(): Collection<Array<Any>> {
+            return listOf(
+                arrayOf(true),
+                arrayOf(false)
+            )
+        }
     }
 }

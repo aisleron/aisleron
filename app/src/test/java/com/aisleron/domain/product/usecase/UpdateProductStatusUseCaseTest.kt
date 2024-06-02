@@ -9,6 +9,10 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
+import java.util.stream.Stream
 
 class UpdateProductStatusUseCaseTest {
 
@@ -31,26 +35,35 @@ class UpdateProductStatusUseCaseTest {
     fun tearDown() {
     }
 
-    @Test
-    fun updateProductStatus_ProductExists_StatusUpdated() {
+    @ParameterizedTest(name = "Test when inStock Status is {0}")
+    @MethodSource("inStockArguments")
+    fun updateProductStatus_ProductExists_StatusUpdated(inStock: Boolean) {
         val existingProduct: Product
         val updatedProduct = runBlocking {
             existingProduct = testData.productRepository.getAll().first()
-            updateProductStatusUseCase(existingProduct.id, !existingProduct.inStock)
+            updateProductStatusUseCase(existingProduct.id, inStock)
         }
 
         assertNotNull(updatedProduct)
         assertEquals(existingProduct.id, updatedProduct?.id)
         assertEquals(existingProduct.name, updatedProduct?.name)
-        assertEquals(!existingProduct.inStock, updatedProduct?.inStock)
+        assertEquals(inStock, updatedProduct?.inStock)
     }
 
     @Test
-    fun updateProductStatus_ProductDoesNotExist_ReturnNull () {
+    fun updateProductStatus_ProductDoesNotExist_ReturnNull() {
         val updatedProduct = runBlocking {
             updateProductStatusUseCase(1001, true)
         }
 
         assertNull(updatedProduct)
+    }
+
+    private companion object {
+        @JvmStatic
+        fun inStockArguments(): Stream<Arguments> = Stream.of(
+            Arguments.of(true),
+            Arguments.of(false)
+        )
     }
 }

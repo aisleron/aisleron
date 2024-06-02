@@ -44,6 +44,18 @@ class RemoveProductUseCaseTest {
     }
 
     @Test
+    fun removeProduct_IsNonExistentProduct_NoProductsRemoved() {
+        val countBefore: Int
+        val countAfter: Int
+        runBlocking {
+            countBefore = testData.productRepository.getAll().count()
+            removeProductUseCase(testData.productRepository.getAll().maxOf { it.id } + 1000)
+            countAfter = testData.productRepository.getAll().count()
+        }
+        assertEquals(countBefore, countAfter)
+    }
+
+    @Test
     fun removeProduct_ProductRemoved_AisleProductsRemoved() {
         val aisleProductCountBefore: Int
         val aisleProductCountAfter: Int

@@ -146,4 +146,11 @@ class BundlerTest {
         val bundledLocation = bundler.getAddEditLocationBundle(Bundle())
         assertEquals(addEditLocation, bundledLocation)
     }
+
+    @Test
+    fun testGetAddEditLocationBundle_NullBundle_ReturnDefaultLocationBundle() {
+        val addEditLocation = AddEditLocationBundle()
+        val bundledLocation = bundler.getAddEditLocationBundle(null)
+        assertEquals(addEditLocation, bundledLocation)
+    }
 }

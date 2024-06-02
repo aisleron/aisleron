@@ -16,8 +16,11 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
 
-class ShopViewModelTest {
+@RunWith(value = Parameterized::class)
+class ShopViewModelTest(private val pinned: Boolean) {
 
     private lateinit var testData: TestDataManager
     private lateinit var shopViewModel: ShopViewModel
@@ -56,21 +59,20 @@ class ShopViewModelTest {
         val countBefore: Int = testData.locationRepository.getAll().count()
 
         shopViewModel.hydrate(existingLocation.id)
-        shopViewModel.saveLocation(updatedLocationName, !existingLocation.pinned)
+        shopViewModel.saveLocation(updatedLocationName, pinned)
 
         val updatedLocation = testData.locationRepository.get(existingLocation.id)
         val countAfter: Int = testData.locationRepository.getAll().count()
 
         Assert.assertNotNull(updatedLocation)
         Assert.assertEquals(updatedLocationName, updatedLocation?.name)
-        Assert.assertEquals(!existingLocation.pinned, updatedLocation?.pinned)
+        Assert.assertEquals(pinned, updatedLocation?.pinned)
         Assert.assertEquals(countBefore, countAfter)
     }
 
     @Test
     fun testSaveLocation_LocationDoesNotExists_CreateLocation() = runTest {
         val newLocationName = "New Location Name"
-        val pinned = false
 
         shopViewModel.hydrate(0)
         val countBefore: Int = testData.locationRepository.getAll().count()
@@ -92,7 +94,7 @@ class ShopViewModelTest {
         val existingLocation: Location = testData.locationRepository.getAll().first()
 
         shopViewModel.hydrate(existingLocation.id)
-        shopViewModel.saveLocation(updatedLocationName, !existingLocation.pinned)
+        shopViewModel.saveLocation(updatedLocationName, pinned)
 
         Assert.assertEquals(
             ShopViewModel.ShopUiState.Updated(shopViewModel),
@@ -105,7 +107,7 @@ class ShopViewModelTest {
         val existingLocation: Location = testData.locationRepository.getAll().first()
 
         shopViewModel.hydrate(0)
-        shopViewModel.saveLocation(existingLocation.name, false)
+        shopViewModel.saveLocation(existingLocation.name, pinned)
 
         Assert.assertTrue(shopViewModel.shopUiState.value is ShopViewModel.ShopUiState.Error)
     }
@@ -160,5 +162,16 @@ class ShopViewModelTest {
     fun testGetType_LocationDoesNotExists_ReturnsNull() = runTest {
         shopViewModel.hydrate(0)
         Assert.assertNull(shopViewModel.type)
+    }
+
+    companion object {
+        @JvmStatic
+        @Parameterized.Parameters
+        fun data(): Collection<Array<Any>> {
+            return listOf(
+                arrayOf(true),
+                arrayOf(false)
+            )
+        }
     }
 }

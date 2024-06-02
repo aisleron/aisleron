@@ -16,7 +16,7 @@
       <SelectionState runConfigName="ShopViewModelTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="testGetPinned_LocationExists_ReturnsLocationPinnedStatus()">
+      <SelectionState runConfigName="ProductViewModelTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
