@@ -9,6 +9,7 @@ import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.location.usecase.AddLocationUseCase
 import com.aisleron.domain.location.usecase.GetLocationUseCase
 import com.aisleron.domain.location.usecase.UpdateLocationUseCase
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -16,8 +17,10 @@ import kotlinx.coroutines.launch
 class ShopViewModel(
     private val addLocationUseCase: AddLocationUseCase,
     private val updateLocationUseCase: UpdateLocationUseCase,
-    private val getLocationUseCase: GetLocationUseCase
+    private val getLocationUseCase: GetLocationUseCase,
+    coroutineScopeProvider: CoroutineScope? = null
 ) : ViewModel() {
+    private val coroutineScope = coroutineScopeProvider ?: this.viewModelScope
     val pinned: Boolean get() = location?.pinned ?: false
     val defaultFilter: FilterType? get() = location?.defaultFilter
     val type: LocationType? get() = location?.type
@@ -29,7 +32,7 @@ class ShopViewModel(
     val shopUiState: StateFlow<ShopUiState> = _shopUiState
 
     fun hydrate(locationId: Int) {
-        viewModelScope.launch {
+        coroutineScope.launch {
             _shopUiState.value = ShopUiState.Loading
             location = getLocationUseCase(locationId)
             _shopUiState.value = ShopUiState.Updated(this@ShopViewModel)
@@ -37,14 +40,10 @@ class ShopViewModel(
     }
 
     fun saveLocation(name: String, pinned: Boolean) {
-        viewModelScope.launch {
+        coroutineScope.launch {
             _shopUiState.value = ShopUiState.Loading
             try {
-                if (location == null) {
-                    addLocation(name, pinned)
-                } else {
-                    updateLocation(name, pinned)
-                }
+                location?.let { updateLocation(it, name, pinned) } ?: addLocation(name, pinned)
                 _shopUiState.value = ShopUiState.Success
             } catch (e: AisleronException) {
                 _shopUiState.value = ShopUiState.Error(e.exceptionCode, e.message)
@@ -55,12 +54,10 @@ class ShopViewModel(
         }
     }
 
-    private suspend fun updateLocation(name: String, pinned: Boolean) {
-        location!!.let {
-            it.name = name
-            it.pinned = pinned
-        }
-        updateLocationUseCase(location!!)
+    private suspend fun updateLocation(location: Location, name: String, pinned: Boolean) {
+        val updateLocation = location.copy(name = name, pinned = pinned)
+        updateLocationUseCase(updateLocation)
+        hydrate(updateLocation.id)
     }
 
     private suspend fun addLocation(name: String, pinned: Boolean) {

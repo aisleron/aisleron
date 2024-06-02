@@ -1,9 +1,7 @@
 package com.aisleron.domain.location.usecase
 
 import com.aisleron.data.TestDataManager
-import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.Location
-import com.aisleron.domain.location.LocationType
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.AfterEach
@@ -31,6 +29,9 @@ class GetPinnedShopsUseCaseTest {
     fun getPinnedShops_NoPinnedShopsDefined_ReturnEmptyList() {
         val resultList: List<Location> =
             runBlocking {
+                testData.locationRepository.getAll().filter { it.pinned }
+                    .forEach { testData.locationRepository.remove(it) }
+
                 getPinnedShopsUseCase().first()
             }
         Assertions.assertEquals(0, resultList.count())
@@ -38,31 +39,13 @@ class GetPinnedShopsUseCaseTest {
 
     @Test
     fun getShops_PinnedShopsDefined_ReturnPinnedShopsList() {
+        val pinnedCount: Int
         val resultList: List<Location> =
             runBlocking {
-                testData.locationRepository.add(
-                    listOf(
-                        Location(
-                            id = 4,
-                            type = LocationType.SHOP,
-                            defaultFilter = FilterType.NEEDED,
-                            name = "Shop 3",
-                            pinned = true,
-                            aisles = emptyList()
-                        ),
-                        Location(
-                            id = 5,
-                            type = LocationType.SHOP,
-                            defaultFilter = FilterType.NEEDED,
-                            name = "Shop 4",
-                            pinned = true,
-                            aisles = emptyList()
-                        ),
-                    )
-                )
+                pinnedCount = testData.locationRepository.getAll().count { it.pinned }
                 getPinnedShopsUseCase().first()
             }
 
-        Assertions.assertEquals(2, resultList.count())
+        Assertions.assertEquals(pinnedCount, resultList.count())
     }
 }

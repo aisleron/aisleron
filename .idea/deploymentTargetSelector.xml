@@ -13,19 +13,10 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="testSaveProduct_ProductExists_UpdateProduct()">
+      <SelectionState runConfigName="ShopViewModelTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="testSaveProduct_ProductDoesNotExists_CreateProduct()">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
-      <SelectionState runConfigName="ProductViewModelTest">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
-      <SelectionState runConfigName="testSaveProduct_SaveSuccessful_UiStateIsSuccess()">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
-      <SelectionState runConfigName="testSaveProduct_AisleronErrorOnSave_UiStateIsError()">
+      <SelectionState runConfigName="testGetPinned_LocationExists_ReturnsLocationPinnedStatus()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

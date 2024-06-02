@@ -74,7 +74,7 @@ class TestDataManager {
         }
     }
 
-    private suspend fun addLocations(): Int {
+    private suspend fun addLocations() {
         val addLocationUseCase = AddLocationUseCase(
             locationRepository,
             AddAisleUseCase(aisleRepository),
@@ -94,13 +94,24 @@ class TestDataManager {
             )
         )
 
-        return addLocationUseCase(
+        addLocationUseCase(
             Location(
                 id = 2,
                 type = LocationType.SHOP,
                 defaultFilter = FilterType.NEEDED,
                 name = "Shop 2",
                 pinned = false,
+                aisles = emptyList()
+            )
+        )
+
+        addLocationUseCase(
+            Location(
+                id = 3,
+                type = LocationType.SHOP,
+                defaultFilter = FilterType.NEEDED,
+                name = "Shop 3",
+                pinned = true,
                 aisles = emptyList()
             )
         )
