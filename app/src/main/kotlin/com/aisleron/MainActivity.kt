@@ -16,11 +16,13 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.preference.PreferenceManager
 import com.aisleron.databinding.ActivityMainBinding
+import com.aisleron.ui.AisleronFragmentFactory
+import com.aisleron.ui.AppTitleUpdateListener
 import com.aisleron.ui.FabHandler
 import com.google.android.material.navigation.NavigationView
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), AppTitleUpdateListener {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
@@ -45,6 +47,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setSupportActionBar(binding.appBarMain.toolbar)
+        supportFragmentManager.fragmentFactory = AisleronFragmentFactory(this)
 
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
@@ -100,5 +103,9 @@ class MainActivity : AppCompatActivity() {
         private const val DISPLAY_LOCKSCREEN = "display_lockscreen"
         private const val APPLICATION_THEME = "application_theme"
 
+    }
+
+    override fun applicationTitleUpdated(newTitle: String) {
+        supportActionBar?.title = newTitle
     }
 }

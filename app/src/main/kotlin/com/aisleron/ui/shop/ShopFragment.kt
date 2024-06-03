@@ -8,7 +8,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
@@ -18,16 +17,16 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.aisleron.R
 import com.aisleron.databinding.FragmentShopBinding
+import com.aisleron.ui.AppTitleUpdateListener
 import com.aisleron.ui.bundles.AddEditLocationBundle
 import com.aisleron.ui.bundles.Bundler
-import com.aisleron.ui.shoppinglist.ShoppingListFragment
 import com.aisleron.ui.widgets.ErrorSnackBar
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
-class ShopFragment : Fragment() {
+class ShopFragment(private val appTitleUpdateListener: AppTitleUpdateListener) : Fragment() {
 
     private val shopViewModel: ShopViewModel by viewModel()
     private var _binding: FragmentShopBinding? = null
@@ -128,10 +127,12 @@ class ShopFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        (activity as AppCompatActivity?)!!.supportActionBar!!.title = when (editMode) {
+        val appTitle = when (editMode) {
             true -> getString(R.string.edit_location)
             false -> getString(R.string.add_location)
         }
+
+        appTitleUpdateListener.applicationTitleUpdated(appTitle)
 
         val edtLocationName = binding.edtShopName
         edtLocationName.postDelayed({
@@ -145,8 +146,8 @@ class ShopFragment : Fragment() {
     companion object {
 
         @JvmStatic
-        fun newInstance(name: String?) =
-            ShoppingListFragment().apply {
+        fun newInstance(name: String?, appTitleUpdateListener: AppTitleUpdateListener) =
+            ShopFragment(appTitleUpdateListener).apply {
                 arguments = Bundler().makeAddLocationBundle(name)
             }
     }
