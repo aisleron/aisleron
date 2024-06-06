@@ -13,27 +13,19 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="ShopFragmentTest">
-        <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2024-06-03T08:52:24.456984213Z">
-          <Target type="DEFAULT_BOOT">
-            <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=/home/danie/.var/app/com.google.AndroidStudio/config/.android/avd/Pixel_3a_API_34_AOSP_AVD.avd" />
-            </handle>
-          </Target>
-        </DropdownSelection>
-        <DialogSelection />
-      </SelectionState>
-      <SelectionState runConfigName="onSaveClick_PinnedStatusChanged_PinnedStatusUpdated()">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
-      <SelectionState runConfigName="onCreateShopFragment_HasEditBundle_AppTitleIsAdd()">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
       <SelectionState runConfigName="onSaveClick_IsDuplicateName_ShowErrorSnackBar()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
       <SelectionState runConfigName="newInstance_CallNewInstance_ReturnsFragment()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="onSaveClick_NoProductNameEntered_DoNothing()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="onSaveClick_ExistingProductHasUniqueName_ProductUpdated()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="onSaveClick_InStockChanged_InStockUpdated()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

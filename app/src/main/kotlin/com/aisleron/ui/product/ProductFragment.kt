@@ -8,7 +8,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
@@ -18,6 +17,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.aisleron.R
 import com.aisleron.databinding.FragmentProductBinding
+import com.aisleron.ui.AddEditFragmentListener
 import com.aisleron.ui.bundles.AddEditProductBundle
 import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.widgets.ErrorSnackBar
@@ -25,19 +25,27 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class ProductFragment : Fragment() {
+class ProductFragment(
+    private val addEditFragmentListener: AddEditFragmentListener,
+    private val menuHost: MenuHost
+) : Fragment(), MenuProvider {
 
     private val productViewModel: ProductViewModel by viewModel()
     private var _binding: FragmentProductBinding? = null
 
     private val binding get() = _binding!!
 
-    private var editMode: Boolean = false
+    private var appTitle: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val addEditProductBundle = Bundler().getAddEditProductBundle(arguments)
-        editMode = addEditProductBundle.actionType == AddEditProductBundle.ProductAction.EDIT
+
+        appTitle = when (addEditProductBundle.actionType) {
+            AddEditProductBundle.ProductAction.ADD -> getString(R.string.add_product)
+            AddEditProductBundle.ProductAction.EDIT -> getString(R.string.edit_product)
+        }
+
         productViewModel.hydrate(
             addEditProductBundle.productId,
             addEditProductBundle.inStock ?: false
@@ -55,7 +63,7 @@ class ProductFragment : Fragment() {
                 productViewModel.productUiState.collect {
                     when (it) {
                         ProductViewModel.ProductUiState.Success -> {
-                            requireActivity().onBackPressedDispatcher.onBackPressed()
+                            addEditFragmentListener.addEditActionCompleted()
                         }
 
                         ProductViewModel.ProductUiState.Empty -> Unit
@@ -67,7 +75,6 @@ class ProductFragment : Fragment() {
                         is ProductViewModel.ProductUiState.Updated -> {
                             binding.chkProductInStock.isChecked = productViewModel.inStock
                             binding.edtProductName.setText(productViewModel.productName)
-
                         }
                     }
                 }
@@ -98,28 +105,7 @@ class ProductFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val menuHost: MenuHost = requireActivity()
-        menuHost.addMenuProvider(object : MenuProvider {
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menuInflater.inflate(R.menu.add_edit_fragment_main, menu)
-            }
-
-            //NOTE: If you override onMenuItemSelected, OnSupportNavigateUp will only be called when returning false
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                return when (menuItem.itemId) {
-                    R.id.mnu_btn_save -> {
-                        saveProduct(
-                            binding.edtProductName.text.toString(),
-                            binding.chkProductInStock.isChecked
-                        )
-                        true
-                    }
-
-                    else -> false
-                }
-            }
-        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+        menuHost.addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
     override fun onDestroyView() {
@@ -130,10 +116,8 @@ class ProductFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        (activity as AppCompatActivity?)!!.supportActionBar!!.title = when (editMode) {
-            true -> getString(R.string.edit_product)
-            false -> getString(R.string.add_product)
-        }
+        addEditFragmentListener.applicationTitleUpdated(appTitle)
+
 
         val edtProductName = binding.edtProductName
         edtProductName.postDelayed({
@@ -146,9 +130,32 @@ class ProductFragment : Fragment() {
 
     companion object {
         @JvmStatic
-        fun newInstance(name: String?, inStock: Boolean) =
-            ProductFragment().apply {
+        fun newInstance(
+            name: String?,
+            inStock: Boolean,
+            addEditFragmentListener: AddEditFragmentListener,
+            menuHost: MenuHost
+        ) =
+            ProductFragment(addEditFragmentListener, menuHost).apply {
                 arguments = Bundler().makeAddProductBundle(name, inStock)
             }
+    }
+
+    override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+        menuInflater.inflate(R.menu.add_edit_fragment_main, menu)
+    }
+
+    override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+        return when (menuItem.itemId) {
+            R.id.mnu_btn_save -> {
+                saveProduct(
+                    binding.edtProductName.text.toString(),
+                    binding.chkProductInStock.isChecked
+                )
+                true
+            }
+
+            else -> false
+        }
     }
 }

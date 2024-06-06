@@ -1,4 +1,4 @@
-package com.aisleron.ui.shop
+package com.aisleron.ui.product
 
 import android.content.Context
 import android.os.Bundle
@@ -14,13 +14,12 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.platform.app.InstrumentationRegistry
 import com.aisleron.R
 import com.aisleron.data.TestDataManager
-import com.aisleron.domain.aisle.usecase.AddAisleUseCase
+import com.aisleron.domain.aisle.usecase.GetDefaultAislesUseCase
 import com.aisleron.domain.aisleproduct.usecase.AddAisleProductsUseCase
-import com.aisleron.domain.location.usecase.AddLocationUseCase
-import com.aisleron.domain.location.usecase.GetLocationUseCase
-import com.aisleron.domain.location.usecase.IsLocationNameUniqueUseCase
-import com.aisleron.domain.location.usecase.UpdateLocationUseCase
-import com.aisleron.domain.product.usecase.GetAllProductsUseCase
+import com.aisleron.domain.product.usecase.AddProductUseCase
+import com.aisleron.domain.product.usecase.GetProductUseCase
+import com.aisleron.domain.product.usecase.IsProductNameUniqueUseCase
+import com.aisleron.domain.product.usecase.UpdateProductUseCase
 import com.aisleron.ui.AddEditFragmentListener
 import com.aisleron.ui.KoinTestRule
 import com.aisleron.ui.TestMenuHost
@@ -37,7 +36,7 @@ import org.junit.Test
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
-class ShopFragmentTest {
+class ProductFragmentTest {
     private lateinit var bundler: Bundler
     private lateinit var addEditFragmentListener: TestAddEditFragmentListener
     private lateinit var testData: TestDataManager
@@ -50,25 +49,24 @@ class ShopFragmentTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun getKoinModules(): List<Module> {
         testData = TestDataManager()
-        val shopViewModel = ShopViewModel(
-            addLocationUseCase = AddLocationUseCase(
-                testData.locationRepository,
-                AddAisleUseCase(testData.aisleRepository),
-                GetAllProductsUseCase(testData.productRepository),
+        val productViewModel = ProductViewModel(
+            addProductUseCase = AddProductUseCase(
+                testData.productRepository,
+                GetDefaultAislesUseCase(testData.aisleRepository),
                 AddAisleProductsUseCase(testData.aisleProductRepository),
-                IsLocationNameUniqueUseCase(testData.locationRepository)
+                IsProductNameUniqueUseCase(testData.productRepository)
             ),
-            updateLocationUseCase = UpdateLocationUseCase(
-                testData.locationRepository,
-                IsLocationNameUniqueUseCase(testData.locationRepository)
+            updateProductUseCase = UpdateProductUseCase(
+                testData.productRepository,
+                IsProductNameUniqueUseCase(testData.productRepository)
             ),
-            getLocationUseCase = GetLocationUseCase(testData.locationRepository),
+            getProductUseCase = GetProductUseCase(testData.productRepository),
             TestScope(UnconfinedTestDispatcher())
         )
 
         return listOf(
             module {
-                factory<ShopViewModel> { shopViewModel }
+                factory<ProductViewModel> { productViewModel }
             }
         )
     }
@@ -84,64 +82,64 @@ class ShopFragmentTest {
     }
 
     @Test
-    fun onCreateShopFragment_HasEditBundle_AppTitleIsEdit() {
-        val bundle = bundler.makeEditLocationBundle(1)
+    fun onCreateProductFragment_HasEditBundle_AppTitleIsEdit() {
+        val bundle = bundler.makeEditProductBundle(1)
         val scenario = getFragmentScenario(bundle)
         scenario.onFragment {
             Assert.assertEquals(
-                it.getString(R.string.edit_location),
+                it.getString(R.string.edit_product),
                 addEditFragmentListener.appTitle
             )
         }
     }
 
     @Test
-    fun onCreateShopFragment_HasEditBundle_ScreenMatchesEditLocation() {
-        val existingShop = runBlocking {
-            testData.locationRepository.getAll().first { it.pinned }
+    fun onCreateProductFragment_HasEditBundle_ScreenMatchesEditProduct() {
+        val existingProduct = runBlocking {
+            testData.productRepository.getAll().first { it.inStock }
         }
 
-        val bundle = bundler.makeEditLocationBundle(existingShop.id)
+        val bundle = bundler.makeEditProductBundle(existingProduct.id)
         getFragmentScenario(bundle)
 
-        onView(withId(R.id.edt_shop_name)).check(matches(ViewMatchers.withText(existingShop.name)))
-        onView(withId(R.id.swc_shop_pinned)).check(matches(ViewMatchers.isChecked()))
+        onView(withId(R.id.edt_product_name)).check(matches(ViewMatchers.withText(existingProduct.name)))
+        onView(withId(R.id.chk_product_in_stock)).check(matches(ViewMatchers.isChecked()))
     }
 
     @Test
-    fun onCreateShopFragment_HasAddBundle_AppTitleIsAdd() {
-        val bundle = bundler.makeAddLocationBundle("New Location")
+    fun onCreateProductFragment_HasAddBundle_AppTitleIsAdd() {
+        val bundle = bundler.makeAddProductBundle("New Product")
         val scenario = getFragmentScenario(bundle)
         scenario.onFragment {
             Assert.assertEquals(
-                it.getString(R.string.add_location),
+                it.getString(R.string.add_product),
                 addEditFragmentListener.appTitle
             )
         }
     }
 
     @Test
-    fun onSaveClick_NewShopHasUniqueName_ShopSaved() {
-        val bundle = bundler.makeAddLocationBundle("New Location")
+    fun onSaveClick_NewProductHasUniqueName_ProductSaved() {
+        val bundle = bundler.makeAddProductBundle("New Product")
         val scenario = getFragmentScenario(bundle)
         val menuItem = getSaveMenuItem()
-        val newShopName = "Shop Add New Test"
+        val newProductName = "Product Add New Test"
 
-        onView(withId(R.id.edt_shop_name)).perform(typeText(newShopName))
+        onView(withId(R.id.edt_product_name)).perform(typeText(newProductName))
         scenario.onFragment { it.onMenuItemSelected(menuItem) }
 
-        val shop = runBlocking {
-            testData.locationRepository.getAll().firstOrNull { it.name == newShopName }
+        val product = runBlocking {
+            testData.productRepository.getByName(newProductName)
         }
 
-        onView(withId(R.id.edt_shop_name)).check(matches(ViewMatchers.withText(newShopName)))
+        onView(withId(R.id.edt_product_name)).check(matches(ViewMatchers.withText(newProductName)))
         Assert.assertTrue(addEditFragmentListener.addEditSuccess)
-        Assert.assertNotNull(shop)
+        Assert.assertNotNull(product)
     }
 
     @Test
-    fun onSaveClick_NoShopNameEntered_DoNothing() {
-        val bundle = bundler.makeAddLocationBundle()
+    fun onSaveClick_NoProductNameEntered_DoNothing() {
+        val bundle = bundler.makeAddProductBundle()
         val scenario = getFragmentScenario(bundle)
         val menuItem = getSaveMenuItem()
 
@@ -149,67 +147,70 @@ class ShopFragmentTest {
             it.onMenuItemSelected(menuItem)
         }
 
-        onView(withId(R.id.edt_shop_name)).check(matches(ViewMatchers.withText("")))
+        onView(withId(R.id.edt_product_name)).check(matches(ViewMatchers.withText("")))
         Assert.assertFalse(addEditFragmentListener.addEditSuccess)
     }
 
     @Test
-    fun onSaveClick_ExistingShopHasUniqueName_ShopUpdated() {
-        val existingShop = runBlocking {
-            testData.locationRepository.getAll().first()
+    fun onSaveClick_ExistingProductHasUniqueName_ProductUpdated() {
+        val existingProduct = runBlocking {
+            testData.productRepository.getAll().first()
         }
 
-        val bundle = bundler.makeEditLocationBundle(existingShop.id)
+        val bundle = bundler.makeEditProductBundle(existingProduct.id)
         val scenario = getFragmentScenario(bundle)
         val menuItem = getSaveMenuItem()
-        val newShopName = existingShop.name + " Updated"
+        val newProductName = existingProduct.name + " Updated"
 
-        onView(withId(R.id.edt_shop_name))
+        onView(withId(R.id.edt_product_name))
             .perform(ViewActions.clearText())
-            .perform(typeText(newShopName))
+            .perform(typeText(newProductName))
         scenario.onFragment { it.onMenuItemSelected(menuItem) }
 
-        val updatedShop = runBlocking { testData.locationRepository.get(existingShop.id) }
+        val updatedProduct = runBlocking { testData.productRepository.get(existingProduct.id) }
 
-        onView(withId(R.id.edt_shop_name)).check(matches(ViewMatchers.withText(newShopName)))
+        onView(withId(R.id.edt_product_name)).check(matches(ViewMatchers.withText(newProductName)))
         Assert.assertTrue(addEditFragmentListener.addEditSuccess)
-        Assert.assertNotNull(updatedShop)
-        Assert.assertEquals(newShopName, updatedShop?.name)
+        Assert.assertNotNull(updatedProduct)
+        Assert.assertEquals(newProductName, updatedProduct?.name)
     }
 
     @Test
-    fun onSaveClick_PinnedStatusChanged_PinnedStatusUpdated() {
-        val existingShop = runBlocking {
-            testData.locationRepository.getAll().first { !it.pinned }
+    fun onSaveClick_InStockChanged_InStockUpdated() {
+        val existingProduct = runBlocking {
+            testData.productRepository.getAll().first { !it.inStock }
         }
 
-        val bundle = bundler.makeEditLocationBundle(existingShop.id)
+        val bundle = bundler.makeEditProductBundle(existingProduct.id)
         val scenario = getFragmentScenario(bundle)
         val menuItem = getSaveMenuItem()
 
-        onView(withId(R.id.swc_shop_pinned)).perform(ViewActions.click())
+        onView(withId(R.id.chk_product_in_stock)).perform(ViewActions.click())
         scenario.onFragment { it.onMenuItemSelected(menuItem) }
 
-        val updatedShop = runBlocking { testData.locationRepository.get(existingShop.id) }
+        val updatedProduct = runBlocking { testData.productRepository.get(existingProduct.id) }
 
-        onView(withId(R.id.swc_shop_pinned)).check(matches(ViewMatchers.isChecked()))
+        onView(withId(R.id.chk_product_in_stock)).check(matches(ViewMatchers.isChecked()))
         Assert.assertTrue(addEditFragmentListener.addEditSuccess)
-        Assert.assertEquals(existingShop.copy(pinned = !existingShop.pinned), updatedShop)
+        Assert.assertEquals(
+            existingProduct.copy(inStock = !existingProduct.inStock),
+            updatedProduct
+        )
     }
 
     @Test
     fun onSaveClick_IsDuplicateName_ShowErrorSnackBar() {
-        val existingShop = runBlocking {
-            testData.locationRepository.getAll().first()
+        val existingProduct = runBlocking {
+            testData.productRepository.getAll().first()
         }
 
-        val bundle = bundler.makeAddLocationBundle()
+        val bundle = bundler.makeAddProductBundle()
         val scenario = getFragmentScenario(bundle)
         val menuItem = getSaveMenuItem()
 
-        onView(withId(R.id.edt_shop_name))
+        onView(withId(R.id.edt_product_name))
             .perform(ViewActions.clearText())
-            .perform(typeText(existingShop.name))
+            .perform(typeText(existingProduct.name))
         scenario.onFragment { it.onMenuItemSelected(menuItem) }
 
         onView(withId(com.google.android.material.R.id.snackbar_text)).check(
@@ -223,9 +224,11 @@ class ShopFragmentTest {
 
     @Test
     fun newInstance_CallNewInstance_ReturnsFragment() {
-        val fragment = ShopFragment.newInstance(null, addEditFragmentListener, TestMenuHost())
+        val fragment =
+            ProductFragment.newInstance(null, false, addEditFragmentListener, TestMenuHost())
         Assert.assertNotNull(fragment)
     }
+
 
     private fun getSaveMenuItem(): ActionMenuItem {
         val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
@@ -233,11 +236,11 @@ class ShopFragmentTest {
         return menuItem
     }
 
-    private fun getFragmentScenario(bundle: Bundle): FragmentScenario<ShopFragment> {
-        val scenario = launchFragmentInContainer<ShopFragment>(
+    private fun getFragmentScenario(bundle: Bundle): FragmentScenario<ProductFragment> {
+        val scenario = launchFragmentInContainer<ProductFragment>(
             fragmentArgs = bundle,
             themeResId = R.style.Theme_Aisleron,
-            instantiate = { ShopFragment(addEditFragmentListener, TestMenuHost()) }
+            instantiate = { ProductFragment(addEditFragmentListener, TestMenuHost()) }
         )
 
         return scenario
