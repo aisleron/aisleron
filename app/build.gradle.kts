@@ -18,7 +18,7 @@ android {
         versionCode = 1
         versionName = "0.1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.aisleron.ui.KoinInstrumentationTestRunner"
 
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
@@ -88,6 +88,9 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     androidTestImplementation(project(":testData"))
     androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    debugImplementation("androidx.fragment:fragment-testing:1.7.1")
+    implementation("androidx.lifecycle:lifecycle-runtime-testing:2.8.1")
+    androidTestImplementation("io.insert-koin:koin-test:3.5.6")
 
     //Room
     implementation("androidx.room:room-runtime:2.6.1")

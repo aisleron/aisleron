@@ -16,13 +16,13 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.preference.PreferenceManager
 import com.aisleron.databinding.ActivityMainBinding
+import com.aisleron.ui.AddEditFragmentListener
 import com.aisleron.ui.AisleronFragmentFactory
-import com.aisleron.ui.AppTitleUpdateListener
 import com.aisleron.ui.FabHandler
 import com.google.android.material.navigation.NavigationView
 
 
-class MainActivity : AppCompatActivity(), AppTitleUpdateListener {
+class MainActivity : AppCompatActivity(), AddEditFragmentListener {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
@@ -47,7 +47,7 @@ class MainActivity : AppCompatActivity(), AppTitleUpdateListener {
         setContentView(binding.root)
 
         setSupportActionBar(binding.appBarMain.toolbar)
-        supportFragmentManager.fragmentFactory = AisleronFragmentFactory(this)
+        supportFragmentManager.fragmentFactory = AisleronFragmentFactory(this, this)
 
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
@@ -107,5 +107,9 @@ class MainActivity : AppCompatActivity(), AppTitleUpdateListener {
 
     override fun applicationTitleUpdated(newTitle: String) {
         supportActionBar?.title = newTitle
+    }
+
+    override fun addEditActionCompleted() {
+        onBackPressedDispatcher.onBackPressed()
     }
 }
