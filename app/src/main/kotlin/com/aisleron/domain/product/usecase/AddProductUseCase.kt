@@ -17,7 +17,7 @@ class AddProductUseCase(
     suspend operator fun invoke(product: Product): Int {
 
         if (!isProductNameUniqueUseCase(product)) {
-            throw AisleronException.DuplicateLocationNameException("Product Name must be unique")
+            throw AisleronException.DuplicateProductNameException("Product Name must be unique")
         }
 
         val newProduct = Product(

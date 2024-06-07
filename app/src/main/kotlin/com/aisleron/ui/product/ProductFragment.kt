@@ -18,6 +18,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.aisleron.R
 import com.aisleron.databinding.FragmentProductBinding
 import com.aisleron.ui.AddEditFragmentListener
+import com.aisleron.ui.AisleronExceptionMap
 import com.aisleron.ui.bundles.AddEditProductBundle
 import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.widgets.ErrorSnackBar
@@ -87,14 +88,8 @@ class ProductFragment(
     }
 
     private fun displayErrorSnackBar(errorCode: String, errorMessage: String?) {
-        val resourceId = resources.getIdentifier(errorCode, "string", requireContext().packageName)
-
-        val snackBarMessage: String = if (resourceId > 0) {
-            getString(resourceId)
-        } else {
-            getString(R.string.generic_error, errorMessage)
-        }
-
+        val snackBarMessage =
+            getString(AisleronExceptionMap().getErrorResourceId(errorCode), errorMessage)
         ErrorSnackBar().make(requireView(), snackBarMessage, Snackbar.LENGTH_SHORT).show()
     }
 

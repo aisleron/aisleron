@@ -43,7 +43,7 @@ class AddProductUseCaseTest {
     fun addProduct_IsDuplicateName_ThrowsException() {
         runBlocking {
             val newProduct = testData.productRepository.getAll()[1].copy(id = 0)
-            assertThrows<AisleronException.DuplicateLocationNameException> {
+            assertThrows<AisleronException.DuplicateProductNameException> {
                 addProductUseCase(newProduct)
             }
         }
