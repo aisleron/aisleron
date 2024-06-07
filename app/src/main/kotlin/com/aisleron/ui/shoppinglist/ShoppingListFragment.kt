@@ -29,6 +29,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.aisleron.R
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.LocationType
+import com.aisleron.ui.AisleronExceptionMap
 import com.aisleron.ui.FabHandler
 import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.widgets.ErrorSnackBar
@@ -152,14 +153,8 @@ class ShoppingListFragment : Fragment(), SearchView.OnQueryTextListener, ActionM
     }
 
     private fun displayErrorSnackBar(errorCode: String, errorMessage: String?) {
-        val resourceId = resources.getIdentifier(errorCode, "string", requireContext().packageName)
-
-        val snackBarMessage: String = if (resourceId > 0) {
-            getString(resourceId)
-        } else {
-            getString(R.string.generic_error, errorMessage)
-        }
-
+        val snackBarMessage =
+            getString(AisleronExceptionMap().getErrorResourceId(errorCode), errorMessage)
         ErrorSnackBar().make(requireView(), snackBarMessage, Snackbar.LENGTH_SHORT).show()
     }
 
