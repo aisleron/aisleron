@@ -154,7 +154,12 @@ val appModule = module {
 
     factory<GetDefaultAislesUseCase> { GetDefaultAislesUseCase(aisleRepository = get()) }
 
-    factory<UpdateAisleUseCase> { UpdateAisleUseCase(aisleRepository = get()) }
+    factory<UpdateAisleUseCase> {
+        UpdateAisleUseCase(
+            aisleRepository = get(),
+            getLocationUseCase = get()
+        )
+    }
 
     factory<UpdateAisleRankUseCase> { UpdateAisleRankUseCase(aisleRepository = get()) }
 
