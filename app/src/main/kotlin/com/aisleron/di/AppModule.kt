@@ -32,17 +32,17 @@ import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductRankUseCase
 import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductsUseCase
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.location.usecase.AddLocationUseCase
-import com.aisleron.domain.location.usecase.IsLocationNameUniqueUseCase
 import com.aisleron.domain.location.usecase.GetLocationUseCase
 import com.aisleron.domain.location.usecase.GetPinnedShopsUseCase
 import com.aisleron.domain.location.usecase.GetShopsUseCase
+import com.aisleron.domain.location.usecase.IsLocationNameUniqueUseCase
 import com.aisleron.domain.location.usecase.RemoveLocationUseCase
 import com.aisleron.domain.location.usecase.UpdateLocationUseCase
 import com.aisleron.domain.product.ProductRepository
 import com.aisleron.domain.product.usecase.AddProductUseCase
-import com.aisleron.domain.product.usecase.IsProductNameUniqueUseCase
 import com.aisleron.domain.product.usecase.GetAllProductsUseCase
 import com.aisleron.domain.product.usecase.GetProductUseCase
+import com.aisleron.domain.product.usecase.IsProductNameUniqueUseCase
 import com.aisleron.domain.product.usecase.RemoveProductUseCase
 import com.aisleron.domain.product.usecase.UpdateProductStatusUseCase
 import com.aisleron.domain.product.usecase.UpdateProductUseCase
@@ -145,7 +145,12 @@ val appModule = module {
     /**
      * Aisle Use Cases
      */
-    factory<AddAisleUseCase> { AddAisleUseCase(aisleRepository = get()) }
+    factory<AddAisleUseCase> {
+        AddAisleUseCase(
+            aisleRepository = get(),
+            getLocationUseCase = get()
+        )
+    }
 
     factory<GetDefaultAislesUseCase> { GetDefaultAislesUseCase(aisleRepository = get()) }
 

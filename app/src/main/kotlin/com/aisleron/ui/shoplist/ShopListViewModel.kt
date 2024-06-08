@@ -8,6 +8,7 @@ import com.aisleron.domain.location.usecase.GetLocationUseCase
 import com.aisleron.domain.location.usecase.GetPinnedShopsUseCase
 import com.aisleron.domain.location.usecase.GetShopsUseCase
 import com.aisleron.domain.location.usecase.RemoveLocationUseCase
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,9 +18,10 @@ class ShopListViewModel(
     private val getShopsUseCase: GetShopsUseCase,
     private val getPinnedShopsUseCase: GetPinnedShopsUseCase,
     private val removeLocationUseCase: RemoveLocationUseCase,
-    private val getLocationUseCase: GetLocationUseCase
+    private val getLocationUseCase: GetLocationUseCase,
+    coroutineScopeProvider: CoroutineScope? = null
 ) : ViewModel() {
-
+    private val coroutineScope = coroutineScopeProvider ?: this.viewModelScope
     private val _shopListUiState = MutableStateFlow<ShopListUiState>(ShopListUiState.Empty)
     val shopListUiState: StateFlow<ShopListUiState> = _shopListUiState
 
@@ -32,7 +34,7 @@ class ShopListViewModel(
     }
 
     private fun hydrateShops(shopsFlow: Flow<List<Location>>) {
-        viewModelScope.launch {
+        coroutineScope.launch {
             _shopListUiState.value = ShopListUiState.Loading
             shopsFlow.collect {
                 val items = it.map { l ->
@@ -48,7 +50,7 @@ class ShopListViewModel(
     }
 
     fun removeItem(item: ShopListItemViewModel) {
-        viewModelScope.launch {
+        coroutineScope.launch {
             try {
                 val location = getLocationUseCase(item.id)
                 location?.let { removeLocationUseCase(location) }

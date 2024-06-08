@@ -28,6 +28,7 @@
     <string name="delete_default_aisle_exception">ERROR: Default Aisle can\'t be removed</string>
     <string name="duplicate_product_name_exception">ERROR: Product Name must be unique</string>
     <string name="duplicate_location_name_exception">ERROR: Location Name must be unique</string>
+    <string name="invalid_location_exception">ERROR: Invalid Location Id provided</string>
 
 
 

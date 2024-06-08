@@ -359,6 +359,19 @@
             </AndroidTestResultsTableState>
           </value>
         </entry>
+        <entry key="793760954">
+          <value>
+            <AndroidTestResultsTableState>
+              <option name="preferredColumnWidths">
+                <map>
+                  <entry key="Duration" value="90" />
+                  <entry key="Tests" value="360" />
+                  <entry key="unknown Android SDK built for x86_64" value="120" />
+                </map>
+              </option>
+            </AndroidTestResultsTableState>
+          </value>
+        </entry>
         <entry key="912081788">
           <value>
             <AndroidTestResultsTableState>
@@ -489,6 +502,19 @@
             </AndroidTestResultsTableState>
           </value>
         </entry>
+        <entry key="1783064680">
+          <value>
+            <AndroidTestResultsTableState>
+              <option name="preferredColumnWidths">
+                <map>
+                  <entry key="Duration" value="90" />
+                  <entry key="Tests" value="360" />
+                  <entry key="unknown Android SDK built for x86_64" value="120" />
+                </map>
+              </option>
+            </AndroidTestResultsTableState>
+          </value>
+        </entry>
         <entry key="1818510948">
           <value>
             <AndroidTestResultsTableState>
@@ -529,6 +555,19 @@
           </value>
         </entry>
         <entry key="2080246221">
+          <value>
+            <AndroidTestResultsTableState>
+              <option name="preferredColumnWidths">
+                <map>
+                  <entry key="Duration" value="90" />
+                  <entry key="Tests" value="360" />
+                  <entry key="unknown Android SDK built for x86_64" value="120" />
+                </map>
+              </option>
+            </AndroidTestResultsTableState>
+          </value>
+        </entry>
+        <entry key="2118055464">
           <value>
             <AndroidTestResultsTableState>
               <option name="preferredColumnWidths">

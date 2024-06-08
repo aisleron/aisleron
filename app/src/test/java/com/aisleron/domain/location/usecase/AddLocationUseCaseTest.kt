@@ -31,7 +31,10 @@ class AddLocationUseCaseTest {
 
         addLocationUseCase = AddLocationUseCase(
             testData.locationRepository,
-            AddAisleUseCase(testData.aisleRepository),
+            AddAisleUseCase(
+                testData.aisleRepository,
+                GetLocationUseCase(testData.locationRepository)
+            ),
             GetAllProductsUseCase(testData.productRepository),
             AddAisleProductsUseCase(testData.aisleProductRepository),
             IsLocationNameUniqueUseCase(testData.locationRepository)

@@ -43,11 +43,11 @@ class MainActivity : AppCompatActivity(), AddEditFragmentListener {
             else -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
         }
 
+        supportFragmentManager.fragmentFactory = AisleronFragmentFactory(this, this)
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         setSupportActionBar(binding.appBarMain.toolbar)
-        supportFragmentManager.fragmentFactory = AisleronFragmentFactory(this, this)
 
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView

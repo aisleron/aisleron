@@ -2,12 +2,15 @@ package com.aisleron.domain.aisle.usecase
 
 import com.aisleron.data.TestDataManager
 import com.aisleron.domain.aisle.Aisle
+import com.aisleron.domain.base.AisleronException
+import com.aisleron.domain.location.usecase.GetLocationUseCase
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 
 class AddAisleUseCaseTest {
 
@@ -17,7 +20,10 @@ class AddAisleUseCaseTest {
     @BeforeEach
     fun setUp() {
         testData = TestDataManager()
-        addAisleUseCase = AddAisleUseCase(testData.aisleRepository)
+        addAisleUseCase = AddAisleUseCase(
+            testData.aisleRepository,
+            GetLocationUseCase(testData.locationRepository)
+        )
     }
 
     @AfterEach
@@ -86,5 +92,13 @@ class AddAisleUseCaseTest {
             countAfter = testData.aisleRepository.getForLocation(newAisle.locationId).count()
         }
         assertEquals(countBefore + 1, countAfter)
+    }
+
+    @Test
+    fun addAisle_IsInvalidLocation_ThrowsInvalidLocationException() {
+        val newAisle = getNewAisle().copy(locationId = -1)
+        runBlocking {
+            assertThrows<AisleronException.InvalidLocationException> { addAisleUseCase(newAisle) }
+        }
     }
 }

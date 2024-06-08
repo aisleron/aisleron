@@ -14,10 +14,15 @@ sealed class AisleronException(
     class DuplicateLocationNameException(message: String? = null, cause: Throwable? = null) :
         AisleronException(DUPLICATE_LOCATION_NAME_EXCEPTION, message, cause)
 
+    class InvalidLocationException(message: String? = null, cause: Throwable? = null) :
+        AisleronException(INVALID_LOCATION_EXCEPTION, message, cause)
+
+
     companion object {
         const val GENERIC_EXCEPTION = "generic_exception"
         const val DELETE_DEFAULT_AISLE_EXCEPTION = "delete_default_aisle_exception"
         const val DUPLICATE_PRODUCT_NAME_EXCEPTION = "duplicate_product_name_exception"
         const val DUPLICATE_LOCATION_NAME_EXCEPTION = "duplicate_location_name_exception"
+        const val INVALID_LOCATION_EXCEPTION = "invalid_location_exception"
     }
 }

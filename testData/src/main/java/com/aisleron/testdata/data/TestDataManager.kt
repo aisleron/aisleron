@@ -19,6 +19,7 @@ import com.aisleron.domain.aisleproduct.usecase.AddAisleProductsUseCase
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.location.usecase.AddLocationUseCase
+import com.aisleron.domain.location.usecase.GetLocationUseCase
 import com.aisleron.domain.location.usecase.IsLocationNameUniqueUseCase
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.usecase.GetAllProductsUseCase
@@ -77,7 +78,7 @@ class TestDataManager {
     private suspend fun addLocations() {
         val addLocationUseCase = AddLocationUseCase(
             locationRepository,
-            AddAisleUseCase(aisleRepository),
+            AddAisleUseCase(aisleRepository, GetLocationUseCase(locationRepository)),
             GetAllProductsUseCase(productRepository),
             AddAisleProductsUseCase(aisleProductRepository),
             IsLocationNameUniqueUseCase(locationRepository)

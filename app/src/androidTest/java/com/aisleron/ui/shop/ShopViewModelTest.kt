@@ -32,7 +32,10 @@ class ShopViewModelTest(private val pinned: Boolean) {
 
         val addAisleProductsUseCase = AddAisleProductsUseCase(testData.aisleProductRepository)
         val isLocationNameUniqueUseCase = IsLocationNameUniqueUseCase(testData.locationRepository)
-        val addAisleUseCase = AddAisleUseCase(testData.aisleRepository)
+        val addAisleUseCase = AddAisleUseCase(
+            testData.aisleRepository,
+            GetLocationUseCase(testData.locationRepository)
+        )
         val getAllProductsUseCase = GetAllProductsUseCase(testData.productRepository)
 
         val testDispatcher = UnconfinedTestDispatcher()

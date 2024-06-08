@@ -13,10 +13,8 @@ import android.view.View.OnAttachStateChangeListener
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat.getSystemService
-import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
@@ -30,6 +28,7 @@ import com.aisleron.R
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.LocationType
 import com.aisleron.ui.AisleronExceptionMap
+import com.aisleron.ui.ApplicationTitleUpdateListener
 import com.aisleron.ui.FabHandler
 import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.widgets.ErrorSnackBar
@@ -42,7 +41,10 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 /**
  * A fragment representing a list of [ShoppingListItemViewModel].
  */
-class ShoppingListFragment : Fragment(), SearchView.OnQueryTextListener, ActionMode.Callback {
+class ShoppingListFragment(
+    private val applicationTitleUpdateListener: ApplicationTitleUpdateListener,
+) :
+    Fragment(), SearchView.OnQueryTextListener, ActionMode.Callback {
 
     private var actionMode: ActionMode? = null
     private var actionModeItem: ShoppingListItemViewModel? = null
@@ -110,15 +112,7 @@ class ShoppingListFragment : Fragment(), SearchView.OnQueryTextListener, ActionM
                         }
 
                         override fun onCleared(item: ShoppingListItemViewModel) {
-                            when (item.lineItemType) {
-                                ShoppingListItemType.AISLE -> shoppingListViewModel.updateAisleRanks(
-                                    item
-                                )
-
-                                ShoppingListItemType.PRODUCT -> shoppingListViewModel.updateProductRank(
-                                    item
-                                )
-                            }
+                            shoppingListViewModel.updateItemRank(item)
                         }
 
                         override fun onLongClick(item: ShoppingListItemViewModel): Boolean {
@@ -173,7 +167,7 @@ class ShoppingListFragment : Fragment(), SearchView.OnQueryTextListener, ActionM
     }
 
     private fun updateTitle() {
-        (activity as AppCompatActivity).supportActionBar?.title =
+        val appTitle =
             when (shoppingListViewModel.locationType) {
                 LocationType.HOME ->
                     when (shoppingListViewModel.defaultFilter) {
@@ -184,6 +178,7 @@ class ShoppingListFragment : Fragment(), SearchView.OnQueryTextListener, ActionM
 
                 LocationType.SHOP -> shoppingListViewModel.locationName
             }
+        applicationTitleUpdateListener.applicationTitleUpdated(appTitle)
     }
 
     private fun navigateToAddProduct(filterType: FilterType) {
@@ -198,8 +193,7 @@ class ShoppingListFragment : Fragment(), SearchView.OnQueryTextListener, ActionM
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val menuHost: MenuHost = requireActivity()
+        val menuHost = requireActivity()
         menuHost.addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 menuInflater.inflate(R.menu.shopping_list_fragment_main, menu)
@@ -314,7 +308,7 @@ class ShoppingListFragment : Fragment(), SearchView.OnQueryTextListener, ActionM
     }
 
     override fun onQueryTextChange(newText: String?): Boolean {
-        shoppingListViewModel.submitProductSearchResults(query = newText ?: "")
+        shoppingListViewModel.submitProductSearch(query = newText ?: "")
         return false
     }
 
@@ -361,8 +355,12 @@ class ShoppingListFragment : Fragment(), SearchView.OnQueryTextListener, ActionM
         private const val ARG_FILTER_TYPE = "filterType"
 
         @JvmStatic
-        fun newInstance(locationId: Long, filterType: FilterType) =
-            ShoppingListFragment().apply {
+        fun newInstance(
+            applicationTitleUpdateListener: ApplicationTitleUpdateListener,
+            locationId: Long,
+            filterType: FilterType
+        ) =
+            ShoppingListFragment(applicationTitleUpdateListener).apply {
                 arguments = Bundle().apply {
                     putInt(ARG_LOCATION_ID, locationId.toInt())
                     putSerializable(ARG_FILTER_TYPE, filterType)

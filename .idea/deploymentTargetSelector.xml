@@ -19,13 +19,13 @@
       <SelectionState runConfigName="newInstance_CallNewInstance_ReturnsFragment()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="onSaveClick_NoProductNameEntered_DoNothing()">
+      <SelectionState runConfigName="hydrate_IsValidLocation_LocationMembersAreCorrect()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="onSaveClick_ExistingProductHasUniqueName_ProductUpdated()">
+      <SelectionState runConfigName="hydrate_IsInvalidLocation_LocationMembersAreDefault()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="onSaveClick_InStockChanged_InStockUpdated()">
+      <SelectionState runConfigName="addAisle_HasValidLocation_AisleAdded()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
