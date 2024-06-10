@@ -138,31 +138,48 @@ class ShoppingListViewModel(
 
     fun addAisle(aisleName: String) {
         coroutineScope.launch {
-            addAisleUseCase(
-                Aisle(
-                    name = aisleName,
-                    products = emptyList(),
-                    locationId = _locationId,
-                    isDefault = false,
-                    rank = 0,
-                    id = 0
+            try {
+                addAisleUseCase(
+                    Aisle(
+                        name = aisleName,
+                        products = emptyList(),
+                        locationId = _locationId,
+                        isDefault = false,
+                        rank = 0,
+                        id = 0
+                    )
                 )
-            )
+
+            } catch (e: AisleronException) {
+                _shoppingListUiState.value = ShoppingListUiState.Error(e.exceptionCode, e.message)
+
+            } catch (e: Exception) {
+                _shoppingListUiState.value =
+                    ShoppingListUiState.Error(AisleronException.GENERIC_EXCEPTION, e.message)
+            }
         }
     }
 
     fun updateAisle(aisle: ShoppingListItemViewModel) {
         coroutineScope.launch {
-            updateAisleUseCase(
-                Aisle(
-                    name = aisle.name,
-                    products = emptyList(),
-                    locationId = _locationId,
-                    isDefault = aisle.inStock,
-                    rank = aisle.rank,
-                    id = aisle.id
+            try {
+                updateAisleUseCase(
+                    Aisle(
+                        name = aisle.name,
+                        products = emptyList(),
+                        locationId = _locationId,
+                        isDefault = aisle.inStock,
+                        rank = aisle.rank,
+                        id = aisle.id
+                    )
                 )
-            )
+            } catch (e: AisleronException) {
+                _shoppingListUiState.value = ShoppingListUiState.Error(e.exceptionCode, e.message)
+
+            } catch (e: Exception) {
+                _shoppingListUiState.value =
+                    ShoppingListUiState.Error(AisleronException.GENERIC_EXCEPTION, e.message)
+            }
         }
     }
 

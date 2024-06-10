@@ -13,16 +13,19 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="hydrate_IsInvalidLocation_LocationMembersAreDefault()">
+      <SelectionState runConfigName="updateProductStatus_InStockFalse_ProductUpdatedToNotInStock()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="addAisle_HasValidLocation_AisleAdded()">
+      <SelectionState runConfigName="submitProductSearch_ProductsMatch_UiStateHasProducts()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="addAisle_IsInvalidLocation_ThrowsInvalidLocationException()">
+      <SelectionState runConfigName="submitProductSearch_NoProductsMatch_UiStateHasNoProducts()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="addAisle_IsInvalidLocation_UiStateIsError()">
+      <SelectionState runConfigName="submitProductSearch_SearchRun_UiStateHasAllAisles()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="requestDefaultList_SearchRun_UiStateHasAllAislesAndProducts()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

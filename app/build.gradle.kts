@@ -87,7 +87,7 @@ dependencies {
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     androidTestImplementation(project(":testData"))
-    androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")
     debugImplementation("androidx.fragment:fragment-testing:1.7.1")
     implementation("androidx.lifecycle:lifecycle-runtime-testing:2.8.1")
     androidTestImplementation("io.insert-koin:koin-test:3.5.6")
