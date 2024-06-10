@@ -1,6 +1,7 @@
 package com.aisleron.ui.bundles
 
 import android.os.Bundle
+import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.LocationType
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
@@ -152,5 +153,58 @@ class BundlerTest {
         val addEditLocation = AddEditLocationBundle()
         val bundledLocation = bundler.getAddEditLocationBundle(null)
         assertEquals(addEditLocation, bundledLocation)
+    }
+
+    @Test
+    fun testMakeShoppingListBundle_ParametersProvided_ShoppingListBundleReturned() {
+        val locationId = 123
+        val filterType = FilterType.NEEDED
+        val bundle = bundler.makeShoppingListBundle(locationId, filterType)
+
+        val shoppingListBundle =
+            bundle.getParcelable("shoppingList", ShoppingListBundle::class.java)
+
+        assertEquals(locationId, shoppingListBundle?.locationId)
+        assertEquals(filterType, shoppingListBundle?.filterType)
+    }
+
+
+    @Test
+    fun testGetShoppingListBundle_ValidBundle_ReturnBundle() {
+        val shoppingListBundle = ShoppingListBundle(
+            locationId = 123,
+            filterType = FilterType.NEEDED
+        )
+        val bundle = Bundle()
+        bundle.putParcelable("shoppingList", shoppingListBundle)
+        val bundledShoppingList = bundler.getShoppingListBundle(bundle)
+        assertEquals(shoppingListBundle, bundledShoppingList)
+    }
+
+    @Test
+    fun testGetShoppingListBundle_InvalidBundle_ReturnDefaultShoppingListBundle() {
+        val shoppingListBundle = ShoppingListBundle(null, null)
+        val bundledShoppingList = bundler.getShoppingListBundle(Bundle())
+        assertEquals(shoppingListBundle, bundledShoppingList)
+    }
+
+    @Test
+    fun testGetShoppingListBundle_NullBundle_ReturnDefaultShoppingListBundle() {
+        val shoppingListBundle = ShoppingListBundle(null, null)
+        val bundledShoppingList = bundler.getShoppingListBundle(null)
+        assertEquals(shoppingListBundle, bundledShoppingList)
+    }
+
+    @Test
+    fun testGetShoppingListBundle_BundledAttributes_ReturnBundle() {
+        val shoppingListBundle = ShoppingListBundle(
+            locationId = 123,
+            filterType = FilterType.IN_STOCK
+        )
+        val bundle = Bundle()
+        bundle.putInt("locationId", shoppingListBundle.locationId)
+        bundle.putSerializable("filterType", shoppingListBundle.filterType)
+        val bundledShoppingList = bundler.getShoppingListBundle(bundle)
+        assertEquals(shoppingListBundle, bundledShoppingList)
     }
 }

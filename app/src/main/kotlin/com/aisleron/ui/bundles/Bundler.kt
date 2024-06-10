@@ -3,6 +3,7 @@ package com.aisleron.ui.bundles
 import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
+import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.LocationType
 
 class Bundler {
@@ -69,9 +70,39 @@ class Bundler {
         return result ?: AddEditLocationBundle()
     }
 
+    fun makeShoppingListBundle(locationId: Int, filterType: FilterType): Bundle {
+        val shoppingListBundle = ShoppingListBundle(
+            locationId = locationId,
+            filterType = filterType
+        )
+        return makeParcelableBundle(SHOPPING_LIST_BUNDLE, shoppingListBundle)
+    }
+
+    fun getShoppingListBundle(bundle: Bundle?): ShoppingListBundle {
+        var result: ShoppingListBundle? =
+            getParcelableBundle(bundle, SHOPPING_LIST_BUNDLE, ShoppingListBundle::class.java)
+        if (result == null) {
+            val locationId = bundle?.getInt(ARG_LOCATION_ID, 1)
+            val filterType =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    bundle?.getSerializable(ARG_FILTER_TYPE, FilterType::class.java)
+                } else {
+                    bundle?.let {
+                        @Suppress("DEPRECATION")
+                        it.getSerializable(ARG_FILTER_TYPE) as FilterType
+                    }
+                }
+            result = ShoppingListBundle(locationId, filterType)
+        }
+        return result
+    }
 
     private companion object BundleType {
         const val ADD_EDIT_PRODUCT = "addEditProduct"
         const val ADD_EDIT_LOCATION = "addEditLocation"
+        const val SHOPPING_LIST_BUNDLE = "shoppingList"
+
+        const val ARG_LOCATION_ID = "locationId"
+        const val ARG_FILTER_TYPE = "filterType"
     }
 }
