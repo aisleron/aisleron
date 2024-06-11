@@ -37,6 +37,7 @@ import com.aisleron.domain.location.usecase.GetPinnedShopsUseCase
 import com.aisleron.domain.location.usecase.GetShopsUseCase
 import com.aisleron.domain.location.usecase.IsLocationNameUniqueUseCase
 import com.aisleron.domain.location.usecase.RemoveLocationUseCase
+import com.aisleron.domain.location.usecase.RemoveLocationUseCaseImpl
 import com.aisleron.domain.location.usecase.UpdateLocationUseCase
 import com.aisleron.domain.product.ProductRepository
 import com.aisleron.domain.product.usecase.AddProductUseCase
@@ -125,7 +126,7 @@ val appModule = module {
     }
 
     factory<RemoveLocationUseCase> {
-        RemoveLocationUseCase(
+        RemoveLocationUseCaseImpl(
             locationRepository = get(),
             removeAisleUseCase = get(),
             removeDefaultAisleUseCase = get()

@@ -6,12 +6,16 @@ import com.aisleron.domain.aisle.usecase.RemoveDefaultAisleUseCase
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationRepository
 
-class RemoveLocationUseCase(
+interface RemoveLocationUseCase {
+    suspend operator fun invoke(location: Location)
+}
+
+class RemoveLocationUseCaseImpl(
     private val locationRepository: LocationRepository,
     private val removeAisleUseCase: RemoveAisleUseCase,
     private val removeDefaultAisleUseCase: RemoveDefaultAisleUseCase
-) {
-    suspend operator fun invoke(location: Location) {
+) : RemoveLocationUseCase {
+    override suspend operator fun invoke(location: Location) {
         val loc = locationRepository.getLocationWithAisles(location.id)
         val aisles = loc.aisles.filter { !it.isDefault }
         aisles.forEach { removeAisleUseCase(it) }

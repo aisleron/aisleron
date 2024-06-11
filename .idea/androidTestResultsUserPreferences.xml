@@ -280,6 +280,19 @@
             </AndroidTestResultsTableState>
           </value>
         </entry>
+        <entry key="-786620069">
+          <value>
+            <AndroidTestResultsTableState>
+              <option name="preferredColumnWidths">
+                <map>
+                  <entry key="Duration" value="90" />
+                  <entry key="Tests" value="360" />
+                  <entry key="unknown Android SDK built for x86_64" value="120" />
+                </map>
+              </option>
+            </AndroidTestResultsTableState>
+          </value>
+        </entry>
         <entry key="-639247620">
           <value>
             <AndroidTestResultsTableState>
@@ -320,6 +333,19 @@
           </value>
         </entry>
         <entry key="-462545044">
+          <value>
+            <AndroidTestResultsTableState>
+              <option name="preferredColumnWidths">
+                <map>
+                  <entry key="Duration" value="90" />
+                  <entry key="Tests" value="360" />
+                  <entry key="unknown Android SDK built for x86_64" value="120" />
+                </map>
+              </option>
+            </AndroidTestResultsTableState>
+          </value>
+        </entry>
+        <entry key="-459858069">
           <value>
             <AndroidTestResultsTableState>
               <option name="preferredColumnWidths">
@@ -841,6 +867,19 @@
           </value>
         </entry>
         <entry key="1967297933">
+          <value>
+            <AndroidTestResultsTableState>
+              <option name="preferredColumnWidths">
+                <map>
+                  <entry key="Duration" value="90" />
+                  <entry key="Tests" value="360" />
+                  <entry key="unknown Android SDK built for x86_64" value="120" />
+                </map>
+              </option>
+            </AndroidTestResultsTableState>
+          </value>
+        </entry>
+        <entry key="2060376783">
           <value>
             <AndroidTestResultsTableState>
               <option name="preferredColumnWidths">

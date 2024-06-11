@@ -14,9 +14,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class RemoveLocationUseCaseTest {
-
     private lateinit var testData: TestDataManager
-
     private lateinit var removeLocationUseCase: RemoveLocationUseCase
     private lateinit var existingLocation: Location
 
@@ -24,7 +22,7 @@ class RemoveLocationUseCaseTest {
     fun setUp() {
         testData = TestDataManager()
 
-        removeLocationUseCase = RemoveLocationUseCase(
+        removeLocationUseCase = RemoveLocationUseCaseImpl(
             testData.locationRepository,
             RemoveAisleUseCase(
                 testData.aisleRepository,
@@ -67,7 +65,8 @@ class RemoveLocationUseCaseTest {
         val aisleCountAfter: Int
         val aisleCountLocation: Int
         runBlocking {
-            aisleCountLocation = testData.aisleRepository.getForLocation(existingLocation.id).count()
+            aisleCountLocation =
+                testData.aisleRepository.getForLocation(existingLocation.id).count()
             aisleCountBefore = testData.aisleRepository.getAll().count()
             removeLocationUseCase(existingLocation)
             aisleCountAfter = testData.aisleRepository.getAll().count()
@@ -83,7 +82,8 @@ class RemoveLocationUseCaseTest {
         runBlocking {
             val aisles = testData.aisleRepository.getForLocation(existingLocation.id)
             aisleProductCountLocation =
-                testData.aisleProductRepository.getAll().count { it.aisleId in aisles.map { a -> a.id } }
+                testData.aisleProductRepository.getAll()
+                    .count { it.aisleId in aisles.map { a -> a.id } }
             aisleProductCountBefore = testData.aisleProductRepository.getAll().count()
             removeLocationUseCase(existingLocation)
             aisleProductCountAfter = testData.aisleProductRepository.getAll().count()

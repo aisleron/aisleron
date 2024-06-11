@@ -4,12 +4,16 @@ import com.aisleron.data.TestDataManager
 import com.aisleron.domain.aisle.usecase.AddAisleUseCase
 import com.aisleron.domain.aisle.usecase.GetAisleUseCase
 import com.aisleron.domain.aisle.usecase.RemoveAisleUseCase
+import com.aisleron.domain.aisle.usecase.RemoveDefaultAisleUseCase
 import com.aisleron.domain.aisle.usecase.UpdateAisleRankUseCase
 import com.aisleron.domain.aisle.usecase.UpdateAisleUseCase
 import com.aisleron.domain.aisleproduct.usecase.RemoveProductsFromAisleUseCase
 import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductRankUseCase
 import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductsUseCase
 import com.aisleron.domain.location.usecase.GetLocationUseCase
+import com.aisleron.domain.location.usecase.GetPinnedShopsUseCase
+import com.aisleron.domain.location.usecase.GetShopsUseCase
+import com.aisleron.domain.location.usecase.RemoveLocationUseCaseImpl
 import com.aisleron.domain.product.usecase.GetProductUseCase
 import com.aisleron.domain.product.usecase.IsProductNameUniqueUseCase
 import com.aisleron.domain.product.usecase.RemoveProductUseCase
@@ -22,6 +26,8 @@ class TestUseCaseProvider(testData: TestDataManager) {
      * Location Use Cases
      */
     val getLocationUseCase = GetLocationUseCase(testData.locationRepository)
+    val getShopsUseCase = GetShopsUseCase(testData.locationRepository)
+    val getPinnedShopsUseCase = GetPinnedShopsUseCase(testData.locationRepository)
 
     /**
      * Aisle Product Use Cases
@@ -42,6 +48,8 @@ class TestUseCaseProvider(testData: TestDataManager) {
     val removeAisleUseCase = RemoveAisleUseCase(
         testData.aisleRepository, updateAisleProductsUseCase, removeProductsFromAisleUseCase
     )
+    val removeDefaultAisleUseCase =
+        RemoveDefaultAisleUseCase(testData.aisleRepository, removeProductsFromAisleUseCase)
 
     /**
      * Product Use Cases
@@ -58,4 +66,14 @@ class TestUseCaseProvider(testData: TestDataManager) {
      * Shopping List Use Cases
      */
     val getShoppingListUseCase = GetShoppingListUseCase(testData.locationRepository)
+
+    /**
+     * Location Use Cases with Dependencies
+     */
+    val removeLocationUseCase = RemoveLocationUseCaseImpl(
+        testData.locationRepository,
+        removeAisleUseCase,
+        removeDefaultAisleUseCase
+    )
+
 }
