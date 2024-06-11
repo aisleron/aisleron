@@ -14,12 +14,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.platform.app.InstrumentationRegistry
 import com.aisleron.R
 import com.aisleron.data.TestDataManager
-import com.aisleron.domain.aisle.usecase.GetDefaultAislesUseCase
-import com.aisleron.domain.aisleproduct.usecase.AddAisleProductsUseCase
-import com.aisleron.domain.product.usecase.AddProductUseCase
-import com.aisleron.domain.product.usecase.GetProductUseCase
-import com.aisleron.domain.product.usecase.IsProductNameUniqueUseCase
-import com.aisleron.domain.product.usecase.UpdateProductUseCase
+import com.aisleron.domain.TestUseCaseProvider
 import com.aisleron.ui.AddEditFragmentListener
 import com.aisleron.ui.KoinTestRule
 import com.aisleron.ui.TestMenuHost
@@ -49,18 +44,11 @@ class ProductFragmentTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun getKoinModules(): List<Module> {
         testData = TestDataManager()
+        val testUseCases = TestUseCaseProvider(testData)
         val productViewModel = ProductViewModel(
-            addProductUseCase = AddProductUseCase(
-                testData.productRepository,
-                GetDefaultAislesUseCase(testData.aisleRepository),
-                AddAisleProductsUseCase(testData.aisleProductRepository),
-                IsProductNameUniqueUseCase(testData.productRepository)
-            ),
-            updateProductUseCase = UpdateProductUseCase(
-                testData.productRepository,
-                IsProductNameUniqueUseCase(testData.productRepository)
-            ),
-            getProductUseCase = GetProductUseCase(testData.productRepository),
+            addProductUseCase = testUseCases.addProductUseCase,
+            updateProductUseCase = testUseCases.updateProductUseCase,
+            getProductUseCase = testUseCases.getProductUseCase,
             TestScope(UnconfinedTestDispatcher())
         )
 

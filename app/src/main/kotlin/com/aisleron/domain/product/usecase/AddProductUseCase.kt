@@ -7,14 +7,18 @@ import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
 
-class AddProductUseCase(
+interface AddProductUseCase {
+    suspend operator fun invoke(product: Product): Int
+}
+
+class AddProductUseCaseImpl(
     private val productRepository: ProductRepository,
     private val getDefaultAislesUseCase: GetDefaultAislesUseCase,
     private val addAisleProductsUseCase: AddAisleProductsUseCase,
     private val isProductNameUniqueUseCase: IsProductNameUniqueUseCase
 
-) {
-    suspend operator fun invoke(product: Product): Int {
+) : AddProductUseCase {
+    override suspend operator fun invoke(product: Product): Int {
 
         if (!isProductNameUniqueUseCase(product)) {
             throw AisleronException.DuplicateProductNameException("Product Name must be unique")

@@ -23,7 +23,7 @@ class AddProductUseCaseTest {
     fun setUp() {
         testData = TestDataManager()
 
-        addProductUseCase = AddProductUseCase(
+        addProductUseCase = AddProductUseCaseImpl(
             testData.productRepository,
             GetDefaultAislesUseCase(testData.aisleRepository),
             AddAisleProductsUseCase(testData.aisleProductRepository),

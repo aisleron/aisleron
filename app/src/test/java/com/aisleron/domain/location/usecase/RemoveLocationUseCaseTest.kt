@@ -1,11 +1,13 @@
 package com.aisleron.domain.location.usecase
 
 import com.aisleron.data.TestDataManager
+import com.aisleron.domain.FilterType
 import com.aisleron.domain.aisle.usecase.RemoveAisleUseCase
 import com.aisleron.domain.aisle.usecase.RemoveDefaultAisleUseCase
 import com.aisleron.domain.aisleproduct.usecase.RemoveProductsFromAisleUseCase
 import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductsUseCase
 import com.aisleron.domain.location.Location
+import com.aisleron.domain.location.LocationType
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -89,5 +91,25 @@ class RemoveLocationUseCaseTest {
             aisleProductCountAfter = testData.aisleProductRepository.getAll().count()
         }
         assertEquals(aisleProductCountBefore - aisleProductCountLocation, aisleProductCountAfter)
+    }
+
+    @Test
+    fun removeLocation_LocationHasNoAisles_LocationRemoved() {
+        val removedLocation = runBlocking {
+            val newLocationId = testData.locationRepository.add(
+                Location(
+                    id = 0,
+                    type = LocationType.SHOP,
+                    defaultFilter = FilterType.NEEDED,
+                    name = "Dummy Shop",
+                    pinned = false,
+                    aisles = emptyList()
+                )
+            )
+            val newLocation = testData.locationRepository.get(newLocationId)!!
+            removeLocationUseCase(newLocation)
+            testData.locationRepository.get(newLocation.id)
+        }
+        assertNull(removedLocation)
     }
 }
