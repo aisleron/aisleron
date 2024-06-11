@@ -96,14 +96,14 @@ class FabHandler(private val activity: Activity) {
             FabOption.ADD_SHOP -> fabAddShop
         }
 
-        fab.setOnClickListener {
+        fab?.setOnClickListener {
             onClickListener.onClick(it)
             hideAllFab()
         }
     }
 
     fun setModeShowAllFab() {
-        fabMain.setOnClickListener {
+        fabMain?.setOnClickListener {
             if (allFabAreHidden) {
                 showAllFab()
             } else {

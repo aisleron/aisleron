@@ -116,6 +116,16 @@ class TestDataManager {
                 aisles = emptyList()
             )
         )
+
+        addLocationUseCase(
+            Location(
+                id = 4,
+                type = LocationType.HOME,
+                defaultFilter = FilterType.NEEDED,
+                name = "Home",
+                pinned = false,
+                aisles = emptyList()
+            ))
     }
 
     private suspend fun addProducts() {

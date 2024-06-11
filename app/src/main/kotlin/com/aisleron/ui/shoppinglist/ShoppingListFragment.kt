@@ -53,13 +53,8 @@ class ShoppingListFragment(
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val bundle = arguments
-        val locationId: Int = bundle?.getInt(ARG_LOCATION_ID) ?: 1
-        val filterType: FilterType =
-            if (bundle != null) bundle.getSerializable(ARG_FILTER_TYPE) as FilterType else FilterType.ALL
-
-        shoppingListViewModel.hydrate(locationId, filterType)
+        val shoppingListBundle = Bundler().getShoppingListBundle(arguments)
+        shoppingListViewModel.hydrate(shoppingListBundle.locationId, shoppingListBundle.filterType)
     }
 
     override fun onCreateView(

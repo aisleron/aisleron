@@ -13,19 +13,19 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="updateProductStatus_InStockFalse_ProductUpdatedToNotInStock()">
+      <SelectionState runConfigName="ShoppingListFragmentTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="submitProductSearch_ProductsMatch_UiStateHasProducts()">
+      <SelectionState runConfigName="BundlerTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="submitProductSearch_NoProductsMatch_UiStateHasNoProducts()">
+      <SelectionState runConfigName="onCreateShoppingListFragment_FilterIsInStock_AppTitleIsInStock()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="submitProductSearch_SearchRun_UiStateHasAllAisles()">
+      <SelectionState runConfigName="onCreateShoppingListFragment_LocationTypeIsShop_AppTitleIsShopName()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="requestDefaultList_SearchRun_UiStateHasAllAislesAndProducts()">
+      <SelectionState runConfigName="onCreateShoppingListFragment_BundleISAttributes_FragmentCreated()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
