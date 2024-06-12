@@ -45,7 +45,8 @@ class AisleDaoTestImpl(private val aisleProductDao: AisleProductDaoTestImpl) : A
     override suspend fun getAisleWithProducts(aisleId: Int): AisleWithProducts {
         return AisleWithProducts(
             aisle = getAisle(aisleId)!!,
-            products = emptyList()
+            products = aisleProductDao.getAisleProducts()
+                .filter { ap -> ap.aisleProduct.aisleId == aisleId }
         )
     }
 

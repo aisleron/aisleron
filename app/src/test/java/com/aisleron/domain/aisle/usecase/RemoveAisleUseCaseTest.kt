@@ -99,9 +99,9 @@ class RemoveAisleUseCaseTest {
             val defaultAisle =
                 testData.aisleRepository.getDefaultAisleFor(existingAisle.locationId)!!
             aisleProductCount =
-                testData.aisleProductRepository.getAll().count { it.aisleId == defaultAisle.id }
-            defaultAisleProductCountBefore =
                 testData.aisleProductRepository.getAll().count { it.aisleId == existingAisle.id }
+            defaultAisleProductCountBefore =
+                testData.aisleProductRepository.getAll().count { it.aisleId == defaultAisle.id }
 
             aisleProductCountBefore = testData.aisleProductRepository.getAll().count()
 
@@ -110,11 +110,37 @@ class RemoveAisleUseCaseTest {
             aisleProductCountAfter = testData.aisleProductRepository.getAll().count()
 
             defaultAisleProductCountAfter =
-                testData.aisleProductRepository.getAll().count { it.aisleId == existingAisle.id }
+                testData.aisleProductRepository.getAll().count { it.aisleId == defaultAisle.id }
 
 
         }
         assertEquals(aisleProductCountBefore, aisleProductCountAfter)
         assertEquals(defaultAisleProductCountBefore + aisleProductCount, defaultAisleProductCountAfter)
+    }
+
+    @Test
+    fun removeAisle_AisleHasNoProducts_AisleRemoved() {
+        val countBefore: Int
+        val countAfter: Int
+        val removedAisle: Aisle?
+        runBlocking {
+            val emptyAisleId = testData.aisleRepository.add(
+                Aisle(
+                    name = "Empty Aisle",
+                    products = emptyList(),
+                    locationId = testData.locationRepository.getAll().first().id,
+                    rank = 1000,
+                    id = 0,
+                    isDefault = false
+                )
+            )
+            val emptyAisle = testData.aisleRepository.get(emptyAisleId)!!
+            countBefore = testData.aisleRepository.getAll().count()
+            removeAisleUseCase(emptyAisle)
+            removedAisle = testData.aisleRepository.get(emptyAisle.id)
+            countAfter = testData.aisleRepository.getAll().count()
+        }
+        assertNull(removedAisle)
+        assertEquals(countBefore - 1, countAfter)
     }
 }
