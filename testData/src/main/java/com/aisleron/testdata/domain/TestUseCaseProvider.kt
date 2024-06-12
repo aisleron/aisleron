@@ -12,11 +12,15 @@ import com.aisleron.domain.aisleproduct.usecase.AddAisleProductsUseCase
 import com.aisleron.domain.aisleproduct.usecase.RemoveProductsFromAisleUseCase
 import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductRankUseCase
 import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductsUseCase
+import com.aisleron.domain.location.usecase.AddLocationUseCaseImpl
 import com.aisleron.domain.location.usecase.GetLocationUseCase
 import com.aisleron.domain.location.usecase.GetPinnedShopsUseCase
 import com.aisleron.domain.location.usecase.GetShopsUseCase
+import com.aisleron.domain.location.usecase.IsLocationNameUniqueUseCase
 import com.aisleron.domain.location.usecase.RemoveLocationUseCaseImpl
+import com.aisleron.domain.location.usecase.UpdateLocationUseCase
 import com.aisleron.domain.product.usecase.AddProductUseCaseImpl
+import com.aisleron.domain.product.usecase.GetAllProductsUseCase
 import com.aisleron.domain.product.usecase.GetProductUseCase
 import com.aisleron.domain.product.usecase.IsProductNameUniqueUseCase
 import com.aisleron.domain.product.usecase.RemoveProductUseCase
@@ -31,6 +35,9 @@ class TestUseCaseProvider(testData: TestDataManager) {
     val getLocationUseCase = GetLocationUseCase(testData.locationRepository)
     val getShopsUseCase = GetShopsUseCase(testData.locationRepository)
     val getPinnedShopsUseCase = GetPinnedShopsUseCase(testData.locationRepository)
+    val isLocationNameUniqueUseCase = IsLocationNameUniqueUseCase(testData.locationRepository)
+    val updateLocationUseCase =
+        UpdateLocationUseCase(testData.locationRepository, isLocationNameUniqueUseCase)
 
     /**
      * Aisle Product Use Cases
@@ -62,6 +69,7 @@ class TestUseCaseProvider(testData: TestDataManager) {
      */
     val removeProductUseCase = RemoveProductUseCase(testData.productRepository)
     val getProductUseCase = GetProductUseCase(testData.productRepository)
+    val getAllProductsUseCase = GetAllProductsUseCase(testData.productRepository)
     val isProductNameUniqueUseCase = IsProductNameUniqueUseCase(testData.productRepository)
     val updateProductUseCase =
         UpdateProductUseCase(testData.productRepository, isProductNameUniqueUseCase)
@@ -86,6 +94,13 @@ class TestUseCaseProvider(testData: TestDataManager) {
         testData.locationRepository,
         removeAisleUseCase,
         removeDefaultAisleUseCase
+    )
+    val addLocationUseCase = AddLocationUseCaseImpl(
+        testData.locationRepository,
+        addAisleUseCase,
+        getAllProductsUseCase,
+        addAisleProductsUseCase,
+        isLocationNameUniqueUseCase
     )
 
 }

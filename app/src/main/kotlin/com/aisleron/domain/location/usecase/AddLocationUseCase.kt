@@ -9,15 +9,19 @@ import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.product.usecase.GetAllProductsUseCase
 
-class AddLocationUseCase(
+interface AddLocationUseCase {
+    suspend operator fun invoke(location: Location): Int
+}
+
+class AddLocationUseCaseImpl(
     private val locationRepository: LocationRepository,
     private val addAisleUseCase: AddAisleUseCase,
     private val getAllProductsUseCase: GetAllProductsUseCase,
     private val addAisleProductsUseCase: AddAisleProductsUseCase,
     private val isLocationNameUniqueUseCase: IsLocationNameUniqueUseCase
 
-) {
-    suspend operator fun invoke(location: Location): Int {
+) : AddLocationUseCase {
+    override suspend operator fun invoke(location: Location): Int {
 
         if (!isLocationNameUniqueUseCase(location)) {
             throw AisleronException.DuplicateLocationNameException("Location Name must be unique")

@@ -15,7 +15,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
-
 @RunWith(value = Parameterized::class)
 class ProductViewModelTest(private val inStock: Boolean) {
     private lateinit var testData: TestDataManager
@@ -127,7 +126,6 @@ class ProductViewModelTest(private val inStock: Boolean) {
         )
     }
 
-
     @Test
     fun testGetProductName_ProductExists_ReturnsProductName() = runTest {
         val existingProduct: Product = testData.productRepository.getAll().first()
@@ -145,7 +143,10 @@ class ProductViewModelTest(private val inStock: Boolean) {
     fun testHydrate_ProductDoesNotExists_UiStateIsUpdated() = runTest {
         productViewModel.hydrate(1, inStock)
         Assert.assertTrue(productViewModel.productUiState.value is ProductViewModel.ProductUiState.Updated)
-        Assert.assertEquals(productViewModel, (productViewModel.productUiState.value as ProductViewModel.ProductUiState.Updated).product)
+        Assert.assertEquals(
+            productViewModel,
+            (productViewModel.productUiState.value as ProductViewModel.ProductUiState.Updated).product
+        )
     }
 
     @Test

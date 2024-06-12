@@ -1,14 +1,10 @@
 package com.aisleron.ui.shop
 
 import com.aisleron.data.TestDataManager
-import com.aisleron.domain.aisle.usecase.AddAisleUseCase
-import com.aisleron.domain.aisleproduct.usecase.AddAisleProductsUseCase
+import com.aisleron.domain.TestUseCaseProvider
+import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.usecase.AddLocationUseCase
-import com.aisleron.domain.location.usecase.GetLocationUseCase
-import com.aisleron.domain.location.usecase.IsLocationNameUniqueUseCase
-import com.aisleron.domain.location.usecase.UpdateLocationUseCase
-import com.aisleron.domain.product.usecase.GetAllProductsUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -21,7 +17,6 @@ import org.junit.runners.Parameterized
 
 @RunWith(value = Parameterized::class)
 class ShopViewModelTest(private val pinned: Boolean) {
-
     private lateinit var testData: TestDataManager
     private lateinit var shopViewModel: ShopViewModel
 
@@ -29,28 +24,14 @@ class ShopViewModelTest(private val pinned: Boolean) {
     @Before
     fun setUp() {
         testData = TestDataManager()
-
-        val addAisleProductsUseCase = AddAisleProductsUseCase(testData.aisleProductRepository)
-        val isLocationNameUniqueUseCase = IsLocationNameUniqueUseCase(testData.locationRepository)
-        val addAisleUseCase = AddAisleUseCase(
-            testData.aisleRepository,
-            GetLocationUseCase(testData.locationRepository)
-        )
-        val getAllProductsUseCase = GetAllProductsUseCase(testData.productRepository)
-
+        val testUseCases = TestUseCaseProvider(testData)
         val testDispatcher = UnconfinedTestDispatcher()
         val testScope = TestScope(testDispatcher)
 
         shopViewModel = ShopViewModel(
-            AddLocationUseCase(
-                testData.locationRepository,
-                addAisleUseCase,
-                getAllProductsUseCase,
-                addAisleProductsUseCase,
-                isLocationNameUniqueUseCase
-            ),
-            UpdateLocationUseCase(testData.locationRepository, isLocationNameUniqueUseCase),
-            GetLocationUseCase(testData.locationRepository),
+            testUseCases.addLocationUseCase,
+            testUseCases.updateLocationUseCase,
+            testUseCases.getLocationUseCase,
             testScope
         )
     }
@@ -102,6 +83,11 @@ class ShopViewModelTest(private val pinned: Boolean) {
         Assert.assertEquals(
             ShopViewModel.ShopUiState.Updated(shopViewModel),
             shopViewModel.shopUiState.value
+        )
+
+        Assert.assertEquals(
+            shopViewModel,
+            (shopViewModel.shopUiState.value as ShopViewModel.ShopUiState.Updated).shop
         )
     }
 
@@ -165,6 +151,48 @@ class ShopViewModelTest(private val pinned: Boolean) {
     fun testGetType_LocationDoesNotExists_ReturnsNull() = runTest {
         shopViewModel.hydrate(0)
         Assert.assertNull(shopViewModel.type)
+    }
+
+    @Test
+    fun constructor_NoCoroutineScopeProvided_ShopViewModelReturned() {
+        val testUseCases = TestUseCaseProvider(testData)
+        val svm = ShopViewModel(
+            testUseCases.addLocationUseCase,
+            testUseCases.updateLocationUseCase,
+            testUseCases.getLocationUseCase
+        )
+
+        Assert.assertNotNull(svm)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun testSaveLocation_ExceptionRaised_UiStateIsError() = runTest {
+        val testUseCases = TestUseCaseProvider(testData)
+        val exceptionMessage = "Error on save Location"
+        val svm = ShopViewModel(
+            object : AddLocationUseCase {
+                override suspend fun invoke(location: Location): Int {
+                    throw Exception(exceptionMessage)
+                }
+            },
+            testUseCases.updateLocationUseCase,
+            testUseCases.getLocationUseCase,
+            TestScope(UnconfinedTestDispatcher())
+        )
+
+        svm.hydrate(0)
+        svm.saveLocation("Bogus Product", pinned)
+
+        Assert.assertTrue(svm.shopUiState.value is ShopViewModel.ShopUiState.Error)
+        Assert.assertEquals(
+            AisleronException.GENERIC_EXCEPTION,
+            (svm.shopUiState.value as ShopViewModel.ShopUiState.Error).errorCode
+        )
+        Assert.assertEquals(
+            exceptionMessage,
+            (svm.shopUiState.value as ShopViewModel.ShopUiState.Error).errorMessage
+        )
     }
 
     companion object {

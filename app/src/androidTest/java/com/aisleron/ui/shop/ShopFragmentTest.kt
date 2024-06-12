@@ -16,7 +16,7 @@ import com.aisleron.R
 import com.aisleron.data.TestDataManager
 import com.aisleron.domain.aisle.usecase.AddAisleUseCase
 import com.aisleron.domain.aisleproduct.usecase.AddAisleProductsUseCase
-import com.aisleron.domain.location.usecase.AddLocationUseCase
+import com.aisleron.domain.location.usecase.AddLocationUseCaseImpl
 import com.aisleron.domain.location.usecase.GetLocationUseCase
 import com.aisleron.domain.location.usecase.IsLocationNameUniqueUseCase
 import com.aisleron.domain.location.usecase.UpdateLocationUseCase
@@ -51,7 +51,7 @@ class ShopFragmentTest {
     private fun getKoinModules(): List<Module> {
         testData = TestDataManager()
         val shopViewModel = ShopViewModel(
-            addLocationUseCase = AddLocationUseCase(
+            addLocationUseCase = AddLocationUseCaseImpl(
                 testData.locationRepository,
                 AddAisleUseCase(
                     testData.aisleRepository,

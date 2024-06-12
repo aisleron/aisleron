@@ -29,7 +29,7 @@ class AddLocationUseCaseTest {
     fun setUp() {
         testData = TestDataManager()
 
-        addLocationUseCase = AddLocationUseCase(
+        addLocationUseCase = AddLocationUseCaseImpl(
             testData.locationRepository,
             AddAisleUseCase(
                 testData.aisleRepository,
