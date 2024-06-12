@@ -87,10 +87,8 @@ class Bundler {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     bundle?.getSerializable(ARG_FILTER_TYPE, FilterType::class.java)
                 } else {
-                    bundle?.let {
-                        @Suppress("DEPRECATION")
-                        it.getSerializable(ARG_FILTER_TYPE) as FilterType
-                    }
+                    @Suppress("DEPRECATION")
+                    bundle?.getSerializable(ARG_FILTER_TYPE) as FilterType
                 }
             result = ShoppingListBundle(locationId, filterType)
         }

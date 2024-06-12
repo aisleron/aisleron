@@ -23,7 +23,8 @@ class UpdateAisleProductRankUseCaseTest {
 
     @Test
     fun updateAisleProductRank_NewRankProvided_AisleProductRankUpdated() {
-        val updateAisleProduct = existingAisleProduct.copy(rank = 1001)
+        val updateAisleProduct = existingAisleProduct.copy()
+        updateAisleProduct.rank = 1001
         val updatedAisleProduct: AisleProduct?
         runBlocking {
             updateAisleProductRankUseCase(updateAisleProduct)
