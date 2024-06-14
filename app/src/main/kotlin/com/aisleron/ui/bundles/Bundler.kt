@@ -13,7 +13,7 @@ class Bundler {
             bundle?.getParcelable(key, clazz)
         } else {
             @Suppress("DEPRECATION")
-            bundle?.getParcelable(key)
+            bundle?.getParcelable(key) as T?
         }
         return result
     }
@@ -88,7 +88,7 @@ class Bundler {
                     bundle?.getSerializable(ARG_FILTER_TYPE, FilterType::class.java)
                 } else {
                     @Suppress("DEPRECATION")
-                    bundle?.getSerializable(ARG_FILTER_TYPE) as FilterType
+                    bundle?.getSerializable(ARG_FILTER_TYPE) as FilterType?
                 }
             result = ShoppingListBundle(locationId, filterType)
         }

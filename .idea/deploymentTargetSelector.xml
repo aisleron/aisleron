@@ -13,10 +13,16 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="testSaveLocation_SaveSuccessful_UiStateIsSuccess()">
+      <SelectionState runConfigName="BundlerTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="BundlerTest">
+      <SelectionState runConfigName="testMakeEditProductBundle_ProductIdProvided_EditObjectBundled()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="testGetShoppingListBundle_InvalidBundle_ReturnDefaultShoppingListBundle()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="ProductFragmentTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

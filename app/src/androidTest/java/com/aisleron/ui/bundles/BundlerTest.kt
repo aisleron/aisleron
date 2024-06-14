@@ -1,5 +1,6 @@
 package com.aisleron.ui.bundles
 
+import android.os.Build
 import android.os.Bundle
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.LocationType
@@ -14,6 +15,16 @@ import org.junit.Test
 class BundlerTest {
     private lateinit var bundler: Bundler
 
+    private fun <T> getParcelableBundle(bundle: Bundle?, key: String, clazz: Class<T>): T? {
+        val result = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            bundle?.getParcelable(key, clazz)
+        } else {
+            @Suppress("DEPRECATION")
+            bundle?.getParcelable(key) as T?
+        }
+        return result
+    }
+
     @Before
     fun setUp() {
         bundler = Bundler()
@@ -25,7 +36,7 @@ class BundlerTest {
         val bundle = bundler.makeEditProductBundle(productId)
 
         val editProductBundle =
-            bundle.getParcelable("addEditProduct", AddEditProductBundle::class.java)
+            getParcelableBundle(bundle, "addEditProduct", AddEditProductBundle::class.java)
 
         assertNotNull(editProductBundle)
         assertEquals(1, editProductBundle?.productId)
@@ -37,7 +48,7 @@ class BundlerTest {
         val bundle = bundler.makeAddProductBundle()
 
         val addProductBundle =
-            bundle.getParcelable("addEditProduct", AddEditProductBundle::class.java)
+            getParcelableBundle(bundle, "addEditProduct", AddEditProductBundle::class.java)
 
         assertNotNull(addProductBundle)
         assertNull(addProductBundle?.name)
@@ -51,7 +62,7 @@ class BundlerTest {
         val bundle = bundler.makeAddProductBundle(productName)
 
         val addProductBundle =
-            bundle.getParcelable("addEditProduct", AddEditProductBundle::class.java)
+            getParcelableBundle(bundle, "addEditProduct", AddEditProductBundle::class.java)
 
         assertEquals(productName, addProductBundle?.name)
         assertEquals(AddEditProductBundle.ProductAction.ADD, addProductBundle?.actionType)
@@ -63,7 +74,7 @@ class BundlerTest {
         val bundle = bundler.makeAddProductBundle(inStock = inStock)
 
         val addProductBundle =
-            bundle.getParcelable("addEditProduct", AddEditProductBundle::class.java)
+            getParcelableBundle(bundle, "addEditProduct", AddEditProductBundle::class.java)
 
         assertEquals(inStock, addProductBundle?.inStock)
         assertEquals(AddEditProductBundle.ProductAction.ADD, addProductBundle?.actionType)
@@ -96,7 +107,7 @@ class BundlerTest {
         val bundle = bundler.makeEditLocationBundle(locationId)
 
         val editLocationBundle =
-            bundle.getParcelable("addEditLocation", AddEditLocationBundle::class.java)
+            getParcelableBundle(bundle, "addEditLocation", AddEditLocationBundle::class.java)
 
         assertNotNull(editLocationBundle)
         assertEquals(1, editLocationBundle?.locationId)
@@ -108,7 +119,7 @@ class BundlerTest {
         val bundle = bundler.makeAddLocationBundle()
 
         val addLocationBundle =
-            bundle.getParcelable("addEditLocation", AddEditLocationBundle::class.java)
+            getParcelableBundle(bundle, "addEditLocation", AddEditLocationBundle::class.java)
 
         assertNotNull(addLocationBundle)
         assertNull(addLocationBundle?.name)
@@ -121,7 +132,7 @@ class BundlerTest {
         val bundle = bundler.makeAddLocationBundle(locationName)
 
         val addLocationBundle =
-            bundle.getParcelable("addEditLocation", AddEditLocationBundle::class.java)
+            getParcelableBundle(bundle, "addEditLocation", AddEditLocationBundle::class.java)
 
         assertEquals(locationName, addLocationBundle?.name)
         assertEquals(AddEditLocationBundle.LocationAction.ADD, addLocationBundle?.actionType)
@@ -139,6 +150,7 @@ class BundlerTest {
         locationBundle.putParcelable("addEditLocation", addEditLocation)
         val bundledLocation = bundler.getAddEditLocationBundle(locationBundle)
         assertEquals(addEditLocation, bundledLocation)
+        assertEquals(addEditLocation.locationType, bundledLocation.locationType)
     }
 
     @Test
@@ -162,7 +174,7 @@ class BundlerTest {
         val bundle = bundler.makeShoppingListBundle(locationId, filterType)
 
         val shoppingListBundle =
-            bundle.getParcelable("shoppingList", ShoppingListBundle::class.java)
+            getParcelableBundle(bundle, "shoppingList", ShoppingListBundle::class.java)
 
         assertEquals(locationId, shoppingListBundle?.locationId)
         assertEquals(filterType, shoppingListBundle?.filterType)
