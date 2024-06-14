@@ -14,7 +14,7 @@ class GetAisleUseCaseTest {
     @BeforeEach
     fun setUp() {
         testData = TestDataManager()
-        getAisleUseCase = GetAisleUseCase(testData.aisleRepository)
+        getAisleUseCase = GetAisleUseCaseImpl(testData.aisleRepository)
     }
 
     @Test

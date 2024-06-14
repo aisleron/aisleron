@@ -2,11 +2,15 @@ package com.aisleron.domain.product.usecase
 
 import com.aisleron.domain.product.Product
 
-class UpdateProductStatusUseCase(
+interface UpdateProductStatusUseCase {
+    suspend operator fun invoke(id: Int, inStock: Boolean): Product?
+}
+
+class UpdateProductStatusUseCaseImpl(
     private val getProductUseCase: GetProductUseCase,
     private val updateProductUseCase: UpdateProductUseCase
-) {
-    suspend operator fun invoke(id: Int, inStock: Boolean): Product? {
+) : UpdateProductStatusUseCase {
+    override suspend operator fun invoke(id: Int, inStock: Boolean): Product? {
         val product = getProductUseCase(id)?.copy(inStock = inStock)
 
         if (product != null) {

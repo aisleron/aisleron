@@ -6,12 +6,16 @@ import com.aisleron.domain.aisleproduct.usecase.RemoveProductsFromAisleUseCase
 import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductsUseCase
 import com.aisleron.domain.base.AisleronException
 
-class RemoveAisleUseCase(
+interface RemoveAisleUseCase {
+    suspend operator fun invoke(aisle: Aisle)
+}
+
+class RemoveAisleUseCaseImpl(
     private val aisleRepository: AisleRepository,
     private val updateAisleProductsUseCase: UpdateAisleProductsUseCase,
     private val removeProductsFromAisleUseCase: RemoveProductsFromAisleUseCase
-) {
-    suspend operator fun invoke(aisle: Aisle) {
+) : RemoveAisleUseCase {
+    override suspend operator fun invoke(aisle: Aisle) {
         if (aisle.isDefault) {
             throw AisleronException.DeleteDefaultAisleException("Cannot delete default Aisle")
         }

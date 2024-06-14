@@ -14,7 +14,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.platform.app.InstrumentationRegistry
 import com.aisleron.R
 import com.aisleron.data.TestDataManager
-import com.aisleron.domain.aisle.usecase.AddAisleUseCase
+import com.aisleron.domain.aisle.usecase.AddAisleUseCaseImpl
 import com.aisleron.domain.aisleproduct.usecase.AddAisleProductsUseCase
 import com.aisleron.domain.location.usecase.AddLocationUseCaseImpl
 import com.aisleron.domain.location.usecase.GetLocationUseCase
@@ -53,7 +53,7 @@ class ShopFragmentTest {
         val shopViewModel = ShopViewModel(
             addLocationUseCase = AddLocationUseCaseImpl(
                 testData.locationRepository,
-                AddAisleUseCase(
+                AddAisleUseCaseImpl(
                     testData.aisleRepository,
                     GetLocationUseCase(testData.locationRepository)
                 ),

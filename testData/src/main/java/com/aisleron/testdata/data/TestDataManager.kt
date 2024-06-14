@@ -14,7 +14,7 @@ import com.aisleron.data.product.ProductMapper
 import com.aisleron.data.product.ProductRepositoryImpl
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.aisle.Aisle
-import com.aisleron.domain.aisle.usecase.AddAisleUseCase
+import com.aisleron.domain.aisle.usecase.AddAisleUseCaseImpl
 import com.aisleron.domain.aisleproduct.usecase.AddAisleProductsUseCase
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationType
@@ -78,7 +78,7 @@ class TestDataManager {
     private suspend fun addLocations() {
         val addLocationUseCase = AddLocationUseCaseImpl(
             locationRepository,
-            AddAisleUseCase(aisleRepository, GetLocationUseCase(locationRepository)),
+            AddAisleUseCaseImpl(aisleRepository, GetLocationUseCase(locationRepository)),
             GetAllProductsUseCase(productRepository),
             AddAisleProductsUseCase(aisleProductRepository),
             IsLocationNameUniqueUseCase(locationRepository)

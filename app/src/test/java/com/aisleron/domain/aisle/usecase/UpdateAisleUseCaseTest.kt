@@ -21,7 +21,7 @@ class UpdateAisleUseCaseTest {
 
         existingAisle = runBlocking { testData.aisleRepository.get(1)!! }
 
-        updateAisleUseCase = UpdateAisleUseCase(
+        updateAisleUseCase = UpdateAisleUseCaseImpl(
             testData.aisleRepository,
             GetLocationUseCase(testData.locationRepository)
         )

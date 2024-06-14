@@ -46,7 +46,8 @@ class ShoppingListViewModel(
 
     private val shoppingList = mutableListOf<ShoppingListItemViewModel>()
     private var _locationId: Int = 0
-    private var _listFilter: (ShoppingListItemViewModel) -> Boolean = { _ -> false }
+    private var _listFilter: (ShoppingListItemViewModel) -> Boolean =
+        getListFilterByProductFilter(_defaultFilter)
     private val _shoppingListUiState = MutableStateFlow<ShoppingListUiState>(
         ShoppingListUiState.Empty
     )
@@ -75,44 +76,43 @@ class ShoppingListViewModel(
         coroutineScope.launch {
             _shoppingListUiState.value = ShoppingListUiState.Loading
             getShoppingListUseCase(locationId).collect { location ->
+                shoppingList.clear()
                 location?.let {
                     _locationName = it.name
                     _locationType = it.type
                     _locationId = it.id
-                }
 
-                shoppingList.clear()
-
-                location?.aisles?.forEach { a ->
-                    shoppingList.add(
-                        ShoppingListItemViewModel(
-                            lineItemType = ShoppingListItemType.AISLE,
-                            aisleRank = a.rank,
-                            rank = a.rank,
-                            id = a.id,
-                            name = a.name,
-                            inStock = a.isDefault,  //inStock holds the aisle default value in the shopping list
-                            aisleId = a.id,
-                            mappingId = 0,
-                            childCount = a.products.count { p ->
-                                (p.product.inStock && defaultFilter == FilterType.IN_STOCK)
-                                        || (!p.product.inStock && defaultFilter == FilterType.NEEDED)
-                                        || (defaultFilter == FilterType.ALL)
-                            }
+                    it.aisles.forEach { a ->
+                        shoppingList.add(
+                            ShoppingListItemViewModel(
+                                lineItemType = ShoppingListItemType.AISLE,
+                                aisleRank = a.rank,
+                                rank = a.rank,
+                                id = a.id,
+                                name = a.name,
+                                inStock = a.isDefault,  //inStock holds the aisle default value in the shopping list
+                                aisleId = a.id,
+                                mappingId = 0,
+                                childCount = a.products.count { p ->
+                                    (p.product.inStock && defaultFilter == FilterType.IN_STOCK)
+                                            || (!p.product.inStock && defaultFilter == FilterType.NEEDED)
+                                            || (defaultFilter == FilterType.ALL)
+                                }
+                            )
                         )
-                    )
-                    shoppingList += a.products.map { p ->
-                        ShoppingListItemViewModel(
-                            lineItemType = ShoppingListItemType.PRODUCT,
-                            aisleRank = a.rank,
-                            rank = p.rank,
-                            id = p.product.id,
-                            name = p.product.name,
-                            inStock = p.product.inStock,
-                            aisleId = p.aisleId,
-                            mappingId = p.id,
-                            childCount = 0
-                        )
+                        shoppingList += a.products.map { p ->
+                            ShoppingListItemViewModel(
+                                lineItemType = ShoppingListItemType.PRODUCT,
+                                aisleRank = a.rank,
+                                rank = p.rank,
+                                id = p.product.id,
+                                name = p.product.name,
+                                inStock = p.product.inStock,
+                                aisleId = p.aisleId,
+                                mappingId = p.id,
+                                childCount = 0
+                            )
+                        }
                     }
                 }
 

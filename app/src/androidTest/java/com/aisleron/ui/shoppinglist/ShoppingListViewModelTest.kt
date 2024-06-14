@@ -4,6 +4,11 @@ import com.aisleron.data.TestDataManager
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.TestUseCaseProvider
 import com.aisleron.domain.aisle.Aisle
+import com.aisleron.domain.aisle.usecase.AddAisleUseCase
+import com.aisleron.domain.aisle.usecase.GetAisleUseCase
+import com.aisleron.domain.aisle.usecase.UpdateAisleUseCase
+import com.aisleron.domain.base.AisleronException
+import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationType
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
@@ -13,6 +18,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
+import kotlin.test.assertTrue
 
 class ShoppingListViewModelTest {
     private lateinit var testData: TestDataManager
@@ -57,6 +63,23 @@ class ShoppingListViewModelTest {
         Assert.assertEquals("", shoppingListViewModel.locationName)
         Assert.assertEquals(FilterType.NEEDED, shoppingListViewModel.defaultFilter)
         Assert.assertEquals(LocationType.HOME, shoppingListViewModel.locationType)
+    }
+
+    @Test
+    fun hydrate_LocationHasNoAisles_ShoppingListIsEmpty() {
+        val location = Location(
+            id = 0,
+            type = LocationType.SHOP,
+            defaultFilter = FilterType.NEEDED,
+            name = "No Aisle Shop",
+            pinned = false,
+            aisles = emptyList()
+        )
+
+        val locationId = runBlocking { testData.locationRepository.add(location) }
+        shoppingListViewModel.hydrate(locationId, location.defaultFilter)
+
+        assertTrue((shoppingListViewModel.shoppingListUiState.value as ShoppingListViewModel.ShoppingListUiState.Updated).shoppingList.isEmpty())
     }
 
     @Test
@@ -517,6 +540,146 @@ class ShoppingListViewModelTest {
         Assert.assertEquals(
             productCount, shoppingList.count { it.lineItemType == ShoppingListItemType.PRODUCT }
         )
+    }
+
+    @Test
+    fun constructor_NoCoroutineScopeProvided_ShoppingListViewModelReturned() {
+        val testUseCases = TestUseCaseProvider(testData)
+        val vm = ShoppingListViewModel(
+            testUseCases.getShoppingListUseCase,
+            testUseCases.updateProductStatusUseCase,
+            testUseCases.addAisleUseCase,
+            testUseCases.updateAisleUseCase,
+            testUseCases.updateAisleProductRankUseCase,
+            testUseCases.updateAisleRankUseCase,
+            testUseCases.removeAisleUseCase,
+            testUseCases.removeProductUseCase,
+            testUseCases.getAisleUseCase
+        )
+
+        Assert.assertNotNull(vm)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun updateAisle_ExceptionRaised_UiStateIsError() {
+        val testUseCases = TestUseCaseProvider(testData)
+        val exceptionMessage = "Error on update Aisle"
+        val vm = ShoppingListViewModel(
+            testUseCases.getShoppingListUseCase,
+            testUseCases.updateProductStatusUseCase,
+            testUseCases.addAisleUseCase,
+            object : UpdateAisleUseCase {
+                override suspend fun invoke(aisle: Aisle) {
+                    throw Exception(exceptionMessage)
+                }
+            },
+            testUseCases.updateAisleProductRankUseCase,
+            testUseCases.updateAisleRankUseCase,
+            testUseCases.removeAisleUseCase,
+            testUseCases.removeProductUseCase,
+            testUseCases.getAisleUseCase,
+            TestScope(UnconfinedTestDispatcher())
+        )
+
+        vm.hydrate(1, FilterType.NEEDED)
+
+        val sli = ShoppingListItemViewModel(
+            lineItemType = ShoppingListItemType.AISLE,
+            aisleRank = 1000,
+            rank = 1000,
+            id = -1,
+            name = "Dummy",
+            inStock = false,
+            aisleId = -1,
+            mappingId = 0,
+            childCount = 0
+        )
+        vm.updateAisle(sli)
+
+        val uiState = vm.shoppingListUiState.value
+        Assert.assertTrue(uiState is ShoppingListViewModel.ShoppingListUiState.Error)
+        with(uiState as ShoppingListViewModel.ShoppingListUiState.Error) {
+            Assert.assertEquals(AisleronException.GENERIC_EXCEPTION, this.errorCode)
+            Assert.assertEquals(exceptionMessage, this.errorMessage)
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun addAisle_ExceptionRaised_UiStateIsError() {
+        val testUseCases = TestUseCaseProvider(testData)
+        val exceptionMessage = "Error on update Product Status"
+        val vm = ShoppingListViewModel(
+            testUseCases.getShoppingListUseCase,
+            testUseCases.updateProductStatusUseCase,
+            object : AddAisleUseCase {
+                override suspend fun invoke(aisle: Aisle): Int {
+                    throw Exception(exceptionMessage)
+                }
+            },
+            testUseCases.updateAisleUseCase,
+            testUseCases.updateAisleProductRankUseCase,
+            testUseCases.updateAisleRankUseCase,
+            testUseCases.removeAisleUseCase,
+            testUseCases.removeProductUseCase,
+            testUseCases.getAisleUseCase,
+            TestScope(UnconfinedTestDispatcher())
+        )
+
+        vm.hydrate(1, FilterType.NEEDED)
+        vm.addAisle("New Dummy Aisle")
+
+        val uiState = vm.shoppingListUiState.value
+        Assert.assertTrue(uiState is ShoppingListViewModel.ShoppingListUiState.Error)
+        with(uiState as ShoppingListViewModel.ShoppingListUiState.Error) {
+            Assert.assertEquals(AisleronException.GENERIC_EXCEPTION, this.errorCode)
+            Assert.assertEquals(exceptionMessage, this.errorMessage)
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun removeItem_ExceptionRaised_UiStateIsError() {
+        val testUseCases = TestUseCaseProvider(testData)
+        val exceptionMessage = "Error on Remove Item"
+        val vm = ShoppingListViewModel(
+            testUseCases.getShoppingListUseCase,
+            testUseCases.updateProductStatusUseCase,
+            testUseCases.addAisleUseCase,
+            testUseCases.updateAisleUseCase,
+            testUseCases.updateAisleProductRankUseCase,
+            testUseCases.updateAisleRankUseCase,
+            testUseCases.removeAisleUseCase,
+            testUseCases.removeProductUseCase,
+            object : GetAisleUseCase {
+                override suspend operator fun invoke(id: Int): Aisle? {
+                    throw Exception(exceptionMessage)
+                }
+            },
+            TestScope(UnconfinedTestDispatcher())
+        )
+
+        vm.hydrate(1, FilterType.NEEDED)
+        val sli = ShoppingListItemViewModel(
+            lineItemType = ShoppingListItemType.AISLE,
+            aisleRank = 1000,
+            rank = 1000,
+            id = -1,
+            name = "Dummy",
+            inStock = false,
+            aisleId = -1,
+            mappingId = 0,
+            childCount = 0
+        )
+        vm.removeItem(sli)
+
+        val uiState = vm.shoppingListUiState.value
+        Assert.assertTrue(uiState is ShoppingListViewModel.ShoppingListUiState.Error)
+        with(uiState as ShoppingListViewModel.ShoppingListUiState.Error) {
+            Assert.assertEquals(AisleronException.GENERIC_EXCEPTION, this.errorCode)
+            Assert.assertEquals(exceptionMessage, this.errorMessage)
+        }
     }
 
 //Hydrate, each filter type

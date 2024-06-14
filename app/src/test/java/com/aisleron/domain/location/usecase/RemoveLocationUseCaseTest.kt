@@ -2,7 +2,7 @@ package com.aisleron.domain.location.usecase
 
 import com.aisleron.data.TestDataManager
 import com.aisleron.domain.FilterType
-import com.aisleron.domain.aisle.usecase.RemoveAisleUseCase
+import com.aisleron.domain.aisle.usecase.RemoveAisleUseCaseImpl
 import com.aisleron.domain.aisle.usecase.RemoveDefaultAisleUseCase
 import com.aisleron.domain.aisleproduct.usecase.RemoveProductsFromAisleUseCase
 import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductsUseCase
@@ -26,7 +26,7 @@ class RemoveLocationUseCaseTest {
 
         removeLocationUseCase = RemoveLocationUseCaseImpl(
             testData.locationRepository,
-            RemoveAisleUseCase(
+            RemoveAisleUseCaseImpl(
                 testData.aisleRepository,
                 UpdateAisleProductsUseCase(testData.aisleProductRepository),
                 RemoveProductsFromAisleUseCase(testData.aisleProductRepository)

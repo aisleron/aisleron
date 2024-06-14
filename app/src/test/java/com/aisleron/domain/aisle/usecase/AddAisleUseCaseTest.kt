@@ -20,7 +20,7 @@ class AddAisleUseCaseTest {
     @BeforeEach
     fun setUp() {
         testData = TestDataManager()
-        addAisleUseCase = AddAisleUseCase(
+        addAisleUseCase = AddAisleUseCaseImpl(
             testData.aisleRepository,
             GetLocationUseCase(testData.locationRepository)
         )

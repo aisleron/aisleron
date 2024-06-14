@@ -13,19 +13,19 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="BundlerTest">
+      <SelectionState runConfigName="updateAisle_ExceptionRaised_UiStateIsError()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="ProductFragmentTest">
+      <SelectionState runConfigName="updateProductStatus_ExceptionRaised_UiStateIsError()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="invoke_NewDatabase_HomeLocationAdded()">
+      <SelectionState runConfigName="addAisle_ExceptionRaised_UiStateIsError()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="invoke_HomeLocationAdded_DefaultAisleCreated()">
+      <SelectionState runConfigName="removeItem_ExceptionRaised_UiStateIsError()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="DbInitializerTest">
+      <SelectionState runConfigName="hydrate_LocationHasNoAisles_ShoppingListIsEmpty()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

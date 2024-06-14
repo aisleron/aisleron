@@ -22,7 +22,7 @@ class UpdateProductStatusUseCaseTest {
     @BeforeEach
     fun setUp() {
         testData = TestDataManager()
-        updateProductStatusUseCase = UpdateProductStatusUseCase(
+        updateProductStatusUseCase = UpdateProductStatusUseCaseImpl(
             GetProductUseCase(testData.productRepository),
             UpdateProductUseCase(
                 testData.productRepository,

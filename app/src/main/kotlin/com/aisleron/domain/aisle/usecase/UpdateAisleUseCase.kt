@@ -5,11 +5,15 @@ import com.aisleron.domain.aisle.AisleRepository
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.location.usecase.GetLocationUseCase
 
-class UpdateAisleUseCase(
+interface UpdateAisleUseCase {
+    suspend operator fun invoke(aisle: Aisle)
+}
+
+class UpdateAisleUseCaseImpl(
     private val aisleRepository: AisleRepository,
     private val getLocationUseCase: GetLocationUseCase
-) {
-    suspend operator fun invoke(aisle: Aisle) {
+) : UpdateAisleUseCase {
+    override suspend operator fun invoke(aisle: Aisle) {
         getLocationUseCase(aisle.locationId)
             ?: throw AisleronException.InvalidLocationException("Invalid Location Id provided")
 

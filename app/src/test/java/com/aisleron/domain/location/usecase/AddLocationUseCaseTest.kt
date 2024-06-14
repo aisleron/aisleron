@@ -3,7 +3,7 @@ package com.aisleron.domain.location.usecase
 import com.aisleron.data.TestDataManager
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.aisle.Aisle
-import com.aisleron.domain.aisle.usecase.AddAisleUseCase
+import com.aisleron.domain.aisle.usecase.AddAisleUseCaseImpl
 import com.aisleron.domain.aisleproduct.AisleProduct
 import com.aisleron.domain.aisleproduct.usecase.AddAisleProductsUseCase
 import com.aisleron.domain.base.AisleronException
@@ -31,7 +31,7 @@ class AddLocationUseCaseTest {
 
         addLocationUseCase = AddLocationUseCaseImpl(
             testData.locationRepository,
-            AddAisleUseCase(
+            AddAisleUseCaseImpl(
                 testData.aisleRepository,
                 GetLocationUseCase(testData.locationRepository)
             ),

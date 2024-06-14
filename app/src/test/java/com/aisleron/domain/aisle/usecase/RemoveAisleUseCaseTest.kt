@@ -21,7 +21,7 @@ class RemoveAisleUseCaseTest {
     @BeforeEach
     fun setUp() {
         testData = TestDataManager()
-        removeAisleUseCase = RemoveAisleUseCase(
+        removeAisleUseCase = RemoveAisleUseCaseImpl(
             testData.aisleRepository,
             UpdateAisleProductsUseCase(testData.aisleProductRepository),
             RemoveProductsFromAisleUseCase(testData.aisleProductRepository),
