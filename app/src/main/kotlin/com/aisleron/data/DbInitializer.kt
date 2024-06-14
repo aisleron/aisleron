@@ -9,8 +9,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
-class DbInitializer {
-    operator fun invoke(db: AisleronDatabase) {
+class DbInitializer(
+    private val database: AisleronDatabase,
+    coroutineScopeProvider: CoroutineScope? = null
+) {
+    private val coroutineScope = coroutineScopeProvider ?: CoroutineScope(Dispatchers.IO)
+
+    operator fun invoke() {
 
         val home = LocationEntity(
             id = 0,
@@ -19,8 +24,8 @@ class DbInitializer {
             name = "Home",
             pinned = false
         )
-        CoroutineScope(Dispatchers.IO).launch {
-            val homeId = db.locationDao().upsert(home)[0].toInt()
+        coroutineScope.launch {
+            val homeId = database.locationDao().upsert(home)[0].toInt()
             val aisle = AisleEntity(
                 id = 0,
                 name = "No Aisle",
@@ -29,7 +34,7 @@ class DbInitializer {
                 isDefault = true
             )
 
-            db.aisleDao().upsert(aisle)
+            database.aisleDao().upsert(aisle)
         }
 
     }
