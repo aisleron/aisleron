@@ -9,11 +9,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.aisleron.R
-import com.aisleron.domain.FilterType
 import com.aisleron.ui.shoplist.ShopListItemViewModel
 import com.aisleron.ui.shoplist.ShopListViewModel
 import kotlinx.coroutines.launch
@@ -22,20 +20,12 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 /**
  * A fragment representing a list of Items.
  */
-class ShopMenuFragment : Fragment() {
-
-    private var columnCount = 1
+class ShopMenuFragment : Fragment(), ShopMenuRecyclerViewAdapter.ShopMenuItemListener {
     private val shopListViewModel: ShopListViewModel by viewModel()
-
     private val items = mutableListOf<ShopListItemViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        arguments?.let {
-            columnCount = it.getInt(ARG_COLUMN_COUNT)
-        }
-
         shopListViewModel.hydratePinnedShops()
     }
 
@@ -73,37 +63,24 @@ class ShopMenuFragment : Fragment() {
                 }
             }
             with(view) {
-                layoutManager = when {
-                    columnCount <= 1 -> LinearLayoutManager(context)
-                    else -> GridLayoutManager(context, columnCount)
-                }
-                adapter =
-                    ShopMenuRecyclerViewAdapter(items,
-                        object :
-                            ShopMenuRecyclerViewAdapter.ShopMenuItemListener {
-                            override fun onItemClick(item: ShopListItemViewModel) {
-                                navigateToShoppingList(item)
-                            }
-                        })
+                layoutManager = LinearLayoutManager(context)
+                adapter = ShopMenuRecyclerViewAdapter(items, this@ShopMenuFragment)
             }
         }
         return view
     }
 
     companion object {
-
-        const val ARG_COLUMN_COUNT = "column-count"
         const val ARG_LOCATION_ID = "locationId"
         const val ARG_FILTER_TYPE = "filterType"
 
         @JvmStatic
-        fun newInstance(columnCount: Int, locationId: Long, filterType: FilterType) =
-            ShopMenuFragment().apply {
-                arguments = Bundle().apply {
-                    putInt(ARG_COLUMN_COUNT, columnCount)
-                    putInt(ARG_LOCATION_ID, locationId.toInt())
-                    putSerializable(ARG_FILTER_TYPE, filterType)
-                }
-            }
+        fun newInstance() = ShopMenuFragment().apply {
+            arguments = null
+        }
+    }
+
+    override fun onItemClick(item: ShopListItemViewModel) {
+        navigateToShoppingList(item)
     }
 }

@@ -80,6 +80,7 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.1.1")
     implementation("androidx.fragment:fragment-ktx:1.7.1")
     implementation("androidx.databinding:databinding-runtime:8.4.1")
+    implementation("androidx.navigation:navigation-testing:2.7.7")
 
     //Testing
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
