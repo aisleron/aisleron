@@ -13,12 +13,6 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="hydrate_LocationHasNoAisles_ShoppingListIsEmpty()">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
-      <SelectionState runConfigName="newInstance_CallNewInstance_ReturnsFragment()">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
       <SelectionState runConfigName="onCreateView_ShopsLoaded_MatchesPinnedShopCount()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
@@ -26,6 +20,12 @@
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
       <SelectionState runConfigName="onItemClick_IsValidLocation_NavigateToShoppingList()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="NavigationDrawerFragmentTest">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="onClick_textViewClicked_NavigateToTargetView()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
