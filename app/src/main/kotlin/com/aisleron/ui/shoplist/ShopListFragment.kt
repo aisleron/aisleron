@@ -31,7 +31,8 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 /**
  * A fragment representing a list of Items.
  */
-class ShopListFragment : Fragment(), ActionMode.Callback {
+class ShopListFragment : Fragment(), ActionMode.Callback,
+    ShopListItemRecyclerViewAdapter.ShopListItemListener {
 
     private var actionMode: ActionMode? = null
     private var actionModeItem: ShopListItemViewModel? = null
@@ -73,14 +74,16 @@ class ShopListFragment : Fragment(), ActionMode.Callback {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val fab = this.activity?.findViewById<View>(R.id.fab) as FloatingActionButton
-        fab.setImageDrawable(
-            ResourcesCompat.getDrawable(
-                resources, R.drawable.baseline_add_business_24, context?.theme
+        val fab = this.activity?.findViewById<View>(R.id.fab) as FloatingActionButton?
+        fab?.let {
+            it.setImageDrawable(
+                ResourcesCompat.getDrawable(
+                    resources, R.drawable.baseline_add_business_24, context?.theme
+                )
             )
-        )
-        fab.setOnClickListener { _ ->
-            navigateToAddShop()
+            it.setOnClickListener { _ ->
+                navigateToAddShop()
+            }
         }
 
         val view = inflater.inflate(R.layout.fragment_shop_list, container, false)
@@ -113,27 +116,7 @@ class ShopListFragment : Fragment(), ActionMode.Callback {
                     else -> GridLayoutManager(context, columnCount)
                 }
                 adapter =
-                    ShopListItemRecyclerViewAdapter(items,
-                        object :
-                            ShopListItemRecyclerViewAdapter.ShopListItemListener {
-                            override fun onClick(item: ShopListItemViewModel) {
-                                navigateToShoppingList(item)
-                            }
-
-                            override fun onLongClick(item: ShopListItemViewModel): Boolean {
-                                actionModeItem = item
-                                return when (actionMode) {
-                                    null -> {
-                                        // Start the CAB using the ActionMode.Callback defined earlier.
-                                        actionMode =
-                                            requireActivity().startActionMode(this@ShopListFragment)
-                                        true
-                                    }
-
-                                    else -> false
-                                }
-                            }
-                        })
+                    ShopListItemRecyclerViewAdapter(items, this@ShopListFragment)
             }
         }
         return view
@@ -214,5 +197,23 @@ class ShopListFragment : Fragment(), ActionMode.Callback {
                     putInt(ARG_COLUMN_COUNT, columnCount)
                 }
             }
+    }
+
+    override fun onClick(item: ShopListItemViewModel) {
+        navigateToShoppingList(item)
+    }
+
+    override fun onLongClick(item: ShopListItemViewModel): Boolean {
+        actionModeItem = item
+        return when (actionMode) {
+            null -> {
+                // Start the CAB using the ActionMode.Callback defined earlier.
+                actionMode =
+                    requireActivity().startActionMode(this@ShopListFragment)
+                true
+            }
+
+            else -> false
+        }
     }
 }

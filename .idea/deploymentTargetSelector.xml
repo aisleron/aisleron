@@ -13,19 +13,19 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="onCreateView_ShopsLoaded_MatchesPinnedShopCount()">
+      <SelectionState runConfigName="onLongClick_ActionModeNotActive_ShowActionModeContextMenu()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="onItemClick_IsValidLocation_ShowShoppingList()">
+      <SelectionState runConfigName="ProductFragmentTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="onItemClick_IsValidLocation_NavigateToShoppingList()">
+      <SelectionState runConfigName="onSaveClick_NoProductNameEntered_DoNothing()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="NavigationDrawerFragmentTest">
+      <SelectionState runConfigName="ShopFragmentTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="onClick_textViewClicked_NavigateToTargetView()">
+      <SelectionState runConfigName="ShopListFragmentTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

@@ -163,6 +163,19 @@
             </AndroidTestResultsTableState>
           </value>
         </entry>
+        <entry key="-1502200273">
+          <value>
+            <AndroidTestResultsTableState>
+              <option name="preferredColumnWidths">
+                <map>
+                  <entry key="Duration" value="90" />
+                  <entry key="Tests" value="360" />
+                  <entry key="unknown Android SDK built for x86_64" value="120" />
+                </map>
+              </option>
+            </AndroidTestResultsTableState>
+          </value>
+        </entry>
         <entry key="-1449832050">
           <value>
             <AndroidTestResultsTableState>
@@ -488,6 +501,19 @@
             </AndroidTestResultsTableState>
           </value>
         </entry>
+        <entry key="-226275451">
+          <value>
+            <AndroidTestResultsTableState>
+              <option name="preferredColumnWidths">
+                <map>
+                  <entry key="Duration" value="90" />
+                  <entry key="Tests" value="360" />
+                  <entry key="unknown Android SDK built for x86_64" value="120" />
+                </map>
+              </option>
+            </AndroidTestResultsTableState>
+          </value>
+        </entry>
         <entry key="-200277740">
           <value>
             <AndroidTestResultsTableState>
@@ -619,6 +645,19 @@
             </AndroidTestResultsTableState>
           </value>
         </entry>
+        <entry key="265195691">
+          <value>
+            <AndroidTestResultsTableState>
+              <option name="preferredColumnWidths">
+                <map>
+                  <entry key="Duration" value="90" />
+                  <entry key="Tests" value="360" />
+                  <entry key="unknown Android SDK built for x86_64" value="120" />
+                </map>
+              </option>
+            </AndroidTestResultsTableState>
+          </value>
+        </entry>
         <entry key="278735842">
           <value>
             <AndroidTestResultsTableState>
@@ -633,6 +672,19 @@
           </value>
         </entry>
         <entry key="281502245">
+          <value>
+            <AndroidTestResultsTableState>
+              <option name="preferredColumnWidths">
+                <map>
+                  <entry key="Duration" value="90" />
+                  <entry key="Tests" value="360" />
+                  <entry key="unknown Android SDK built for x86_64" value="120" />
+                </map>
+              </option>
+            </AndroidTestResultsTableState>
+          </value>
+        </entry>
+        <entry key="433630329">
           <value>
             <AndroidTestResultsTableState>
               <option name="preferredColumnWidths">
@@ -776,6 +828,19 @@
           </value>
         </entry>
         <entry key="992208953">
+          <value>
+            <AndroidTestResultsTableState>
+              <option name="preferredColumnWidths">
+                <map>
+                  <entry key="Duration" value="90" />
+                  <entry key="Tests" value="360" />
+                  <entry key="unknown Android SDK built for x86_64" value="120" />
+                </map>
+              </option>
+            </AndroidTestResultsTableState>
+          </value>
+        </entry>
+        <entry key="1003498828">
           <value>
             <AndroidTestResultsTableState>
               <option name="preferredColumnWidths">
@@ -1010,6 +1075,19 @@
           </value>
         </entry>
         <entry key="1713995037">
+          <value>
+            <AndroidTestResultsTableState>
+              <option name="preferredColumnWidths">
+                <map>
+                  <entry key="Duration" value="90" />
+                  <entry key="Tests" value="360" />
+                  <entry key="unknown Android SDK built for x86_64" value="120" />
+                </map>
+              </option>
+            </AndroidTestResultsTableState>
+          </value>
+        </entry>
+        <entry key="1776243266">
           <value>
             <AndroidTestResultsTableState>
               <option name="preferredColumnWidths">
