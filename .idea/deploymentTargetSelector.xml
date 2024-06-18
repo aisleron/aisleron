@@ -13,19 +13,19 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="onLongClick_ActionModeNotActive_ShowActionModeContextMenu()">
+      <SelectionState runConfigName="onActionItemClicked_ActionItemIsDelete_DeleteDialogShown()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="ProductFragmentTest">
+      <SelectionState runConfigName="onActionItemClicked_DeleteConfirmed_LocationDeleted()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="onSaveClick_NoProductNameEntered_DoNothing()">
+      <SelectionState runConfigName="onActionItemClicked_DeleteCancelled_LocationNotDeleted()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="ShopFragmentTest">
+      <SelectionState runConfigName="newInstance_CallNewInstance_ReturnsFragment()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="ShopListFragmentTest">
+      <SelectionState runConfigName="onActionItemClicked_ErrorOccurs_ShowErrorSnackBar()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
