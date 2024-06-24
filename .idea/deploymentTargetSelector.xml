@@ -4,7 +4,7 @@
     <selectionStates>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2024-05-13T08:27:21.179148093Z">
+        <DropdownSelection timestamp="2024-06-22T10:27:23.188771725Z">
           <Target type="DEFAULT_BOOT">
             <handle>
               <DeviceId pluginId="LocalEmulator" identifier="path=/home/danie/.var/app/com.google.AndroidStudio/config/.android/avd/Pixel_3a_API_34_AOSP.avd" />
@@ -13,19 +13,19 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="onActionItemClicked_ActionItemIsDelete_DeleteDialogShown()">
+      <SelectionState runConfigName="ShoppingListFragmentTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="onActionItemClicked_DeleteConfirmed_LocationDeleted()">
+      <SelectionState runConfigName="onActionItemClicked_ActionItemIsEditOnProduct_NavigateToEditProduct()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="onActionItemClicked_DeleteCancelled_LocationNotDeleted()">
+      <SelectionState runConfigName="onProductStatusChange_SetProductInStock_ProductStatusUpdated()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="newInstance_CallNewInstance_ReturnsFragment()">
+      <SelectionState runConfigName="onProductStatusChange_SetProductNeeded_ProductStatusUpdated()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="onActionItemClicked_ErrorOccurs_ShowErrorSnackBar()">
+      <SelectionState runConfigName="onSwipe_IsProduct_ProductStatusToggled()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

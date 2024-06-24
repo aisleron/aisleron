@@ -81,6 +81,7 @@ dependencies {
     implementation("androidx.fragment:fragment-ktx:1.8.0")
     implementation("androidx.databinding:databinding-runtime:8.5.0")
     implementation("androidx.navigation:navigation-testing:2.7.7")
+    implementation("androidx.test.espresso:espresso-contrib:3.5.1")
 
     //Testing
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")

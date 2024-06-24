@@ -118,7 +118,7 @@ class ShoppingListItemRecyclerViewAdapter(
 
         fun bind(item: ShoppingListItemViewModel) {
             itemView.isLongClickable = true
-            contentView.text = String.format("${item.name} ")
+            contentView.text = item.name
             if (item.inStock) {
                 contentView.setTypeface(null, Typeface.ITALIC)
             } else {

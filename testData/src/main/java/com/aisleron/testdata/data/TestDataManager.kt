@@ -125,7 +125,8 @@ class TestDataManager {
                 name = "Home",
                 pinned = false,
                 aisles = emptyList()
-            ))
+            )
+        )
     }
 
     private suspend fun addProducts() {
