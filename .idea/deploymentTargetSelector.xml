@@ -13,19 +13,19 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="ShoppingListFragmentTest">
+      <SelectionState runConfigName="onSearchBox_Existing_Product_ProductDisplayed()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="onActionItemClicked_ActionItemIsEditOnProduct_NavigateToEditProduct()">
+      <SelectionState runConfigName="onSearchBox_IsNonExistentProduct_ProductDisplayed()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="onProductStatusChange_SetProductInStock_ProductStatusUpdated()">
+      <SelectionState runConfigName="onSearchBox_ClearSearchClicked_ShowProducts()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="onProductStatusChange_SetProductNeeded_ProductStatusUpdated()">
+      <SelectionState runConfigName="onSearchBox_BackPressed_SearchBoxHidden()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="onSwipe_IsProduct_ProductStatusToggled()">
+      <SelectionState runConfigName="MainActivityTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

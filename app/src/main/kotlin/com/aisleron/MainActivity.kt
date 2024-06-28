@@ -18,7 +18,7 @@ import androidx.preference.PreferenceManager
 import com.aisleron.databinding.ActivityMainBinding
 import com.aisleron.ui.AddEditFragmentListener
 import com.aisleron.ui.AisleronFragmentFactory
-import com.aisleron.ui.FabHandler
+import com.aisleron.ui.FabHandlerImpl
 import com.google.android.material.navigation.NavigationView
 
 
@@ -72,7 +72,7 @@ class MainActivity : AppCompatActivity(), AddEditFragmentListener {
 
         navController.addOnDestinationChangedListener { _, _, _ ->
             drawerLayout.closeDrawers()
-            FabHandler(this).initializeFab()
+            FabHandlerImpl(this).initializeFab()
         }
     }
 

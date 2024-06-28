@@ -10,12 +10,8 @@ import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import com.aisleron.R
 import com.aisleron.data.TestDataManager
-import com.aisleron.domain.TestUseCaseProvider
+import com.aisleron.di.TestAppModules
 import com.aisleron.ui.KoinTestRule
-import com.aisleron.ui.shoplist.ShopListViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Rule
@@ -23,7 +19,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import org.koin.core.module.Module
-import org.koin.dsl.module
 
 @RunWith(value = Parameterized::class)
 class NavigationDrawerFragmentTest(
@@ -37,22 +32,8 @@ class NavigationDrawerFragmentTest(
         modules = getKoinModules()
     )
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     private fun getKoinModules(): List<Module> {
-        val testUseCases = TestUseCaseProvider(TestDataManager())
-        val shopListViewModel = ShopListViewModel(
-            getShopsUseCase = testUseCases.getShopsUseCase,
-            getPinnedShopsUseCase = testUseCases.getPinnedShopsUseCase,
-            removeLocationUseCase = testUseCases.removeLocationUseCase,
-            getLocationUseCase = testUseCases.getLocationUseCase,
-            TestScope(UnconfinedTestDispatcher())
-        )
-
-        return listOf(
-            module {
-                factory<ShopListViewModel> { shopListViewModel }
-            }
-        )
+        return TestAppModules().getTestAppModules(TestDataManager())
     }
 
     private fun getFragmentScenario(): FragmentScenario<NavigationDrawerFragment> =

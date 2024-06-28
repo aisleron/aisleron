@@ -14,22 +14,18 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.platform.app.InstrumentationRegistry
 import com.aisleron.R
 import com.aisleron.data.TestDataManager
-import com.aisleron.domain.TestUseCaseProvider
+import com.aisleron.di.TestAppModules
 import com.aisleron.ui.AddEditFragmentListener
 import com.aisleron.ui.KoinTestRule
 import com.aisleron.ui.TestMenuHost
 import com.aisleron.ui.bundles.Bundler
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.koin.core.module.Module
-import org.koin.dsl.module
 
 class ProductFragmentTest {
     private lateinit var bundler: Bundler
@@ -41,22 +37,9 @@ class ProductFragmentTest {
         modules = getKoinModules()
     )
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     private fun getKoinModules(): List<Module> {
         testData = TestDataManager()
-        val testUseCases = TestUseCaseProvider(testData)
-        val productViewModel = ProductViewModel(
-            addProductUseCase = testUseCases.addProductUseCase,
-            updateProductUseCase = testUseCases.updateProductUseCase,
-            getProductUseCase = testUseCases.getProductUseCase,
-            TestScope(UnconfinedTestDispatcher())
-        )
-
-        return listOf(
-            module {
-                factory<ProductViewModel> { productViewModel }
-            }
-        )
+        return TestAppModules().getTestAppModules(testData)
     }
 
     @Before

@@ -30,6 +30,7 @@ import com.aisleron.domain.location.LocationType
 import com.aisleron.ui.AisleronExceptionMap
 import com.aisleron.ui.ApplicationTitleUpdateListener
 import com.aisleron.ui.FabHandler
+import com.aisleron.ui.FabHandlerImpl
 import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.widgets.ErrorSnackBar
 import com.google.android.material.snackbar.Snackbar
@@ -43,11 +44,13 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  */
 class ShoppingListFragment(
     private val applicationTitleUpdateListener: ApplicationTitleUpdateListener,
+    fabHandler: FabHandler? = null
 ) :
     Fragment(), SearchView.OnQueryTextListener, ActionMode.Callback {
 
     private var actionMode: ActionMode? = null
     private var actionModeItem: ShoppingListItemViewModel? = null
+    private val fabHandler = fabHandler ?: this.activity?.let { FabHandlerImpl(it) }
 
     private val shoppingListViewModel: ShoppingListViewModel by viewModel()
 
@@ -122,7 +125,6 @@ class ShoppingListFragment(
 
                                 else -> false
                             }
-
                         }
 
                         override fun onMoved(item: ShoppingListItemViewModel) {
@@ -148,9 +150,7 @@ class ShoppingListFragment(
     }
 
     private fun initializeFab() {
-        val fabHandler = this.activity?.let { FabHandler(it) }
-
-        if (fabHandler != null) {
+        fabHandler?.let {
             fabHandler.setModeShowAllFab()
             fabHandler.setFabOnClickListener(FabHandler.FabOption.ADD_PRODUCT) {
                 navigateToAddProduct(shoppingListViewModel.defaultFilter)
