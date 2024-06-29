@@ -104,7 +104,6 @@ class MainActivityTest {
         val searchString = "This is Not a Real Product Name"
 
         performSearch(searchString)
-
         val clearSearch = onView(
             Matchers.allOf(
                 withId(com.google.android.material.R.id.search_close_btn),
@@ -122,16 +121,16 @@ class MainActivityTest {
         val searchString = "This is Not a Real Product Name"
 
         performSearch(searchString)
-
         val backAction = onView(
-            Matchers.allOf(
-                withContentDescription("Collapse"),
-                isDisplayed()
-            )
+            Matchers.allOf(withContentDescription("Collapse"), isDisplayed())
         )
         backAction.perform(click())
 
         getSearchTextBox().check(doesNotExist())
     }
+
+    /*
+        Fab shows correctly
+     */
 }
 

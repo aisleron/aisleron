@@ -19,6 +19,8 @@ import com.aisleron.R
 import com.aisleron.databinding.FragmentProductBinding
 import com.aisleron.ui.AddEditFragmentListener
 import com.aisleron.ui.AisleronExceptionMap
+import com.aisleron.ui.FabHandler
+import com.aisleron.ui.FabHandlerImpl
 import com.aisleron.ui.bundles.AddEditProductBundle
 import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.widgets.ErrorSnackBar
@@ -28,11 +30,13 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ProductFragment(
     private val addEditFragmentListener: AddEditFragmentListener,
-    private val menuHost: MenuHost
+    private val menuHost: MenuHost,
+    fabHandler: FabHandler? = null
 ) : Fragment(), MenuProvider {
 
     private val productViewModel: ProductViewModel by viewModel()
     private var _binding: FragmentProductBinding? = null
+    private val _fabHandler = fabHandler
 
     private val binding get() = _binding!!
 
@@ -57,6 +61,8 @@ class ProductFragment(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        val fabHandler = _fabHandler ?: FabHandlerImpl(this.requireActivity())
+        fabHandler.setModeShowNoFab()
         _binding = FragmentProductBinding.inflate(inflater, container, false)
 
         viewLifecycleOwner.lifecycleScope.launch {

@@ -16,6 +16,7 @@ import com.aisleron.R
 import com.aisleron.data.TestDataManager
 import com.aisleron.di.TestAppModules
 import com.aisleron.ui.AddEditFragmentListener
+import com.aisleron.ui.FabHandlerTestImpl
 import com.aisleron.ui.KoinTestRule
 import com.aisleron.ui.TestMenuHost
 import com.aisleron.ui.bundles.Bundler
@@ -31,6 +32,7 @@ class ProductFragmentTest {
     private lateinit var bundler: Bundler
     private lateinit var addEditFragmentListener: TestAddEditFragmentListener
     private lateinit var testData: TestDataManager
+    private lateinit var fabHandler: FabHandlerTestImpl
 
     @get:Rule
     val koinTestRule = KoinTestRule(
@@ -46,6 +48,7 @@ class ProductFragmentTest {
     fun setUp() {
         bundler = Bundler()
         addEditFragmentListener = TestAddEditFragmentListener()
+        fabHandler = FabHandlerTestImpl()
     }
 
     @After
@@ -211,7 +214,7 @@ class ProductFragmentTest {
         val scenario = launchFragmentInContainer<ProductFragment>(
             fragmentArgs = bundle,
             themeResId = R.style.Theme_Aisleron,
-            instantiate = { ProductFragment(addEditFragmentListener, TestMenuHost()) }
+            instantiate = { ProductFragment(addEditFragmentListener, TestMenuHost(), fabHandler) }
         )
 
         return scenario

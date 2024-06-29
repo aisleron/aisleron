@@ -10,7 +10,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -21,9 +20,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.aisleron.R
 import com.aisleron.ui.AisleronExceptionMap
+import com.aisleron.ui.FabHandler
+import com.aisleron.ui.FabHandlerImpl
 import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.widgets.ErrorSnackBar
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -31,11 +31,12 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 /**
  * A fragment representing a list of Items.
  */
-class ShopListFragment : Fragment(), ActionMode.Callback,
+class ShopListFragment(fabHandler: FabHandler? = null) : Fragment(), ActionMode.Callback,
     ShopListItemRecyclerViewAdapter.ShopListItemListener {
 
     private var actionMode: ActionMode? = null
     private var actionModeItem: ShopListItemViewModel? = null
+    private val _fabHandler = fabHandler
 
 
     private var columnCount = 3
@@ -74,16 +75,10 @@ class ShopListFragment : Fragment(), ActionMode.Callback,
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val fab = this.activity?.findViewById<View>(R.id.fab) as FloatingActionButton?
-        fab?.let {
-            it.setImageDrawable(
-                ResourcesCompat.getDrawable(
-                    resources, R.drawable.baseline_add_business_24, context?.theme
-                )
-            )
-            it.setOnClickListener { _ ->
-                navigateToAddShop()
-            }
+        val fabHandler = _fabHandler ?: FabHandlerImpl(this.requireActivity())
+        fabHandler.setModeShowAddShopFabOnly()
+        fabHandler.setFabOnClickListener(FabHandler.FabOption.ADD_SHOP) {
+            navigateToAddShop()
         }
 
         val view = inflater.inflate(R.layout.fragment_shop_list, container, false)

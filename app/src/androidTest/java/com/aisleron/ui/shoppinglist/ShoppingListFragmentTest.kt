@@ -58,7 +58,7 @@ class ShoppingListFragmentTest {
     private lateinit var bundler: Bundler
     private lateinit var applicationTitleUpdateListener: TestApplicationTitleUpdateListener
     private lateinit var testData: TestDataManager
-    private val fabHandler = FabHandlerTestImpl()
+    private lateinit var fabHandler: FabHandlerTestImpl
 
     @get:Rule
     val koinTestRule = KoinTestRule(
@@ -87,6 +87,7 @@ class ShoppingListFragmentTest {
     fun setUp() {
         bundler = Bundler()
         applicationTitleUpdateListener = TestApplicationTitleUpdateListener()
+        fabHandler = FabHandlerTestImpl()
     }
 
     @Test

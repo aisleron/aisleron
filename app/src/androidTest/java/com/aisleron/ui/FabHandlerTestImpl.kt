@@ -22,6 +22,8 @@ class FabHandlerTestImpl : FabHandler {
     }
 
     override fun setModeShowAllFab() {}
+    override fun setModeShowAddShopFabOnly() {}
+    override fun setModeShowNoFab() {}
 
     fun clickFab(fabOption: FabHandler.FabOption, view: View) {
         fabOnClick[fabOption]?.onClick(view)

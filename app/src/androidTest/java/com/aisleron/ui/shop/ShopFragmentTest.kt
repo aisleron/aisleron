@@ -22,6 +22,7 @@ import com.aisleron.domain.location.usecase.IsLocationNameUniqueUseCase
 import com.aisleron.domain.location.usecase.UpdateLocationUseCase
 import com.aisleron.domain.product.usecase.GetAllProductsUseCase
 import com.aisleron.ui.AddEditFragmentListener
+import com.aisleron.ui.FabHandlerTestImpl
 import com.aisleron.ui.KoinTestRule
 import com.aisleron.ui.TestMenuHost
 import com.aisleron.ui.bundles.Bundler
@@ -41,6 +42,7 @@ class ShopFragmentTest {
     private lateinit var bundler: Bundler
     private lateinit var addEditFragmentListener: TestAddEditFragmentListener
     private lateinit var testData: TestDataManager
+    private lateinit var fabHandler: FabHandlerTestImpl
 
     @get:Rule
     val koinTestRule = KoinTestRule(
@@ -80,6 +82,7 @@ class ShopFragmentTest {
     fun setUp() {
         bundler = Bundler()
         addEditFragmentListener = TestAddEditFragmentListener()
+        fabHandler = FabHandlerTestImpl()
     }
 
     @After
@@ -240,7 +243,7 @@ class ShopFragmentTest {
         val scenario = launchFragmentInContainer<ShopFragment>(
             fragmentArgs = bundle,
             themeResId = R.style.Theme_Aisleron,
-            instantiate = { ShopFragment(addEditFragmentListener, TestMenuHost()) }
+            instantiate = { ShopFragment(addEditFragmentListener, TestMenuHost(), fabHandler) }
         )
 
         return scenario

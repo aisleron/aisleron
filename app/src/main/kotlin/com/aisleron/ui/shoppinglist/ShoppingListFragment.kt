@@ -50,7 +50,7 @@ class ShoppingListFragment(
 
     private var actionMode: ActionMode? = null
     private var actionModeItem: ShoppingListItemViewModel? = null
-    private val fabHandler = fabHandler ?: this.activity?.let { FabHandlerImpl(it) }
+    private val _fabHandler = fabHandler
 
     private val shoppingListViewModel: ShoppingListViewModel by viewModel()
 
@@ -150,14 +150,14 @@ class ShoppingListFragment(
     }
 
     private fun initializeFab() {
-        fabHandler?.let {
-            fabHandler.setModeShowAllFab()
-            fabHandler.setFabOnClickListener(FabHandler.FabOption.ADD_PRODUCT) {
-                navigateToAddProduct(shoppingListViewModel.defaultFilter)
-            }
-            fabHandler.setFabOnClickListener(FabHandler.FabOption.ADD_AISLE) {
-                showAisleDialog(requireView().context)
-            }
+        val fabHandler = _fabHandler ?: FabHandlerImpl(this.requireActivity())
+        fabHandler.setModeShowAllFab()
+        fabHandler.setFabOnClickListener(FabHandler.FabOption.ADD_PRODUCT) {
+            navigateToAddProduct(shoppingListViewModel.defaultFilter)
+        }
+
+        fabHandler.setFabOnClickListener(FabHandler.FabOption.ADD_AISLE) {
+            showAisleDialog(requireView().context)
         }
     }
 

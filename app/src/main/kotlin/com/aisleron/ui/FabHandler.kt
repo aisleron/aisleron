@@ -7,12 +7,10 @@ interface FabHandler {
     fun hideAllFab()
     fun showAllFab()
     fun initializeFab()
-    fun setFabOnClickListener(
-        fabOption: FabOption,
-        onClickListener: View.OnClickListener
-    )
-
+    fun setFabOnClickListener(fabOption: FabOption, onClickListener: View.OnClickListener)
     fun setModeShowAllFab()
+    fun setModeShowAddShopFabOnly()
+    fun setModeShowNoFab()
 
     enum class FabOption {
         ADD_PRODUCT, ADD_AISLE, ADD_SHOP

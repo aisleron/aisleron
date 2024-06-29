@@ -106,7 +106,8 @@ class FabHandlerImpl(private val activity: Activity) : FabHandler {
     }
 
     override fun setModeShowAllFab() {
-        fabMain?.setOnClickListener {
+        fabMain.show()
+        fabMain.setOnClickListener {
             if (allFabAreHidden) {
                 showAllFab()
             } else {
@@ -114,4 +115,20 @@ class FabHandlerImpl(private val activity: Activity) : FabHandler {
             }
         }
     }
+
+    override fun setModeShowAddShopFabOnly() {
+        fabMain.show()
+        fabMain.setImageDrawable(
+            ResourcesCompat.getDrawable(
+                activity.resources, R.drawable.baseline_add_business_24, activity.theme
+            )
+        )
+        fabMain.setOnClickListener { _ -> fabAddShop.callOnClick() }
+    }
+
+    override fun setModeShowNoFab() {
+        fabMain.hide()
+    }
+
+
 }
