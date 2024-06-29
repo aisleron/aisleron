@@ -3,7 +3,6 @@ package com.aisleron.ui
 import android.view.View
 
 class FabHandlerTestImpl : FabHandler {
-    override var allFabAreHidden: Boolean = true
     private val fabOnClick = mutableMapOf<FabHandler.FabOption, View.OnClickListener>()
 
     override fun setFabOnClickListener(

@@ -3,7 +3,6 @@ package com.aisleron.ui
 import android.view.View
 
 interface FabHandler {
-    var allFabAreHidden: Boolean
     fun setFabOnClickListener(fabOption: FabOption, onClickListener: View.OnClickListener)
     fun setFabItems(vararg fabOptions: FabOption)
 
