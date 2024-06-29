@@ -17,7 +17,6 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.preference.PreferenceManager
 import com.aisleron.databinding.ActivityMainBinding
 import com.aisleron.ui.AddEditFragmentListener
-import com.aisleron.ui.AisleronFragmentFactory
 import com.aisleron.ui.FabHandlerImpl
 import com.google.android.material.navigation.NavigationView
 
@@ -42,8 +41,6 @@ class MainActivity : AppCompatActivity(), AddEditFragmentListener {
             DARK_THEME -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
             else -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
         }
-
-        supportFragmentManager.fragmentFactory = AisleronFragmentFactory(this, this)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -72,7 +69,7 @@ class MainActivity : AppCompatActivity(), AddEditFragmentListener {
 
         navController.addOnDestinationChangedListener { _, _, _ ->
             drawerLayout.closeDrawers()
-            FabHandlerImpl(this).initializeFab()
+            FabHandlerImpl(this).setFabItems()
         }
     }
 

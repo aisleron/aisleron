@@ -43,7 +43,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  * A fragment representing a list of [ShoppingListItemViewModel].
  */
 class ShoppingListFragment(
-    private val applicationTitleUpdateListener: ApplicationTitleUpdateListener,
+    applicationTitleUpdateListener: ApplicationTitleUpdateListener? = null,
     fabHandler: FabHandler? = null
 ) :
     Fragment(), SearchView.OnQueryTextListener, ActionMode.Callback {
@@ -51,6 +51,7 @@ class ShoppingListFragment(
     private var actionMode: ActionMode? = null
     private var actionModeItem: ShoppingListItemViewModel? = null
     private val _fabHandler = fabHandler
+    private val _applicationTitleUpdateListener = applicationTitleUpdateListener
 
     private val shoppingListViewModel: ShoppingListViewModel by viewModel()
 
@@ -151,7 +152,11 @@ class ShoppingListFragment(
 
     private fun initializeFab() {
         val fabHandler = _fabHandler ?: FabHandlerImpl(this.requireActivity())
-        fabHandler.setModeShowAllFab()
+        fabHandler.setFabItems(
+            FabHandler.FabOption.ADD_SHOP,
+            FabHandler.FabOption.ADD_AISLE,
+            FabHandler.FabOption.ADD_PRODUCT
+        )
         fabHandler.setFabOnClickListener(FabHandler.FabOption.ADD_PRODUCT) {
             navigateToAddProduct(shoppingListViewModel.defaultFilter)
         }
@@ -173,6 +178,9 @@ class ShoppingListFragment(
 
                 LocationType.SHOP -> shoppingListViewModel.locationName
             }
+
+        val applicationTitleUpdateListener = _applicationTitleUpdateListener
+            ?: (this.requireActivity() as ApplicationTitleUpdateListener)
         applicationTitleUpdateListener.applicationTitleUpdated(appTitle)
     }
 

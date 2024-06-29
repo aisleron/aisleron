@@ -61,11 +61,6 @@ class ShopListFragment(fabHandler: FabHandler? = null) : Fragment(), ActionMode.
         this.findNavController().navigate(R.id.action_nav_all_shops_to_nav_shopping_list, bundle)
     }
 
-    private fun navigateToAddShop() {
-        val bundle = Bundler().makeAddLocationBundle()
-        this.findNavController().navigate(R.id.nav_add_shop, bundle)
-    }
-
     private fun navigateToEditShop(locationId: Int) {
         val bundle = Bundler().makeEditLocationBundle(locationId)
         this.findNavController().navigate(R.id.nav_add_shop, bundle)
@@ -76,10 +71,7 @@ class ShopListFragment(fabHandler: FabHandler? = null) : Fragment(), ActionMode.
         savedInstanceState: Bundle?
     ): View? {
         val fabHandler = _fabHandler ?: FabHandlerImpl(this.requireActivity())
-        fabHandler.setModeShowAddShopFabOnly()
-        fabHandler.setFabOnClickListener(FabHandler.FabOption.ADD_SHOP) {
-            navigateToAddShop()
-        }
+        fabHandler.setFabItems(FabHandler.FabOption.ADD_SHOP)
 
         val view = inflater.inflate(R.layout.fragment_shop_list, container, false)
 

@@ -14,6 +14,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.platform.app.InstrumentationRegistry
 import com.aisleron.R
 import com.aisleron.data.TestDataManager
+import com.aisleron.di.KoinTestRule
 import com.aisleron.domain.aisle.usecase.AddAisleUseCaseImpl
 import com.aisleron.domain.aisleproduct.usecase.AddAisleProductsUseCase
 import com.aisleron.domain.location.usecase.AddLocationUseCaseImpl
@@ -23,8 +24,6 @@ import com.aisleron.domain.location.usecase.UpdateLocationUseCase
 import com.aisleron.domain.product.usecase.GetAllProductsUseCase
 import com.aisleron.ui.AddEditFragmentListener
 import com.aisleron.ui.FabHandlerTestImpl
-import com.aisleron.di.KoinTestRule
-import com.aisleron.ui.TestMenuHost
 import com.aisleron.ui.bundles.Bundler
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
@@ -229,7 +228,7 @@ class ShopFragmentTest {
 
     @Test
     fun newInstance_CallNewInstance_ReturnsFragment() {
-        val fragment = ShopFragment.newInstance(null, addEditFragmentListener, TestMenuHost())
+        val fragment = ShopFragment.newInstance(null, addEditFragmentListener)
         Assert.assertNotNull(fragment)
     }
 
@@ -243,7 +242,7 @@ class ShopFragmentTest {
         val scenario = launchFragmentInContainer<ShopFragment>(
             fragmentArgs = bundle,
             themeResId = R.style.Theme_Aisleron,
-            instantiate = { ShopFragment(addEditFragmentListener, TestMenuHost(), fabHandler) }
+            instantiate = { ShopFragment(addEditFragmentListener, fabHandler) }
         )
 
         return scenario

@@ -22,29 +22,13 @@ class FabHandlerImpl(private val activity: Activity) : FabHandler {
     private val fabAddShop = activity.findViewById<FloatingActionButton>(R.id.fab_add_shop)
     private val lblAddShop = activity.findViewById<TextView>(R.id.add_shop_fab_label)
 
-    override var allFabAreHidden: Boolean = true
+    private var fabEntries = mutableListOf<FabHandler.FabOption>()
 
-    private fun hideFab(fabOption: FabHandler.FabOption) {
-        when (fabOption) {
-            FabHandler.FabOption.ADD_PRODUCT -> hideSingleFabViews(fabAddProduct, lblAddProduct)
-            FabHandler.FabOption.ADD_AISLE -> hideSingleFabViews(fabAddAisle, lblAddAisle)
-            FabHandler.FabOption.ADD_SHOP -> hideSingleFabViews(fabAddShop, lblAddShop)
-        }
-    }
+    override var allFabAreHidden: Boolean = true
 
     private fun hideSingleFabViews(fab: FloatingActionButton, label: TextView) {
         fab.hide()
         label.visibility = View.GONE
-    }
-
-    private fun showFab(fabOption: FabHandler.FabOption) {
-        when (fabOption) {
-            FabHandler.FabOption.ADD_PRODUCT -> showSingleFabViews(fabAddProduct, lblAddProduct)
-            FabHandler.FabOption.ADD_AISLE -> showSingleFabViews(fabAddAisle, lblAddAisle)
-            FabHandler.FabOption.ADD_SHOP -> showSingleFabViews(fabAddShop, lblAddShop)
-        }
-
-        allFabAreHidden = false
     }
 
     private fun showSingleFabViews(fab: FloatingActionButton, label: TextView) {
@@ -52,61 +36,65 @@ class FabHandlerImpl(private val activity: Activity) : FabHandler {
         label.visibility = View.VISIBLE
     }
 
-    override fun hideAllFab() {
+    private fun hideAllFab() {
         for (fabOption in FabHandler.FabOption.entries) {
-            hideFab(fabOption)
+            when (fabOption) {
+                FabHandler.FabOption.ADD_PRODUCT -> hideSingleFabViews(fabAddProduct, lblAddProduct)
+                FabHandler.FabOption.ADD_AISLE -> hideSingleFabViews(fabAddAisle, lblAddAisle)
+                FabHandler.FabOption.ADD_SHOP -> hideSingleFabViews(fabAddShop, lblAddShop)
+            }
         }
+
         allFabAreHidden = true
     }
 
-    override fun showAllFab() {
-        for (fabOption in FabHandler.FabOption.entries) {
-            showFab(fabOption)
-        }
-    }
-
-    override fun initializeFab() {
-        hideAllFab()
-
-        fabAddShop.setOnClickListener {
-            val bundle = Bundler().makeAddLocationBundle()
-            activity.findNavController(R.id.nav_host_fragment_content_main)
-                .navigate(R.id.nav_add_shop, bundle)
-            hideAllFab()
-        }
-
-        fabMain.setImageDrawable(
-            ResourcesCompat.getDrawable(
-                activity.resources, android.R.drawable.ic_input_add, activity.theme
-            )
-        )
-        fabMain.setOnClickListener {
-            if (allFabAreHidden) {
-                showFab(FabHandler.FabOption.ADD_SHOP)
-            } else {
-                hideAllFab()
+    private fun showAllFab() {
+        for (fabOption in fabEntries) {
+            when (fabOption) {
+                FabHandler.FabOption.ADD_PRODUCT -> showSingleFabViews(fabAddProduct, lblAddProduct)
+                FabHandler.FabOption.ADD_AISLE -> showSingleFabViews(fabAddAisle, lblAddAisle)
+                FabHandler.FabOption.ADD_SHOP -> showSingleFabViews(fabAddShop, lblAddShop)
             }
         }
+
+        allFabAreHidden = false
     }
 
     override fun setFabOnClickListener(
         fabOption: FabHandler.FabOption,
         onClickListener: View.OnClickListener
     ) {
-        val fab = when (fabOption) {
-            FabHandler.FabOption.ADD_PRODUCT -> fabAddProduct
-            FabHandler.FabOption.ADD_AISLE -> fabAddAisle
-            FabHandler.FabOption.ADD_SHOP -> fabAddShop
-        }
+        val fab = getFabFromOption(fabOption)
 
-        fab?.setOnClickListener {
+        fab.setOnClickListener {
             onClickListener.onClick(it)
             hideAllFab()
         }
     }
 
-    override fun setModeShowAllFab() {
+    private fun getFabFromOption(fabOption: FabHandler.FabOption): FloatingActionButton =
+        when (fabOption) {
+            FabHandler.FabOption.ADD_PRODUCT -> fabAddProduct
+            FabHandler.FabOption.ADD_AISLE -> fabAddAisle
+            FabHandler.FabOption.ADD_SHOP -> fabAddShop
+        }
+
+    private fun setMainFabToSingleOption() {
+        getFabFromOption(fabEntries.first()).let {
+            fabMain.setImageDrawable(it.drawable)
+            fabMain.setOnClickListener { _ -> it.callOnClick() }
+        }
+
         fabMain.show()
+    }
+
+    private fun setMainFabToMultiOption() {
+        fabMain.setImageDrawable(
+            ResourcesCompat.getDrawable(
+                activity.resources, android.R.drawable.ic_input_add, activity.theme
+            )
+        )
+
         fabMain.setOnClickListener {
             if (allFabAreHidden) {
                 showAllFab()
@@ -114,20 +102,24 @@ class FabHandlerImpl(private val activity: Activity) : FabHandler {
                 hideAllFab()
             }
         }
-    }
 
-    override fun setModeShowAddShopFabOnly() {
         fabMain.show()
-        fabMain.setImageDrawable(
-            ResourcesCompat.getDrawable(
-                activity.resources, R.drawable.baseline_add_business_24, activity.theme
-            )
-        )
-        fabMain.setOnClickListener { _ -> fabAddShop.callOnClick() }
     }
 
-    override fun setModeShowNoFab() {
-        fabMain.hide()
+    override fun setFabItems(vararg fabOptions: FabHandler.FabOption) {
+        fabEntries = fabOptions.distinctBy { it.name }.toMutableList()
+        when (fabEntries.count()) {
+            0 -> fabMain.hide()
+            1 -> setMainFabToSingleOption()
+            else -> setMainFabToMultiOption()
+        }
+
+        hideAllFab()
+        setFabOnClickListener(FabHandler.FabOption.ADD_SHOP) {
+            val bundle = Bundler().makeAddLocationBundle()
+            activity.findNavController(R.id.nav_host_fragment_content_main)
+                .navigate(R.id.nav_add_shop, bundle)
+        }
     }
 
 

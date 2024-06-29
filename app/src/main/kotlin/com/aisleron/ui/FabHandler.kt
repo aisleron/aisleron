@@ -4,13 +4,8 @@ import android.view.View
 
 interface FabHandler {
     var allFabAreHidden: Boolean
-    fun hideAllFab()
-    fun showAllFab()
-    fun initializeFab()
     fun setFabOnClickListener(fabOption: FabOption, onClickListener: View.OnClickListener)
-    fun setModeShowAllFab()
-    fun setModeShowAddShopFabOnly()
-    fun setModeShowNoFab()
+    fun setFabItems(vararg fabOptions: FabOption)
 
     enum class FabOption {
         ADD_PRODUCT, ADD_AISLE, ADD_SHOP

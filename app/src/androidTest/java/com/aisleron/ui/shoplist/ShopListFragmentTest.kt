@@ -19,11 +19,9 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.aisleron.R
 import com.aisleron.data.TestDataManager
-import com.aisleron.domain.TestUseCaseProvider
-import com.aisleron.domain.location.LocationType
-import com.aisleron.ui.FabHandler
-import com.aisleron.ui.FabHandlerTestImpl
 import com.aisleron.di.KoinTestRule
+import com.aisleron.domain.TestUseCaseProvider
+import com.aisleron.ui.FabHandlerTestImpl
 import com.aisleron.ui.bundles.AddEditLocationBundle
 import com.aisleron.ui.bundles.Bundler
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -37,7 +35,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.koin.core.module.Module
 import org.koin.dsl.module
-import kotlin.test.assertNull
 
 class ShopListFragmentTest {
     private lateinit var bundler: Bundler
@@ -208,24 +205,5 @@ class ShopListFragmentTest {
 
         val deletedLocation = runBlocking { testData.locationRepository.get(deleteLocation.id) }
         assertEquals(deleteLocation, deletedLocation)
-    }
-
-    @Test
-    fun onClickFab_IsAddShopFab_NavigateToAddShop() {
-        val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
-        getFragmentScenario().onFragment { fragment ->
-            navController.setGraph(R.navigation.mobile_navigation)
-            navController.setCurrentDestination(R.id.nav_all_shops)
-            Navigation.setViewNavController(fragment.requireView(), navController)
-            fabHandler.clickFab(FabHandler.FabOption.ADD_SHOP, fragment.requireView())
-        }
-
-        val bundle = navController.backStack.last().arguments
-        val addEditShopBundle = bundler.getAddEditLocationBundle(bundle)
-
-        assertNull(addEditShopBundle.name)
-        assertEquals(AddEditLocationBundle.LocationAction.ADD, addEditShopBundle.actionType)
-        assertEquals(LocationType.SHOP, addEditShopBundle.locationType)
-        assertEquals(R.id.nav_add_shop, navController.currentDestination?.id)
     }
 }

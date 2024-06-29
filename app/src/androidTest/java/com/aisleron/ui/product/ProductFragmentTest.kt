@@ -18,7 +18,6 @@ import com.aisleron.di.KoinTestRule
 import com.aisleron.di.TestAppModules
 import com.aisleron.ui.AddEditFragmentListener
 import com.aisleron.ui.FabHandlerTestImpl
-import com.aisleron.ui.TestMenuHost
 import com.aisleron.ui.bundles.Bundler
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -199,7 +198,7 @@ class ProductFragmentTest {
     @Test
     fun newInstance_CallNewInstance_ReturnsFragment() {
         val fragment =
-            ProductFragment.newInstance(null, false, addEditFragmentListener, TestMenuHost())
+            ProductFragment.newInstance(null, false, addEditFragmentListener)
         Assert.assertNotNull(fragment)
     }
 
@@ -214,7 +213,7 @@ class ProductFragmentTest {
         val scenario = launchFragmentInContainer<ProductFragment>(
             fragmentArgs = bundle,
             themeResId = R.style.Theme_Aisleron,
-            instantiate = { ProductFragment(addEditFragmentListener, TestMenuHost(), fabHandler) }
+            instantiate = { ProductFragment(addEditFragmentListener, fabHandler) }
         )
 
         return scenario

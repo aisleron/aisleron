@@ -27,17 +27,16 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.aisleron.R
 import com.aisleron.data.TestDataManager
+import com.aisleron.di.KoinTestRule
 import com.aisleron.di.TestAppModules
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationType
 import com.aisleron.ui.FabHandler
 import com.aisleron.ui.FabHandlerTestImpl
-import com.aisleron.di.KoinTestRule
 import com.aisleron.ui.TestApplicationTitleUpdateListener
 import com.aisleron.ui.bundles.AddEditProductBundle
 import com.aisleron.ui.bundles.Bundler
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.allOf
@@ -65,7 +64,6 @@ class ShoppingListFragmentTest {
         modules = getKoinModules()
     )
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     private fun getKoinModules(): List<Module> {
         testData = TestDataManager()
         return TestAppModules().getTestAppModules(testData)

@@ -9,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
-import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
@@ -29,14 +28,14 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ProductFragment(
-    private val addEditFragmentListener: AddEditFragmentListener,
-    private val menuHost: MenuHost,
+    private val addEditFragmentListener: AddEditFragmentListener? = null,
     fabHandler: FabHandler? = null
 ) : Fragment(), MenuProvider {
 
     private val productViewModel: ProductViewModel by viewModel()
     private var _binding: FragmentProductBinding? = null
     private val _fabHandler = fabHandler
+    private lateinit var _addEditFragmentListener: AddEditFragmentListener
 
     private val binding get() = _binding!!
 
@@ -62,7 +61,11 @@ class ProductFragment(
         savedInstanceState: Bundle?
     ): View {
         val fabHandler = _fabHandler ?: FabHandlerImpl(this.requireActivity())
-        fabHandler.setModeShowNoFab()
+        fabHandler.setFabItems()
+
+        _addEditFragmentListener =
+            addEditFragmentListener ?: (this.requireActivity() as AddEditFragmentListener)
+
         _binding = FragmentProductBinding.inflate(inflater, container, false)
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -70,7 +73,7 @@ class ProductFragment(
                 productViewModel.productUiState.collect {
                     when (it) {
                         ProductViewModel.ProductUiState.Success -> {
-                            addEditFragmentListener.addEditActionCompleted()
+                            _addEditFragmentListener.addEditActionCompleted()
                         }
 
                         ProductViewModel.ProductUiState.Empty -> Unit
@@ -106,6 +109,7 @@ class ProductFragment(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val menuHost = requireActivity()
         menuHost.addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
@@ -116,9 +120,7 @@ class ProductFragment(
 
     override fun onResume() {
         super.onResume()
-
-        addEditFragmentListener.applicationTitleUpdated(appTitle)
-
+        _addEditFragmentListener.applicationTitleUpdated(appTitle)
 
         val edtProductName = binding.edtProductName
         edtProductName.postDelayed({
@@ -134,10 +136,9 @@ class ProductFragment(
         fun newInstance(
             name: String?,
             inStock: Boolean,
-            addEditFragmentListener: AddEditFragmentListener,
-            menuHost: MenuHost
+            addEditFragmentListener: AddEditFragmentListener
         ) =
-            ProductFragment(addEditFragmentListener, menuHost).apply {
+            ProductFragment(addEditFragmentListener).apply {
                 arguments = Bundler().makeAddProductBundle(name, inStock)
             }
     }
