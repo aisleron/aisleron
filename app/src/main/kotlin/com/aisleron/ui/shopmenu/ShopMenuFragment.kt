@@ -12,6 +12,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.aisleron.R
+import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.shoplist.ShopListItemViewModel
 import com.aisleron.ui.shoplist.ShopListViewModel
 import kotlinx.coroutines.launch
@@ -22,7 +23,6 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  */
 class ShopMenuFragment : Fragment(), ShopMenuRecyclerViewAdapter.ShopMenuItemListener {
     private val shopListViewModel: ShopListViewModel by viewModel()
-    private val items = mutableListOf<ShopListItemViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,9 +30,7 @@ class ShopMenuFragment : Fragment(), ShopMenuRecyclerViewAdapter.ShopMenuItemLis
     }
 
     private fun navigateToShoppingList(item: ShopListItemViewModel) {
-        val bundle = Bundle()
-        bundle.putInt(ARG_LOCATION_ID, item.id)
-        bundle.putSerializable(ARG_FILTER_TYPE, item.defaultFilter)
+        val bundle = Bundler().makeShoppingListBundle(item.id, item.defaultFilter)
         this.findNavController().navigate(R.id.nav_shopping_list, bundle)
     }
 
@@ -48,31 +46,24 @@ class ShopMenuFragment : Fragment(), ShopMenuRecyclerViewAdapter.ShopMenuItemLis
                 viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                     shopListViewModel.shopListUiState.collect {
                         when (it) {
-                            ShopListViewModel.ShopListUiState.Empty -> Unit
-                            ShopListViewModel.ShopListUiState.Loading -> Unit
-                            ShopListViewModel.ShopListUiState.Success -> Unit
-                            is ShopListViewModel.ShopListUiState.Error -> Unit
-
                             is ShopListViewModel.ShopListUiState.Updated -> {
-                                items.clear()
-                                items += it.shops
-                                view.adapter?.notifyDataSetChanged()
+                                (view.adapter as ShopMenuRecyclerViewAdapter).submitList(it.shops)
                             }
+
+                            else -> Unit
                         }
                     }
                 }
             }
             with(view) {
                 layoutManager = LinearLayoutManager(context)
-                adapter = ShopMenuRecyclerViewAdapter(items, this@ShopMenuFragment)
+                adapter = ShopMenuRecyclerViewAdapter(this@ShopMenuFragment)
             }
         }
         return view
     }
 
     companion object {
-        const val ARG_LOCATION_ID = "locationId"
-        const val ARG_FILTER_TYPE = "filterType"
 
         @JvmStatic
         fun newInstance() = ShopMenuFragment().apply {
@@ -80,7 +71,7 @@ class ShopMenuFragment : Fragment(), ShopMenuRecyclerViewAdapter.ShopMenuItemLis
         }
     }
 
-    override fun onItemClick(item: ShopListItemViewModel) {
+    override fun onClick(item: ShopListItemViewModel) {
         navigateToShoppingList(item)
     }
 }

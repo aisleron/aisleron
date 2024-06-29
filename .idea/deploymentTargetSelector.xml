@@ -13,19 +13,19 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="ShoppingListFragmentTest">
+      <SelectionState runConfigName="MainActivityTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="onClickFab_IsAddShopFab_NavigateToAddShop()">
+      <SelectionState runConfigName="Tests in 'com.aisleron.ui.product'">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="newInstance_CallNewInstance_ReturnsFragment()">
+      <SelectionState runConfigName="Tests in 'com.aisleron.ui.shoplist'">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="Tests in 'com.aisleron'">
+      <SelectionState runConfigName="Tests in 'com.aisleron.ui.shopmenu'">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="checkAllModules()">
+      <SelectionState runConfigName="onItemClick_IsValidLocation_NavigateToShoppingList()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

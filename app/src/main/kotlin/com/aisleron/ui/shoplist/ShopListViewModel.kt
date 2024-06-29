@@ -64,7 +64,6 @@ class ShopListViewModel(
     sealed class ShopListUiState {
         data object Empty : ShopListUiState()
         data object Loading : ShopListUiState()
-        data object Success : ShopListUiState()
         data class Error(val errorCode: String, val errorMessage: String?) : ShopListUiState()
         data class Updated(val shops: List<ShopListItemViewModel>) : ShopListUiState()
     }

@@ -37,12 +37,8 @@ class ShopListFragment(fabHandler: FabHandler? = null) : Fragment(), ActionMode.
     private var actionMode: ActionMode? = null
     private var actionModeItem: ShopListItemViewModel? = null
     private val _fabHandler = fabHandler
-
-
     private var columnCount = 3
     private val shopListViewModel: ShopListViewModel by viewModel()
-
-    private val items = mutableListOf<ShopListItemViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,9 +51,7 @@ class ShopListFragment(fabHandler: FabHandler? = null) : Fragment(), ActionMode.
     }
 
     private fun navigateToShoppingList(item: ShopListItemViewModel) {
-        val bundle = Bundle()
-        bundle.putInt(ARG_LOCATION_ID, item.id)
-        bundle.putSerializable(ARG_FILTER_TYPE, item.defaultFilter)
+        val bundle = Bundler().makeShoppingListBundle(item.id, item.defaultFilter)
         this.findNavController().navigate(R.id.action_nav_all_shops_to_nav_shopping_list, bundle)
     }
 
@@ -81,18 +75,15 @@ class ShopListFragment(fabHandler: FabHandler? = null) : Fragment(), ActionMode.
                 viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                     shopListViewModel.shopListUiState.collect {
                         when (it) {
-                            ShopListViewModel.ShopListUiState.Empty -> Unit
-                            ShopListViewModel.ShopListUiState.Loading -> Unit
-                            ShopListViewModel.ShopListUiState.Success -> Unit
                             is ShopListViewModel.ShopListUiState.Error -> {
                                 displayErrorSnackBar(it.errorCode, it.errorMessage)
                             }
 
                             is ShopListViewModel.ShopListUiState.Updated -> {
-                                items.clear()
-                                items += it.shops
-                                view.adapter?.notifyDataSetChanged()
+                                (view.adapter as ShopListItemRecyclerViewAdapter).submitList(it.shops)
                             }
+
+                            else -> Unit
                         }
                     }
                 }
@@ -102,8 +93,7 @@ class ShopListFragment(fabHandler: FabHandler? = null) : Fragment(), ActionMode.
                     columnCount <= 1 -> LinearLayoutManager(context)
                     else -> GridLayoutManager(context, columnCount)
                 }
-                adapter =
-                    ShopListItemRecyclerViewAdapter(items, this@ShopListFragment)
+                adapter = ShopListItemRecyclerViewAdapter(this@ShopListFragment)
             }
         }
         return view
@@ -174,8 +164,6 @@ class ShopListFragment(fabHandler: FabHandler? = null) : Fragment(), ActionMode.
     companion object {
 
         const val ARG_COLUMN_COUNT = "column-count"
-        const val ARG_LOCATION_ID = "locationId"
-        const val ARG_FILTER_TYPE = "filterType"
 
         @JvmStatic
         fun newInstance(columnCount: Int) =

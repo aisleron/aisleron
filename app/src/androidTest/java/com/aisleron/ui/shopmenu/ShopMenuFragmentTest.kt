@@ -6,15 +6,16 @@ import androidx.navigation.Navigation
 import androidx.navigation.testing.TestNavHostController
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.hasChildCount
 import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.matcher.ViewMatchers.withText
 import com.aisleron.R
 import com.aisleron.data.TestDataManager
-import com.aisleron.domain.TestUseCaseProvider
 import com.aisleron.di.KoinTestRule
+import com.aisleron.domain.TestUseCaseProvider
 import com.aisleron.ui.bundles.Bundler
-import com.aisleron.ui.shoplist.ShopListItemViewModel
 import com.aisleron.ui.shoplist.ShopListViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.count
@@ -87,32 +88,26 @@ class ShopMenuFragmentTest {
 
     @Test
     fun onItemClick_IsValidLocation_NavigateToShoppingList() {
-        val editLocation = runBlocking { testData.locationRepository.getAll().first { it.pinned } }
-        val item = ShopListItemViewModel(
-            name = editLocation.name,
-            id = editLocation.id,
-            defaultFilter = editLocation.defaultFilter
-        )
+        val shopLocation = runBlocking { testData.locationRepository.getAll().first { it.pinned } }
 
         // Create a TestNavHostController
         val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
 
-        val scenario = getFragmentScenario()
-        scenario.onFragment { fragment ->
+        getFragmentScenario().onFragment { fragment ->
             // Set the graph on the TestNavHostController
             navController.setGraph(R.navigation.mobile_navigation)
 
             // Make the NavController available via the findNavController() APIs
             Navigation.setViewNavController(fragment.requireView(), navController)
-
-            fragment.onItemClick(item)
         }
+
+        onView(withText(shopLocation.name)).perform(click())
 
         val bundle = navController.backStack.last().arguments
         val shoppingListBundle = bundler.getShoppingListBundle(bundle)
 
-        Assert.assertEquals(editLocation.id, shoppingListBundle.locationId)
-        Assert.assertEquals(editLocation.defaultFilter, shoppingListBundle.filterType)
+        Assert.assertEquals(shopLocation.id, shoppingListBundle.locationId)
+        Assert.assertEquals(shopLocation.defaultFilter, shoppingListBundle.filterType)
         Assert.assertEquals(R.id.nav_shopping_list, navController.currentDestination?.id)
     }
 }
