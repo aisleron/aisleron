@@ -13,19 +13,19 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="MainActivityTest">
+      <SelectionState runConfigName="loadedMultiFab_FabNotClicked_ChildFabHidden()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="Tests in 'com.aisleron.ui.product'">
+      <SelectionState runConfigName="clickFab_ChildFabShowing_HideChildFab()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="Tests in 'com.aisleron.ui.shoplist'">
+      <SelectionState runConfigName="FabHandlerImplTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="Tests in 'com.aisleron.ui.shopmenu'">
+      <SelectionState runConfigName="SearchBoxTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="onItemClick_IsValidLocation_NavigateToShoppingList()">
+      <SelectionState runConfigName="onSearchBox_IsExistingProduct_ProductDisplayed()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

@@ -14,8 +14,8 @@ import androidx.test.espresso.matcher.ViewMatchers.withContentDescription
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import com.aisleron.data.TestDataManager
-import com.aisleron.di.TestAppModules
 import com.aisleron.di.KoinTestRule
+import com.aisleron.di.TestAppModules
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.allOf
 import org.hamcrest.Matchers
@@ -25,7 +25,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.koin.core.module.Module
 
-class MainActivityTest {
+class SearchBoxTest {
 
     private lateinit var testData: TestDataManager
     private lateinit var scenario: ActivityScenario<MainActivity>

@@ -3,6 +3,7 @@ package com.aisleron.di
 import com.aisleron.data.TestDataManager
 import com.aisleron.domain.TestUseCaseProvider
 import com.aisleron.ui.product.ProductViewModel
+import com.aisleron.ui.shop.ShopViewModel
 import com.aisleron.ui.shoplist.ShopListViewModel
 import com.aisleron.ui.shoppinglist.ShoppingListViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -49,6 +50,15 @@ class TestAppModules {
                         addProductUseCase = testUseCases.addProductUseCase,
                         updateProductUseCase = testUseCases.updateProductUseCase,
                         getProductUseCase = testUseCases.getProductUseCase,
+                        TestScope(UnconfinedTestDispatcher())
+                    )
+                }
+
+                factory<ShopViewModel> {
+                    ShopViewModel(
+                        addLocationUseCase = testUseCases.addLocationUseCase,
+                        updateLocationUseCase = testUseCases.updateLocationUseCase,
+                        getLocationUseCase = testUseCases.getLocationUseCase,
                         TestScope(UnconfinedTestDispatcher())
                     )
                 }
