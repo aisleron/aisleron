@@ -18,7 +18,7 @@ android {
         versionCode = 1
         versionName = "0.1.0"
 
-        testInstrumentationRunner = "com.aisleron.ui.KoinInstrumentationTestRunner"
+        testInstrumentationRunner = "com.aisleron.di.KoinInstrumentationTestRunner"
 
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")

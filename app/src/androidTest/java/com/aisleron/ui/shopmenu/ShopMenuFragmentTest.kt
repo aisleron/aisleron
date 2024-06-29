@@ -12,7 +12,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import com.aisleron.R
 import com.aisleron.data.TestDataManager
 import com.aisleron.domain.TestUseCaseProvider
-import com.aisleron.ui.KoinTestRule
+import com.aisleron.di.KoinTestRule
 import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.shoplist.ShopListItemViewModel
 import com.aisleron.ui.shoplist.ShopListViewModel

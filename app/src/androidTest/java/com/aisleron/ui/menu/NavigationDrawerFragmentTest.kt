@@ -11,7 +11,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import com.aisleron.R
 import com.aisleron.data.TestDataManager
 import com.aisleron.di.TestAppModules
-import com.aisleron.ui.KoinTestRule
+import com.aisleron.di.KoinTestRule
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Rule

@@ -1,4 +1,4 @@
-package com.aisleron.ui
+package com.aisleron.di
 
 import android.app.Application
 

@@ -23,7 +23,7 @@ import com.aisleron.domain.location.usecase.UpdateLocationUseCase
 import com.aisleron.domain.product.usecase.GetAllProductsUseCase
 import com.aisleron.ui.AddEditFragmentListener
 import com.aisleron.ui.FabHandlerTestImpl
-import com.aisleron.ui.KoinTestRule
+import com.aisleron.di.KoinTestRule
 import com.aisleron.ui.TestMenuHost
 import com.aisleron.ui.bundles.Bundler
 import kotlinx.coroutines.ExperimentalCoroutinesApi

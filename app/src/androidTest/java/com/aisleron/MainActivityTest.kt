@@ -15,7 +15,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import com.aisleron.data.TestDataManager
 import com.aisleron.di.TestAppModules
-import com.aisleron.ui.KoinTestRule
+import com.aisleron.di.KoinTestRule
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.allOf
 import org.hamcrest.Matchers

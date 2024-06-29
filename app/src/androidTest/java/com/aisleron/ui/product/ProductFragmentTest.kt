@@ -14,10 +14,10 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.platform.app.InstrumentationRegistry
 import com.aisleron.R
 import com.aisleron.data.TestDataManager
+import com.aisleron.di.KoinTestRule
 import com.aisleron.di.TestAppModules
 import com.aisleron.ui.AddEditFragmentListener
 import com.aisleron.ui.FabHandlerTestImpl
-import com.aisleron.ui.KoinTestRule
 import com.aisleron.ui.TestMenuHost
 import com.aisleron.ui.bundles.Bundler
 import kotlinx.coroutines.runBlocking

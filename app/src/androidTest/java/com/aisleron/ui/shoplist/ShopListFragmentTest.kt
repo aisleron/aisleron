@@ -23,7 +23,7 @@ import com.aisleron.domain.TestUseCaseProvider
 import com.aisleron.domain.location.LocationType
 import com.aisleron.ui.FabHandler
 import com.aisleron.ui.FabHandlerTestImpl
-import com.aisleron.ui.KoinTestRule
+import com.aisleron.di.KoinTestRule
 import com.aisleron.ui.bundles.AddEditLocationBundle
 import com.aisleron.ui.bundles.Bundler
 import kotlinx.coroutines.ExperimentalCoroutinesApi
