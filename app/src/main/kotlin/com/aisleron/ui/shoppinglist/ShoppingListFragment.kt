@@ -40,7 +40,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 /**
- * A fragment representing a list of [ShoppingListItemViewModel].
+ * A fragment representing a list of [ShoppingListItem].
  */
 class ShoppingListFragment(
     applicationTitleUpdateListener: ApplicationTitleUpdateListener? = null,
@@ -49,7 +49,7 @@ class ShoppingListFragment(
     Fragment(), SearchView.OnQueryTextListener, ActionMode.Callback {
 
     private var actionMode: ActionMode? = null
-    private var actionModeItem: ShoppingListItemViewModel? = null
+    private var actionModeItem: ShoppingListItem? = null
     private val _fabHandler = fabHandler
     private val _applicationTitleUpdateListener = applicationTitleUpdateListener
 
@@ -75,20 +75,18 @@ class ShoppingListFragment(
                 viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                     shoppingListViewModel.shoppingListUiState.collect {
                         when (it) {
-                            ShoppingListViewModel.ShoppingListUiState.Empty -> Unit
-                            ShoppingListViewModel.ShoppingListUiState.Loading -> Unit
-                            ShoppingListViewModel.ShoppingListUiState.Success -> Unit
                             is ShoppingListViewModel.ShoppingListUiState.Error -> {
                                 displayErrorSnackBar(it.errorCode, it.errorMessage)
                             }
 
                             is ShoppingListViewModel.ShoppingListUiState.Updated -> {
                                 updateTitle()
-
                                 (view.adapter as ShoppingListItemRecyclerViewAdapter).submitList(
                                     it.shoppingList
                                 )
                             }
+
+                            else -> Unit
                         }
                     }
                 }
@@ -99,22 +97,22 @@ class ShoppingListFragment(
                 adapter = ShoppingListItemRecyclerViewAdapter(
                     object :
                         ShoppingListItemRecyclerViewAdapter.ShoppingListItemListener {
-                        override fun onClick(item: ShoppingListItemViewModel) {
+                        override fun onClick(item: ShoppingListItem) {
                             actionMode?.finish()
                         }
 
                         override fun onProductStatusChange(
-                            item: ShoppingListItemViewModel,
+                            item: ShoppingListItem,
                             inStock: Boolean
                         ) {
                             shoppingListViewModel.updateProductStatus(item, inStock)
                         }
 
-                        override fun onCleared(item: ShoppingListItemViewModel) {
+                        override fun onCleared(item: ShoppingListItem) {
                             shoppingListViewModel.updateItemRank(item)
                         }
 
-                        override fun onLongClick(item: ShoppingListItemViewModel): Boolean {
+                        override fun onLongClick(item: ShoppingListItem): Boolean {
                             actionModeItem = item
                             return when (actionMode) {
                                 null -> {
@@ -128,7 +126,7 @@ class ShoppingListFragment(
                             }
                         }
 
-                        override fun onMoved(item: ShoppingListItemViewModel) {
+                        override fun onMoved(item: ShoppingListItem) {
                             actionMode?.finish()
                         }
                     }
@@ -232,7 +230,7 @@ class ShoppingListFragment(
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
-    private fun showAisleDialog(context: Context, aisle: ShoppingListItemViewModel? = null) {
+    private fun showAisleDialog(context: Context, aisle: ShoppingListItem? = null) {
         val inflater = requireActivity().layoutInflater
         val aisleDialogView = inflater.inflate(R.layout.dialog_aisle, null)
         val txtAisleName = aisleDialogView.findViewById<TextInputEditText>(R.id.edt_aisle_name)
@@ -257,7 +255,7 @@ class ShoppingListFragment(
             builder
                 .setTitle(R.string.edit_aisle)
                 .setPositiveButton(R.string.done) { _, _ ->
-                    updateAisle(aisle.copy(name = txtAisleName.text.toString()))
+                    updateAisle((aisle as AisleShoppingListItem).copy(name = txtAisleName.text.toString()))
                 }
         }
 
@@ -273,7 +271,7 @@ class ShoppingListFragment(
         dialog.show()
     }
 
-    private fun updateAisle(aisle: ShoppingListItemViewModel) {
+    private fun updateAisle(aisle: ShoppingListItem) {
         if (aisle.name.isNotBlank()) {
             shoppingListViewModel.updateAisle(aisle)
         }
@@ -285,7 +283,7 @@ class ShoppingListFragment(
         }
     }
 
-    private fun confirmDelete(context: Context, item: ShoppingListItemViewModel) {
+    private fun confirmDelete(context: Context, item: ShoppingListItem) {
         val builder: AlertDialog.Builder = AlertDialog.Builder(context)
         builder
             .setTitle(getString(R.string.delete_confirmation, item.name))
@@ -299,7 +297,7 @@ class ShoppingListFragment(
         dialog.show()
     }
 
-    private fun editShoppingListItem(item: ShoppingListItemViewModel) {
+    private fun editShoppingListItem(item: ShoppingListItem) {
         when (item.lineItemType) {
             ShoppingListItemType.AISLE -> showAisleDialog(requireContext(), item)
             ShoppingListItemType.PRODUCT -> navigateToEditProduct(item.id)

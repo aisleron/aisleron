@@ -14,12 +14,12 @@ import com.aisleron.databinding.FragmentProductListItemBinding
 import java.util.Collections
 
 /**
- * [RecyclerView.Adapter] that can display a [ShoppingListItemViewModel].
+ * [RecyclerView.Adapter] that can display a [ShoppingListItem].
  *
  */
 class ShoppingListItemRecyclerViewAdapter(
     private val listener: ShoppingListItemListener
-) : ListAdapter<ShoppingListItemViewModel, RecyclerView.ViewHolder>(ShoppingListItemDiffCallback()),
+) : ListAdapter<ShoppingListItem, RecyclerView.ViewHolder>(ShoppingListItemDiffCallback()),
     ShoppingListItemMoveCallbackListener.Listener {
 
     companion object {
@@ -31,19 +31,29 @@ class ShoppingListItemRecyclerViewAdapter(
     private var selectedView: View? = null
     private var itemMoved: Boolean = false
 
-    class ShoppingListItemDiffCallback : DiffUtil.ItemCallback<ShoppingListItemViewModel>() {
+    class ShoppingListItemDiffCallback : DiffUtil.ItemCallback<ShoppingListItem>() {
         override fun areItemsTheSame(
-            oldItem: ShoppingListItemViewModel,
-            newItem: ShoppingListItemViewModel
+            oldItem: ShoppingListItem,
+            newItem: ShoppingListItem
         ): Boolean {
             return (oldItem.lineItemType == newItem.lineItemType && oldItem.id == newItem.id)
         }
 
         override fun areContentsTheSame(
-            oldItem: ShoppingListItemViewModel,
-            newItem: ShoppingListItemViewModel
+            oldItem: ShoppingListItem,
+            newItem: ShoppingListItem
         ): Boolean {
-            return oldItem == newItem
+            val old = when (oldItem.lineItemType) {
+                ShoppingListItemType.AISLE -> oldItem as AisleShoppingListItem
+                ShoppingListItemType.PRODUCT -> oldItem as ProductShoppingListItem
+            }
+
+            val new = when (newItem.lineItemType) {
+                ShoppingListItemType.AISLE -> newItem as AisleShoppingListItem
+                ShoppingListItemType.PRODUCT -> newItem as ProductShoppingListItem
+            }
+
+            return old == new
         }
 
     }
@@ -53,17 +63,13 @@ class ShoppingListItemRecyclerViewAdapter(
         val newViewHolder = when (viewType) {
             AISLE_VIEW -> AisleViewHolder(
                 FragmentAisleListItemBinding.inflate(
-                    LayoutInflater.from(parent.context),
-                    parent,
-                    false
+                    LayoutInflater.from(parent.context), parent, false
                 )
             )
 
             else -> ProductListItemViewHolder(
                 FragmentProductListItemBinding.inflate(
-                    LayoutInflater.from(parent.context),
-                    parent,
-                    false
+                    LayoutInflater.from(parent.context), parent, false
                 )
             )
         }
@@ -92,11 +98,9 @@ class ShoppingListItemRecyclerViewAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val item = getItem(position)
-
-        when (item.lineItemType) {
-            ShoppingListItemType.AISLE -> (holder as AisleViewHolder).bind(item)
-            ShoppingListItemType.PRODUCT -> (holder as ProductListItemViewHolder).bind(item)
+        when (val item = getItem(position)) {
+            is AisleShoppingListItem -> (holder as AisleViewHolder).bind(item)
+            is ProductShoppingListItem -> (holder as ProductListItemViewHolder).bind(item)
         }
     }
 
@@ -112,14 +116,10 @@ class ShoppingListItemRecyclerViewAdapter(
         private val contentView: TextView = binding.txtAisleName
         private val productCountView: TextView = binding.txtProductCnt
 
-        override fun toString(): String {
-            return super.toString() + " '" + contentView.text + "'"
-        }
-
-        fun bind(item: ShoppingListItemViewModel) {
+        fun bind(item: AisleShoppingListItem) {
             itemView.isLongClickable = true
             contentView.text = item.name
-            if (item.inStock) {
+            if (item.isDefault) {
                 contentView.setTypeface(null, Typeface.ITALIC)
             } else {
                 contentView.setTypeface(null, Typeface.NORMAL)
@@ -131,15 +131,10 @@ class ShoppingListItemRecyclerViewAdapter(
 
     inner class ProductListItemViewHolder(binding: FragmentProductListItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
-
         private val contentView: TextView = binding.txtProductName
         private val inStockView: CheckBox = binding.chkInStock
 
-        override fun toString(): String {
-            return super.toString() + " '" + contentView.text + "'"
-        }
-
-        fun bind(item: ShoppingListItemViewModel) {
+        fun bind(item: ProductShoppingListItem) {
             itemView.isLongClickable = true
             contentView.text = item.name
             inStockView.isChecked = item.inStock
@@ -151,11 +146,11 @@ class ShoppingListItemRecyclerViewAdapter(
     }
 
     interface ShoppingListItemListener {
-        fun onClick(item: ShoppingListItemViewModel)
-        fun onProductStatusChange(item: ShoppingListItemViewModel, inStock: Boolean)
-        fun onCleared(item: ShoppingListItemViewModel)
-        fun onLongClick(item: ShoppingListItemViewModel): Boolean
-        fun onMoved(item: ShoppingListItemViewModel)
+        fun onClick(item: ShoppingListItem)
+        fun onProductStatusChange(item: ShoppingListItem, inStock: Boolean)
+        fun onCleared(item: ShoppingListItem)
+        fun onLongClick(item: ShoppingListItem): Boolean
+        fun onMoved(item: ShoppingListItem)
     }
 
     override fun onRowMoved(fromPosition: Int, toPosition: Int) {
@@ -182,38 +177,41 @@ class ShoppingListItemRecyclerViewAdapter(
         if (!itemMoved || viewHolder.absoluteAdapterPosition < 0) return
 
         val item = getItem(viewHolder.absoluteAdapterPosition)
-        when (viewHolder.itemViewType) {
-            PRODUCT_VIEW -> {
+        val updatedItem = when (item.lineItemType) {
+            ShoppingListItemType.PRODUCT -> {
                 //Collect the aisle details from the row above the moved item; the item above will
                 //always be an aisle or in the same aisle as the item was dropped in.
                 //Maybe there's a better way to do this.
                 val precedingItem = getItem(viewHolder.absoluteAdapterPosition - 1)
-                item.aisleId = precedingItem.aisleId
-                item.aisleRank = precedingItem.aisleRank
-                item.rank =
-                    if (precedingItem.lineItemType == ShoppingListItemType.PRODUCT) precedingItem.rank + 1 else 1
+                (item as ProductShoppingListItem).copy(
+                    aisleId = precedingItem.aisleId,
+                    aisleRank = precedingItem.aisleRank,
+                    rank = if (precedingItem.lineItemType == ShoppingListItemType.PRODUCT) precedingItem.rank + 1 else 1
+                )
             }
 
-            AISLE_VIEW -> {
+            ShoppingListItemType.AISLE -> {
                 //Find the max rank of all aisles above the current item in the list
                 val aisles = currentList.subList(0, viewHolder.absoluteAdapterPosition)
                     .filter { a -> a.lineItemType == ShoppingListItemType.AISLE }
-                if (aisles.isNotEmpty()) {
-                    item.rank = aisles.maxOf { a -> a.rank } + 1
+                val newRank = if (aisles.isNotEmpty()) {
+                    aisles.maxOf { a -> a.rank } + 1
                 } else {
-                    item.rank = 1
+                    1
                 }
+
+                (item as AisleShoppingListItem).copy(rank = newRank)
             }
         }
         selectedView?.isSelected = false
         selectedView = null
         itemMoved = false
 
-        listener.onCleared(item)
+        listener.onCleared(updatedItem)
     }
 
     override fun onRowSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-        val item = getItem(viewHolder.absoluteAdapterPosition)
+        val item = getItem(viewHolder.absoluteAdapterPosition) as ProductShoppingListItem
         listener.onProductStatusChange(item, !item.inStock)
     }
 }

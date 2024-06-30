@@ -543,6 +543,19 @@
             </AndroidTestResultsTableState>
           </value>
         </entry>
+        <entry key="-909182380">
+          <value>
+            <AndroidTestResultsTableState>
+              <option name="preferredColumnWidths">
+                <map>
+                  <entry key="Duration" value="90" />
+                  <entry key="Tests" value="360" />
+                  <entry key="unknown Android SDK built for x86_64" value="120" />
+                </map>
+              </option>
+            </AndroidTestResultsTableState>
+          </value>
+        </entry>
         <entry key="-858331609">
           <value>
             <AndroidTestResultsTableState>

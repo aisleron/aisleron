@@ -9,11 +9,9 @@ import com.aisleron.domain.aisle.usecase.GetAisleUseCase
 import com.aisleron.domain.aisle.usecase.RemoveAisleUseCase
 import com.aisleron.domain.aisle.usecase.UpdateAisleRankUseCase
 import com.aisleron.domain.aisle.usecase.UpdateAisleUseCase
-import com.aisleron.domain.aisleproduct.AisleProduct
 import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductRankUseCase
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.location.LocationType
-import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.usecase.RemoveProductUseCase
 import com.aisleron.domain.product.usecase.UpdateProductStatusUseCase
 import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
@@ -44,9 +42,9 @@ class ShoppingListViewModel(
     private var _defaultFilter: FilterType = FilterType.NEEDED
     val defaultFilter: FilterType get() = _defaultFilter
 
-    private val shoppingList = mutableListOf<ShoppingListItemViewModel>()
+    private val shoppingList = mutableListOf<ShoppingListItem>()
     private var _locationId: Int = 0
-    private var _listFilter: (ShoppingListItemViewModel) -> Boolean =
+    private var _listFilter: (ShoppingListItem) -> Boolean =
         getListFilterByProductFilter(_defaultFilter)
     private val _shoppingListUiState = MutableStateFlow<ShoppingListUiState>(
         ShoppingListUiState.Empty
@@ -60,10 +58,10 @@ class ShoppingListViewModel(
         refreshListItems(locationId)
     }
 
-    private fun getListFilterByProductFilter(filter: FilterType): (ShoppingListItemViewModel) -> Boolean {
-        return { sli: ShoppingListItemViewModel ->
-            (sli.lineItemType == ShoppingListItemType.AISLE) || (
-                    (sli.lineItemType == ShoppingListItemType.PRODUCT) && (
+    private fun getListFilterByProductFilter(filter: FilterType): (ShoppingListItem) -> Boolean {
+        return { sli: ShoppingListItem ->
+            (sli is AisleShoppingListItem) || (
+                    (sli is ProductShoppingListItem) && (
                             (sli.inStock && filter == FilterType.IN_STOCK) ||
                                     (!sli.inStock && filter == FilterType.NEEDED) ||
                                     (filter == FilterType.ALL)
@@ -84,15 +82,15 @@ class ShoppingListViewModel(
 
                     it.aisles.forEach { a ->
                         shoppingList.add(
-                            ShoppingListItemViewModel(
-                                lineItemType = ShoppingListItemType.AISLE,
-                                aisleRank = a.rank,
+                            AisleShoppingListItem(
                                 rank = a.rank,
                                 id = a.id,
                                 name = a.name,
-                                inStock = a.isDefault,  //inStock holds the aisle default value in the shopping list
-                                aisleId = a.id,
-                                mappingId = 0,
+                                isDefault = a.isDefault,
+                                updateAisleRankUseCase = updateAisleRankUseCase,
+                                getAisleUseCase = getAisleUseCase,
+                                removeAisleUseCase = removeAisleUseCase,
+                                locationId = _locationId,
                                 childCount = a.products.count { p ->
                                     (p.product.inStock && defaultFilter == FilterType.IN_STOCK)
                                             || (!p.product.inStock && defaultFilter == FilterType.NEEDED)
@@ -101,16 +99,16 @@ class ShoppingListViewModel(
                             )
                         )
                         shoppingList += a.products.map { p ->
-                            ShoppingListItemViewModel(
-                                lineItemType = ShoppingListItemType.PRODUCT,
+                            ProductShoppingListItem(
                                 aisleRank = a.rank,
                                 rank = p.rank,
                                 id = p.product.id,
                                 name = p.product.name,
                                 inStock = p.product.inStock,
                                 aisleId = p.aisleId,
-                                mappingId = p.id,
-                                childCount = 0
+                                aisleProductId = p.id,
+                                removeProductUseCase = removeProductUseCase,
+                                updateAisleProductRankUseCase = updateAisleProductRankUseCase
                             )
                         }
                     }
@@ -130,7 +128,7 @@ class ShoppingListViewModel(
         }
     }
 
-    fun updateProductStatus(item: ShoppingListItemViewModel, inStock: Boolean) {
+    fun updateProductStatus(item: ShoppingListItem, inStock: Boolean) {
         coroutineScope.launch {
             updateProductStatusUseCase(item.id, inStock)
         }
@@ -160,19 +158,21 @@ class ShoppingListViewModel(
         }
     }
 
-    fun updateAisle(aisle: ShoppingListItemViewModel) {
+    fun updateAisle(aisle: ShoppingListItem) {
         coroutineScope.launch {
             try {
-                updateAisleUseCase(
-                    Aisle(
-                        name = aisle.name,
-                        products = emptyList(),
-                        locationId = _locationId,
-                        isDefault = aisle.inStock,
-                        rank = aisle.rank,
-                        id = aisle.id
+                with(aisle as AisleShoppingListItem) {
+                    updateAisleUseCase(
+                        Aisle(
+                            name = name,
+                            products = emptyList(),
+                            locationId = locationId,
+                            isDefault = isDefault,
+                            rank = rank,
+                            id = id
+                        )
                     )
-                )
+                }
             } catch (e: AisleronException) {
                 _shoppingListUiState.value = ShoppingListUiState.Error(e.exceptionCode, e.message)
 
@@ -183,47 +183,16 @@ class ShoppingListViewModel(
         }
     }
 
-    fun updateItemRank(item: ShoppingListItemViewModel) {
+    fun updateItemRank(item: ShoppingListItem) {
         coroutineScope.launch {
-            when (item.lineItemType) {
-                ShoppingListItemType.AISLE -> updateAisleRanks(item)
-                ShoppingListItemType.PRODUCT -> updateProductRank(item)
-            }
+            with(item as ShoppingListItemViewModel) { updateRank() }
         }
-    }
-
-    private suspend fun updateProductRank(product: ShoppingListItemViewModel) {
-        updateAisleProductRankUseCase(
-            AisleProduct(
-                rank = product.rank,
-                aisleId = product.aisleId,
-                id = product.mappingId,
-                product = Product(
-                    id = product.id,
-                    name = product.name,
-                    inStock = product.inStock
-                )
-            )
-        )
-    }
-
-    private suspend fun updateAisleRanks(aisle: ShoppingListItemViewModel) {
-        updateAisleRankUseCase(
-            Aisle(
-                id = aisle.id,
-                name = aisle.name,
-                products = emptyList(),
-                locationId = _locationId,
-                rank = aisle.rank,
-                isDefault = aisle.inStock
-            )
-        )
     }
 
     fun submitProductSearch(query: String) {
         _listFilter = { sli ->
-            (sli.lineItemType == ShoppingListItemType.AISLE) || (
-                    (sli.lineItemType == ShoppingListItemType.PRODUCT)
+            (sli is AisleShoppingListItem) || (
+                    (sli is ProductShoppingListItem)
                             && (sli.name.contains(query, true))
                     )
         }
@@ -243,17 +212,10 @@ class ShoppingListViewModel(
         }
     }
 
-    fun removeItem(item: ShoppingListItemViewModel) {
+    fun removeItem(item: ShoppingListItem) {
         coroutineScope.launch {
             try {
-                when (item.lineItemType) {
-                    ShoppingListItemType.PRODUCT -> removeProductUseCase(item.id)
-                    ShoppingListItemType.AISLE -> {
-                        val aisle = getAisleUseCase(item.id)
-                        aisle?.let { removeAisleUseCase(it) }
-                    }
-                }
-
+                with(item as ShoppingListItemViewModel) { remove() }
             } catch (e: AisleronException) {
                 _shoppingListUiState.value = ShoppingListUiState.Error(e.exceptionCode, e.message)
 
@@ -267,9 +229,7 @@ class ShoppingListViewModel(
     sealed class ShoppingListUiState {
         data object Empty : ShoppingListUiState()
         data object Loading : ShoppingListUiState()
-        data object Success : ShoppingListUiState()
         data class Error(val errorCode: String, val errorMessage: String?) : ShoppingListUiState()
-        data class Updated(val shoppingList: List<ShoppingListItemViewModel>) :
-            ShoppingListUiState()
+        data class Updated(val shoppingList: List<ShoppingListItem>) : ShoppingListUiState()
     }
 }
