@@ -128,7 +128,7 @@ class ShoppingListViewModel(
         }
     }
 
-    fun updateProductStatus(item: ShoppingListItem, inStock: Boolean) {
+    fun updateProductStatus(item: ProductShoppingListItem, inStock: Boolean) {
         coroutineScope.launch {
             updateProductStatusUseCase(item.id, inStock)
         }
@@ -158,21 +158,19 @@ class ShoppingListViewModel(
         }
     }
 
-    fun updateAisle(aisle: ShoppingListItem) {
+    fun updateAisle(aisle: AisleShoppingListItem) {
         coroutineScope.launch {
             try {
-                (aisle as AisleShoppingListItem).let {
-                    updateAisleUseCase(
-                        Aisle(
-                            name = it.name,
-                            products = emptyList(),
-                            locationId = it.locationId,
-                            isDefault = it.isDefault,
-                            rank = it.rank,
-                            id = it.id
-                        )
+                updateAisleUseCase(
+                    Aisle(
+                        name = aisle.name,
+                        products = emptyList(),
+                        locationId = aisle.locationId,
+                        isDefault = aisle.isDefault,
+                        rank = aisle.rank,
+                        id = aisle.id
                     )
-                }
+                )
             } catch (e: AisleronException) {
                 _shoppingListUiState.value = ShoppingListUiState.Error(e.exceptionCode, e.message)
 

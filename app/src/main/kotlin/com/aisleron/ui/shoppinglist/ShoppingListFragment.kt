@@ -102,7 +102,7 @@ class ShoppingListFragment(
                         }
 
                         override fun onProductStatusChange(
-                            item: ShoppingListItem,
+                            item: ProductShoppingListItem,
                             inStock: Boolean
                         ) {
                             shoppingListViewModel.updateProductStatus(item, inStock)
@@ -230,7 +230,7 @@ class ShoppingListFragment(
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
-    private fun showAisleDialog(context: Context, aisle: ShoppingListItem? = null) {
+    private fun showAisleDialog(context: Context, aisle: AisleShoppingListItem? = null) {
         val inflater = requireActivity().layoutInflater
         val aisleDialogView = inflater.inflate(R.layout.dialog_aisle, null)
         val txtAisleName = aisleDialogView.findViewById<TextInputEditText>(R.id.edt_aisle_name)
@@ -255,7 +255,7 @@ class ShoppingListFragment(
             builder
                 .setTitle(R.string.edit_aisle)
                 .setPositiveButton(R.string.done) { _, _ ->
-                    updateAisle((aisle as AisleShoppingListItem).copy(name = txtAisleName.text.toString()))
+                    updateAisle(aisle.copy(name = txtAisleName.text.toString()))
                 }
         }
 
@@ -271,7 +271,7 @@ class ShoppingListFragment(
         dialog.show()
     }
 
-    private fun updateAisle(aisle: ShoppingListItem) {
+    private fun updateAisle(aisle: AisleShoppingListItem) {
         if (aisle.name.isNotBlank()) {
             shoppingListViewModel.updateAisle(aisle)
         }
@@ -298,9 +298,9 @@ class ShoppingListFragment(
     }
 
     private fun editShoppingListItem(item: ShoppingListItem) {
-        when (item.itemType) {
-            ShoppingListItem.ItemType.AISLE -> showAisleDialog(requireContext(), item)
-            ShoppingListItem.ItemType.PRODUCT -> navigateToEditProduct(item.id)
+        when (item) {
+            is AisleShoppingListItem -> showAisleDialog(requireContext(), item)
+            is ProductShoppingListItem -> navigateToEditProduct(item.id)
         }
     }
 

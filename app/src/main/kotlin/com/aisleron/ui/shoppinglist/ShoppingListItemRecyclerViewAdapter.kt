@@ -49,7 +49,6 @@ class ShoppingListItemRecyclerViewAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-
         val newViewHolder = when (viewType) {
             AISLE_VIEW -> AisleViewHolder(
                 FragmentAisleListItemBinding.inflate(
@@ -137,7 +136,7 @@ class ShoppingListItemRecyclerViewAdapter(
 
     interface ShoppingListItemListener {
         fun onClick(item: ShoppingListItem)
-        fun onProductStatusChange(item: ShoppingListItem, inStock: Boolean)
+        fun onProductStatusChange(item: ProductShoppingListItem, inStock: Boolean)
         fun onCleared(item: ShoppingListItem)
         fun onLongClick(item: ShoppingListItem): Boolean
         fun onMoved(item: ShoppingListItem)
@@ -163,35 +162,31 @@ class ShoppingListItemRecyclerViewAdapter(
     override fun onRowSelected(viewHolder: RecyclerView.ViewHolder) {}
 
     override fun onRowClear(viewHolder: RecyclerView.ViewHolder) {
-
         if (!itemMoved || viewHolder.absoluteAdapterPosition < 0) return
 
-        val item = getItem(viewHolder.absoluteAdapterPosition)
-        val updatedItem = when (item.itemType) {
-            ShoppingListItem.ItemType.PRODUCT -> {
+        val updatedItem = when (val item = getItem(viewHolder.absoluteAdapterPosition)) {
+            is ProductShoppingListItem -> {
                 //Collect the aisle details from the row above the moved item; the item above will
-                //always be an aisle or in the same aisle as the item was dropped in.
+                //always be an aisle or in the same aisle as the item was dropped on.
                 //Maybe there's a better way to do this.
                 val precedingItem = getItem(viewHolder.absoluteAdapterPosition - 1)
-                (item as ProductShoppingListItem).copy(
+                item.copy(
                     aisleId = precedingItem.aisleId,
                     aisleRank = precedingItem.aisleRank,
-                    rank = if (precedingItem.itemType == ShoppingListItem.ItemType.PRODUCT) precedingItem.rank + 1 else 1
+                    rank = if (precedingItem.itemType == item.itemType) precedingItem.rank + 1 else 1
                 )
             }
 
-            ShoppingListItem.ItemType.AISLE -> {
+            is AisleShoppingListItem -> {
                 //Find the max rank of all aisles above the current item in the list
-                val aisles = currentList.subList(0, viewHolder.absoluteAdapterPosition)
-                    .filter { a -> a.itemType == ShoppingListItem.ItemType.AISLE }
-                val newRank = if (aisles.isNotEmpty()) {
-                    aisles.maxOf { a -> a.rank } + 1
-                } else {
-                    1
-                }
+                val maxRank = currentList.subList(0, viewHolder.absoluteAdapterPosition)
+                    .filter { a -> a.itemType == item.itemType }
+                    .maxOfOrNull { a -> a.rank } ?: 0
 
-                (item as AisleShoppingListItem).copy(rank = newRank)
+                item.copy(rank = maxRank + 1)
             }
+
+            else -> item
         }
         selectedView?.isSelected = false
         selectedView = null
