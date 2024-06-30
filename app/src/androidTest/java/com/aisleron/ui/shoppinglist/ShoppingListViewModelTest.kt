@@ -476,7 +476,7 @@ class ShoppingListViewModelTest {
             (shoppingListViewModel.shoppingListUiState.value as ShoppingListViewModel.ShoppingListUiState.Updated).shoppingList
         Assert.assertEquals(
             productSearchCount,
-            shoppingList.count { p -> p.name.contains(searchString) && p.lineItemType == ShoppingListItemType.PRODUCT }
+            shoppingList.count { p -> p.name.contains(searchString) && p.itemType == ShoppingListItem.ItemType.PRODUCT }
         )
 
     }
@@ -494,7 +494,7 @@ class ShoppingListViewModelTest {
             (shoppingListViewModel.shoppingListUiState.value as ShoppingListViewModel.ShoppingListUiState.Updated).shoppingList
         Assert.assertEquals(
             productSearchCount,
-            shoppingList.count { p -> p.name.contains(searchString) && p.lineItemType == ShoppingListItemType.PRODUCT }
+            shoppingList.count { p -> p.name.contains(searchString) && p.itemType == ShoppingListItem.ItemType.PRODUCT }
         )
 
     }
@@ -514,7 +514,7 @@ class ShoppingListViewModelTest {
         val shoppingList =
             (shoppingListViewModel.shoppingListUiState.value as ShoppingListViewModel.ShoppingListUiState.Updated).shoppingList
         Assert.assertEquals(
-            aisleCount, shoppingList.count { it.lineItemType == ShoppingListItemType.AISLE }
+            aisleCount, shoppingList.count { it.itemType == ShoppingListItem.ItemType.AISLE }
         )
     }
 
@@ -536,10 +536,10 @@ class ShoppingListViewModelTest {
         val shoppingList =
             (shoppingListViewModel.shoppingListUiState.value as ShoppingListViewModel.ShoppingListUiState.Updated).shoppingList
         Assert.assertEquals(
-            aisleCount, shoppingList.count { it.lineItemType == ShoppingListItemType.AISLE }
+            aisleCount, shoppingList.count { it.itemType == ShoppingListItem.ItemType.AISLE }
         )
         Assert.assertEquals(
-            productCount, shoppingList.count { it.lineItemType == ShoppingListItemType.PRODUCT }
+            productCount, shoppingList.count { it.itemType == ShoppingListItem.ItemType.PRODUCT }
         )
     }
 

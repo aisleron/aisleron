@@ -36,21 +36,21 @@ class ShoppingListItemRecyclerViewAdapter(
             oldItem: ShoppingListItem,
             newItem: ShoppingListItem
         ): Boolean {
-            return (oldItem.lineItemType == newItem.lineItemType && oldItem.id == newItem.id)
+            return (oldItem.itemType == newItem.itemType && oldItem.id == newItem.id)
         }
 
         override fun areContentsTheSame(
             oldItem: ShoppingListItem,
             newItem: ShoppingListItem
         ): Boolean {
-            val old = when (oldItem.lineItemType) {
-                ShoppingListItemType.AISLE -> oldItem as AisleShoppingListItem
-                ShoppingListItemType.PRODUCT -> oldItem as ProductShoppingListItem
+            val old = when (oldItem.itemType) {
+                ShoppingListItem.ItemType.AISLE -> oldItem as AisleShoppingListItem
+                ShoppingListItem.ItemType.PRODUCT -> oldItem as ProductShoppingListItem
             }
 
-            val new = when (newItem.lineItemType) {
-                ShoppingListItemType.AISLE -> newItem as AisleShoppingListItem
-                ShoppingListItemType.PRODUCT -> newItem as ProductShoppingListItem
+            val new = when (newItem.itemType) {
+                ShoppingListItem.ItemType.AISLE -> newItem as AisleShoppingListItem
+                ShoppingListItem.ItemType.PRODUCT -> newItem as ProductShoppingListItem
             }
 
             return old == new
@@ -105,9 +105,9 @@ class ShoppingListItemRecyclerViewAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return when (getItem(position).lineItemType) {
-            ShoppingListItemType.AISLE -> AISLE_VIEW
-            ShoppingListItemType.PRODUCT -> PRODUCT_VIEW
+        return when (getItem(position).itemType) {
+            ShoppingListItem.ItemType.AISLE -> AISLE_VIEW
+            ShoppingListItem.ItemType.PRODUCT -> PRODUCT_VIEW
         }
     }
 
@@ -177,8 +177,8 @@ class ShoppingListItemRecyclerViewAdapter(
         if (!itemMoved || viewHolder.absoluteAdapterPosition < 0) return
 
         val item = getItem(viewHolder.absoluteAdapterPosition)
-        val updatedItem = when (item.lineItemType) {
-            ShoppingListItemType.PRODUCT -> {
+        val updatedItem = when (item.itemType) {
+            ShoppingListItem.ItemType.PRODUCT -> {
                 //Collect the aisle details from the row above the moved item; the item above will
                 //always be an aisle or in the same aisle as the item was dropped in.
                 //Maybe there's a better way to do this.
@@ -186,14 +186,14 @@ class ShoppingListItemRecyclerViewAdapter(
                 (item as ProductShoppingListItem).copy(
                     aisleId = precedingItem.aisleId,
                     aisleRank = precedingItem.aisleRank,
-                    rank = if (precedingItem.lineItemType == ShoppingListItemType.PRODUCT) precedingItem.rank + 1 else 1
+                    rank = if (precedingItem.itemType == ShoppingListItem.ItemType.PRODUCT) precedingItem.rank + 1 else 1
                 )
             }
 
-            ShoppingListItemType.AISLE -> {
+            ShoppingListItem.ItemType.AISLE -> {
                 //Find the max rank of all aisles above the current item in the list
                 val aisles = currentList.subList(0, viewHolder.absoluteAdapterPosition)
-                    .filter { a -> a.lineItemType == ShoppingListItemType.AISLE }
+                    .filter { a -> a.itemType == ShoppingListItem.ItemType.AISLE }
                 val newRank = if (aisles.isNotEmpty()) {
                     aisles.maxOf { a -> a.rank } + 1
                 } else {

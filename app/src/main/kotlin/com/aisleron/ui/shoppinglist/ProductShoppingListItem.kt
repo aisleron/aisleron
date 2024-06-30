@@ -16,6 +16,9 @@ data class ProductShoppingListItem(
     private val updateAisleProductRankUseCase: UpdateAisleProductRankUseCase,
     private val removeProductUseCase: RemoveProductUseCase
 ) : ShoppingListItem, ShoppingListItemViewModel {
+    override val itemType: ShoppingListItem.ItemType
+        get() = ShoppingListItem.ItemType.PRODUCT
+
     override suspend fun remove() {
         removeProductUseCase(id)
     }
@@ -34,7 +37,4 @@ data class ProductShoppingListItem(
             )
         )
     }
-
-    override val lineItemType: ShoppingListItemType
-        get() = ShoppingListItemType.PRODUCT
 }

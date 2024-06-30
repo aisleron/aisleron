@@ -118,7 +118,7 @@ class ShoppingListViewModel(
                     compareBy(
                         { it.aisleRank },
                         { it.aisleId },
-                        { it.lineItemType },
+                        { it.itemType },
                         { it.rank },
                         { it.name })
                 )
@@ -161,15 +161,15 @@ class ShoppingListViewModel(
     fun updateAisle(aisle: ShoppingListItem) {
         coroutineScope.launch {
             try {
-                with(aisle as AisleShoppingListItem) {
+                (aisle as AisleShoppingListItem).let {
                     updateAisleUseCase(
                         Aisle(
-                            name = name,
+                            name = it.name,
                             products = emptyList(),
-                            locationId = locationId,
-                            isDefault = isDefault,
-                            rank = rank,
-                            id = id
+                            locationId = it.locationId,
+                            isDefault = it.isDefault,
+                            rank = it.rank,
+                            id = it.id
                         )
                     )
                 }
@@ -185,7 +185,7 @@ class ShoppingListViewModel(
 
     fun updateItemRank(item: ShoppingListItem) {
         coroutineScope.launch {
-            with(item as ShoppingListItemViewModel) { updateRank() }
+            (item as ShoppingListItemViewModel).updateRank()
         }
     }
 
@@ -215,7 +215,7 @@ class ShoppingListViewModel(
     fun removeItem(item: ShoppingListItem) {
         coroutineScope.launch {
             try {
-                with(item as ShoppingListItemViewModel) { remove() }
+                (item as ShoppingListItemViewModel).remove()
             } catch (e: AisleronException) {
                 _shoppingListUiState.value = ShoppingListUiState.Error(e.exceptionCode, e.message)
 

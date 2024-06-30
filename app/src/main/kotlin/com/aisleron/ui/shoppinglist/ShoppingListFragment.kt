@@ -298,9 +298,9 @@ class ShoppingListFragment(
     }
 
     private fun editShoppingListItem(item: ShoppingListItem) {
-        when (item.lineItemType) {
-            ShoppingListItemType.AISLE -> showAisleDialog(requireContext(), item)
-            ShoppingListItemType.PRODUCT -> navigateToEditProduct(item.id)
+        when (item.itemType) {
+            ShoppingListItem.ItemType.AISLE -> showAisleDialog(requireContext(), item)
+            ShoppingListItem.ItemType.PRODUCT -> navigateToEditProduct(item.id)
         }
     }
 

@@ -18,8 +18,8 @@ data class AisleShoppingListItem(
 ) : ShoppingListItem, ShoppingListItemViewModel {
     override val aisleId: Int
         get() = id
-    override val lineItemType: ShoppingListItemType
-        get() = ShoppingListItemType.AISLE
+    override val itemType: ShoppingListItem.ItemType
+        get() = ShoppingListItem.ItemType.AISLE
     override val aisleRank: Int
         get() = rank
 

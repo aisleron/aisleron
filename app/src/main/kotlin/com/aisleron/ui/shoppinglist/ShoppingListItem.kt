@@ -6,5 +6,10 @@ interface ShoppingListItem {
     val id: Int
     val name: String
     val aisleId: Int
-    val lineItemType: ShoppingListItemType
+    val itemType: ItemType
+
+    enum class ItemType {
+        AISLE, PRODUCT
+    }
 }
+
