@@ -43,17 +43,7 @@ class ShoppingListItemRecyclerViewAdapter(
             oldItem: ShoppingListItem,
             newItem: ShoppingListItem
         ): Boolean {
-            val old = when (oldItem.itemType) {
-                ShoppingListItem.ItemType.AISLE -> oldItem as AisleShoppingListItem
-                ShoppingListItem.ItemType.PRODUCT -> oldItem as ProductShoppingListItem
-            }
-
-            val new = when (newItem.itemType) {
-                ShoppingListItem.ItemType.AISLE -> newItem as AisleShoppingListItem
-                ShoppingListItem.ItemType.PRODUCT -> newItem as ProductShoppingListItem
-            }
-
-            return old == new
+            return oldItem == newItem
         }
 
     }
