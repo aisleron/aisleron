@@ -13,19 +13,19 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="loadedMultiFab_FabNotClicked_ChildFabHidden()">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
-      <SelectionState runConfigName="clickFab_ChildFabShowing_HideChildFab()">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
       <SelectionState runConfigName="FabHandlerImplTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="SearchBoxTest">
+      <SelectionState runConfigName="Tests in 'com.aisleron'">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="onSearchBox_IsExistingProduct_ProductDisplayed()">
+      <SelectionState runConfigName="onSaveClick_NoProductNameEntered_DoNothing()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="ProductFragmentTest">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="DbInitializerTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
