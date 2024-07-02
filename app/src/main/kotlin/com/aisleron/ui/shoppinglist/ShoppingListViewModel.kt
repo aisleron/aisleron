@@ -82,7 +82,7 @@ class ShoppingListViewModel(
 
                     it.aisles.forEach { a ->
                         shoppingList.add(
-                            AisleShoppingListItem(
+                            AisleShoppingListItemViewModel(
                                 rank = a.rank,
                                 id = a.id,
                                 name = a.name,
@@ -99,7 +99,7 @@ class ShoppingListViewModel(
                             )
                         )
                         shoppingList += a.products.map { p ->
-                            ProductShoppingListItem(
+                            ProductShoppingListItemViewModel(
                                 aisleRank = a.rank,
                                 rank = p.rank,
                                 id = p.product.id,
@@ -158,12 +158,12 @@ class ShoppingListViewModel(
         }
     }
 
-    fun updateAisle(aisle: AisleShoppingListItem) {
+    fun updateAisleName(aisle: AisleShoppingListItem, newName: String) {
         coroutineScope.launch {
             try {
                 updateAisleUseCase(
                     Aisle(
-                        name = aisle.name,
+                        name = newName,
                         products = emptyList(),
                         locationId = aisle.locationId,
                         isDefault = aisle.isDefault,
@@ -181,9 +181,9 @@ class ShoppingListViewModel(
         }
     }
 
-    fun updateItemRank(item: ShoppingListItem) {
+    fun updateItemRank(item: ShoppingListItem, precedingItem: ShoppingListItem?) {
         coroutineScope.launch {
-            (item as ShoppingListItemViewModel).updateRank()
+            (item as ShoppingListItemViewModel).updateRank(precedingItem)
         }
     }
 

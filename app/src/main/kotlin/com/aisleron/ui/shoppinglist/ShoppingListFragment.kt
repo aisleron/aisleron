@@ -108,8 +108,10 @@ class ShoppingListFragment(
                             shoppingListViewModel.updateProductStatus(item, inStock)
                         }
 
-                        override fun onCleared(item: ShoppingListItem) {
-                            shoppingListViewModel.updateItemRank(item)
+                        override fun onListPositionChanged(
+                            item: ShoppingListItem, precedingItem: ShoppingListItem?
+                        ) {
+                            shoppingListViewModel.updateItemRank(item, precedingItem)
                         }
 
                         override fun onLongClick(item: ShoppingListItem): Boolean {
@@ -255,7 +257,7 @@ class ShoppingListFragment(
             builder
                 .setTitle(R.string.edit_aisle)
                 .setPositiveButton(R.string.done) { _, _ ->
-                    updateAisle(aisle.copy(name = txtAisleName.text.toString()))
+                    updateAisleName(aisle, txtAisleName.text.toString())
                 }
         }
 
@@ -271,9 +273,9 @@ class ShoppingListFragment(
         dialog.show()
     }
 
-    private fun updateAisle(aisle: AisleShoppingListItem) {
-        if (aisle.name.isNotBlank()) {
-            shoppingListViewModel.updateAisle(aisle)
+    private fun updateAisleName(aisle: AisleShoppingListItem, newName: String) {
+        if (newName.isNotBlank()) {
+            shoppingListViewModel.updateAisleName(aisle, newName)
         }
     }
 
