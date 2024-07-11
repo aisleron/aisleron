@@ -22,6 +22,7 @@
         <item name="actionModeStyle">@style/Theme.Aisleron.ActionMode</item>
         <item name="actionBarPopupTheme">@style/Theme.Aisleron.PopupOverlay</item>
         <item name="colorSelectedListItem">?android:attr/colorControlHighlight</item>
+        <item name="colorAisleron">@color/blue_100</item>
     </style>
 
     <style name="Theme.Aisleron.NoActionBar">
@@ -54,8 +55,13 @@
         <item name="android:textAlignment">center</item>
         <item name="android:textColor">@android:color/white</item>
         <item name="android:background">@drawable/text_background_rounded</item>
-
     </style>
+
+    <style name="FloatingActionButton" parent="Widget.MaterialComponents.FloatingActionButton">
+        <item name="colorSecondary">?attr/colorAisleron</item>
+        <item name="colorOnSecondary">@color/black</item>
+    </style>
+
 
 </resources>
 

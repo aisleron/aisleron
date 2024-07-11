@@ -29,6 +29,7 @@
         android:layout_marginEnd="@dimen/fab_margin"
         android:layout_marginBottom="16dp"
         android:contentDescription="@string/main_fab"
+        android:theme="@style/FloatingActionButton"
         app:srcCompat="@android:drawable/ic_input_add" />
 
     <TextView
@@ -51,6 +52,7 @@
         app:layout_anchorGravity="top|end"
         android:layout_gravity="top"
         android:layout_marginEnd="@dimen/mini_fab_margin"
+        android:theme="@style/FloatingActionButton"
         app:srcCompat="@drawable/baseline_add_business_24" />
 
     <TextView
@@ -72,6 +74,7 @@
         app:layout_anchor="@id/fab_add_shop"
         app:layout_anchorGravity="top"
         android:layout_gravity="top|end"
+        android:theme="@style/FloatingActionButton"
         app:srcCompat="@drawable/baseline_add_aisle_24" />
 
 
@@ -94,6 +97,7 @@
         app:layout_anchor="@id/fab_add_aisle"
         app:layout_anchorGravity="end"
         android:layout_gravity="top"
+        android:theme="@style/FloatingActionButton"
         app:srcCompat="@drawable/baseline_add_product_24" />
 
 

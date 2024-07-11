@@ -20,6 +20,7 @@
         <item name="actionModeStyle">@style/Theme.Aisleron.ActionMode</item>
         <item name="actionBarPopupTheme">@style/Theme.Aisleron.PopupOverlay</item>
         <item name="colorSelectedListItem">?android:attr/colorControlHighlight</item>
+        <item name="colorAisleron">@color/orange_100</item>
     </style>
 
     <style name="Theme.Aisleron.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
