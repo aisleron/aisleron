@@ -29,7 +29,7 @@
         android:layout_marginEnd="@dimen/fab_margin"
         android:layout_marginBottom="16dp"
         android:contentDescription="@string/main_fab"
-        android:theme="@style/FloatingActionButton"
+        android:theme="@style/FloatingActionButtonPrimary"
         app:srcCompat="@android:drawable/ic_input_add" />
 
     <TextView
@@ -47,12 +47,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="@string/add_shop_fab"
-        app:fabSize="mini"
         app:layout_anchor="@id/fab"
         app:layout_anchorGravity="top|end"
         android:layout_gravity="top"
         android:layout_marginEnd="@dimen/mini_fab_margin"
-        android:theme="@style/FloatingActionButton"
+        android:theme="@style/FloatingActionButtonSecondary"
         app:srcCompat="@drawable/baseline_add_business_24" />
 
     <TextView
@@ -70,11 +69,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="@string/add_aisle_fab"
-        app:fabSize="mini"
         app:layout_anchor="@id/fab_add_shop"
         app:layout_anchorGravity="top"
         android:layout_gravity="top|end"
-        android:theme="@style/FloatingActionButton"
+        android:theme="@style/FloatingActionButtonSecondary"
         app:srcCompat="@drawable/baseline_add_aisle_24" />
 
 
@@ -93,11 +91,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="@string/add_product_fab"
-        app:fabSize="mini"
         app:layout_anchor="@id/fab_add_aisle"
         app:layout_anchorGravity="end"
         android:layout_gravity="top"
-        android:theme="@style/FloatingActionButton"
+        android:theme="@style/FloatingActionButtonSecondary"
         app:srcCompat="@drawable/baseline_add_product_24" />
 
 

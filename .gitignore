@@ -23,3 +23,6 @@
 hs_err_pid*
 replay_pid*
 /.idea/dbnavigator.xml
+
+# Specific Files #
+keystore.properties

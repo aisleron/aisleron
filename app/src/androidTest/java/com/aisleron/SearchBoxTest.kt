@@ -125,6 +125,7 @@ class SearchBoxTest {
             Matchers.allOf(withContentDescription("Collapse"), isDisplayed())
         )
         backAction.perform(click())
+        Thread.sleep(500)
 
         getSearchTextBox().check(doesNotExist())
     }

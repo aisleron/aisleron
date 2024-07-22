@@ -148,6 +148,19 @@
             </AndroidTestResultsTableState>
           </value>
         </entry>
+        <entry key="-1762082955">
+          <value>
+            <AndroidTestResultsTableState>
+              <option name="preferredColumnWidths">
+                <map>
+                  <entry key="Duration" value="90" />
+                  <entry key="Tests" value="360" />
+                  <entry key="unknown Android SDK built for x86_64" value="120" />
+                </map>
+              </option>
+            </AndroidTestResultsTableState>
+          </value>
+        </entry>
         <entry key="-1658040227">
           <value>
             <AndroidTestResultsTableState>
@@ -1526,6 +1539,7 @@
               <option name="preferredColumnWidths">
                 <map>
                   <entry key="Duration" value="90" />
+                  <entry key="Google sdk_gphone64_x86_64" value="120" />
                   <entry key="Tests" value="360" />
                   <entry key="unknown Android SDK built for x86_64" value="120" />
                 </map>

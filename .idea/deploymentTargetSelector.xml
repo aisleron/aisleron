@@ -13,19 +13,24 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="onSaveClick_NoProductNameEntered_DoNothing()">
+      <SelectionState runConfigName="Tests in 'com.aisleron.ui.shoppinglist'">
         <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="onSaveClick_InStockChanged_InStockUpdated()">
+        <option name="selectionMode" value="DROPDOWN" />
+        <DropdownSelection timestamp="2024-07-11T06:34:55.467598730Z">
+          <Target type="DEFAULT_BOOT">
+            <handle>
+              <DeviceId pluginId="LocalEmulator" identifier="path=/home/danie/.var/app/com.google.AndroidStudio/config/.android/avd/Pixel_3a_API_34_AOSP.avd" />
+            </handle>
+          </Target>
+        </DropdownSelection>
+        <DialogSelection />
       </SelectionState>
       <SelectionState runConfigName="DbInitializerTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="Tests in 'com.aisleron.ui.shoppinglist'">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
-      <SelectionState runConfigName="removeItem_ExceptionRaised_UiStateIsError()">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
-      <SelectionState runConfigName="updateItemRank_NullPrecedingItem_AisleRankIsOne()">
+      <SelectionState runConfigName="onSearchBox_BackPressed_SearchBoxHidden()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
