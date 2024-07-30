@@ -14,6 +14,7 @@ import com.aisleron.data.aisleproduct.AisleProductRepositoryImpl
 import com.aisleron.data.location.LocationDao
 import com.aisleron.data.location.LocationMapper
 import com.aisleron.data.location.LocationRepositoryImpl
+import com.aisleron.data.maintenance.DatabaseMaintenanceImpl
 import com.aisleron.data.product.ProductDao
 import com.aisleron.data.product.ProductMapper
 import com.aisleron.data.product.ProductRepositoryImpl
@@ -34,6 +35,11 @@ import com.aisleron.domain.aisleproduct.usecase.AddAisleProductsUseCase
 import com.aisleron.domain.aisleproduct.usecase.RemoveProductsFromAisleUseCase
 import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductRankUseCase
 import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductsUseCase
+import com.aisleron.domain.backup.DatabaseMaintenance
+import com.aisleron.domain.backup.usecase.BackupDatabaseUseCase
+import com.aisleron.domain.backup.usecase.BackupDatabaseUseCaseImpl
+import com.aisleron.domain.backup.usecase.RestoreDatabaseUseCase
+import com.aisleron.domain.backup.usecase.RestoreDatabaseUseCaseImpl
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.location.usecase.AddLocationUseCase
 import com.aisleron.domain.location.usecase.AddLocationUseCaseImpl
@@ -237,6 +243,14 @@ val appModule = module {
      * Shopping List Use Cases
      */
     factory<GetShoppingListUseCase> { GetShoppingListUseCase(locationRepository = get()) }
+
+    /**
+     * Backup Use Cases
+     */
+    factory<DatabaseMaintenance> { DatabaseMaintenanceImpl(database = get()) }
+    factory<BackupDatabaseUseCase> { BackupDatabaseUseCaseImpl(backupDatabase = get()) }
+
+    factory<RestoreDatabaseUseCase> { RestoreDatabaseUseCaseImpl() }
 
     /**
      * ViewModels

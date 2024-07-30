@@ -11,7 +11,18 @@
             android:entryValues="@array/theme_values"
             android:key="application_theme"
             android:title="@string/theme"
-            app:summary="%s" />
+            app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
+    <PreferenceCategory app:title="@string/backup_restore_title">
+        <Preference
+            android:title="@string/backup_database"
+            app:key="backup_database" />
+        <Preference
+            android:title="@string/restore_database"
+            app:key="restore_database" />
+        <Preference
+            android:title="@string/backup_location"
+            app:key="backup_location" />
+    </PreferenceCategory>
 </PreferenceScreen>

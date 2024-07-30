@@ -63,6 +63,13 @@
     <string name="light_theme">Light Theme</string>
     <string name="dark_theme">Dark Theme</string>
     <string name="theme">Theme</string>
+    <string name="backup_restore_title">Backup/Restore</string>
+    <string name="backup_database">Backup database</string>
+    <string name="restore_database">Restore database</string>
+    <string name="backup_location">Backup location</string>
+    <string name="last_backup">Last backup:</string>
+    <string name="last_restore">Last restore:</string>
+    <string name="never">Never</string>
 
 
 </resources>
