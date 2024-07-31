@@ -19,8 +19,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
         const val RESTORE_DATABASE = "restore_database"
     }
 
-    private lateinit var selectBackupFileLauncher: ActivityResultLauncher<Intent>
-    private lateinit var selectBackupFolderLauncher: ActivityResultLauncher<Intent>
+    private lateinit var restoreDbLauncher: ActivityResultLauncher<Intent>
+    private lateinit var backupFolderLauncher: ActivityResultLauncher<Intent>
+    private lateinit var backupDbLauncher: ActivityResultLauncher<Intent>
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey)
@@ -28,12 +29,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
         val backupFolderPreferenceHandler =
             BackupFolderPreferenceHandler(findPreference(BACKUP_LOCATION))
         backupFolderPreferenceHandler.getPreference()?.setOnPreferenceClickListener {
-            val uriString = backupFolderPreferenceHandler.getValue()
-            selectBackupFolder(Uri.parse(uriString))
+            val uri = backupFolderPreferenceHandler.getValue()
+            selectBackupFolder(uri, backupFolderLauncher)
             true
         }
 
-        selectBackupFolderLauncher =
+        backupFolderLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == Activity.RESULT_OK) {
                     result.data?.data.also { uri ->
@@ -44,19 +45,30 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
         val backupDbPreferenceHandler = BackupDbPreferenceHandler(findPreference(BACKUP_DATABASE))
         backupDbPreferenceHandler.getPreference()?.setOnPreferenceClickListener {
-            backupDbPreferenceHandler.handleOnPreferenceClick(backupFolderPreferenceHandler.getValue())
+            val uri = backupFolderPreferenceHandler.getValue()
+            selectBackupFolder(uri, backupDbLauncher)
             true
         }
+
+        backupDbLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == Activity.RESULT_OK) {
+                    result.data?.data.also { uri ->
+                        backupFolderPreferenceHandler.setValue(uri.toString())
+                        backupDbPreferenceHandler.handleOnPreferenceClick(uri.toString())
+                    }
+                }
+            }
 
         val restoreDbPreferenceHandler =
             RestoreDbPreferenceHandler(findPreference(RESTORE_DATABASE))
         restoreDbPreferenceHandler.getPreference()?.setOnPreferenceClickListener {
-            val uriString = backupFolderPreferenceHandler.getValue()
-            selectBackupFile(Uri.parse(uriString))
+            val uri = backupFolderPreferenceHandler.getValue()
+            selectBackupFile(uri)
             true
         }
 
-        selectBackupFileLauncher =
+        restoreDbLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == Activity.RESULT_OK) {
                     result.data?.data.also { uri ->
@@ -66,31 +78,35 @@ class SettingsFragment : PreferenceFragmentCompat() {
             }
     }
 
-    private fun selectBackupFolder(pickerInitialUri: Uri) {
+    private fun selectBackupFolder(
+        pickerInitialUri: String,
+        launcher: ActivityResultLauncher<Intent>
+    ) {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
             // Optionally, specify a URI for the file that should appear in the
             // system file picker when it loads.
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri)
+                putExtra(DocumentsContract.EXTRA_INITIAL_URI, Uri.parse(pickerInitialUri))
             }
         }
 
-        selectBackupFolderLauncher.launch(intent)
+        launcher.launch(intent)
     }
 
-    private fun selectBackupFile(pickerInitialUri: Uri) {
+    private fun selectBackupFile(pickerInitialUri: String) {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_DEFAULT)
             type = "*/*"
+            //type = "application/vnd.sqlite3"
 
             // Optionally, specify a URI for the file that should appear in the
             // system file picker when it loads.
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri)
+                putExtra(DocumentsContract.EXTRA_INITIAL_URI, Uri.parse(pickerInitialUri))
             }
         }
 
-        selectBackupFileLauncher.launch(intent)
+        restoreDbLauncher.launch(intent)
     }
 
 }
