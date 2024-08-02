@@ -37,8 +37,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
         backupFolderLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == Activity.RESULT_OK) {
-                    result.data?.data.also { uri ->
-                        backupFolderPreferenceHandler.handleOnPreferenceClick(uri.toString())
+                    result.data?.data?.also { uri ->
+                        backupFolderPreferenceHandler.handleOnPreferenceClick(uri)
                     }
                 }
             }
@@ -53,9 +53,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
         backupDbLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == Activity.RESULT_OK) {
-                    result.data?.data.also { uri ->
+                    result.data?.data?.also { uri ->
                         backupFolderPreferenceHandler.setValue(uri.toString())
-                        backupDbPreferenceHandler.handleOnPreferenceClick(uri.toString())
+                        backupDbPreferenceHandler.handleOnPreferenceClick(uri)
                     }
                 }
             }
@@ -71,8 +71,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
         restoreDbLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == Activity.RESULT_OK) {
-                    result.data?.data.also { uri ->
-                        restoreDbPreferenceHandler.handleOnPreferenceClick(uri.toString())
+                    result.data?.data?.also { uri ->
+                        restoreDbPreferenceHandler.handleOnPreferenceClick(uri)
                     }
                 }
             }

@@ -1,12 +1,14 @@
 package com.aisleron.domain.backup.usecase
 
+import android.net.Uri
+
 interface RestoreDatabaseUseCase {
-    operator fun invoke(backupFolder: String): Boolean
+    suspend operator fun invoke(backupUri: Uri): Boolean
 }
 
 class RestoreDatabaseUseCaseImpl(
 ) : RestoreDatabaseUseCase {
-    override operator fun invoke(backupFolder: String): Boolean {
+    override suspend operator fun invoke(backupUri: Uri): Boolean {
         return true
     }
 }

@@ -1,5 +1,6 @@
 package com.aisleron.ui.settings
 
+import android.net.Uri
 import androidx.preference.Preference
 
 class BackupFolderPreferenceHandler(private val preference: Preference?) :
@@ -9,8 +10,8 @@ class BackupFolderPreferenceHandler(private val preference: Preference?) :
         updateSummary()
     }
 
-    override fun handleOnPreferenceClick(backupUri: String) {
-        setValue(backupUri)
+    override fun handleOnPreferenceClick(backupUri: Uri) {
+        setValue(backupUri.toString())
     }
 
     override fun getPreference() = preference

@@ -1,8 +1,10 @@
 package com.aisleron.ui.settings
 
+import android.net.Uri
 import androidx.preference.Preference
 import com.aisleron.R
 import com.aisleron.domain.backup.usecase.RestoreDatabaseUseCase
+import kotlinx.coroutines.runBlocking
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.text.DateFormat.getDateTimeInstance
@@ -22,9 +24,12 @@ class RestoreDbPreferenceHandler(private val preference: Preference?) :
 
     override fun getDefaultValue() = preference?.context?.getString(R.string.never) ?: ""
 
-    override fun handleOnPreferenceClick(backupUri: String) {
-        restoreDatabaseUseCase(backupUri)
-        setValue(getDateTimeInstance().format(Date()))
+    override fun handleOnPreferenceClick(backupUri: Uri) {
+        runBlocking {
+            //TODO: Change this to proper coroutine handling
+            restoreDatabaseUseCase(backupUri)
+            setValue(getDateTimeInstance().format(Date()))
+        }
     }
 
     override fun getPreference() = preference

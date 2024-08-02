@@ -8,6 +8,7 @@ import com.aisleron.data.aisleproduct.AisleProductDao
 import com.aisleron.data.aisleproduct.AisleProductEntity
 import com.aisleron.data.location.LocationDao
 import com.aisleron.data.location.LocationEntity
+import com.aisleron.data.maintenance.MaintenanceDao
 import com.aisleron.data.product.ProductDao
 import com.aisleron.data.product.ProductEntity
 
@@ -20,4 +21,5 @@ abstract class AisleronDatabase : RoomDatabase() {
     abstract fun locationDao(): LocationDao
     abstract fun productDao(): ProductDao
     abstract fun aisleProductDao(): AisleProductDao
+    abstract fun maintenanceDao(): MaintenanceDao
 }

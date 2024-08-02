@@ -1,11 +1,12 @@
 package com.aisleron.ui.settings
 
+import android.net.Uri
 import androidx.preference.Preference
 
 interface BackupRestoreDbPreferenceHandler {
     fun getDefaultValue(): String = String()
     fun getSummaryTemplate(): String = "%s"
-    fun handleOnPreferenceClick(backupUri: String)
+    fun handleOnPreferenceClick(backupUri: Uri)
     fun getPreference(): Preference?
 
     fun getValue(): String {
