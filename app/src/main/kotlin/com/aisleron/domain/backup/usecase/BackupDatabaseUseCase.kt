@@ -7,21 +7,20 @@ import java.util.Date
 import java.util.Locale
 
 interface BackupDatabaseUseCase {
-    suspend operator fun invoke(backupUri: Uri): Boolean
+    suspend operator fun invoke(backupFolderUri: Uri): Boolean
 }
 
 class BackupDatabaseUseCaseImpl(private val databaseMaintenance: DatabaseMaintenance) :
     BackupDatabaseUseCase {
 
-    override suspend operator fun invoke(backupUri: Uri): Boolean {
+    override suspend operator fun invoke(backupFolderUri: Uri): Boolean {
         val dbName = databaseMaintenance.getDatabaseName()
         if (dbName.isNullOrBlank()) return false
 
         val dateStr = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
         val backupDbName =
             "${dbName.substringBeforeLast(".")}-backup-$dateStr.${dbName.substringAfterLast(".")}"
-        databaseMaintenance.backupDatabase(backupUri, backupDbName)
-
+        databaseMaintenance.backupDatabase(backupFolderUri, backupDbName)
 
         return true
     }

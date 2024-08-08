@@ -6,7 +6,7 @@ import androidx.preference.Preference
 interface BackupRestoreDbPreferenceHandler {
     fun getDefaultValue(): String = String()
     fun getSummaryTemplate(): String = "%s"
-    fun handleOnPreferenceClick(backupUri: Uri)
+    fun handleOnPreferenceClick(uri: Uri)
     fun getPreference(): Preference?
 
     fun getValue(): String {

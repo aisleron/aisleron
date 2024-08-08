@@ -24,10 +24,10 @@ class RestoreDbPreferenceHandler(private val preference: Preference?) :
 
     override fun getDefaultValue() = preference?.context?.getString(R.string.never) ?: ""
 
-    override fun handleOnPreferenceClick(backupUri: Uri) {
+    override fun handleOnPreferenceClick(uri: Uri) {
         runBlocking {
             //TODO: Change this to proper coroutine handling
-            restoreDatabaseUseCase(backupUri)
+            restoreDatabaseUseCase(uri)
             setValue(getDateTimeInstance().format(Date()))
         }
     }
