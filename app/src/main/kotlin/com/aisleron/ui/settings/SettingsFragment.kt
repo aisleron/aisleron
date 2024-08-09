@@ -1,16 +1,19 @@
 package com.aisleron.ui.settings
 
 import android.app.Activity
+import android.content.ContentResolver
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.DocumentsContract
-import android.util.Log
+import android.provider.OpenableColumns
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -21,6 +24,7 @@ import com.aisleron.ui.widgets.ErrorSnackBar
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.io.File
 
 class SettingsFragment : PreferenceFragmentCompat() {
 
@@ -30,29 +34,70 @@ class SettingsFragment : PreferenceFragmentCompat() {
         const val RESTORE_DATABASE = "restore_database"
     }
 
-    private lateinit var restoreDbLauncher: ActivityResultLauncher<Intent>
-    private lateinit var backupFolderLauncher: ActivityResultLauncher<Intent>
-    private lateinit var backupDbLauncher: ActivityResultLauncher<Intent>
-
     private val settingsViewModel: SettingsViewModel by viewModel()
-
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey)
 
-        val backupFolderPreferenceHandler =
-            BackupFolderPreferenceHandler(findPreference(BACKUP_LOCATION))
-        backupFolderPreferenceHandler.getPreference()?.setOnPreferenceClickListener {
-            val uri = backupFolderPreferenceHandler.getValue()
-            selectBackupFolder(uri, backupFolderLauncher)
-            true
-        }
+        initializeBackupLocationPreference()
+        initializeBackupDatabasePreference()
+        initializeRestoreDatabasePreference()
+    }
 
-        settingsViewModel.addBackupRestoreDbPreferenceHandler(
-            BACKUP_LOCATION, backupFolderPreferenceHandler
+    private fun initializeRestoreDatabasePreference() {
+        settingsViewModel.addPreferenceHandler(
+            RESTORE_DATABASE, RestoreDbPreferenceHandler(findPreference(RESTORE_DATABASE))
         )
 
-        backupFolderLauncher =
+        val restoreDbLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == Activity.RESULT_OK) {
+                    result.data?.data?.also { uri ->
+                        restoreDatabase(uri)
+                    }
+                }
+            }
+
+        settingsViewModel.getPreferenceHandler(RESTORE_DATABASE)?.let { handler ->
+            handler.getPreference()?.setOnPreferenceClickListener {
+                val uri = getBackupLocation()
+                selectBackupFile(uri, restoreDbLauncher)
+                true
+            }
+        }
+    }
+
+    private fun initializeBackupDatabasePreference() {
+        settingsViewModel.addPreferenceHandler(
+            BACKUP_DATABASE, BackupDbPreferenceHandler(findPreference(BACKUP_DATABASE))
+        )
+
+        val backupDbLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == Activity.RESULT_OK) {
+                    result.data?.data?.also { uri ->
+                        settingsViewModel.getPreferenceHandler(BACKUP_LOCATION)
+                            ?.setValue(uri.toString())
+                        settingsViewModel.handleOnPreferenceClick(BACKUP_DATABASE, uri)
+                    }
+                }
+            }
+
+        settingsViewModel.getPreferenceHandler(BACKUP_DATABASE)?.let { handler ->
+            handler.getPreference()?.setOnPreferenceClickListener {
+                val uri = getBackupLocation()
+                selectBackupFolder(uri, backupDbLauncher)
+                true
+            }
+        }
+    }
+
+    private fun initializeBackupLocationPreference() {
+        settingsViewModel.addPreferenceHandler(
+            BACKUP_LOCATION, BackupFolderPreferenceHandler(findPreference(BACKUP_LOCATION))
+        )
+
+        val backupFolderLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == Activity.RESULT_OK) {
                     result.data?.data?.also { uri ->
@@ -61,48 +106,18 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 }
             }
 
-        val backupDbPreferenceHandler = BackupDbPreferenceHandler(findPreference(BACKUP_DATABASE))
-        backupDbPreferenceHandler.getPreference()?.setOnPreferenceClickListener {
-            val uri = backupFolderPreferenceHandler.getValue()
-            selectBackupFolder(uri, backupDbLauncher)
-            true
-        }
-
-        settingsViewModel.addBackupRestoreDbPreferenceHandler(
-            BACKUP_DATABASE, backupDbPreferenceHandler
-        )
-
-        backupDbLauncher =
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-                if (result.resultCode == Activity.RESULT_OK) {
-                    result.data?.data?.also { uri ->
-                        backupFolderPreferenceHandler.setValue(uri.toString())
-                        settingsViewModel.handleOnPreferenceClick(BACKUP_DATABASE, uri)
-                    }
-                }
+        settingsViewModel.getPreferenceHandler(BACKUP_LOCATION)?.let { handler ->
+            handler.getPreference()?.setOnPreferenceClickListener {
+                val uri = getBackupLocation()
+                selectBackupFolder(uri, backupFolderLauncher)
+                true
             }
-
-        val restoreDbPreferenceHandler =
-            RestoreDbPreferenceHandler(findPreference(RESTORE_DATABASE))
-        restoreDbPreferenceHandler.getPreference()?.setOnPreferenceClickListener {
-            val uri = backupFolderPreferenceHandler.getValue()
-            selectBackupFile(uri)
-            true
         }
-
-        settingsViewModel.addBackupRestoreDbPreferenceHandler(
-            RESTORE_DATABASE, restoreDbPreferenceHandler
-        )
-
-        restoreDbLauncher =
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-                if (result.resultCode == Activity.RESULT_OK) {
-                    result.data?.data?.also { uri ->
-                        settingsViewModel.handleOnPreferenceClick(RESTORE_DATABASE, uri)
-                    }
-                }
-            }
     }
+
+    private fun getBackupLocation() =
+        settingsViewModel.getPreferenceHandler(BACKUP_LOCATION)
+            ?.getValue() ?: String()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -113,7 +128,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
                     when (it) {
                         SettingsViewModel.UiState.Empty -> Unit
                         is SettingsViewModel.UiState.Processing -> {
-                            Log.d("Settings", "Processing...")
                             it.message?.let { msg ->
                                 Snackbar.make(requireView(), msg, Toast.LENGTH_SHORT).show()
                             }
@@ -123,7 +137,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
                             displayErrorSnackBar(it.errorCode, it.errorMessage)
 
                         is SettingsViewModel.UiState.Success -> {
-                            Log.d("Settings", "Completed.")
                             it.message?.let { msg ->
                                 Snackbar.make(requireView(), msg, Toast.LENGTH_SHORT).show()
                             }
@@ -135,8 +148,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     }
 
     private fun selectBackupFolder(
-        pickerInitialUri: String,
-        launcher: ActivityResultLauncher<Intent>
+        pickerInitialUri: String, launcher: ActivityResultLauncher<Intent>
     ) {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -147,7 +159,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
         launcher.launch(intent)
     }
 
-    private fun selectBackupFile(pickerInitialUri: String) {
+    private fun selectBackupFile(
+        pickerInitialUri: String,
+        launcher: ActivityResultLauncher<Intent>
+    ) {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_DEFAULT)
             type = "application/octet-stream"
@@ -157,12 +172,38 @@ class SettingsFragment : PreferenceFragmentCompat() {
             }
         }
 
-        restoreDbLauncher.launch(intent)
+        launcher.launch(intent)
     }
 
     private fun displayErrorSnackBar(errorCode: String, errorMessage: String?) {
         val snackBarMessage =
             getString(AisleronExceptionMap().getErrorResourceId(errorCode), errorMessage)
         ErrorSnackBar().make(requireView(), snackBarMessage, Snackbar.LENGTH_SHORT).show()
+    }
+
+    private fun restoreDatabase(restoreFromUri: Uri) {
+        val filename = requireContext().getFileName(restoreFromUri)
+        val builder: AlertDialog.Builder = AlertDialog.Builder(requireContext())
+        builder
+            .setTitle(getString(R.string.db_restore_confirmation_title))
+            .setMessage(getString(R.string.db_restore_confirmation, filename))
+            .setNegativeButton(android.R.string.cancel, null)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                settingsViewModel.handleOnPreferenceClick(RESTORE_DATABASE, restoreFromUri)
+            }
+
+        builder.create().show()
+    }
+
+    private fun Context.getFileName(uri: Uri): String? = when (uri.scheme) {
+        ContentResolver.SCHEME_CONTENT -> {
+            contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+                cursor.moveToFirst()
+                return@use cursor.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME)
+                    .let(cursor::getString)
+            }
+        }
+
+        else -> uri.path?.let(::File)?.name
     }
 }

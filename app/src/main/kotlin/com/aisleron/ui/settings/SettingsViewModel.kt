@@ -12,20 +12,20 @@ import kotlinx.coroutines.launch
 class SettingsViewModel(coroutineScopeProvider: CoroutineScope? = null) : ViewModel() {
     private val coroutineScope = coroutineScopeProvider ?: this.viewModelScope
 
-    private val backupRestoreDbPreferenceHandlers =
+    private val preferenceHandlers =
         mutableMapOf<String, BackupRestoreDbPreferenceHandler>()
     private val _uiState = MutableStateFlow<UiState>(UiState.Empty)
     val uiState: StateFlow<UiState> = _uiState
 
-    fun addBackupRestoreDbPreferenceHandler(
-        key: String,
-        handler: BackupRestoreDbPreferenceHandler
+    fun addPreferenceHandler(
+        preferenceKey: String,
+        backupRestoreDbPreferenceHandler: BackupRestoreDbPreferenceHandler
     ) {
-        backupRestoreDbPreferenceHandlers[key] = handler
+        preferenceHandlers[preferenceKey] = backupRestoreDbPreferenceHandler
     }
 
     fun handleOnPreferenceClick(preferenceKey: String, uri: Uri) {
-        backupRestoreDbPreferenceHandlers[preferenceKey]?.let {
+        preferenceHandlers[preferenceKey]?.let {
             _uiState.value = UiState.Processing(it.getProcessingMessage())
 
             coroutineScope.launch {
@@ -42,6 +42,9 @@ class SettingsViewModel(coroutineScopeProvider: CoroutineScope? = null) : ViewMo
             }
         }
     }
+
+    fun getPreferenceHandler(preferenceKey: String) =
+        preferenceHandlers[preferenceKey]
 
     sealed class UiState {
         data object Empty : UiState()
