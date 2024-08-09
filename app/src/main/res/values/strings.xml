@@ -25,12 +25,14 @@
     <!-- Sync Preferences -->
 
     <!-- Exception Messages   -->
+    <string name="generic_error">ERROR: %1$s</string>
     <string name="delete_default_aisle_exception">ERROR: Default Aisle can\'t be removed</string>
     <string name="duplicate_product_name_exception">ERROR: Product Name must be unique</string>
     <string name="duplicate_location_name_exception">ERROR: Location Name must be unique</string>
     <string name="invalid_location_exception">ERROR: Invalid Location Id provided</string>
-
-
+    <string name="invalid_db_name_exception">ERROR: Unable to determine database name</string>
+    <string name="invalid_db_backup_file_exception">ERROR: Invalid backup target</string>
+    <string name="invalid_db_restore_file_exception">ERROR: Invalid restore source</string>
 
     <string name="aisle">Aisle</string>
     <string name="product">Product</string>
@@ -54,7 +56,6 @@
     <string name="delete_confirmation">Delete %1$s?</string>
     <string name="edit_aisle">Edit Aisle</string>
     <string name="edit_location">Edit Shop</string>
-    <string name="generic_error">ERROR: %1$s</string>
     <string name="main_fab">Main FAB</string>
     <string name="add_shop_fab">Add Shop FAB</string>
     <string name="add_aisle_fab">Add Aisle FAB</string>
@@ -76,6 +77,5 @@
     <string name="db_restore_success">Restore completed</string>
     <string name="db_restore_confirmation">Are you sure you want to replace your current database with backup %1$s?</string>
     <string name="db_restore_confirmation_title">Confirm Database Restore</string>
-
 
 </resources>

@@ -35,7 +35,8 @@ class SettingsViewModel(coroutineScopeProvider: CoroutineScope? = null) : ViewMo
                 } catch (e: AisleronException) {
                     _uiState.value = UiState.Error(e.exceptionCode, e.message)
                 } catch (e: Exception) {
-                    _uiState.value = UiState.Error(AisleronException.GENERIC_EXCEPTION, e.message)
+                    _uiState.value =
+                        UiState.Error(AisleronException.ExceptionCode.GENERIC_EXCEPTION, e.message)
                 }
 
                 _uiState.value = UiState.Empty
@@ -43,13 +44,15 @@ class SettingsViewModel(coroutineScopeProvider: CoroutineScope? = null) : ViewMo
         }
     }
 
-    fun getPreferenceHandler(preferenceKey: String) =
-        preferenceHandlers[preferenceKey]
+    fun getPreferenceHandler(preferenceKey: String) = preferenceHandlers[preferenceKey]
 
     sealed class UiState {
         data object Empty : UiState()
         data class Processing(val message: String?) : UiState()
         data class Success(val message: String?) : UiState()
-        data class Error(val errorCode: String, val errorMessage: String?) : UiState()
+        data class Error(
+            val errorCode: AisleronException.ExceptionCode,
+            val errorMessage: String?
+        ) : UiState()
     }
 }

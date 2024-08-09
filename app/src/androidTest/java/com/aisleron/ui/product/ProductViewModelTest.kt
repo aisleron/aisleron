@@ -117,7 +117,7 @@ class ProductViewModelTest(private val inStock: Boolean) {
 
         Assert.assertTrue(pvm.productUiState.value is ProductViewModel.ProductUiState.Error)
         Assert.assertEquals(
-            AisleronException.GENERIC_EXCEPTION,
+            AisleronException.ExceptionCode.GENERIC_EXCEPTION,
             (pvm.productUiState.value as ProductViewModel.ProductUiState.Error).errorCode
         )
         Assert.assertEquals(

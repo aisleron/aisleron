@@ -26,6 +26,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.aisleron.R
 import com.aisleron.domain.FilterType
+import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.location.LocationType
 import com.aisleron.ui.AisleronExceptionMap
 import com.aisleron.ui.ApplicationTitleUpdateListener
@@ -144,7 +145,9 @@ class ShoppingListFragment(
         return view
     }
 
-    private fun displayErrorSnackBar(errorCode: String, errorMessage: String?) {
+    private fun displayErrorSnackBar(
+        errorCode: AisleronException.ExceptionCode, errorMessage: String?
+    ) {
         val snackBarMessage =
             getString(AisleronExceptionMap().getErrorResourceId(errorCode), errorMessage)
         ErrorSnackBar().make(requireView(), snackBarMessage, Snackbar.LENGTH_SHORT).show()

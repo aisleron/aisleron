@@ -394,7 +394,7 @@ class ShoppingListViewModelTest {
         val uiState = vm.shoppingListUiState.value
         Assert.assertTrue(uiState is ShoppingListViewModel.ShoppingListUiState.Error)
         with(uiState as ShoppingListViewModel.ShoppingListUiState.Error) {
-            Assert.assertEquals(AisleronException.GENERIC_EXCEPTION, this.errorCode)
+            Assert.assertEquals(AisleronException.ExceptionCode.GENERIC_EXCEPTION, this.errorCode)
             Assert.assertEquals(exceptionMessage, this.errorMessage)
         }
     }
@@ -427,7 +427,7 @@ class ShoppingListViewModelTest {
         val uiState = vm.shoppingListUiState.value
         Assert.assertTrue(uiState is ShoppingListViewModel.ShoppingListUiState.Error)
         with(uiState as ShoppingListViewModel.ShoppingListUiState.Error) {
-            Assert.assertEquals(AisleronException.GENERIC_EXCEPTION, this.errorCode)
+            Assert.assertEquals(AisleronException.ExceptionCode.GENERIC_EXCEPTION, this.errorCode)
             Assert.assertEquals(exceptionMessage, this.errorMessage)
         }
     }
@@ -473,7 +473,7 @@ class ShoppingListViewModelTest {
         val uiState = vm.shoppingListUiState.value
         Assert.assertTrue(uiState is ShoppingListViewModel.ShoppingListUiState.Error)
         with(uiState as ShoppingListViewModel.ShoppingListUiState.Error) {
-            Assert.assertEquals(AisleronException.GENERIC_EXCEPTION, this.errorCode)
+            Assert.assertEquals(AisleronException.ExceptionCode.GENERIC_EXCEPTION, this.errorCode)
             Assert.assertEquals(exceptionMessage, this.errorMessage)
         }
     }

@@ -1,28 +1,39 @@
 package com.aisleron.domain.base
 
 sealed class AisleronException(
-    val exceptionCode: String,
+    val exceptionCode: ExceptionCode,
     message: String? = null,
     cause: Throwable? = null
 ) : Exception(message, cause) {
     class DeleteDefaultAisleException(message: String? = null, cause: Throwable? = null) :
-        AisleronException(DELETE_DEFAULT_AISLE_EXCEPTION, message, cause)
+        AisleronException(ExceptionCode.DELETE_DEFAULT_AISLE_EXCEPTION, message, cause)
 
     class DuplicateProductNameException(message: String? = null, cause: Throwable? = null) :
-        AisleronException(DUPLICATE_PRODUCT_NAME_EXCEPTION, message, cause)
+        AisleronException(ExceptionCode.DUPLICATE_PRODUCT_NAME_EXCEPTION, message, cause)
 
     class DuplicateLocationNameException(message: String? = null, cause: Throwable? = null) :
-        AisleronException(DUPLICATE_LOCATION_NAME_EXCEPTION, message, cause)
+        AisleronException(ExceptionCode.DUPLICATE_LOCATION_NAME_EXCEPTION, message, cause)
 
     class InvalidLocationException(message: String? = null, cause: Throwable? = null) :
-        AisleronException(INVALID_LOCATION_EXCEPTION, message, cause)
+        AisleronException(ExceptionCode.INVALID_LOCATION_EXCEPTION, message, cause)
 
+    class InvalidDbNameException(message: String? = null, cause: Throwable? = null) :
+        AisleronException(ExceptionCode.INVALID_DB_NAME_EXCEPTION, message, cause)
 
-    companion object {
-        const val GENERIC_EXCEPTION = "generic_exception"
-        const val DELETE_DEFAULT_AISLE_EXCEPTION = "delete_default_aisle_exception"
-        const val DUPLICATE_PRODUCT_NAME_EXCEPTION = "duplicate_product_name_exception"
-        const val DUPLICATE_LOCATION_NAME_EXCEPTION = "duplicate_location_name_exception"
-        const val INVALID_LOCATION_EXCEPTION = "invalid_location_exception"
+    class InvalidDbBackupFileException(message: String? = null, cause: Throwable? = null) :
+        AisleronException(ExceptionCode.INVALID_DB_BACKUP_FILE_EXCEPTION, message, cause)
+
+    class InvalidDbRestoreFileException(message: String? = null, cause: Throwable? = null) :
+        AisleronException(ExceptionCode.INVALID_DB_RESTORE_FILE_EXCEPTION, message, cause)
+
+    enum class ExceptionCode {
+        GENERIC_EXCEPTION,
+        DELETE_DEFAULT_AISLE_EXCEPTION,
+        DUPLICATE_PRODUCT_NAME_EXCEPTION,
+        DUPLICATE_LOCATION_NAME_EXCEPTION,
+        INVALID_LOCATION_EXCEPTION,
+        INVALID_DB_NAME_EXCEPTION,
+        INVALID_DB_BACKUP_FILE_EXCEPTION,
+        INVALID_DB_RESTORE_FILE_EXCEPTION
     }
 }

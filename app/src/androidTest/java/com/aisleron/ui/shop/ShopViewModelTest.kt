@@ -186,7 +186,7 @@ class ShopViewModelTest(private val pinned: Boolean) {
 
         Assert.assertTrue(svm.shopUiState.value is ShopViewModel.ShopUiState.Error)
         Assert.assertEquals(
-            AisleronException.GENERIC_EXCEPTION,
+            AisleronException.ExceptionCode.GENERIC_EXCEPTION,
             (svm.shopUiState.value as ShopViewModel.ShopUiState.Error).errorCode
         )
         Assert.assertEquals(

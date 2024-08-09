@@ -153,7 +153,9 @@ class ShoppingListViewModel(
 
             } catch (e: Exception) {
                 _shoppingListUiState.value =
-                    ShoppingListUiState.Error(AisleronException.GENERIC_EXCEPTION, e.message)
+                    ShoppingListUiState.Error(
+                        AisleronException.ExceptionCode.GENERIC_EXCEPTION, e.message
+                    )
             }
         }
     }
@@ -176,7 +178,9 @@ class ShoppingListViewModel(
 
             } catch (e: Exception) {
                 _shoppingListUiState.value =
-                    ShoppingListUiState.Error(AisleronException.GENERIC_EXCEPTION, e.message)
+                    ShoppingListUiState.Error(
+                        AisleronException.ExceptionCode.GENERIC_EXCEPTION, e.message
+                    )
             }
         }
     }
@@ -219,7 +223,9 @@ class ShoppingListViewModel(
 
             } catch (e: Exception) {
                 _shoppingListUiState.value =
-                    ShoppingListUiState.Error(AisleronException.GENERIC_EXCEPTION, e.message)
+                    ShoppingListUiState.Error(
+                        AisleronException.ExceptionCode.GENERIC_EXCEPTION, e.message
+                    )
             }
         }
     }
@@ -227,7 +233,10 @@ class ShoppingListViewModel(
     sealed class ShoppingListUiState {
         data object Empty : ShoppingListUiState()
         data object Loading : ShoppingListUiState()
-        data class Error(val errorCode: String, val errorMessage: String?) : ShoppingListUiState()
+        data class Error(
+            val errorCode: AisleronException.ExceptionCode, val errorMessage: String?
+        ) : ShoppingListUiState()
+
         data class Updated(val shoppingList: List<ShoppingListItem>) : ShoppingListUiState()
     }
 }

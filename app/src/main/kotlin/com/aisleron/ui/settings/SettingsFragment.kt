@@ -19,6 +19,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.preference.PreferenceFragmentCompat
 import com.aisleron.R
+import com.aisleron.domain.base.AisleronException
 import com.aisleron.ui.AisleronExceptionMap
 import com.aisleron.ui.widgets.ErrorSnackBar
 import com.google.android.material.snackbar.Snackbar
@@ -88,8 +89,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     }
 
     private fun getBackupLocation() =
-        settingsViewModel.getPreferenceHandler(BACKUP_LOCATION)
-            ?.getValue() ?: String()
+        settingsViewModel.getPreferenceHandler(BACKUP_LOCATION)?.getValue() ?: String()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -146,7 +146,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
         launcher.launch(intent)
     }
 
-    private fun displayErrorSnackBar(errorCode: String, errorMessage: String?) {
+    private fun displayErrorSnackBar(
+        errorCode: AisleronException.ExceptionCode, errorMessage: String?
+    ) {
         val snackBarMessage =
             getString(AisleronExceptionMap().getErrorResourceId(errorCode), errorMessage)
         ErrorSnackBar().make(requireView(), snackBarMessage, Snackbar.LENGTH_SHORT).show()

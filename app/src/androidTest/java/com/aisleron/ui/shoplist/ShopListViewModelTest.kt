@@ -125,7 +125,7 @@ class ShopListViewModelTest {
 
         Assert.assertTrue(sli.shopListUiState.value is ShopListViewModel.ShopListUiState.Error)
         Assert.assertEquals(
-            AisleronException.GENERIC_EXCEPTION,
+            AisleronException.ExceptionCode.GENERIC_EXCEPTION,
             (sli.shopListUiState.value as ShopListViewModel.ShopListUiState.Error).errorCode
         )
         Assert.assertEquals(

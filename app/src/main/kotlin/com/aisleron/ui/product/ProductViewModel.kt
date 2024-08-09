@@ -49,7 +49,9 @@ class ProductViewModel(
                 _productUiState.value = ProductUiState.Error(e.exceptionCode, e.message)
             } catch (e: Exception) {
                 _productUiState.value =
-                    ProductUiState.Error(AisleronException.GENERIC_EXCEPTION, e.message)
+                    ProductUiState.Error(
+                        AisleronException.ExceptionCode.GENERIC_EXCEPTION, e.message
+                    )
             }
         }
     }
@@ -75,7 +77,10 @@ class ProductViewModel(
         data object Empty : ProductUiState()
         data object Loading : ProductUiState()
         data object Success : ProductUiState()
-        data class Error(val errorCode: String, val errorMessage: String?) : ProductUiState()
+        data class Error(
+            val errorCode: AisleronException.ExceptionCode, val errorMessage: String?
+        ) : ProductUiState()
+
         data class Updated(val product: ProductViewModel) : ProductUiState()
     }
 

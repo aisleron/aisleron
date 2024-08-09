@@ -16,6 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.aisleron.R
 import com.aisleron.databinding.FragmentShopBinding
+import com.aisleron.domain.base.AisleronException
 import com.aisleron.ui.AddEditFragmentListener
 import com.aisleron.ui.AisleronExceptionMap
 import com.aisleron.ui.FabHandler
@@ -91,7 +92,9 @@ class ShopFragment(
         return binding.root
     }
 
-    private fun displayErrorSnackBar(errorCode: String, errorMessage: String?) {
+    private fun displayErrorSnackBar(
+        errorCode: AisleronException.ExceptionCode, errorMessage: String?
+    ) {
         val snackBarMessage =
             getString(AisleronExceptionMap().getErrorResourceId(errorCode), errorMessage)
         ErrorSnackBar().make(requireView(), snackBarMessage, Snackbar.LENGTH_SHORT).show()

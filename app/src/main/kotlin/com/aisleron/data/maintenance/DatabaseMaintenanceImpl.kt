@@ -7,6 +7,8 @@ import androidx.sqlite.db.SimpleSQLiteQuery
 import com.aisleron.data.AisleronDatabase
 import com.aisleron.di.appModule
 import com.aisleron.domain.backup.DatabaseMaintenance
+import com.aisleron.domain.base.AisleronException
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.koin.core.context.loadKoinModules
@@ -20,44 +22,56 @@ import java.io.OutputStream
 
 class DatabaseMaintenanceImpl(
     private val database: AisleronDatabase,
-    private val context: Context
+    private val context: Context,
+    coroutineDispatcher: CoroutineDispatcher? = null
 ) : DatabaseMaintenance {
 
     companion object {
         private const val BUFFER_SIZE = 8192
     }
 
+    private val _coroutineDispatcher = coroutineDispatcher ?: Dispatchers.IO
+
+
     override fun getDatabaseName() = database.openHelper.databaseName
 
     override suspend fun backupDatabase(backupFolderUri: Uri, backupFileName: String) {
         val backupFolder = DocumentFile.fromTreeUri(context, backupFolderUri)
         val backupFile = backupFolder?.createFile("application/vnd.sqlite3", backupFileName)
-        val backupStream: OutputStream? = backupFile?.let {
+        val backupStream = backupFile?.let {
             context.contentResolver.openOutputStream(it.uri)
         }
 
-        withContext(Dispatchers.IO) {
+        if (backupStream == null)
+            throw AisleronException.InvalidDbBackupFileException("Invalid database backup file/location")
+
+        withContext(_coroutineDispatcher) {
             createCheckpoint()
             val databaseStream = FileInputStream(database.openHelper.writableDatabase.path)
-            backupStream?.let { copy(databaseStream, it) }
-
-            databaseStream.close()
-            backupStream?.flush()
-            backupStream?.close()
+            try {
+                copy(databaseStream, backupStream)
+            } finally {
+                databaseStream.close()
+                backupStream.flush()
+                backupStream.close()
+            }
         }
     }
 
     override suspend fun restoreDatabase(restoreFileUri: Uri) {
         val restoreStream = context.contentResolver.openInputStream(restoreFileUri)
-        withContext(Dispatchers.IO) {
+            ?: throw AisleronException.InvalidDbRestoreFileException("Invalid database backup file/location")
+
+        withContext(_coroutineDispatcher) {
             val databaseStream = FileOutputStream(database.openHelper.writableDatabase.path)
             database.close()
-
-            restoreStream?.let { copy(it, databaseStream) }
-
-            restoreStream?.close()
-            databaseStream.flush()
-            databaseStream.close()
+            try {
+                copy(restoreStream, databaseStream)
+            } finally {
+                restoreStream.close()
+                databaseStream.flush()
+                databaseStream.close()
+            }
             unloadKoinModules(appModule)
             loadKoinModules(appModule)
             getKoin().get<AisleronDatabase>()

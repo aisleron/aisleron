@@ -248,7 +248,10 @@ val appModule = module {
     /**
      * Backup Use Cases
      */
-    factory<DatabaseMaintenance> { DatabaseMaintenanceImpl(database = get(), androidApplication()) }
+    factory<DatabaseMaintenance> {
+        DatabaseMaintenanceImpl(database = get(), context = androidApplication())
+    }
+
     factory<BackupDatabaseUseCase> { BackupDatabaseUseCaseImpl(databaseMaintenance = get()) }
     factory<RestoreDatabaseUseCase> { RestoreDatabaseUseCaseImpl(databaseMaintenance = get()) }
 

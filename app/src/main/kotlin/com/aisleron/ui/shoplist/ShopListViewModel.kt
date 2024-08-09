@@ -56,7 +56,9 @@ class ShopListViewModel(
                 location?.let { removeLocationUseCase(location) }
             } catch (e: Exception) {
                 _shopListUiState.value =
-                    ShopListUiState.Error(AisleronException.GENERIC_EXCEPTION, e.message)
+                    ShopListUiState.Error(
+                        AisleronException.ExceptionCode.GENERIC_EXCEPTION, e.message
+                    )
             }
         }
     }
@@ -64,7 +66,10 @@ class ShopListViewModel(
     sealed class ShopListUiState {
         data object Empty : ShopListUiState()
         data object Loading : ShopListUiState()
-        data class Error(val errorCode: String, val errorMessage: String?) : ShopListUiState()
+        data class Error(
+            val errorCode: AisleronException.ExceptionCode, val errorMessage: String?
+        ) : ShopListUiState()
+
         data class Updated(val shops: List<ShopListItemViewModel>) : ShopListUiState()
     }
 }

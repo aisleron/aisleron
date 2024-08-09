@@ -49,7 +49,7 @@ class ShopViewModel(
                 _shopUiState.value = ShopUiState.Error(e.exceptionCode, e.message)
             } catch (e: Exception) {
                 _shopUiState.value =
-                    ShopUiState.Error(AisleronException.GENERIC_EXCEPTION, e.message)
+                    ShopUiState.Error(AisleronException.ExceptionCode.GENERIC_EXCEPTION, e.message)
             }
         }
     }
@@ -78,7 +78,10 @@ class ShopViewModel(
         data object Empty : ShopUiState()
         data object Loading : ShopUiState()
         data object Success : ShopUiState()
-        data class Error(val errorCode: String, val errorMessage: String?) : ShopUiState()
+        data class Error(
+            val errorCode: AisleronException.ExceptionCode, val errorMessage: String?
+        ) : ShopUiState()
+
         data class Updated(val shop: ShopViewModel) : ShopUiState()
     }
 }

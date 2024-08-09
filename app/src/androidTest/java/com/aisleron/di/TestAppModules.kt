@@ -3,6 +3,7 @@ package com.aisleron.di
 import com.aisleron.data.TestDataManager
 import com.aisleron.domain.TestUseCaseProvider
 import com.aisleron.ui.product.ProductViewModel
+import com.aisleron.ui.settings.SettingsViewModel
 import com.aisleron.ui.shop.ShopViewModel
 import com.aisleron.ui.shoplist.ShopListViewModel
 import com.aisleron.ui.shoppinglist.ShoppingListViewModel
@@ -59,6 +60,12 @@ class TestAppModules {
                         addLocationUseCase = testUseCases.addLocationUseCase,
                         updateLocationUseCase = testUseCases.updateLocationUseCase,
                         getLocationUseCase = testUseCases.getLocationUseCase,
+                        TestScope(UnconfinedTestDispatcher())
+                    )
+                }
+
+                factory<SettingsViewModel> {
+                    SettingsViewModel(
                         TestScope(UnconfinedTestDispatcher())
                     )
                 }
