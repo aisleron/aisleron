@@ -70,6 +70,10 @@
     <string name="last_backup">Last backup:</string>
     <string name="last_restore">Last restore:</string>
     <string name="never">Never</string>
+    <string name="db_backup_processing">Backup in progress</string>
+    <string name="db_backup_success">Backup completed</string>
+    <string name="db_restore_processing">Restore in progress</string>
+    <string name="db_restore_success">Restore completed</string>
 
 
 </resources>

@@ -10,9 +10,11 @@ class BackupFolderPreferenceHandler(private val preference: Preference?) :
         updateSummary()
     }
 
-    override fun handleOnPreferenceClick(uri: Uri) {
+    override suspend fun handleOnPreferenceClick(uri: Uri) {
         setValue(uri.toString())
     }
 
     override fun getPreference() = preference
+    override fun getProcessingMessage() = null
+    override fun getSuccessMessage() = null
 }

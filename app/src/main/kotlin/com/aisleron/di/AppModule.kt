@@ -62,6 +62,7 @@ import com.aisleron.domain.product.usecase.UpdateProductStatusUseCaseImpl
 import com.aisleron.domain.product.usecase.UpdateProductUseCase
 import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
 import com.aisleron.ui.product.ProductViewModel
+import com.aisleron.ui.settings.SettingsViewModel
 import com.aisleron.ui.shop.ShopViewModel
 import com.aisleron.ui.shoplist.ShopListViewModel
 import com.aisleron.ui.shoppinglist.ShoppingListViewModel
@@ -291,5 +292,9 @@ val appModule = module {
             updateProductUseCase = get(),
             getProductUseCase = get()
         )
+    }
+
+    viewModel {
+        SettingsViewModel()
     }
 }

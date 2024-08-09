@@ -4,7 +4,6 @@ import android.net.Uri
 import androidx.preference.Preference
 import com.aisleron.R
 import com.aisleron.domain.backup.usecase.BackupDatabaseUseCase
-import kotlinx.coroutines.runBlocking
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.text.DateFormat.getDateTimeInstance
@@ -24,13 +23,18 @@ class BackupDbPreferenceHandler(private val preference: Preference?) :
 
     override fun getDefaultValue() = preference?.context?.getString(R.string.never) ?: ""
 
-    override fun handleOnPreferenceClick(uri: Uri) {
-        runBlocking {
-            //TODO: Change this to proper coroutine handling
-            backupDatabaseUseCase(uri)
-            setValue(getDateTimeInstance().format(Date()))
-        }
+    override suspend fun handleOnPreferenceClick(uri: Uri) {
+        backupDatabaseUseCase(uri)
+        setValue(getDateTimeInstance().format(Date()))
     }
 
     override fun getPreference() = preference
+
+    override fun getProcessingMessage(): String? {
+        return preference?.context?.getString(R.string.db_backup_processing)
+    }
+
+    override fun getSuccessMessage(): String? {
+        return preference?.context?.getString(R.string.db_backup_success)
+    }
 }

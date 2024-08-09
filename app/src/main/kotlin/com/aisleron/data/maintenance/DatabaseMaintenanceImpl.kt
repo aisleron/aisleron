@@ -31,13 +31,13 @@ class DatabaseMaintenanceImpl(
 
     override suspend fun backupDatabase(backupFolderUri: Uri, backupFileName: String) {
         val backupFolder = DocumentFile.fromTreeUri(context, backupFolderUri)
-        val backupFile = backupFolder?.createFile("*/*", backupFileName)
+        val backupFile = backupFolder?.createFile("application/vnd.sqlite3", backupFileName)
         val backupStream: OutputStream? = backupFile?.let {
             context.contentResolver.openOutputStream(it.uri)
         }
 
-        createCheckpoint()
         withContext(Dispatchers.IO) {
+            createCheckpoint()
             val databaseStream = FileInputStream(database.openHelper.writableDatabase.path)
             backupStream?.let { copy(databaseStream, it) }
 

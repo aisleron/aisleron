@@ -6,10 +6,21 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.DocumentsContract
+import android.util.Log
+import android.view.View
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.preference.PreferenceFragmentCompat
 import com.aisleron.R
+import com.aisleron.ui.AisleronExceptionMap
+import com.aisleron.ui.widgets.ErrorSnackBar
+import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SettingsFragment : PreferenceFragmentCompat() {
 
@@ -23,6 +34,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private lateinit var backupFolderLauncher: ActivityResultLauncher<Intent>
     private lateinit var backupDbLauncher: ActivityResultLauncher<Intent>
 
+    private val settingsViewModel: SettingsViewModel by viewModel()
+
+
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey)
 
@@ -34,11 +48,15 @@ class SettingsFragment : PreferenceFragmentCompat() {
             true
         }
 
+        settingsViewModel.addBackupRestoreDbPreferenceHandler(
+            BACKUP_LOCATION, backupFolderPreferenceHandler
+        )
+
         backupFolderLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == Activity.RESULT_OK) {
                     result.data?.data?.also { uri ->
-                        backupFolderPreferenceHandler.handleOnPreferenceClick(uri)
+                        settingsViewModel.handleOnPreferenceClick(BACKUP_LOCATION, uri)
                     }
                 }
             }
@@ -50,12 +68,16 @@ class SettingsFragment : PreferenceFragmentCompat() {
             true
         }
 
+        settingsViewModel.addBackupRestoreDbPreferenceHandler(
+            BACKUP_DATABASE, backupDbPreferenceHandler
+        )
+
         backupDbLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == Activity.RESULT_OK) {
                     result.data?.data?.also { uri ->
                         backupFolderPreferenceHandler.setValue(uri.toString())
-                        backupDbPreferenceHandler.handleOnPreferenceClick(uri)
+                        settingsViewModel.handleOnPreferenceClick(BACKUP_DATABASE, uri)
                     }
                 }
             }
@@ -68,14 +90,48 @@ class SettingsFragment : PreferenceFragmentCompat() {
             true
         }
 
+        settingsViewModel.addBackupRestoreDbPreferenceHandler(
+            RESTORE_DATABASE, restoreDbPreferenceHandler
+        )
+
         restoreDbLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == Activity.RESULT_OK) {
                     result.data?.data?.also { uri ->
-                        restoreDbPreferenceHandler.handleOnPreferenceClick(uri)
+                        settingsViewModel.handleOnPreferenceClick(RESTORE_DATABASE, uri)
                     }
                 }
             }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                settingsViewModel.uiState.collect {
+                    when (it) {
+                        SettingsViewModel.UiState.Empty -> Unit
+                        is SettingsViewModel.UiState.Processing -> {
+                            Log.d("Settings", "Processing...")
+                            it.message?.let { msg ->
+                                Snackbar.make(requireView(), msg, Toast.LENGTH_SHORT).show()
+                            }
+                        }
+
+                        is SettingsViewModel.UiState.Error ->
+                            displayErrorSnackBar(it.errorCode, it.errorMessage)
+
+                        is SettingsViewModel.UiState.Success -> {
+                            Log.d("Settings", "Completed.")
+                            it.message?.let { msg ->
+                                Snackbar.make(requireView(), msg, Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private fun selectBackupFolder(
@@ -83,8 +139,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
         launcher: ActivityResultLauncher<Intent>
     ) {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
-            // Optionally, specify a URI for the file that should appear in the
-            // system file picker when it loads.
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 putExtra(DocumentsContract.EXTRA_INITIAL_URI, Uri.parse(pickerInitialUri))
             }
@@ -96,11 +150,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private fun selectBackupFile(pickerInitialUri: String) {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_DEFAULT)
-            type = "*/*"
-            //type = "application/vnd.sqlite3"
+            type = "application/octet-stream"
 
-            // Optionally, specify a URI for the file that should appear in the
-            // system file picker when it loads.
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 putExtra(DocumentsContract.EXTRA_INITIAL_URI, Uri.parse(pickerInitialUri))
             }
@@ -109,4 +160,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
         restoreDbLauncher.launch(intent)
     }
 
+    private fun displayErrorSnackBar(errorCode: String, errorMessage: String?) {
+        val snackBarMessage =
+            getString(AisleronExceptionMap().getErrorResourceId(errorCode), errorMessage)
+        ErrorSnackBar().make(requireView(), snackBarMessage, Snackbar.LENGTH_SHORT).show()
+    }
 }

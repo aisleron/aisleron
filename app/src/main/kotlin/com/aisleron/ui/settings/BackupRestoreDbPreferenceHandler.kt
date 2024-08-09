@@ -6,8 +6,10 @@ import androidx.preference.Preference
 interface BackupRestoreDbPreferenceHandler {
     fun getDefaultValue(): String = String()
     fun getSummaryTemplate(): String = "%s"
-    fun handleOnPreferenceClick(uri: Uri)
     fun getPreference(): Preference?
+    fun getProcessingMessage(): String?
+    fun getSuccessMessage(): String?
+    suspend fun handleOnPreferenceClick(uri: Uri)
 
     fun getValue(): String {
         val preference = getPreference()
