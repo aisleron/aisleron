@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aisleron.domain.base.AisleronException
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -31,7 +30,6 @@ class SettingsViewModel(coroutineScopeProvider: CoroutineScope? = null) : ViewMo
 
             coroutineScope.launch {
                 try {
-                    delay(3000)
                     it.handleOnPreferenceClick(uri)
                     _uiState.value = UiState.Success(it.getSuccessMessage())
                 } catch (e: AisleronException) {
