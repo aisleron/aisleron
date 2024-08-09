@@ -39,15 +39,19 @@ class SettingsFragment : PreferenceFragmentCompat() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey)
 
-        initializeBackupLocationPreference()
-        initializeBackupDatabasePreference()
-        initializeRestoreDatabasePreference()
+        initializeBackupPreference(
+            BACKUP_LOCATION, BackupFolderPreferenceHandler(findPreference(BACKUP_LOCATION))
+        )
+
+        initializeBackupPreference(
+            BACKUP_DATABASE, BackupDbPreferenceHandler(findPreference(BACKUP_DATABASE))
+        )
+
+        initializeRestorePreference(RestoreDbPreferenceHandler(findPreference(RESTORE_DATABASE)))
     }
 
-    private fun initializeRestoreDatabasePreference() {
-        settingsViewModel.addPreferenceHandler(
-            RESTORE_DATABASE, RestoreDbPreferenceHandler(findPreference(RESTORE_DATABASE))
-        )
+    private fun initializeRestorePreference(handler: BackupRestoreDbPreferenceHandler) {
+        settingsViewModel.addPreferenceHandler(RESTORE_DATABASE, handler)
 
         val restoreDbLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -58,8 +62,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 }
             }
 
-        settingsViewModel.getPreferenceHandler(RESTORE_DATABASE)?.let { handler ->
-            handler.getPreference()?.setOnPreferenceClickListener {
+        settingsViewModel.getPreferenceHandler(RESTORE_DATABASE)?.let { h ->
+            h.getPreference()?.setOnPreferenceClickListener {
                 val uri = getBackupLocation()
                 selectBackupFile(uri, restoreDbLauncher)
                 true
@@ -67,49 +71,26 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
     }
 
-    private fun initializeBackupDatabasePreference() {
-        settingsViewModel.addPreferenceHandler(
-            BACKUP_DATABASE, BackupDbPreferenceHandler(findPreference(BACKUP_DATABASE))
-        )
+    private fun initializeBackupPreference(
+        preferenceKey: String, handler: BackupRestoreDbPreferenceHandler
+    ) {
+        settingsViewModel.addPreferenceHandler(preferenceKey, handler)
 
-        val backupDbLauncher =
+        val backupLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == Activity.RESULT_OK) {
                     result.data?.data?.also { uri ->
                         settingsViewModel.getPreferenceHandler(BACKUP_LOCATION)
                             ?.setValue(uri.toString())
-                        settingsViewModel.handleOnPreferenceClick(BACKUP_DATABASE, uri)
+                        settingsViewModel.handleOnPreferenceClick(preferenceKey, uri)
                     }
                 }
             }
 
-        settingsViewModel.getPreferenceHandler(BACKUP_DATABASE)?.let { handler ->
-            handler.getPreference()?.setOnPreferenceClickListener {
+        settingsViewModel.getPreferenceHandler(preferenceKey)?.let { h ->
+            h.getPreference()?.setOnPreferenceClickListener {
                 val uri = getBackupLocation()
-                selectBackupFolder(uri, backupDbLauncher)
-                true
-            }
-        }
-    }
-
-    private fun initializeBackupLocationPreference() {
-        settingsViewModel.addPreferenceHandler(
-            BACKUP_LOCATION, BackupFolderPreferenceHandler(findPreference(BACKUP_LOCATION))
-        )
-
-        val backupFolderLauncher =
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-                if (result.resultCode == Activity.RESULT_OK) {
-                    result.data?.data?.also { uri ->
-                        settingsViewModel.handleOnPreferenceClick(BACKUP_LOCATION, uri)
-                    }
-                }
-            }
-
-        settingsViewModel.getPreferenceHandler(BACKUP_LOCATION)?.let { handler ->
-            handler.getPreference()?.setOnPreferenceClickListener {
-                val uri = getBackupLocation()
-                selectBackupFolder(uri, backupFolderLauncher)
+                selectBackupFolder(uri, backupLauncher)
                 true
             }
         }
