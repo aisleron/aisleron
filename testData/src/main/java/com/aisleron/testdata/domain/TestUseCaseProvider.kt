@@ -12,6 +12,8 @@ import com.aisleron.domain.aisleproduct.usecase.AddAisleProductsUseCase
 import com.aisleron.domain.aisleproduct.usecase.RemoveProductsFromAisleUseCase
 import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductRankUseCase
 import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductsUseCase
+import com.aisleron.domain.backup.usecase.BackupDatabaseUseCaseImpl
+import com.aisleron.domain.backup.usecase.RestoreDatabaseUseCaseImpl
 import com.aisleron.domain.location.usecase.AddLocationUseCaseImpl
 import com.aisleron.domain.location.usecase.GetLocationUseCase
 import com.aisleron.domain.location.usecase.GetPinnedShopsUseCase
@@ -86,6 +88,12 @@ class TestUseCaseProvider(testData: TestDataManager) {
      * Shopping List Use Cases
      */
     val getShoppingListUseCase = GetShoppingListUseCase(testData.locationRepository)
+
+    /**
+     * Backup/Restore Use Cases
+     */
+    val backupDatabaseUseCase = BackupDatabaseUseCaseImpl(testData.databaseMaintenance)
+    val restoreDatabaseUseCase = RestoreDatabaseUseCaseImpl(testData.databaseMaintenance)
 
     /**
      * Location Use Cases with Dependencies

@@ -23,6 +23,7 @@ import com.aisleron.domain.location.usecase.GetLocationUseCase
 import com.aisleron.domain.location.usecase.IsLocationNameUniqueUseCase
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.usecase.GetAllProductsUseCase
+import com.aisleron.testdata.data.maintenance.DatabaseMaintenanceTestImpl
 import kotlinx.coroutines.runBlocking
 
 class TestDataManager {
@@ -37,6 +38,8 @@ class TestDataManager {
         AisleProductRepositoryImpl(aisleProductDao, AisleProductRankMapper())
     val aisleRepository = AisleRepositoryImpl(aisleDao, AisleMapper())
     val locationRepository = LocationRepositoryImpl(locationDao, LocationMapper())
+
+    val databaseMaintenance = DatabaseMaintenanceTestImpl()
 
     init {
         initializeTestData()

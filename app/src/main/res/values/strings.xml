@@ -67,7 +67,7 @@
     <string name="backup_restore_title">Backup/Restore</string>
     <string name="backup_database">Backup database</string>
     <string name="restore_database">Restore database</string>
-    <string name="backup_location">Backup location</string>
+    <string name="backup_folder">Backup folder</string>
     <string name="last_backup">Last backup:</string>
     <string name="last_restore">Last restore:</string>
     <string name="never">Never</string>

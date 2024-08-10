@@ -66,6 +66,8 @@ class TestAppModules {
 
                 factory<SettingsViewModel> {
                     SettingsViewModel(
+                        backupDatabaseUseCase = testUseCases.backupDatabaseUseCase,
+                        restoreDatabaseUseCase = testUseCases.restoreDatabaseUseCase,
                         TestScope(UnconfinedTestDispatcher())
                     )
                 }

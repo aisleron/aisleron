@@ -3,13 +3,20 @@ package com.aisleron.ui.settings
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.preference.Preference
+import com.aisleron.domain.backup.usecase.BackupDatabaseUseCase
+import com.aisleron.domain.backup.usecase.RestoreDatabaseUseCase
 import com.aisleron.domain.base.AisleronException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class SettingsViewModel(coroutineScopeProvider: CoroutineScope? = null) : ViewModel() {
+class SettingsViewModel(
+    private val backupDatabaseUseCase: BackupDatabaseUseCase,
+    private val restoreDatabaseUseCase: RestoreDatabaseUseCase,
+    coroutineScopeProvider: CoroutineScope? = null
+) : ViewModel() {
     private val coroutineScope = coroutineScopeProvider ?: this.viewModelScope
 
     private val preferenceHandlers =
@@ -17,15 +24,8 @@ class SettingsViewModel(coroutineScopeProvider: CoroutineScope? = null) : ViewMo
     private val _uiState = MutableStateFlow<UiState>(UiState.Empty)
     val uiState: StateFlow<UiState> = _uiState
 
-    fun addPreferenceHandler(
-        preferenceKey: String,
-        backupRestoreDbPreferenceHandler: BackupRestoreDbPreferenceHandler
-    ) {
-        preferenceHandlers[preferenceKey] = backupRestoreDbPreferenceHandler
-    }
-
-    fun handleOnPreferenceClick(preferenceKey: String, uri: Uri) {
-        preferenceHandlers[preferenceKey]?.let {
+    fun handleOnPreferenceClick(preferenceOption: SettingsFragment.PreferenceOption, uri: Uri) {
+        preferenceHandlers[preferenceOption.key]?.let {
             _uiState.value = UiState.Processing(it.getProcessingMessage())
 
             coroutineScope.launch {
@@ -44,7 +44,32 @@ class SettingsViewModel(coroutineScopeProvider: CoroutineScope? = null) : ViewMo
         }
     }
 
-    fun getPreferenceHandler(preferenceKey: String) = preferenceHandlers[preferenceKey]
+    fun setPreferenceValue(preferenceOption: SettingsFragment.PreferenceOption, value: String) {
+        preferenceHandlers[preferenceOption.key]?.setValue(value)
+    }
+
+    fun getPreferenceValue(preferenceOption: SettingsFragment.PreferenceOption): String? {
+        return preferenceHandlers[preferenceOption.key]?.getValue()
+    }
+
+    fun preferenceHandlerFactory(
+        preferenceOption: SettingsFragment.PreferenceOption, preference: Preference?
+    ): BackupRestoreDbPreferenceHandler {
+        val result = when (preferenceOption) {
+            SettingsFragment.PreferenceOption.BACKUP_FOLDER ->
+                BackupFolderPreferenceHandler(preference)
+
+            SettingsFragment.PreferenceOption.BACKUP_DATABASE ->
+                BackupDbPreferenceHandler(preference, backupDatabaseUseCase)
+
+            SettingsFragment.PreferenceOption.RESTORE_DATABASE ->
+                RestoreDbPreferenceHandler(preference, restoreDatabaseUseCase)
+        }
+
+        preferenceHandlers[preferenceOption.key] = result
+
+        return result
+    }
 
     sealed class UiState {
         data object Empty : UiState()

@@ -16,8 +16,8 @@
 
     <PreferenceCategory app:title="@string/backup_restore_title">
         <Preference
-            android:title="@string/backup_location"
-            app:key="backup_location" />
+            android:title="@string/backup_folder"
+            app:key="backup_folder" />
         <Preference
             android:title="@string/backup_database"
             app:key="backup_database" />

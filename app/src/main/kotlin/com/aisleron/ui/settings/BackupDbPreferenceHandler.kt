@@ -5,18 +5,18 @@ import androidx.preference.Preference
 import com.aisleron.R
 import com.aisleron.domain.backup.usecase.BackupDatabaseUseCase
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import java.text.DateFormat.getDateTimeInstance
 import java.util.Date
 
-class BackupDbPreferenceHandler(private val preference: Preference?) :
+class BackupDbPreferenceHandler(
+    private val preference: Preference?,
+    private val backupDatabaseUseCase: BackupDatabaseUseCase
+) :
     BackupRestoreDbPreferenceHandler, KoinComponent {
 
     init {
         updateSummary()
     }
-
-    private val backupDatabaseUseCase: BackupDatabaseUseCase by inject()
 
     override fun getSummaryTemplate() =
         preference?.context?.getString(R.string.last_backup) + " %s"
@@ -28,7 +28,7 @@ class BackupDbPreferenceHandler(private val preference: Preference?) :
         setValue(getDateTimeInstance().format(Date()))
     }
 
-    override fun getPreference() = preference
+    override fun BackupRestoreDbPreferenceHandler.getPreference() = preference
 
     override fun getProcessingMessage(): String? {
         return preference?.context?.getString(R.string.db_backup_processing)

@@ -298,6 +298,9 @@ val appModule = module {
     }
 
     viewModel {
-        SettingsViewModel()
+        SettingsViewModel(
+            backupDatabaseUseCase = get(),
+            restoreDatabaseUseCase = get()
+        )
     }
 }

@@ -14,7 +14,7 @@ class BackupFolderPreferenceHandler(private val preference: Preference?) :
         setValue(uri.toString())
     }
 
-    override fun getPreference() = preference
+    override fun BackupRestoreDbPreferenceHandler.getPreference() = preference
     override fun getProcessingMessage() = null
     override fun getSuccessMessage() = null
 }
