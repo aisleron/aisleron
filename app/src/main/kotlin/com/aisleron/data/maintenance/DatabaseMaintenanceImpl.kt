@@ -18,6 +18,7 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.InputStream
 import java.io.OutputStream
+import java.net.URI
 
 
 class DatabaseMaintenanceImpl(
@@ -35,8 +36,9 @@ class DatabaseMaintenanceImpl(
 
     override fun getDatabaseName() = database.openHelper.databaseName
 
-    override suspend fun backupDatabase(backupFolderUri: Uri, backupFileName: String) {
-        val backupFolder = DocumentFile.fromTreeUri(context, backupFolderUri)
+    override suspend fun backupDatabase(backupFolderUri: URI, backupFileName: String) {
+        val uri = Uri.parse(backupFolderUri.toString())
+        val backupFolder = DocumentFile.fromTreeUri(context, uri)
         val backupFile = backupFolder?.createFile("application/vnd.sqlite3", backupFileName)
         val backupStream = backupFile?.let {
             context.contentResolver.openOutputStream(it.uri)
@@ -58,8 +60,9 @@ class DatabaseMaintenanceImpl(
         }
     }
 
-    override suspend fun restoreDatabase(restoreFileUri: Uri) {
-        val restoreStream = context.contentResolver.openInputStream(restoreFileUri)
+    override suspend fun restoreDatabase(restoreFileUri: URI) {
+        val uri = Uri.parse(restoreFileUri.toString())
+        val restoreStream = context.contentResolver.openInputStream(uri)
             ?: throw AisleronException.InvalidDbRestoreFileException("Invalid database backup file/location")
 
         withContext(_coroutineDispatcher) {

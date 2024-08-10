@@ -1,20 +1,20 @@
 package com.aisleron.domain.backup.usecase
 
-import android.net.Uri
 import com.aisleron.domain.backup.DatabaseMaintenance
 import com.aisleron.domain.base.AisleronException
+import java.net.URI
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 interface BackupDatabaseUseCase {
-    suspend operator fun invoke(backupFolderUri: Uri)
+    suspend operator fun invoke(backupFolderUri: URI)
 }
 
 class BackupDatabaseUseCaseImpl(private val databaseMaintenance: DatabaseMaintenance) :
     BackupDatabaseUseCase {
 
-    override suspend operator fun invoke(backupFolderUri: Uri) {
+    override suspend operator fun invoke(backupFolderUri: URI) {
         val dbName = databaseMaintenance.getDatabaseName()
         if (dbName.isNullOrBlank()) throw AisleronException.InvalidDbNameException("Invalid database name")
 

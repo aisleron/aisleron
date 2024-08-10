@@ -5,6 +5,7 @@ import androidx.preference.Preference
 import com.aisleron.R
 import com.aisleron.domain.backup.usecase.BackupDatabaseUseCase
 import org.koin.core.component.KoinComponent
+import java.net.URI
 import java.text.DateFormat.getDateTimeInstance
 import java.util.Date
 
@@ -24,7 +25,7 @@ class BackupDbPreferenceHandler(
     override fun getDefaultValue() = preference?.context?.getString(R.string.never) ?: ""
 
     override suspend fun handleOnPreferenceClick(uri: Uri) {
-        backupDatabaseUseCase(uri)
+        backupDatabaseUseCase(URI(uri.toString()))
         setValue(getDateTimeInstance().format(Date()))
     }
 

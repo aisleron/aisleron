@@ -1,10 +1,10 @@
 package com.aisleron.domain.backup
 
-import android.net.Uri
+import java.net.URI
 
 
 interface DatabaseMaintenance {
     fun getDatabaseName(): String?
-    suspend fun backupDatabase(backupFolderUri: Uri, backupFileName: String)
-    suspend fun restoreDatabase(restoreFileUri: Uri)
+    suspend fun backupDatabase(backupFolderUri: URI, backupFileName: String)
+    suspend fun restoreDatabase(restoreFileUri: URI)
 }
