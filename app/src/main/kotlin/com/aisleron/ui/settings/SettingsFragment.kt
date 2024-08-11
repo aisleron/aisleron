@@ -66,12 +66,13 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 }
             }
 
-        val preference: Preference? = findPreference(preferenceOption.key)
-        val handler = settingsViewModel.preferenceHandlerFactory(preferenceOption, preference)
-        handler.setOnPreferenceClickListener {
-            val uri = getBackupFolderUri()
-            filePicker(uri, filePickerResultLauncher)
-            true
+        findPreference<Preference>(preferenceOption.key)?.let {
+            val handler = settingsViewModel.preferenceHandlerFactory(preferenceOption, it)
+            handler.setOnPreferenceClickListener {
+                val uri = getBackupFolderUri()
+                filePicker(uri, filePickerResultLauncher)
+                true
+            }
         }
     }
 
@@ -98,9 +99,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                             displayErrorSnackBar(it.errorCode, it.errorMessage)
 
                         is SettingsViewModel.UiState.Success -> {
-                            it.message?.let { msg ->
-                                Snackbar.make(requireView(), msg, Toast.LENGTH_SHORT).show()
-                            }
+                            Snackbar.make(requireView(), it.message, Toast.LENGTH_SHORT).show()
                         }
                     }
                 }

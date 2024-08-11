@@ -10,7 +10,7 @@ import java.text.DateFormat.getDateTimeInstance
 import java.util.Date
 
 class RestoreDbPreferenceHandler(
-    private val preference: Preference?,
+    private val preference: Preference,
     private val restoreDatabaseUseCase: RestoreDatabaseUseCase
 ) :
     BackupRestoreDbPreferenceHandler, KoinComponent {
@@ -20,9 +20,9 @@ class RestoreDbPreferenceHandler(
     }
 
     override fun getSummaryTemplate() =
-        preference?.context?.getString(R.string.last_restore) + " %s"
+        preference.context.getString(R.string.last_restore) + " %s"
 
-    override fun getDefaultValue() = preference?.context?.getString(R.string.never) ?: ""
+    override fun getDefaultValue() = preference.context.getString(R.string.never)
 
     override suspend fun handleOnPreferenceClick(uri: Uri) {
         restoreDatabaseUseCase(URI(uri.toString()))
@@ -31,11 +31,11 @@ class RestoreDbPreferenceHandler(
 
     override fun BackupRestoreDbPreferenceHandler.getPreference() = preference
 
-    override fun getProcessingMessage(): String? {
-        return preference?.context?.getString(R.string.db_restore_processing)
+    override fun getProcessingMessage(): String {
+        return preference.context.getString(R.string.db_restore_processing)
     }
 
-    override fun getSuccessMessage(): String? {
-        return preference?.context?.getString(R.string.db_restore_success)
+    override fun getSuccessMessage(): String {
+        return preference.context.getString(R.string.db_restore_success)
     }
 }

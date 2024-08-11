@@ -2,8 +2,9 @@ package com.aisleron.ui.settings
 
 import android.net.Uri
 import androidx.preference.Preference
+import com.aisleron.R
 
-class BackupFolderPreferenceHandler(private val preference: Preference?) :
+class BackupFolderPreferenceHandler(private val preference: Preference) :
     BackupRestoreDbPreferenceHandler {
 
     init {
@@ -16,5 +17,7 @@ class BackupFolderPreferenceHandler(private val preference: Preference?) :
 
     override fun BackupRestoreDbPreferenceHandler.getPreference() = preference
     override fun getProcessingMessage() = null
-    override fun getSuccessMessage() = null
+    override fun getSuccessMessage(): String {
+        return preference.context.getString(R.string.backup_folder_success)
+    }
 }

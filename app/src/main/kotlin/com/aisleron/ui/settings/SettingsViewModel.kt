@@ -25,35 +25,32 @@ class SettingsViewModel(
     val uiState: StateFlow<UiState> = _uiState
 
     fun handleOnPreferenceClick(preferenceOption: SettingsFragment.PreferenceOption, uri: Uri) {
-        preferenceHandlers[preferenceOption.key]?.let {
-            _uiState.value = UiState.Processing(it.getProcessingMessage())
+        val preferenceHandler = preferenceHandlers.getValue(preferenceOption.key)
+        _uiState.value = UiState.Processing(preferenceHandler.getProcessingMessage())
 
-            coroutineScope.launch {
-                try {
-                    it.handleOnPreferenceClick(uri)
-                    _uiState.value = UiState.Success(it.getSuccessMessage())
-                } catch (e: AisleronException) {
-                    _uiState.value = UiState.Error(e.exceptionCode, e.message)
-                } catch (e: Exception) {
-                    _uiState.value =
-                        UiState.Error(AisleronException.ExceptionCode.GENERIC_EXCEPTION, e.message)
-                }
-
-                _uiState.value = UiState.Empty
+        coroutineScope.launch {
+            try {
+                preferenceHandler.handleOnPreferenceClick(uri)
+                _uiState.value = UiState.Success(preferenceHandler.getSuccessMessage())
+            } catch (e: AisleronException) {
+                _uiState.value = UiState.Error(e.exceptionCode, e.message)
+            } catch (e: Exception) {
+                _uiState.value =
+                    UiState.Error(AisleronException.ExceptionCode.GENERIC_EXCEPTION, e.message)
             }
         }
     }
 
     fun setPreferenceValue(preferenceOption: SettingsFragment.PreferenceOption, value: String) {
-        preferenceHandlers[preferenceOption.key]?.setValue(value)
+        preferenceHandlers.getValue(preferenceOption.key).setValue(value)
     }
 
-    fun getPreferenceValue(preferenceOption: SettingsFragment.PreferenceOption): String? {
-        return preferenceHandlers[preferenceOption.key]?.getValue()
+    fun getPreferenceValue(preferenceOption: SettingsFragment.PreferenceOption): String {
+        return preferenceHandlers.getValue(preferenceOption.key).getValue()
     }
 
     fun preferenceHandlerFactory(
-        preferenceOption: SettingsFragment.PreferenceOption, preference: Preference?
+        preferenceOption: SettingsFragment.PreferenceOption, preference: Preference
     ): BackupRestoreDbPreferenceHandler {
         val result = when (preferenceOption) {
             SettingsFragment.PreferenceOption.BACKUP_FOLDER ->
@@ -74,7 +71,7 @@ class SettingsViewModel(
     sealed class UiState {
         data object Empty : UiState()
         data class Processing(val message: String?) : UiState()
-        data class Success(val message: String?) : UiState()
+        data class Success(val message: String) : UiState()
         data class Error(
             val errorCode: AisleronException.ExceptionCode,
             val errorMessage: String?

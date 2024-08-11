@@ -71,11 +71,12 @@
     <string name="last_backup">Last backup:</string>
     <string name="last_restore">Last restore:</string>
     <string name="never">Never</string>
-    <string name="db_backup_processing">Backup in progress</string>
+    <string name="db_backup_processing">Backup in progress…</string>
     <string name="db_backup_success">Backup completed</string>
-    <string name="db_restore_processing">Restore in progress</string>
+    <string name="db_restore_processing">Restore in progress…</string>
     <string name="db_restore_success">Restore completed</string>
     <string name="db_restore_confirmation">Are you sure you want to replace your current database with backup %1$s?</string>
     <string name="db_restore_confirmation_title">Confirm Database Restore</string>
+    <string name="backup_folder_success">Backup folder set</string>
 
 </resources>
