@@ -105,7 +105,7 @@ dependencies {
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     implementation("androidx.datastore:datastore-preferences:1.1.1")
     implementation("androidx.fragment:fragment-ktx:1.8.2")
-    implementation("androidx.databinding:databinding-runtime:8.5.1")
+    implementation("androidx.databinding:databinding-runtime:8.5.2")
     implementation("androidx.navigation:navigation-testing:2.7.7")
     implementation("androidx.test.espresso:espresso-contrib:3.6.1")
 
@@ -118,6 +118,7 @@ dependencies {
     androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")
     androidTestImplementation("io.insert-koin:koin-test:3.5.6")
     androidTestImplementation("androidx.test:core-ktx:1.6.1")
+    androidTestImplementation("androidx.test.espresso:espresso-intents:3.6.1")
     debugImplementation("androidx.fragment:fragment-testing:1.8.2")
     implementation("androidx.lifecycle:lifecycle-runtime-testing:2.8.4")
 

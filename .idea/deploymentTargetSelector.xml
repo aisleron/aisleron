@@ -4,25 +4,25 @@
     <selectionStates>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2024-06-28T22:56:24.152312530Z">
+        <DropdownSelection timestamp="2024-08-13T09:12:27.145506233Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=/home/danie/.var/app/com.google.AndroidStudio/config/.android/avd/Pixel_3a_API_34_AOSP.avd" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=/home/danie/.var/app/com.google.AndroidStudio/config/.android/avd/Test_Pixel_3a_API_34_AOSP.avd" />
             </handle>
           </Target>
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="SettingsViewModelTest">
+      <SelectionState runConfigName="onBackupDatabaseClick_OnFilePickerIntentResponse_BackupDatabasePreferenceUpdated()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="constructor_NoCoroutineScopeProvided_ShopViewModelReturned()">
+      <SelectionState runConfigName="onRestoreDatabaseClick_OnFilePickerIntentResponse_ConfirmationModalDisplayed()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="constructor_NoCoroutineScopeProvided_SettingsViewModelReturned()">
+      <SelectionState runConfigName="onRestoreDatabaseClick_OnConfirmRestore_RestoreDatabasePreferenceUpdated()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="SettingsFragmentTest">
+      <SelectionState runConfigName="onRestoreDatabaseClick_OnCancelRestore_RestoreDatabasePreferenceNoUpdated()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
       <SelectionState runConfigName="Tests in 'com.aisleron.ui.settings'">
