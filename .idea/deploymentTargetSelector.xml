@@ -13,19 +13,16 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="onBackupDatabaseClick_OnFilePickerIntentResponse_BackupDatabasePreferenceUpdated()">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
-      <SelectionState runConfigName="onRestoreDatabaseClick_OnFilePickerIntentResponse_ConfirmationModalDisplayed()">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
-      <SelectionState runConfigName="onRestoreDatabaseClick_OnConfirmRestore_RestoreDatabasePreferenceUpdated()">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
       <SelectionState runConfigName="onRestoreDatabaseClick_OnCancelRestore_RestoreDatabasePreferenceNoUpdated()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
       <SelectionState runConfigName="Tests in 'com.aisleron.ui.settings'">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="onFilePickerResponse_IsError_ShowErrorSnackBar()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="onBackupDatabaseClick_OnFilePickerIntentResponse_BackupDatabasePreferenceUpdated()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

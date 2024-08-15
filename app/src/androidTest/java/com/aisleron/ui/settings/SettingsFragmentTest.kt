@@ -19,14 +19,18 @@ import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.Intents.intending
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
 import androidx.test.espresso.matcher.RootMatchers.isDialog
+import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withContentDescription
+import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import com.aisleron.MainActivity
 import com.aisleron.R
 import com.aisleron.data.TestDataManager
 import com.aisleron.di.KoinTestRule
 import com.aisleron.di.TestAppModules
+import org.hamcrest.CoreMatchers.allOf
+import org.hamcrest.CoreMatchers.startsWith
 import org.hamcrest.Matchers
 import org.junit.After
 import org.junit.Assert
@@ -34,7 +38,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.koin.core.module.Module
-import java.time.LocalDate
+import java.util.Calendar
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
@@ -154,7 +158,7 @@ class SettingsFragmentTest {
         runFilePickerIntent(testUri, Intent.ACTION_OPEN_DOCUMENT_TREE, R.string.backup_database)
         val summaryAfter = preference?.summary!!
 
-        val year: String = LocalDate.now().year.toString()
+        val year = Calendar.getInstance().get(Calendar.YEAR).toString()
         assertNotEquals(summaryBefore, summaryAfter)
         assertTrue(summaryAfter.contains(Regex("$summaryPrefix.*$year.*")))
     }
@@ -209,7 +213,7 @@ class SettingsFragmentTest {
 
         val summaryAfter = preference?.summary!!
 
-        val year: String = LocalDate.now().year.toString()
+        val year = Calendar.getInstance().get(Calendar.YEAR).toString()
         assertNotEquals(summaryBefore, summaryAfter)
         assertTrue(summaryAfter.contains(Regex("$summaryPrefix.*$year.*")))
     }
@@ -234,6 +238,28 @@ class SettingsFragmentTest {
         val summaryAfter = preference?.summary!!
 
         assertEquals(summaryBefore, summaryAfter)
+    }
+
+    @Test
+    fun onFilePickerResponse_IsError_ShowErrorSnackBar() {
+        val testUri = String()
+        getFragmentScenario()
+
+        runFilePickerIntent(testUri, Intent.ACTION_OPEN_DOCUMENT, R.string.restore_database)
+
+        onView(withText(android.R.string.ok))
+            .inRoot(isDialog())
+            .check(matches(isDisplayed()))
+            .perform(click())
+
+        onView(withId(com.google.android.material.R.id.snackbar_text)).check(
+            matches(
+                allOf(
+                    ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE),
+                    withText(startsWith("ERROR:"))
+                )
+            )
+        )
     }
 
     /**
