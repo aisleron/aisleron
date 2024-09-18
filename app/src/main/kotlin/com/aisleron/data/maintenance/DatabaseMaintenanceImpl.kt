@@ -20,19 +20,13 @@ import java.io.InputStream
 import java.io.OutputStream
 import java.net.URI
 
-
 class DatabaseMaintenanceImpl(
     private val database: AisleronDatabase,
     private val context: Context,
     coroutineDispatcher: CoroutineDispatcher? = null
 ) : DatabaseMaintenance {
 
-    companion object {
-        private const val BUFFER_SIZE = 8192
-    }
-
     private val _coroutineDispatcher = coroutineDispatcher ?: Dispatchers.IO
-
 
     override fun getDatabaseName() = database.openHelper.databaseName
 
@@ -40,41 +34,30 @@ class DatabaseMaintenanceImpl(
         val uri = Uri.parse(backupFolderUri.toString())
         val backupFolder = DocumentFile.fromTreeUri(context, uri)
         val backupFile = backupFolder?.createFile("application/vnd.sqlite3", backupFileName)
-        val backupStream = backupFile?.let {
+        val outputStream = backupFile?.let {
             context.contentResolver.openOutputStream(it.uri)
         }
 
-        if (backupStream == null)
+        if (outputStream == null)
             throw AisleronException.InvalidDbBackupFileException("Invalid database backup file/location")
 
         withContext(_coroutineDispatcher) {
             createCheckpoint()
-            val databaseStream = FileInputStream(database.openHelper.writableDatabase.path)
-            try {
-                copy(databaseStream, backupStream)
-            } finally {
-                databaseStream.close()
-                backupStream.flush()
-                backupStream.close()
-            }
+            val inputStream = FileInputStream(database.openHelper.writableDatabase.path)
+            copyAndClose(inputStream, outputStream)
         }
     }
 
     override suspend fun restoreDatabase(restoreFileUri: URI) {
         val uri = Uri.parse(restoreFileUri.toString())
-        val restoreStream = context.contentResolver.openInputStream(uri)
+        val inputStream = context.contentResolver.openInputStream(uri)
             ?: throw AisleronException.InvalidDbRestoreFileException("Invalid database backup file/location")
 
         withContext(_coroutineDispatcher) {
-            val databaseStream = FileOutputStream(database.openHelper.writableDatabase.path)
+            val dbPath = database.openHelper.writableDatabase.path
             database.close()
-            try {
-                copy(restoreStream, databaseStream)
-            } finally {
-                restoreStream.close()
-                databaseStream.flush()
-                databaseStream.close()
-            }
+            val outputStream = FileOutputStream(dbPath)
+            copyAndClose(inputStream, outputStream)
             unloadKoinModules(appModule)
             loadKoinModules(appModule)
             getKoin().get<AisleronDatabase>()
@@ -85,14 +68,13 @@ class DatabaseMaintenanceImpl(
         database.maintenanceDao().checkpoint((SimpleSQLiteQuery("pragma wal_checkpoint(full)")))
     }
 
-    private fun copy(source: InputStream, sink: OutputStream): Long {
-        var totalBytes = 0L
-        val buffer = ByteArray(BUFFER_SIZE)
-        var readChunk: Int
-        while ((source.read(buffer).also { readChunk = it }) > 0) {
-            sink.write(buffer, 0, readChunk)
-            totalBytes += readChunk.toLong()
+    private fun copyAndClose(inputStream: InputStream, outputStream: OutputStream): Long {
+        try {
+            return inputStream.copyTo(outputStream, DEFAULT_BUFFER_SIZE)
+        } finally {
+            inputStream.close()
+            outputStream.flush()
+            outputStream.close()
         }
-        return totalBytes
     }
 }
