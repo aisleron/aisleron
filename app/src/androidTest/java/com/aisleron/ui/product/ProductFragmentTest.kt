@@ -20,7 +20,6 @@ import com.aisleron.ui.AddEditFragmentListener
 import com.aisleron.ui.FabHandlerTestImpl
 import com.aisleron.ui.bundles.Bundler
 import kotlinx.coroutines.runBlocking
-import org.junit.After
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
@@ -48,10 +47,6 @@ class ProductFragmentTest {
         bundler = Bundler()
         addEditFragmentListener = TestAddEditFragmentListener()
         fabHandler = FabHandlerTestImpl()
-    }
-
-    @After
-    fun tearDown() {
     }
 
     @Test

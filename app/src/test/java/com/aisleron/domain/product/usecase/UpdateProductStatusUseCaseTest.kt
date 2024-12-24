@@ -3,7 +3,6 @@ package com.aisleron.domain.product.usecase
 import com.aisleron.data.TestDataManager
 import com.aisleron.domain.product.Product
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
@@ -29,10 +28,6 @@ class UpdateProductStatusUseCaseTest {
                 IsProductNameUniqueUseCase(testData.productRepository)
             )
         )
-    }
-
-    @AfterEach
-    fun tearDown() {
     }
 
     @ParameterizedTest(name = "Test when inStock Status is {0}")

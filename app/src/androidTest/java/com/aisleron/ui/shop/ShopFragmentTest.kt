@@ -29,7 +29,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import org.junit.After
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
@@ -82,10 +81,6 @@ class ShopFragmentTest {
         bundler = Bundler()
         addEditFragmentListener = TestAddEditFragmentListener()
         fabHandler = FabHandlerTestImpl()
-    }
-
-    @After
-    fun tearDown() {
     }
 
     @Test

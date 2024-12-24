@@ -3,7 +3,6 @@ package com.aisleron.domain.product.usecase
 import com.aisleron.data.TestDataManager
 import com.aisleron.domain.product.Product
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
@@ -22,10 +21,6 @@ class RemoveProductUseCaseTest {
         removeProductUseCase = RemoveProductUseCase(testData.productRepository)
 
         existingProduct = runBlocking { testData.productRepository.get(1)!! }
-    }
-
-    @AfterEach
-    fun tearDown() {
     }
 
     @Test

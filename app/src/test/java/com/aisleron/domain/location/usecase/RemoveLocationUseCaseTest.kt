@@ -9,7 +9,6 @@ import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductsUseCase
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationType
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
@@ -40,10 +39,6 @@ class RemoveLocationUseCaseTest {
         runBlocking {
             existingLocation = testData.locationRepository.get(1)!!
         }
-    }
-
-    @AfterEach
-    fun tearDown() {
     }
 
     @Test

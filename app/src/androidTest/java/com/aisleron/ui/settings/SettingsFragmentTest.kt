@@ -32,9 +32,7 @@ import com.aisleron.di.TestAppModules
 import org.hamcrest.CoreMatchers.allOf
 import org.hamcrest.CoreMatchers.startsWith
 import org.hamcrest.Matchers
-import org.junit.After
 import org.junit.Assert
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.koin.core.module.Module
@@ -53,14 +51,6 @@ class SettingsFragmentTest {
 
     private fun getKoinModules(): List<Module> {
         return TestAppModules().getTestAppModules(TestDataManager())
-    }
-
-    @Before
-    fun setUp() {
-    }
-
-    @After
-    fun tearDown() {
     }
 
     private fun getFragmentScenario(): FragmentScenario<SettingsFragment> =

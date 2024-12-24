@@ -4,7 +4,6 @@ import com.aisleron.data.TestDataManager
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.product.Product
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
@@ -29,10 +28,6 @@ class UpdateProductUseCaseTest {
         )
     }
 
-    @AfterEach
-    fun tearDown() {
-    }
-
     @Test
     fun updateProduct_IsDuplicateName_ThrowsException() {
         runBlocking {
@@ -44,7 +39,8 @@ class UpdateProductUseCaseTest {
                 )
             )
 
-            val updateProduct = testData.productRepository.get(id)!!.copy(name = existingProduct.name)
+            val updateProduct =
+                testData.productRepository.get(id)!!.copy(name = existingProduct.name)
             assertThrows<AisleronException.DuplicateProductNameException> {
                 updateProductUseCase(updateProduct)
             }

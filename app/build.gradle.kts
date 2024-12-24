@@ -30,7 +30,7 @@ android {
         }
     }
     namespace = "com.aisleron"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.aisleron"
@@ -48,7 +48,9 @@ android {
 
     buildTypes {
         release {
+            isDebuggable = false
             isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -57,8 +59,13 @@ android {
         }
 
         debug {
+            isDebuggable = true
             enableAndroidTestCoverage = true
             enableUnitTestCoverage = true
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-DEBUG"
+            resValue("string", "app_name", "Aisleron Debug")
+            resValue("string", "nav_header_title", "Aisleron Debug")
         }
     }
     compileOptions {
@@ -92,42 +99,42 @@ android {
 
 dependencies {
 
-    implementation("androidx.core:core-ktx:1.13.1")
+    implementation("androidx.core:core-ktx:1.15.0")
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("com.google.android.material:material:1.12.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.6")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.6")
-    implementation("androidx.navigation:navigation-fragment-ktx:2.8.2")
-    implementation("androidx.navigation:navigation-ui-ktx:2.8.2")
+    implementation("androidx.constraintlayout:constraintlayout:2.2.0")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.7")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.8.5")
+    implementation("androidx.navigation:navigation-ui-ktx:2.8.5")
     implementation("androidx.preference:preference-ktx:1.2.1")
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     implementation("androidx.datastore:datastore-preferences:1.1.1")
-    implementation("androidx.fragment:fragment-ktx:1.8.4")
-    implementation("androidx.databinding:databinding-runtime:8.7.0")
-    implementation("androidx.navigation:navigation-testing:2.8.2")
+    implementation("androidx.fragment:fragment-ktx:1.8.5")
+    implementation("androidx.databinding:databinding-runtime:8.7.3")
+    implementation("androidx.navigation:navigation-testing:2.8.5")
     implementation("androidx.test.espresso:espresso-contrib:3.6.1")
 
     //Testing
-    testImplementation("org.junit.jupiter:junit-jupiter:5.11.2")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.11.4")
     testImplementation(project(":testData"))
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
     androidTestImplementation(project(":testData"))
-    androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
-    androidTestImplementation("io.insert-koin:koin-test:4.0.0")
+    androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.1")
+    androidTestImplementation("io.insert-koin:koin-test:4.0.1")
     androidTestImplementation("androidx.test:core-ktx:1.6.1")
     androidTestImplementation("androidx.test.espresso:espresso-intents:3.6.1")
-    debugImplementation("androidx.fragment:fragment-testing:1.8.4")
-    implementation("androidx.lifecycle:lifecycle-runtime-testing:2.8.6")
+    debugImplementation("androidx.fragment:fragment-testing:1.8.5")
+    implementation("androidx.lifecycle:lifecycle-runtime-testing:2.8.7")
 
     //Room
     implementation("androidx.room:room-runtime:2.6.1")
     ksp("androidx.room:room-compiler:2.6.1")
 
     //Koin
-    implementation("io.insert-koin:koin-android:4.0.0")
+    implementation("io.insert-koin:koin-android:4.0.1")
 
     //Coroutines
     implementation("androidx.room:room-ktx:2.6.1")

@@ -6,7 +6,6 @@ import com.aisleron.domain.aisleproduct.usecase.AddAisleProductsUseCase
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.product.Product
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -35,10 +34,6 @@ class AddProductUseCaseTest {
         }
     }
 
-    @AfterEach
-    fun tearDown() {
-    }
-
     @Test
     fun addProduct_IsDuplicateName_ThrowsException() {
         runBlocking {
@@ -50,42 +45,17 @@ class AddProductUseCaseTest {
     }
 
     @Test
-    fun addProduct_IsExistingProduct_ProductUpdated() {
+    fun addProduct_IsExistingProduct_ThrowsException() {
         val updateProduct = existingProduct.copy(
             name = existingProduct.name + " Updated",
             inStock = !existingProduct.inStock
         )
-        val updatedProduct: Product?
-        val countBefore: Int
-        val countAfter: Int
-        runBlocking {
-            countBefore = testData.productRepository.getAll().count()
-            val id = addProductUseCase(updateProduct)
-            updatedProduct = testData.productRepository.get(id)
-            countAfter = testData.productRepository.getAll().count()
-        }
-        Assertions.assertNotNull(updatedProduct)
-        Assertions.assertEquals(countBefore, countAfter)
-        Assertions.assertEquals(updateProduct.id, updatedProduct?.id)
-        Assertions.assertEquals(updateProduct.name, updatedProduct?.name)
-        Assertions.assertEquals(updateProduct.inStock, updatedProduct?.inStock)
-    }
 
-    @Test
-    fun addProduct_ProductUpdated_DoesNotAddAisleProducts() {
-        //TODO("Fix this Test")
-        /*val updateProduct = existingProduct.copy(
-            name = existingProduct.name + " Updated",
-            inStock = !existingProduct.inStock
-        )
-        val aisleProductCountBefore: Int
-        val aisleProductCountAfter: Int
         runBlocking {
-            aisleProductCountBefore = testData.aisleProductRepository.getAll().count()
-            addProductUseCase(updateProduct)
-            aisleProductCountAfter = testData.aisleProductRepository.getAll().count()
+            assertThrows<AisleronException.DuplicateProductException> {
+                addProductUseCase(updateProduct)
+            }
         }
-        Assertions.assertEquals(aisleProductCountBefore, aisleProductCountAfter)*/
     }
 
     private fun getNewProduct(): Product {

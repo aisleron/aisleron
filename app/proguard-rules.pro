@@ -19,3 +19,6 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+-keep public class com.aisleron.ui.bundles.AddEditLocationBundle
+-keep public class com.aisleron.ui.bundles.AddEditProductBundle

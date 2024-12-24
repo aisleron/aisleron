@@ -27,6 +27,10 @@ class AddLocationUseCaseImpl(
             throw AisleronException.DuplicateLocationNameException("Location Name must be unique")
         }
 
+        if (locationRepository.get(location.id) != null) {
+            throw AisleronException.DuplicateLocationException("Cannot add a duplicate of an existing Location")
+        }
+
         val newLocationId = locationRepository.add(location)
         //Add location default Aisle. Set Rank high so it shows at the end of the shopping list
         val newAisleId = addAisleUseCase(

@@ -115,7 +115,10 @@ class RemoveAisleUseCaseTest {
 
         }
         assertEquals(aisleProductCountBefore, aisleProductCountAfter)
-        assertEquals(defaultAisleProductCountBefore + aisleProductCount, defaultAisleProductCountAfter)
+        assertEquals(
+            defaultAisleProductCountBefore + aisleProductCount,
+            defaultAisleProductCountAfter
+        )
     }
 
     @Test

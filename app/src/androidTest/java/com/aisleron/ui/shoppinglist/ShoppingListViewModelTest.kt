@@ -437,7 +437,7 @@ class ShoppingListViewModelTest {
     fun removeItem_ExceptionRaised_UiStateIsError() {
         val testUseCases = TestUseCaseProvider(testData)
         val exceptionMessage = "Error on Remove Item"
-        val getAisleUseCase = object: GetAisleUseCase {
+        val getAisleUseCase = object : GetAisleUseCase {
             override suspend operator fun invoke(id: Int): Aisle? {
                 throw Exception(exceptionMessage)
             }

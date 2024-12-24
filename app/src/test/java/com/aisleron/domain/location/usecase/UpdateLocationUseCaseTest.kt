@@ -6,7 +6,6 @@ import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationType
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
@@ -31,10 +30,6 @@ class UpdateLocationUseCaseTest {
         )
     }
 
-    @AfterEach
-    fun tearDown() {
-    }
-
     @Test
     fun updateLocation_IsDuplicateName_ThrowsException() {
         runBlocking {
@@ -49,7 +44,8 @@ class UpdateLocationUseCaseTest {
                 )
             )
 
-            val updateLocation = testData.locationRepository.get(id)!!.copy(name = existingLocation.name)
+            val updateLocation =
+                testData.locationRepository.get(id)!!.copy(name = existingLocation.name)
             assertThrows<AisleronException.DuplicateLocationNameException> {
                 updateLocationUseCase(updateLocation)
             }

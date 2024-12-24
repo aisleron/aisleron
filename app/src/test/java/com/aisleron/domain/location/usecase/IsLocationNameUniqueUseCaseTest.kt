@@ -4,7 +4,6 @@ import com.aisleron.data.TestDataManager
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationType
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNotEquals
@@ -20,11 +19,6 @@ class IsLocationNameUniqueUseCaseTest {
     @BeforeEach
     fun setUp() {
         isLocationNameUniqueUseCase = IsLocationNameUniqueUseCase(testData.locationRepository)
-    }
-
-    @AfterEach
-    fun tearDown() {
-
     }
 
     @Test

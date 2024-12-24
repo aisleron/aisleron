@@ -33,6 +33,8 @@
     <string name="invalid_db_name_exception">ERROR: Unable to determine database name</string>
     <string name="invalid_db_backup_file_exception">ERROR: Invalid backup target</string>
     <string name="invalid_db_restore_file_exception">ERROR: Invalid restore source</string>
+    <string name="duplicate_product_exception">ERROR: Cannot add a duplicate of an existing product</string>
+    <string name="duplicate_location_exception">ERROR: Cannot add a duplicate of an existing location</string>
 
     <string name="aisle">Aisle</string>
     <string name="product">Product</string>
@@ -78,5 +80,4 @@
     <string name="db_restore_confirmation">Are you sure you want to replace your current database with backup %1$s?</string>
     <string name="db_restore_confirmation_title">Confirm Database Restore</string>
     <string name="backup_folder_success">Backup folder set</string>
-
 </resources>

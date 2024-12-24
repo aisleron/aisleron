@@ -6,7 +6,6 @@ import com.aisleron.testdata.data.maintenance.DatabaseMaintenanceBlankDbNameImpl
 import com.aisleron.testdata.data.maintenance.DatabaseMaintenanceNullDbNameImpl
 import com.aisleron.testdata.data.maintenance.DatabaseMaintenanceTestImpl
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
@@ -20,10 +19,6 @@ class BackupDatabaseUseCaseImplTest {
     @BeforeEach
     fun setUp() {
         testData = TestDataManager()
-    }
-
-    @AfterEach
-    fun tearDown() {
     }
 
     @Test

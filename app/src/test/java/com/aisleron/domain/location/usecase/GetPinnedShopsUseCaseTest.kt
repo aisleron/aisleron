@@ -4,7 +4,6 @@ import com.aisleron.data.TestDataManager
 import com.aisleron.domain.location.Location
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -19,10 +18,6 @@ class GetPinnedShopsUseCaseTest {
     fun setUp() {
         testData = TestDataManager()
         getPinnedShopsUseCase = GetPinnedShopsUseCase(testData.locationRepository)
-    }
-
-    @AfterEach
-    fun tearDown() {
     }
 
     @Test

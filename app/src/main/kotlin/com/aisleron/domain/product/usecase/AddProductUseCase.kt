@@ -24,6 +24,10 @@ class AddProductUseCaseImpl(
             throw AisleronException.DuplicateProductNameException("Product Name must be unique")
         }
 
+        if (productRepository.get(product.id) != null) {
+            throw AisleronException.DuplicateProductException("Cannot add a duplicate of an existing Product")
+        }
+
         val newProduct = Product(
             id = productRepository.add(product),
             name = product.name,

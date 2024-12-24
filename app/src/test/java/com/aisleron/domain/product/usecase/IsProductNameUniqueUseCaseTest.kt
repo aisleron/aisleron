@@ -3,7 +3,6 @@ package com.aisleron.domain.product.usecase
 import com.aisleron.data.TestDataManager
 import com.aisleron.domain.product.Product
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -16,11 +15,6 @@ class IsProductNameUniqueUseCaseTest {
     @BeforeEach
     fun setUp() {
         isProductNameUniqueUseCase = IsProductNameUniqueUseCase(testData.productRepository)
-    }
-
-    @AfterEach
-    fun tearDown() {
-
     }
 
     @Test

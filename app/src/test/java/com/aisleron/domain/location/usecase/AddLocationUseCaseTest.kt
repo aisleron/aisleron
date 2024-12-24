@@ -11,7 +11,6 @@ import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.product.usecase.GetAllProductsUseCase
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
@@ -45,10 +44,6 @@ class AddLocationUseCaseTest {
         }
     }
 
-    @AfterEach
-    fun tearDown() {
-    }
-
     @Test
     fun addLocation_IsDuplicateName_ThrowsException() {
         val newLocation = existingLocation.copy(id = 0, pinned = !existingLocation.pinned)
@@ -60,64 +55,18 @@ class AddLocationUseCaseTest {
     }
 
     @Test
-    fun addLocation_IsExistingLocation_LocationUpdated() {
+    fun addLocation_IsExistingLocation_ThrowsException() {
         val updateLocation =
             existingLocation.copy(
                 name = existingLocation.name + " Updated",
                 pinned = !existingLocation.pinned
             )
-        val updatedLocation: Location?
-        val countBefore: Int
-        val countAfter: Int
-        runBlocking {
-            countBefore = testData.locationRepository.getAll().count()
-            val id = addLocationUseCase(updateLocation)
-            updatedLocation = testData.locationRepository.get(id)
-            countAfter = testData.locationRepository.getAll().count()
-        }
-        assertNotNull(updatedLocation)
-        assertEquals(countBefore, countAfter)
-        assertEquals(updateLocation.id, updatedLocation?.id)
-        assertEquals(updateLocation.name, updatedLocation?.name)
-        assertEquals(updateLocation.type, updatedLocation?.type)
-        assertEquals(updateLocation.pinned, updatedLocation?.pinned)
-        assertEquals(updateLocation.defaultFilter, updatedLocation?.defaultFilter)
-    }
 
-    @Test
-    fun addLocation_LocationUpdated_DoesNotAddDefaultAisle() {
-        //TODO("Fix this Test")
-        /*val updateLocation =
-            existingLocation.copy(
-                name = existingLocation.name + " Updated",
-                pinned = !existingLocation.pinned
-            )
-        val aisleCountBefore: Int
-        val aisleCountAfter: Int
         runBlocking {
-            aisleCountBefore = testData.aisleRepository.getAll().count()
-            addLocationUseCase(updateLocation)
-            aisleCountAfter = testData.aisleRepository.getAll().count()
+            assertThrows<AisleronException.DuplicateLocationException> {
+                addLocationUseCase(updateLocation)
+            }
         }
-        assertEquals(aisleCountBefore, aisleCountAfter)*/
-    }
-
-    @Test
-    fun addLocation_LocationUpdated_DoesNotAddAisleProducts() {
-        //TODO("Fix this Test")
-        /*val updateLocation =
-            existingLocation.copy(
-                name = existingLocation.name + " Updated",
-                pinned = !existingLocation.pinned
-            )
-        val aisleProductCountBefore: Int
-        val aisleProductCountAfter: Int
-        runBlocking {
-            aisleProductCountBefore = testData.aisleProductRepository.getAll().count()
-            addLocationUseCase(updateLocation)
-            aisleProductCountAfter = testData.aisleProductRepository.getAll().count()
-        }
-        assertEquals(aisleProductCountBefore, aisleProductCountAfter)*/
     }
 
     private fun getNewLocation(): Location {

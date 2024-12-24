@@ -3,7 +3,6 @@ package com.aisleron.domain.product.usecase
 import com.aisleron.data.TestDataManager
 import com.aisleron.domain.product.Product
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -17,10 +16,6 @@ class GetAllProductsUseCaseTest {
     fun setUp() {
         testData = TestDataManager()
         getAllProductsUseCase = GetAllProductsUseCase(testData.productRepository)
-    }
-
-    @AfterEach
-    fun tearDown() {
     }
 
     @Test

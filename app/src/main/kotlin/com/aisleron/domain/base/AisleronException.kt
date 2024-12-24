@@ -26,6 +26,13 @@ sealed class AisleronException(
     class InvalidDbRestoreFileException(message: String? = null, cause: Throwable? = null) :
         AisleronException(ExceptionCode.INVALID_DB_RESTORE_FILE_EXCEPTION, message, cause)
 
+    class DuplicateProductException(message: String? = null, cause: Throwable? = null) :
+        AisleronException(ExceptionCode.DUPLICATE_PRODUCT_EXCEPTION, message, cause)
+
+    class DuplicateLocationException(message: String? = null, cause: Throwable? = null) :
+        AisleronException(ExceptionCode.DUPLICATE_LOCATION_EXCEPTION, message, cause)
+
+
     enum class ExceptionCode {
         GENERIC_EXCEPTION,
         DELETE_DEFAULT_AISLE_EXCEPTION,
@@ -34,6 +41,8 @@ sealed class AisleronException(
         INVALID_LOCATION_EXCEPTION,
         INVALID_DB_NAME_EXCEPTION,
         INVALID_DB_BACKUP_FILE_EXCEPTION,
-        INVALID_DB_RESTORE_FILE_EXCEPTION
+        INVALID_DB_RESTORE_FILE_EXCEPTION,
+        DUPLICATE_PRODUCT_EXCEPTION,
+        DUPLICATE_LOCATION_EXCEPTION
     }
 }

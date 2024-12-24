@@ -5,7 +5,6 @@ import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.location.usecase.GetLocationUseCase
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
@@ -24,10 +23,6 @@ class AddAisleUseCaseTest {
             testData.aisleRepository,
             GetLocationUseCase(testData.locationRepository)
         )
-    }
-
-    @AfterEach
-    fun tearDown() {
     }
 
     @Test
