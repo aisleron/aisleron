@@ -9,7 +9,7 @@
     <string name="action_search">Search</string>
 
     <string name="menu_in_stock">In Stock</string>
-    <string name="menu_shopping_list">Shopping List</string>
+    <string name="menu_needed">Needed</string>
     <string name="menu_all_items">All Items</string>
     <string name="menu_settings">Settings</string>
     <string name="menu_all_shops">All Shops</string>

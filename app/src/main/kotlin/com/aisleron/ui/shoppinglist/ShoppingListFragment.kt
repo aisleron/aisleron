@@ -175,7 +175,7 @@ class ShoppingListFragment(
                 LocationType.HOME ->
                     when (shoppingListViewModel.defaultFilter) {
                         FilterType.IN_STOCK -> resources.getString(R.string.menu_in_stock)
-                        FilterType.NEEDED -> resources.getString(R.string.menu_shopping_list)
+                        FilterType.NEEDED -> resources.getString(R.string.menu_needed)
                         FilterType.ALL -> resources.getString(R.string.menu_all_items)
                     }
 

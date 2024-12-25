@@ -9,12 +9,15 @@ Streamline your shopping with this intuitive, easy-to-use shopping list app. Whe
 * Create Custom Shops & Aisles: Add your favorite stores, categorize items by aisles, and easily organize your shopping list based on your local layout.
 * Smart Product Management: Add products to your list and assign them to the appropriate area in your home. Rearrange products by aisle within each store to match your shopping route.
 * Swipe-to-Track: Keep track of your shopping progress with a simple swipe. Swipe left or right to mark items as "Needed" or "In Stock."
+* Show on Lock Screen: No need to unlock your screen at the end of each aisle. Your shopping list will be displayed over the lock screen for convenience.
 
 ## Why you'll love it:
+
 * Stay organized by shopping smarter.
 * Reduce time spent navigating the store.
 * Never forget an item again — track everything you need with ease.
-* Free and doesn't contain any ads.
-* Everything is done on the local device, no sharing of location data or shopping habits
+* Light and Dark themes.
+* Free, no ads.
+* Everything is done on the local device, no sharing of location data or shopping habits.
 
 Get started today and make your shopping trips faster and more efficient!

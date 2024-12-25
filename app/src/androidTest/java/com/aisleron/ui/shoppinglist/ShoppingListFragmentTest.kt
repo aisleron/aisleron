@@ -115,7 +115,7 @@ class ShoppingListFragmentTest {
         val scenario = getFragmentScenario(bundle)
         scenario.onFragment {
             assertEquals(
-                it.getString(R.string.menu_shopping_list),
+                it.getString(R.string.menu_needed),
                 applicationTitleUpdateListener.appTitle
             )
         }
@@ -156,7 +156,7 @@ class ShoppingListFragmentTest {
         val scenario = getFragmentScenario(bundle)
         scenario.onFragment {
             assertEquals(
-                it.getString(R.string.menu_shopping_list),
+                it.getString(R.string.menu_needed),
                 applicationTitleUpdateListener.appTitle
             )
         }

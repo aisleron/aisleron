@@ -32,8 +32,8 @@
                 android:id="@+id/nav_needed"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/menu_shopping_list"
-                app:drawableStartCompat="@drawable/baseline_checklist_24"
+                android:text="@string/menu_needed"
+                app:drawableStartCompat="@drawable/needed_list_24"
                 android:textAppearance="?attr/textAppearanceListItem" />
 
             <TextView
