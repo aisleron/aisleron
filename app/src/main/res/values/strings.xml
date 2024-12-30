@@ -17,7 +17,6 @@
     <string name="menu_about">About</string>
 
     <!-- Preference Titles -->
-    <string name="sync_header">Sync</string>
 
     <!-- List Preferences -->
 
@@ -82,4 +81,14 @@
     <string name="db_restore_confirmation_title">Confirm Database Restore</string>
     <string name="backup_folder_success">Backup folder set</string>
     <string name="title_activity_about">About Aisleron</string>
+
+    <!-- About Preferences -->
+    <string name="about_support_header">Support</string>
+    <string name="about_legal_header">Legal</string>
+    <string name="about_support_version">Version</string>
+    <string name="about_support_report_issue">Report an issue</string>
+    <string name="about_support_sourcecode">Source code</string>
+    <string name="about_legal_license">License</string>
+    <string name="about_legal_privacy">Privacy Policy</string>
+    <string name="about_legal_tnc">Terms and Conditions</string>
 </resources>

@@ -1,7 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <Preference
-        android:key="version"
-        android:title="Version" />
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="@string/about_support_header">
+        <Preference
+            android:key="about_support_version"
+            android:title="@string/about_support_version"
+            android:summary="@string/about_support_version" />
+        <Preference
+            android:key="about_support_report_issue"
+            android:title="@string/about_support_report_issue"
+            android:summary="@string/about_support_report_issue" />
+        <Preference
+            android:key="about_support_sourcecode"
+            android:title="@string/about_support_sourcecode"
+            android:summary="@string/about_support_sourcecode" />
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/about_legal_header">
+        <Preference
+            android:key="about_legal_license"
+            android:title="@string/about_legal_license"
+            android:summary="@string/about_legal_license" />
+        <Preference
+            android:key="about_legal_privacy"
+            android:title="@string/about_legal_privacy"
+            android:summary="@string/about_legal_privacy" />
+        <Preference
+            android:key="about_legal_tnc"
+            android:title="@string/about_legal_tnc"
+            android:summary="@string/about_legal_tnc" />
+    </PreferenceCategory>
 
 </PreferenceScreen>
