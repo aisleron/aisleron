@@ -101,4 +101,9 @@
             android:name="addEditProductBundle"
             app:argType="com.aisleron.ui.bundles.AddEditProductBundle" />
     </fragment>
+    <activity
+        android:id="@+id/nav_about"
+        android:name="com.aisleron.AboutActivity"
+        android:label="@string/title_activity_about"
+        tools:layout="@layout/activity_about" />
 </navigation>

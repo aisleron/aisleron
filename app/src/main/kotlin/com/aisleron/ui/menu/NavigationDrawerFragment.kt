@@ -18,12 +18,13 @@ class NavigationDrawerFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
         _binding = FragmentNavigationDrawerBinding.inflate(inflater, container, false)
 
         with(binding) {
             //Set onclick listener for views that navigate based on their Id matching a navigation graph destination
-            val navButtons = setOf(navInStock, navNeeded, navAllItems, navSettings, navAllShops)
+            val navButtons =
+                setOf(navInStock, navNeeded, navAllItems, navSettings, navAllShops, navAbout)
+
             for (view in navButtons) {
                 view.setOnClickListener {
                     findNavController().navigate(it.id, null)
@@ -32,6 +33,5 @@ class NavigationDrawerFragment : Fragment() {
         }
 
         return binding.root
-
     }
 }

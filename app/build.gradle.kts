@@ -69,14 +69,15 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "11"
     }
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 
     tasks.withType<Test> {
@@ -115,6 +116,7 @@ dependencies {
     implementation("androidx.databinding:databinding-runtime:8.7.3")
     implementation("androidx.navigation:navigation-testing:2.8.5")
     implementation("androidx.test.espresso:espresso-contrib:3.6.1")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
 
     //Testing
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.4")

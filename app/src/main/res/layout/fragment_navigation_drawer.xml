@@ -86,6 +86,14 @@
                 android:text="@string/menu_settings"
                 app:drawableStartCompat="@drawable/ic_menu_settings"
                 android:textAppearance="?attr/textAppearanceListItem" />
+
+            <TextView
+                android:id="@+id/nav_about"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/menu_about"
+                app:drawableStartCompat="@drawable/baseline_info_24"
+                android:textAppearance="?attr/textAppearanceListItem" />
         </LinearLayout>
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

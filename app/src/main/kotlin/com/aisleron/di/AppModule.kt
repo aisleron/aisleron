@@ -61,6 +61,7 @@ import com.aisleron.domain.product.usecase.UpdateProductStatusUseCase
 import com.aisleron.domain.product.usecase.UpdateProductStatusUseCaseImpl
 import com.aisleron.domain.product.usecase.UpdateProductUseCase
 import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
+import com.aisleron.ui.about.AboutViewModel
 import com.aisleron.ui.product.ProductViewModel
 import com.aisleron.ui.settings.SettingsViewModel
 import com.aisleron.ui.shop.ShopViewModel
@@ -302,5 +303,9 @@ val appModule = module {
             backupDatabaseUseCase = get(),
             restoreDatabaseUseCase = get()
         )
+    }
+
+    viewModel {
+        AboutViewModel()
     }
 }

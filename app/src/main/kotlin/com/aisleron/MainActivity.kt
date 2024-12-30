@@ -30,6 +30,8 @@ class MainActivity : AppCompatActivity(), AddEditFragmentListener {
         super.onCreate(savedInstanceState)
 
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+        //TODO: prefs.registerOnSharedPreferenceChangeListener(this)
+
         val displayOnLockScreen = prefs.getBoolean(DISPLAY_LOCKSCREEN, false)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
             setShowWhenLocked(displayOnLockScreen)
@@ -108,5 +110,12 @@ class MainActivity : AppCompatActivity(), AddEditFragmentListener {
 
     override fun addEditActionCompleted() {
         onBackPressedDispatcher.onBackPressed()
+    }
+
+    override fun onResume() {
+        if (binding.drawerLayout.isOpen) {
+            binding.drawerLayout.closeDrawers()
+        }
+        super.onResume()
     }
 }
