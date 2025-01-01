@@ -5,31 +5,47 @@
     <PreferenceCategory app:title="@string/about_support_header">
         <Preference
             android:key="about_support_version"
-            android:title="@string/about_support_version"
-            android:summary="@string/about_support_version" />
+            android:title="@string/about_support_version_title"
+            android:summary="@string/about_support_version_summary">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="https://github.com/thebatdan/Aisleron/releases" />
+        </Preference>
         <Preference
             android:key="about_support_report_issue"
-            android:title="@string/about_support_report_issue"
-            android:summary="@string/about_support_report_issue" />
+            android:title="@string/about_support_report_issue_title"
+            android:summary="@string/about_support_report_issue_summary">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="https://github.com/thebatdan/Aisleron/issues" />
+        </Preference>
         <Preference
             android:key="about_support_sourcecode"
-            android:title="@string/about_support_sourcecode"
-            android:summary="@string/about_support_sourcecode" />
+            android:title="@string/about_support_sourcecode_title"
+            android:summary="@string/about_support_sourcecode_summary">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="https://github.com/thebatdan/Aisleron" />
+        </Preference>
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/about_legal_header">
         <Preference
             android:key="about_legal_license"
-            android:title="@string/about_legal_license"
-            android:summary="@string/about_legal_license" />
+            android:title="@string/about_legal_license_title"
+            android:summary="@string/about_legal_license_summary">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="https://github.com/thebatdan/Aisleron/blob/main/LICENSE" />
+        </Preference>
         <Preference
             android:key="about_legal_privacy"
-            android:title="@string/about_legal_privacy"
-            android:summary="@string/about_legal_privacy" />
-        <Preference
-            android:key="about_legal_tnc"
-            android:title="@string/about_legal_tnc"
-            android:summary="@string/about_legal_tnc" />
+            android:title="@string/about_legal_privacy_title"
+            android:summary="@string/about_legal_privacy_summary">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="https://github.com/thebatdan/Aisleron/blob/main/PRIVACY.md" />
+        </Preference>
     </PreferenceCategory>
 
 </PreferenceScreen>

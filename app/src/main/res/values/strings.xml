@@ -85,10 +85,14 @@
     <!-- About Preferences -->
     <string name="about_support_header">Support</string>
     <string name="about_legal_header">Legal</string>
-    <string name="about_support_version">Version</string>
-    <string name="about_support_report_issue">Report an issue</string>
-    <string name="about_support_sourcecode">Source code</string>
-    <string name="about_legal_license">License</string>
-    <string name="about_legal_privacy">Privacy Policy</string>
-    <string name="about_legal_tnc">Terms and Conditions</string>
+    <string name="about_support_version_title">Version history</string>
+    <string name="about_support_report_issue_title">Report an issue</string>
+    <string name="about_support_sourcecode_title">Source code</string>
+    <string name="about_legal_license_title">License</string>
+    <string name="about_legal_privacy_title">Privacy Policy</string>
+    <string name="about_support_version_summary">"Current version: %1$s"</string>
+    <string name="about_support_report_issue_summary">Report an issue on GitHub</string>
+    <string name="about_support_sourcecode_summary">View source code on GitHub</string>
+    <string name="about_legal_license_summary">GNU Affero General Public License (AGPL) version 3</string>
+    <string name="about_legal_privacy_summary">View Privacy Policy online</string>
 </resources>
