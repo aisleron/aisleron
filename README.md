@@ -10,6 +10,7 @@ Streamline your shopping with this intuitive, easy-to-use shopping list app. Whe
 * Smart Product Management: Add products to your list and assign them to the appropriate area in your home. Rearrange products by aisle within each store to match your shopping route.
 * Swipe-to-Track: Keep track of your shopping progress with a simple swipe. Swipe left or right to mark items as "Needed" or "In Stock."
 * Show on Lock Screen: No need to unlock your screen at the end of each aisle. Your shopping list will be displayed over the lock screen for convenience.
+* Easy Editing: Long-press any item to edit or delete it
 
 ## Why you'll love it:
 
