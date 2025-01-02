@@ -21,11 +21,18 @@
             android:padding="0dp">
 
             <TextView
+                android:id="@+id/nav_home_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/home"
+                android:textAppearance="?attr/textAppearanceOverline" />
+
+            <TextView
                 android:id="@+id/nav_in_stock"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/menu_in_stock"
-                app:drawableStartCompat="@drawable/baseline_home_24"
+                app:drawableStartCompat="@drawable/baseline_checklist_rtl_24"
                 android:textAppearance="?attr/textAppearanceListItem" />
 
             <TextView
