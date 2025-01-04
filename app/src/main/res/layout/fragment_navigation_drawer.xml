@@ -32,7 +32,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/menu_in_stock"
-                app:drawableStartCompat="@drawable/baseline_checklist_rtl_24"
+                app:drawableStartCompat="@drawable/in_stock_list_24"
                 android:textAppearance="?attr/textAppearanceListItem" />
 
             <TextView
@@ -48,7 +48,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/menu_all_items"
-                app:drawableStartCompat="@drawable/baseline_format_list_bulleted_24"
+                app:drawableStartCompat="@drawable/all_items_list_24"
                 android:textAppearance="?attr/textAppearanceListItem" />
 
             <View

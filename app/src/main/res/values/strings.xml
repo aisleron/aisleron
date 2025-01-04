@@ -16,52 +16,9 @@
     <string name="menu_about">About</string>
     <string name="home">Home</string>
 
-    <!-- Preference Titles -->
-
-    <!-- List Preferences -->
-
-    <!-- Messages Preferences -->
-
-    <!-- Sync Preferences -->
-
-    <!-- Exception Messages   -->
-    <string name="generic_error">ERROR: %1$s</string>
-    <string name="delete_default_aisle_exception">ERROR: Default Aisle can\'t be removed</string>
-    <string name="duplicate_product_name_exception">ERROR: Product Name must be unique</string>
-    <string name="duplicate_location_name_exception">ERROR: Location Name must be unique</string>
-    <string name="invalid_location_exception">ERROR: Invalid Location Id provided</string>
-    <string name="invalid_db_name_exception">ERROR: Unable to determine database name</string>
-    <string name="invalid_db_backup_file_exception">ERROR: Invalid backup target</string>
-    <string name="invalid_db_restore_file_exception">ERROR: Invalid restore source</string>
-    <string name="duplicate_product_exception">ERROR: Cannot add a duplicate of an existing product</string>
-    <string name="duplicate_location_exception">ERROR: Cannot add a duplicate of an existing location</string>
-
-    <string name="aisle">Aisle</string>
-    <string name="product">Product</string>
-    <string name="add_product">Add Product</string>
-    <string name="product_name">Product Name</string>
-    <string name="save">Save</string>
-    <string name="shop_name">Shop Name</string>
-    <string name="add_location">Add Shop</string>
-    <string name="edit_product">Edit Product</string>
-    <string name="pin_shop">Pin Shop to Drawer</string>
-    <string name="add_aisle">Add Aisle</string>
-    <string name="add_another">Add Another</string>
-    <string name="aisle_name">Aisle Name</string>
-    <string name="id_label">id</string>
+    <!-- Preferences -->
     <string name="display_options_header">Display Options</string>
     <string name="show_on_lock_screen">Show on lock screen</string>
-    <string name="done">Done</string>
-    <string name="search_product_hint">Search Products…</string>
-    <string name="edit">Edit</string>
-    <string name="delete">Delete</string>
-    <string name="delete_confirmation">Delete %1$s?</string>
-    <string name="edit_aisle">Edit Aisle</string>
-    <string name="edit_location">Edit Shop</string>
-    <string name="main_fab">Main FAB</string>
-    <string name="add_shop_fab">Add Shop FAB</string>
-    <string name="add_aisle_fab">Add Aisle FAB</string>
-    <string name="add_product_fab">Add Product FAB</string>
     <string name="system_theme">System Theme</string>
     <string name="light_theme">Light Theme</string>
     <string name="dark_theme">Dark Theme</string>
@@ -80,7 +37,18 @@
     <string name="db_restore_confirmation">Are you sure you want to replace your current database with backup %1$s?</string>
     <string name="db_restore_confirmation_title">Confirm Database Restore</string>
     <string name="backup_folder_success">Backup folder set</string>
-    <string name="title_activity_about">About Aisleron</string>
+
+    <!-- Exception Messages   -->
+    <string name="generic_error">ERROR: %1$s</string>
+    <string name="delete_default_aisle_exception">ERROR: Default Aisle can\'t be removed</string>
+    <string name="duplicate_product_name_exception">ERROR: Product Name must be unique</string>
+    <string name="duplicate_location_name_exception">ERROR: Location Name must be unique</string>
+    <string name="invalid_location_exception">ERROR: Invalid Location Id provided</string>
+    <string name="invalid_db_name_exception">ERROR: Unable to determine database name</string>
+    <string name="invalid_db_backup_file_exception">ERROR: Invalid backup target</string>
+    <string name="invalid_db_restore_file_exception">ERROR: Invalid restore source</string>
+    <string name="duplicate_product_exception">ERROR: Cannot add a duplicate of an existing product</string>
+    <string name="duplicate_location_exception">ERROR: Cannot add a duplicate of an existing location</string>
 
     <!-- About Preferences -->
     <string name="about_support_header">Support</string>
@@ -95,4 +63,35 @@
     <string name="about_support_sourcecode_summary">View source code on GitHub</string>
     <string name="about_legal_license_summary">GNU Affero General Public License (AGPL) version 3</string>
     <string name="about_legal_privacy_summary">View Privacy Policy online</string>
+
+    <!-- Misc -->
+    <string name="aisle">Aisle</string>
+    <string name="product">Product</string>
+    <string name="add_product">Add Product</string>
+    <string name="product_name">Product Name</string>
+    <string name="save">Save</string>
+    <string name="shop_name">Shop Name</string>
+    <string name="add_location">Add Shop</string>
+    <string name="edit_product">Edit Product</string>
+    <string name="pin_shop">Pin Shop to Drawer</string>
+    <string name="add_aisle">Add Aisle</string>
+    <string name="add_another">Add Another</string>
+    <string name="aisle_name">Aisle Name</string>
+    <string name="id_label">id</string>
+    <string name="done">Done</string>
+    <string name="search_product_hint">Search Products…</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="delete_confirmation">Delete %1$s?</string>
+    <string name="edit_aisle">Edit Aisle</string>
+    <string name="edit_location">Edit Shop</string>
+    <string name="main_fab">Main FAB</string>
+    <string name="add_shop_fab">Add Shop FAB</string>
+    <string name="add_aisle_fab">Add Aisle FAB</string>
+    <string name="add_product_fab">Add Product FAB</string>
+    <string name="title_activity_about">About Aisleron</string>
+    <string name="shopping_list_options_header">Shopping List Options</string>
+    <string name="hide_status_change_snack_bar">Hide status change message</string>
+    <string name="status_change_confirmation">%1$s moved to %2$s</string>
+    <string name="undo">UNDO</string>
 </resources>

@@ -21,6 +21,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -38,7 +39,6 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
-
 
 /**
  * A fragment representing a list of [ShoppingListItem].
@@ -107,6 +107,7 @@ class ShoppingListFragment(
                             inStock: Boolean
                         ) {
                             shoppingListViewModel.updateProductStatus(item, inStock)
+                            displayStatusChangeSnackBar(item, inStock)
                         }
 
                         override fun onListPositionChanged(
@@ -143,6 +144,26 @@ class ShoppingListFragment(
             }
         }
         return view
+    }
+
+    private fun displayStatusChangeSnackBar(item: ProductShoppingListItem, inStock: Boolean) {
+
+        val hideStatusChangeSnackBar =
+            PreferenceManager.getDefaultSharedPreferences(requireContext()).getBoolean(
+                PREF_HIDE_STATUS_CHANGE_SNACK_BAR, false
+            )
+
+        if (hideStatusChangeSnackBar) return
+
+        val newStatus = getString(if (inStock) R.string.menu_in_stock else R.string.menu_needed)
+
+        Snackbar.make(
+            requireView(),
+            getString(R.string.status_change_confirmation, item.name, newStatus),
+            Snackbar.LENGTH_SHORT
+        ).setAction(getString(R.string.undo)) { _ ->
+            shoppingListViewModel.updateProductStatus(item, !inStock)
+        }.show()
     }
 
     private fun displayErrorSnackBar(
@@ -359,6 +380,8 @@ class ShoppingListFragment(
 
         private const val ARG_LOCATION_ID = "locationId"
         private const val ARG_FILTER_TYPE = "filterType"
+
+        private const val PREF_HIDE_STATUS_CHANGE_SNACK_BAR = "hide_status_change_snack_bar"
 
         @JvmStatic
         fun newInstance(
