@@ -22,6 +22,13 @@
         <item name="colorSelectedListItem">?android:attr/colorControlHighlight</item>
         <item name="actionBarTheme">@style/Theme.Aisleron.ActionBar</item>
         <item name="colorAisleron">@color/orange_100</item>
+
+        <!--this is makes changes to the entire snackbar-->
+        <item name="snackbarStyle">@style/Theme.Aisleron.Snackbar</item>
+
+        <!--this item is optional as all the snackbar wont contain the action button-->
+        <item name="snackbarButtonStyle">@style/Theme.Aisleron.SnackbarButton</item>
+        <item name="snackbarTextViewStyle">@style/Theme.Aisleron.SnackbarTextView</item>
     </style>
 
     <style name="Theme.Aisleron.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
@@ -30,6 +37,30 @@
 
     <style name="Theme.Aisleron.ActionBar" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
         <item name="colorSurface">@color/black_orange</item>
+    </style>
+
+    <style name="Theme.Aisleron.Snackbar" parent="Widget.MaterialComponents.Snackbar">
+        <!--this child makes changes to the background color of the snackbar-->
+        <item name="materialThemeOverlay">@style/ThemeOverlay.Aisleron.Snackbar</item>
+
+        <!--if this is made 0 then the action button text color will be white-->
+        <!--if this is 1 then the custom color can be set to action button text-->
+        <item name="actionTextColorAlpha">1</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.Material3.Corner.Large</item>
+    </style>
+
+    <!--this color inside this child is the background color of the snackbar-->
+    <style name="ThemeOverlay.Aisleron.Snackbar" parent="">
+        <item name="colorOnSurface">?android:attr/colorControlHighlight</item>
+    </style>
+
+    <!--this is child is needed only when there is action button in snackbar-->
+    <style name="Theme.Aisleron.SnackbarButton" parent="Widget.MaterialComponents.Button.TextButton.Snackbar">
+        <item name="android:textColor">@color/orange_100</item>
+    </style>
+
+    <style name="Theme.Aisleron.SnackbarTextView" parent="@style/Widget.MaterialComponents.Snackbar.TextView">
+        <item name="android:textColor">@color/white</item>
     </style>
 
 </resources>

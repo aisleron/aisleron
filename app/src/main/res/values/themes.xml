@@ -13,7 +13,7 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimary</item>
 
-        <!-- Error color. -->Failed to find '@android:attr/textAppearance' in current theme.
+        <!-- Error color. -->
         <item name="colorError">@color/red_dark</item>
         <item name="colorOnError">@color/white</item>
 
@@ -23,6 +23,9 @@
         <item name="actionBarPopupTheme">@style/Theme.Aisleron.PopupOverlay</item>
         <item name="colorSelectedListItem">?android:attr/colorControlHighlight</item>
         <item name="colorAisleron">@color/blue_100</item>
+
+        <!--this is makes changes to the entire snackbar-->
+        <item name="snackbarStyle">@style/Theme.Aisleron.Snackbar</item>
     </style>
 
     <style name="Theme.Aisleron.NoActionBar">
@@ -42,7 +45,6 @@
     <style name="Theme.Aisleron.ActionMode" parent="Widget.AppCompat.ActionMode">
         <item name="background">@drawable/action_mode_background</item>
     </style>
-
 
     <style name="Theme.Aisleron.NavigationDrawer" parent="Theme.Aisleron">
         <item name="android:drawablePadding">@dimen/menu_padding</item>
@@ -68,6 +70,9 @@
         <item name="fabCustomSize">40dp</item>
     </style>
 
+    <style name="Theme.Aisleron.Snackbar" parent="Widget.MaterialComponents.Snackbar">
+        <item name="shapeAppearance">@style/ShapeAppearance.Material3.Corner.Large</item>
+    </style>
 
 </resources>
 
