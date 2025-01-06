@@ -109,7 +109,7 @@ class ShoppingListFragmentTest {
     }
 
     @Test
-    fun onCreateShoppingListFragment_HomeFilterIsNeeded_AppTitleIsShoppingList() {
+    fun onCreateShoppingListFragment_HomeFilterIsNeeded_AppTitleIsNeeded() {
         val location = getLocation(LocationType.HOME)
         val bundle = bundler.makeShoppingListBundle(location.id, FilterType.NEEDED)
         val scenario = getFragmentScenario(bundle)

@@ -8,13 +8,13 @@
             <LayoutPositions>
               <option name="myPositions">
                 <map>
-                  <entry key="aboutActivity">
+                  <entry key="nav_about">
                     <value>
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="10" />
-                            <option name="y" value="701" />
+                            <option name="x" value="11" />
+                            <option name="y" value="-279" />
                           </Point>
                         </option>
                       </LayoutPositions>

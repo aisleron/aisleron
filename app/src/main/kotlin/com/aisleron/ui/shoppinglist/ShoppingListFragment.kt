@@ -34,6 +34,8 @@ import com.aisleron.ui.ApplicationTitleUpdateListener
 import com.aisleron.ui.FabHandler
 import com.aisleron.ui.FabHandlerImpl
 import com.aisleron.ui.bundles.Bundler
+import com.aisleron.ui.settings.ShoppingListPreferences
+import com.aisleron.ui.settings.ShoppingListPreferencesImpl
 import com.aisleron.ui.widgets.ErrorSnackBar
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
@@ -45,7 +47,8 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  */
 class ShoppingListFragment(
     applicationTitleUpdateListener: ApplicationTitleUpdateListener? = null,
-    fabHandler: FabHandler? = null
+    fabHandler: FabHandler? = null,
+    shoppingListPreferences: ShoppingListPreferences? = null
 ) :
     Fragment(), SearchView.OnQueryTextListener, ActionMode.Callback {
 
@@ -53,6 +56,7 @@ class ShoppingListFragment(
     private var actionModeItem: ShoppingListItem? = null
     private val _fabHandler = fabHandler
     private val _applicationTitleUpdateListener = applicationTitleUpdateListener
+    private val _shoppingListPreferences = shoppingListPreferences
 
     private val shoppingListViewModel: ShoppingListViewModel by viewModel()
 
@@ -147,13 +151,7 @@ class ShoppingListFragment(
     }
 
     private fun displayStatusChangeSnackBar(item: ProductShoppingListItem, inStock: Boolean) {
-
-        val hideStatusChangeSnackBar =
-            PreferenceManager.getDefaultSharedPreferences(requireContext()).getBoolean(
-                PREF_HIDE_STATUS_CHANGE_SNACK_BAR, false
-            )
-
-        if (hideStatusChangeSnackBar) return
+        if (getShoppingListPreference().hideStatusChangeSnackBar) return
 
         val newStatus = getString(if (inStock) R.string.menu_in_stock else R.string.menu_needed)
 
@@ -371,6 +369,11 @@ class ShoppingListFragment(
         }
     }
 
+    private fun getShoppingListPreference(): ShoppingListPreferences =
+        _shoppingListPreferences ?: ShoppingListPreferencesImpl(
+            PreferenceManager.getDefaultSharedPreferences(requireContext())
+        )
+
     override fun onDestroyActionMode(mode: ActionMode) {
         actionMode = null
         actionModeItem = null
@@ -380,8 +383,6 @@ class ShoppingListFragment(
 
         private const val ARG_LOCATION_ID = "locationId"
         private const val ARG_FILTER_TYPE = "filterType"
-
-        private const val PREF_HIDE_STATUS_CHANGE_SNACK_BAR = "hide_status_change_snack_bar"
 
         @JvmStatic
         fun newInstance(

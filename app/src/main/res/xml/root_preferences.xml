@@ -2,6 +2,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <PreferenceCategory app:title="@string/display_options_header">
+        <SwitchPreferenceCompat
+            app:key="display_lockscreen"
+            app:title="@string/show_on_lock_screen" />
         <ListPreference
             android:defaultValue="system_theme"
             android:entries="@array/theme_names"
@@ -12,9 +15,7 @@
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/shopping_list_options_header">
-        <SwitchPreferenceCompat
-            app:key="display_lockscreen"
-            app:title="@string/show_on_lock_screen" />
+
         <SwitchPreferenceCompat
             app:key="hide_status_change_snack_bar"
             app:title="@string/hide_status_change_snack_bar" />

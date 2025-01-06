@@ -18,6 +18,8 @@ import androidx.preference.PreferenceManager
 import com.aisleron.databinding.ActivityMainBinding
 import com.aisleron.ui.AddEditFragmentListener
 import com.aisleron.ui.FabHandlerImpl
+import com.aisleron.ui.settings.DisplayPreferences
+import com.aisleron.ui.settings.DisplayPreferencesImpl
 import com.google.android.material.navigation.NavigationView
 
 
@@ -32,15 +34,19 @@ class MainActivity : AppCompatActivity(), AddEditFragmentListener {
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
         //TODO: prefs.registerOnSharedPreferenceChangeListener(this)
 
-        val displayOnLockScreen = prefs.getBoolean(DISPLAY_LOCKSCREEN, false)
+        val displayPreferences = DisplayPreferencesImpl(prefs)
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-            setShowWhenLocked(displayOnLockScreen)
+            setShowWhenLocked(displayPreferences.showOnLockScreen)
         }
 
-        val appTheme = prefs.getString(APPLICATION_THEME, SYSTEM_THEME)
-        when (appTheme) {
-            LIGHT_THEME -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-            DARK_THEME -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        when (displayPreferences.applicationTheme) {
+            DisplayPreferences.ApplicationTheme.LIGHT_THEME ->
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+
+            DisplayPreferences.ApplicationTheme.DARK_THEME ->
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+
             else -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
         }
 
@@ -92,16 +98,6 @@ class MainActivity : AppCompatActivity(), AddEditFragmentListener {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         return item.onNavDestinationSelected(navController) || super.onOptionsItemSelected(item)
-    }
-
-    companion object {
-        private const val SYSTEM_THEME = "system_theme"
-        private const val LIGHT_THEME = "light_theme"
-        private const val DARK_THEME = "dark_theme"
-
-        private const val DISPLAY_LOCKSCREEN = "display_lockscreen"
-        private const val APPLICATION_THEME = "application_theme"
-
     }
 
     override fun applicationTitleUpdated(newTitle: String) {
