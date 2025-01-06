@@ -15,6 +15,7 @@ import androidx.test.espresso.action.ViewActions.clearText
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.longClick
 import androidx.test.espresso.action.ViewActions.typeText
+import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.RootMatchers.isDialog
 import androidx.test.espresso.matcher.ViewMatchers
@@ -37,6 +38,7 @@ import com.aisleron.ui.FabHandlerTestImpl
 import com.aisleron.ui.TestApplicationTitleUpdateListener
 import com.aisleron.ui.bundles.AddEditProductBundle
 import com.aisleron.ui.bundles.Bundler
+import com.aisleron.ui.settings.ShoppingListPreferencesTestImpl
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.allOf
@@ -49,6 +51,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.koin.core.module.Module
 import java.lang.Thread.sleep
+import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
@@ -69,11 +72,19 @@ class ShoppingListFragmentTest {
         return TestAppModules().getTestAppModules(testData)
     }
 
-    private fun getFragmentScenario(bundle: Bundle): FragmentScenario<ShoppingListFragment> =
+    private fun getFragmentScenario(
+        bundle: Bundle, shoppingListPreferencesTestImpl: ShoppingListPreferencesTestImpl? = null
+    ): FragmentScenario<ShoppingListFragment> =
         launchFragmentInContainer<ShoppingListFragment>(
             fragmentArgs = bundle,
             themeResId = R.style.Theme_Aisleron,
-            instantiate = { ShoppingListFragment(applicationTitleUpdateListener, fabHandler) }
+            instantiate = {
+                ShoppingListFragment(
+                    applicationTitleUpdateListener,
+                    fabHandler,
+                    shoppingListPreferencesTestImpl
+                )
+            }
         )
 
     private fun getLocation(locationType: LocationType): Location =
@@ -721,6 +732,92 @@ class ShoppingListFragmentTest {
             .check(matches(isDisplayed()))
 
         assertNotNull(addedAisle)
+    }
+
+    @Test
+    fun onProductStatusChange_StatusUpdateSnackBarEnabled_ShowSnackBar() {
+        val shoppingList = getShoppingList()
+        val product =
+            shoppingList.aisles.first { it.products.isNotEmpty() }.products.first { !it.product.inStock }.product
+        val shoppingListBundle =
+            bundler.makeShoppingListBundle(shoppingList.id, FilterType.NEEDED)
+
+        val shoppingListPreferencesTestImpl = ShoppingListPreferencesTestImpl()
+        shoppingListPreferencesTestImpl.setHideStatusChangeSnackBar(false)
+
+        getFragmentScenario(shoppingListBundle, shoppingListPreferencesTestImpl)
+
+        onView(
+            allOf(
+                withId(R.id.chk_in_stock),
+                hasSibling(allOf(withText(product.name), withId(R.id.txt_product_name)))
+            )
+        ).perform(click())
+
+        onView(withId(com.google.android.material.R.id.snackbar_text)).check(
+            matches(
+                ViewMatchers.withEffectiveVisibility(
+                    ViewMatchers.Visibility.VISIBLE
+                )
+            )
+        )
+    }
+
+    @Test
+    fun onProductStatusChange_StatusUpdateSnackBarDisabled_HideSnackBar() {
+        val shoppingList = getShoppingList()
+        val product =
+            shoppingList.aisles.first { it.products.isNotEmpty() }.products.first { !it.product.inStock }.product
+        val shoppingListBundle =
+            bundler.makeShoppingListBundle(shoppingList.id, FilterType.NEEDED)
+
+        val shoppingListPreferencesTestImpl = ShoppingListPreferencesTestImpl()
+        shoppingListPreferencesTestImpl.setHideStatusChangeSnackBar(true)
+
+        getFragmentScenario(shoppingListBundle, shoppingListPreferencesTestImpl)
+
+        onView(
+            allOf(
+                withId(R.id.chk_in_stock),
+                hasSibling(allOf(withText(product.name), withId(R.id.txt_product_name)))
+            )
+        ).perform(click())
+
+        onView(withId(com.google.android.material.R.id.snackbar_text)).check(doesNotExist())
+    }
+
+    @Test
+    fun onProductStatusChange_StatusUpdateSnackBarUndoClicked_ProductStatusChanged() {
+        val shoppingList = getShoppingList()
+        val product =
+            shoppingList.aisles.first { it.products.isNotEmpty() }.products.first { !it.product.inStock }.product
+        val shoppingListBundle =
+            bundler.makeShoppingListBundle(shoppingList.id, FilterType.NEEDED)
+
+        val productStatusBefore = product.inStock
+
+        val shoppingListPreferencesTestImpl = ShoppingListPreferencesTestImpl()
+        shoppingListPreferencesTestImpl.setHideStatusChangeSnackBar(false)
+
+        getFragmentScenario(shoppingListBundle, shoppingListPreferencesTestImpl)
+
+        onView(
+            allOf(
+                withId(R.id.chk_in_stock),
+                hasSibling(allOf(withText(product.name), withId(R.id.txt_product_name)))
+            )
+        ).perform(click())
+
+        val productStatusAfterChange =
+            runBlocking { testData.productRepository.get(product.id)?.inStock }
+
+        onView(withId(com.google.android.material.R.id.snackbar_action)).perform(click())
+
+        val productStatusAfterUndo =
+            runBlocking { testData.productRepository.get(product.id)?.inStock }
+
+        assertNotEquals(productStatusBefore, productStatusAfterChange)
+        assertEquals(productStatusBefore, productStatusAfterUndo)
     }
 
     /*@Test

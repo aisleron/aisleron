@@ -24,6 +24,15 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
+      <SelectionState runConfigName="onProductStatusChange_StatusUpdateSnackBarEnabled_ShowSnackBar()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="onProductStatusChange_StatusUpdateSnackBarDisabled_HideSnackBar()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="onProductStatusChange_StatusUpdateSnackBarUndoClicked_ProductStatusChanged()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
     </selectionStates>
   </component>
 </project>
