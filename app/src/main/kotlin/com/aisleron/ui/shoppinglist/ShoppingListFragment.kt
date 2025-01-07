@@ -161,7 +161,7 @@ class ShoppingListFragment(
             Snackbar.LENGTH_SHORT
         ).setAction(getString(R.string.undo)) { _ ->
             shoppingListViewModel.updateProductStatus(item, !inStock)
-        }.show()
+        }.setAnchorView(R.id.fab).show()
     }
 
     private fun displayErrorSnackBar(
