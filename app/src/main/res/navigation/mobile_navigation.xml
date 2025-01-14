@@ -17,7 +17,6 @@
             android:name="filterType"
             app:argType="com.aisleron.domain.FilterType"
             android:defaultValue="IN_STOCK" />
-
     </fragment>
 
     <fragment
@@ -106,4 +105,9 @@
         android:name="com.aisleron.AboutActivity"
         android:label="@string/title_activity_about"
         tools:layout="@layout/activity_about" />
+    <fragment
+        android:id="@+id/nav_welcome"
+        android:name="com.aisleron.ui.welcome.WelcomeFragment"
+        android:label="@string/welcome_app_title"
+        tools:layout="@layout/fragment_welcome" />
 </navigation>

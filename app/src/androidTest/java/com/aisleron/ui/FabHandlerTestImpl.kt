@@ -4,6 +4,7 @@ import android.view.View
 
 class FabHandlerTestImpl : FabHandler {
     private val fabOnClick = mutableMapOf<FabHandler.FabOption, View.OnClickListener>()
+    override val getFabView: View? = null
 
     override fun setFabOnClickListener(
         fabOption: FabHandler.FabOption,

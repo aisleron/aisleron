@@ -114,7 +114,7 @@ dependencies {
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     implementation("androidx.datastore:datastore-preferences:1.1.1")
     implementation("androidx.fragment:fragment-ktx:1.8.5")
-    implementation("androidx.databinding:databinding-runtime:8.7.3")
+    implementation("androidx.databinding:databinding-runtime:8.8.0")
     implementation("androidx.navigation:navigation-testing:2.8.5")
     implementation("androidx.test.espresso:espresso-contrib:3.6.1")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
@@ -122,6 +122,7 @@ dependencies {
     //Testing
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.4")
     testImplementation(project(":testData"))
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.1")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
     androidTestImplementation(project(":testData"))

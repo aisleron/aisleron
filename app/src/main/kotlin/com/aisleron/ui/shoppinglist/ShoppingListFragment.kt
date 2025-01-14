@@ -161,7 +161,7 @@ class ShoppingListFragment(
             Snackbar.LENGTH_SHORT
         ).setAction(getString(R.string.undo)) { _ ->
             shoppingListViewModel.updateProductStatus(item, !inStock)
-        }.setAnchorView(R.id.fab).show()
+        }.setAnchorView(_fabHandler?.getFabView).show()
     }
 
     private fun displayErrorSnackBar(
@@ -169,7 +169,10 @@ class ShoppingListFragment(
     ) {
         val snackBarMessage =
             getString(AisleronExceptionMap().getErrorResourceId(errorCode), errorMessage)
-        ErrorSnackBar().make(requireView(), snackBarMessage, Snackbar.LENGTH_SHORT).show()
+
+        ErrorSnackBar().make(
+            requireView(), snackBarMessage, Snackbar.LENGTH_SHORT, _fabHandler?.getFabView
+        ).show()
     }
 
     private fun initializeFab() {

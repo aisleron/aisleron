@@ -3,6 +3,8 @@ package com.aisleron.ui
 import android.view.View
 
 interface FabHandler {
+    val getFabView: View?
+
     fun setFabOnClickListener(fabOption: FabOption, onClickListener: View.OnClickListener)
     fun setFabItems(vararg fabOptions: FabOption)
 

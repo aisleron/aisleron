@@ -43,6 +43,7 @@ import com.aisleron.domain.backup.usecase.RestoreDatabaseUseCaseImpl
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.location.usecase.AddLocationUseCase
 import com.aisleron.domain.location.usecase.AddLocationUseCaseImpl
+import com.aisleron.domain.location.usecase.GetHomeLocationUseCase
 import com.aisleron.domain.location.usecase.GetLocationUseCase
 import com.aisleron.domain.location.usecase.GetPinnedShopsUseCase
 import com.aisleron.domain.location.usecase.GetShopsUseCase
@@ -60,6 +61,7 @@ import com.aisleron.domain.product.usecase.RemoveProductUseCase
 import com.aisleron.domain.product.usecase.UpdateProductStatusUseCase
 import com.aisleron.domain.product.usecase.UpdateProductStatusUseCaseImpl
 import com.aisleron.domain.product.usecase.UpdateProductUseCase
+import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
 import com.aisleron.ui.about.AboutViewModel
 import com.aisleron.ui.product.ProductViewModel
@@ -67,6 +69,7 @@ import com.aisleron.ui.settings.SettingsViewModel
 import com.aisleron.ui.shop.ShopViewModel
 import com.aisleron.ui.shoplist.ShopListViewModel
 import com.aisleron.ui.shoppinglist.ShoppingListViewModel
+import com.aisleron.ui.welcome.WelcomeViewModel
 import org.koin.android.ext.koin.androidApplication
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
@@ -132,6 +135,8 @@ val appModule = module {
     factory<GetPinnedShopsUseCase> { GetPinnedShopsUseCase(locationRepository = get()) }
 
     factory<IsLocationNameUniqueUseCase> { IsLocationNameUniqueUseCase(locationRepository = get()) }
+
+    factory<GetHomeLocationUseCase> { GetHomeLocationUseCase(locationRepository = get()) }
 
     factory<UpdateLocationUseCase> {
         UpdateLocationUseCase(
@@ -257,6 +262,21 @@ val appModule = module {
     factory<RestoreDatabaseUseCase> { RestoreDatabaseUseCaseImpl(databaseMaintenance = get()) }
 
     /**
+     * Sample Data Use Cases
+     */
+    factory<CreateSampleDataUseCase> {
+        CreateSampleDataUseCase(
+            addProductUseCase = get(),
+            addAisleUseCase = get(),
+            getShoppingListUseCase = get(),
+            updateAisleProductRankUseCase = get(),
+            addLocationUseCase = get(),
+            getAllProductsUseCase = get(),
+            getHomeLocationUseCase = get()
+        )
+    }
+
+    /**
      * ViewModels
      */
     viewModel {
@@ -307,5 +327,11 @@ val appModule = module {
 
     viewModel {
         AboutViewModel()
+    }
+
+    viewModel {
+        WelcomeViewModel(
+            createSampleDataUseCase = get()
+        )
     }
 }

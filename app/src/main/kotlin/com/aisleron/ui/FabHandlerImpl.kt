@@ -26,6 +26,8 @@ class FabHandlerImpl(private val activity: Activity) : FabHandler {
 
     private var allFabAreHidden: Boolean = true
 
+    override val getFabView: View? = fabMain
+
     private fun hideSingleFabViews(fab: FloatingActionButton, label: TextView) {
         fab.hide()
         label.visibility = View.GONE

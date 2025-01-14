@@ -49,6 +49,7 @@
     <string name="invalid_db_restore_file_exception">ERROR: Invalid restore source</string>
     <string name="duplicate_product_exception">ERROR: Cannot add a duplicate of an existing product</string>
     <string name="duplicate_location_exception">ERROR: Cannot add a duplicate of an existing location</string>
+    <string name="sample_data_creation_exception">ERROR: Cannot load sample data into an existing database</string>
 
     <!-- About Preferences -->
     <string name="about_support_header">Support</string>
@@ -94,4 +95,11 @@
     <string name="hide_status_change_snack_bar">Hide status change message</string>
     <string name="status_change_confirmation">%1$s moved to %2$s</string>
     <string name="undo">UNDO</string>
+    <string name="welcome_app_title">Getting Started</string>
+    <string name="welcome_message">We\'re excited to help you make your shopping experience easier and more organized. To get started, choose one of the following options:</string>
+    <string name="welcome_add_own_product">&lt;h3&gt;Add Your Own Products&lt;/h3&gt; Start building your personalized shopping list from scratch by adding Products, Shops, and Aisles</string>
+    <string name="welcome_load_sample_items">&lt;h3&gt;Load Sample Items&lt;/h3&gt; Try out our pre-filled list to get a feel for how the app works</string>
+    <string name="welcome_import_db">&lt;h3&gt;Import an Existing Database&lt;/h3&gt; Bring in your shopping list from an earlier backup by importing it from the Settings page</string>
+    <string name="aisleron_logo">Aisleron logo</string>
+    <string name="welcome_title">Welcome to Aisleron</string>
 </resources>

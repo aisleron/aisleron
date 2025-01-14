@@ -20,6 +20,7 @@ import com.aisleron.ui.AddEditFragmentListener
 import com.aisleron.ui.FabHandlerImpl
 import com.aisleron.ui.settings.DisplayPreferences
 import com.aisleron.ui.settings.DisplayPreferencesImpl
+import com.aisleron.ui.settings.WelcomePreferencesImpl
 import com.google.android.material.navigation.NavigationView
 
 
@@ -35,6 +36,7 @@ class MainActivity : AppCompatActivity(), AddEditFragmentListener {
         //TODO: prefs.registerOnSharedPreferenceChangeListener(this)
 
         val displayPreferences = DisplayPreferencesImpl(prefs)
+        val welcomePreferences = WelcomePreferencesImpl(prefs)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
             setShowWhenLocked(displayPreferences.showOnLockScreen)
@@ -78,6 +80,10 @@ class MainActivity : AppCompatActivity(), AddEditFragmentListener {
         navController.addOnDestinationChangedListener { _, _, _ ->
             drawerLayout.closeDrawers()
             FabHandlerImpl(this).setFabItems()
+        }
+
+        if (!welcomePreferences.isInitialized) {
+            navController.navigate(R.id.nav_welcome)
         }
     }
 

@@ -5,9 +5,10 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.aisleron.data.maintenance.DatabaseMaintenanceImpl
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import org.junit.After
 import org.junit.Before
 
-class DatabaseMaintenanceImplTest {
+class DatabaseMaintenanceTest {
     private lateinit var db: AisleronDatabase
     private lateinit var dbMaintenance: DatabaseMaintenanceImpl
 
@@ -27,6 +28,11 @@ class DatabaseMaintenanceImplTest {
             InstrumentationRegistry.getInstrumentation().context,
             testDispatcher
         )
+    }
+
+    @After
+    fun tearDown() {
+        db.close()
     }
 
     /*    @Test

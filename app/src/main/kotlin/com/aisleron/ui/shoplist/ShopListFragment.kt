@@ -105,7 +105,9 @@ class ShopListFragment(fabHandler: FabHandler? = null) : Fragment(), ActionMode.
     ) {
         val snackBarMessage =
             getString(AisleronExceptionMap().getErrorResourceId(errorCode), errorMessage)
-        ErrorSnackBar().make(requireView(), snackBarMessage, Snackbar.LENGTH_SHORT).show()
+        ErrorSnackBar().make(
+            requireView(), snackBarMessage, Snackbar.LENGTH_SHORT, _fabHandler?.getFabView
+        ).show()
     }
 
     override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {

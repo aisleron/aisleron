@@ -7,6 +7,7 @@ import com.aisleron.ui.settings.SettingsViewModel
 import com.aisleron.ui.shop.ShopViewModel
 import com.aisleron.ui.shoplist.ShopListViewModel
 import com.aisleron.ui.shoppinglist.ShoppingListViewModel
+import com.aisleron.ui.welcome.WelcomeViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -68,6 +69,13 @@ class TestAppModules {
                     SettingsViewModel(
                         backupDatabaseUseCase = testUseCases.backupDatabaseUseCase,
                         restoreDatabaseUseCase = testUseCases.restoreDatabaseUseCase,
+                        TestScope(UnconfinedTestDispatcher())
+                    )
+                }
+
+                factory<WelcomeViewModel> {
+                    WelcomeViewModel(
+                        createSampleDataUseCase = testUseCases.createSampleDataUseCase,
                         TestScope(UnconfinedTestDispatcher())
                     )
                 }

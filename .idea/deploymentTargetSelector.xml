@@ -13,24 +13,19 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="onCreateShopFragment_HasEditBundle_ScreenMatchesEditLocation()">
+      <SelectionState runConfigName="onProductStatusChange_SetProductInStock_ProductStatusToggled()">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2024-12-25T00:38:16.999149793Z">
-          <Target type="DEFAULT_BOOT">
-            <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=/home/danie/.var/app/com.google.AndroidStudio/config/.android/avd/Pixel_3a_API_24.avd" />
-            </handle>
-          </Target>
-        </DropdownSelection>
-        <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="onProductStatusChange_StatusUpdateSnackBarEnabled_ShowSnackBar()">
+      <SelectionState runConfigName="ShoppingListFragmentTest">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="onActionItemClicked_ActionItemIsEditOnProduct_NavigateToEditProduct()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
       <SelectionState runConfigName="onProductStatusChange_StatusUpdateSnackBarDisabled_HideSnackBar()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="onProductStatusChange_StatusUpdateSnackBarUndoClicked_ProductStatusChanged()">
+      <SelectionState runConfigName="onProductStatusChange_StatusUpdateSnackBarEnabled_ShowSnackBar()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

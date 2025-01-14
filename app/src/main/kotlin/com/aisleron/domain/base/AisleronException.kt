@@ -32,6 +32,12 @@ sealed class AisleronException(
     class DuplicateLocationException(message: String? = null, cause: Throwable? = null) :
         AisleronException(ExceptionCode.DUPLICATE_LOCATION_EXCEPTION, message, cause)
 
+    class SampleDataCreationException(message: String? = null, cause: Throwable? = null) :
+        AisleronException(ExceptionCode.SAMPLE_DATA_CREATION_EXCEPTION, message, cause)
+
+
+
+
 
     enum class ExceptionCode {
         GENERIC_EXCEPTION,
@@ -43,6 +49,7 @@ sealed class AisleronException(
         INVALID_DB_BACKUP_FILE_EXCEPTION,
         INVALID_DB_RESTORE_FILE_EXCEPTION,
         DUPLICATE_PRODUCT_EXCEPTION,
-        DUPLICATE_LOCATION_EXCEPTION
+        DUPLICATE_LOCATION_EXCEPTION,
+        SAMPLE_DATA_CREATION_EXCEPTION
     }
 }

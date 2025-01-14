@@ -15,6 +15,7 @@ import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductsUseCase
 import com.aisleron.domain.backup.usecase.BackupDatabaseUseCaseImpl
 import com.aisleron.domain.backup.usecase.RestoreDatabaseUseCaseImpl
 import com.aisleron.domain.location.usecase.AddLocationUseCaseImpl
+import com.aisleron.domain.location.usecase.GetHomeLocationUseCase
 import com.aisleron.domain.location.usecase.GetLocationUseCase
 import com.aisleron.domain.location.usecase.GetPinnedShopsUseCase
 import com.aisleron.domain.location.usecase.GetShopsUseCase
@@ -28,9 +29,11 @@ import com.aisleron.domain.product.usecase.IsProductNameUniqueUseCase
 import com.aisleron.domain.product.usecase.RemoveProductUseCase
 import com.aisleron.domain.product.usecase.UpdateProductStatusUseCaseImpl
 import com.aisleron.domain.product.usecase.UpdateProductUseCase
+import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
 
 class TestUseCaseProvider(testData: TestDataManager) {
+
     /**
      * Location Use Cases
      */
@@ -40,6 +43,7 @@ class TestUseCaseProvider(testData: TestDataManager) {
     val isLocationNameUniqueUseCase = IsLocationNameUniqueUseCase(testData.locationRepository)
     val updateLocationUseCase =
         UpdateLocationUseCase(testData.locationRepository, isLocationNameUniqueUseCase)
+    val getHomeLocationUseCase = GetHomeLocationUseCase(testData.locationRepository)
 
     /**
      * Aisle Product Use Cases
@@ -110,5 +114,19 @@ class TestUseCaseProvider(testData: TestDataManager) {
         addAisleProductsUseCase,
         isLocationNameUniqueUseCase
     )
+
+    /**
+     * Welcome Use Cases
+     */
+    val createSampleDataUseCase = CreateSampleDataUseCase(
+        addProductUseCase = addProductUseCase,
+        addAisleUseCase = addAisleUseCase,
+        getShoppingListUseCase = getShoppingListUseCase,
+        updateAisleProductRankUseCase = updateAisleProductRankUseCase,
+        addLocationUseCase = addLocationUseCase,
+        getAllProductsUseCase = getAllProductsUseCase,
+        getHomeLocationUseCase = getHomeLocationUseCase
+    )
+
 
 }

@@ -17,14 +17,14 @@
             android:name=".AboutActivity"
             android:exported="false"
             android:label="@string/title_activity_about"
-            android:theme="@style/Theme.Aisleron"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/Theme.Aisleron" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:launchMode="singleTop"
             android:theme="@style/Theme.Aisleron.NoActionBar"
-            android:windowSoftInputMode="adjustResize"
-            android:launchMode="singleTop">
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.SEARCH" />

@@ -16,6 +16,7 @@ class AisleronExceptionMap {
             ExceptionCode.INVALID_DB_RESTORE_FILE_EXCEPTION -> R.string.invalid_db_restore_file_exception
             ExceptionCode.DUPLICATE_PRODUCT_EXCEPTION -> R.string.duplicate_product_exception
             ExceptionCode.DUPLICATE_LOCATION_EXCEPTION -> R.string.duplicate_location_exception
+            ExceptionCode.SAMPLE_DATA_CREATION_EXCEPTION -> R.string.sample_data_creation_exception
         }
     }
 }
