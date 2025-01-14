@@ -1,5 +1,7 @@
 package com.aisleron.ui
 
+import android.app.Activity
+
 interface AddEditFragmentListener {
-    fun addEditActionCompleted()
+    fun addEditActionCompleted(activity: Activity)
 }

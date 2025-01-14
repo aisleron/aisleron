@@ -16,7 +16,7 @@ import com.aisleron.R
 import com.aisleron.data.TestDataManager
 import com.aisleron.di.KoinTestRule
 import com.aisleron.di.TestAppModules
-import com.aisleron.ui.AddEditFragmentListener
+import com.aisleron.ui.AddEditFragmentListenerTestImpl
 import com.aisleron.ui.ApplicationTitleUpdateListenerTestImpl
 import com.aisleron.ui.FabHandlerTestImpl
 import com.aisleron.ui.bundles.Bundler
@@ -29,7 +29,7 @@ import org.koin.core.module.Module
 
 class ProductFragmentTest {
     private lateinit var bundler: Bundler
-    private lateinit var addEditFragmentListener: TestAddEditFragmentListener
+    private lateinit var addEditFragmentListener: AddEditFragmentListenerTestImpl
     private lateinit var applicationTitleUpdateListener: ApplicationTitleUpdateListenerTestImpl
     private lateinit var testData: TestDataManager
     private lateinit var fabHandler: FabHandlerTestImpl
@@ -47,7 +47,7 @@ class ProductFragmentTest {
     @Before
     fun setUp() {
         bundler = Bundler()
-        addEditFragmentListener = TestAddEditFragmentListener()
+        addEditFragmentListener = AddEditFragmentListenerTestImpl()
         applicationTitleUpdateListener = ApplicationTitleUpdateListenerTestImpl()
         fabHandler = FabHandlerTestImpl()
     }
@@ -213,9 +213,7 @@ class ProductFragmentTest {
             themeResId = R.style.Theme_Aisleron,
             instantiate = {
                 ProductFragment(
-                    addEditFragmentListener,
-                    applicationTitleUpdateListener,
-                    fabHandler
+                    addEditFragmentListener, applicationTitleUpdateListener, fabHandler
                 )
             }
         )
@@ -223,10 +221,5 @@ class ProductFragmentTest {
         return scenario
     }
 
-    class TestAddEditFragmentListener : AddEditFragmentListener {
-        var addEditSuccess: Boolean = false
-        override fun addEditActionCompleted() {
-            addEditSuccess = true
-        }
-    }
+
 }

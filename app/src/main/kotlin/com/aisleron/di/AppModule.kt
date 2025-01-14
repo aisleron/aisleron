@@ -63,6 +63,8 @@ import com.aisleron.domain.product.usecase.UpdateProductStatusUseCaseImpl
 import com.aisleron.domain.product.usecase.UpdateProductUseCase
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
+import com.aisleron.ui.AddEditFragmentListener
+import com.aisleron.ui.AddEditFragmentListenerImpl
 import com.aisleron.ui.ApplicationTitleUpdateListener
 import com.aisleron.ui.ApplicationTitleUpdateListenerImpl
 import com.aisleron.ui.FabHandler
@@ -357,4 +359,6 @@ val appModule = module {
     factory<DisplayPreferences> { DisplayPreferencesImpl() }
 
     factory<ApplicationTitleUpdateListener> { ApplicationTitleUpdateListenerImpl() }
+
+    factory<AddEditFragmentListener> { AddEditFragmentListenerImpl() }
 }

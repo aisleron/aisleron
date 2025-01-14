@@ -18,12 +18,30 @@ val fragmentModule = module {
         )
     }
 
-    fragment { ProductFragment(null, applicationTitleUpdateListener = get(), fabHandler = get()) }
+    fragment {
+        ProductFragment(
+            addEditFragmentListener = get(),
+            applicationTitleUpdateListener = get(),
+            fabHandler = get()
+        )
+    }
 
-    fragment { ShopFragment(null, applicationTitleUpdateListener = get(), fabHandler = get()) }
+    fragment {
+        ShopFragment(
+            addEditFragmentListener = get(),
+            applicationTitleUpdateListener = get(),
+            fabHandler = get()
+        )
+    }
 
     fragment { ShopListFragment(fabHandler = get()) }
 
-    fragment { WelcomeFragment(fabHandler = get(), welcomePreferences = get()) }
+    fragment {
+        WelcomeFragment(
+            fabHandler = get(),
+            welcomePreferences = get(),
+            addEditFragmentListener = get()
+        )
+    }
 
 }

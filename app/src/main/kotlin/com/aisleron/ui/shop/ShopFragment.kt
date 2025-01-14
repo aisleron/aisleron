@@ -32,13 +32,12 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 class ShopFragment(
-    private val addEditFragmentListener: AddEditFragmentListener? = null,
+    private val addEditFragmentListener: AddEditFragmentListener,
     private val applicationTitleUpdateListener: ApplicationTitleUpdateListener,
     private val fabHandler: FabHandler
 ) : Fragment(), MenuProvider {
     private val shopViewModel: ShopViewModel by viewModel()
     private var _binding: FragmentShopBinding? = null
-    private lateinit var _addEditFragmentListener: AddEditFragmentListener
 
     private val binding get() = _binding!!
 
@@ -62,9 +61,6 @@ class ShopFragment(
     ): View {
         fabHandler.setFabItems(this.requireActivity())
 
-        _addEditFragmentListener =
-            addEditFragmentListener ?: (this.requireActivity() as AddEditFragmentListener)
-
         _binding = FragmentShopBinding.inflate(inflater, container, false)
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -72,7 +68,7 @@ class ShopFragment(
                 shopViewModel.shopUiState.collect {
                     when (it) {
                         ShopViewModel.ShopUiState.Success -> {
-                            _addEditFragmentListener.addEditActionCompleted()
+                            addEditFragmentListener.addEditActionCompleted(requireActivity())
                         }
 
                         ShopViewModel.ShopUiState.Empty -> Unit

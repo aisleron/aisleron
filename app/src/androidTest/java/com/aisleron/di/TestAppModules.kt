@@ -2,6 +2,8 @@ package com.aisleron.di
 
 import com.aisleron.data.TestDataManager
 import com.aisleron.domain.TestUseCaseProvider
+import com.aisleron.ui.AddEditFragmentListener
+import com.aisleron.ui.AddEditFragmentListenerTestImpl
 import com.aisleron.ui.ApplicationTitleUpdateListener
 import com.aisleron.ui.ApplicationTitleUpdateListenerTestImpl
 import com.aisleron.ui.FabHandler
@@ -106,6 +108,8 @@ class TestAppModules {
                 factory<FabHandler> { FabHandlerTestImpl() }
 
                 factory<ApplicationTitleUpdateListener> { ApplicationTitleUpdateListenerTestImpl() }
+
+                factory<AddEditFragmentListener> { AddEditFragmentListenerTestImpl() }
             },
             module {
                 fragment {
@@ -118,7 +122,7 @@ class TestAppModules {
 
                 fragment {
                     ProductFragment(
-                        null,
+                        addEditFragmentListener = get(),
                         applicationTitleUpdateListener = get(),
                         fabHandler = get()
                     )
@@ -126,7 +130,7 @@ class TestAppModules {
 
                 fragment {
                     ShopFragment(
-                        null,
+                        addEditFragmentListener = get(),
                         applicationTitleUpdateListener = get(),
                         fabHandler = get()
                     )
@@ -134,7 +138,13 @@ class TestAppModules {
 
                 fragment { ShopListFragment(fabHandler = get()) }
 
-                fragment { WelcomeFragment(fabHandler = get(), welcomePreferences = get()) }
+                fragment {
+                    WelcomeFragment(
+                        fabHandler = get(),
+                        welcomePreferences = get(),
+                        addEditFragmentListener = get()
+                    )
+                }
             }
         )
 

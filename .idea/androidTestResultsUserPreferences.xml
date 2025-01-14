@@ -314,6 +314,7 @@
                 <map>
                   <entry key="Duration" value="90" />
                   <entry key="Google sdk_gphone64_x86_64" value="120" />
+                  <entry key="Test_Pixel_3a_API_34_AOSP" value="120" />
                   <entry key="Tests" value="360" />
                   <entry key="unknown Android SDK built for x86_64" value="120" />
                 </map>

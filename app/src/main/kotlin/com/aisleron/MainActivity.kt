@@ -16,7 +16,6 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.preference.PreferenceManager
 import com.aisleron.databinding.ActivityMainBinding
-import com.aisleron.ui.AddEditFragmentListener
 import com.aisleron.ui.FabHandlerImpl
 import com.aisleron.ui.settings.DisplayPreferences
 import com.aisleron.ui.settings.WelcomePreferences
@@ -25,7 +24,7 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.fragment.android.setupKoinFragmentFactory
 
 
-class MainActivity : AppCompatActivity(), AddEditFragmentListener {
+class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
@@ -107,10 +106,6 @@ class MainActivity : AppCompatActivity(), AddEditFragmentListener {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         return item.onNavDestinationSelected(navController) || super.onOptionsItemSelected(item)
-    }
-
-    override fun addEditActionCompleted() {
-        onBackPressedDispatcher.onBackPressed()
     }
 
     override fun onResume() {

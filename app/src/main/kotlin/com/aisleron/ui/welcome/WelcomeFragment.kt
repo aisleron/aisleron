@@ -15,6 +15,7 @@ import com.aisleron.R
 import com.aisleron.databinding.FragmentWelcomeBinding
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.ui.AddEditFragmentListener
+import com.aisleron.ui.AddEditFragmentListenerImpl
 import com.aisleron.ui.AisleronExceptionMap
 import com.aisleron.ui.FabHandler
 import com.aisleron.ui.FabHandlerImpl
@@ -28,14 +29,13 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class WelcomeFragment(
     private val fabHandler: FabHandler,
     private val welcomePreferences: WelcomePreferences,
-    private val addEditFragmentListener: AddEditFragmentListener? = null,
-
-    ) : Fragment() {
-
-    private lateinit var _addEditFragmentListener: AddEditFragmentListener
+    private val addEditFragmentListener: AddEditFragmentListener
+) : Fragment() {
 
     companion object {
-        fun newInstance() = WelcomeFragment(FabHandlerImpl(), WelcomePreferencesImpl())
+        fun newInstance() = WelcomeFragment(
+            FabHandlerImpl(), WelcomePreferencesImpl(), AddEditFragmentListenerImpl()
+        )
     }
 
     private val viewModel: WelcomeViewModel by viewModel()
@@ -56,9 +56,6 @@ class WelcomeFragment(
     ): View {
         initializeFab()
 
-        _addEditFragmentListener =
-            addEditFragmentListener ?: (this.requireActivity() as AddEditFragmentListener)
-
         val binding = FragmentWelcomeBinding.inflate(inflater, container, false)
 
         with(binding.txtWelcomeLoadSampleItems) {
@@ -74,7 +71,7 @@ class WelcomeFragment(
             text = Html.fromHtml(getString(R.string.welcome_add_own_product), FROM_HTML_MODE_LEGACY)
             setOnClickListener { _ ->
                 welcomePreferences.setInitialised(requireContext())
-                _addEditFragmentListener.addEditActionCompleted()
+                addEditFragmentListener.addEditActionCompleted(requireActivity())
             }
         }
 
@@ -98,7 +95,7 @@ class WelcomeFragment(
 
                         is WelcomeViewModel.WelcomeUiState.SampleDataLoaded -> {
                             welcomePreferences.setInitialised(requireContext())
-                            _addEditFragmentListener.addEditActionCompleted()
+                            addEditFragmentListener.addEditActionCompleted(requireActivity())
                         }
 
                         else -> Unit

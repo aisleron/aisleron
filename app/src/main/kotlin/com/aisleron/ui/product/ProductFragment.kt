@@ -31,14 +31,13 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ProductFragment(
-    private val addEditFragmentListener: AddEditFragmentListener? = null,
+    private val addEditFragmentListener: AddEditFragmentListener,
     private val applicationTitleUpdateListener: ApplicationTitleUpdateListener,
     private val fabHandler: FabHandler
 ) : Fragment(), MenuProvider {
 
     private val productViewModel: ProductViewModel by viewModel()
     private var _binding: FragmentProductBinding? = null
-    private lateinit var _addEditFragmentListener: AddEditFragmentListener
 
     private val binding get() = _binding!!
 
@@ -65,9 +64,6 @@ class ProductFragment(
     ): View {
         fabHandler.setFabItems(this.requireActivity())
 
-        _addEditFragmentListener =
-            addEditFragmentListener ?: (this.requireActivity() as AddEditFragmentListener)
-
         _binding = FragmentProductBinding.inflate(inflater, container, false)
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -75,7 +71,7 @@ class ProductFragment(
                 productViewModel.productUiState.collect {
                     when (it) {
                         ProductViewModel.ProductUiState.Success -> {
-                            _addEditFragmentListener.addEditActionCompleted()
+                            addEditFragmentListener.addEditActionCompleted(requireActivity())
                         }
 
                         ProductViewModel.ProductUiState.Empty -> Unit

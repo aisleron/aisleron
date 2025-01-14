@@ -22,7 +22,7 @@ import com.aisleron.domain.location.usecase.GetLocationUseCase
 import com.aisleron.domain.location.usecase.IsLocationNameUniqueUseCase
 import com.aisleron.domain.location.usecase.UpdateLocationUseCase
 import com.aisleron.domain.product.usecase.GetAllProductsUseCase
-import com.aisleron.ui.AddEditFragmentListener
+import com.aisleron.ui.AddEditFragmentListenerTestImpl
 import com.aisleron.ui.ApplicationTitleUpdateListenerTestImpl
 import com.aisleron.ui.FabHandlerTestImpl
 import com.aisleron.ui.bundles.Bundler
@@ -39,7 +39,8 @@ import org.koin.dsl.module
 
 class ShopFragmentTest {
     private lateinit var bundler: Bundler
-    private lateinit var addEditFragmentListener: TestAddEditFragmentListener
+    private lateinit var addEditFragmentListener: AddEditFragmentListenerTestImpl
+    private lateinit var applicationTitleUpdateListener: ApplicationTitleUpdateListenerTestImpl
     private lateinit var testData: TestDataManager
     private lateinit var fabHandler: FabHandlerTestImpl
 
@@ -80,7 +81,8 @@ class ShopFragmentTest {
     @Before
     fun setUp() {
         bundler = Bundler()
-        addEditFragmentListener = TestAddEditFragmentListener()
+        addEditFragmentListener = AddEditFragmentListenerTestImpl()
+        applicationTitleUpdateListener = ApplicationTitleUpdateListenerTestImpl()
         fabHandler = FabHandlerTestImpl()
     }
 
@@ -91,7 +93,7 @@ class ShopFragmentTest {
         scenario.onFragment {
             Assert.assertEquals(
                 it.getString(R.string.edit_location),
-                addEditFragmentListener.appTitle
+                applicationTitleUpdateListener.appTitle
             )
         }
     }
@@ -116,7 +118,7 @@ class ShopFragmentTest {
         scenario.onFragment {
             Assert.assertEquals(
                 it.getString(R.string.add_location),
-                addEditFragmentListener.appTitle
+                applicationTitleUpdateListener.appTitle
             )
         }
     }
@@ -240,22 +242,11 @@ class ShopFragmentTest {
             themeResId = R.style.Theme_Aisleron,
             instantiate = {
                 ShopFragment(
-                    addEditFragmentListener,
-                    ApplicationTitleUpdateListenerTestImpl(),
-                    fabHandler
+                    addEditFragmentListener, applicationTitleUpdateListener, fabHandler
                 )
             }
         )
 
         return scenario
-    }
-
-    class TestAddEditFragmentListener : AddEditFragmentListener {
-        var appTitle: String = ""
-        var addEditSuccess: Boolean = false
-
-        override fun addEditActionCompleted() {
-            addEditSuccess = true
-        }
     }
 }
