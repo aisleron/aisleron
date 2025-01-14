@@ -21,7 +21,7 @@ import org.junit.Test
 import org.koin.core.module.Module
 import java.lang.Thread.sleep
 
-class FabHandlerImplTest {
+class FabHandlerTest {
     private lateinit var scenario: ActivityScenario<MainActivity>
 
     @get:Rule
@@ -46,8 +46,8 @@ class FabHandlerImplTest {
     @Test
     fun clickFab_IsAddShop_NavigateToAddShop() {
         scenario.onActivity {
-            val fabHandler = FabHandlerImpl(it)
-            fabHandler.setFabItems(FabHandler.FabOption.ADD_SHOP)
+            val fabHandler = FabHandlerImpl()
+            fabHandler.setFabItems(it, FabHandler.FabOption.ADD_SHOP)
         }
 
         onView(withId(R.id.fab)).perform(click())
@@ -61,8 +61,9 @@ class FabHandlerImplTest {
     @Test
     fun loadedMultiFab_FabNotClicked_ChildFabHidden() {
         scenario.onActivity {
-            val fabHandler = FabHandlerImpl(it)
+            val fabHandler = FabHandlerImpl()
             fabHandler.setFabItems(
+                it,
                 FabHandler.FabOption.ADD_SHOP,
                 FabHandler.FabOption.ADD_AISLE,
                 FabHandler.FabOption.ADD_PRODUCT
@@ -78,8 +79,9 @@ class FabHandlerImplTest {
     @Test
     fun clickFab_IsMultiFab_ShopAllFab() {
         scenario.onActivity {
-            val fabHandler = FabHandlerImpl(it)
+            val fabHandler = FabHandlerImpl()
             fabHandler.setFabItems(
+                it,
                 FabHandler.FabOption.ADD_SHOP,
                 FabHandler.FabOption.ADD_AISLE,
                 FabHandler.FabOption.ADD_PRODUCT
@@ -97,8 +99,9 @@ class FabHandlerImplTest {
     @Test
     fun clickFab_ChildFabShowing_HideChildFab() {
         scenario.onActivity {
-            val fabHandler = FabHandlerImpl(it)
+            val fabHandler = FabHandlerImpl()
             fabHandler.setFabItems(
+                it,
                 FabHandler.FabOption.ADD_SHOP,
                 FabHandler.FabOption.ADD_AISLE,
                 FabHandler.FabOption.ADD_PRODUCT
@@ -117,8 +120,8 @@ class FabHandlerImplTest {
     @Test
     fun setFab_None_FabIsHidden() {
         scenario.onActivity {
-            val fabHandler = FabHandlerImpl(it)
-            fabHandler.setFabItems()
+            val fabHandler = FabHandlerImpl()
+            fabHandler.setFabItems(it)
         }
 
         sleep(500)

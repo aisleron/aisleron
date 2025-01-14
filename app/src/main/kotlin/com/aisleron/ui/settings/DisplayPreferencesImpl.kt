@@ -1,23 +1,23 @@
 package com.aisleron.ui.settings
 
-import android.content.SharedPreferences
+import android.content.Context
+import androidx.preference.PreferenceManager
 
-class DisplayPreferencesImpl(private val sharedPreferences: SharedPreferences) :
-    DisplayPreferences {
+class DisplayPreferencesImpl : DisplayPreferences {
 
-    override val showOnLockScreen: Boolean
-        get() = sharedPreferences.getBoolean(DISPLAY_LOCKSCREEN, false)
+    override fun showOnLockScreen(context: Context): Boolean =
+        PreferenceManager.getDefaultSharedPreferences(context).getBoolean(DISPLAY_LOCKSCREEN, false)
 
-    override val applicationTheme: DisplayPreferences.ApplicationTheme
-        get() {
-            val appTheme = sharedPreferences.getString(APPLICATION_THEME, SYSTEM_THEME)
+    override fun applicationTheme(context: Context): DisplayPreferences.ApplicationTheme {
+        val appTheme = PreferenceManager.getDefaultSharedPreferences(context)
+            .getString(APPLICATION_THEME, SYSTEM_THEME)
 
-            return when (appTheme) {
-                LIGHT_THEME -> DisplayPreferences.ApplicationTheme.LIGHT_THEME
-                DARK_THEME -> DisplayPreferences.ApplicationTheme.DARK_THEME
-                else -> DisplayPreferences.ApplicationTheme.SYSTEM_THEME
-            }
+        return when (appTheme) {
+            LIGHT_THEME -> DisplayPreferences.ApplicationTheme.LIGHT_THEME
+            DARK_THEME -> DisplayPreferences.ApplicationTheme.DARK_THEME
+            else -> DisplayPreferences.ApplicationTheme.SYSTEM_THEME
         }
+    }
 
     companion object {
         private const val SYSTEM_THEME = "system_theme"

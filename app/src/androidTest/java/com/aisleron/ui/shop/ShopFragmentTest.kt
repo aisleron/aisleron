@@ -23,6 +23,7 @@ import com.aisleron.domain.location.usecase.IsLocationNameUniqueUseCase
 import com.aisleron.domain.location.usecase.UpdateLocationUseCase
 import com.aisleron.domain.product.usecase.GetAllProductsUseCase
 import com.aisleron.ui.AddEditFragmentListener
+import com.aisleron.ui.ApplicationTitleUpdateListenerTestImpl
 import com.aisleron.ui.FabHandlerTestImpl
 import com.aisleron.ui.bundles.Bundler
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -237,7 +238,13 @@ class ShopFragmentTest {
         val scenario = launchFragmentInContainer<ShopFragment>(
             fragmentArgs = bundle,
             themeResId = R.style.Theme_Aisleron,
-            instantiate = { ShopFragment(addEditFragmentListener, fabHandler) }
+            instantiate = {
+                ShopFragment(
+                    addEditFragmentListener,
+                    ApplicationTitleUpdateListenerTestImpl(),
+                    fabHandler
+                )
+            }
         )
 
         return scenario
@@ -246,9 +253,6 @@ class ShopFragmentTest {
     class TestAddEditFragmentListener : AddEditFragmentListener {
         var appTitle: String = ""
         var addEditSuccess: Boolean = false
-        override fun applicationTitleUpdated(newTitle: String) {
-            appTitle = newTitle
-        }
 
         override fun addEditActionCompleted() {
             addEditSuccess = true

@@ -35,7 +35,7 @@ import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationType
 import com.aisleron.ui.FabHandler
 import com.aisleron.ui.FabHandlerTestImpl
-import com.aisleron.ui.TestApplicationTitleUpdateListener
+import com.aisleron.ui.ApplicationTitleUpdateListenerTestImpl
 import com.aisleron.ui.bundles.AddEditProductBundle
 import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.settings.ShoppingListPreferencesTestImpl
@@ -58,7 +58,7 @@ import kotlin.test.assertNull
 class ShoppingListFragmentTest {
 
     private lateinit var bundler: Bundler
-    private lateinit var applicationTitleUpdateListener: TestApplicationTitleUpdateListener
+    private lateinit var applicationTitleUpdateListener: ApplicationTitleUpdateListenerTestImpl
     private lateinit var testData: TestDataManager
     private lateinit var fabHandler: FabHandlerTestImpl
 
@@ -82,7 +82,7 @@ class ShoppingListFragmentTest {
                 ShoppingListFragment(
                     applicationTitleUpdateListener,
                     fabHandler,
-                    shoppingListPreferencesTestImpl
+                    shoppingListPreferencesTestImpl ?: ShoppingListPreferencesTestImpl()
                 )
             }
         )
@@ -95,7 +95,7 @@ class ShoppingListFragmentTest {
     @Before
     fun setUp() {
         bundler = Bundler()
-        applicationTitleUpdateListener = TestApplicationTitleUpdateListener()
+        applicationTitleUpdateListener = ApplicationTitleUpdateListenerTestImpl()
         fabHandler = FabHandlerTestImpl()
     }
 

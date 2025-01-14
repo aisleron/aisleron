@@ -32,12 +32,11 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 /**
  * A fragment representing a list of Items.
  */
-class ShopListFragment(fabHandler: FabHandler? = null) : Fragment(), ActionMode.Callback,
+class ShopListFragment(private val fabHandler: FabHandler) : Fragment(), ActionMode.Callback,
     ShopListItemRecyclerViewAdapter.ShopListItemListener {
 
     private var actionMode: ActionMode? = null
     private var actionModeItem: ShopListItemViewModel? = null
-    private val _fabHandler = fabHandler
     private var columnCount = 3
     private val shopListViewModel: ShopListViewModel by viewModel()
 
@@ -65,8 +64,7 @@ class ShopListFragment(fabHandler: FabHandler? = null) : Fragment(), ActionMode.
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val fabHandler = _fabHandler ?: FabHandlerImpl(this.requireActivity())
-        fabHandler.setFabItems(FabHandler.FabOption.ADD_SHOP)
+        fabHandler.setFabItems(this.requireActivity(), FabHandler.FabOption.ADD_SHOP)
 
         val view = inflater.inflate(R.layout.fragment_shop_list, container, false)
 
@@ -106,7 +104,10 @@ class ShopListFragment(fabHandler: FabHandler? = null) : Fragment(), ActionMode.
         val snackBarMessage =
             getString(AisleronExceptionMap().getErrorResourceId(errorCode), errorMessage)
         ErrorSnackBar().make(
-            requireView(), snackBarMessage, Snackbar.LENGTH_SHORT, _fabHandler?.getFabView
+            requireView(),
+            snackBarMessage,
+            Snackbar.LENGTH_SHORT,
+            fabHandler.getFabView(this.requireActivity())
         ).show()
     }
 
@@ -172,7 +173,7 @@ class ShopListFragment(fabHandler: FabHandler? = null) : Fragment(), ActionMode.
 
         @JvmStatic
         fun newInstance(columnCount: Int) =
-            ShopListFragment().apply {
+            ShopListFragment(FabHandlerImpl()).apply {
                 arguments = Bundle().apply {
                     putInt(ARG_COLUMN_COUNT, columnCount)
                 }

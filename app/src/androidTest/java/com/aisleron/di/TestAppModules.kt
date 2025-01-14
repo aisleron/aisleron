@@ -2,15 +2,31 @@ package com.aisleron.di
 
 import com.aisleron.data.TestDataManager
 import com.aisleron.domain.TestUseCaseProvider
+import com.aisleron.ui.ApplicationTitleUpdateListener
+import com.aisleron.ui.ApplicationTitleUpdateListenerTestImpl
+import com.aisleron.ui.FabHandler
+import com.aisleron.ui.FabHandlerTestImpl
+import com.aisleron.ui.product.ProductFragment
 import com.aisleron.ui.product.ProductViewModel
+import com.aisleron.ui.settings.DisplayPreferences
+import com.aisleron.ui.settings.DisplayPreferencesImpl
 import com.aisleron.ui.settings.SettingsViewModel
+import com.aisleron.ui.settings.ShoppingListPreferences
+import com.aisleron.ui.settings.ShoppingListPreferencesTestImpl
+import com.aisleron.ui.settings.WelcomePreferences
+import com.aisleron.ui.settings.WelcomePreferencesImpl
+import com.aisleron.ui.shop.ShopFragment
 import com.aisleron.ui.shop.ShopViewModel
+import com.aisleron.ui.shoplist.ShopListFragment
 import com.aisleron.ui.shoplist.ShopListViewModel
+import com.aisleron.ui.shoppinglist.ShoppingListFragment
 import com.aisleron.ui.shoppinglist.ShoppingListViewModel
+import com.aisleron.ui.welcome.WelcomeFragment
 import com.aisleron.ui.welcome.WelcomeViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import org.koin.androidx.fragment.dsl.fragment
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
@@ -79,6 +95,46 @@ class TestAppModules {
                         TestScope(UnconfinedTestDispatcher())
                     )
                 }
+
+                //ToDo: Test Implementations for all preferences
+                factory<DisplayPreferences> { DisplayPreferencesImpl() }
+
+                factory<ShoppingListPreferences> { ShoppingListPreferencesTestImpl() }
+
+                factory<WelcomePreferences> { WelcomePreferencesImpl() }
+
+                factory<FabHandler> { FabHandlerTestImpl() }
+
+                factory<ApplicationTitleUpdateListener> { ApplicationTitleUpdateListenerTestImpl() }
+            },
+            module {
+                fragment {
+                    ShoppingListFragment(
+                        applicationTitleUpdateListener = get(),
+                        fabHandler = get(),
+                        shoppingListPreferences = get()
+                    )
+                }
+
+                fragment {
+                    ProductFragment(
+                        null,
+                        applicationTitleUpdateListener = get(),
+                        fabHandler = get()
+                    )
+                }
+
+                fragment {
+                    ShopFragment(
+                        null,
+                        applicationTitleUpdateListener = get(),
+                        fabHandler = get()
+                    )
+                }
+
+                fragment { ShopListFragment(fabHandler = get()) }
+
+                fragment { WelcomeFragment(fabHandler = get(), welcomePreferences = get()) }
             }
         )
 

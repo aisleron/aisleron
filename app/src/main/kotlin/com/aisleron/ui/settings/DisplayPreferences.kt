@@ -1,5 +1,7 @@
 package com.aisleron.ui.settings
 
+import android.content.Context
+
 interface DisplayPreferences {
 
     enum class ApplicationTheme {
@@ -8,7 +10,7 @@ interface DisplayPreferences {
         DARK_THEME
     }
 
-    val showOnLockScreen: Boolean
+    fun showOnLockScreen(context: Context): Boolean
 
-    val applicationTheme: ApplicationTheme
+    fun applicationTheme(context: Context): ApplicationTheme
 }

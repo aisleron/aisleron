@@ -19,6 +19,8 @@ import com.aisleron.databinding.FragmentShopBinding
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.ui.AddEditFragmentListener
 import com.aisleron.ui.AisleronExceptionMap
+import com.aisleron.ui.ApplicationTitleUpdateListener
+import com.aisleron.ui.ApplicationTitleUpdateListenerImpl
 import com.aisleron.ui.FabHandler
 import com.aisleron.ui.FabHandlerImpl
 import com.aisleron.ui.bundles.AddEditLocationBundle
@@ -31,11 +33,11 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ShopFragment(
     private val addEditFragmentListener: AddEditFragmentListener? = null,
-    fabHandler: FabHandler? = null
+    private val applicationTitleUpdateListener: ApplicationTitleUpdateListener,
+    private val fabHandler: FabHandler
 ) : Fragment(), MenuProvider {
     private val shopViewModel: ShopViewModel by viewModel()
     private var _binding: FragmentShopBinding? = null
-    private val _fabHandler = fabHandler
     private lateinit var _addEditFragmentListener: AddEditFragmentListener
 
     private val binding get() = _binding!!
@@ -58,8 +60,7 @@ class ShopFragment(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val fabHandler = _fabHandler ?: FabHandlerImpl(this.requireActivity())
-        fabHandler.setFabItems()
+        fabHandler.setFabItems(this.requireActivity())
 
         _addEditFragmentListener =
             addEditFragmentListener ?: (this.requireActivity() as AddEditFragmentListener)
@@ -118,7 +119,7 @@ class ShopFragment(
 
     override fun onResume() {
         super.onResume()
-        _addEditFragmentListener.applicationTitleUpdated(appTitle)
+        applicationTitleUpdateListener.applicationTitleUpdated(requireActivity(), appTitle)
 
         val edtLocationName = binding.edtShopName
         edtLocationName.postDelayed({
@@ -136,7 +137,9 @@ class ShopFragment(
             name: String?,
             addEditFragmentListener: AddEditFragmentListener
         ) =
-            ShopFragment(addEditFragmentListener).apply {
+            ShopFragment(
+                addEditFragmentListener, ApplicationTitleUpdateListenerImpl(), FabHandlerImpl()
+            ).apply {
                 arguments = Bundler().makeAddLocationBundle(name)
             }
     }

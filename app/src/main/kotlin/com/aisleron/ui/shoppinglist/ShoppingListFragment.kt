@@ -21,7 +21,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -46,17 +45,13 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  * A fragment representing a list of [ShoppingListItem].
  */
 class ShoppingListFragment(
-    applicationTitleUpdateListener: ApplicationTitleUpdateListener? = null,
-    fabHandler: FabHandler? = null,
-    shoppingListPreferences: ShoppingListPreferences? = null
-) :
-    Fragment(), SearchView.OnQueryTextListener, ActionMode.Callback {
+    private val applicationTitleUpdateListener: ApplicationTitleUpdateListener,
+    private val fabHandler: FabHandler,
+    private val shoppingListPreferences: ShoppingListPreferences
+) : Fragment(), SearchView.OnQueryTextListener, ActionMode.Callback {
 
     private var actionMode: ActionMode? = null
     private var actionModeItem: ShoppingListItem? = null
-    private val _fabHandler = fabHandler
-    private val _applicationTitleUpdateListener = applicationTitleUpdateListener
-    private val _shoppingListPreferences = shoppingListPreferences
 
     private val shoppingListViewModel: ShoppingListViewModel by viewModel()
 
@@ -151,7 +146,7 @@ class ShoppingListFragment(
     }
 
     private fun displayStatusChangeSnackBar(item: ProductShoppingListItem, inStock: Boolean) {
-        if (getShoppingListPreference().hideStatusChangeSnackBar) return
+        if (shoppingListPreferences.isStatusChangeSnackBarHidden(requireContext())) return
 
         val newStatus = getString(if (inStock) R.string.menu_in_stock else R.string.menu_needed)
 
@@ -161,7 +156,7 @@ class ShoppingListFragment(
             Snackbar.LENGTH_SHORT
         ).setAction(getString(R.string.undo)) { _ ->
             shoppingListViewModel.updateProductStatus(item, !inStock)
-        }.setAnchorView(_fabHandler?.getFabView).show()
+        }.setAnchorView(fabHandler.getFabView(this.requireActivity())).show()
     }
 
     private fun displayErrorSnackBar(
@@ -171,22 +166,25 @@ class ShoppingListFragment(
             getString(AisleronExceptionMap().getErrorResourceId(errorCode), errorMessage)
 
         ErrorSnackBar().make(
-            requireView(), snackBarMessage, Snackbar.LENGTH_SHORT, _fabHandler?.getFabView
+            requireView(),
+            snackBarMessage,
+            Snackbar.LENGTH_SHORT,
+            fabHandler.getFabView(this.requireActivity())
         ).show()
     }
 
     private fun initializeFab() {
-        val fabHandler = _fabHandler ?: FabHandlerImpl(this.requireActivity())
         fabHandler.setFabItems(
+            this.requireActivity(),
             FabHandler.FabOption.ADD_SHOP,
             FabHandler.FabOption.ADD_AISLE,
             FabHandler.FabOption.ADD_PRODUCT
         )
-        fabHandler.setFabOnClickListener(FabHandler.FabOption.ADD_PRODUCT) {
+        fabHandler.setFabOnClickListener(this.requireActivity(), FabHandler.FabOption.ADD_PRODUCT) {
             navigateToAddProduct(shoppingListViewModel.defaultFilter)
         }
 
-        fabHandler.setFabOnClickListener(FabHandler.FabOption.ADD_AISLE) {
+        fabHandler.setFabOnClickListener(this.requireActivity(), FabHandler.FabOption.ADD_AISLE) {
             showAisleDialog(requireView().context)
         }
     }
@@ -204,9 +202,7 @@ class ShoppingListFragment(
                 LocationType.SHOP -> shoppingListViewModel.locationName
             }
 
-        val applicationTitleUpdateListener = _applicationTitleUpdateListener
-            ?: (this.requireActivity() as ApplicationTitleUpdateListener)
-        applicationTitleUpdateListener.applicationTitleUpdated(appTitle)
+        applicationTitleUpdateListener.applicationTitleUpdated(requireActivity(), appTitle)
     }
 
     private fun navigateToAddProduct(filterType: FilterType) {
@@ -372,11 +368,6 @@ class ShoppingListFragment(
         }
     }
 
-    private fun getShoppingListPreference(): ShoppingListPreferences =
-        _shoppingListPreferences ?: ShoppingListPreferencesImpl(
-            PreferenceManager.getDefaultSharedPreferences(requireContext())
-        )
-
     override fun onDestroyActionMode(mode: ActionMode) {
         actionMode = null
         actionModeItem = null
@@ -393,7 +384,9 @@ class ShoppingListFragment(
             locationId: Long,
             filterType: FilterType
         ) =
-            ShoppingListFragment(applicationTitleUpdateListener).apply {
+            ShoppingListFragment(
+                applicationTitleUpdateListener, FabHandlerImpl(), ShoppingListPreferencesImpl()
+            ).apply {
                 arguments = Bundle().apply {
                     putInt(ARG_LOCATION_ID, locationId.toInt())
                     putSerializable(ARG_FILTER_TYPE, filterType)

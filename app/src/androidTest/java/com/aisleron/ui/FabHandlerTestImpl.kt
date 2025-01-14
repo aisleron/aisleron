@@ -1,19 +1,21 @@
 package com.aisleron.ui
 
+import android.app.Activity
 import android.view.View
 
 class FabHandlerTestImpl : FabHandler {
     private val fabOnClick = mutableMapOf<FabHandler.FabOption, View.OnClickListener>()
-    override val getFabView: View? = null
+    override fun getFabView(activity: Activity): View? = null
 
     override fun setFabOnClickListener(
+        activity: Activity,
         fabOption: FabHandler.FabOption,
         onClickListener: View.OnClickListener
     ) {
         fabOnClick[fabOption] = onClickListener
     }
 
-    override fun setFabItems(vararg fabOptions: FabHandler.FabOption) {
+    override fun setFabItems(activity: Activity, vararg fabOptions: FabHandler.FabOption) {
         fabOnClick.clear()
     }
 

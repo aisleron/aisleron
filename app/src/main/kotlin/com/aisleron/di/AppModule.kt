@@ -63,9 +63,19 @@ import com.aisleron.domain.product.usecase.UpdateProductStatusUseCaseImpl
 import com.aisleron.domain.product.usecase.UpdateProductUseCase
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
+import com.aisleron.ui.ApplicationTitleUpdateListener
+import com.aisleron.ui.ApplicationTitleUpdateListenerImpl
+import com.aisleron.ui.FabHandler
+import com.aisleron.ui.FabHandlerImpl
 import com.aisleron.ui.about.AboutViewModel
 import com.aisleron.ui.product.ProductViewModel
+import com.aisleron.ui.settings.DisplayPreferences
+import com.aisleron.ui.settings.DisplayPreferencesImpl
 import com.aisleron.ui.settings.SettingsViewModel
+import com.aisleron.ui.settings.ShoppingListPreferences
+import com.aisleron.ui.settings.ShoppingListPreferencesImpl
+import com.aisleron.ui.settings.WelcomePreferences
+import com.aisleron.ui.settings.WelcomePreferencesImpl
 import com.aisleron.ui.shop.ShopViewModel
 import com.aisleron.ui.shoplist.ShopListViewModel
 import com.aisleron.ui.shoppinglist.ShoppingListViewModel
@@ -334,4 +344,17 @@ val appModule = module {
             createSampleDataUseCase = get()
         )
     }
+
+    /**
+     * Misc
+     */
+    factory<FabHandler> { FabHandlerImpl() }
+
+    factory<ShoppingListPreferences> { ShoppingListPreferencesImpl() }
+
+    factory<WelcomePreferences> { WelcomePreferencesImpl() }
+
+    factory<DisplayPreferences> { DisplayPreferencesImpl() }
+
+    factory<ApplicationTitleUpdateListener> { ApplicationTitleUpdateListenerImpl() }
 }

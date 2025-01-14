@@ -1,17 +1,16 @@
 package com.aisleron.ui.settings
 
-import android.content.SharedPreferences
+import android.content.Context
+import androidx.preference.PreferenceManager
 
-class WelcomePreferencesImpl(private val sharedPreferences: SharedPreferences) :
+class WelcomePreferencesImpl() :
     WelcomePreferences {
 
-    override val isInitialized: Boolean
-        get() {
-            return sharedPreferences.getBoolean(IS_INITIALIZED, false)
-        }
+    override fun isInitialized(context: Context): Boolean =
+        PreferenceManager.getDefaultSharedPreferences(context).getBoolean(IS_INITIALIZED, false)
 
-    override fun setInitialised() {
-        sharedPreferences.edit()
+    override fun setInitialised(context: Context) {
+        PreferenceManager.getDefaultSharedPreferences(context).edit()
             ?.putBoolean(IS_INITIALIZED, true)
             ?.apply()
     }

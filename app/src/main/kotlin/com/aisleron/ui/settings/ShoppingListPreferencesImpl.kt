@@ -1,12 +1,12 @@
 package com.aisleron.ui.settings
 
-import android.content.SharedPreferences
+import android.content.Context
+import androidx.preference.PreferenceManager
 
-class ShoppingListPreferencesImpl(private val sharedPreferences: SharedPreferences) :
-    ShoppingListPreferences {
+class ShoppingListPreferencesImpl : ShoppingListPreferences {
 
-    override val hideStatusChangeSnackBar: Boolean
-        get() = sharedPreferences.getBoolean(
+    override fun isStatusChangeSnackBarHidden(context: Context): Boolean =
+        PreferenceManager.getDefaultSharedPreferences(context).getBoolean(
             PREF_HIDE_STATUS_CHANGE_SNACK_BAR, false
         )
 

@@ -1,6 +1,8 @@
 package com.aisleron.ui.settings
 
+import android.content.Context
+
 interface ShoppingListPreferences {
 
-    val hideStatusChangeSnackBar: Boolean
+    fun isStatusChangeSnackBarHidden(context: Context): Boolean
 }

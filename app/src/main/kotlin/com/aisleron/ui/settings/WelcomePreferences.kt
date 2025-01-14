@@ -1,8 +1,10 @@
 package com.aisleron.ui.settings
 
+import android.content.Context
+
 interface WelcomePreferences {
 
-    val isInitialized: Boolean
+    fun isInitialized(context: Context): Boolean
 
-    fun setInitialised()
+    fun setInitialised(context: Context)
 }

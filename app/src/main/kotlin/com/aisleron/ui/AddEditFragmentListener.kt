@@ -1,5 +1,5 @@
 package com.aisleron.ui
 
-interface AddEditFragmentListener : ApplicationTitleUpdateListener {
+interface AddEditFragmentListener {
     fun addEditActionCompleted()
 }

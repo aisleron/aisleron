@@ -9,24 +9,27 @@ import com.aisleron.R
 import com.aisleron.ui.bundles.Bundler
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
-class FabHandlerImpl(private val activity: Activity) : FabHandler {
+class FabHandlerImpl : FabHandler {
 
-    private val fabMain = activity.findViewById<FloatingActionButton>(R.id.fab)
+    private fun fabMain(activity: Activity) = activity.findViewById<FloatingActionButton>(R.id.fab)
 
-    private val fabAddProduct = activity.findViewById<FloatingActionButton>(R.id.fab_add_product)
-    private val lblAddProduct = activity.findViewById<TextView>(R.id.add_product_fab_label)
+    private fun fabAddProduct(activity: Activity) = activity.findViewById<FloatingActionButton>(R.id.fab_add_product)
 
-    private val fabAddAisle = activity.findViewById<FloatingActionButton>(R.id.fab_add_aisle)
-    private val lblAddAisle = activity.findViewById<TextView>(R.id.add_aisle_fab_label)
+    private fun lblAddProduct(activity: Activity) = activity.findViewById<TextView>(R.id.add_product_fab_label)
 
-    private val fabAddShop = activity.findViewById<FloatingActionButton>(R.id.fab_add_shop)
-    private val lblAddShop = activity.findViewById<TextView>(R.id.add_shop_fab_label)
+    private fun fabAddAisle(activity: Activity) = activity.findViewById<FloatingActionButton>(R.id.fab_add_aisle)
+
+    private fun lblAddAisle(activity: Activity) = activity.findViewById<TextView>(R.id.add_aisle_fab_label)
+
+    private fun fabAddShop(activity: Activity) = activity.findViewById<FloatingActionButton>(R.id.fab_add_shop)
+
+    private fun lblAddShop(activity: Activity) = activity.findViewById<TextView>(R.id.add_shop_fab_label)
 
     private var fabEntries = mutableListOf<FabHandler.FabOption>()
 
     private var allFabAreHidden: Boolean = true
 
-    override val getFabView: View? = fabMain
+    override fun getFabView(activity: Activity): View? = fabMain(activity)
 
     private fun hideSingleFabViews(fab: FloatingActionButton, label: TextView) {
         fab.hide()
@@ -38,24 +41,46 @@ class FabHandlerImpl(private val activity: Activity) : FabHandler {
         label.visibility = View.VISIBLE
     }
 
-    private fun hideAllFab() {
+    private fun hideAllFab(activity: Activity) {
         for (fabOption in FabHandler.FabOption.entries) {
             when (fabOption) {
-                FabHandler.FabOption.ADD_PRODUCT -> hideSingleFabViews(fabAddProduct, lblAddProduct)
-                FabHandler.FabOption.ADD_AISLE -> hideSingleFabViews(fabAddAisle, lblAddAisle)
-                FabHandler.FabOption.ADD_SHOP -> hideSingleFabViews(fabAddShop, lblAddShop)
+                FabHandler.FabOption.ADD_PRODUCT -> hideSingleFabViews(
+                    fabAddProduct(activity),
+                    lblAddProduct(activity)
+                )
+
+                FabHandler.FabOption.ADD_AISLE -> hideSingleFabViews(
+                    fabAddAisle(activity),
+                    lblAddAisle(activity)
+                )
+
+                FabHandler.FabOption.ADD_SHOP -> hideSingleFabViews(
+                    fabAddShop(activity),
+                    lblAddShop(activity)
+                )
             }
         }
 
         allFabAreHidden = true
     }
 
-    private fun showAllFab() {
+    private fun showAllFab(activity: Activity) {
         for (fabOption in fabEntries) {
             when (fabOption) {
-                FabHandler.FabOption.ADD_PRODUCT -> showSingleFabViews(fabAddProduct, lblAddProduct)
-                FabHandler.FabOption.ADD_AISLE -> showSingleFabViews(fabAddAisle, lblAddAisle)
-                FabHandler.FabOption.ADD_SHOP -> showSingleFabViews(fabAddShop, lblAddShop)
+                FabHandler.FabOption.ADD_PRODUCT -> showSingleFabViews(
+                    fabAddProduct(activity),
+                    lblAddProduct(activity)
+                )
+
+                FabHandler.FabOption.ADD_AISLE -> showSingleFabViews(
+                    fabAddAisle(activity),
+                    lblAddAisle(activity)
+                )
+
+                FabHandler.FabOption.ADD_SHOP -> showSingleFabViews(
+                    fabAddShop(activity),
+                    lblAddShop(activity)
+                )
             }
         }
 
@@ -63,61 +88,65 @@ class FabHandlerImpl(private val activity: Activity) : FabHandler {
     }
 
     override fun setFabOnClickListener(
+        activity: Activity,
         fabOption: FabHandler.FabOption,
         onClickListener: View.OnClickListener
     ) {
-        val fab = getFabFromOption(fabOption)
+        val fab = getFabFromOption(fabOption, activity)
 
         fab.setOnClickListener {
             onClickListener.onClick(it)
-            hideAllFab()
+            hideAllFab(activity)
         }
     }
 
-    private fun getFabFromOption(fabOption: FabHandler.FabOption): FloatingActionButton =
+    private fun getFabFromOption(
+        fabOption: FabHandler.FabOption, activity: Activity
+    ): FloatingActionButton =
         when (fabOption) {
-            FabHandler.FabOption.ADD_PRODUCT -> fabAddProduct
-            FabHandler.FabOption.ADD_AISLE -> fabAddAisle
-            FabHandler.FabOption.ADD_SHOP -> fabAddShop
+            FabHandler.FabOption.ADD_PRODUCT -> fabAddProduct(activity)
+            FabHandler.FabOption.ADD_AISLE -> fabAddAisle(activity)
+            FabHandler.FabOption.ADD_SHOP -> fabAddShop(activity)
         }
 
-    private fun setMainFabToSingleOption() {
-        getFabFromOption(fabEntries.first()).let {
-            fabMain.setImageDrawable(it.drawable)
-            fabMain.setOnClickListener { _ -> it.callOnClick() }
+    private fun setMainFabToSingleOption(activity: Activity) {
+        getFabFromOption(fabEntries.first(), activity).let {
+            fabMain(activity).setImageDrawable(it.drawable)
+            fabMain(activity).setOnClickListener { _ -> it.callOnClick() }
         }
 
-        fabMain.show()
+        fabMain(activity).show()
     }
 
-    private fun setMainFabToMultiOption() {
-        fabMain.setImageDrawable(
+    private fun setMainFabToMultiOption(activity: Activity) {
+        val fab = fabMain(activity)
+        fab.setImageDrawable(
             ResourcesCompat.getDrawable(
                 activity.resources, android.R.drawable.ic_input_add, activity.theme
             )
         )
 
-        fabMain.setOnClickListener {
+        fab.setOnClickListener {
             if (allFabAreHidden) {
-                showAllFab()
+                showAllFab(activity)
             } else {
-                hideAllFab()
+                hideAllFab(activity)
             }
         }
 
-        fabMain.show()
+        fab.show()
     }
 
-    override fun setFabItems(vararg fabOptions: FabHandler.FabOption) {
+    override fun setFabItems(activity: Activity, vararg fabOptions: FabHandler.FabOption) {
         fabEntries = fabOptions.distinctBy { it.name }.toMutableList()
         when (fabEntries.count()) {
-            0 -> fabMain.hide()
-            1 -> setMainFabToSingleOption()
-            else -> setMainFabToMultiOption()
+            0 -> fabMain(activity).hide()
+            1 -> setMainFabToSingleOption(activity)
+            else -> setMainFabToMultiOption(activity)
         }
 
-        hideAllFab()
-        setFabOnClickListener(FabHandler.FabOption.ADD_SHOP) {
+        hideAllFab(activity)
+        setFabOnClickListener(activity, FabHandler.FabOption.ADD_SHOP) {
             val bundle = Bundler().makeAddLocationBundle()
             activity.findNavController(R.id.nav_host_fragment_content_main)
                 .navigate(R.id.nav_add_shop, bundle)

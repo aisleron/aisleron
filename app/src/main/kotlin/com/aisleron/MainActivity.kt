@@ -19,9 +19,10 @@ import com.aisleron.databinding.ActivityMainBinding
 import com.aisleron.ui.AddEditFragmentListener
 import com.aisleron.ui.FabHandlerImpl
 import com.aisleron.ui.settings.DisplayPreferences
-import com.aisleron.ui.settings.DisplayPreferencesImpl
-import com.aisleron.ui.settings.WelcomePreferencesImpl
+import com.aisleron.ui.settings.WelcomePreferences
 import com.google.android.material.navigation.NavigationView
+import org.koin.android.ext.android.inject
+import org.koin.androidx.fragment.android.setupKoinFragmentFactory
 
 
 class MainActivity : AppCompatActivity(), AddEditFragmentListener {
@@ -30,19 +31,20 @@ class MainActivity : AppCompatActivity(), AddEditFragmentListener {
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        setupKoinFragmentFactory()
+
         super.onCreate(savedInstanceState)
 
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
         //TODO: prefs.registerOnSharedPreferenceChangeListener(this)
 
-        val displayPreferences = DisplayPreferencesImpl(prefs)
-        val welcomePreferences = WelcomePreferencesImpl(prefs)
+        val displayPreferences: DisplayPreferences by inject()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-            setShowWhenLocked(displayPreferences.showOnLockScreen)
+            setShowWhenLocked(displayPreferences.showOnLockScreen(this))
         }
 
-        when (displayPreferences.applicationTheme) {
+        when (displayPreferences.applicationTheme(this)) {
             DisplayPreferences.ApplicationTheme.LIGHT_THEME ->
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
 
@@ -79,10 +81,11 @@ class MainActivity : AppCompatActivity(), AddEditFragmentListener {
 
         navController.addOnDestinationChangedListener { _, _, _ ->
             drawerLayout.closeDrawers()
-            FabHandlerImpl(this).setFabItems()
+            FabHandlerImpl().setFabItems(this)
         }
 
-        if (!welcomePreferences.isInitialized) {
+        val welcomePreferences: WelcomePreferences by inject()
+        if (!welcomePreferences.isInitialized(this)) {
             navController.navigate(R.id.nav_welcome)
         }
     }
@@ -104,10 +107,6 @@ class MainActivity : AppCompatActivity(), AddEditFragmentListener {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         return item.onNavDestinationSelected(navController) || super.onOptionsItemSelected(item)
-    }
-
-    override fun applicationTitleUpdated(newTitle: String) {
-        supportActionBar?.title = newTitle
     }
 
     override fun addEditActionCompleted() {

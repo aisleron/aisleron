@@ -17,6 +17,7 @@ import com.aisleron.data.TestDataManager
 import com.aisleron.di.KoinTestRule
 import com.aisleron.di.TestAppModules
 import com.aisleron.ui.AddEditFragmentListener
+import com.aisleron.ui.ApplicationTitleUpdateListenerTestImpl
 import com.aisleron.ui.FabHandlerTestImpl
 import com.aisleron.ui.bundles.Bundler
 import kotlinx.coroutines.runBlocking
@@ -29,6 +30,7 @@ import org.koin.core.module.Module
 class ProductFragmentTest {
     private lateinit var bundler: Bundler
     private lateinit var addEditFragmentListener: TestAddEditFragmentListener
+    private lateinit var applicationTitleUpdateListener: ApplicationTitleUpdateListenerTestImpl
     private lateinit var testData: TestDataManager
     private lateinit var fabHandler: FabHandlerTestImpl
 
@@ -46,6 +48,7 @@ class ProductFragmentTest {
     fun setUp() {
         bundler = Bundler()
         addEditFragmentListener = TestAddEditFragmentListener()
+        applicationTitleUpdateListener = ApplicationTitleUpdateListenerTestImpl()
         fabHandler = FabHandlerTestImpl()
     }
 
@@ -56,7 +59,7 @@ class ProductFragmentTest {
         scenario.onFragment {
             Assert.assertEquals(
                 it.getString(R.string.edit_product),
-                addEditFragmentListener.appTitle
+                applicationTitleUpdateListener.appTitle
             )
         }
     }
@@ -81,7 +84,7 @@ class ProductFragmentTest {
         scenario.onFragment {
             Assert.assertEquals(
                 it.getString(R.string.add_product),
-                addEditFragmentListener.appTitle
+                applicationTitleUpdateListener.appTitle
             )
         }
     }
@@ -208,19 +211,20 @@ class ProductFragmentTest {
         val scenario = launchFragmentInContainer<ProductFragment>(
             fragmentArgs = bundle,
             themeResId = R.style.Theme_Aisleron,
-            instantiate = { ProductFragment(addEditFragmentListener, fabHandler) }
+            instantiate = {
+                ProductFragment(
+                    addEditFragmentListener,
+                    applicationTitleUpdateListener,
+                    fabHandler
+                )
+            }
         )
 
         return scenario
     }
 
     class TestAddEditFragmentListener : AddEditFragmentListener {
-        var appTitle: String = ""
         var addEditSuccess: Boolean = false
-        override fun applicationTitleUpdated(newTitle: String) {
-            appTitle = newTitle
-        }
-
         override fun addEditActionCompleted() {
             addEditSuccess = true
         }

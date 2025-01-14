@@ -5,15 +5,14 @@ import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import androidx.preference.PreferenceManager
 import com.aisleron.R
+import com.aisleron.databinding.FragmentWelcomeBinding
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.ui.AddEditFragmentListener
 import com.aisleron.ui.AisleronExceptionMap
@@ -27,19 +26,16 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class WelcomeFragment(
-    fabHandler: FabHandler? = null,
-    private val welcomePreferences: WelcomePreferences? = null,
+    private val fabHandler: FabHandler,
+    private val welcomePreferences: WelcomePreferences,
     private val addEditFragmentListener: AddEditFragmentListener? = null,
 
     ) : Fragment() {
 
-    private val _fabHandler = fabHandler
-    private lateinit var _welcomePreferences: WelcomePreferences
     private lateinit var _addEditFragmentListener: AddEditFragmentListener
 
-
     companion object {
-        fun newInstance() = WelcomeFragment()
+        fun newInstance() = WelcomeFragment(FabHandlerImpl(), WelcomePreferencesImpl())
     }
 
     private val viewModel: WelcomeViewModel by viewModel()
@@ -51,8 +47,7 @@ class WelcomeFragment(
     }
 
     private fun initializeFab() {
-        val fabHandler = _fabHandler ?: FabHandlerImpl(this.requireActivity())
-        fabHandler.setFabItems()
+        fabHandler.setFabItems(this.requireActivity())
     }
 
     override fun onCreateView(
@@ -61,43 +56,37 @@ class WelcomeFragment(
     ): View {
         initializeFab()
 
-        _welcomePreferences = welcomePreferences ?: WelcomePreferencesImpl(
-            PreferenceManager.getDefaultSharedPreferences(requireContext())
-        )
-
         _addEditFragmentListener =
             addEditFragmentListener ?: (this.requireActivity() as AddEditFragmentListener)
 
-        val view = inflater.inflate(R.layout.fragment_welcome, container, false)
+        val binding = FragmentWelcomeBinding.inflate(inflater, container, false)
 
-        val txtWelcomeLoadSampleItems: TextView = view.findViewById(R.id.txt_welcome_load_sample_items)
-        txtWelcomeLoadSampleItems.text =
-            Html.fromHtml(getString(R.string.welcome_load_sample_items), FROM_HTML_MODE_LEGACY)
+        with(binding.txtWelcomeLoadSampleItems) {
+            text =
+                Html.fromHtml(getString(R.string.welcome_load_sample_items), FROM_HTML_MODE_LEGACY)
 
-        txtWelcomeLoadSampleItems.setOnClickListener { _ ->
-            viewModel.createSampleData()
+            setOnClickListener { _ ->
+                viewModel.createSampleData()
+            }
         }
 
-        val txtWelcomeAddOwnProduct: TextView = view.findViewById(R.id.txt_welcome_add_own_product)
-        txtWelcomeAddOwnProduct.text =
-            Html.fromHtml(getString(R.string.welcome_add_own_product), FROM_HTML_MODE_LEGACY)
-
-        txtWelcomeAddOwnProduct.setOnClickListener { _ ->
-            _welcomePreferences.setInitialised()
-            _addEditFragmentListener.addEditActionCompleted()
+        with(binding.txtWelcomeAddOwnProduct) {
+            text = Html.fromHtml(getString(R.string.welcome_add_own_product), FROM_HTML_MODE_LEGACY)
+            setOnClickListener { _ ->
+                welcomePreferences.setInitialised(requireContext())
+                _addEditFragmentListener.addEditActionCompleted()
+            }
         }
 
-        val txtWelcomeImportDb: TextView = view.findViewById(R.id.txt_welcome_import_db)
-        txtWelcomeImportDb.text =
-            Html.fromHtml(getString(R.string.welcome_import_db), FROM_HTML_MODE_LEGACY)
-
-        txtWelcomeImportDb.setOnClickListener { _ ->
-            _welcomePreferences.setInitialised()
-            val navController = this.findNavController()
-            navController.popBackStack(R.id.nav_welcome, true)
-            navController.navigate(R.id.nav_settings)
+        with(binding.txtWelcomeImportDb) {
+            text = Html.fromHtml(getString(R.string.welcome_import_db), FROM_HTML_MODE_LEGACY)
+            setOnClickListener { _ ->
+                welcomePreferences.setInitialised(requireContext())
+                val navController = this@WelcomeFragment.findNavController()
+                navController.popBackStack(R.id.nav_welcome, true)
+                navController.navigate(R.id.nav_settings)
+            }
         }
-
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -108,7 +97,7 @@ class WelcomeFragment(
                         }
 
                         is WelcomeViewModel.WelcomeUiState.SampleDataLoaded -> {
-                            _welcomePreferences.setInitialised()
+                            welcomePreferences.setInitialised(requireContext())
                             _addEditFragmentListener.addEditActionCompleted()
                         }
 
@@ -118,7 +107,7 @@ class WelcomeFragment(
             }
         }
 
-        return view
+        return binding.root
     }
 
     private fun displayErrorSnackBar(
