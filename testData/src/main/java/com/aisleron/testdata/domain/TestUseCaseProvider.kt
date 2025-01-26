@@ -29,7 +29,7 @@ import com.aisleron.domain.product.usecase.IsProductNameUniqueUseCase
 import com.aisleron.domain.product.usecase.RemoveProductUseCase
 import com.aisleron.domain.product.usecase.UpdateProductStatusUseCaseImpl
 import com.aisleron.domain.product.usecase.UpdateProductUseCase
-import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
+import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCaseImpl
 import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
 
 class TestUseCaseProvider(testData: TestDataManager) {
@@ -118,7 +118,7 @@ class TestUseCaseProvider(testData: TestDataManager) {
     /**
      * Welcome Use Cases
      */
-    val createSampleDataUseCase = CreateSampleDataUseCase(
+    val createSampleDataUseCase = CreateSampleDataUseCaseImpl(
         addProductUseCase = addProductUseCase,
         addAisleUseCase = addAisleUseCase,
         getShoppingListUseCase = getShoppingListUseCase,

@@ -62,6 +62,7 @@ import com.aisleron.domain.product.usecase.UpdateProductStatusUseCase
 import com.aisleron.domain.product.usecase.UpdateProductStatusUseCaseImpl
 import com.aisleron.domain.product.usecase.UpdateProductUseCase
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
+import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCaseImpl
 import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
 import com.aisleron.ui.AddEditFragmentListener
 import com.aisleron.ui.AddEditFragmentListenerImpl
@@ -277,7 +278,7 @@ val appModule = module {
      * Sample Data Use Cases
      */
     factory<CreateSampleDataUseCase> {
-        CreateSampleDataUseCase(
+        CreateSampleDataUseCaseImpl(
             addProductUseCase = get(),
             addAisleUseCase = get(),
             getShoppingListUseCase = get(),

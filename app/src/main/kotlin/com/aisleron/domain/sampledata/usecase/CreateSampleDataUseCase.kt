@@ -16,7 +16,11 @@ import com.aisleron.domain.product.usecase.GetAllProductsUseCase
 import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
 import kotlinx.coroutines.flow.first
 
-class CreateSampleDataUseCase(
+interface CreateSampleDataUseCase {
+    suspend operator fun invoke()
+}
+
+class CreateSampleDataUseCaseImpl(
     private val addProductUseCase: AddProductUseCase,
     private val addAisleUseCase: AddAisleUseCase,
     private val getShoppingListUseCase: GetShoppingListUseCase,
@@ -24,7 +28,7 @@ class CreateSampleDataUseCase(
     private val addLocationUseCase: AddLocationUseCase,
     private val getAllProductsUseCase: GetAllProductsUseCase,
     private val getHomeLocationUseCase: GetHomeLocationUseCase
-) {
+) : CreateSampleDataUseCase{
 
     companion object {
         private const val PRD_FROZEN_VEGES = "Frozen Vegetables"
@@ -54,7 +58,7 @@ class CreateSampleDataUseCase(
         private const val SHOP_AISLE_FROZEN_FOODS = "Frozen Foods"
     }
 
-    suspend operator fun invoke() {
+    override suspend operator fun invoke() {
         val products = getAllProductsUseCase()
         if (products.isNotEmpty()) {
             throw AisleronException.SampleDataCreationException("Cannot load sample data into an existing database")

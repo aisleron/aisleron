@@ -39,7 +39,7 @@ class WelcomeViewModel(
 
     sealed class WelcomeUiState {
         data object Empty : WelcomeUiState()
-        data object SampleDataLoaded: WelcomeUiState()
+        data object SampleDataLoaded : WelcomeUiState()
 
         //data object Loading : WelcomeUiState()
         data class Error(
