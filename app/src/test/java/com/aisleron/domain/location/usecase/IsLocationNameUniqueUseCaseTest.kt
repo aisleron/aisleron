@@ -72,7 +72,9 @@ class IsLocationNameUniqueUseCaseTest {
         @BeforeAll
         fun beforeSpec() {
             testData = TestDataManager()
-            existingLocation = runBlocking { testData.locationRepository.get(1)!! }
+            existingLocation = runBlocking {
+                testData.locationRepository.getAll().first { it.type == LocationType.SHOP }
+            }
         }
     }
 }

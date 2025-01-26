@@ -20,9 +20,7 @@ import com.aisleron.domain.base.AisleronException
 import com.aisleron.ui.AddEditFragmentListener
 import com.aisleron.ui.AisleronExceptionMap
 import com.aisleron.ui.ApplicationTitleUpdateListener
-import com.aisleron.ui.ApplicationTitleUpdateListenerImpl
 import com.aisleron.ui.FabHandler
-import com.aisleron.ui.FabHandlerImpl
 import com.aisleron.ui.bundles.AddEditProductBundle
 import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.widgets.ErrorSnackBar
@@ -136,10 +134,12 @@ class ProductFragment(
         fun newInstance(
             name: String?,
             inStock: Boolean,
-            addEditFragmentListener: AddEditFragmentListener
+            addEditFragmentListener: AddEditFragmentListener,
+            applicationTitleUpdateListener: ApplicationTitleUpdateListener,
+            fabHandler: FabHandler
         ) =
             ProductFragment(
-                addEditFragmentListener, ApplicationTitleUpdateListenerImpl(), FabHandlerImpl()
+                addEditFragmentListener, applicationTitleUpdateListener, fabHandler
             ).apply {
                 arguments = Bundler().makeAddProductBundle(name, inStock)
             }

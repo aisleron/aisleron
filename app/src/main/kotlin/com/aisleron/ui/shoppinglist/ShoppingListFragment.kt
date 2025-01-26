@@ -31,10 +31,8 @@ import com.aisleron.domain.location.LocationType
 import com.aisleron.ui.AisleronExceptionMap
 import com.aisleron.ui.ApplicationTitleUpdateListener
 import com.aisleron.ui.FabHandler
-import com.aisleron.ui.FabHandlerImpl
 import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.settings.ShoppingListPreferences
-import com.aisleron.ui.settings.ShoppingListPreferencesImpl
 import com.aisleron.ui.widgets.ErrorSnackBar
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
@@ -380,12 +378,14 @@ class ShoppingListFragment(
 
         @JvmStatic
         fun newInstance(
-            applicationTitleUpdateListener: ApplicationTitleUpdateListener,
             locationId: Long,
-            filterType: FilterType
+            filterType: FilterType,
+            applicationTitleUpdateListener: ApplicationTitleUpdateListener,
+            fabHandler: FabHandler,
+            shoppingListPreferences: ShoppingListPreferences
         ) =
             ShoppingListFragment(
-                applicationTitleUpdateListener, FabHandlerImpl(), ShoppingListPreferencesImpl()
+                applicationTitleUpdateListener, fabHandler, shoppingListPreferences
             ).apply {
                 arguments = Bundle().apply {
                     putInt(ARG_LOCATION_ID, locationId.toInt())

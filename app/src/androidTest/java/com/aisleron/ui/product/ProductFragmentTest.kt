@@ -196,7 +196,13 @@ class ProductFragmentTest {
     @Test
     fun newInstance_CallNewInstance_ReturnsFragment() {
         val fragment =
-            ProductFragment.newInstance(null, false, addEditFragmentListener)
+            ProductFragment.newInstance(
+                null,
+                false,
+                addEditFragmentListener,
+                applicationTitleUpdateListener,
+                fabHandler
+            )
         Assert.assertNotNull(fragment)
     }
 

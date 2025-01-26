@@ -22,7 +22,6 @@ import com.aisleron.R
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.ui.AisleronExceptionMap
 import com.aisleron.ui.FabHandler
-import com.aisleron.ui.FabHandlerImpl
 import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.widgets.ErrorSnackBar
 import com.google.android.material.snackbar.Snackbar
@@ -172,8 +171,8 @@ class ShopListFragment(private val fabHandler: FabHandler) : Fragment(), ActionM
         const val ARG_COLUMN_COUNT = "column-count"
 
         @JvmStatic
-        fun newInstance(columnCount: Int) =
-            ShopListFragment(FabHandlerImpl()).apply {
+        fun newInstance(columnCount: Int, fabHandler: FabHandler) =
+            ShopListFragment(fabHandler).apply {
                 arguments = Bundle().apply {
                     putInt(ARG_COLUMN_COUNT, columnCount)
                 }

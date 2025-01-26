@@ -18,9 +18,9 @@ import androidx.preference.PreferenceManager
 import com.aisleron.databinding.ActivityMainBinding
 import com.aisleron.ui.FabHandlerImpl
 import com.aisleron.ui.settings.DisplayPreferences
-import com.aisleron.ui.settings.WelcomePreferences
+import com.aisleron.ui.settings.DisplayPreferencesImpl
+import com.aisleron.ui.settings.WelcomePreferencesImpl
 import com.google.android.material.navigation.NavigationView
-import org.koin.android.ext.android.inject
 import org.koin.androidx.fragment.android.setupKoinFragmentFactory
 
 
@@ -37,7 +37,7 @@ class MainActivity : AppCompatActivity() {
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
         //TODO: prefs.registerOnSharedPreferenceChangeListener(this)
 
-        val displayPreferences: DisplayPreferences by inject()
+        val displayPreferences = DisplayPreferencesImpl()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
             setShowWhenLocked(displayPreferences.showOnLockScreen(this))
@@ -83,8 +83,7 @@ class MainActivity : AppCompatActivity() {
             FabHandlerImpl().setFabItems(this)
         }
 
-        val welcomePreferences: WelcomePreferences by inject()
-        if (!welcomePreferences.isInitialized(this)) {
+        if (!WelcomePreferencesImpl().isInitialized(this)) {
             navController.navigate(R.id.nav_welcome)
         }
     }

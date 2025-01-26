@@ -26,7 +26,7 @@ import com.aisleron.domain.product.usecase.GetAllProductsUseCase
 import com.aisleron.testdata.data.maintenance.DatabaseMaintenanceTestImpl
 import kotlinx.coroutines.runBlocking
 
-class TestDataManager {
+class TestDataManager(private val addData: Boolean = true) {
 
     private val productDao = ProductDaoTestImpl()
     private val aisleProductDao = AisleProductDaoTestImpl(productDao)
@@ -47,9 +47,12 @@ class TestDataManager {
 
     private fun initializeTestData() {
         runBlocking {
-            addProducts()
-            addLocations()
-            addAisles()
+            DbInitializer(locationDao, aisleDao, this).invoke()
+            if (addData) {
+                addProducts()
+                addShops()
+                addAisles()
+            }
         }
     }
 
@@ -78,7 +81,7 @@ class TestDataManager {
         }
     }
 
-    private suspend fun addLocations() {
+    private suspend fun addShops() {
         val addLocationUseCase = AddLocationUseCaseImpl(
             locationRepository,
             AddAisleUseCaseImpl(aisleRepository, GetLocationUseCase(locationRepository)),
@@ -89,7 +92,7 @@ class TestDataManager {
 
         addLocationUseCase(
             Location(
-                id = 1,
+                id = 0,
                 type = LocationType.SHOP,
                 defaultFilter = FilterType.NEEDED,
                 name = "Shop 1",
@@ -100,7 +103,7 @@ class TestDataManager {
 
         addLocationUseCase(
             Location(
-                id = 2,
+                id = 0,
                 type = LocationType.SHOP,
                 defaultFilter = FilterType.NEEDED,
                 name = "Shop 2",
@@ -111,22 +114,11 @@ class TestDataManager {
 
         addLocationUseCase(
             Location(
-                id = 3,
+                id = 0,
                 type = LocationType.SHOP,
                 defaultFilter = FilterType.NEEDED,
                 name = "Shop 3",
                 pinned = true,
-                aisles = emptyList()
-            )
-        )
-
-        addLocationUseCase(
-            Location(
-                id = 4,
-                type = LocationType.HOME,
-                defaultFilter = FilterType.NEEDED,
-                name = "Home",
-                pinned = false,
                 aisles = emptyList()
             )
         )

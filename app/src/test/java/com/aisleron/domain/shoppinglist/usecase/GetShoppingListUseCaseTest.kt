@@ -2,6 +2,7 @@ package com.aisleron.domain.shoppinglist.usecase
 
 import com.aisleron.data.TestDataManager
 import com.aisleron.domain.location.Location
+import com.aisleron.domain.location.LocationType
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -50,7 +51,8 @@ class GetShoppingListUseCaseTest {
     fun getShoppingList_ExistingId_ReturnLocationWithProducts() {
         val shoppingList: Location?
         runBlocking {
-            val locationId = testData.locationRepository.getAll().first().id
+            val locationId =
+                testData.locationRepository.getAll().first { it.type == LocationType.SHOP }.id
             shoppingList = getShoppingListUseCase(locationId).first()
         }
         assertTrue(shoppingList!!.aisles.count { it.products.isNotEmpty() } > 0)

@@ -26,7 +26,7 @@ class DbInitializerTest {
         val testDispatcher = UnconfinedTestDispatcher()
         val testScope = TestScope(testDispatcher)
 
-        initializer = DbInitializer(db, testScope)
+        initializer = DbInitializer(db.locationDao(), db.aisleDao(), testScope)
     }
 
     @After
@@ -57,7 +57,7 @@ class DbInitializerTest {
 
     @Test
     fun constructor_NoCoroutineScopeProvided_DbInitializerReturned() {
-        val init = DbInitializer(db)
+        val init = DbInitializer(db.locationDao(), db.aisleDao())
         Assert.assertNotNull(init)
     }
 }

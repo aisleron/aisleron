@@ -20,9 +20,7 @@ import com.aisleron.domain.base.AisleronException
 import com.aisleron.ui.AddEditFragmentListener
 import com.aisleron.ui.AisleronExceptionMap
 import com.aisleron.ui.ApplicationTitleUpdateListener
-import com.aisleron.ui.ApplicationTitleUpdateListenerImpl
 import com.aisleron.ui.FabHandler
-import com.aisleron.ui.FabHandlerImpl
 import com.aisleron.ui.bundles.AddEditLocationBundle
 import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.widgets.ErrorSnackBar
@@ -131,10 +129,12 @@ class ShopFragment(
         @JvmStatic
         fun newInstance(
             name: String?,
-            addEditFragmentListener: AddEditFragmentListener
+            addEditFragmentListener: AddEditFragmentListener,
+            applicationTitleUpdateListener: ApplicationTitleUpdateListener,
+            fabHandler: FabHandler
         ) =
             ShopFragment(
-                addEditFragmentListener, ApplicationTitleUpdateListenerImpl(), FabHandlerImpl()
+                addEditFragmentListener, applicationTitleUpdateListener, fabHandler
             ).apply {
                 arguments = Bundler().makeAddLocationBundle(name)
             }

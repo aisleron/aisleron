@@ -33,9 +33,9 @@ import com.aisleron.di.TestAppModules
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationType
+import com.aisleron.ui.ApplicationTitleUpdateListenerTestImpl
 import com.aisleron.ui.FabHandler
 import com.aisleron.ui.FabHandlerTestImpl
-import com.aisleron.ui.ApplicationTitleUpdateListenerTestImpl
 import com.aisleron.ui.bundles.AddEditProductBundle
 import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.settings.ShoppingListPreferencesTestImpl
@@ -102,7 +102,13 @@ class ShoppingListFragmentTest {
     @Test
     fun newInstance_CallNewInstance_ReturnsFragment() {
         val fragment =
-            ShoppingListFragment.newInstance(applicationTitleUpdateListener, 1, FilterType.ALL)
+            ShoppingListFragment.newInstance(
+                1,
+                FilterType.ALL,
+                applicationTitleUpdateListener,
+                fabHandler,
+                ShoppingListPreferencesTestImpl()
+            )
         Assert.assertNotNull(fragment)
     }
 

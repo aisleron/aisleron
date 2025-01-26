@@ -22,7 +22,9 @@ class UpdateLocationUseCaseTest {
     fun setUp() {
         testData = TestDataManager()
 
-        existingLocation = runBlocking { testData.locationRepository.get(1)!! }
+        existingLocation = runBlocking {
+            testData.locationRepository.getAll().first { it.type == LocationType.SHOP }
+        }
 
         updateLocationUseCase = UpdateLocationUseCase(
             testData.locationRepository,
@@ -35,10 +37,10 @@ class UpdateLocationUseCaseTest {
         runBlocking {
             val id = testData.locationRepository.add(
                 Location(
-                    id = 2,
+                    id = 0,
                     type = LocationType.SHOP,
                     defaultFilter = FilterType.NEEDED,
-                    name = "Shop 2",
+                    name = "Shop 99",
                     pinned = false,
                     aisles = emptyList()
                 )

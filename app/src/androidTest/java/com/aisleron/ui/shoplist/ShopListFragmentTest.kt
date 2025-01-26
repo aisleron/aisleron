@@ -80,7 +80,7 @@ class ShopListFragmentTest {
     @Test
     fun newInstance_CallNewInstance_ReturnsFragment() {
         val fragment =
-            ShopListFragment.newInstance(3)
+            ShopListFragment.newInstance(3, fabHandler)
         Assert.assertNotNull(fragment)
     }
 

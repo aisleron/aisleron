@@ -15,12 +15,9 @@ import com.aisleron.R
 import com.aisleron.databinding.FragmentWelcomeBinding
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.ui.AddEditFragmentListener
-import com.aisleron.ui.AddEditFragmentListenerImpl
 import com.aisleron.ui.AisleronExceptionMap
 import com.aisleron.ui.FabHandler
-import com.aisleron.ui.FabHandlerImpl
 import com.aisleron.ui.settings.WelcomePreferences
-import com.aisleron.ui.settings.WelcomePreferencesImpl
 import com.aisleron.ui.widgets.ErrorSnackBar
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
@@ -33,8 +30,12 @@ class WelcomeFragment(
 ) : Fragment() {
 
     companion object {
-        fun newInstance() = WelcomeFragment(
-            FabHandlerImpl(), WelcomePreferencesImpl(), AddEditFragmentListenerImpl()
+        fun newInstance(
+            fabHandler: FabHandler,
+            welcomePreferences: WelcomePreferences,
+            addEditFragmentListener: AddEditFragmentListener
+        ) = WelcomeFragment(
+            fabHandler, welcomePreferences, addEditFragmentListener
         )
     }
 

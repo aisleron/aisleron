@@ -4,7 +4,7 @@
     <selectionStates>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-01-01T03:10:46.901142547Z">
+        <DropdownSelection timestamp="2025-01-15T09:13:44.883415253Z">
           <Target type="DEFAULT_BOOT">
             <handle>
               <DeviceId pluginId="LocalEmulator" identifier="path=/home/danie/.var/app/com.google.AndroidStudio/config/.android/avd/Test_Pixel_3a_API_34_AOSP.avd" />
@@ -13,20 +13,19 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="ShoppingListFragmentTest">
+      <SelectionState runConfigName="Tests in 'com.aisleron'">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="onProductStatusChange_StatusUpdateSnackBarDisabled_HideSnackBar()">
+      <SelectionState runConfigName="invoke_NewDatabase_HomeLocationAdded()">
         <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
-      <SelectionState runConfigName="onProductStatusChange_StatusUpdateSnackBarEnabled_ShowSnackBar()">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
-      <SelectionState runConfigName="ProductFragmentTest">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
-      <SelectionState runConfigName="ShopFragmentTest">
-        <option name="selectionMode" value="DROPDOWN" />
+        <DropdownSelection timestamp="2025-01-26T02:28:00.524645483Z">
+          <Target type="DEFAULT_BOOT">
+            <handle>
+              <DeviceId pluginId="LocalEmulator" identifier="path=/home/danie/.var/app/com.google.AndroidStudio/config/.android/avd/Test_Pixel_3a_API_34_AOSP.avd" />
+            </handle>
+          </Target>
+        </DropdownSelection>
+        <DialogSelection />
       </SelectionState>
     </selectionStates>
   </component>
