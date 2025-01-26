@@ -51,7 +51,7 @@ class GetShoppingListUseCaseTest {
     fun getShoppingList_ExistingId_ReturnLocationWithProducts() {
         val shoppingList: Location?
         runBlocking {
-            val locationId =
+           val locationId =
                 testData.locationRepository.getAll().first { it.type == LocationType.SHOP }.id
             shoppingList = getShoppingListUseCase(locationId).first()
         }

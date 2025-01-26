@@ -185,13 +185,15 @@ class ShoppingListViewModelTest {
 
     @Test
     fun updateProductStatus_InStockTrue_ProductUpdatedToInStock() {
-        val locationId = runBlocking { testData.locationRepository.getAll().first().id }
+        val locationId = runBlocking {
+            testData.locationRepository.getAll().first { it.type == LocationType.SHOP }.id
+        }
         val shoppingList = runBlocking {
             testData.locationRepository.getLocationWithAislesWithProducts(locationId)
                 .first()
         }
         val newInStock = true
-        val existingAisle = shoppingList!!.aisles[0]
+        val existingAisle = shoppingList!!.aisles.first { it.products.count { p -> !p.product.inStock } > 0 }
         val aisleProduct = existingAisle.products.first { it.product.inStock == !newInStock }
         val existingProduct =
             runBlocking { testData.productRepository.get(aisleProduct.product.id)!! }

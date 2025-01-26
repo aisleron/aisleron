@@ -33,6 +33,7 @@ import com.aisleron.di.TestAppModules
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationType
+import com.aisleron.domain.product.Product
 import com.aisleron.ui.ApplicationTitleUpdateListenerTestImpl
 import com.aisleron.ui.FabHandler
 import com.aisleron.ui.FabHandlerTestImpl
@@ -232,14 +233,13 @@ class ShoppingListFragmentTest {
             bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
         )
 
-        val productName =
-            shoppingList.aisles.first { it.products.isNotEmpty() }.products.first().product.name
+        val product = getProduct(shoppingList, false)
 
-        onView(withText(productName)).perform(longClick())
+        onView(withText(product.name)).perform(longClick())
 
         val actionBar = onView(withResourceName("action_mode_bar"))
         actionBar.check(matches(isDisplayed()))
-        actionBar.check(matches(hasDescendant(withText(productName))))
+        actionBar.check(matches(hasDescendant(withText(product.name))))
         actionBar.check(matches(hasDescendant(withId(R.id.mnu_edit_shopping_list_item))))
 
         openActionBarOverflowOrOptionsMenu(getInstrumentation().targetContext)
@@ -251,10 +251,9 @@ class ShoppingListFragmentTest {
         val shoppingList = getShoppingList()
         val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
         val scenario = getFragmentScenario(bundle)
-        val productName =
-            shoppingList.aisles.first { it.products.isNotEmpty() }.products.first().product.name
+        val product = getProduct(shoppingList, false)
 
-        val productItem = onView(allOf(withText(productName), withId(R.id.txt_product_name)))
+        val productItem = onView(allOf(withText(product.name), withId(R.id.txt_product_name)))
         productItem.perform(longClick())
         productItem.perform(click())
         sleep(500)
@@ -271,10 +270,9 @@ class ShoppingListFragmentTest {
         val shoppingList = getShoppingList()
         val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
         val scenario = getFragmentScenario(bundle)
-        val productName =
-            shoppingList.aisles.first { it.products.isNotEmpty() }.products.first().product.name
+        val product = getProduct(shoppingList, false)
 
-        val productItem = onView(allOf(withText(productName), withId(R.id.txt_product_name)))
+        val productItem = onView(allOf(withText(product.name), withId(R.id.txt_product_name)))
         productItem.perform(longClick())
         pressBack()
         sleep(500)
@@ -289,17 +287,16 @@ class ShoppingListFragmentTest {
     @Test
     fun onActionItemClicked_ActionItemIsDelete_DeleteDialogShown() {
         val shoppingList = getShoppingList()
-        val productName =
-            shoppingList.aisles.first { it.products.isNotEmpty() }.products.first().product.name
+        val product = getProduct(shoppingList, false)
         val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
         val scenario = getFragmentScenario(bundle)
         var deleteConfirmMessage = ""
 
         scenario.onFragment { fragment ->
-            deleteConfirmMessage = fragment.getString(R.string.delete_confirmation, productName)
+            deleteConfirmMessage = fragment.getString(R.string.delete_confirmation, product.name)
         }
 
-        val productItem = onView(allOf(withText(productName), withId(R.id.txt_product_name)))
+        val productItem = onView(allOf(withText(product.name), withId(R.id.txt_product_name)))
         productItem.perform(longClick())
         openActionBarOverflowOrOptionsMenu(getInstrumentation().targetContext)
         onView(withText(R.string.delete)).perform(click())
@@ -312,13 +309,12 @@ class ShoppingListFragmentTest {
     @Test
     fun onActionItemClicked_DeleteConfirmedOnProduct_ProductDeleted() {
         val shoppingList = getShoppingList()
-        val productName =
-            shoppingList.aisles.first { it.products.isNotEmpty() }.products.first().product.name
+        val product = getProduct(shoppingList, false)
         val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
 
         getFragmentScenario(bundle)
 
-        val productItem = onView(allOf(withText(productName), withId(R.id.txt_product_name)))
+        val productItem = onView(allOf(withText(product.name), withId(R.id.txt_product_name)))
         productItem.perform(longClick())
         openActionBarOverflowOrOptionsMenu(getInstrumentation().targetContext)
         onView(withText(R.string.delete)).perform(click())
@@ -327,7 +323,7 @@ class ShoppingListFragmentTest {
             .check(matches(isDisplayed()))
             .perform(click())
 
-        val deletedProduct = runBlocking { testData.productRepository.getByName(productName) }
+        val deletedProduct = runBlocking { testData.productRepository.getByName(product.name) }
         Assert.assertNull(deletedProduct)
     }
 
@@ -401,8 +397,7 @@ class ShoppingListFragmentTest {
     @Test
     fun onActionItemClicked_ActionItemIsEditOnProduct_NavigateToEditProduct() {
         val shoppingList = getShoppingList()
-        val product =
-            shoppingList.aisles.first { it.products.isNotEmpty() }.products.first().product
+        val product = getProduct(shoppingList, false)
         val shoppingListBundle =
             bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
 
@@ -428,8 +423,7 @@ class ShoppingListFragmentTest {
     @Test
     fun onProductStatusChange_SetProductInStock_ProductStatusToggled() {
         val shoppingList = getShoppingList()
-        val product =
-            shoppingList.aisles.first { it.products.isNotEmpty() }.products.first { !it.product.inStock }.product
+        val product = getProduct(shoppingList, false)
         val shoppingListBundle =
             bundler.makeShoppingListBundle(shoppingList.id, FilterType.NEEDED)
 
@@ -449,8 +443,7 @@ class ShoppingListFragmentTest {
     @Test
     fun onProductStatusChange_SetProductNeeded_ProductStatusToggled() {
         val shoppingList = getShoppingList()
-        val product =
-            shoppingList.aisles.first { it.products.isNotEmpty() }.products.first { it.product.inStock }.product
+        val product = getProduct(shoppingList, true)
         val shoppingListBundle =
             bundler.makeShoppingListBundle(shoppingList.id, FilterType.IN_STOCK)
 
@@ -471,7 +464,7 @@ class ShoppingListFragmentTest {
     fun onSwipe_IsProduct_ProductStatusToggled() {
         val shoppingList = getShoppingList()
         val product =
-            shoppingList.aisles.first { it.products.isNotEmpty() }.products.first { !it.product.inStock }.product
+            getProduct(shoppingList, false)
         val shoppingListBundle =
             bundler.makeShoppingListBundle(shoppingList.id, FilterType.NEEDED)
 
@@ -486,6 +479,14 @@ class ShoppingListFragmentTest {
 
         val updatedProduct = runBlocking { testData.productRepository.get(product.id) }
         assertEquals(!product.inStock, updatedProduct?.inStock)
+    }
+
+    private fun getProduct(shoppingList: Location, inStock: Boolean): Product {
+        val product =
+            shoppingList.aisles.first {
+                it.products.count { ap -> ap.product.inStock == inStock } > 0 && !it.isDefault
+            }.products.first { it.product.inStock == inStock }.product
+        return product
     }
 
     @Test
@@ -743,8 +744,7 @@ class ShoppingListFragmentTest {
     @Test
     fun onProductStatusChange_StatusUpdateSnackBarEnabled_ShowSnackBar() {
         val shoppingList = getShoppingList()
-        val product =
-            shoppingList.aisles.first { it.products.isNotEmpty() }.products.first { !it.product.inStock }.product
+        val product = getProduct(shoppingList, false)
         val shoppingListBundle =
             bundler.makeShoppingListBundle(shoppingList.id, FilterType.NEEDED)
 
@@ -772,8 +772,7 @@ class ShoppingListFragmentTest {
     @Test
     fun onProductStatusChange_StatusUpdateSnackBarDisabled_HideSnackBar() {
         val shoppingList = getShoppingList()
-        val product =
-            shoppingList.aisles.first { it.products.isNotEmpty() }.products.first { !it.product.inStock }.product
+        val product = getProduct(shoppingList, false)
         val shoppingListBundle =
             bundler.makeShoppingListBundle(shoppingList.id, FilterType.NEEDED)
 
@@ -795,8 +794,7 @@ class ShoppingListFragmentTest {
     @Test
     fun onProductStatusChange_StatusUpdateSnackBarUndoClicked_ProductStatusChanged() {
         val shoppingList = getShoppingList()
-        val product =
-            shoppingList.aisles.first { it.products.isNotEmpty() }.products.first { !it.product.inStock }.product
+        val product = getProduct(shoppingList, false)
         val shoppingListBundle =
             bundler.makeShoppingListBundle(shoppingList.id, FilterType.NEEDED)
 

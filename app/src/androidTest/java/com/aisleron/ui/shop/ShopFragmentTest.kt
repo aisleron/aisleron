@@ -17,6 +17,7 @@ import com.aisleron.data.TestDataManager
 import com.aisleron.di.KoinTestRule
 import com.aisleron.domain.aisle.usecase.AddAisleUseCaseImpl
 import com.aisleron.domain.aisleproduct.usecase.AddAisleProductsUseCase
+import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.location.usecase.AddLocationUseCaseImpl
 import com.aisleron.domain.location.usecase.GetLocationUseCase
 import com.aisleron.domain.location.usecase.IsLocationNameUniqueUseCase
@@ -203,7 +204,7 @@ class ShopFragmentTest {
     @Test
     fun onSaveClick_IsDuplicateName_ShowErrorSnackBar() {
         val existingShop = runBlocking {
-            testData.locationRepository.getAll().first()
+            testData.locationRepository.getAll().first { it.type == LocationType.SHOP }
         }
 
         val bundle = bundler.makeAddLocationBundle()

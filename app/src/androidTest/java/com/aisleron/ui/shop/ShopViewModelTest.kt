@@ -4,6 +4,7 @@ import com.aisleron.data.TestDataManager
 import com.aisleron.domain.TestUseCaseProvider
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.location.Location
+import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.location.usecase.AddLocationUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
@@ -93,7 +94,8 @@ class ShopViewModelTest(private val pinned: Boolean) {
 
     @Test
     fun testSaveLocation_AisleronErrorOnSave_UiStateIsError() = runTest {
-        val existingLocation: Location = testData.locationRepository.getAll().first()
+        val existingLocation: Location =
+            testData.locationRepository.getAll().first { it.type == LocationType.SHOP }
 
         shopViewModel.hydrate(0)
         shopViewModel.saveLocation(existingLocation.name, pinned)
