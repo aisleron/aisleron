@@ -13,19 +13,19 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="welcomePage_SelectRestoreDatabase_NavigateToSettings()">
+      <SelectionState runConfigName="appStarted_SetToLightTheme_ReturnLightThemeEnum()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="selectedImport_BackPressedOnSettings_ReturnToMainScreen()">
+      <SelectionState runConfigName="DisplayPreferencesImplTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="welcomePage_BackPressed_InitializeOptionNotSet()">
+      <SelectionState runConfigName="appStart_LightApplicationThemeSet_UseLightTheme()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="ProductViewModelTest">
+      <SelectionState runConfigName="appStart_DarkApplicationThemeSet_UseDarkTheme()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="AboutIntentsTest">
+      <SelectionState runConfigName="MainActivityTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

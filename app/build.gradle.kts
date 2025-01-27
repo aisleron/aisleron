@@ -111,8 +111,8 @@ dependencies {
     implementation("androidx.navigation:navigation-ui-ktx:2.8.5")
     implementation("androidx.preference:preference-ktx:1.2.1")
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
-    implementation("androidx.recyclerview:recyclerview:1.3.2")
-    implementation("androidx.datastore:datastore-preferences:1.1.1")
+    implementation("androidx.recyclerview:recyclerview:1.4.0")
+    implementation("androidx.datastore:datastore-preferences:1.1.2")
     implementation("androidx.fragment:fragment-ktx:1.8.5")
     implementation("androidx.databinding:databinding-runtime:8.8.0")
     implementation("androidx.navigation:navigation-testing:2.8.5")
@@ -127,7 +127,7 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
     androidTestImplementation(project(":testData"))
     androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.1")
-    androidTestImplementation("io.insert-koin:koin-test:4.0.1")
+    androidTestImplementation("io.insert-koin:koin-test:4.0.2")
     androidTestImplementation("androidx.test:core-ktx:1.6.1")
     androidTestImplementation("androidx.test.espresso:espresso-intents:3.6.1")
     debugImplementation("androidx.fragment:fragment-testing:1.8.5")
@@ -138,7 +138,7 @@ dependencies {
     ksp("androidx.room:room-compiler:2.6.1")
 
     //Koin
-    implementation("io.insert-koin:koin-android:4.0.1")
+    implementation("io.insert-koin:koin-android:4.0.2")
 
     //Coroutines
     implementation("androidx.room:room-ktx:2.6.1")

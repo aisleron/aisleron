@@ -42,7 +42,7 @@ class SearchBoxTest {
 
     @Before
     fun setUp() {
-        SharedPreferencesInitializer().invoke(isInitialized = true)
+        SharedPreferencesInitializer().setIsInitialized(true)
         scenario = ActivityScenario.launch(MainActivity::class.java)
     }
 

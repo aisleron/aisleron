@@ -88,7 +88,7 @@ class WelcomeFragmentTest {
 
     @Test
     fun applicationStarted_AppNotInitialized_WelcomeScreenDisplayed() {
-        SharedPreferencesInitializer().invoke(isInitialized = false)
+        SharedPreferencesInitializer().setIsInitialized(false)
         val scenario = ActivityScenario.launch(MainActivity::class.java)
         scenario.use { s ->
             s.onActivity { a ->
@@ -102,7 +102,7 @@ class WelcomeFragmentTest {
 
     @Test
     fun applicationStarted_AppInitialized_WelcomeScreenNotDisplayed() {
-        SharedPreferencesInitializer().invoke(isInitialized = true)
+        SharedPreferencesInitializer().setIsInitialized(true)
         val scenario = ActivityScenario.launch(MainActivity::class.java)
         scenario.use { s ->
             s.onActivity { a ->
@@ -273,7 +273,7 @@ class WelcomeFragmentTest {
 
     @Test
     fun selectedDbImport_BackPressedOnSettings_ReturnToMainScreen() {
-        SharedPreferencesInitializer().invoke(isInitialized = false)
+        SharedPreferencesInitializer().setIsInitialized(false)
         val scenario = ActivityScenario.launch(MainActivity::class.java)
 
         val welcomeOption = onView(withId(R.id.txt_welcome_import_db))
@@ -291,7 +291,7 @@ class WelcomeFragmentTest {
 
     @Test
     fun welcomePage_BackPressed_InitializeOptionNotSet() {
-        SharedPreferencesInitializer().invoke(isInitialized = false)
+        SharedPreferencesInitializer().setIsInitialized(false)
         val scenario = ActivityScenario.launch(MainActivity::class.java)
 
         val welcomeOption = onView(withId(R.id.txt_welcome_import_db))
