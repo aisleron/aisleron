@@ -16,7 +16,7 @@ import com.aisleron.ui.settings.SettingsViewModel
 import com.aisleron.ui.settings.ShoppingListPreferences
 import com.aisleron.ui.settings.ShoppingListPreferencesTestImpl
 import com.aisleron.ui.settings.WelcomePreferences
-import com.aisleron.ui.settings.WelcomePreferencesImpl
+import com.aisleron.ui.settings.WelcomePreferencesTestImpl
 import com.aisleron.ui.shop.ShopFragment
 import com.aisleron.ui.shop.ShopViewModel
 import com.aisleron.ui.shoplist.ShopListFragment
@@ -103,7 +103,7 @@ class TestAppModules {
 
                 factory<ShoppingListPreferences> { ShoppingListPreferencesTestImpl() }
 
-                factory<WelcomePreferences> { WelcomePreferencesImpl() }
+                factory<WelcomePreferences> { WelcomePreferencesTestImpl() }
 
                 factory<FabHandler> { FabHandlerTestImpl() }
 

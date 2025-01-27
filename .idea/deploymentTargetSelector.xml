@@ -13,19 +13,19 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="ShoppingListFragmentTest">
+      <SelectionState runConfigName="selectLoadSampleItems_HasExistingProducts_ShowErrorSnackBar()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="onProductStatusChange_SetProductNeeded_ProductStatusToggled()">
+      <SelectionState runConfigName="welcomePage_SelectRestoreDatabase_InitializeOptionSet()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="Tests in 'com.aisleron'">
+      <SelectionState runConfigName="welcomePage_SelectRestoreDatabase_NavigateToSettings()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="testSaveLocation_AisleronErrorOnSave_UiStateIsError()">
+      <SelectionState runConfigName="selectedImport_BackPressedOnSettings_ReturnToMainScreen()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="onSaveClick_IsDuplicateName_ShowErrorSnackBar()">
+      <SelectionState runConfigName="welcomePage_BackPressed_InitializeOptionNotSet()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
