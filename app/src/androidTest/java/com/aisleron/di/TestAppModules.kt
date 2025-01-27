@@ -8,6 +8,7 @@ import com.aisleron.ui.ApplicationTitleUpdateListener
 import com.aisleron.ui.ApplicationTitleUpdateListenerTestImpl
 import com.aisleron.ui.FabHandler
 import com.aisleron.ui.FabHandlerTestImpl
+import com.aisleron.ui.about.AboutViewModel
 import com.aisleron.ui.product.ProductFragment
 import com.aisleron.ui.product.ProductViewModel
 import com.aisleron.ui.settings.DisplayPreferences
@@ -96,6 +97,10 @@ class TestAppModules {
                         createSampleDataUseCase = testUseCases.createSampleDataUseCase,
                         TestScope(UnconfinedTestDispatcher())
                     )
+                }
+
+                factory<AboutViewModel> {
+                    AboutViewModel()
                 }
 
                 //ToDo: Test Implementations for all preferences

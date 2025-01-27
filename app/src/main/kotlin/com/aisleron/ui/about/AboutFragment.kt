@@ -12,17 +12,18 @@ class AboutFragment : PreferenceFragmentCompat() {
 
     enum class AboutOption(val key: String) {
         VERSION("about_support_version"),
-        REPORT_ISSUE("about_support_report_issue"),
-        SOURCE_CODE("about_support_sourcecode"),
-        LICENSE("about_legal_license"),
-        PRIVACY("about_legal_privacy"),
+//        REPORT_ISSUE("about_support_report_issue"),
+//        SOURCE_CODE("about_support_sourcecode"),
+//        LICENSE("about_legal_license"),
+//        PRIVACY("about_legal_privacy"),
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.about, rootKey)
 
         findPreference<Preference>(AboutOption.VERSION.key)?.let {
-            it.summary = getString(R.string.about_support_version_summary, aboutViewModel.versionName)
+            it.summary =
+                getString(R.string.about_support_version_summary, aboutViewModel.versionName)
         }
     }
 }
