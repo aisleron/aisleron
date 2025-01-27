@@ -35,11 +35,11 @@ class AboutIntentsTest(private val resourceId: Int, private val expectedUri: Str
             return listOf(
                 arrayOf(
                     R.string.about_support_version_title,
-                    "https://github.com/thebatdan/Aisleron/releases"
+                    "https://aisleron.com/docs/version-history"
                 ),
                 arrayOf(
                     R.string.about_support_report_issue_title,
-                    "https://github.com/thebatdan/Aisleron/issues"
+                    "https://aisleron.com/docs/reporting-issues"
                 ),
                 arrayOf(
                     R.string.about_support_sourcecode_title,
@@ -47,13 +47,20 @@ class AboutIntentsTest(private val resourceId: Int, private val expectedUri: Str
                 ),
                 arrayOf(
                     R.string.about_legal_license_title,
-                    "https://github.com/thebatdan/Aisleron/blob/main/LICENSE"
+                    "https://aisleron.com/docs/licenses-policies/aisleron-license"
                 ),
                 arrayOf(
                     R.string.about_legal_privacy_title,
-                    "https://github.com/thebatdan/Aisleron/blob/main/PRIVACY.md"
+                    "https://aisleron.com/docs/licenses-policies/aisleron-privacy-policy"
                 ),
-                //arrayOf(R.string., "")
+                arrayOf(
+                    R.string.about_support_documentation_title,
+                    "https://aisleron.com/docs/documentation/"
+                ),
+                arrayOf(
+                    R.string.about_legal_3rdparty_title,
+                    "https://aisleron.com/docs/licenses-policies/3rd-party-licenses"
+                )
             )
         }
     }

@@ -9,7 +9,15 @@
             android:summary="@string/about_support_version_summary">
             <intent
                 android:action="android.intent.action.VIEW"
-                android:data="https://github.com/thebatdan/Aisleron/releases" />
+                android:data="https://aisleron.com/docs/version-history" />
+        </Preference>
+        <Preference
+            android:key="about_documentation"
+            android:title="@string/about_support_documentation_title"
+            android:summary="@string/about_support_documentation_summary">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="https://aisleron.com/docs/documentation/" />
         </Preference>
         <Preference
             android:key="about_support_report_issue"
@@ -17,7 +25,7 @@
             android:summary="@string/about_support_report_issue_summary">
             <intent
                 android:action="android.intent.action.VIEW"
-                android:data="https://github.com/thebatdan/Aisleron/issues" />
+                android:data="https://aisleron.com/docs/reporting-issues" />
         </Preference>
         <Preference
             android:key="about_support_sourcecode"
@@ -36,7 +44,7 @@
             android:summary="@string/about_legal_license_summary">
             <intent
                 android:action="android.intent.action.VIEW"
-                android:data="https://github.com/thebatdan/Aisleron/blob/main/LICENSE" />
+                android:data="https://aisleron.com/docs/licenses-policies/aisleron-license" />
         </Preference>
         <Preference
             android:key="about_legal_privacy"
@@ -44,7 +52,15 @@
             android:summary="@string/about_legal_privacy_summary">
             <intent
                 android:action="android.intent.action.VIEW"
-                android:data="https://github.com/thebatdan/Aisleron/blob/main/PRIVACY.md" />
+                android:data="https://aisleron.com/docs/licenses-policies/aisleron-privacy-policy" />
+        </Preference>
+        <Preference
+            android:key="about_legal_3rdparty"
+            android:title="@string/about_legal_3rdparty_title"
+            android:summary="@string/about_legal_3rdparty_summary">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="https://aisleron.com/docs/licenses-policies/3rd-party-licenses" />
         </Preference>
     </PreferenceCategory>
 

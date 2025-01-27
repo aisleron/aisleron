@@ -53,14 +53,14 @@
 
     <!-- About Preferences -->
     <string name="about_support_header">Support</string>
-    <string name="about_legal_header">Legal</string>
+    <string name="about_legal_header">Licenses &amp; Policies</string>
     <string name="about_support_version_title">Version history</string>
     <string name="about_support_report_issue_title">Report an issue</string>
     <string name="about_support_sourcecode_title">Source code</string>
-    <string name="about_legal_license_title">License</string>
-    <string name="about_legal_privacy_title">Privacy Policy</string>
+    <string name="about_legal_license_title">Aisleron License</string>
+    <string name="about_legal_privacy_title">Aisleron Privacy Policy</string>
     <string name="about_support_version_summary">"Current version: %1$s"</string>
-    <string name="about_support_report_issue_summary">Report an issue on GitHub</string>
+    <string name="about_support_report_issue_summary">Log a bug or feature request</string>
     <string name="about_support_sourcecode_summary">View source code on GitHub</string>
     <string name="about_legal_license_summary">GNU Affero General Public License (AGPL) version 3</string>
     <string name="about_legal_privacy_summary">View Privacy Policy online</string>
@@ -102,4 +102,8 @@
     <string name="welcome_import_db">&lt;h3&gt;Import an Existing Database&lt;/h3&gt; Bring in a shopping list from an earlier backup by importing it from the Settings page</string>
     <string name="aisleron_logo">Aisleron logo</string>
     <string name="welcome_title">Welcome to Aisleron</string>
+    <string name="about_support_documentation_title">Documentation</string>
+    <string name="about_support_documentation_summary">View documentation online</string>
+    <string name="about_legal_3rdparty_title">3rd Party Licenses</string>
+    <string name="about_legal_3rdparty_summary">View 3rd party licenses online</string>
 </resources>

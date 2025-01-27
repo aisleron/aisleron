@@ -50,12 +50,6 @@ class SettingsViewModelTest(
                     RestoreDbPreferenceHandler::class.java,
                     "Set Restore Database Value",
                     "Get Restore Database Value"
-                ),
-                arrayOf(
-                    SettingsFragment.PreferenceOption.RESTORE_DATABASE,
-                    RestoreDbPreferenceHandler::class.java,
-                    "Set Restore Database Value",
-                    "Get Restore Database Value"
                 )
             )
         }
