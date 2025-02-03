@@ -31,6 +31,7 @@ class MainActivityTest {
     @Test
     fun appStart_LightThemeSet_UseLightTheme() {
         SharedPreferencesInitializer().setApplicationTheme(SharedPreferencesInitializer.ApplicationTheme.LIGHT_THEME)
+
         ActivityScenario.launch(MainActivity::class.java)
         assertEquals(AppCompatDelegate.MODE_NIGHT_NO, AppCompatDelegate.getDefaultNightMode())
     }

@@ -14,11 +14,11 @@ tasks.register('codeCoverage', JacocoReport) {
             fileTree(getLayout().getBuildDirectory()) {
                 include("/tmp/kotlin-classes/debug/**")
                 exclude(
-                        '**/R.class',
-                        '**/R$*.class',
-                        '**/BuildConfig.*',
-                        '**/Manifest*.*',
-                        '**/airbnb/**/*.*',
+                        "**/R.class",
+                        "**/R\$*.class",
+                        "**/BuildConfig.*",
+                        "**/Manifest\$*.*",
+                        "**/airbnb/**/*.*",
                         "**/*Screen*",
                         "**/Showkase*",
                         "**/theme/Theme*",
@@ -56,11 +56,11 @@ tasks.register('testsWithCodeCoverage', JacocoReport) {
             fileTree(getLayout().getBuildDirectory()) {
                 include("/tmp/kotlin-classes/debug/**")
                 exclude(
-                        '**/R.class',
-                        '**/R$*.class',
-                        '**/BuildConfig.*',
-                        '**/Manifest*.*',
-                        '**/airbnb/**/*.*',
+                        "**/R.class",
+                        "**/R\$*.class",
+                        "**/BuildConfig.*",
+                        "**/Manifest\$*.*",
+                        "**/airbnb/**/*.*",
                         "**/*Screen*",
                         "**/Showkase*",
                         "**/theme/Theme*",
