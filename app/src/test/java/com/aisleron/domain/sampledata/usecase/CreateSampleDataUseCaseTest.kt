@@ -1,9 +1,20 @@
 package com.aisleron.domain.sampledata.usecase
 
 import com.aisleron.data.TestDataManager
-import com.aisleron.domain.TestUseCaseProvider
+import com.aisleron.domain.aisle.usecase.AddAisleUseCaseImpl
+import com.aisleron.domain.aisle.usecase.GetDefaultAislesUseCase
+import com.aisleron.domain.aisleproduct.usecase.AddAisleProductsUseCase
+import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductRankUseCase
 import com.aisleron.domain.base.AisleronException
+import com.aisleron.domain.location.usecase.AddLocationUseCaseImpl
+import com.aisleron.domain.location.usecase.GetHomeLocationUseCase
+import com.aisleron.domain.location.usecase.GetLocationUseCase
+import com.aisleron.domain.location.usecase.IsLocationNameUniqueUseCase
 import com.aisleron.domain.product.Product
+import com.aisleron.domain.product.usecase.AddProductUseCaseImpl
+import com.aisleron.domain.product.usecase.GetAllProductsUseCase
+import com.aisleron.domain.product.usecase.IsProductNameUniqueUseCase
+import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.AfterEach
@@ -16,13 +27,47 @@ class CreateSampleDataUseCaseTest {
 
     private lateinit var testData: TestDataManager
     private lateinit var createSampleDataUseCase: CreateSampleDataUseCase
-    private lateinit var testUseCaseProvider: TestUseCaseProvider
 
     @BeforeEach
     fun setUp() {
         testData = TestDataManager(false)
-        testUseCaseProvider = TestUseCaseProvider(testData)
-        createSampleDataUseCase = testUseCaseProvider.createSampleDataUseCase
+
+        val getShoppingListUseCase = GetShoppingListUseCase(testData.locationRepository)
+        val getAllProductsUseCase = GetAllProductsUseCase(testData.productRepository)
+        val getHomeLocationUseCase = GetHomeLocationUseCase(testData.locationRepository)
+        val addAisleProductsUseCase = AddAisleProductsUseCase(testData.aisleProductRepository)
+        val updateAisleProductRankUseCase =
+            UpdateAisleProductRankUseCase(testData.aisleProductRepository)
+
+        val addProductUseCase = AddProductUseCaseImpl(
+            testData.productRepository,
+            GetDefaultAislesUseCase(testData.aisleRepository),
+            addAisleProductsUseCase,
+            IsProductNameUniqueUseCase(testData.productRepository)
+        )
+
+        val addAisleUseCase = AddAisleUseCaseImpl(
+            testData.aisleRepository,
+            GetLocationUseCase(testData.locationRepository)
+        )
+
+        val addLocationUseCase = AddLocationUseCaseImpl(
+            testData.locationRepository,
+            addAisleUseCase,
+            getAllProductsUseCase,
+            addAisleProductsUseCase,
+            IsLocationNameUniqueUseCase(testData.locationRepository)
+        )
+
+        createSampleDataUseCase = CreateSampleDataUseCaseImpl (
+            addProductUseCase = addProductUseCase,
+            addAisleUseCase = addAisleUseCase,
+            getShoppingListUseCase = getShoppingListUseCase,
+            updateAisleProductRankUseCase = updateAisleProductRankUseCase,
+            addLocationUseCase = addLocationUseCase,
+            getAllProductsUseCase = getAllProductsUseCase,
+            getHomeLocationUseCase = getHomeLocationUseCase
+        )
     }
 
     @AfterEach
@@ -62,7 +107,7 @@ class CreateSampleDataUseCaseTest {
 
         val homeList = runBlocking {
             val homeId = testData.locationRepository.getHome().id
-            testUseCaseProvider.getShoppingListUseCase(homeId).first()!!
+            GetShoppingListUseCase(testData.locationRepository).invoke(homeId).first()!!
         }
 
         val aisleProductCountAfter = homeList.aisles.find { !it.isDefault }?.products?.count() ?: 0
@@ -88,7 +133,7 @@ class CreateSampleDataUseCaseTest {
 
         val shopList = runBlocking {
             val shopId = testData.locationRepository.getShops().first().first().id
-            testUseCaseProvider.getShoppingListUseCase(shopId).first()!!
+            GetShoppingListUseCase(testData.locationRepository).invoke(shopId).first()!!
         }
 
         val aisleProductCountAfter = shopList.aisles.find { !it.isDefault }?.products?.count() ?: 0
@@ -99,7 +144,14 @@ class CreateSampleDataUseCaseTest {
     @Test
     fun createSampleDataUseCase_ProductsExistInDatabase_ThrowsException() {
         runBlocking {
-            testUseCaseProvider.addProductUseCase(
+            val addProductUseCase = AddProductUseCaseImpl(
+                testData.productRepository,
+                GetDefaultAislesUseCase(testData.aisleRepository),
+                AddAisleProductsUseCase(testData.aisleProductRepository),
+                IsProductNameUniqueUseCase(testData.productRepository)
+            )
+
+            addProductUseCase(
                 Product(
                     id = 0,
                     name = "CreateSampleDataProductExistsTest",
