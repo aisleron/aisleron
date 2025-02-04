@@ -56,4 +56,15 @@ class WelcomeViewModelTest {
             welcomeViewModel.welcomeUiState.value
         )
     }
+
+    @Test
+    fun constructor_NoCoroutineScopeProvided_WelcomeViewModelReturned() {
+        val welcomeViewModel = WelcomeViewModel(
+            object : CreateSampleDataUseCase {
+                override suspend operator fun invoke() {}
+            }
+        )
+
+        Assert.assertNotNull(welcomeViewModel)
+    }
 }
