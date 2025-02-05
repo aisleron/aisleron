@@ -39,6 +39,35 @@ class WelcomeViewModelTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
+    fun createSampleData_SampleDataCreationExceptionExceptionRaised_WelcomeUiStateIsError() {
+        val exceptionMessage = "Error Creating Sample Data"
+
+        val welcomeViewModel = WelcomeViewModel(
+            object : CreateSampleDataUseCase {
+                override suspend operator fun invoke() {
+                    throw AisleronException.SampleDataCreationException(
+                        exceptionMessage
+                    )
+                }
+            },
+            TestScope(UnconfinedTestDispatcher())
+        )
+
+        welcomeViewModel.createSampleData()
+
+        Assert.assertTrue(welcomeViewModel.welcomeUiState.value is WelcomeViewModel.WelcomeUiState.Error)
+        Assert.assertEquals(
+            AisleronException.ExceptionCode.SAMPLE_DATA_CREATION_EXCEPTION,
+            (welcomeViewModel.welcomeUiState.value as WelcomeViewModel.WelcomeUiState.Error).errorCode
+        )
+        Assert.assertEquals(
+            exceptionMessage,
+            (welcomeViewModel.welcomeUiState.value as WelcomeViewModel.WelcomeUiState.Error).errorMessage
+        )
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
     fun createSampleData_CreationSuccessful_WelcomeUiStateIsSampleDataLoaded() {
         val welcomeViewModel = WelcomeViewModel(
             object : CreateSampleDataUseCase {
