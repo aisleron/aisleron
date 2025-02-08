@@ -33,7 +33,7 @@
             android:summary="@string/about_support_sourcecode_summary">
             <intent
                 android:action="android.intent.action.VIEW"
-                android:data="https://github.com/thebatdan/Aisleron" />
+                android:data="https://github.com/aisleron/aisleron" />
         </Preference>
     </PreferenceCategory>
 

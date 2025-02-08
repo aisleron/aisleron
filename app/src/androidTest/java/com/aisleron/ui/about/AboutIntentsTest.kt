@@ -43,7 +43,7 @@ class AboutIntentsTest(private val resourceId: Int, private val expectedUri: Str
                 ),
                 arrayOf(
                     R.string.about_support_sourcecode_title,
-                    "https://github.com/thebatdan/Aisleron"
+                    "https://github.com/aisleron/aisleron"
                 ),
                 arrayOf(
                     R.string.about_legal_license_title,
