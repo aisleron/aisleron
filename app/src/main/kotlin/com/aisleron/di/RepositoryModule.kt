@@ -21,7 +21,8 @@ val repositoryModule = module {
 
     factory<AisleRepository> {
         AisleRepositoryImpl(
-            aisleDao = get(), aisleMapper = AisleMapper())
+            aisleDao = get(), aisleMapper = AisleMapper()
+        )
     }
 
     factory<AisleProductRepository> {

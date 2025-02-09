@@ -5,7 +5,14 @@ import android.net.Uri
 import androidx.documentfile.provider.DocumentFile
 import androidx.sqlite.db.SimpleSQLiteQuery
 import com.aisleron.data.AisleronDatabase
-import com.aisleron.di.appModule
+import com.aisleron.di.daoModule
+import com.aisleron.di.databaseModule
+import com.aisleron.di.fragmentModule
+import com.aisleron.di.generalModule
+import com.aisleron.di.preferenceModule
+import com.aisleron.di.repositoryModule
+import com.aisleron.di.useCaseModule
+import com.aisleron.di.viewModelModule
 import com.aisleron.domain.backup.DatabaseMaintenance
 import com.aisleron.domain.base.AisleronException
 import kotlinx.coroutines.CoroutineDispatcher
@@ -58,8 +65,20 @@ class DatabaseMaintenanceImpl(
             database.close()
             val outputStream = FileOutputStream(dbPath)
             copyAndClose(inputStream, outputStream)
-            unloadKoinModules(appModule)
-            loadKoinModules(appModule)
+
+            val koinModules = listOf(
+                daoModule,
+                databaseModule,
+                fragmentModule,
+                generalModule,
+                preferenceModule,
+                repositoryModule,
+                useCaseModule,
+                viewModelModule
+            )
+
+            unloadKoinModules(koinModules)
+            loadKoinModules(koinModules)
             getKoin().get<AisleronDatabase>()
         }
     }

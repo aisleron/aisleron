@@ -21,6 +21,7 @@ import com.aisleron.domain.backup.usecase.BackupDatabaseUseCase
 import com.aisleron.domain.backup.usecase.BackupDatabaseUseCaseImpl
 import com.aisleron.domain.backup.usecase.RestoreDatabaseUseCase
 import com.aisleron.domain.backup.usecase.RestoreDatabaseUseCaseImpl
+import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.location.usecase.AddLocationUseCase
 import com.aisleron.domain.location.usecase.AddLocationUseCaseImpl
 import com.aisleron.domain.location.usecase.GetHomeLocationUseCase
@@ -47,10 +48,12 @@ import org.koin.android.ext.koin.androidApplication
 import org.koin.dsl.module
 
 val useCaseModule = module {
+    includes(repositoryModule)
+
     /**
      * Location Use Cases
      */
-    factory<GetLocationUseCase> { GetLocationUseCase(locationRepository = get()) }
+    factory<GetLocationUseCase> { GetLocationUseCase(locationRepository = get<LocationRepository>()) }
     factory<GetShopsUseCase> { GetShopsUseCase(locationRepository = get()) }
     factory<GetPinnedShopsUseCase> { GetPinnedShopsUseCase(locationRepository = get()) }
     factory<IsLocationNameUniqueUseCase> { IsLocationNameUniqueUseCase(locationRepository = get()) }

@@ -16,10 +16,10 @@ import com.aisleron.data.product.ProductEntity
     entities = [AisleEntity::class, LocationEntity::class, ProductEntity::class, AisleProductEntity::class],
     version = 1
 )
-abstract class AisleronDatabase : RoomDatabase() {
-    abstract fun aisleDao(): AisleDao
-    abstract fun locationDao(): LocationDao
-    abstract fun productDao(): ProductDao
-    abstract fun aisleProductDao(): AisleProductDao
-    abstract fun maintenanceDao(): MaintenanceDao
+abstract class AisleronDatabase : AisleronDb, RoomDatabase() {
+    abstract override fun aisleDao(): AisleDao
+    abstract override fun locationDao(): LocationDao
+    abstract override fun productDao(): ProductDao
+    abstract override fun aisleProductDao(): AisleProductDao
+    abstract override fun maintenanceDao(): MaintenanceDao
 }
