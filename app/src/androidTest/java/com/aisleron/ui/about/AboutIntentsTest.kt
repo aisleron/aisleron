@@ -13,20 +13,18 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasData
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import com.aisleron.R
-import com.aisleron.data.TestDataManager
 import com.aisleron.di.KoinTestRule
-import com.aisleron.di.TestAppModules
+import com.aisleron.di.viewModelTestModule
 import org.hamcrest.Matchers
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
-import org.koin.core.module.Module
+import org.koin.test.KoinTest
 
 
 @RunWith(value = Parameterized::class)
-class AboutIntentsTest(private val resourceId: Int, private val expectedUri: String) {
+class AboutIntentsTest(private val resourceId: Int, private val expectedUri: String) : KoinTest {
 
     companion object {
         @JvmStatic
@@ -67,16 +65,8 @@ class AboutIntentsTest(private val resourceId: Int, private val expectedUri: Str
 
     @get:Rule
     val koinTestRule = KoinTestRule(
-        modules = getKoinModules()
+        modules = listOf(viewModelTestModule)
     )
-
-    private fun getKoinModules(): List<Module> {
-        return TestAppModules().getTestAppModules(TestDataManager())
-    }
-
-    @Before
-    fun setUp() {
-    }
 
     private fun getFragmentScenario(): FragmentScenario<AboutFragment> =
         launchFragmentInContainer<AboutFragment>(

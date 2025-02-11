@@ -1,6 +1,7 @@
 package com.aisleron.domain.location.usecase
 
 import com.aisleron.data.TestDataManager
+import com.aisleron.domain.location.LocationRepository
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -16,7 +17,7 @@ class GetLocationUseCaseTest {
     @BeforeEach
     fun setUp() {
         testData = TestDataManager()
-        getLocationUseCase = GetLocationUseCase(testData.locationRepository)
+        getLocationUseCase = GetLocationUseCase(testData.getRepository<LocationRepository>())
     }
 
     @Test

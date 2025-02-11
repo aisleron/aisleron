@@ -2,15 +2,10 @@ package com.aisleron.ui.settings
 
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.aisleron.SharedPreferencesInitializer
-import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
 
 class DisplayPreferencesImplTest {
-
-    @Before
-    fun setUp() {
-    }
 
     @Test
     fun getApplicationTheme_SetToLightTheme_ReturnLightThemeEnum() {

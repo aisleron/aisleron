@@ -12,51 +12,31 @@ import androidx.test.espresso.matcher.ViewMatchers.hasChildCount
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import com.aisleron.R
-import com.aisleron.data.TestDataManager
 import com.aisleron.di.KoinTestRule
-import com.aisleron.domain.TestUseCaseProvider
+import com.aisleron.di.daoTestModule
+import com.aisleron.di.repositoryModule
+import com.aisleron.di.useCaseModule
+import com.aisleron.di.viewModelTestModule
+import com.aisleron.domain.location.LocationRepository
+import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import com.aisleron.ui.bundles.Bundler
-import com.aisleron.ui.shoplist.ShopListViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.koin.core.module.Module
-import org.koin.dsl.module
+import org.koin.test.KoinTest
+import org.koin.test.get
 
-class ShopMenuFragmentTest {
+class ShopMenuFragmentTest : KoinTest {
     private lateinit var bundler: Bundler
-    private lateinit var testData: TestDataManager
 
     @get:Rule
     val koinTestRule = KoinTestRule(
-        modules = getKoinModules()
+        modules = listOf(daoTestModule, viewModelTestModule, repositoryModule, useCaseModule)
     )
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private fun getKoinModules(): List<Module> {
-        testData = TestDataManager()
-        val testUseCases = TestUseCaseProvider(testData)
-        val shopListViewModel = ShopListViewModel(
-            getShopsUseCase = testUseCases.getShopsUseCase,
-            getPinnedShopsUseCase = testUseCases.getPinnedShopsUseCase,
-            removeLocationUseCase = testUseCases.removeLocationUseCase,
-            getLocationUseCase = testUseCases.getLocationUseCase,
-            TestScope(UnconfinedTestDispatcher())
-        )
-
-        return listOf(
-            module {
-                factory<ShopListViewModel> { shopListViewModel }
-            }
-        )
-    }
-
 
     private fun getFragmentScenario(): FragmentScenario<ShopMenuFragment> {
         val scenario = launchFragmentInContainer<ShopMenuFragment>(
@@ -77,18 +57,19 @@ class ShopMenuFragmentTest {
     @Before
     fun setUp() {
         bundler = Bundler()
+        runBlocking { get<CreateSampleDataUseCase>().invoke() }
     }
 
     @Test
-    fun onCreateView_ShopsLoaded_MatchesPinnedShopCount() {
-        val pinnedShopCount = runBlocking { testData.locationRepository.getPinnedShops().count() }
+    fun onCreateView_ShopsLoaded_MatchesPinnedShopCount() = runTest {
+        val pinnedShopCount = get<LocationRepository>().getPinnedShops().count()
         getFragmentScenario()
         onView(withId(R.id.fragment_shop_menu)).check(matches(hasChildCount(pinnedShopCount)))
     }
 
     @Test
-    fun onItemClick_IsValidLocation_NavigateToShoppingList() {
-        val shopLocation = runBlocking { testData.locationRepository.getAll().first { it.pinned } }
+    fun onItemClick_IsValidLocation_NavigateToShoppingList() = runTest {
+        val shopLocation = get<LocationRepository>().getAll().first { it.pinned }
 
         // Create a TestNavHostController
         val navController = TestNavHostController(ApplicationProvider.getApplicationContext())

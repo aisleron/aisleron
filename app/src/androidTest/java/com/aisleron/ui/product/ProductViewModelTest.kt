@@ -1,52 +1,56 @@
 package com.aisleron.ui.product
 
-import com.aisleron.data.TestDataManager
-import com.aisleron.domain.TestUseCaseProvider
+import com.aisleron.di.KoinTestRule
+import com.aisleron.di.daoTestModule
+import com.aisleron.di.repositoryModule
+import com.aisleron.di.useCaseModule
+import com.aisleron.di.viewModelTestModule
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.product.Product
+import com.aisleron.domain.product.ProductRepository
 import com.aisleron.domain.product.usecase.AddProductUseCase
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import com.aisleron.domain.product.usecase.GetProductUseCase
+import com.aisleron.domain.product.usecase.UpdateProductUseCase
+import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
+import org.koin.test.KoinTest
+import org.koin.test.get
+import org.koin.test.mock.declare
 
 @RunWith(value = Parameterized::class)
-class ProductViewModelTest(private val inStock: Boolean) {
-    private lateinit var testData: TestDataManager
+class ProductViewModelTest(private val inStock: Boolean) : KoinTest {
     private lateinit var productViewModel: ProductViewModel
 
-    @OptIn(ExperimentalCoroutinesApi::class)
+    @get:Rule
+    val koinTestRule = KoinTestRule(
+        modules = listOf(daoTestModule, viewModelTestModule, repositoryModule, useCaseModule)
+    )
+
     @Before
     fun setUp() {
-        testData = TestDataManager()
-        val testUseCases = TestUseCaseProvider(testData)
-        val testDispatcher = UnconfinedTestDispatcher()
-        val testScope = TestScope(testDispatcher)
-
-        productViewModel = ProductViewModel(
-            testUseCases.addProductUseCase,
-            testUseCases.updateProductUseCase,
-            testUseCases.getProductUseCase,
-            testScope
-        )
+        productViewModel = get<ProductViewModel>()
+        runBlocking { get<CreateSampleDataUseCase>().invoke() }
     }
 
     @Test
     fun testSaveProduct_ProductExists_UpdateProduct() = runTest {
         val updatedProductName = "Updated Product Name"
-        val existingProduct: Product = testData.productRepository.getAll().first()
-        val countBefore: Int = testData.productRepository.getAll().count()
+        val productRepository = get<ProductRepository>()
+        val existingProduct: Product = productRepository.getAll().first()
+        val countBefore: Int = productRepository.getAll().count()
 
         productViewModel.hydrate(existingProduct.id, existingProduct.inStock)
         productViewModel.saveProduct(updatedProductName, inStock)
 
-        val updatedProduct = testData.productRepository.get(existingProduct.id)
-        val countAfter: Int = testData.productRepository.getAll().count()
+        val updatedProduct = productRepository.get(existingProduct.id)
+        val countAfter: Int = productRepository.getAll().count()
 
         Assert.assertNotNull(updatedProduct)
         Assert.assertEquals(updatedProductName, updatedProduct?.name)
@@ -57,12 +61,13 @@ class ProductViewModelTest(private val inStock: Boolean) {
     @Test
     fun testSaveProduct_ProductDoesNotExists_CreateProduct() = runTest {
         val newProductName = "New Product Name"
+        val productRepository = get<ProductRepository>()
 
         productViewModel.hydrate(0, inStock)
-        val countBefore: Int = testData.productRepository.getAll().count()
+        val countBefore: Int = productRepository.getAll().count()
         productViewModel.saveProduct(newProductName, inStock)
-        val newProduct = testData.productRepository.getByName(newProductName)
-        val countAfter: Int = testData.productRepository.getAll().count()
+        val newProduct = productRepository.getByName(newProductName)
+        val countAfter: Int = productRepository.getAll().count()
 
         Assert.assertNotNull(newProduct)
         Assert.assertEquals(newProductName, newProduct?.name)
@@ -75,7 +80,7 @@ class ProductViewModelTest(private val inStock: Boolean) {
     @Test
     fun testSaveProduct_SaveSuccessful_UiStateIsSuccess() = runTest {
         val updatedProductName = "Updated Product Name"
-        val existingProduct: Product = testData.productRepository.getAll().first()
+        val existingProduct: Product = get<ProductRepository>().getAll().first()
 
         productViewModel.hydrate(existingProduct.id, existingProduct.inStock)
         productViewModel.saveProduct(updatedProductName, inStock)
@@ -88,7 +93,7 @@ class ProductViewModelTest(private val inStock: Boolean) {
 
     @Test
     fun testSaveProduct_AisleronErrorOnSave_UiStateIsError() = runTest {
-        val existingProduct: Product = testData.productRepository.getAll().first()
+        val existingProduct: Product = get<ProductRepository>().getAll().first()
 
         productViewModel.hydrate(0, false)
         productViewModel.saveProduct(existingProduct.name, inStock)
@@ -96,21 +101,19 @@ class ProductViewModelTest(private val inStock: Boolean) {
         Assert.assertTrue(productViewModel.productUiState.value is ProductViewModel.ProductUiState.Error)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun testSaveProduct_ExceptionRaised_UiStateIsError() = runTest {
-        val testUseCases = TestUseCaseProvider(testData)
         val exceptionMessage = "Error on save Product"
-        val pvm = ProductViewModel(
+
+        declare<AddProductUseCase> {
             object : AddProductUseCase {
                 override suspend fun invoke(product: Product): Int {
                     throw Exception(exceptionMessage)
                 }
-            },
-            testUseCases.updateProductUseCase,
-            testUseCases.getProductUseCase,
-            TestScope(UnconfinedTestDispatcher())
-        )
+            }
+        }
+
+        val pvm = get<ProductViewModel>()
 
         pvm.hydrate(0, false)
         pvm.saveProduct("Bogus Product", inStock)
@@ -128,7 +131,7 @@ class ProductViewModelTest(private val inStock: Boolean) {
 
     @Test
     fun testGetProductName_ProductExists_ReturnsProductName() = runTest {
-        val existingProduct: Product = testData.productRepository.getAll().first()
+        val existingProduct: Product = get<ProductRepository>().getAll().first()
         productViewModel.hydrate(existingProduct.id, existingProduct.inStock)
         Assert.assertEquals(existingProduct.name, productViewModel.productName)
     }
@@ -151,11 +154,10 @@ class ProductViewModelTest(private val inStock: Boolean) {
 
     @Test
     fun constructor_NoCoroutineScopeProvided_ProductViewModelReturned() {
-        val testUseCases = TestUseCaseProvider(testData)
         val pvm = ProductViewModel(
-            testUseCases.addProductUseCase,
-            testUseCases.updateProductUseCase,
-            testUseCases.getProductUseCase
+            get<AddProductUseCase>(),
+            get<UpdateProductUseCase>(),
+            get<GetProductUseCase>()
         )
 
         Assert.assertNotNull(pvm)

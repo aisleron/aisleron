@@ -5,6 +5,6 @@ import com.aisleron.BuildConfig
 
 class AboutViewModel : ViewModel() {
 
-    val versionName: String get() = BuildConfig.VERSION_NAME
+    val versionName: String = BuildConfig.VERSION_NAME
 
 }

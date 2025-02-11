@@ -7,7 +7,7 @@ import com.aisleron.data.aisleproduct.AisleProductDao
 import com.aisleron.data.location.LocationDao
 import com.aisleron.di.KoinTestRule
 import com.aisleron.di.daoModule
-import com.aisleron.di.databaseTestModule
+import com.aisleron.di.inMemoryDatabaseTestModule
 import com.aisleron.di.repositoryModule
 import com.aisleron.di.useCaseModule
 import com.aisleron.domain.FilterType
@@ -18,7 +18,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -39,7 +38,7 @@ class ProductRepositoryImplTest : KoinTest {
     )
 
     private fun getKoinModules(): List<Module> = listOf(
-        daoModule, databaseTestModule, repositoryModule, useCaseModule
+        daoModule, inMemoryDatabaseTestModule, repositoryModule, useCaseModule
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -49,9 +48,8 @@ class ProductRepositoryImplTest : KoinTest {
             get<LocationDao>(), get<AisleDao>(), TestScope(UnconfinedTestDispatcher())
         ).invoke()
 
-        val createSampleDataUseCase = get<CreateSampleDataUseCase>()
         runBlocking {
-            createSampleDataUseCase()
+            get<CreateSampleDataUseCase>().invoke()
         }
 
         productRepositoryImpl = ProductRepositoryImpl(
@@ -59,10 +57,6 @@ class ProductRepositoryImplTest : KoinTest {
             aisleProductDao = get<AisleProductDao>(),
             productMapper = ProductMapper()
         )
-    }
-
-    @After
-    fun tearDown() {
     }
 
     @Test

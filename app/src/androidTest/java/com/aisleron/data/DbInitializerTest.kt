@@ -3,9 +3,9 @@ package com.aisleron.data
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
@@ -35,22 +35,22 @@ class DbInitializerTest {
     }
 
     @Test
-    fun invoke_NewDatabase_HomeLocationAdded() {
-        val homeBefore = runBlocking { db.locationDao().getHome() }
+    fun invoke_NewDatabase_HomeLocationAdded() = runTest {
+        val homeBefore = db.locationDao().getHome()
         initializer.invoke()
-        val homeAfter = runBlocking { db.locationDao().getHome() }
+        val homeAfter = db.locationDao().getHome()
         Assert.assertNull(homeBefore)
         Assert.assertNotNull(homeAfter)
     }
 
     @Test
-    fun invoke_HomeLocationAdded_DefaultAisleCreated() {
-        val aisleCountBefore = runBlocking { db.aisleDao().getAisles().count() }
+    fun invoke_HomeLocationAdded_DefaultAisleCreated() = runTest {
+        val aisleCountBefore = db.aisleDao().getAisles().count()
         initializer.invoke()
-        val defaultAisle = runBlocking {
-            val homeId = db.locationDao().getHome().id
-            db.aisleDao().getDefaultAisleFor(homeId)
-        }
+
+        val homeId = db.locationDao().getHome().id
+        val defaultAisle = db.aisleDao().getDefaultAisleFor(homeId)
+
         Assert.assertEquals(0, aisleCountBefore)
         Assert.assertNotNull(defaultAisle)
     }

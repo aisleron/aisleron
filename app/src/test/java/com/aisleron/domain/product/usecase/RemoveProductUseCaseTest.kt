@@ -1,7 +1,9 @@
 package com.aisleron.domain.product.usecase
 
 import com.aisleron.data.TestDataManager
+import com.aisleron.domain.aisleproduct.AisleProductRepository
 import com.aisleron.domain.product.Product
+import com.aisleron.domain.product.ProductRepository
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
@@ -17,10 +19,11 @@ class RemoveProductUseCaseTest {
     @BeforeEach
     fun setUp() {
         testData = TestDataManager()
+        val productRepository = testData.getRepository<ProductRepository>()
 
-        removeProductUseCase = RemoveProductUseCase(testData.productRepository)
+        removeProductUseCase = RemoveProductUseCase(productRepository)
 
-        existingProduct = runBlocking { testData.productRepository.get(1)!! }
+        existingProduct = runBlocking { productRepository.get(1)!! }
     }
 
     @Test
@@ -29,10 +32,11 @@ class RemoveProductUseCaseTest {
         val countAfter: Int
         val removedProduct: Product?
         runBlocking {
-            countBefore = testData.productRepository.getAll().count()
+            val productRepository = testData.getRepository<ProductRepository>()
+            countBefore = productRepository.getAll().count()
             removeProductUseCase(existingProduct.id)
-            removedProduct = testData.productRepository.get(existingProduct.id)
-            countAfter = testData.productRepository.getAll().count()
+            removedProduct = productRepository.get(existingProduct.id)
+            countAfter = productRepository.getAll().count()
         }
         assertNull(removedProduct)
         assertEquals(countBefore - 1, countAfter)
@@ -43,9 +47,10 @@ class RemoveProductUseCaseTest {
         val countBefore: Int
         val countAfter: Int
         runBlocking {
-            countBefore = testData.productRepository.getAll().count()
-            removeProductUseCase(testData.productRepository.getAll().maxOf { it.id } + 1000)
-            countAfter = testData.productRepository.getAll().count()
+            val productRepository = testData.getRepository<ProductRepository>()
+            countBefore = productRepository.getAll().count()
+            removeProductUseCase(productRepository.getAll().maxOf { it.id } + 1000)
+            countAfter = productRepository.getAll().count()
         }
         assertEquals(countBefore, countAfter)
     }
@@ -56,12 +61,13 @@ class RemoveProductUseCaseTest {
         val aisleProductCountAfter: Int
         val aisleProductCountProduct: Int
         runBlocking {
-            val aisleProductList = testData.aisleProductRepository.getAll()
+            val aisleProductRepository = testData.getRepository<AisleProductRepository>()
+            val aisleProductList = aisleProductRepository.getAll()
                 .filter { it.product.id == existingProduct.id }
             aisleProductCountProduct = aisleProductList.count()
-            aisleProductCountBefore = testData.aisleProductRepository.getAll().count()
+            aisleProductCountBefore = aisleProductRepository.getAll().count()
             removeProductUseCase(existingProduct.id)
-            aisleProductCountAfter = testData.aisleProductRepository.getAll().count()
+            aisleProductCountAfter = aisleProductRepository.getAll().count()
         }
         assertEquals(
             aisleProductCountBefore - aisleProductCountProduct,

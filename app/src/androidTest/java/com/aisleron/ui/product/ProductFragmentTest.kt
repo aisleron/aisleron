@@ -13,36 +13,36 @@ import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.platform.app.InstrumentationRegistry
 import com.aisleron.R
-import com.aisleron.data.TestDataManager
 import com.aisleron.di.KoinTestRule
-import com.aisleron.di.TestAppModules
+import com.aisleron.di.daoTestModule
+import com.aisleron.di.repositoryModule
+import com.aisleron.di.useCaseModule
+import com.aisleron.di.viewModelTestModule
+import com.aisleron.domain.product.ProductRepository
+import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import com.aisleron.ui.AddEditFragmentListenerTestImpl
 import com.aisleron.ui.ApplicationTitleUpdateListenerTestImpl
 import com.aisleron.ui.FabHandlerTestImpl
 import com.aisleron.ui.bundles.Bundler
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.koin.core.module.Module
+import org.koin.test.KoinTest
+import org.koin.test.get
 
-class ProductFragmentTest {
+class ProductFragmentTest : KoinTest {
     private lateinit var bundler: Bundler
     private lateinit var addEditFragmentListener: AddEditFragmentListenerTestImpl
     private lateinit var applicationTitleUpdateListener: ApplicationTitleUpdateListenerTestImpl
-    private lateinit var testData: TestDataManager
     private lateinit var fabHandler: FabHandlerTestImpl
 
     @get:Rule
     val koinTestRule = KoinTestRule(
-        modules = getKoinModules()
+        modules = listOf(daoTestModule, viewModelTestModule, repositoryModule, useCaseModule)
     )
-
-    private fun getKoinModules(): List<Module> {
-        testData = TestDataManager()
-        return TestAppModules().getTestAppModules(testData)
-    }
 
     @Before
     fun setUp() {
@@ -50,6 +50,7 @@ class ProductFragmentTest {
         addEditFragmentListener = AddEditFragmentListenerTestImpl()
         applicationTitleUpdateListener = ApplicationTitleUpdateListenerTestImpl()
         fabHandler = FabHandlerTestImpl()
+        runBlocking { get<CreateSampleDataUseCase>().invoke() }
     }
 
     @Test
@@ -65,11 +66,8 @@ class ProductFragmentTest {
     }
 
     @Test
-    fun onCreateProductFragment_HasEditBundle_ScreenMatchesEditProduct() {
-        val existingProduct = runBlocking {
-            testData.productRepository.getAll().first { it.inStock }
-        }
-
+    fun onCreateProductFragment_HasEditBundle_ScreenMatchesEditProduct() = runTest {
+        val existingProduct = get<ProductRepository>().getAll().first { it.inStock }
         val bundle = bundler.makeEditProductBundle(existingProduct.id)
         getFragmentScenario(bundle)
 
@@ -90,7 +88,7 @@ class ProductFragmentTest {
     }
 
     @Test
-    fun onSaveClick_NewProductHasUniqueName_ProductSaved() {
+    fun onSaveClick_NewProductHasUniqueName_ProductSaved() = runTest {
         val bundle = bundler.makeAddProductBundle("New Product")
         val scenario = getFragmentScenario(bundle)
         val menuItem = getSaveMenuItem()
@@ -99,9 +97,7 @@ class ProductFragmentTest {
         onView(withId(R.id.edt_product_name)).perform(typeText(newProductName))
         scenario.onFragment { it.onMenuItemSelected(menuItem) }
 
-        val product = runBlocking {
-            testData.productRepository.getByName(newProductName)
-        }
+        val product = get<ProductRepository>().getByName(newProductName)
 
         onView(withId(R.id.edt_product_name)).check(matches(ViewMatchers.withText(newProductName)))
         Assert.assertTrue(addEditFragmentListener.addEditSuccess)
@@ -123,10 +119,9 @@ class ProductFragmentTest {
     }
 
     @Test
-    fun onSaveClick_ExistingProductHasUniqueName_ProductUpdated() {
-        val existingProduct = runBlocking {
-            testData.productRepository.getAll().first()
-        }
+    fun onSaveClick_ExistingProductHasUniqueName_ProductUpdated() = runTest {
+        val productRepository = get<ProductRepository>()
+        val existingProduct = productRepository.getAll().first()
 
         val bundle = bundler.makeEditProductBundle(existingProduct.id)
         val scenario = getFragmentScenario(bundle)
@@ -138,7 +133,7 @@ class ProductFragmentTest {
             .perform(typeText(newProductName))
         scenario.onFragment { it.onMenuItemSelected(menuItem) }
 
-        val updatedProduct = runBlocking { testData.productRepository.get(existingProduct.id) }
+        val updatedProduct = productRepository.get(existingProduct.id)
 
         onView(withId(R.id.edt_product_name)).check(matches(ViewMatchers.withText(newProductName)))
         Assert.assertTrue(addEditFragmentListener.addEditSuccess)
@@ -147,10 +142,9 @@ class ProductFragmentTest {
     }
 
     @Test
-    fun onSaveClick_InStockChanged_InStockUpdated() {
-        val existingProduct = runBlocking {
-            testData.productRepository.getAll().first { !it.inStock }
-        }
+    fun onSaveClick_InStockChanged_InStockUpdated() = runTest {
+        val productRepository = get<ProductRepository>()
+        val existingProduct = productRepository.getAll().first { !it.inStock }
 
         val bundle = bundler.makeEditProductBundle(existingProduct.id)
         val scenario = getFragmentScenario(bundle)
@@ -159,7 +153,7 @@ class ProductFragmentTest {
         onView(withId(R.id.chk_product_in_stock)).perform(ViewActions.click())
         scenario.onFragment { it.onMenuItemSelected(menuItem) }
 
-        val updatedProduct = runBlocking { testData.productRepository.get(existingProduct.id) }
+        val updatedProduct = productRepository.get(existingProduct.id)
 
         onView(withId(R.id.chk_product_in_stock)).check(matches(ViewMatchers.isChecked()))
         Assert.assertTrue(addEditFragmentListener.addEditSuccess)
@@ -170,10 +164,8 @@ class ProductFragmentTest {
     }
 
     @Test
-    fun onSaveClick_IsDuplicateName_ShowErrorSnackBar() {
-        val existingProduct = runBlocking {
-            testData.productRepository.getAll().first()
-        }
+    fun onSaveClick_IsDuplicateName_ShowErrorSnackBar() = runTest {
+        val existingProduct = get<ProductRepository>().getAll().first()
 
         val bundle = bundler.makeAddProductBundle()
         val scenario = getFragmentScenario(bundle)

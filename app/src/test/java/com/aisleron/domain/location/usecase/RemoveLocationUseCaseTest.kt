@@ -2,11 +2,14 @@ package com.aisleron.domain.location.usecase
 
 import com.aisleron.data.TestDataManager
 import com.aisleron.domain.FilterType
+import com.aisleron.domain.aisle.AisleRepository
 import com.aisleron.domain.aisle.usecase.RemoveAisleUseCaseImpl
 import com.aisleron.domain.aisle.usecase.RemoveDefaultAisleUseCase
+import com.aisleron.domain.aisleproduct.AisleProductRepository
 import com.aisleron.domain.aisleproduct.usecase.RemoveProductsFromAisleUseCase
 import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductsUseCase
 import com.aisleron.domain.location.Location
+import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.location.LocationType
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -22,22 +25,24 @@ class RemoveLocationUseCaseTest {
     @BeforeEach
     fun setUp() {
         testData = TestDataManager()
+        val locationRepository = testData.getRepository<LocationRepository>()
+        val aisleRepository = testData.getRepository<AisleRepository>()
+        val aisleProductRepository = testData.getRepository<AisleProductRepository>()
 
         removeLocationUseCase = RemoveLocationUseCaseImpl(
-            testData.locationRepository,
+            locationRepository,
             RemoveAisleUseCaseImpl(
-                testData.aisleRepository,
-                UpdateAisleProductsUseCase(testData.aisleProductRepository),
-                RemoveProductsFromAisleUseCase(testData.aisleProductRepository)
+                aisleRepository,
+                UpdateAisleProductsUseCase(aisleProductRepository),
+                RemoveProductsFromAisleUseCase(aisleProductRepository)
             ),
             RemoveDefaultAisleUseCase(
-                testData.aisleRepository,
-                RemoveProductsFromAisleUseCase(testData.aisleProductRepository)
+                aisleRepository, RemoveProductsFromAisleUseCase(aisleProductRepository)
             )
         )
 
         runBlocking {
-            existingLocation = testData.locationRepository.get(1)!!
+            existingLocation = locationRepository.get(1)!!
         }
     }
 
@@ -47,10 +52,11 @@ class RemoveLocationUseCaseTest {
         val countAfter: Int
         val removedLocation: Location?
         runBlocking {
-            countBefore = testData.locationRepository.getAll().count()
+            val locationRepository = testData.getRepository<LocationRepository>()
+            countBefore = locationRepository.getAll().count()
             removeLocationUseCase(existingLocation)
-            removedLocation = testData.locationRepository.get(existingLocation.id)
-            countAfter = testData.locationRepository.getAll().count()
+            removedLocation = locationRepository.get(existingLocation.id)
+            countAfter = locationRepository.getAll().count()
         }
         assertNull(removedLocation)
         assertEquals(countBefore - 1, countAfter)
@@ -62,11 +68,11 @@ class RemoveLocationUseCaseTest {
         val aisleCountAfter: Int
         val aisleCountLocation: Int
         runBlocking {
-            aisleCountLocation =
-                testData.aisleRepository.getForLocation(existingLocation.id).count()
-            aisleCountBefore = testData.aisleRepository.getAll().count()
+            val aisleRepository = testData.getRepository<AisleRepository>()
+            aisleCountLocation = aisleRepository.getForLocation(existingLocation.id).count()
+            aisleCountBefore = aisleRepository.getAll().count()
             removeLocationUseCase(existingLocation)
-            aisleCountAfter = testData.aisleRepository.getAll().count()
+            aisleCountAfter = aisleRepository.getAll().count()
         }
         assertEquals(aisleCountBefore - aisleCountLocation, aisleCountAfter)
     }
@@ -77,13 +83,14 @@ class RemoveLocationUseCaseTest {
         val aisleProductCountAfter: Int
         val aisleProductCountLocation: Int
         runBlocking {
-            val aisles = testData.aisleRepository.getForLocation(existingLocation.id)
+            val aisleProductRepository = testData.getRepository<AisleProductRepository>()
+            val aisles =
+                testData.getRepository<AisleRepository>().getForLocation(existingLocation.id)
             aisleProductCountLocation =
-                testData.aisleProductRepository.getAll()
-                    .count { it.aisleId in aisles.map { a -> a.id } }
-            aisleProductCountBefore = testData.aisleProductRepository.getAll().count()
+                aisleProductRepository.getAll().count { it.aisleId in aisles.map { a -> a.id } }
+            aisleProductCountBefore = aisleProductRepository.getAll().count()
             removeLocationUseCase(existingLocation)
-            aisleProductCountAfter = testData.aisleProductRepository.getAll().count()
+            aisleProductCountAfter = aisleProductRepository.getAll().count()
         }
         assertEquals(aisleProductCountBefore - aisleProductCountLocation, aisleProductCountAfter)
     }
@@ -91,7 +98,8 @@ class RemoveLocationUseCaseTest {
     @Test
     fun removeLocation_LocationHasNoAisles_LocationRemoved() {
         val removedLocation = runBlocking {
-            val newLocationId = testData.locationRepository.add(
+            val locationRepository = testData.getRepository<LocationRepository>()
+            val newLocationId = locationRepository.add(
                 Location(
                     id = 0,
                     type = LocationType.SHOP,
@@ -101,9 +109,9 @@ class RemoveLocationUseCaseTest {
                     aisles = emptyList()
                 )
             )
-            val newLocation = testData.locationRepository.get(newLocationId)!!
+            val newLocation = locationRepository.get(newLocationId)!!
             removeLocationUseCase(newLocation)
-            testData.locationRepository.get(newLocation.id)
+            locationRepository.get(newLocation.id)
         }
         assertNull(removedLocation)
     }

@@ -1,61 +1,63 @@
 package com.aisleron.ui.shoplist
 
-import com.aisleron.data.TestDataManager
+import com.aisleron.di.KoinTestRule
+import com.aisleron.di.daoTestModule
+import com.aisleron.di.repositoryModule
+import com.aisleron.di.useCaseModule
+import com.aisleron.di.viewModelTestModule
 import com.aisleron.domain.FilterType
-import com.aisleron.domain.TestUseCaseProvider
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.location.Location
+import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.location.LocationType
+import com.aisleron.domain.location.usecase.GetLocationUseCase
+import com.aisleron.domain.location.usecase.GetPinnedShopsUseCase
+import com.aisleron.domain.location.usecase.GetShopsUseCase
 import com.aisleron.domain.location.usecase.RemoveLocationUseCase
+import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
+import org.koin.test.KoinTest
+import org.koin.test.get
+import kotlin.test.assertTrue
 
-class ShopListViewModelTest {
-    private lateinit var testData: TestDataManager
+class ShopListViewModelTest : KoinTest {
     private lateinit var shopListViewModel: ShopListViewModel
 
-    @OptIn(ExperimentalCoroutinesApi::class)
+    @get:Rule
+    val koinTestRule = KoinTestRule(
+        modules = listOf(daoTestModule, viewModelTestModule, repositoryModule, useCaseModule)
+    )
+
     @Before
     fun setUp() {
-        testData = TestDataManager()
-        val testDispatcher = UnconfinedTestDispatcher()
-        val testScope = TestScope(testDispatcher)
-        val testUseCases = TestUseCaseProvider(testData)
-
-        shopListViewModel = ShopListViewModel(
-            testUseCases.getShopsUseCase,
-            testUseCases.getPinnedShopsUseCase,
-            testUseCases.removeLocationUseCase,
-            testUseCases.getLocationUseCase,
-            testScope
-        )
+        shopListViewModel = get<ShopListViewModel>()
+        runBlocking { get<CreateSampleDataUseCase>().invoke() }
     }
 
     @Test
-    fun hydratePinnedShops_MethodCalled_ReturnsOnlyPinnedShops() {
+    fun hydratePinnedShops_MethodCalled_ReturnsOnlyPinnedShops() = runTest {
         val pinnedShopCount =
-            runBlocking {
-                testData.locationRepository.getAll()
-                    .count { it.pinned && it.type == LocationType.SHOP }
-            }
+            get<LocationRepository>().getAll().count { it.pinned && it.type == LocationType.SHOP }
 
         shopListViewModel.hydratePinnedShops()
         val shops =
             (shopListViewModel.shopListUiState.value as ShopListViewModel.ShopListUiState.Updated).shops
 
+        assertTrue { pinnedShopCount > 0 }
         Assert.assertEquals(pinnedShopCount, shops.count())
     }
 
     @Test
-    fun hydrateAllShops_MethodCalled_ReturnsAllShops() {
-        val shopCount = runBlocking {
-            testData.locationRepository.getAll().count { it.type == LocationType.SHOP }
-        }
+    fun hydrateAllShops_MethodCalled_ReturnsAllShops() = runTest {
+        val shopCount = get<LocationRepository>().getAll().count { it.type == LocationType.SHOP }
 
         shopListViewModel.hydrateAllShops()
         val shops =
@@ -65,8 +67,9 @@ class ShopListViewModelTest {
     }
 
     @Test
-    fun removeItem_ValidLocation_LocationRemoved() {
-        val location = runBlocking { testData.locationRepository.getAll().first() }
+    fun removeItem_ValidLocation_LocationRemoved() = runTest {
+        val locationRepository = get<LocationRepository>()
+        val location = locationRepository.getAll().first()
         val shopListItemViewModel = ShopListItemViewModel(
             name = location.name,
             id = location.id,
@@ -74,47 +77,45 @@ class ShopListViewModelTest {
         )
 
         shopListViewModel.removeItem(shopListItemViewModel)
-        val removedLocation = runBlocking { testData.locationRepository.get(location.id) }
+        val removedLocation = locationRepository.get(location.id)
 
         Assert.assertNull(removedLocation)
     }
 
     @Test
-    fun removeItem_InvalidLocation_NoLocationRemoved() {
+    fun removeItem_InvalidLocation_NoLocationRemoved() = runTest {
         val shopListItemViewModel = ShopListItemViewModel(
             name = "Dummy Location",
             id = -1,
             defaultFilter = FilterType.ALL
         )
 
-        val countBefore = runBlocking { testData.locationRepository.getAll().count() }
+        val locationRepository = get<LocationRepository>()
+        val countBefore = locationRepository.getAll().count()
         shopListViewModel.removeItem(shopListItemViewModel)
-        val countAfter = runBlocking { testData.locationRepository.getAll().count() }
+        val countAfter = locationRepository.getAll().count()
 
         Assert.assertEquals(countBefore, countAfter)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun removeItem_ExceptionRaised_ShopListUiStateIsError() {
-        val testUseCases = TestUseCaseProvider(testData)
-        val testDispatcher = UnconfinedTestDispatcher()
-        val testScope = TestScope(testDispatcher)
+    fun removeItem_ExceptionRaised_ShopListUiStateIsError() = runTest {
         val exceptionMessage = "Error on remove location"
 
         val sli = ShopListViewModel(
-            testUseCases.getShopsUseCase,
-            testUseCases.getPinnedShopsUseCase,
-            object : RemoveLocationUseCase {
+            getShopsUseCase = get<GetShopsUseCase>(),
+            getPinnedShopsUseCase = get<GetPinnedShopsUseCase>(),
+            removeLocationUseCase = object : RemoveLocationUseCase {
                 override suspend operator fun invoke(location: Location) {
                     throw Exception("Error on remove location")
                 }
             },
-            testUseCases.getLocationUseCase,
-            testScope
+            getLocationUseCase = get<GetLocationUseCase>(),
+            coroutineScopeProvider = TestScope(UnconfinedTestDispatcher())
         )
 
-        val location = runBlocking { testData.locationRepository.getAll().first() }
+        val location = get<LocationRepository>().getAll().first()
         val shopListItemViewModel = ShopListItemViewModel(
             name = location.name,
             id = location.id,
@@ -136,12 +137,11 @@ class ShopListViewModelTest {
 
     @Test
     fun constructor_NoCoroutineScopeProvided_ShopListViewModelReturned() {
-        val testUseCases = TestUseCaseProvider(testData)
         val sli = ShopListViewModel(
-            testUseCases.getShopsUseCase,
-            testUseCases.getPinnedShopsUseCase,
-            testUseCases.removeLocationUseCase,
-            testUseCases.getLocationUseCase
+            getShopsUseCase = get<GetShopsUseCase>(),
+            getPinnedShopsUseCase = get<GetPinnedShopsUseCase>(),
+            removeLocationUseCase = get<RemoveLocationUseCase>(),
+            getLocationUseCase = get<GetLocationUseCase>()
         )
 
         Assert.assertNotNull(sli)

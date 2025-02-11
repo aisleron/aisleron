@@ -13,16 +13,7 @@ class AisleronApplication : Application() {
             androidLogger()
             fragmentFactory()
             androidContext(this@AisleronApplication)
-            modules(
-                daoModule,
-                databaseModule,
-                fragmentModule,
-                generalModule,
-                preferenceModule,
-                repositoryModule,
-                useCaseModule,
-                viewModelModule
-            )
+            modules(appModules)
         }
     }
 }

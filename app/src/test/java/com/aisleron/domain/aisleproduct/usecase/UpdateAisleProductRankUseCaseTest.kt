@@ -2,6 +2,7 @@ package com.aisleron.domain.aisleproduct.usecase
 
 import com.aisleron.data.TestDataManager
 import com.aisleron.domain.aisleproduct.AisleProduct
+import com.aisleron.domain.aisleproduct.AisleProductRepository
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -15,10 +16,9 @@ class UpdateAisleProductRankUseCaseTest {
     @BeforeEach
     fun setUp() {
         testData = TestDataManager()
-        updateAisleProductRankUseCase =
-            UpdateAisleProductRankUseCase(testData.aisleProductRepository)
-
-        existingAisleProduct = runBlocking { testData.aisleProductRepository.getAll().first() }
+        val aisleProductRepository = testData.getRepository<AisleProductRepository>()
+        updateAisleProductRankUseCase = UpdateAisleProductRankUseCase(aisleProductRepository)
+        existingAisleProduct = runBlocking { aisleProductRepository.getAll().first() }
     }
 
     @Test
@@ -28,7 +28,8 @@ class UpdateAisleProductRankUseCaseTest {
         val updatedAisleProduct: AisleProduct?
         runBlocking {
             updateAisleProductRankUseCase(updateAisleProduct)
-            updatedAisleProduct = testData.aisleProductRepository.get(existingAisleProduct.id)
+            updatedAisleProduct =
+                testData.getRepository<AisleProductRepository>().get(existingAisleProduct.id)
         }
         Assertions.assertNotNull(updatedAisleProduct)
         Assertions.assertEquals(updateAisleProduct, updatedAisleProduct)
@@ -40,12 +41,13 @@ class UpdateAisleProductRankUseCaseTest {
         val maxAisleProductRankBefore: Int
         val maxAisleProductRankAfter: Int
         runBlocking {
-            maxAisleProductRankBefore = testData.aisleProductRepository.getAll()
+            val aisleProductRepository = testData.getRepository<AisleProductRepository>()
+            maxAisleProductRankBefore = aisleProductRepository.getAll()
                 .filter { it.aisleId == existingAisleProduct.aisleId }.maxOf { it.rank }
 
             updateAisleProductRankUseCase(updateAisleProduct)
 
-            maxAisleProductRankAfter = testData.aisleProductRepository.getAll()
+            maxAisleProductRankAfter = aisleProductRepository.getAll()
                 .filter { it.aisleId == existingAisleProduct.aisleId }.maxOf { it.rank }
         }
         Assertions.assertEquals(maxAisleProductRankBefore + 1, maxAisleProductRankAfter)

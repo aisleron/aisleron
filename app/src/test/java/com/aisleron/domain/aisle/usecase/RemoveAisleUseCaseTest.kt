@@ -2,9 +2,12 @@ package com.aisleron.domain.aisle.usecase
 
 import com.aisleron.data.TestDataManager
 import com.aisleron.domain.aisle.Aisle
+import com.aisleron.domain.aisle.AisleRepository
+import com.aisleron.domain.aisleproduct.AisleProductRepository
 import com.aisleron.domain.aisleproduct.usecase.RemoveProductsFromAisleUseCase
 import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductsUseCase
 import com.aisleron.domain.base.AisleronException
+import com.aisleron.domain.location.LocationRepository
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
@@ -21,22 +24,24 @@ class RemoveAisleUseCaseTest {
     @BeforeEach
     fun setUp() {
         testData = TestDataManager()
+        val aisleRepository = testData.getRepository<AisleRepository>()
+        val aisleProductRepository = testData.getRepository<AisleProductRepository>()
         removeAisleUseCase = RemoveAisleUseCaseImpl(
-            testData.aisleRepository,
-            UpdateAisleProductsUseCase(testData.aisleProductRepository),
-            RemoveProductsFromAisleUseCase(testData.aisleProductRepository),
+            aisleRepository,
+            UpdateAisleProductsUseCase(aisleProductRepository),
+            RemoveProductsFromAisleUseCase(aisleProductRepository),
         )
 
         runBlocking {
-            existingAisle = testData.aisleRepository.getAll().first { !it.isDefault }
+            existingAisle = aisleRepository.getAll().first { !it.isDefault }
             val defaultAisle =
-                testData.aisleRepository.getDefaultAisleFor(existingAisle.locationId)!!
+                aisleRepository.getDefaultAisleFor(existingAisle.locationId)!!
             val aisleProducts =
-                testData.aisleProductRepository.getAll().filter { it.aisleId == defaultAisle.id }
+                aisleProductRepository.getAll().filter { it.aisleId == defaultAisle.id }
 
             aisleProducts.forEach {
                 val moveAisle = it.copy(aisleId = existingAisle.id)
-                testData.aisleProductRepository.update(moveAisle)
+                aisleProductRepository.update(moveAisle)
             }
         }
     }
@@ -44,7 +49,7 @@ class RemoveAisleUseCaseTest {
     @Test
     fun removeAisle_IsDefaultAisle_ThrowsException() {
         runBlocking {
-            val defaultAisle = testData.aisleRepository.getDefaultAisles().first()
+            val defaultAisle = testData.getRepository<AisleRepository>().getDefaultAisles().first()
 
             assertThrows<AisleronException.DeleteDefaultAisleException> {
                 removeAisleUseCase(defaultAisle)
@@ -58,10 +63,11 @@ class RemoveAisleUseCaseTest {
         val countAfter: Int
         val removedAisle: Aisle?
         runBlocking {
-            countBefore = testData.aisleRepository.getAll().count()
+            val aisleRepository = testData.getRepository<AisleRepository>()
+            countBefore = aisleRepository.getAll().count()
             removeAisleUseCase(existingAisle)
-            removedAisle = testData.aisleRepository.get(existingAisle.id)
-            countAfter = testData.aisleRepository.getAll().count()
+            removedAisle = aisleRepository.get(existingAisle.id)
+            countAfter = aisleRepository.getAll().count()
         }
         assertNull(removedAisle)
         assertEquals(countBefore - 1, countAfter)
@@ -73,16 +79,18 @@ class RemoveAisleUseCaseTest {
         val aisleProductCountAfter: Int
         val aisleProductCount: Int
         runBlocking {
-            val defaultAisle = testData.aisleRepository.getDefaultAisleFor(existingAisle.locationId)
-            defaultAisle?.let { testData.aisleRepository.remove(it) }
+            val aisleRepository = testData.getRepository<AisleRepository>()
+            val aisleProductRepository = testData.getRepository<AisleProductRepository>()
+            val defaultAisle = aisleRepository.getDefaultAisleFor(existingAisle.locationId)
+            defaultAisle?.let { aisleRepository.remove(it) }
             aisleProductCount =
-                testData.aisleProductRepository.getAll().count { it.aisleId == existingAisle.id }
+                aisleProductRepository.getAll().count { it.aisleId == existingAisle.id }
 
-            aisleProductCountBefore = testData.aisleProductRepository.getAll().count()
+            aisleProductCountBefore = aisleProductRepository.getAll().count()
 
             removeAisleUseCase(existingAisle)
 
-            aisleProductCountAfter = testData.aisleProductRepository.getAll().count()
+            aisleProductCountAfter = aisleProductRepository.getAll().count()
 
         }
         assertEquals(aisleProductCountBefore - aisleProductCount, aisleProductCountAfter)
@@ -96,21 +104,23 @@ class RemoveAisleUseCaseTest {
         val defaultAisleProductCountBefore: Int
         val defaultAisleProductCountAfter: Int
         runBlocking {
+            val aisleRepository = testData.getRepository<AisleRepository>()
+            val aisleProductRepository = testData.getRepository<AisleProductRepository>()
             val defaultAisle =
-                testData.aisleRepository.getDefaultAisleFor(existingAisle.locationId)!!
+                aisleRepository.getDefaultAisleFor(existingAisle.locationId)!!
             aisleProductCount =
-                testData.aisleProductRepository.getAll().count { it.aisleId == existingAisle.id }
+                aisleProductRepository.getAll().count { it.aisleId == existingAisle.id }
             defaultAisleProductCountBefore =
-                testData.aisleProductRepository.getAll().count { it.aisleId == defaultAisle.id }
+                aisleProductRepository.getAll().count { it.aisleId == defaultAisle.id }
 
-            aisleProductCountBefore = testData.aisleProductRepository.getAll().count()
+            aisleProductCountBefore = aisleProductRepository.getAll().count()
 
             removeAisleUseCase(existingAisle)
 
-            aisleProductCountAfter = testData.aisleProductRepository.getAll().count()
+            aisleProductCountAfter = aisleProductRepository.getAll().count()
 
             defaultAisleProductCountAfter =
-                testData.aisleProductRepository.getAll().count { it.aisleId == defaultAisle.id }
+                aisleProductRepository.getAll().count { it.aisleId == defaultAisle.id }
 
 
         }
@@ -127,21 +137,22 @@ class RemoveAisleUseCaseTest {
         val countAfter: Int
         val removedAisle: Aisle?
         runBlocking {
-            val emptyAisleId = testData.aisleRepository.add(
+            val aisleRepository = testData.getRepository<AisleRepository>()
+            val emptyAisleId = aisleRepository.add(
                 Aisle(
                     name = "Empty Aisle",
                     products = emptyList(),
-                    locationId = testData.locationRepository.getAll().first().id,
+                    locationId = testData.getRepository<LocationRepository>().getAll().first().id,
                     rank = 1000,
                     id = 0,
                     isDefault = false
                 )
             )
-            val emptyAisle = testData.aisleRepository.get(emptyAisleId)!!
-            countBefore = testData.aisleRepository.getAll().count()
+            val emptyAisle = aisleRepository.get(emptyAisleId)!!
+            countBefore = aisleRepository.getAll().count()
             removeAisleUseCase(emptyAisle)
-            removedAisle = testData.aisleRepository.get(emptyAisle.id)
-            countAfter = testData.aisleRepository.getAll().count()
+            removedAisle = aisleRepository.get(emptyAisle.id)
+            countAfter = aisleRepository.getAll().count()
         }
         assertNull(removedAisle)
         assertEquals(countBefore - 1, countAfter)

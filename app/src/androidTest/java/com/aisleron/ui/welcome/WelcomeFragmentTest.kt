@@ -17,39 +17,53 @@ import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.aisleron.MainActivity
 import com.aisleron.R
 import com.aisleron.SharedPreferencesInitializer
-import com.aisleron.data.TestDataManager
 import com.aisleron.di.KoinTestRule
-import com.aisleron.di.TestAppModules
+import com.aisleron.di.daoTestModule
+import com.aisleron.di.fragmentTestModule
+import com.aisleron.di.generalTestModule
+import com.aisleron.di.inMemoryDatabaseTestModule
+import com.aisleron.di.preferenceTestModule
+import com.aisleron.di.repositoryModule
+import com.aisleron.di.useCaseModule
+import com.aisleron.di.viewModelTestModule
+import com.aisleron.domain.aisle.AisleRepository
+import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.product.Product
+import com.aisleron.domain.product.ProductRepository
 import com.aisleron.ui.AddEditFragmentListenerTestImpl
 import com.aisleron.ui.FabHandlerTestImpl
 import com.aisleron.ui.settings.WelcomePreferencesTestImpl
 import kotlinx.coroutines.runBlocking
-import org.junit.After
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.koin.core.module.Module
+import org.koin.core.context.loadKoinModules
+import org.koin.test.KoinTest
+import org.koin.test.get
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class WelcomeFragmentTest {
+class WelcomeFragmentTest : KoinTest {
 
     private lateinit var addEditFragmentListener: AddEditFragmentListenerTestImpl
-    private lateinit var testData: TestDataManager
     private lateinit var fabHandler: FabHandlerTestImpl
 
     @get:Rule
     val koinTestRule = KoinTestRule(
-        modules = getKoinModules()
+        modules = listOf(
+            daoTestModule,
+            viewModelTestModule,
+            repositoryModule,
+            useCaseModule,
+        )
     )
 
-    private fun getKoinModules(): List<Module> {
-        testData = TestDataManager(false)
+    /*private fun getKoinModules(): List<Module> {
         return TestAppModules().getTestAppModules(testData)
-    }
+    }*/
 
     private fun getFragmentScenario(
         welcomePreferences: WelcomePreferencesTestImpl? = null
@@ -71,10 +85,6 @@ class WelcomeFragmentTest {
         fabHandler = FabHandlerTestImpl()
     }
 
-    @After
-    fun tearDown() {
-    }
-
     @Test
     fun newInstance_CallNewInstance_ReturnsFragment() {
         val fragment =
@@ -88,6 +98,7 @@ class WelcomeFragmentTest {
 
     @Test
     fun applicationStarted_AppNotInitialized_WelcomeScreenDisplayed() {
+        loadKoinModules(listOf(preferenceTestModule, fragmentTestModule, generalTestModule))
         SharedPreferencesInitializer().setIsInitialized(false)
         val scenario = ActivityScenario.launch(MainActivity::class.java)
         scenario.use { s ->
@@ -102,6 +113,14 @@ class WelcomeFragmentTest {
 
     @Test
     fun applicationStarted_AppInitialized_WelcomeScreenNotDisplayed() {
+        loadKoinModules(
+            listOf(
+                preferenceTestModule,
+                fragmentTestModule,
+                generalTestModule,
+                inMemoryDatabaseTestModule
+            )
+        )
         SharedPreferencesInitializer().setIsInitialized(true)
         val scenario = ActivityScenario.launch(MainActivity::class.java)
         scenario.use { s ->
@@ -115,19 +134,19 @@ class WelcomeFragmentTest {
     }
 
     @Test
-    fun welcomePage_SelectAddOwnProducts_NoDataAdded() {
-        val productCountBefore = runBlocking { testData.productRepository.getAll().count() }
-        val locationCountBefore = runBlocking { testData.locationRepository.getAll().count() }
-        val aisleCountBefore = runBlocking { testData.aisleRepository.getAll().count() }
+    fun welcomePage_SelectAddOwnProducts_NoDataAdded() = runTest {
+        val productCountBefore = get<ProductRepository>().getAll().count()
+        val locationCountBefore = get<LocationRepository>().getAll().count()
+        val aisleCountBefore = get<AisleRepository>().getAll().count()
 
         getFragmentScenario()
 
         val welcomeOption = onView(withId(R.id.txt_welcome_add_own_product))
         welcomeOption.perform(click())
 
-        val productCountAfter = runBlocking { testData.productRepository.getAll().count() }
-        val locationCountAfter = runBlocking { testData.locationRepository.getAll().count() }
-        val aisleCountAfter = runBlocking { testData.aisleRepository.getAll().count() }
+        val productCountAfter = get<ProductRepository>().getAll().count()
+        val locationCountAfter = get<LocationRepository>().getAll().count()
+        val aisleCountAfter = get<AisleRepository>().getAll().count()
 
         assertEquals(productCountBefore, productCountAfter)
         assertEquals(locationCountBefore, locationCountAfter)
@@ -162,19 +181,19 @@ class WelcomeFragmentTest {
     }
 
     @Test
-    fun welcomePage_SelectLoadSampleItems_DataAdded() {
-        val productCountBefore = runBlocking { testData.productRepository.getAll().count() }
-        val locationCountBefore = runBlocking { testData.locationRepository.getAll().count() }
-        val aisleCountBefore = runBlocking { testData.aisleRepository.getAll().count() }
+    fun welcomePage_SelectLoadSampleItems_DataAdded() = runTest {
+        val productCountBefore = get<ProductRepository>().getAll().count()
+        val locationCountBefore = get<LocationRepository>().getAll().count()
+        val aisleCountBefore = get<AisleRepository>().getAll().count()
 
         getFragmentScenario()
 
         val welcomeOption = onView(withId(R.id.txt_welcome_load_sample_items))
         welcomeOption.perform(click())
 
-        val productCountAfter = runBlocking { testData.productRepository.getAll().count() }
-        val locationCountAfter = runBlocking { testData.locationRepository.getAll().count() }
-        val aisleCountAfter = runBlocking { testData.aisleRepository.getAll().count() }
+        val productCountAfter = get<ProductRepository>().getAll().count()
+        val locationCountAfter = get<LocationRepository>().getAll().count()
+        val aisleCountAfter = get<AisleRepository>().getAll().count()
 
         assertTrue(productCountBefore < productCountAfter)
         assertTrue(locationCountBefore < locationCountAfter)
@@ -212,7 +231,7 @@ class WelcomeFragmentTest {
     fun selectLoadSampleItems_HasExistingProducts_ShowErrorSnackBar() {
         val welcomePreferences = WelcomePreferencesTestImpl()
         runBlocking {
-            testData.productRepository.add(
+            get<ProductRepository>().add(
                 Product(
                     id = 0,
                     name = "Welcome Page Sample Items Error Test",
@@ -273,6 +292,14 @@ class WelcomeFragmentTest {
 
     @Test
     fun selectedDbImport_BackPressedOnSettings_ReturnToMainScreen() {
+        loadKoinModules(
+            listOf(
+                preferenceTestModule,
+                fragmentTestModule,
+                generalTestModule,
+                inMemoryDatabaseTestModule
+            )
+        )
         SharedPreferencesInitializer().setIsInitialized(false)
         val scenario = ActivityScenario.launch(MainActivity::class.java)
 
@@ -291,6 +318,14 @@ class WelcomeFragmentTest {
 
     @Test
     fun welcomePage_BackPressed_InitializeOptionNotSet() {
+        loadKoinModules(
+            listOf(
+                preferenceTestModule,
+                fragmentTestModule,
+                generalTestModule,
+                inMemoryDatabaseTestModule
+            )
+        )
         SharedPreferencesInitializer().setIsInitialized(false)
         val scenario = ActivityScenario.launch(MainActivity::class.java)
 

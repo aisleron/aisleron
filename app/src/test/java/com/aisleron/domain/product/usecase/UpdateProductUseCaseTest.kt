@@ -3,6 +3,7 @@ package com.aisleron.domain.product.usecase
 import com.aisleron.data.TestDataManager
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.product.Product
+import com.aisleron.domain.product.ProductRepository
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -19,19 +20,18 @@ class UpdateProductUseCaseTest {
     @BeforeEach
     fun setUp() {
         testData = TestDataManager()
-
-        existingProduct = runBlocking { testData.productRepository.get(1)!! }
-
+        val productRepository = testData.getRepository<ProductRepository>()
+        existingProduct = runBlocking { productRepository.get(1)!! }
         updateProductUseCase = UpdateProductUseCase(
-            testData.productRepository,
-            IsProductNameUniqueUseCase(testData.productRepository)
+            productRepository, IsProductNameUniqueUseCase(productRepository)
         )
     }
 
     @Test
     fun updateProduct_IsDuplicateName_ThrowsException() {
         runBlocking {
-            val id = testData.productRepository.add(
+            val productRepository = testData.getRepository<ProductRepository>()
+            val id = productRepository.add(
                 Product(
                     id = 2,
                     name = "Product 2",
@@ -39,8 +39,7 @@ class UpdateProductUseCaseTest {
                 )
             )
 
-            val updateProduct =
-                testData.productRepository.get(id)!!.copy(name = existingProduct.name)
+            val updateProduct = productRepository.get(id)!!.copy(name = existingProduct.name)
             assertThrows<AisleronException.DuplicateProductNameException> {
                 updateProductUseCase(updateProduct)
             }
@@ -58,10 +57,11 @@ class UpdateProductUseCaseTest {
         val countBefore: Int
         val countAfter: Int
         runBlocking {
-            countBefore = testData.productRepository.getAll().count()
+            val productRepository = testData.getRepository<ProductRepository>()
+            countBefore = productRepository.getAll().count()
             updateProductUseCase(updateProduct)
-            updatedProduct = testData.productRepository.getByName(updateProduct.name)
-            countAfter = testData.productRepository.getAll().count()
+            updatedProduct = productRepository.getByName(updateProduct.name)
+            countAfter = productRepository.getAll().count()
         }
         assertNotNull(updatedProduct)
         assertEquals(countBefore, countAfter)
@@ -80,10 +80,11 @@ class UpdateProductUseCaseTest {
         val countBefore: Int
         val countAfter: Int
         runBlocking {
-            countBefore = testData.productRepository.getAll().count()
+            val productRepository = testData.getRepository<ProductRepository>()
+            countBefore = productRepository.getAll().count()
             updateProductUseCase(newProduct)
-            updatedProduct = testData.productRepository.getByName(newProduct.name)
-            countAfter = testData.productRepository.getAll().count()
+            updatedProduct = productRepository.getByName(newProduct.name)
+            countAfter = productRepository.getAll().count()
         }
         assertNotNull(updatedProduct)
         assertEquals(countBefore + 1, countAfter)

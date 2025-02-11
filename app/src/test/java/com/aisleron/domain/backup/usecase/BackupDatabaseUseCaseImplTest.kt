@@ -2,8 +2,7 @@ package com.aisleron.domain.backup.usecase
 
 import com.aisleron.data.TestDataManager
 import com.aisleron.domain.base.AisleronException
-import com.aisleron.testdata.data.maintenance.DatabaseMaintenanceBlankDbNameImpl
-import com.aisleron.testdata.data.maintenance.DatabaseMaintenanceNullDbNameImpl
+import com.aisleron.testdata.data.maintenance.DatabaseMaintenanceDbNameTestImpl
 import com.aisleron.testdata.data.maintenance.DatabaseMaintenanceTestImpl
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -23,7 +22,7 @@ class BackupDatabaseUseCaseImplTest {
 
     @Test
     fun backupDb_IsNullDbName_ThrowsInvalidDbNameException() {
-        val dbMaintenance = DatabaseMaintenanceNullDbNameImpl()
+        val dbMaintenance = DatabaseMaintenanceDbNameTestImpl(null)
         val backupDatabaseUseCase = BackupDatabaseUseCaseImpl(dbMaintenance)
         runBlocking {
             assertThrows<AisleronException.InvalidDbNameException> {
@@ -34,7 +33,7 @@ class BackupDatabaseUseCaseImplTest {
 
     @Test
     fun backupDb_IsBlankDbName_ThrowsInvalidDbNameException() {
-        val dbMaintenance = DatabaseMaintenanceBlankDbNameImpl()
+        val dbMaintenance = DatabaseMaintenanceDbNameTestImpl("")
         val backupDatabaseUseCase = BackupDatabaseUseCaseImpl(dbMaintenance)
         runBlocking {
             assertThrows<AisleronException.InvalidDbNameException> {

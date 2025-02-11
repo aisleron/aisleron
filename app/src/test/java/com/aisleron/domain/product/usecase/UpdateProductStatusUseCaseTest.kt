@@ -2,6 +2,7 @@ package com.aisleron.domain.product.usecase
 
 import com.aisleron.data.TestDataManager
 import com.aisleron.domain.product.Product
+import com.aisleron.domain.product.ProductRepository
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -21,12 +22,10 @@ class UpdateProductStatusUseCaseTest {
     @BeforeEach
     fun setUp() {
         testData = TestDataManager()
+        val productRepository = testData.getRepository<ProductRepository>()
         updateProductStatusUseCase = UpdateProductStatusUseCaseImpl(
-            GetProductUseCase(testData.productRepository),
-            UpdateProductUseCase(
-                testData.productRepository,
-                IsProductNameUniqueUseCase(testData.productRepository)
-            )
+            GetProductUseCase(productRepository),
+            UpdateProductUseCase(productRepository, IsProductNameUniqueUseCase(productRepository))
         )
     }
 
@@ -35,7 +34,7 @@ class UpdateProductStatusUseCaseTest {
     fun updateProductStatus_ProductExists_StatusUpdated(inStock: Boolean) {
         val existingProduct: Product
         val updatedProduct = runBlocking {
-            existingProduct = testData.productRepository.getAll().first()
+            existingProduct = testData.getRepository<ProductRepository>().getAll().first()
             updateProductStatusUseCase(existingProduct.id, inStock)
         }
 

@@ -2,6 +2,7 @@ package com.aisleron.domain.product.usecase
 
 import com.aisleron.data.TestDataManager
 import com.aisleron.domain.product.Product
+import com.aisleron.domain.product.ProductRepository
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -15,7 +16,7 @@ class GetAllProductsUseCaseTest {
     @BeforeEach
     fun setUp() {
         testData = TestDataManager()
-        getAllProductsUseCase = GetAllProductsUseCase(testData.productRepository)
+        getAllProductsUseCase = GetAllProductsUseCase(testData.getRepository<ProductRepository>())
     }
 
     @Test
@@ -24,7 +25,7 @@ class GetAllProductsUseCaseTest {
         val repoProductsList: List<Product>
 
         runBlocking {
-            repoProductsList = testData.productRepository.getAll()
+            repoProductsList = testData.getRepository<ProductRepository>().getAll()
             getProductsList = getAllProductsUseCase()
         }
 

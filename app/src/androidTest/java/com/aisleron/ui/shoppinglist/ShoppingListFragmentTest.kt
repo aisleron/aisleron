@@ -27,13 +27,19 @@ import androidx.test.espresso.matcher.ViewMatchers.withResourceName
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.aisleron.R
-import com.aisleron.data.TestDataManager
 import com.aisleron.di.KoinTestRule
-import com.aisleron.di.TestAppModules
+import com.aisleron.di.daoTestModule
+import com.aisleron.di.repositoryModule
+import com.aisleron.di.useCaseModule
+import com.aisleron.di.viewModelTestModule
 import com.aisleron.domain.FilterType
+import com.aisleron.domain.aisle.AisleRepository
 import com.aisleron.domain.location.Location
+import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.product.Product
+import com.aisleron.domain.product.ProductRepository
+import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import com.aisleron.ui.ApplicationTitleUpdateListenerTestImpl
 import com.aisleron.ui.FabHandler
 import com.aisleron.ui.FabHandlerTestImpl
@@ -42,6 +48,7 @@ import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.settings.ShoppingListPreferencesTestImpl
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.allOf
 import org.hamcrest.CoreMatchers.instanceOf
 import org.hamcrest.CoreMatchers.not
@@ -50,28 +57,23 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.koin.core.module.Module
+import org.koin.test.KoinTest
+import org.koin.test.get
 import java.lang.Thread.sleep
 import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
-class ShoppingListFragmentTest {
+class ShoppingListFragmentTest : KoinTest {
 
     private lateinit var bundler: Bundler
     private lateinit var applicationTitleUpdateListener: ApplicationTitleUpdateListenerTestImpl
-    private lateinit var testData: TestDataManager
     private lateinit var fabHandler: FabHandlerTestImpl
 
     @get:Rule
     val koinTestRule = KoinTestRule(
-        modules = getKoinModules()
+        modules = listOf(daoTestModule, viewModelTestModule, repositoryModule, useCaseModule)
     )
-
-    private fun getKoinModules(): List<Module> {
-        testData = TestDataManager()
-        return TestAppModules().getTestAppModules(testData)
-    }
 
     private fun getFragmentScenario(
         bundle: Bundle, shoppingListPreferencesTestImpl: ShoppingListPreferencesTestImpl? = null
@@ -88,16 +90,16 @@ class ShoppingListFragmentTest {
             }
         )
 
-    private fun getLocation(locationType: LocationType): Location =
-        runBlocking {
-            testData.locationRepository.getAll().first { it.type == locationType }
-        }
+    private fun getLocation(locationType: LocationType): Location = runBlocking {
+        get<LocationRepository>().getAll().first { it.type == locationType }
+    }
 
     @Before
     fun setUp() {
         bundler = Bundler()
         applicationTitleUpdateListener = ApplicationTitleUpdateListenerTestImpl()
         fabHandler = FabHandlerTestImpl()
+        runBlocking { get<CreateSampleDataUseCase>().invoke() }
     }
 
     @Test
@@ -180,33 +182,14 @@ class ShoppingListFragmentTest {
         }
     }
 
-    /*private fun withAisleName(text: String): org.hamcrest.Matcher<RecyclerView.ViewHolder> {
-        return object :
-            BoundedMatcher<RecyclerView.ViewHolder, ShoppingListItemRecyclerViewAdapter.AisleViewHolder>(
-                ShoppingListItemRecyclerViewAdapter.AisleViewHolder::class.java
-            ) {
-            override fun describeTo(description: Description?) {
-                description?.appendText("with item package name " + text)
-            }
-
-            override fun matchesSafely(item: ShoppingListItemRecyclerViewAdapter.AisleViewHolder?): Boolean {
-                return item?.itemView?.findViewById<TextView>(R.id.txt_aisle_name)?.text == text
-            }
-        }
-    }*/
-
-    private fun getShoppingList(): Location {
-        val shoppingList = runBlocking {
-            val locationId =
-                testData.locationRepository.getAll().first { it.type != LocationType.HOME }.id
-
-            testData.locationRepository.getLocationWithAislesWithProducts(locationId).first()!!
-        }
-        return shoppingList
+    private suspend fun getShoppingList(): Location {
+        val locationRepository = get<LocationRepository>()
+        val locationId = locationRepository.getAll().first { it.type != LocationType.HOME }.id
+        return locationRepository.getLocationWithAislesWithProducts(locationId).first()!!
     }
 
     @Test
-    fun onLongClick_IsAisleAndActionModeNotActive_ShowActionModeContextMenu() {
+    fun onLongClick_IsAisleAndActionModeNotActive_ShowActionModeContextMenu() = runTest {
         val shoppingList = getShoppingList()
         getFragmentScenario(
             bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
@@ -227,7 +210,7 @@ class ShoppingListFragmentTest {
     }
 
     @Test
-    fun onLongClick_IsProductAndActionModeNotActive_ShowActionModeContextMenu() {
+    fun onLongClick_IsProductAndActionModeNotActive_ShowActionModeContextMenu() = runTest {
         val shoppingList = getShoppingList()
         getFragmentScenario(
             bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
@@ -247,7 +230,7 @@ class ShoppingListFragmentTest {
     }
 
     @Test
-    fun onClick_ActionModeIsActive_DismissActionModeContextMenu() {
+    fun onClick_ActionModeIsActive_DismissActionModeContextMenu() = runTest {
         val shoppingList = getShoppingList()
         val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
         val scenario = getFragmentScenario(bundle)
@@ -266,7 +249,7 @@ class ShoppingListFragmentTest {
     }
 
     @Test
-    fun onBackPress_ActionModeIsActive_DismissActionModeContextMenu() {
+    fun onBackPress_ActionModeIsActive_DismissActionModeContextMenu() = runTest {
         val shoppingList = getShoppingList()
         val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
         val scenario = getFragmentScenario(bundle)
@@ -285,7 +268,7 @@ class ShoppingListFragmentTest {
     }
 
     @Test
-    fun onActionItemClicked_ActionItemIsDelete_DeleteDialogShown() {
+    fun onActionItemClicked_ActionItemIsDelete_DeleteDialogShown() = runTest {
         val shoppingList = getShoppingList()
         val product = getProduct(shoppingList, false)
         val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
@@ -307,7 +290,7 @@ class ShoppingListFragmentTest {
     }
 
     @Test
-    fun onActionItemClicked_DeleteConfirmedOnProduct_ProductDeleted() {
+    fun onActionItemClicked_DeleteConfirmedOnProduct_ProductDeleted() = runTest {
         val shoppingList = getShoppingList()
         val product = getProduct(shoppingList, false)
         val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
@@ -323,12 +306,12 @@ class ShoppingListFragmentTest {
             .check(matches(isDisplayed()))
             .perform(click())
 
-        val deletedProduct = runBlocking { testData.productRepository.getByName(product.name) }
+        val deletedProduct = get<ProductRepository>().getByName(product.name)
         Assert.assertNull(deletedProduct)
     }
 
     @Test
-    fun onActionItemClicked_DeleteConfirmedOnAisle_AisleDeleted() {
+    fun onActionItemClicked_DeleteConfirmedOnAisle_AisleDeleted() = runTest {
         val shoppingList = getShoppingList()
         val aisle = shoppingList.aisles.first { !it.isDefault }
         val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
@@ -344,12 +327,12 @@ class ShoppingListFragmentTest {
             .perform(click())
 
         //TODO: Check item is deleted in recyclerview rather than db. Need to consider Flows
-        val deletedAisle = runBlocking { testData.aisleRepository.get(aisle.id) }
+        val deletedAisle = get<AisleRepository>().get(aisle.id)
         Assert.assertNull(deletedAisle)
     }
 
     @Test
-    fun onActionItemClicked_DeleteConfirmedOnDefaultAisle_ErrorSnackBarShown() {
+    fun onActionItemClicked_DeleteConfirmedOnDefaultAisle_ErrorSnackBarShown() = runTest {
         val shoppingList = getShoppingList()
         val aisle = shoppingList.aisles.first { it.isDefault }
         val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
@@ -375,7 +358,7 @@ class ShoppingListFragmentTest {
     }
 
     @Test
-    fun onActionItemClicked_DeleteCancelled_AisleNotDeleted() {
+    fun onActionItemClicked_DeleteCancelled_AisleNotDeleted() = runTest {
         val shoppingList = getShoppingList()
         val aisle = shoppingList.aisles.first { !it.isDefault }
         val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
@@ -390,12 +373,12 @@ class ShoppingListFragmentTest {
             .check(matches(isDisplayed()))
             .perform(click())
 
-        val deletedAisle = runBlocking { testData.aisleRepository.get(aisle.id) }
+        val deletedAisle = get<AisleRepository>().get(aisle.id)
         Assert.assertNotNull(deletedAisle)
     }
 
     @Test
-    fun onActionItemClicked_ActionItemIsEditOnProduct_NavigateToEditProduct() {
+    fun onActionItemClicked_ActionItemIsEditOnProduct_NavigateToEditProduct() = runTest {
         val shoppingList = getShoppingList()
         val product = getProduct(shoppingList, false)
         val shoppingListBundle =
@@ -421,7 +404,7 @@ class ShoppingListFragmentTest {
     }
 
     @Test
-    fun onProductStatusChange_SetProductInStock_ProductStatusToggled() {
+    fun onProductStatusChange_SetProductInStock_ProductStatusToggled() = runTest {
         val shoppingList = getShoppingList()
         val product = getProduct(shoppingList, false)
         val shoppingListBundle =
@@ -436,12 +419,12 @@ class ShoppingListFragmentTest {
             )
         ).perform(click())
 
-        val updatedProduct = runBlocking { testData.productRepository.get(product.id) }
+        val updatedProduct = get<ProductRepository>().get(product.id)
         assertEquals(!product.inStock, updatedProduct?.inStock)
     }
 
     @Test
-    fun onProductStatusChange_SetProductNeeded_ProductStatusToggled() {
+    fun onProductStatusChange_SetProductNeeded_ProductStatusToggled() = runTest {
         val shoppingList = getShoppingList()
         val product = getProduct(shoppingList, true)
         val shoppingListBundle =
@@ -456,12 +439,12 @@ class ShoppingListFragmentTest {
             )
         ).perform(click())
 
-        val updatedProduct = runBlocking { testData.productRepository.get(product.id) }
+        val updatedProduct = get<ProductRepository>().get(product.id)
         assertEquals(!product.inStock, updatedProduct?.inStock)
     }
 
     @Test
-    fun onSwipe_IsProduct_ProductStatusToggled() {
+    fun onSwipe_IsProduct_ProductStatusToggled() = runTest {
         val shoppingList = getShoppingList()
         val product =
             getProduct(shoppingList, false)
@@ -477,7 +460,7 @@ class ShoppingListFragmentTest {
             )
         ).perform(ViewActions.swipeLeft())
 
-        val updatedProduct = runBlocking { testData.productRepository.get(product.id) }
+        val updatedProduct = get<ProductRepository>().get(product.id)
         assertEquals(!product.inStock, updatedProduct?.inStock)
     }
 
@@ -490,7 +473,7 @@ class ShoppingListFragmentTest {
     }
 
     @Test
-    fun onActionItemClicked_ActionItemIsEditOnAisle_ShowAisleEditDialog() {
+    fun onActionItemClicked_ActionItemIsEditOnAisle_ShowAisleEditDialog() = runTest {
         val shoppingList = getShoppingList()
         val aisle = shoppingList.aisles.first()
         val shoppingListBundle =
@@ -512,7 +495,7 @@ class ShoppingListFragmentTest {
     }
 
     @Test
-    fun aisleEditDialog_DoneClicked_AisleUpdated() {
+    fun aisleEditDialog_DoneClicked_AisleUpdated() = runTest {
         val shoppingList = getShoppingList()
         val aisle = shoppingList.aisles.first()
         val updateSuffix = " Updated"
@@ -533,13 +516,13 @@ class ShoppingListFragmentTest {
             .inRoot(isDialog())
             .perform(click())
 
-        val updatedAisle = runBlocking { testData.aisleRepository.get(aisle.id) }
+        val updatedAisle = get<AisleRepository>().get(aisle.id)
 
         assertEquals(aisle.name + updateSuffix, updatedAisle?.name)
     }
 
     @Test
-    fun aisleEditDialog_CancelClicked_AisleNotUpdated() {
+    fun aisleEditDialog_CancelClicked_AisleNotUpdated() = runTest {
         val shoppingList = getShoppingList()
         val aisle = shoppingList.aisles.first()
         val updateSuffix = " Updated"
@@ -560,13 +543,13 @@ class ShoppingListFragmentTest {
             .inRoot(isDialog())
             .perform(click())
 
-        val updatedAisle = runBlocking { testData.aisleRepository.get(aisle.id) }
+        val updatedAisle = get<AisleRepository>().get(aisle.id)
 
         assertEquals(aisle.name, updatedAisle?.name)
     }
 
     @Test
-    fun aisleEditDialog_DoneClickedWithBlankAisleName_AisleNotUpdated() {
+    fun aisleEditDialog_DoneClickedWithBlankAisleName_AisleNotUpdated() = runTest {
         val shoppingList = getShoppingList()
         val aisle = shoppingList.aisles.first()
         val shoppingListBundle =
@@ -586,13 +569,13 @@ class ShoppingListFragmentTest {
             .inRoot(isDialog())
             .perform(click())
 
-        val updatedAisle = runBlocking { testData.aisleRepository.get(aisle.id) }
+        val updatedAisle = get<AisleRepository>().get(aisle.id)
 
         assertEquals(aisle.name, updatedAisle?.name)
     }
 
     @Test
-    fun onClickFab_IsAddProductFab_NavigateToAddProduct() {
+    fun onClickFab_IsAddProductFab_NavigateToAddProduct() = runTest {
         val shoppingList = getShoppingList()
         val shoppingListBundle =
             bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
@@ -618,7 +601,7 @@ class ShoppingListFragmentTest {
     }
 
     @Test
-    fun onClickFab_IsAddAisleFab_ShowAddAisleDialog() {
+    fun onClickFab_IsAddAisleFab_ShowAddAisleDialog() = runTest {
         val shoppingList = getShoppingList()
         val shoppingListBundle =
             bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
@@ -637,7 +620,7 @@ class ShoppingListFragmentTest {
     }
 
     @Test
-    fun aisleDialogDoneClick_HasAisleName_AddNewAisle() {
+    fun aisleDialogDoneClick_HasAisleName_AddNewAisle() = runTest {
         val newAisleName = "Add Aisle Test 123321"
         val shoppingList = getShoppingList()
         val shoppingListBundle =
@@ -655,19 +638,19 @@ class ShoppingListFragmentTest {
             .inRoot(isDialog())
             .perform(click())
 
-        val addedAisle = runBlocking {
-            testData.aisleRepository.getAll().firstOrNull { it.name == newAisleName }
-        }
+        val addedAisle = get<AisleRepository>().getAll().firstOrNull { it.name == newAisleName }
 
         assertNotNull(addedAisle)
     }
 
     @Test
-    fun aisleDialogDoneClick_AisleNameIsEmpty_NoAisleAdded() {
+    fun aisleDialogDoneClick_AisleNameIsEmpty_NoAisleAdded() = runTest {
         val shoppingList = getShoppingList()
         val shoppingListBundle =
             bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
-        val aisleCountBefore = runBlocking { testData.aisleRepository.getAll().count() }
+
+        val aisleRepository = get<AisleRepository>()
+        val aisleCountBefore = aisleRepository.getAll().count()
 
         getFragmentScenario(shoppingListBundle).onFragment {
             fabHandler.clickFab(FabHandler.FabOption.ADD_AISLE, it.requireView())
@@ -677,18 +660,20 @@ class ShoppingListFragmentTest {
             .inRoot(isDialog())
             .perform(click())
 
-        val aisleCountAfter = runBlocking { testData.aisleRepository.getAll().count() }
+        val aisleCountAfter = aisleRepository.getAll().count()
 
         assertEquals(aisleCountBefore, aisleCountAfter)
     }
 
     @Test
-    fun aisleDialogCancelClick_RegardlessOfAisleName_NoAisleAdded() {
+    fun aisleDialogCancelClick_RegardlessOfAisleName_NoAisleAdded() = runTest {
         val newAisleName = "Add Aisle Test 123321"
         val shoppingList = getShoppingList()
         val shoppingListBundle =
             bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
-        val aisleCountBefore = runBlocking { testData.aisleRepository.getAll().count() }
+
+        val aisleRepository = get<AisleRepository>()
+        val aisleCountBefore = aisleRepository.getAll().count()
 
         getFragmentScenario(shoppingListBundle).onFragment {
             fabHandler.clickFab(FabHandler.FabOption.ADD_AISLE, it.requireView())
@@ -702,17 +687,15 @@ class ShoppingListFragmentTest {
             .inRoot(isDialog())
             .perform(click())
 
-        val aisleCountAfter = runBlocking { testData.aisleRepository.getAll().count() }
-        val addedAisle = runBlocking {
-            testData.aisleRepository.getAll().firstOrNull { it.name == newAisleName }
-        }
+        val aisleCountAfter = aisleRepository.getAll().count()
+        val addedAisle = aisleRepository.getAll().firstOrNull { it.name == newAisleName }
 
         assertEquals(aisleCountBefore, aisleCountAfter)
         assertNull(addedAisle)
     }
 
     @Test
-    fun aisleDialogAddAnotherClick_HasAisleName_AisleAddedAndShowDialogAgain() {
+    fun aisleDialogAddAnotherClick_HasAisleName_AisleAddedAndShowDialogAgain() = runTest {
         val newAisleName = "Add Aisle Test 123321"
         val shoppingList = getShoppingList()
         val shoppingListBundle =
@@ -730,9 +713,7 @@ class ShoppingListFragmentTest {
             .inRoot(isDialog())
             .perform(click())
 
-        val addedAisle = runBlocking {
-            testData.aisleRepository.getAll().firstOrNull { it.name == newAisleName }
-        }
+        val addedAisle = get<AisleRepository>().getAll().firstOrNull { it.name == newAisleName }
 
         onView(withText(R.string.add_aisle))
             .inRoot(isDialog())
@@ -742,7 +723,7 @@ class ShoppingListFragmentTest {
     }
 
     @Test
-    fun onProductStatusChange_StatusUpdateSnackBarEnabled_ShowSnackBar() {
+    fun onProductStatusChange_StatusUpdateSnackBarEnabled_ShowSnackBar() = runTest {
         val shoppingList = getShoppingList()
         val product = getProduct(shoppingList, false)
         val shoppingListBundle =
@@ -770,7 +751,7 @@ class ShoppingListFragmentTest {
     }
 
     @Test
-    fun onProductStatusChange_StatusUpdateSnackBarDisabled_HideSnackBar() {
+    fun onProductStatusChange_StatusUpdateSnackBarDisabled_HideSnackBar() = runTest {
         val shoppingList = getShoppingList()
         val product = getProduct(shoppingList, false)
         val shoppingListBundle =
@@ -792,7 +773,7 @@ class ShoppingListFragmentTest {
     }
 
     @Test
-    fun onProductStatusChange_StatusUpdateSnackBarUndoClicked_ProductStatusChanged() {
+    fun onProductStatusChange_StatusUpdateSnackBarUndoClicked_ProductStatusChanged() = runTest {
         val shoppingList = getShoppingList()
         val product = getProduct(shoppingList, false)
         val shoppingListBundle =
@@ -812,13 +793,12 @@ class ShoppingListFragmentTest {
             )
         ).perform(click())
 
-        val productStatusAfterChange =
-            runBlocking { testData.productRepository.get(product.id)?.inStock }
+        val productRepository = get<ProductRepository>()
+        val productStatusAfterChange = productRepository.get(product.id)?.inStock
 
         onView(withId(com.google.android.material.R.id.snackbar_action)).perform(click())
 
-        val productStatusAfterUndo =
-            runBlocking { testData.productRepository.get(product.id)?.inStock }
+        val productStatusAfterUndo = productRepository.get(product.id)?.inStock
 
         assertNotEquals(productStatusBefore, productStatusAfterChange)
         assertEquals(productStatusBefore, productStatusAfterUndo)

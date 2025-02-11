@@ -5,30 +5,22 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withText
-import com.aisleron.data.TestDataManager
 import com.aisleron.di.KoinTestRule
-import com.aisleron.di.TestAppModules
-import org.junit.Before
+import com.aisleron.di.daoTestModule
+import com.aisleron.di.fragmentModule
+import com.aisleron.di.repositoryModule
+import com.aisleron.di.useCaseModule
+import com.aisleron.di.viewModelTestModule
 import org.junit.Rule
 import org.junit.Test
-import org.koin.core.module.Module
 
 class AboutActivityTest {
-    private lateinit var testData: TestDataManager
-
     @get:Rule
     val koinTestRule = KoinTestRule(
-        modules = getKoinModules()
+        modules = listOf(
+            daoTestModule, fragmentModule, viewModelTestModule, repositoryModule, useCaseModule
+        )
     )
-
-    private fun getKoinModules(): List<Module> {
-        testData = TestDataManager(false)
-        return TestAppModules().getTestAppModules(testData)
-    }
-
-    @Before
-    fun setUp() {
-    }
 
     @Test
     fun aboutActivity_OnStart_ShowsAbout() {

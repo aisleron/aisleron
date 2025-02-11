@@ -1,6 +1,7 @@
 package com.aisleron.domain.product.usecase
 
 import com.aisleron.data.TestDataManager
+import com.aisleron.domain.product.ProductRepository
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -16,7 +17,7 @@ class GetProductUseCaseTest {
         testData = TestDataManager()
 
         getProductUseCase = GetProductUseCase(
-            testData.productRepository
+            testData.getRepository<ProductRepository>()
         )
     }
 

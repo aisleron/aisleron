@@ -1,4 +1,7 @@
-package com.aisleron.data.product
+package com.aisleron.testdata.data.product
+
+import com.aisleron.data.product.ProductDao
+import com.aisleron.data.product.ProductEntity
 
 class ProductDaoTestImpl : ProductDao {
 

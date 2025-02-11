@@ -1,6 +1,9 @@
-package com.aisleron.data.aisleproduct
+package com.aisleron.testdata.data.aisleproduct
 
-import com.aisleron.data.product.ProductDaoTestImpl
+import com.aisleron.data.aisleproduct.AisleProductDao
+import com.aisleron.data.aisleproduct.AisleProductEntity
+import com.aisleron.data.aisleproduct.AisleProductRank
+import com.aisleron.testdata.data.product.ProductDaoTestImpl
 
 class AisleProductDaoTestImpl(private val productDao: ProductDaoTestImpl) : AisleProductDao {
 

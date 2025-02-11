@@ -13,36 +13,48 @@ import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withContentDescription
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
-import com.aisleron.data.TestDataManager
 import com.aisleron.di.KoinTestRule
-import com.aisleron.di.TestAppModules
+import com.aisleron.di.daoTestModule
+import com.aisleron.di.fragmentModule
+import com.aisleron.di.generalTestModule
+import com.aisleron.di.preferenceTestModule
+import com.aisleron.di.repositoryModule
+import com.aisleron.di.useCaseModule
+import com.aisleron.di.viewModelTestModule
+import com.aisleron.domain.product.ProductRepository
+import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.allOf
 import org.hamcrest.Matchers
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.koin.core.module.Module
+import org.koin.test.KoinTest
+import org.koin.test.get
 
-class SearchBoxTest {
+class SearchBoxTest : KoinTest {
 
-    private lateinit var testData: TestDataManager
     private lateinit var scenario: ActivityScenario<MainActivity>
 
     @get:Rule
     val koinTestRule = KoinTestRule(
-        modules = getKoinModules()
+        modules = listOf(
+            daoTestModule,
+            fragmentModule,
+            viewModelTestModule,
+            repositoryModule,
+            useCaseModule,
+            generalTestModule,
+            preferenceTestModule
+        )
     )
-
-    private fun getKoinModules(): List<Module> {
-        testData = TestDataManager()
-        return TestAppModules().getTestAppModules(testData)
-    }
 
     @Before
     fun setUp() {
         SharedPreferencesInitializer().setIsInitialized(true)
+        runBlocking { get<CreateSampleDataUseCase>().invoke() }
         scenario = ActivityScenario.launch(MainActivity::class.java)
     }
 
@@ -84,8 +96,8 @@ class SearchBoxTest {
     }
 
     @Test
-    fun onSearchBox_IsExistingProduct_ProductDisplayed() {
-        val product = runBlocking { testData.productRepository.getAll().first() }
+    fun onSearchBox_IsExistingProduct_ProductDisplayed() = runTest {
+        val product = get<ProductRepository>().getAll().first()
         performSearch(product.name)
         getProductView(product.name).check(matches(isDisplayed()))
     }
@@ -100,8 +112,8 @@ class SearchBoxTest {
     }
 
     @Test
-    fun onSearchBox_ClearSearchClicked_ShowProducts() {
-        val product = runBlocking { testData.productRepository.getAll().first() }
+    fun onSearchBox_ClearSearchClicked_ShowProducts() = runTest {
+        val product = get<ProductRepository>().getAll().first()
         val searchString = "This is Not a Real Product Name"
 
         performSearch(searchString)

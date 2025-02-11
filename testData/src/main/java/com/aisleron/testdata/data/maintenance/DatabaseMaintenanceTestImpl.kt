@@ -25,16 +25,8 @@ class DatabaseMaintenanceTestImpl : DatabaseMaintenance {
     }
 }
 
-class DatabaseMaintenanceNullDbNameImpl : DatabaseMaintenance {
-    override fun getDatabaseName(): String? = null
-
-    override suspend fun backupDatabase(backupFolderUri: URI, backupFileName: String) {}
-
-    override suspend fun restoreDatabase(restoreFileUri: URI) {}
-}
-
-class DatabaseMaintenanceBlankDbNameImpl : DatabaseMaintenance {
-    override fun getDatabaseName(): String? = null
+class DatabaseMaintenanceDbNameTestImpl(private val databaseName: String?) : DatabaseMaintenance {
+    override fun getDatabaseName(): String? = databaseName
 
     override suspend fun backupDatabase(backupFolderUri: URI, backupFileName: String) {}
 

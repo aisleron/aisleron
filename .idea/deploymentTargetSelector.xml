@@ -4,7 +4,7 @@
     <selectionStates>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-01-15T09:13:44.883415253Z">
+        <DropdownSelection timestamp="2025-02-08T08:45:15.252838760Z">
           <Target type="DEFAULT_BOOT">
             <handle>
               <DeviceId pluginId="LocalEmulator" identifier="path=/home/danie/.var/app/com.google.AndroidStudio/config/.android/avd/Test_Pixel_3a_API_34_AOSP.avd" />
@@ -13,16 +13,19 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="SettingsViewModelTest">
+      <SelectionState runConfigName="MainActivityTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="newInstance_CallNewInstance_ReturnsFragment()">
+      <SelectionState runConfigName="SearchBoxTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="aboutActivity_OnStart_ShowsAbout()">
+      <SelectionState runConfigName="FabHandlerTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
       <SelectionState runConfigName="DbInitializerTest">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="SettingsFragmentTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

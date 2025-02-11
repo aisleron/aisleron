@@ -1,22 +1,36 @@
 package com.aisleron.ui.shoppinglist
 
-import com.aisleron.data.TestDataManager
-import com.aisleron.domain.TestUseCaseProvider
+import com.aisleron.di.KoinTestRule
+import com.aisleron.di.daoTestModule
+import com.aisleron.di.repositoryModule
+import com.aisleron.di.useCaseModule
+import com.aisleron.di.viewModelTestModule
 import com.aisleron.domain.aisle.Aisle
+import com.aisleron.domain.aisle.AisleRepository
+import com.aisleron.domain.aisle.usecase.GetAisleUseCase
+import com.aisleron.domain.aisle.usecase.RemoveAisleUseCase
+import com.aisleron.domain.aisle.usecase.UpdateAisleRankUseCase
+import com.aisleron.domain.location.LocationRepository
+import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
+import org.koin.test.KoinTest
+import org.koin.test.get
 
-class AisleShoppingListItemViewModelTest {
+class AisleShoppingListItemViewModelTest : KoinTest {
 
-    private lateinit var testData: TestDataManager
-    private lateinit var testUseCases: TestUseCaseProvider
+    @get:Rule
+    val koinTestRule = KoinTestRule(
+        modules = listOf(daoTestModule, viewModelTestModule, repositoryModule, useCaseModule)
+    )
 
     @Before
     fun setUp() {
-        testData = TestDataManager()
-        testUseCases = TestUseCaseProvider(testData)
+        runBlocking { get<CreateSampleDataUseCase>().invoke() }
     }
 
     private fun getAisleShoppingListItemViewModel(existingAisle: Aisle): AisleShoppingListItemViewModel {
@@ -27,33 +41,33 @@ class AisleShoppingListItemViewModelTest {
             isDefault = existingAisle.isDefault,
             childCount = 0,
             locationId = existingAisle.locationId,
-            updateAisleRankUseCase = testUseCases.updateAisleRankUseCase,
-            getAisleUseCase = testUseCases.getAisleUseCase,
-            removeAisleUseCase = testUseCases.removeAisleUseCase
+            updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
+            getAisleUseCase = get<GetAisleUseCase>(),
+            removeAisleUseCase = get<RemoveAisleUseCase>()
         )
     }
 
     private fun getAisle(): Aisle {
         return runBlocking {
-            val existingLocationId = testData.locationRepository.getAll().first().id
-            testData.aisleRepository.getAll()
+            val existingLocationId = get<LocationRepository>().getAll().first().id
+            get<AisleRepository>().getAll()
                 .last { it.locationId == existingLocationId && !it.isDefault }
         }
     }
 
     @Test
-    fun removeItem_ItemIsStandardAisle_AisleRemoved() {
+    fun removeItem_ItemIsStandardAisle_AisleRemoved() = runTest {
         val existingAisle = getAisle()
         val shoppingListItem = getAisleShoppingListItemViewModel(existingAisle)
 
         runBlocking { shoppingListItem.remove() }
 
-        val removedAisle = runBlocking { testData.aisleRepository.get(existingAisle.id) }
+        val removedAisle = get<AisleRepository>().get(existingAisle.id)
         Assert.assertNull(removedAisle)
     }
 
     @Test
-    fun removeItem_ItemIsInvalidAisle_NoAisleRemoved() {
+    fun removeItem_ItemIsInvalidAisle_NoAisleRemoved() = runTest {
         val shoppingListItem = AisleShoppingListItemViewModel(
             rank = 1000,
             id = -1,
@@ -61,43 +75,44 @@ class AisleShoppingListItemViewModelTest {
             isDefault = false,
             childCount = 0,
             locationId = -1,
-            updateAisleRankUseCase = testUseCases.updateAisleRankUseCase,
-            getAisleUseCase = testUseCases.getAisleUseCase,
-            removeAisleUseCase = testUseCases.removeAisleUseCase
+            updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
+            getAisleUseCase = get<GetAisleUseCase>(),
+            removeAisleUseCase = get<RemoveAisleUseCase>()
         )
 
-        val aisleCountBefore = runBlocking { testData.aisleRepository.getAll().count() }
-        runBlocking { shoppingListItem.remove() }
-        val aisleCountAfter = runBlocking { testData.aisleRepository.getAll().count() }
+        val aisleRepository = get<AisleRepository>()
+        val aisleCountBefore = aisleRepository.getAll().count()
+        shoppingListItem.remove()
+        val aisleCountAfter = aisleRepository.getAll().count()
 
         Assert.assertEquals(aisleCountBefore, aisleCountAfter)
     }
 
     @Test
-    fun updateItemRank_AisleMoved_AisleRankUpdated() {
+    fun updateItemRank_AisleMoved_AisleRankUpdated() = runTest {
         val movedAisle = getAisle()
         val shoppingListItem = getAisleShoppingListItemViewModel(movedAisle)
-        val precedingAisle = runBlocking {
-            testData.aisleRepository.getAll()
-                .first { it.locationId == movedAisle.locationId && !it.isDefault && it.id != movedAisle.id }
-        }
+        val aisleRepository = get<AisleRepository>()
+        val precedingAisle = aisleRepository.getAll()
+            .first { it.locationId == movedAisle.locationId && !it.isDefault && it.id != movedAisle.id }
+
 
         val precedingItem = getAisleShoppingListItemViewModel(precedingAisle)
 
         runBlocking { shoppingListItem.updateRank(precedingItem) }
 
-        val updatedAisle = runBlocking { testData.aisleRepository.get(movedAisle.id) }
+        val updatedAisle = aisleRepository.get(movedAisle.id)
         Assert.assertEquals(precedingItem.rank + 1, updatedAisle?.rank)
     }
 
     @Test
-    fun updateItemRank_NullPrecedingItem_AisleRankIsOne() {
+    fun updateItemRank_NullPrecedingItem_AisleRankIsOne() = runTest {
         val movedAisle = getAisle()
         val shoppingListItem = getAisleShoppingListItemViewModel(movedAisle)
 
-        runBlocking { shoppingListItem.updateRank(null) }
+        shoppingListItem.updateRank(null)
 
-        val updatedAisle = runBlocking { testData.aisleRepository.get(movedAisle.id) }
+        val updatedAisle = get<AisleRepository>().get(movedAisle.id)
 
         Assert.assertEquals(1, updatedAisle?.rank)
     }

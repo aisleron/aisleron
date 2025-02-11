@@ -3,7 +3,7 @@ package com.aisleron.ui.settings
 import android.content.Context
 import androidx.preference.PreferenceManager
 
-class WelcomePreferencesImpl() :
+class WelcomePreferencesImpl :
     WelcomePreferences {
 
     override fun isInitialized(context: Context): Boolean =

@@ -18,7 +18,7 @@ class UpdateAisleProductsUseCaseTest {
     @BeforeEach
     fun setUp() {
         testData = TestDataManager()
-        aisleProductRepository = testData.aisleProductRepository
+        aisleProductRepository = testData.getRepository<AisleProductRepository>()
         updateAisleProductsUseCase = UpdateAisleProductsUseCase(aisleProductRepository)
         existingAisleProduct = runBlocking { aisleProductRepository.getAll().first() }
     }

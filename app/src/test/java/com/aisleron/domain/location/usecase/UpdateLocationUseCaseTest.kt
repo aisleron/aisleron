@@ -4,6 +4,7 @@ import com.aisleron.data.TestDataManager
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.location.Location
+import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.location.LocationType
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -21,21 +22,23 @@ class UpdateLocationUseCaseTest {
     @BeforeEach
     fun setUp() {
         testData = TestDataManager()
+        val locationRepository = testData.getRepository<LocationRepository>()
 
         existingLocation = runBlocking {
-            testData.locationRepository.getAll().first { it.type == LocationType.SHOP }
+            locationRepository.getAll().first { it.type == LocationType.SHOP }
         }
 
         updateLocationUseCase = UpdateLocationUseCase(
-            testData.locationRepository,
-            IsLocationNameUniqueUseCase(testData.locationRepository)
+            locationRepository,
+            IsLocationNameUniqueUseCase(locationRepository)
         )
     }
 
     @Test
     fun updateLocation_IsDuplicateName_ThrowsException() {
         runBlocking {
-            val id = testData.locationRepository.add(
+            val locationRepository = testData.getRepository<LocationRepository>()
+            val id = locationRepository.add(
                 Location(
                     id = 0,
                     type = LocationType.SHOP,
@@ -47,7 +50,7 @@ class UpdateLocationUseCaseTest {
             )
 
             val updateLocation =
-                testData.locationRepository.get(id)!!.copy(name = existingLocation.name)
+                locationRepository.get(id)!!.copy(name = existingLocation.name)
             assertThrows<AisleronException.DuplicateLocationNameException> {
                 updateLocationUseCase(updateLocation)
             }
@@ -65,10 +68,11 @@ class UpdateLocationUseCaseTest {
         val countBefore: Int
         val countAfter: Int
         runBlocking {
-            countBefore = testData.locationRepository.getAll().count()
+            val locationRepository = testData.getRepository<LocationRepository>()
+            countBefore = locationRepository.getAll().count()
             updateLocationUseCase(updateLocation)
-            updatedLocation = testData.locationRepository.getByName(updateLocation.name)
-            countAfter = testData.locationRepository.getAll().count()
+            updatedLocation = locationRepository.getByName(updateLocation.name)
+            countAfter = locationRepository.getAll().count()
         }
         assertNotNull(updatedLocation)
         assertEquals(countBefore, countAfter)
@@ -89,10 +93,11 @@ class UpdateLocationUseCaseTest {
         val countBefore: Int
         val countAfter: Int
         runBlocking {
-            countBefore = testData.locationRepository.getAll().count()
+            val locationRepository = testData.getRepository<LocationRepository>()
+            countBefore = locationRepository.getAll().count()
             updateLocationUseCase(newLocation)
-            updatedLocation = testData.locationRepository.getByName(newLocation.name)
-            countAfter = testData.locationRepository.getAll().count()
+            updatedLocation = locationRepository.getByName(newLocation.name)
+            countAfter = locationRepository.getAll().count()
         }
         assertNotNull(updatedLocation)
         assertEquals(countBefore + 1, countAfter)

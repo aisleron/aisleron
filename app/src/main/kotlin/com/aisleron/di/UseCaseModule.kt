@@ -48,7 +48,6 @@ import org.koin.android.ext.koin.androidApplication
 import org.koin.dsl.module
 
 val useCaseModule = module {
-    includes(repositoryModule)
 
     /**
      * Location Use Cases

@@ -3,6 +3,7 @@ package com.aisleron.domain.location.usecase
 import com.aisleron.data.TestDataManager
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.Location
+import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.location.LocationType
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -17,15 +18,9 @@ class GetShopsUseCaseTest {
 
     @BeforeEach
     fun setUp() {
-        testData = TestDataManager()
+        testData = TestDataManager(addData = false)
+        getShopsUseCase = GetShopsUseCase(testData.getRepository<LocationRepository>())
 
-        getShopsUseCase = GetShopsUseCase(testData.locationRepository)
-
-        runBlocking {
-            testData.locationRepository.getAll().forEach {
-                testData.locationRepository.remove(it)
-            }
-        }
     }
 
     @Test
@@ -41,7 +36,7 @@ class GetShopsUseCaseTest {
     fun getShops_ShopsDefined_ReturnShopsList() {
         val resultList: List<Location> =
             runBlocking {
-                testData.locationRepository.add(
+                testData.getRepository<LocationRepository>().add(
                     listOf(
                         Location(
                             id = 1000,

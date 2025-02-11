@@ -1,6 +1,10 @@
-package com.aisleron.data.location
+package com.aisleron.testdata.data.location
 
-import com.aisleron.data.aisle.AisleDaoTestImpl
+import com.aisleron.data.location.LocationDao
+import com.aisleron.data.location.LocationEntity
+import com.aisleron.data.location.LocationWithAisles
+import com.aisleron.data.location.LocationWithAislesWithProducts
+import com.aisleron.testdata.data.aisle.AisleDaoTestImpl
 import com.aisleron.domain.location.LocationType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf

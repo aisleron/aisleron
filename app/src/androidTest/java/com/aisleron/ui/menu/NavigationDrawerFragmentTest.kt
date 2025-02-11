@@ -9,32 +9,33 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import com.aisleron.R
-import com.aisleron.data.TestDataManager
-import com.aisleron.di.TestAppModules
 import com.aisleron.di.KoinTestRule
+import com.aisleron.di.daoTestModule
+import com.aisleron.di.fragmentModule
+import com.aisleron.di.repositoryModule
+import com.aisleron.di.useCaseModule
+import com.aisleron.di.viewModelTestModule
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
-import org.koin.core.module.Module
+import org.koin.test.KoinTest
 
 @RunWith(value = Parameterized::class)
 class NavigationDrawerFragmentTest(
     private val testName: String,
     private val textViewId: Int,
     private val navTargetId: Int
-) {
+) : KoinTest {
 
     @get:Rule
     val koinTestRule = KoinTestRule(
-        modules = getKoinModules()
+        modules = listOf(
+            daoTestModule, fragmentModule, repositoryModule, useCaseModule, viewModelTestModule
+        )
     )
-
-    private fun getKoinModules(): List<Module> {
-        return TestAppModules().getTestAppModules(TestDataManager())
-    }
 
     private fun getFragmentScenario(): FragmentScenario<NavigationDrawerFragment> =
         launchFragmentInContainer<NavigationDrawerFragment>(

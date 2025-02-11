@@ -2,6 +2,7 @@ package com.aisleron.domain.aisle.usecase
 
 import com.aisleron.data.TestDataManager
 import com.aisleron.domain.aisle.Aisle
+import com.aisleron.domain.aisle.AisleRepository
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -17,8 +18,9 @@ class UpdateAisleRankUseCaseTest {
     @BeforeEach
     fun setUp() {
         testData = TestDataManager()
-        updateAisleRankUseCase = UpdateAisleRankUseCase(testData.aisleRepository)
-        existingAisle = runBlocking { testData.aisleRepository.getAll().first { !it.isDefault } }
+        val aisleRepository = testData.getRepository<AisleRepository>()
+        updateAisleRankUseCase = UpdateAisleRankUseCase(aisleRepository)
+        existingAisle = runBlocking { aisleRepository.getAll().first { !it.isDefault } }
     }
 
     @Test
@@ -27,7 +29,7 @@ class UpdateAisleRankUseCaseTest {
         val updatedAisle: Aisle?
         runBlocking {
             updateAisleRankUseCase(updateAisle)
-            updatedAisle = testData.aisleRepository.get(existingAisle.id)
+            updatedAisle = testData.getRepository<AisleRepository>().get(existingAisle.id)
         }
         assertNotNull(updatedAisle)
         assertEquals(updateAisle, updatedAisle)
@@ -39,12 +41,12 @@ class UpdateAisleRankUseCaseTest {
         val maxAisleRankBefore: Int
         val maxAisleRankAfter: Int
         runBlocking {
-            maxAisleRankBefore = testData.aisleRepository.getAll()
+            maxAisleRankBefore = testData.getRepository<AisleRepository>().getAll()
                 .filter { it.locationId == existingAisle.locationId }.maxOf { it.rank }
 
             updateAisleRankUseCase(updateAisle)
 
-            maxAisleRankAfter = testData.aisleRepository.getAll()
+            maxAisleRankAfter = testData.getRepository<AisleRepository>().getAll()
                 .filter { it.locationId == existingAisle.locationId }.maxOf { it.rank }
         }
         assertEquals(maxAisleRankBefore + 1, maxAisleRankAfter)

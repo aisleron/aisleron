@@ -35,10 +35,6 @@ sealed class AisleronException(
     class SampleDataCreationException(message: String? = null, cause: Throwable? = null) :
         AisleronException(ExceptionCode.SAMPLE_DATA_CREATION_EXCEPTION, message, cause)
 
-
-
-
-
     enum class ExceptionCode {
         GENERIC_EXCEPTION,
         DELETE_DEFAULT_AISLE_EXCEPTION,

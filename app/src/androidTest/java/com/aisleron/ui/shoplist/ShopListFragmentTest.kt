@@ -18,57 +18,40 @@ import androidx.test.espresso.matcher.ViewMatchers.withResourceName
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.aisleron.R
-import com.aisleron.data.TestDataManager
 import com.aisleron.di.KoinTestRule
-import com.aisleron.domain.TestUseCaseProvider
+import com.aisleron.di.daoTestModule
+import com.aisleron.di.repositoryModule
+import com.aisleron.di.useCaseModule
+import com.aisleron.di.viewModelTestModule
+import com.aisleron.domain.location.LocationRepository
+import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import com.aisleron.ui.FabHandlerTestImpl
 import com.aisleron.ui.bundles.AddEditLocationBundle
 import com.aisleron.ui.bundles.Bundler
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.koin.core.module.Module
-import org.koin.dsl.module
+import org.koin.test.KoinTest
+import org.koin.test.get
 
-class ShopListFragmentTest {
+class ShopListFragmentTest : KoinTest {
     private lateinit var bundler: Bundler
-    private lateinit var testData: TestDataManager
     private lateinit var fabHandler: FabHandlerTestImpl
 
     @get:Rule
     val koinTestRule = KoinTestRule(
-        modules = getKoinModules()
+        modules = listOf(daoTestModule, viewModelTestModule, repositoryModule, useCaseModule)
     )
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private fun getKoinModules(): List<Module> {
-        testData = TestDataManager()
-        val testUseCases = TestUseCaseProvider(testData)
-        val shopListViewModel = ShopListViewModel(
-            getShopsUseCase = testUseCases.getShopsUseCase,
-            getPinnedShopsUseCase = testUseCases.getPinnedShopsUseCase,
-            removeLocationUseCase = testUseCases.removeLocationUseCase,
-            getLocationUseCase = testUseCases.getLocationUseCase,
-            TestScope(UnconfinedTestDispatcher())
-        )
-
-        return listOf(
-            module {
-                factory<ShopListViewModel> { shopListViewModel }
-            }
-        )
-    }
 
     @Before
     fun setUp() {
         bundler = Bundler()
         fabHandler = FabHandlerTestImpl()
+        runBlocking { get<CreateSampleDataUseCase>().invoke() }
     }
 
     private fun getFragmentScenario(): FragmentScenario<ShopListFragment> =
@@ -85,8 +68,8 @@ class ShopListFragmentTest {
     }
 
     @Test
-    fun onClick_IsValidLocation_NavigateToShoppingList() {
-        val shopLocation = runBlocking { testData.locationRepository.getAll().first { it.id != 1 } }
+    fun onClick_IsValidLocation_NavigateToShoppingList() = runTest {
+        val shopLocation = get<LocationRepository>().getAll().first { it.id != 1 }
         val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
 
         getFragmentScenario().onFragment { fragment ->
@@ -106,9 +89,8 @@ class ShopListFragmentTest {
     }
 
     @Test
-    fun onLongClick_ActionModeNotActive_ShowActionModeContextMenu() {
-        val selectedLocation =
-            runBlocking { testData.locationRepository.getAll().first { it.id != 1 } }
+    fun onLongClick_ActionModeNotActive_ShowActionModeContextMenu() = runTest {
+        val selectedLocation = get<LocationRepository>().getAll().first { it.id != 1 }
 
         getFragmentScenario()
         onView(withText(selectedLocation.name)).perform(longClick())
@@ -124,8 +106,8 @@ class ShopListFragmentTest {
     }
 
     @Test
-    fun onActionItemClicked_ActionItemIsEdit_NavigateToEditShop() {
-        val editLocation = runBlocking { testData.locationRepository.getAll().first { it.id != 1 } }
+    fun onActionItemClicked_ActionItemIsEdit_NavigateToEditShop() = runTest {
+        val editLocation = get<LocationRepository>().getAll().first { it.id != 1 }
         val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
 
         getFragmentScenario().onFragment { fragment ->
@@ -147,9 +129,8 @@ class ShopListFragmentTest {
     }
 
     @Test
-    fun onActionItemClicked_ActionItemIsDelete_DeleteDialogShown() {
-        val deleteLocation =
-            runBlocking { testData.locationRepository.getAll().first { it.id != 1 } }
+    fun onActionItemClicked_ActionItemIsDelete_DeleteDialogShown() = runTest {
+        val deleteLocation = get<LocationRepository>().getAll().first { it.id != 1 }
         val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
         var deleteConfirmMessage = ""
 
@@ -171,9 +152,9 @@ class ShopListFragmentTest {
     }
 
     @Test
-    fun onActionItemClicked_DeleteConfirmed_LocationDeleted() {
-        val deleteLocation =
-            runBlocking { testData.locationRepository.getAll().first { it.id != 1 } }
+    fun onActionItemClicked_DeleteConfirmed_LocationDeleted() = runTest {
+        val locationRepository = get<LocationRepository>()
+        val deleteLocation = locationRepository.getAll().first { it.id != 1 }
 
         getFragmentScenario()
         onView(withText(deleteLocation.name)).perform(longClick())
@@ -184,14 +165,14 @@ class ShopListFragmentTest {
             .check(matches(isDisplayed()))
             .perform(click())
 
-        val deletedLocation = runBlocking { testData.locationRepository.get(deleteLocation.id) }
+        val deletedLocation = locationRepository.get(deleteLocation.id)
         Assert.assertNull(deletedLocation)
     }
 
     @Test
-    fun onActionItemClicked_DeleteCancelled_LocationNotDeleted() {
-        val deleteLocation =
-            runBlocking { testData.locationRepository.getAll().first { it.id != 1 } }
+    fun onActionItemClicked_DeleteCancelled_LocationNotDeleted() = runTest {
+        val locationRepository = get<LocationRepository>()
+        val deleteLocation = locationRepository.getAll().first { it.id != 1 }
 
         getFragmentScenario()
 
@@ -203,7 +184,7 @@ class ShopListFragmentTest {
             .check(matches(isDisplayed()))
             .perform(click())
 
-        val deletedLocation = runBlocking { testData.locationRepository.get(deleteLocation.id) }
+        val deletedLocation = locationRepository.get(deleteLocation.id)
         assertEquals(deleteLocation, deletedLocation)
     }
 }

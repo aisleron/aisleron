@@ -2,31 +2,32 @@ package com.aisleron
 
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.test.core.app.ActivityScenario
-import com.aisleron.data.TestDataManager
 import com.aisleron.di.KoinTestRule
-import com.aisleron.di.TestAppModules
-import org.junit.Before
+import com.aisleron.di.daoTestModule
+import com.aisleron.di.fragmentModule
+import com.aisleron.di.generalTestModule
+import com.aisleron.di.preferenceTestModule
+import com.aisleron.di.repositoryModule
+import com.aisleron.di.useCaseModule
+import com.aisleron.di.viewModelTestModule
 import org.junit.Rule
 import org.junit.Test
-import org.koin.core.module.Module
+import org.koin.test.KoinTest
 import kotlin.test.assertEquals
 
-class MainActivityTest {
-    private lateinit var testData: TestDataManager
-
+class MainActivityTest : KoinTest {
     @get:Rule
     val koinTestRule = KoinTestRule(
-        modules = getKoinModules()
+        modules = listOf(
+            daoTestModule,
+            fragmentModule,
+            viewModelTestModule,
+            repositoryModule,
+            useCaseModule,
+            generalTestModule,
+            preferenceTestModule
+        )
     )
-
-    private fun getKoinModules(): List<Module> {
-        testData = TestDataManager(false)
-        return TestAppModules().getTestAppModules(testData)
-    }
-
-    @Before
-    fun setUp() {
-    }
 
     @Test
     fun appStart_LightThemeSet_UseLightTheme() {

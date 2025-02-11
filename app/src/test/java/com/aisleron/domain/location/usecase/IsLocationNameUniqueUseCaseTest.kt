@@ -2,6 +2,7 @@ package com.aisleron.domain.location.usecase
 
 import com.aisleron.data.TestDataManager
 import com.aisleron.domain.location.Location
+import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.location.LocationType
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -18,7 +19,8 @@ class IsLocationNameUniqueUseCaseTest {
 
     @BeforeEach
     fun setUp() {
-        isLocationNameUniqueUseCase = IsLocationNameUniqueUseCase(testData.locationRepository)
+        isLocationNameUniqueUseCase =
+            IsLocationNameUniqueUseCase(testData.getRepository<LocationRepository>())
     }
 
     @Test
@@ -73,7 +75,8 @@ class IsLocationNameUniqueUseCaseTest {
         fun beforeSpec() {
             testData = TestDataManager()
             existingLocation = runBlocking {
-                testData.locationRepository.getAll().first { it.type == LocationType.SHOP }
+                testData.getRepository<LocationRepository>().getAll()
+                    .first { it.type == LocationType.SHOP }
             }
         }
     }

@@ -1,7 +1,8 @@
 package com.aisleron.domain.location.usecase
 
-import com.aisleron.data.TestDataManager
 import com.aisleron.domain.location.Location
+import com.aisleron.domain.location.LocationRepository
+import com.aisleron.data.TestDataManager
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions
@@ -17,15 +18,16 @@ class GetPinnedShopsUseCaseTest {
     @BeforeEach
     fun setUp() {
         testData = TestDataManager()
-        getPinnedShopsUseCase = GetPinnedShopsUseCase(testData.locationRepository)
+        getPinnedShopsUseCase = GetPinnedShopsUseCase(testData.getRepository<LocationRepository>())
     }
 
     @Test
     fun getPinnedShops_NoPinnedShopsDefined_ReturnEmptyList() {
         val resultList: List<Location> =
             runBlocking {
-                testData.locationRepository.getAll().filter { it.pinned }
-                    .forEach { testData.locationRepository.remove(it) }
+                val locationRepository = testData.getRepository<LocationRepository>()
+                locationRepository.getAll().filter { it.pinned }
+                    .forEach { locationRepository.remove(it) }
 
                 getPinnedShopsUseCase().first()
             }
@@ -37,7 +39,8 @@ class GetPinnedShopsUseCaseTest {
         val pinnedCount: Int
         val resultList: List<Location> =
             runBlocking {
-                pinnedCount = testData.locationRepository.getAll().count { it.pinned }
+                pinnedCount =
+                    testData.getRepository<LocationRepository>().getAll().count { it.pinned }
                 getPinnedShopsUseCase().first()
             }
 

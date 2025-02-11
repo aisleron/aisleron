@@ -9,8 +9,6 @@ import org.koin.androidx.fragment.dsl.fragment
 import org.koin.dsl.module
 
 val fragmentModule = module {
-    includes(generalModule, preferenceModule)
-
     fragment {
         ShoppingListFragment(
             applicationTitleUpdateListener = get(),

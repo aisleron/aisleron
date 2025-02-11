@@ -28,7 +28,7 @@ class CreateSampleDataUseCaseImpl(
     private val addLocationUseCase: AddLocationUseCase,
     private val getAllProductsUseCase: GetAllProductsUseCase,
     private val getHomeLocationUseCase: GetHomeLocationUseCase
-) : CreateSampleDataUseCase{
+) : CreateSampleDataUseCase {
 
     companion object {
         private const val PRD_FROZEN_VEGES = "Frozen Vegetables"

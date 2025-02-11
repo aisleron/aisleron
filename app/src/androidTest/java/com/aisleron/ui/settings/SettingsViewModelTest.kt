@@ -4,19 +4,28 @@ import android.net.Uri
 import androidx.preference.Preference
 import androidx.preference.PreferenceManager
 import androidx.test.core.app.ApplicationProvider
-import com.aisleron.data.TestDataManager
-import com.aisleron.domain.TestUseCaseProvider
+import com.aisleron.di.KoinTestRule
+import com.aisleron.di.daoTestModule
+import com.aisleron.di.repositoryModule
+import com.aisleron.di.useCaseModule
+import com.aisleron.di.viewModelTestModule
+import com.aisleron.domain.backup.DatabaseMaintenance
 import com.aisleron.domain.backup.usecase.BackupDatabaseUseCase
 import com.aisleron.domain.backup.usecase.RestoreDatabaseUseCase
 import com.aisleron.domain.base.AisleronException
+import com.aisleron.testdata.data.maintenance.DatabaseMaintenanceDbNameTestImpl
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.Assert
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
+import org.koin.test.KoinTest
+import org.koin.test.get
+import org.koin.test.mock.declare
 import java.net.URI
 
 @RunWith(value = Parameterized::class)
@@ -25,8 +34,15 @@ class SettingsViewModelTest(
     private val clazz: Class<BackupRestoreDbPreferenceHandler>,
     private val setPreferenceValue: String,
     private val getPreferenceValue: String
-) {
+) : KoinTest {
     private lateinit var preference: Preference
+
+    @get:Rule
+    val koinTestRule = KoinTestRule(
+        modules = listOf(
+            daoTestModule, repositoryModule, useCaseModule, viewModelTestModule
+        )
+    )
 
     companion object {
         @JvmStatic
@@ -64,20 +80,12 @@ class SettingsViewModelTest(
         preference = Preference(pm.context)
         preference.key = preferenceOption.key
         ps.addPreference(preference)
+
+        declare<DatabaseMaintenance> { DatabaseMaintenanceDbNameTestImpl("Dummy") }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     private fun getTestSettingsViewModel(): SettingsViewModel {
-        val testData = TestDataManager()
-        val testDispatcher = UnconfinedTestDispatcher()
-        val testScope = TestScope(testDispatcher)
-        val testUseCases = TestUseCaseProvider(testData)
-
-        return SettingsViewModel(
-            testUseCases.backupDatabaseUseCase,
-            testUseCases.restoreDatabaseUseCase,
-            testScope
-        )
+        return get<SettingsViewModel>()
     }
 
     @Test
@@ -233,10 +241,9 @@ class SettingsViewModelTest(
 
     @Test
     fun constructor_NoCoroutineScopeProvided_SettingsViewModelReturned() {
-        val testUseCases = TestUseCaseProvider(TestDataManager())
         val vm = SettingsViewModel(
-            testUseCases.backupDatabaseUseCase,
-            testUseCases.restoreDatabaseUseCase
+            get<BackupDatabaseUseCase>(),
+            get<RestoreDatabaseUseCase>()
         )
 
         Assert.assertNotNull(vm)

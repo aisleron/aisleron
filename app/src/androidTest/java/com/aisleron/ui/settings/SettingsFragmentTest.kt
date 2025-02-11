@@ -26,31 +26,49 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import com.aisleron.MainActivity
 import com.aisleron.R
-import com.aisleron.data.TestDataManager
 import com.aisleron.di.KoinTestRule
-import com.aisleron.di.TestAppModules
+import com.aisleron.di.daoTestModule
+import com.aisleron.di.fragmentModule
+import com.aisleron.di.generalTestModule
+import com.aisleron.di.preferenceTestModule
+import com.aisleron.di.repositoryModule
+import com.aisleron.di.useCaseModule
+import com.aisleron.di.viewModelTestModule
+import com.aisleron.domain.backup.DatabaseMaintenance
+import com.aisleron.testdata.data.maintenance.DatabaseMaintenanceDbNameTestImpl
 import org.hamcrest.CoreMatchers.allOf
 import org.hamcrest.CoreMatchers.startsWith
 import org.hamcrest.Matchers
 import org.junit.Assert
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.koin.core.module.Module
+import org.koin.test.KoinTest
+import org.koin.test.mock.declare
 import java.util.Calendar
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 
 
-class SettingsFragmentTest {
+class SettingsFragmentTest : KoinTest {
 
     @get:Rule
     val koinTestRule = KoinTestRule(
-        modules = getKoinModules()
+        modules = listOf(
+            daoTestModule,
+            fragmentModule,
+            repositoryModule,
+            useCaseModule,
+            viewModelTestModule,
+            generalTestModule,
+            preferenceTestModule
+        )
     )
 
-    private fun getKoinModules(): List<Module> {
-        return TestAppModules().getTestAppModules(TestDataManager())
+    @Before
+    fun setUp() {
+        declare<DatabaseMaintenance> { DatabaseMaintenanceDbNameTestImpl("Dummy") }
     }
 
     private fun getFragmentScenario(): FragmentScenario<SettingsFragment> =

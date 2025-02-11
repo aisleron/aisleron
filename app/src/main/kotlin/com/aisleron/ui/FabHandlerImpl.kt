@@ -13,17 +13,23 @@ class FabHandlerImpl : FabHandler {
 
     private fun fabMain(activity: Activity) = activity.findViewById<FloatingActionButton>(R.id.fab)
 
-    private fun fabAddProduct(activity: Activity) = activity.findViewById<FloatingActionButton>(R.id.fab_add_product)
+    private fun fabAddProduct(activity: Activity) =
+        activity.findViewById<FloatingActionButton>(R.id.fab_add_product)
 
-    private fun lblAddProduct(activity: Activity) = activity.findViewById<TextView>(R.id.add_product_fab_label)
+    private fun lblAddProduct(activity: Activity) =
+        activity.findViewById<TextView>(R.id.add_product_fab_label)
 
-    private fun fabAddAisle(activity: Activity) = activity.findViewById<FloatingActionButton>(R.id.fab_add_aisle)
+    private fun fabAddAisle(activity: Activity) =
+        activity.findViewById<FloatingActionButton>(R.id.fab_add_aisle)
 
-    private fun lblAddAisle(activity: Activity) = activity.findViewById<TextView>(R.id.add_aisle_fab_label)
+    private fun lblAddAisle(activity: Activity) =
+        activity.findViewById<TextView>(R.id.add_aisle_fab_label)
 
-    private fun fabAddShop(activity: Activity) = activity.findViewById<FloatingActionButton>(R.id.fab_add_shop)
+    private fun fabAddShop(activity: Activity) =
+        activity.findViewById<FloatingActionButton>(R.id.fab_add_shop)
 
-    private fun lblAddShop(activity: Activity) = activity.findViewById<TextView>(R.id.add_shop_fab_label)
+    private fun lblAddShop(activity: Activity) =
+        activity.findViewById<TextView>(R.id.add_shop_fab_label)
 
     private var fabEntries = mutableListOf<FabHandler.FabOption>()
 

@@ -1,53 +1,57 @@
 package com.aisleron.ui.shop
 
-import com.aisleron.data.TestDataManager
-import com.aisleron.domain.TestUseCaseProvider
+import com.aisleron.di.KoinTestRule
+import com.aisleron.di.daoTestModule
+import com.aisleron.di.repositoryModule
+import com.aisleron.di.useCaseModule
+import com.aisleron.di.viewModelTestModule
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.location.Location
+import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.location.usecase.AddLocationUseCase
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import com.aisleron.domain.location.usecase.GetLocationUseCase
+import com.aisleron.domain.location.usecase.UpdateLocationUseCase
+import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
+import org.koin.test.KoinTest
+import org.koin.test.get
+import org.koin.test.mock.declare
 
 @RunWith(value = Parameterized::class)
-class ShopViewModelTest(private val pinned: Boolean) {
-    private lateinit var testData: TestDataManager
+class ShopViewModelTest(private val pinned: Boolean) : KoinTest {
     private lateinit var shopViewModel: ShopViewModel
 
-    @OptIn(ExperimentalCoroutinesApi::class)
+    @get:Rule
+    val koinTestRule = KoinTestRule(
+        modules = listOf(daoTestModule, viewModelTestModule, repositoryModule, useCaseModule)
+    )
+
     @Before
     fun setUp() {
-        testData = TestDataManager()
-        val testUseCases = TestUseCaseProvider(testData)
-        val testDispatcher = UnconfinedTestDispatcher()
-        val testScope = TestScope(testDispatcher)
-
-        shopViewModel = ShopViewModel(
-            testUseCases.addLocationUseCase,
-            testUseCases.updateLocationUseCase,
-            testUseCases.getLocationUseCase,
-            testScope
-        )
+        shopViewModel = get<ShopViewModel>()
+        runBlocking { get<CreateSampleDataUseCase>().invoke() }
     }
 
     @Test
     fun testSaveLocation_LocationExists_UpdateLocation() = runTest {
         val updatedLocationName = "Updated Location Name"
-        val existingLocation: Location = testData.locationRepository.getAll().first()
-        val countBefore: Int = testData.locationRepository.getAll().count()
+        val locationRepository = get<LocationRepository>()
+        val existingLocation: Location = locationRepository.getAll().first()
+        val countBefore: Int = locationRepository.getAll().count()
 
         shopViewModel.hydrate(existingLocation.id)
         shopViewModel.saveLocation(updatedLocationName, pinned)
 
-        val updatedLocation = testData.locationRepository.get(existingLocation.id)
-        val countAfter: Int = testData.locationRepository.getAll().count()
+        val updatedLocation = locationRepository.get(existingLocation.id)
+        val countAfter: Int = locationRepository.getAll().count()
 
         Assert.assertNotNull(updatedLocation)
         Assert.assertEquals(updatedLocationName, updatedLocation?.name)
@@ -58,12 +62,13 @@ class ShopViewModelTest(private val pinned: Boolean) {
     @Test
     fun testSaveLocation_LocationDoesNotExists_CreateLocation() = runTest {
         val newLocationName = "New Location Name"
+        val locationRepository = get<LocationRepository>()
 
         shopViewModel.hydrate(0)
-        val countBefore: Int = testData.locationRepository.getAll().count()
+        val countBefore: Int = locationRepository.getAll().count()
         shopViewModel.saveLocation(newLocationName, pinned)
-        val newLocation = testData.locationRepository.getByName(newLocationName)
-        val countAfter: Int = testData.locationRepository.getAll().count()
+        val newLocation = locationRepository.getByName(newLocationName)
+        val countAfter: Int = locationRepository.getAll().count()
 
         Assert.assertNotNull(newLocation)
         Assert.assertEquals(newLocationName, newLocation?.name)
@@ -76,7 +81,7 @@ class ShopViewModelTest(private val pinned: Boolean) {
     @Test
     fun testSaveLocation_SaveSuccessful_UiStateIsSuccess() = runTest {
         val updatedLocationName = "Updated Location Name"
-        val existingLocation: Location = testData.locationRepository.getAll().first()
+        val existingLocation: Location = get<LocationRepository>().getAll().first()
 
         shopViewModel.hydrate(existingLocation.id)
         shopViewModel.saveLocation(updatedLocationName, pinned)
@@ -95,7 +100,7 @@ class ShopViewModelTest(private val pinned: Boolean) {
     @Test
     fun testSaveLocation_AisleronErrorOnSave_UiStateIsError() = runTest {
         val existingLocation: Location =
-            testData.locationRepository.getAll().first { it.type == LocationType.SHOP }
+            get<LocationRepository>().getAll().first { it.type == LocationType.SHOP }
 
         shopViewModel.hydrate(0)
         shopViewModel.saveLocation(existingLocation.name, pinned)
@@ -105,7 +110,7 @@ class ShopViewModelTest(private val pinned: Boolean) {
 
     @Test
     fun testGetLocationName_LocationExists_ReturnsLocationName() = runTest {
-        val existingLocation: Location = testData.locationRepository.getAll().first()
+        val existingLocation: Location = get<LocationRepository>().getAll().first()
         shopViewModel.hydrate(existingLocation.id)
         Assert.assertEquals(existingLocation.name, shopViewModel.locationName)
     }
@@ -118,7 +123,7 @@ class ShopViewModelTest(private val pinned: Boolean) {
 
     @Test
     fun testGetPinned_LocationExists_ReturnsLocationPinnedStatus() = runTest {
-        val existingLocation: Location = testData.locationRepository.getAll().first { it.pinned }
+        val existingLocation: Location = get<LocationRepository>().getAll().first { it.pinned }
         shopViewModel.hydrate(existingLocation.id)
         Assert.assertEquals(existingLocation.pinned, shopViewModel.pinned)
     }
@@ -131,7 +136,7 @@ class ShopViewModelTest(private val pinned: Boolean) {
 
     @Test
     fun testGetDefaultFilter_LocationExists_ReturnsLocationFilter() = runTest {
-        val existingLocation: Location = testData.locationRepository.getAll().first()
+        val existingLocation: Location = get<LocationRepository>().getAll().first()
         shopViewModel.hydrate(existingLocation.id)
         Assert.assertEquals(existingLocation.defaultFilter, shopViewModel.defaultFilter)
     }
@@ -144,7 +149,7 @@ class ShopViewModelTest(private val pinned: Boolean) {
 
     @Test
     fun testGetType_LocationExists_ReturnsLocationType() = runTest {
-        val existingLocation: Location = testData.locationRepository.getAll().first()
+        val existingLocation: Location = get<LocationRepository>().getAll().first()
         shopViewModel.hydrate(existingLocation.id)
         Assert.assertEquals(existingLocation.type, shopViewModel.type)
     }
@@ -157,31 +162,28 @@ class ShopViewModelTest(private val pinned: Boolean) {
 
     @Test
     fun constructor_NoCoroutineScopeProvided_ShopViewModelReturned() {
-        val testUseCases = TestUseCaseProvider(testData)
         val svm = ShopViewModel(
-            testUseCases.addLocationUseCase,
-            testUseCases.updateLocationUseCase,
-            testUseCases.getLocationUseCase
+            get<AddLocationUseCase>(),
+            get<UpdateLocationUseCase>(),
+            get<GetLocationUseCase>()
         )
 
         Assert.assertNotNull(svm)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun testSaveLocation_ExceptionRaised_UiStateIsError() = runTest {
-        val testUseCases = TestUseCaseProvider(testData)
         val exceptionMessage = "Error on save Location"
-        val svm = ShopViewModel(
+
+        declare<AddLocationUseCase> {
             object : AddLocationUseCase {
                 override suspend fun invoke(location: Location): Int {
                     throw Exception(exceptionMessage)
                 }
-            },
-            testUseCases.updateLocationUseCase,
-            testUseCases.getLocationUseCase,
-            TestScope(UnconfinedTestDispatcher())
-        )
+            }
+        }
+
+        val svm = get<ShopViewModel>()
 
         svm.hydrate(0)
         svm.saveLocation("Bogus Product", pinned)

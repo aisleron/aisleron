@@ -10,9 +10,14 @@ import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import com.aisleron.MainActivity
 import com.aisleron.R
-import com.aisleron.data.TestDataManager
 import com.aisleron.di.KoinTestRule
-import com.aisleron.di.TestAppModules
+import com.aisleron.di.daoTestModule
+import com.aisleron.di.fragmentModule
+import com.aisleron.di.generalTestModule
+import com.aisleron.di.preferenceTestModule
+import com.aisleron.di.repositoryModule
+import com.aisleron.di.useCaseModule
+import com.aisleron.di.viewModelTestModule
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import org.hamcrest.Matchers.not
 import org.junit.After
@@ -20,21 +25,25 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.koin.core.module.Module
+import org.koin.test.KoinTest
 import java.lang.Thread.sleep
 
-class FabHandlerTest {
+class FabHandlerTest : KoinTest {
     private lateinit var scenario: ActivityScenario<MainActivity>
     private lateinit var fabHandler: FabHandlerImpl
 
     @get:Rule
     val koinTestRule = KoinTestRule(
-        modules = getKoinModules()
+        modules = listOf(
+            daoTestModule,
+            fragmentModule,
+            viewModelTestModule,
+            repositoryModule,
+            useCaseModule,
+            generalTestModule,
+            preferenceTestModule
+        )
     )
-
-    private fun getKoinModules(): List<Module> {
-        return TestAppModules().getTestAppModules(TestDataManager())
-    }
 
     @Before
     fun setUp() {
