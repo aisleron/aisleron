@@ -11,6 +11,7 @@ import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.longClick
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.RootMatchers.isDialog
+import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.hasDescendant
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
@@ -23,13 +24,17 @@ import com.aisleron.di.daoTestModule
 import com.aisleron.di.repositoryModule
 import com.aisleron.di.useCaseModule
 import com.aisleron.di.viewModelTestModule
+import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationRepository
+import com.aisleron.domain.location.usecase.RemoveLocationUseCase
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import com.aisleron.ui.FabHandlerTestImpl
 import com.aisleron.ui.bundles.AddEditLocationBundle
 import com.aisleron.ui.bundles.Bundler
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import org.hamcrest.CoreMatchers.allOf
+import org.hamcrest.CoreMatchers.startsWith
 import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -37,6 +42,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.koin.test.KoinTest
 import org.koin.test.get
+import org.koin.test.mock.declare
 
 class ShopListFragmentTest : KoinTest {
     private lateinit var bundler: Bundler
@@ -186,5 +192,39 @@ class ShopListFragmentTest : KoinTest {
 
         val deletedLocation = locationRepository.get(deleteLocation.id)
         assertEquals(deleteLocation, deletedLocation)
+    }
+
+    @Test
+    fun onViewModelStateChange_IsError_ShowErrorSnackBar() = runTest {
+        val exceptionMessage = "Error on delete Shop"
+
+        declare<RemoveLocationUseCase> {
+            object : RemoveLocationUseCase {
+                override suspend fun invoke(location: Location) {
+                    throw Exception(exceptionMessage)
+                }
+            }
+        }
+
+        val locationRepository = get<LocationRepository>()
+        val deleteLocation = locationRepository.getAll().first { it.id != 1 }
+
+        getFragmentScenario()
+        onView(withText(deleteLocation.name)).perform(longClick())
+        openActionBarOverflowOrOptionsMenu(getInstrumentation().targetContext)
+        onView(withText(R.string.delete)).perform(click())
+        onView(withText(android.R.string.ok))
+            .inRoot(isDialog())
+            .check(matches(isDisplayed()))
+            .perform(click())
+
+        onView(withId(com.google.android.material.R.id.snackbar_text)).check(
+            matches(
+                allOf(
+                    ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE),
+                    withText(startsWith("ERROR:"))
+                )
+            )
+        )
     }
 }
