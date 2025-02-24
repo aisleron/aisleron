@@ -22,3 +22,22 @@ Streamline your shopping with this intuitive, easy-to-use shopping list app. Whe
 * Everything is done on the local device, no sharing of location data or shopping habits.
 
 Get started today and make your shopping trips faster and more efficient!
+
+## Documentation
+
+Documentation is avialable at [Aisleron.com](https://aisleron.com/docs/documentation/) 
+
+## Screenshots
+
+[<img src="https://aisleron.com/assets/images/screenshots/light-mode/alr-210-all-items-list.png" width=250px />](https://aisleron.com/assets/images/screenshots/light-mode/alr-210-all-items-list.png)
+[<img src="https://aisleron.com/assets/images/screenshots/light-mode/alr-220-search.png" width=250px />](https://aisleron.com/assets/images/screenshots/light-mode/alr-220-search.png)
+[<img src="https://aisleron.com/assets/images/screenshots/light-mode/alr-240-status-change-snackbar.png" width=250px />](https://aisleron.com/assets/images/screenshots/light-mode/alr-240-status-change-snackbar.png)
+
+[<img src="https://aisleron.com/assets/images/screenshots/light-mode/alr-010-welcome-page.png" width=250px />](https://aisleron.com/assets/images/screenshots/light-mode/alr-010-welcome-page.png)
+[<img src="https://aisleron.com/assets/images/screenshots/light-mode/alr-040-navigation-drawer.png" width=250px />](https://aisleron.com/assets/images/screenshots/light-mode/alr-040-navigation-drawer.png)
+[<img src="https://aisleron.com/assets/images/screenshots/light-mode/alr-050-settings.png" width=250px />](https://aisleron.com/assets/images/screenshots/light-mode/alr-050-settings.png)
+
+[<img src="https://aisleron.com/assets/images/screenshots/light-mode/alr-270-shop-list-full.png" width=250px />](https://aisleron.com/assets/images/screenshots/light-mode/alr-270-shop-list-full.png)
+[<img src="https://aisleron.com/assets/images/screenshots/mixed-mode/alr-270-shop-list-full.png" width=250px />](https://aisleron.com/assets/images/screenshots/mixed-mode/alr-270-shop-list-full.png)
+[<img src="https://aisleron.com/assets/images/screenshots/dark-mode/alr-270-shop-list-full.png" width=250px />](https://aisleron.com/assets/images/screenshots/dark-mode/alr-270-shop-list-full.png)
+
