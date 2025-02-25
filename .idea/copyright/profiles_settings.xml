@@ -1,0 +1,7 @@
+<component name="CopyrightManager">
+  <settings default="AGPL-3.0 license">
+    <module2copyright>
+      <element module="All" copyright="AGPL-3.0 license" />
+    </module2copyright>
+  </settings>
+</component>
