@@ -17,7 +17,7 @@
             android:summary="@string/about_support_documentation_summary">
             <intent
                 android:action="android.intent.action.VIEW"
-                android:data="https://aisleron.com/docs/documentation/" />
+                android:data="@string/aisleron_documentation_url" />
         </Preference>
         <Preference
             android:key="about_support_report_issue"

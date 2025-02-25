@@ -1,5 +1,7 @@
 package com.aisleron.ui.welcome
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.text.Html
 import android.view.LayoutInflater
@@ -22,6 +24,7 @@ import com.aisleron.ui.widgets.ErrorSnackBar
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
+
 
 class WelcomeFragment(
     private val fabHandler: FabHandler,
@@ -83,6 +86,16 @@ class WelcomeFragment(
                 val navController = this@WelcomeFragment.findNavController()
                 navController.popBackStack(R.id.nav_welcome, true)
                 navController.navigate(R.id.nav_settings)
+            }
+        }
+
+        with(binding.txtWelcomeDocumentation) {
+            text = Html.fromHtml(getString(R.string.welcome_documentation), FROM_HTML_MODE_LEGACY)
+            setOnClickListener { _ ->
+                val browserIntent = Intent(
+                    Intent.ACTION_VIEW, Uri.parse(getString(R.string.aisleron_documentation_url))
+                )
+                startActivity(browserIntent)
             }
         }
 

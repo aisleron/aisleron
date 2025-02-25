@@ -1,5 +1,7 @@
 package com.aisleron.ui.welcome
 
+import android.app.Instrumentation
+import android.content.Intent
 import androidx.fragment.app.testing.FragmentScenario
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.navigation.Navigation
@@ -11,6 +13,11 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.intent.Intents
+import androidx.test.espresso.intent.Intents.intended
+import androidx.test.espresso.intent.Intents.intending
+import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
+import androidx.test.espresso.intent.matcher.IntentMatchers.hasData
 import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
@@ -35,6 +42,7 @@ import com.aisleron.ui.FabHandlerTestImpl
 import com.aisleron.ui.settings.WelcomePreferencesTestImpl
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import org.hamcrest.Matchers
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
@@ -60,10 +68,6 @@ class WelcomeFragmentTest : KoinTest {
             useCaseModule,
         )
     )
-
-    /*private fun getKoinModules(): List<Module> {
-        return TestAppModules().getTestAppModules(testData)
-    }*/
 
     private fun getFragmentScenario(
         welcomePreferences: WelcomePreferencesTestImpl? = null
@@ -343,5 +347,27 @@ class WelcomeFragmentTest : KoinTest {
                 assertFalse(isInitialised)
             }
         }
+    }
+
+    @Test
+    fun welcomePage_SelectViewDocumentation_OpensDocumentationUrl() {
+        getFragmentScenario()
+        Intents.init()
+
+        var documentsUri = ""
+
+        getFragmentScenario().onFragment { fragment ->
+            documentsUri = fragment.getString(R.string.aisleron_documentation_url)
+        }
+
+
+        val expectedIntent = Matchers.allOf(hasAction(Intent.ACTION_VIEW), hasData(documentsUri))
+        intending(expectedIntent).respondWith(Instrumentation.ActivityResult(0, null))
+
+        val welcomeOption = onView(withId(R.id.txt_welcome_documentation))
+        welcomeOption.perform(click())
+        intended(expectedIntent)
+
+        Intents.release()
     }
 }

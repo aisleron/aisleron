@@ -101,5 +101,18 @@
             android:text="@string/welcome_import_db"
             app:drawableEndCompat="@drawable/baseline_arrow_right_24" />
 
+        <TextView
+            android:id="@+id/txt_welcome_documentation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/text_margin"
+            android:background="@drawable/background_border"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:padding="@dimen/menu_padding"
+            android:text="@string/welcome_documentation"
+            app:drawableEndCompat="@drawable/baseline_arrow_right_24" />
+
     </LinearLayout>
 </ScrollView>
