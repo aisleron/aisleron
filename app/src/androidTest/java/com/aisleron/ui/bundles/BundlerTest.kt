@@ -71,6 +71,7 @@ class BundlerTest {
         assertNull(addProductBundle?.name)
         assertFalse(addProductBundle?.inStock!!)
         assertEquals(AddEditProductBundle.ProductAction.ADD, addProductBundle.actionType)
+        assertNull(addProductBundle.aisleId)
     }
 
     @Test
@@ -235,5 +236,16 @@ class BundlerTest {
         bundle.putSerializable("filterType", shoppingListBundle.filterType)
         val bundledShoppingList = bundler.getShoppingListBundle(bundle)
         assertEquals(shoppingListBundle, bundledShoppingList)
+    }
+
+    @Test
+    fun makeAddProductBundle_AisleIdProvided_BundleHasAisleId() {
+        val aisleId = 12
+        val bundle = bundler.makeAddProductBundle(aisleId = aisleId)
+
+        val addProductBundle =
+            getParcelableBundle(bundle, "addEditProduct", AddEditProductBundle::class.java)
+
+        assertEquals(aisleId, addProductBundle!!.aisleId)
     }
 }

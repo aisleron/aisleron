@@ -26,6 +26,12 @@
         app:showAsAction="ifRoom"
         android:menuCategory="container" />
     <item
+        android:id="@+id/mnu_add_product_to_aisle"
+        android:title="@string/add_product"
+        android:icon="@drawable/baseline_add_product_24"
+        app:showAsAction="ifRoom"
+        android:menuCategory="container" />
+    <item
         android:id="@+id/mnu_delete_shopping_list_item"
         android:title="@string/delete"
         android:icon="@drawable/baseline_delete_24"

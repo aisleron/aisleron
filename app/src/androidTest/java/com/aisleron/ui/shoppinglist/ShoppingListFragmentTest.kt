@@ -821,6 +821,60 @@ class ShoppingListFragmentTest : KoinTest {
         assertEquals(productStatusBefore, productStatusAfterUndo)
     }
 
+    @Test
+    fun onLongClick_IsAisle_AddProductToAisleShows() = runTest {
+        val shoppingList = getShoppingList()
+        getFragmentScenario(
+            bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
+        )
+
+        val aisleName = shoppingList.aisles.first().name
+
+        onView(withText(aisleName)).perform(longClick())
+
+        val actionBar = onView(withResourceName("action_mode_bar"))
+        actionBar.check(matches(not(hasDescendant(withId(R.id.mnu_add_product_to_aisle)))))
+    }
+
+    @Test
+    fun onLongClick_IsProduct_AddProductToAisleDoesNotShow() = runTest {
+        val shoppingList = getShoppingList()
+        getFragmentScenario(
+            bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
+        )
+
+        val product = getProduct(shoppingList, false)
+
+        onView(withText(product.name)).perform(longClick())
+
+        val actionBar = onView(withResourceName("action_mode_bar"))
+        actionBar.check(matches(not(hasDescendant(withId(R.id.mnu_add_product_to_aisle)))))
+    }
+
+    @Test
+    fun onActionItemClicked_ActionItemIsAddProductToAisle_NavigateToAddProduct() = runTest {
+        val shoppingList = getShoppingList()
+        val aisle = shoppingList.aisles.first()
+        val shoppingListBundle =
+            bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
+
+        val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
+        getFragmentScenario(shoppingListBundle).onFragment { fragment ->
+            navController.setGraph(R.navigation.mobile_navigation)
+            navController.setCurrentDestination(R.id.nav_shopping_list)
+            Navigation.setViewNavController(fragment.requireView(), navController)
+        }
+
+        onView(withText(aisle.name)).perform(longClick())
+        onView(withId(R.id.mnu_add_product_to_aisle)).perform(click())
+        val bundle = navController.backStack.last().arguments
+        val addEditProductBundle = bundler.getAddEditProductBundle(bundle)
+
+        assertEquals(aisle.id, addEditProductBundle.aisleId)
+        assertEquals(AddEditProductBundle.ProductAction.ADD, addEditProductBundle.actionType)
+        assertEquals(R.id.nav_add_product, navController.currentDestination?.id)
+    }
+
     /*@Test
     fun onDrag_IsProduct_ProductRankUpdated() {
         val shoppingList = getShoppingList()

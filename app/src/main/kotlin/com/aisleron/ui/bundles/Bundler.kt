@@ -44,16 +44,21 @@ class Bundler {
     fun makeEditProductBundle(productId: Int): Bundle {
         val editProductBundle = AddEditProductBundle(
             productId = productId,
-            actionType = AddEditProductBundle.ProductAction.EDIT
+            actionType = AddEditProductBundle.ProductAction.EDIT,
+            aisleId = null
         )
         return makeParcelableBundle(ADD_EDIT_PRODUCT, editProductBundle)
     }
 
-    fun makeAddProductBundle(name: String? = null, inStock: Boolean = false): Bundle {
+    fun makeAddProductBundle(
+        name: String? = null, inStock: Boolean = false, aisleId: Int? = null
+    ): Bundle {
         val addProductBundle = AddEditProductBundle(
             name = name,
             inStock = inStock,
-            actionType = AddEditProductBundle.ProductAction.ADD
+            actionType = AddEditProductBundle.ProductAction.ADD,
+            aisleId = aisleId
+
         )
         return makeParcelableBundle(ADD_EDIT_PRODUCT, addProductBundle)
     }

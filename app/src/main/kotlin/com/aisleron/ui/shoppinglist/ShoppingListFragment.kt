@@ -220,8 +220,9 @@ class ShoppingListFragment(
         applicationTitleUpdateListener.applicationTitleUpdated(requireActivity(), appTitle)
     }
 
-    private fun navigateToAddProduct(filterType: FilterType) {
-        val bundle = Bundler().makeAddProductBundle(null, filterType == FilterType.IN_STOCK)
+    private fun navigateToAddProduct(filterType: FilterType, aisleId: Int? = null) {
+        val bundle =
+            Bundler().makeAddProductBundle(null, filterType == FilterType.IN_STOCK, aisleId)
         this.findNavController().navigate(R.id.nav_add_product, bundle)
     }
 
@@ -362,25 +363,35 @@ class ShoppingListFragment(
         mode.title = actionModeItem?.name
         menu.findItem(R.id.mnu_delete_shopping_list_item)
             .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
+
+        menu.findItem(R.id.mnu_add_product_to_aisle)
+            .setVisible(actionModeItem?.itemType == ShoppingListItem.ItemType.AISLE)
+
         return false // Return false if nothing is done
     }
 
     override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.mnu_edit_shopping_list_item -> {
+        var result = true
+        when (item.itemId) {
+            R.id.mnu_edit_shopping_list_item ->
                 actionModeItem?.let { editShoppingListItem(it) }
-                mode.finish()
-                true // Action picked, so close the CAB.
-            }
 
-            R.id.mnu_delete_shopping_list_item -> {
+            R.id.mnu_delete_shopping_list_item ->
                 actionModeItem?.let { confirmDelete(requireContext(), it) }
-                mode.finish()
-                true
-            }
 
-            else -> false
+            R.id.mnu_add_product_to_aisle ->
+                actionModeItem?.let {
+                    navigateToAddProduct(
+                        shoppingListViewModel.defaultFilter, it.aisleId
+                    )
+                }
+
+            else -> result = false // No action picked, so don't close the CAB.
         }
+
+        if (result) mode.finish()  // Action picked, so close the CAB.
+
+        return result
     }
 
     override fun onDestroyActionMode(mode: ActionMode) {
