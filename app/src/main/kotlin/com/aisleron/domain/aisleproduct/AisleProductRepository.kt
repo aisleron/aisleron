@@ -22,4 +22,5 @@ import com.aisleron.domain.base.BaseRepository
 interface AisleProductRepository : BaseRepository<AisleProduct> {
     suspend fun updateAisleProductRank(item: AisleProduct)
     suspend fun removeProductsFromAisle(aisleId: Int)
+    suspend fun getAisleMaxRank(aisleId: Int): Int
 }

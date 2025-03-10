@@ -51,4 +51,7 @@ interface AisleProductDao : BaseDao<AisleProductEntity> {
 
     @Query("DELETE FROM AisleProduct WHERE aisleId = :aisleId")
     suspend fun removeProductsFromAisle(aisleId: Int)
+
+    @Query("SELECT COALESCE(MAX(rank), 0) FROM AisleProduct WHERE aisleId = :aisleId")
+    suspend fun getAisleMaxRank(aisleId: Int): Int
 }

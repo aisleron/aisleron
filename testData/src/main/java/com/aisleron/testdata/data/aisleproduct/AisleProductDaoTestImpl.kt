@@ -68,6 +68,10 @@ class AisleProductDaoTestImpl(private val productDao: ProductDaoTestImpl) : Aisl
         aisleProductList.removeIf { it.aisleId == aisleId }
     }
 
+    override suspend fun getAisleMaxRank(aisleId: Int): Int {
+        return aisleProductList.filter { it.aisleId == aisleId }.maxOfOrNull { it.rank } ?: 0
+    }
+
     override suspend fun upsert(vararg entity: AisleProductEntity): List<Long> {
         val result = mutableListOf<Long>()
         entity.forEach {
