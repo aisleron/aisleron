@@ -833,7 +833,7 @@ class ShoppingListFragmentTest : KoinTest {
         onView(withText(aisleName)).perform(longClick())
 
         val actionBar = onView(withResourceName("action_mode_bar"))
-        actionBar.check(matches(not(hasDescendant(withId(R.id.mnu_add_product_to_aisle)))))
+        actionBar.check(matches(hasDescendant(withId(R.id.mnu_add_product_to_aisle))))
     }
 
     @Test
@@ -871,6 +871,7 @@ class ShoppingListFragmentTest : KoinTest {
         val addEditProductBundle = bundler.getAddEditProductBundle(bundle)
 
         assertEquals(aisle.id, addEditProductBundle.aisleId)
+        assertEquals(shoppingList.id, addEditProductBundle.locationId)
         assertEquals(AddEditProductBundle.ProductAction.ADD, addEditProductBundle.actionType)
         assertEquals(R.id.nav_add_product, navController.currentDestination?.id)
     }

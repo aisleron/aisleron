@@ -61,6 +61,8 @@ class ShoppingListViewModel(
 
     private val shoppingList = mutableListOf<ShoppingListItem>()
     private var _locationId: Int = 0
+    val locationId: Int get() = _locationId
+
     private var _listFilter: (ShoppingListItem) -> Boolean =
         getListFilterByProductFilter(_defaultFilter)
     private val _shoppingListUiState = MutableStateFlow<ShoppingListUiState>(

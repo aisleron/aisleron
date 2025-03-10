@@ -26,3 +26,7 @@ replay_pid*
 
 # Specific Files #
 keystore.properties
+
+# .idea files
+/.idea/androidTestResultsUserPreferences.xml
+/.idea/deploymentTargetSelector.xml

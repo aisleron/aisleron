@@ -23,10 +23,11 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class AddEditProductBundle(
     val productId: Int = 0,
+    val actionType: ProductAction = ProductAction.ADD,
     val name: String? = null,
     val inStock: Boolean? = null,
-    val actionType: ProductAction = ProductAction.ADD,
-    val aisleId: Int? = null
+    val aisleId: Int? = null,
+    val locationId: Int? = null
 ) : Parcelable {
     enum class ProductAction {
         ADD, EDIT

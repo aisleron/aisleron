@@ -222,12 +222,21 @@ class ShoppingListFragment(
 
     private fun navigateToAddProduct(filterType: FilterType, aisleId: Int? = null) {
         val bundle =
-            Bundler().makeAddProductBundle(null, filterType == FilterType.IN_STOCK, aisleId)
+            Bundler().makeAddProductBundle(
+                locationId = shoppingListViewModel.locationId,
+                name = null,
+                inStock = filterType == FilterType.IN_STOCK,
+                aisleId = aisleId
+            )
+
         this.findNavController().navigate(R.id.nav_add_product, bundle)
     }
 
     private fun navigateToEditProduct(productId: Int) {
-        val bundle = Bundler().makeEditProductBundle(productId)
+        val bundle = Bundler().makeEditProductBundle(
+            productId = productId, locationId = shoppingListViewModel.locationId
+        )
+
         this.findNavController().navigate(R.id.nav_add_product, bundle)
     }
 

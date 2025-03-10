@@ -13,13 +13,19 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="onClick_IsValidLocation_NavigateToShoppingList()">
+      <SelectionState runConfigName="BundlerTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="welcomePage_SelectViewDocumentation_OpensDocumentationUrl()">
+      <SelectionState runConfigName="makeAddProductBundle_AisleIdProvided_BundleHasAisleId()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="WelcomeFragmentTest">
+      <SelectionState runConfigName="onLongClick_IsAisle_AddProductToAisleShows()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="onLongClick_IsProduct_AddProductToAisleDoesNotShow()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="onActionItemClicked_ActionItemIsAddProductToAisle_NavigateToAddProduct()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
