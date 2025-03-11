@@ -63,7 +63,8 @@ val viewModelModule = module {
         ProductViewModel(
             addProductUseCase = get(),
             updateProductUseCase = get(),
-            getProductUseCase = get()
+            getProductUseCase = get(),
+            getAisleUseCase = get()
         )
     }
 

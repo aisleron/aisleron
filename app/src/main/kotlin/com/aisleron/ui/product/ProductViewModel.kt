@@ -19,6 +19,8 @@ package com.aisleron.ui.product
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.aisleron.domain.aisle.Aisle
+import com.aisleron.domain.aisle.usecase.GetAisleUseCase
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.usecase.AddProductUseCase
@@ -33,8 +35,11 @@ class ProductViewModel(
     private val addProductUseCase: AddProductUseCase,
     private val updateProductUseCase: UpdateProductUseCase,
     private val getProductUseCase: GetProductUseCase,
+    private val getAisleUseCase: GetAisleUseCase,
     coroutineScopeProvider: CoroutineScope? = null
 ) : ViewModel() {
+    private var _aisleId: Int? = null
+    private var _locationId: Int? = null
     private val coroutineScope = coroutineScopeProvider ?: this.viewModelScope
     val productName: String? get() = product?.name
 
@@ -47,8 +52,10 @@ class ProductViewModel(
     val productUiState: StateFlow<ProductUiState> = _productUiState
 
 
-    fun hydrate(productId: Int, inStock: Boolean) {
+    fun hydrate(productId: Int, inStock: Boolean, locationId: Int? = null, aisleId: Int? = null) {
         coroutineScope.launch {
+            _locationId = locationId
+            _aisleId = aisleId
             _productUiState.value = ProductUiState.Loading
             product = getProductUseCase(productId)
             _inStock = product?.inStock ?: inStock
@@ -60,7 +67,10 @@ class ProductViewModel(
         coroutineScope.launch {
             _productUiState.value = ProductUiState.Loading
             try {
-                product?.let { updateProduct(it, name, inStock) } ?: addProduct(name, inStock)
+                val aisle = _aisleId?.let { getAisleUseCase(it) }
+                product?.let { updateProduct(it, name, inStock) }
+                    ?: addProduct(name, inStock, aisle)
+
                 _productUiState.value = ProductUiState.Success
             } catch (e: AisleronException) {
                 _productUiState.value = ProductUiState.Error(e.exceptionCode, e.message)
@@ -79,13 +89,14 @@ class ProductViewModel(
         hydrate(updateProduct.id, updateProduct.inStock)
     }
 
-    private suspend fun addProduct(name: String, inStock: Boolean) {
+    private suspend fun addProduct(name: String, inStock: Boolean, aisle: Aisle?) {
         val id = addProductUseCase(
             Product(
                 name = name,
                 inStock = inStock,
                 id = 0
-            )
+            ),
+            aisle
         )
         hydrate(id, _inStock)
     }

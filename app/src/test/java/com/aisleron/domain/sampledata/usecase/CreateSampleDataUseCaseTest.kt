@@ -17,11 +17,13 @@
 
 package com.aisleron.domain.sampledata.usecase
 
+import com.aisleron.data.TestDataManager
 import com.aisleron.domain.aisle.AisleRepository
 import com.aisleron.domain.aisle.usecase.AddAisleUseCaseImpl
 import com.aisleron.domain.aisle.usecase.GetDefaultAislesUseCase
 import com.aisleron.domain.aisleproduct.AisleProductRepository
 import com.aisleron.domain.aisleproduct.usecase.AddAisleProductsUseCase
+import com.aisleron.domain.aisleproduct.usecase.GetAisleMaxRankUseCase
 import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductRankUseCase
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.location.LocationRepository
@@ -35,7 +37,6 @@ import com.aisleron.domain.product.usecase.AddProductUseCaseImpl
 import com.aisleron.domain.product.usecase.GetAllProductsUseCase
 import com.aisleron.domain.product.usecase.IsProductNameUniqueUseCase
 import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
-import com.aisleron.data.TestDataManager
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions
@@ -67,7 +68,8 @@ class CreateSampleDataUseCaseTest {
             productRepository,
             GetDefaultAislesUseCase(aisleRepository),
             addAisleProductsUseCase,
-            IsProductNameUniqueUseCase(productRepository)
+            IsProductNameUniqueUseCase(productRepository),
+            GetAisleMaxRankUseCase(aisleProductRepository)
         )
 
         val addAisleUseCase = AddAisleUseCaseImpl(
@@ -169,11 +171,13 @@ class CreateSampleDataUseCaseTest {
     fun createSampleDataUseCase_ProductsExistInDatabase_ThrowsException() {
         runBlocking {
             val productRepository = testData.getRepository<ProductRepository>()
+            val aisleProductRepository = testData.getRepository<AisleProductRepository>()
             val addProductUseCase = AddProductUseCaseImpl(
                 productRepository,
                 GetDefaultAislesUseCase(testData.getRepository<AisleRepository>()),
-                AddAisleProductsUseCase(testData.getRepository<AisleProductRepository>()),
-                IsProductNameUniqueUseCase(productRepository)
+                AddAisleProductsUseCase(aisleProductRepository),
+                IsProductNameUniqueUseCase(productRepository),
+                GetAisleMaxRankUseCase(aisleProductRepository)
             )
 
             addProductUseCase(
@@ -181,7 +185,8 @@ class CreateSampleDataUseCaseTest {
                     id = 0,
                     name = "CreateSampleDataProductExistsTest",
                     inStock = false
-                )
+                ),
+                null
             )
 
             assertThrows<AisleronException.SampleDataCreationException> {

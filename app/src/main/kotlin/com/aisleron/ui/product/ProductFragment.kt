@@ -69,7 +69,9 @@ class ProductFragment(
 
         productViewModel.hydrate(
             addEditProductBundle.productId,
-            addEditProductBundle.inStock ?: false
+            addEditProductBundle.inStock ?: false,
+            addEditProductBundle.locationId,
+            addEditProductBundle.aisleId
         )
     }
 

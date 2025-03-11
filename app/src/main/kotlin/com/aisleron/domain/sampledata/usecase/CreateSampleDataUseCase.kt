@@ -100,7 +100,7 @@ class CreateSampleDataUseCaseImpl(
             Product(0, PRD_SALT, true)
         )
 
-        productList.forEach { addProductUseCase(it) }
+        productList.forEach { addProductUseCase(it, null) }
     }
 
     private suspend fun addHomeAisles() {

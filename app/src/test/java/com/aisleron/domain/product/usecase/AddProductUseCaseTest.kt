@@ -22,11 +22,13 @@ import com.aisleron.domain.aisle.AisleRepository
 import com.aisleron.domain.aisle.usecase.GetDefaultAislesUseCase
 import com.aisleron.domain.aisleproduct.AisleProductRepository
 import com.aisleron.domain.aisleproduct.usecase.AddAisleProductsUseCase
+import com.aisleron.domain.aisleproduct.usecase.GetAisleMaxRankUseCase
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -46,7 +48,8 @@ class AddProductUseCaseTest {
             productRepository,
             GetDefaultAislesUseCase(testData.getRepository<AisleRepository>()),
             AddAisleProductsUseCase(testData.getRepository<AisleProductRepository>()),
-            IsProductNameUniqueUseCase(testData.getRepository<ProductRepository>())
+            IsProductNameUniqueUseCase(testData.getRepository<ProductRepository>()),
+            GetAisleMaxRankUseCase(testData.getRepository<AisleProductRepository>())
         )
 
         existingProduct = runBlocking {
@@ -59,7 +62,7 @@ class AddProductUseCaseTest {
         runBlocking {
             val newProduct = testData.getRepository<ProductRepository>().getAll()[1].copy(id = 0)
             assertThrows<AisleronException.DuplicateProductNameException> {
-                addProductUseCase(newProduct)
+                addProductUseCase(newProduct, null)
             }
         }
     }
@@ -73,7 +76,7 @@ class AddProductUseCaseTest {
 
         runBlocking {
             assertThrows<AisleronException.DuplicateProductException> {
-                addProductUseCase(updateProduct)
+                addProductUseCase(updateProduct, null)
             }
         }
     }
@@ -95,7 +98,7 @@ class AddProductUseCaseTest {
         runBlocking {
             val productRepository = testData.getRepository<ProductRepository>()
             countBefore = productRepository.getAll().count()
-            val id = addProductUseCase(newProduct)
+            val id = addProductUseCase(newProduct, null)
             insertedProduct = productRepository.get(id)
             countAfter = productRepository.getAll().count()
         }
@@ -115,9 +118,34 @@ class AddProductUseCaseTest {
             val aisleProductRepository = testData.getRepository<AisleProductRepository>()
             locationCount = testData.getRepository<LocationRepository>().getAll().count()
             aisleProductCountBefore = aisleProductRepository.getAll().count()
-            addProductUseCase(newProduct)
+            addProductUseCase(newProduct, null)
             aisleProductCountAfter = aisleProductRepository.getAll().count()
         }
         Assertions.assertEquals(aisleProductCountBefore + locationCount, aisleProductCountAfter)
     }
+
+    @Test
+    fun addProduct_AisleProvided_ProductAddedToAisle() = runTest {
+        val newProduct = getNewProduct()
+        val aisle = testData.getRepository<AisleRepository>().getAll().first { !it.isDefault }
+        val aisleProductRepository = testData.getRepository<AisleProductRepository>()
+        val aisleProductCountBefore =
+            aisleProductRepository.getAll().count { it.aisleId == aisle.id }
+
+        val newProductId = addProductUseCase(newProduct, aisle)
+
+        val aisleProductCountAfter =
+            aisleProductRepository.getAll().count { it.aisleId == aisle.id }
+
+        val aisleProduct = aisleProductRepository.getAll()
+            .firstOrNull { it.aisleId == aisle.id && it.product.id == newProductId }
+
+        Assertions.assertEquals(aisleProductCountBefore + 1, aisleProductCountAfter)
+        Assertions.assertNotNull(aisleProduct)
+    }
+
+    /**
+     * Add Product when aisle has no existing products, i.e. max rank is null
+     * No aisle provided > Not in default count is 0
+     */
 }

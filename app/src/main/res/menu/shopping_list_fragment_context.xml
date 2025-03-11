@@ -20,15 +20,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/mnu_edit_shopping_list_item"
-        android:title="@string/edit"
-        android:icon="@drawable/baseline_edit_24"
-        app:showAsAction="ifRoom"
-        android:menuCategory="container" />
-    <item
         android:id="@+id/mnu_add_product_to_aisle"
         android:title="@string/add_product"
         android:icon="@drawable/baseline_add_product_24"
+        app:showAsAction="ifRoom"
+        android:menuCategory="container" />
+    <item
+        android:id="@+id/mnu_edit_shopping_list_item"
+        android:title="@string/edit"
+        android:icon="@drawable/baseline_edit_24"
         app:showAsAction="ifRoom"
         android:menuCategory="container" />
     <item

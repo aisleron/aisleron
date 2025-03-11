@@ -30,6 +30,7 @@ import com.aisleron.domain.aisle.usecase.UpdateAisleRankUseCase
 import com.aisleron.domain.aisle.usecase.UpdateAisleUseCase
 import com.aisleron.domain.aisle.usecase.UpdateAisleUseCaseImpl
 import com.aisleron.domain.aisleproduct.usecase.AddAisleProductsUseCase
+import com.aisleron.domain.aisleproduct.usecase.GetAisleMaxRankUseCase
 import com.aisleron.domain.aisleproduct.usecase.RemoveProductsFromAisleUseCase
 import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductRankUseCase
 import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductsUseCase
@@ -143,6 +144,7 @@ val useCaseModule = module {
     factory<UpdateAisleProductsUseCase> { UpdateAisleProductsUseCase(aisleProductRepository = get()) }
     factory<UpdateAisleProductRankUseCase> { UpdateAisleProductRankUseCase(aisleProductRepository = get()) }
     factory<RemoveProductsFromAisleUseCase> { RemoveProductsFromAisleUseCase(aisleProductRepository = get()) }
+    factory<GetAisleMaxRankUseCase> { GetAisleMaxRankUseCase(aisleProductRepository = get()) }
 
     /**
      * Product Use Cases
@@ -164,7 +166,8 @@ val useCaseModule = module {
             productRepository = get(),
             getDefaultAislesUseCase = get(),
             addAisleProductsUseCase = get(),
-            isProductNameUniqueUseCase = get()
+            isProductNameUniqueUseCase = get(),
+            getAisleMaxRankUseCase = get()
         )
     }
 

@@ -17,25 +17,28 @@
 
 package com.aisleron.domain.product.usecase
 
+import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.aisle.usecase.GetDefaultAislesUseCase
 import com.aisleron.domain.aisleproduct.AisleProduct
 import com.aisleron.domain.aisleproduct.usecase.AddAisleProductsUseCase
+import com.aisleron.domain.aisleproduct.usecase.GetAisleMaxRankUseCase
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
 
 interface AddProductUseCase {
-    suspend operator fun invoke(product: Product): Int
+    suspend operator fun invoke(product: Product, targetAisle: Aisle?): Int
 }
 
 class AddProductUseCaseImpl(
     private val productRepository: ProductRepository,
     private val getDefaultAislesUseCase: GetDefaultAislesUseCase,
     private val addAisleProductsUseCase: AddAisleProductsUseCase,
-    private val isProductNameUniqueUseCase: IsProductNameUniqueUseCase
+    private val isProductNameUniqueUseCase: IsProductNameUniqueUseCase,
+    private val getAisleMaxRankUseCase: GetAisleMaxRankUseCase
 
 ) : AddProductUseCase {
-    override suspend operator fun invoke(product: Product): Int {
+    override suspend operator fun invoke(product: Product, targetAisle: Aisle?): Int {
 
         if (!isProductNameUniqueUseCase(product)) {
             throw AisleronException.DuplicateProductNameException("Product Name must be unique")
@@ -51,11 +54,18 @@ class AddProductUseCaseImpl(
             inStock = product.inStock
         )
 
-        addAisleProductsUseCase(getDefaultAislesUseCase().map {
+        val defaultAisles = getDefaultAislesUseCase().toMutableList()
+
+        targetAisle?.let { target ->
+            defaultAisles.removeIf { it.locationId == target.locationId }
+            defaultAisles.add(target)
+        }
+
+        addAisleProductsUseCase(defaultAisles.map {
             AisleProduct(
                 aisleId = it.id,
                 product = newProduct,
-                rank = 0,
+                rank = getAisleMaxRankUseCase(it) + 1,
                 id = 0
             )
         })

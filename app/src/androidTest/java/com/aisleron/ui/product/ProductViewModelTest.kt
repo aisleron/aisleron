@@ -22,6 +22,10 @@ import com.aisleron.di.daoTestModule
 import com.aisleron.di.repositoryModule
 import com.aisleron.di.useCaseModule
 import com.aisleron.di.viewModelTestModule
+import com.aisleron.domain.aisle.Aisle
+import com.aisleron.domain.aisle.AisleRepository
+import com.aisleron.domain.aisle.usecase.GetAisleUseCase
+import com.aisleron.domain.aisleproduct.AisleProductRepository
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
@@ -124,7 +128,7 @@ class ProductViewModelTest(private val inStock: Boolean) : KoinTest {
 
         declare<AddProductUseCase> {
             object : AddProductUseCase {
-                override suspend fun invoke(product: Product): Int {
+                override suspend fun invoke(product: Product, targetAisle: Aisle?): Int {
                     throw Exception(exceptionMessage)
                 }
             }
@@ -174,10 +178,32 @@ class ProductViewModelTest(private val inStock: Boolean) : KoinTest {
         val pvm = ProductViewModel(
             get<AddProductUseCase>(),
             get<UpdateProductUseCase>(),
-            get<GetProductUseCase>()
+            get<GetProductUseCase>(),
+            get<GetAisleUseCase>()
         )
 
         Assert.assertNotNull(pvm)
+    }
+
+    @Test
+    fun testSaveProduct_AisleProvided_ProductAddedToAisle() = runTest {
+        val newProductName = "New Product Name"
+        val productRepository = get<ProductRepository>()
+        val aisleProductRepository = get<AisleProductRepository>()
+        val aisle = get<AisleRepository>().getAll().first { !it.isDefault }
+
+        productViewModel.hydrate(0, inStock, aisle.locationId, aisle.id)
+        val countBefore = aisleProductRepository.getAll().count { it.aisleId == aisle.id }
+        productViewModel.saveProduct(newProductName, inStock)
+        val newProduct = productRepository.getByName(newProductName)
+        val countAfter = aisleProductRepository.getAll().count { it.aisleId == aisle.id }
+
+        Assert.assertNotNull(newProduct)
+        Assert.assertEquals(newProductName, newProduct?.name)
+        Assert.assertEquals(inStock, newProduct?.inStock)
+        Assert.assertEquals(newProductName, productViewModel.productName)
+        Assert.assertEquals(inStock, productViewModel.inStock)
+        Assert.assertEquals(countBefore + 1, countAfter)
     }
 
     companion object {
