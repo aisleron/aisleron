@@ -43,7 +43,7 @@
         android:id="@+id/chk_product_in_stock"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/menu_in_stock"
+        android:text="@string/in_stock_at_home"
         android:gravity="center_vertical"
         android:checked="false"
         android:padding="@dimen/text_margin"

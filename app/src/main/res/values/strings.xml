@@ -130,5 +130,6 @@
     <string name="undo">UNDO</string>
 
     <string name="aisleron_logo">Aisleron logo</string>
+    <string name="in_stock_at_home">In stock at home?</string>
 
 </resources>

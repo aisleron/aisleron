@@ -122,7 +122,7 @@ class ShopListFragmentTest : KoinTest {
 
         actionBar.check(matches(isDisplayed()))
         actionBar.check(matches(hasDescendant(withText(selectedLocation.name))))
-        actionBar.check(matches(hasDescendant(withId(R.id.mnu_edit_shopping_list_item))))
+        actionBar.check(matches(hasDescendant(withId(R.id.mnu_edit_shop_list_item))))
 
         openActionBarOverflowOrOptionsMenu(getInstrumentation().targetContext)
         onView(withText(R.string.delete)).check(matches(isDisplayed()))
@@ -140,7 +140,7 @@ class ShopListFragmentTest : KoinTest {
         }
 
         onView(withText(editLocation.name)).perform(longClick())
-        onView(withId(R.id.mnu_edit_shopping_list_item)).perform(click())
+        onView(withId(R.id.mnu_edit_shop_list_item)).perform(click())
 
         val bundle = navController.backStack.last().arguments
         val addEditLocationBundle = bundler.getAddEditLocationBundle(bundle)

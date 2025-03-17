@@ -130,33 +130,32 @@ class ShopListFragment(private val fabHandler: FabHandler) : Fragment(), ActionM
     override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
         // Inflate a menu resource providing context menu items.
         val inflater: MenuInflater = mode.menuInflater
-        inflater.inflate(R.menu.shopping_list_fragment_context, menu)
+        inflater.inflate(R.menu.shop_list_fragment_context, menu)
         return true
     }
 
     override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
         mode.title = actionModeItem?.name
-        menu.findItem(R.id.mnu_delete_shopping_list_item)
+        menu.findItem(R.id.mnu_delete_shop_list_item)
             .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
         return false // Return false if nothing is done
     }
 
     override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.mnu_edit_shopping_list_item -> {
+        var result = true
+        when (item.itemId) {
+            R.id.mnu_edit_shop_list_item ->
                 actionModeItem?.let { editShopListItem(it) }
-                mode.finish()
-                true // Action picked, so close the CAB.
-            }
 
-            R.id.mnu_delete_shopping_list_item -> {
+            R.id.mnu_delete_shop_list_item ->
                 actionModeItem?.let { confirmDelete(requireContext(), it) }
-                mode.finish()
-                true
-            }
 
-            else -> false
+            else -> result = false
         }
+
+        if (result) mode.finish()  // Action picked, so close the CAB.
+
+        return result
     }
 
     private fun confirmDelete(context: Context, item: ShopListItemViewModel) {
