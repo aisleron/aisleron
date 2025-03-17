@@ -24,7 +24,7 @@
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_search">Search</string>
 
-    <string name="menu_in_stock">In Stock</string>
+    <string name="menu_in_stock">Home Stock</string>
     <string name="menu_needed">Needed</string>
     <string name="menu_all_items">All Items</string>
     <string name="menu_settings">Settings</string>
