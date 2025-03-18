@@ -115,14 +115,14 @@ class ShoppingListFragment(
                     object :
                         ShoppingListItemRecyclerViewAdapter.ShoppingListItemListener {
                         override fun onClick(item: ShoppingListItem) {
-                            finishActionMode()
+                            actionMode?.finish()
                         }
 
                         override fun onProductStatusChange(
                             item: ProductShoppingListItem,
                             inStock: Boolean
                         ) {
-                            finishActionMode()
+                            actionMode?.finish()
                             shoppingListViewModel.updateProductStatus(item, inStock)
                             displayStatusChangeSnackBar(item, inStock)
                         }
@@ -130,13 +130,13 @@ class ShoppingListFragment(
                         override fun onListPositionChanged(
                             item: ShoppingListItem, precedingItem: ShoppingListItem?
                         ) {
-                            finishActionMode()
+                            actionMode?.finish()
                             shoppingListViewModel.updateItemRank(item, precedingItem)
                         }
 
                         override fun onLongClick(item: ShoppingListItem, view: View): Boolean {
                             // Finish the previous action mode and start a new one
-                            finishActionMode()
+                            actionMode?.finish()
                             actionModeItem = item
                             actionModeItemView = view
                             actionModeItemView?.isSelected = true
@@ -154,7 +154,7 @@ class ShoppingListFragment(
                         }
 
                         override fun onMoved(item: ShoppingListItem) {
-                            finishActionMode()
+                            actionMode?.finish()
                         }
                     }
                 )
@@ -213,11 +213,6 @@ class ShoppingListFragment(
         fabHandler.setFabOnClickListener(this.requireActivity(), FabHandler.FabOption.ADD_AISLE) {
             showAisleDialog(requireView().context)
         }
-    }
-
-    private fun finishActionMode() {
-        actionMode?.finish()
-        actionModeItemView?.isSelected = false
     }
 
     private fun updateTitle() {
@@ -420,8 +415,10 @@ class ShoppingListFragment(
     }
 
     override fun onDestroyActionMode(mode: ActionMode) {
+        actionModeItemView?.isSelected = false
         actionMode = null
         actionModeItem = null
+        actionModeItemView = null
     }
 
     companion object {
@@ -448,6 +445,6 @@ class ShoppingListFragment(
     }
 
     override fun fabClicked(fabOption: FabHandler.FabOption) {
-        finishActionMode()
+        actionMode?.finish()
     }
 }

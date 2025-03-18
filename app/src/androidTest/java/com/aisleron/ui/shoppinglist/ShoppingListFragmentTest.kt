@@ -280,6 +280,8 @@ class ShoppingListFragmentTest : KoinTest {
 
         val actionBar = onView(withResourceName("action_mode_bar"))
         actionBar.check(matches(not(isDisplayed())))
+        productItem.check(matches(not(isSelected())))
+
         scenario.onFragment {
             assertEquals(shoppingList.name, applicationTitleUpdateListener.appTitle)
         }
@@ -958,6 +960,23 @@ class ShoppingListFragmentTest : KoinTest {
 
         val actionBar = onView(withResourceName("action_mode_bar"))
         actionBar.check(matches(not(isDisplayed())))
+    }
+
+    @Test
+    fun onLongClick_EarlierItemSelected_ActionBarHasNewItemTitle() = runTest {
+        val shoppingList = getShoppingList()
+        val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
+        getFragmentScenario(bundle)
+        val product = getProduct(shoppingList, false)
+        val aisle = shoppingList.aisles.first { !it.isDefault }
+
+        val productItem = onView(allOf(withText(product.name), withId(R.id.txt_product_name)))
+        productItem.perform(longClick())
+        val aisleItem = onView(allOf(withText(aisle.name), withId(R.id.txt_aisle_name)))
+        aisleItem.perform(longClick())
+
+        val actionBar = onView(withResourceName("action_mode_bar"))
+        actionBar.check(matches(hasDescendant(withText(aisle.name))))
     }
 
     /*@Test
