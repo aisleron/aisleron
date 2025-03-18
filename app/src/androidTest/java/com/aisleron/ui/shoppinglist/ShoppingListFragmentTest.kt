@@ -39,6 +39,7 @@ import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.hasDescendant
 import androidx.test.espresso.matcher.ViewMatchers.hasSibling
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.isSelected
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withResourceName
 import androidx.test.espresso.matcher.ViewMatchers.withText
@@ -874,6 +875,22 @@ class ShoppingListFragmentTest : KoinTest {
         assertEquals(shoppingList.id, addEditProductBundle.locationId)
         assertEquals(AddEditProductBundle.ProductAction.ADD, addEditProductBundle.actionType)
         assertEquals(R.id.nav_add_product, navController.currentDestination?.id)
+    }
+
+    @Test
+    fun onClick_OtherItemSelected_SelectedItemBecomesDeselected() = runTest {
+        val shoppingList = getShoppingList()
+        val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
+        getFragmentScenario(bundle)
+        val product = getProduct(shoppingList, false)
+        val aisle = shoppingList.aisles.first { !it.isDefault }
+
+        val productItem = onView(allOf(withText(product.name), withId(R.id.txt_product_name)))
+        productItem.perform(longClick())
+        val aisleItem = onView(allOf(withText(aisle.name), withId(R.id.txt_aisle_name)))
+        aisleItem.perform(click())
+
+        productItem.check(matches(not(isSelected())))
     }
 
     /*@Test

@@ -91,11 +91,9 @@ class ShoppingListItemRecyclerViewAdapter(
             true
         }
 
-        newViewHolder.itemView.setOnClickListener { v ->
-            if (v == selectedView) {
-                v.isSelected = false
-                selectedView = null
-            }
+        newViewHolder.itemView.setOnClickListener {
+            selectedView?.isSelected = false
+            selectedView = null
             listener.onClick(getItem(newViewHolder.absoluteAdapterPosition))
         }
 
