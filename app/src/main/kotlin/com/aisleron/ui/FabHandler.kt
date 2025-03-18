@@ -22,6 +22,7 @@ import android.view.View
 
 interface FabHandler {
     fun getFabView(activity: Activity): View?
+    fun setFabOnClickedListener(fabClickedCallBack: FabClickedCallBack)
 
     fun setFabOnClickListener(
         activity: Activity,
@@ -33,5 +34,9 @@ interface FabHandler {
 
     enum class FabOption {
         ADD_PRODUCT, ADD_AISLE, ADD_SHOP
+    }
+
+    interface FabClickedCallBack {
+        fun fabClicked(fabOption: FabOption)
     }
 }

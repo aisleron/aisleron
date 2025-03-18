@@ -893,6 +893,73 @@ class ShoppingListFragmentTest : KoinTest {
         productItem.check(matches(not(isSelected())))
     }
 
+    @Test
+    fun onClickAddAisleFab_ActionModeIsActive_DismissActionModeContextMenu() = runTest {
+        val shoppingList = getShoppingList()
+        val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
+        val scenario = getFragmentScenario(bundle)
+        val product = getProduct(shoppingList, false)
+        val productItem = onView(allOf(withText(product.name), withId(R.id.txt_product_name)))
+
+        productItem.perform(longClick())
+        scenario.onFragment {
+            fabHandler.clickFab(FabHandler.FabOption.ADD_AISLE, it.requireView())
+        }
+
+        onView(withText(android.R.string.cancel))
+            .inRoot(isDialog())
+            .perform(click())
+
+        sleep(1000)
+
+        val actionBar = onView(withResourceName("action_mode_bar"))
+        actionBar.check(matches(not(isDisplayed())))
+    }
+
+    @Test
+    fun onClickAddProductFab_ActionModeIsActive_DismissActionModeContextMenu() = runTest {
+        val shoppingList = getShoppingList()
+        val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
+        val scenario = getFragmentScenario(bundle)
+        val product = getProduct(shoppingList, false)
+        val productItem = onView(allOf(withText(product.name), withId(R.id.txt_product_name)))
+
+        productItem.perform(longClick())
+
+        val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
+        scenario.onFragment { fragment ->
+            navController.setGraph(R.navigation.mobile_navigation)
+            navController.setCurrentDestination(R.id.nav_shopping_list)
+            Navigation.setViewNavController(fragment.requireView(), navController)
+            fabHandler.clickFab(FabHandler.FabOption.ADD_PRODUCT, fragment.requireView())
+        }
+
+        sleep(500)
+
+        val actionBar = onView(withResourceName("action_mode_bar"))
+        actionBar.check(matches(not(isDisplayed())))
+    }
+
+    @Test
+    fun onClickAddShopFab_ActionModeIsActive_DismissActionModeContextMenu() = runTest {
+        val shoppingList = getShoppingList()
+        val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
+        val scenario = getFragmentScenario(bundle)
+        val product = getProduct(shoppingList, false)
+        val productItem = onView(allOf(withText(product.name), withId(R.id.txt_product_name)))
+
+        productItem.perform(longClick())
+        scenario.onFragment { fragment ->
+            fabHandler.setFabOnClickListener(fragment.requireActivity(), FabHandler.FabOption.ADD_SHOP) {}
+            fabHandler.clickFab(FabHandler.FabOption.ADD_SHOP, fragment.requireView())
+        }
+
+        sleep(500)
+
+        val actionBar = onView(withResourceName("action_mode_bar"))
+        actionBar.check(matches(not(isDisplayed())))
+    }
+
     /*@Test
     fun onDrag_IsProduct_ProductRankUpdated() {
         val shoppingList = getShoppingList()
