@@ -16,14 +16,18 @@
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/shop_list"
-    android:name="com.aisleron.ui.ShopListFragment"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_margin="16dp"
-    app:layoutManager="LinearLayoutManager"
-    tools:context=".ui.shoplist.ShopListFragment"
-    tools:listitem="@layout/fragment_shop_list_item" />
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <color android:color="?android:attr/colorBackground" />
+    </item>
+    <item>
+        <selector>
+            <item android:state_selected="true">
+                <shape android:shape="rectangle">
+                    <corners android:radius="10dp" />
+                    <solid android:color="?attr/colorSelectedListItem" />
+                </shape>
+            </item>
+        </selector>
+    </item>
+</layer-list>

@@ -31,6 +31,7 @@ import androidx.test.espresso.matcher.RootMatchers.isDialog
 import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.hasDescendant
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.isSelected
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withResourceName
 import androidx.test.espresso.matcher.ViewMatchers.withText
@@ -45,12 +46,14 @@ import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.location.usecase.RemoveLocationUseCase
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
+import com.aisleron.ui.FabHandler
 import com.aisleron.ui.FabHandlerTestImpl
 import com.aisleron.ui.bundles.AddEditLocationBundle
 import com.aisleron.ui.bundles.Bundler
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.allOf
+import org.hamcrest.CoreMatchers.not
 import org.hamcrest.CoreMatchers.startsWith
 import org.junit.Assert
 import org.junit.Assert.assertEquals
@@ -60,6 +63,7 @@ import org.junit.Test
 import org.koin.test.KoinTest
 import org.koin.test.get
 import org.koin.test.mock.declare
+import java.lang.Thread.sleep
 
 class ShopListFragmentTest : KoinTest {
     private lateinit var bundler: Bundler
@@ -116,9 +120,12 @@ class ShopListFragmentTest : KoinTest {
         val selectedLocation = get<LocationRepository>().getAll().first { it.id != 1 }
 
         getFragmentScenario()
-        onView(withText(selectedLocation.name)).perform(longClick())
+        val shopItem = onView(allOf(withText(selectedLocation.name), withId(R.id.txt_shop_name)))
+        shopItem.perform(longClick())
 
         val actionBar = onView(withResourceName("action_mode_bar"))
+
+        shopItem.check(matches(isSelected()))
 
         actionBar.check(matches(isDisplayed()))
         actionBar.check(matches(hasDescendant(withText(selectedLocation.name))))
@@ -243,5 +250,40 @@ class ShopListFragmentTest : KoinTest {
                 )
             )
         )
+    }
+
+    @Test
+    fun onClick_ActionModeIsActive_DismissActionModeContextMenu() = runTest {
+        val selectedLocation = get<LocationRepository>().getAll().first { it.id != 1 }
+        getFragmentScenario()
+        val shopItem = onView(allOf(withText(selectedLocation.name), withId(R.id.txt_shop_name)))
+
+        shopItem.perform(longClick())
+        shopItem.perform(click())
+        sleep(500)
+
+        val actionBar = onView(withResourceName("action_mode_bar"))
+        actionBar.check(matches(not(isDisplayed())))
+    }
+
+    @Test
+    fun onClickAddShopFab_ActionModeIsActive_DismissActionModeContextMenu() = runTest {
+        val selectedLocation = get<LocationRepository>().getAll().first { it.id != 1 }
+        val scenario = getFragmentScenario()
+        val shopItem = onView(allOf(withText(selectedLocation.name), withId(R.id.txt_shop_name)))
+
+        shopItem.perform(longClick())
+        scenario.onFragment { fragment ->
+            fabHandler.setFabOnClickListener(
+                fragment.requireActivity(), FabHandler.FabOption.ADD_SHOP
+            ) {}
+
+            fabHandler.clickFab(FabHandler.FabOption.ADD_SHOP, fragment.requireView())
+        }
+
+        sleep(500)
+
+        val actionBar = onView(withResourceName("action_mode_bar"))
+        actionBar.check(matches(not(isDisplayed())))
     }
 }
