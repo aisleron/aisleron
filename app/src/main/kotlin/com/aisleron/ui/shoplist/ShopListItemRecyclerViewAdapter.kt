@@ -18,6 +18,7 @@
 package com.aisleron.ui.shoplist
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.ListAdapter
@@ -49,8 +50,8 @@ class ShopListItemRecyclerViewAdapter(
         holder.itemView.setOnClickListener {
             listener.onClick(getItem(position))
         }
-        holder.itemView.setOnLongClickListener {
-            listener.onLongClick(getItem(position))
+        holder.itemView.setOnLongClickListener { view ->
+            listener.onLongClick(getItem(position), view)
         }
     }
 
@@ -61,8 +62,7 @@ class ShopListItemRecyclerViewAdapter(
 
     interface ShopListItemListener {
         fun onClick(item: ShopListItemViewModel)
-        fun onLongClick(item: ShopListItemViewModel): Boolean
-
+        fun onLongClick(item: ShopListItemViewModel, view: View): Boolean
     }
 
 }

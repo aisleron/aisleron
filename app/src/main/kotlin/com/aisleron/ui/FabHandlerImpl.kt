@@ -23,6 +23,7 @@ import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
 import androidx.navigation.findNavController
 import com.aisleron.R
+import com.aisleron.ui.FabHandler.FabClickedCallBack
 import com.aisleron.ui.bundles.Bundler
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
@@ -53,6 +54,11 @@ class FabHandlerImpl : FabHandler {
     private var allFabAreHidden: Boolean = true
 
     override fun getFabView(activity: Activity): View? = fabMain(activity)
+
+    private var _fabClickedCallBack: FabClickedCallBack? = null
+    override fun setFabOnClickedListener(fabClickedCallBack: FabClickedCallBack) {
+        _fabClickedCallBack = fabClickedCallBack
+    }
 
     private fun hideSingleFabViews(fab: FloatingActionButton, label: TextView) {
         fab.hide()
@@ -120,6 +126,7 @@ class FabHandlerImpl : FabHandler {
         fab.setOnClickListener {
             onClickListener.onClick(it)
             hideAllFab(activity)
+            _fabClickedCallBack?.fabClicked(fabOption)
         }
     }
 

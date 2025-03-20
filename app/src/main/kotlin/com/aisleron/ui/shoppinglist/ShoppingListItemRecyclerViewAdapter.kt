@@ -44,8 +44,6 @@ class ShoppingListItemRecyclerViewAdapter(
         const val PRODUCT_VIEW = 2
     }
 
-    //private var selectedPos = RecyclerView.NO_POSITION
-    private var selectedView: View? = null
     private var itemMoved: Boolean = false
 
     class ShoppingListItemDiffCallback : DiffUtil.ItemCallback<ShoppingListItem>() {
@@ -79,23 +77,12 @@ class ShoppingListItemRecyclerViewAdapter(
             )
         }
 
-        newViewHolder.itemView.setOnLongClickListener { v ->
-            //Deselect the previous view, if one exists
-            selectedView?.isSelected = false
-
-            //Allocate the current view as the selected view
-            selectedView = v
-            selectedView?.isSelected = true
-
-            listener.onLongClick(getItem(newViewHolder.absoluteAdapterPosition))
+        newViewHolder.itemView.setOnLongClickListener { view ->
+            listener.onLongClick(getItem(newViewHolder.absoluteAdapterPosition), view)
             true
         }
 
-        newViewHolder.itemView.setOnClickListener { v ->
-            if (v == selectedView) {
-                v.isSelected = false
-                selectedView = null
-            }
+        newViewHolder.itemView.setOnClickListener {
             listener.onClick(getItem(newViewHolder.absoluteAdapterPosition))
         }
 
@@ -154,7 +141,7 @@ class ShoppingListItemRecyclerViewAdapter(
         fun onClick(item: ShoppingListItem)
         fun onProductStatusChange(item: ProductShoppingListItem, inStock: Boolean)
         fun onListPositionChanged(item: ShoppingListItem, precedingItem: ShoppingListItem?)
-        fun onLongClick(item: ShoppingListItem): Boolean
+        fun onLongClick(item: ShoppingListItem, view: View): Boolean
         fun onMoved(item: ShoppingListItem)
     }
 
@@ -180,8 +167,6 @@ class ShoppingListItemRecyclerViewAdapter(
     override fun onRowClear(viewHolder: RecyclerView.ViewHolder) {
         if (!itemMoved || viewHolder.absoluteAdapterPosition < 0) return
 
-        selectedView?.isSelected = false
-        selectedView = null
         itemMoved = false
 
         //Collect the aisle details from the row above the moved item; the item above will
