@@ -22,12 +22,14 @@
     android:layout_height="wrap_content"
     android:padding="6dp"
     android:clickable="true"
-    android:focusable="true">
+    android:focusable="true"
+    android:background="@drawable/shop_list_item_selector" >
 
     <ImageView
         android:id="@+id/imageView2"
         android:layout_width="match_parent"
         android:layout_height="100dp"
+        android:contentDescription="@string/shop_logo"
         app:tint="?attr/colorOnSurface"
         app:srcCompat="@drawable/baseline_store_24"
         app:layout_constraintTop_toTopOf="parent" />

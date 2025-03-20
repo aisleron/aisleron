@@ -48,6 +48,7 @@ import com.aisleron.domain.location.LocationType
 import com.aisleron.ui.AisleronExceptionMap
 import com.aisleron.ui.ApplicationTitleUpdateListener
 import com.aisleron.ui.FabHandler
+import com.aisleron.ui.FabHandler.FabClickedCallBack
 import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.settings.ShoppingListPreferences
 import com.aisleron.ui.widgets.ErrorSnackBar
@@ -63,10 +64,11 @@ class ShoppingListFragment(
     private val applicationTitleUpdateListener: ApplicationTitleUpdateListener,
     private val fabHandler: FabHandler,
     private val shoppingListPreferences: ShoppingListPreferences
-) : Fragment(), SearchView.OnQueryTextListener, ActionMode.Callback {
+) : Fragment(), SearchView.OnQueryTextListener, ActionMode.Callback, FabClickedCallBack {
 
     private var actionMode: ActionMode? = null
     private var actionModeItem: ShoppingListItem? = null
+    private var actionModeItemView: View? = null
 
     private val shoppingListViewModel: ShoppingListViewModel by viewModel()
 
@@ -120,6 +122,7 @@ class ShoppingListFragment(
                             item: ProductShoppingListItem,
                             inStock: Boolean
                         ) {
+                            actionMode?.finish()
                             shoppingListViewModel.updateProductStatus(item, inStock)
                             displayStatusChangeSnackBar(item, inStock)
                         }
@@ -127,11 +130,17 @@ class ShoppingListFragment(
                         override fun onListPositionChanged(
                             item: ShoppingListItem, precedingItem: ShoppingListItem?
                         ) {
+                            actionMode?.finish()
                             shoppingListViewModel.updateItemRank(item, precedingItem)
                         }
 
-                        override fun onLongClick(item: ShoppingListItem): Boolean {
+                        override fun onLongClick(item: ShoppingListItem, view: View): Boolean {
+                            // Finish the previous action mode and start a new one
+                            actionMode?.finish()
                             actionModeItem = item
+                            actionModeItemView = view
+                            actionModeItemView?.isSelected = true
+
                             return when (actionMode) {
                                 null -> {
                                     // Start the CAB using the ActionMode.Callback defined earlier.
@@ -189,12 +198,14 @@ class ShoppingListFragment(
     }
 
     private fun initializeFab() {
+        fabHandler.setFabOnClickedListener(this)
         fabHandler.setFabItems(
             this.requireActivity(),
             FabHandler.FabOption.ADD_SHOP,
             FabHandler.FabOption.ADD_AISLE,
             FabHandler.FabOption.ADD_PRODUCT
         )
+
         fabHandler.setFabOnClickListener(this.requireActivity(), FabHandler.FabOption.ADD_PRODUCT) {
             navigateToAddProduct(shoppingListViewModel.defaultFilter)
         }
@@ -404,8 +415,10 @@ class ShoppingListFragment(
     }
 
     override fun onDestroyActionMode(mode: ActionMode) {
+        actionModeItemView?.isSelected = false
         actionMode = null
         actionModeItem = null
+        actionModeItemView = null
     }
 
     companion object {
@@ -429,5 +442,9 @@ class ShoppingListFragment(
                     putSerializable(ARG_FILTER_TYPE, filterType)
                 }
             }
+    }
+
+    override fun fabClicked(fabOption: FabHandler.FabOption) {
+        actionMode?.finish()
     }
 }

@@ -39,6 +39,7 @@ import com.aisleron.R
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.ui.AisleronExceptionMap
 import com.aisleron.ui.FabHandler
+import com.aisleron.ui.FabHandler.FabClickedCallBack
 import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.widgets.ErrorSnackBar
 import com.google.android.material.snackbar.Snackbar
@@ -49,10 +50,12 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  * A fragment representing a list of Items.
  */
 class ShopListFragment(private val fabHandler: FabHandler) : Fragment(), ActionMode.Callback,
-    ShopListItemRecyclerViewAdapter.ShopListItemListener {
+    ShopListItemRecyclerViewAdapter.ShopListItemListener, FabClickedCallBack {
 
     private var actionMode: ActionMode? = null
     private var actionModeItem: ShopListItemViewModel? = null
+    private var actionModeItemView: View? = null
+
     private var columnCount = 3
     private val shopListViewModel: ShopListViewModel by viewModel()
 
@@ -81,6 +84,7 @@ class ShopListFragment(private val fabHandler: FabHandler) : Fragment(), ActionM
         savedInstanceState: Bundle?
     ): View? {
         fabHandler.setFabItems(this.requireActivity(), FabHandler.FabOption.ADD_SHOP)
+        fabHandler.setFabOnClickedListener(this)
 
         val view = inflater.inflate(R.layout.fragment_shop_list, container, false)
 
@@ -178,8 +182,10 @@ class ShopListFragment(private val fabHandler: FabHandler) : Fragment(), ActionM
     }
 
     override fun onDestroyActionMode(mode: ActionMode?) {
+        actionModeItemView?.isSelected = false
         actionMode = null
         actionModeItem = null
+        actionModeItemView = null
     }
 
     companion object {
@@ -196,11 +202,19 @@ class ShopListFragment(private val fabHandler: FabHandler) : Fragment(), ActionM
     }
 
     override fun onClick(item: ShopListItemViewModel) {
+        actionMode?.let {
+            it.finish()
+            return
+        }
+
         navigateToShoppingList(item)
     }
 
-    override fun onLongClick(item: ShopListItemViewModel): Boolean {
+    override fun onLongClick(item: ShopListItemViewModel, view: View): Boolean {
+        actionMode?.finish()
         actionModeItem = item
+        actionModeItemView = view
+        actionModeItemView?.isSelected = true
         return when (actionMode) {
             null -> {
                 // Start the CAB using the ActionMode.Callback defined earlier.
@@ -211,5 +225,9 @@ class ShopListFragment(private val fabHandler: FabHandler) : Fragment(), ActionM
 
             else -> false
         }
+    }
+
+    override fun fabClicked(fabOption: FabHandler.FabOption) {
+        actionMode?.finish()
     }
 }

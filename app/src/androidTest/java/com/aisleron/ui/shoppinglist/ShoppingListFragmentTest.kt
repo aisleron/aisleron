@@ -39,6 +39,7 @@ import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.hasDescendant
 import androidx.test.espresso.matcher.ViewMatchers.hasSibling
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.isSelected
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withResourceName
 import androidx.test.espresso.matcher.ViewMatchers.withText
@@ -279,6 +280,8 @@ class ShoppingListFragmentTest : KoinTest {
 
         val actionBar = onView(withResourceName("action_mode_bar"))
         actionBar.check(matches(not(isDisplayed())))
+        productItem.check(matches(not(isSelected())))
+
         scenario.onFragment {
             assertEquals(shoppingList.name, applicationTitleUpdateListener.appTitle)
         }
@@ -874,6 +877,106 @@ class ShoppingListFragmentTest : KoinTest {
         assertEquals(shoppingList.id, addEditProductBundle.locationId)
         assertEquals(AddEditProductBundle.ProductAction.ADD, addEditProductBundle.actionType)
         assertEquals(R.id.nav_add_product, navController.currentDestination?.id)
+    }
+
+    @Test
+    fun onClick_OtherItemSelected_SelectedItemBecomesDeselected() = runTest {
+        val shoppingList = getShoppingList()
+        val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
+        getFragmentScenario(bundle)
+        val product = getProduct(shoppingList, false)
+        val aisle = shoppingList.aisles.first { !it.isDefault }
+
+        val productItem = onView(allOf(withText(product.name), withId(R.id.txt_product_name)))
+        productItem.perform(longClick())
+        val aisleItem = onView(allOf(withText(aisle.name), withId(R.id.txt_aisle_name)))
+        aisleItem.perform(click())
+
+        productItem.check(matches(not(isSelected())))
+    }
+
+    @Test
+    fun onClickAddAisleFab_ActionModeIsActive_DismissActionModeContextMenu() = runTest {
+        val shoppingList = getShoppingList()
+        val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
+        val scenario = getFragmentScenario(bundle)
+        val product = getProduct(shoppingList, false)
+        val productItem = onView(allOf(withText(product.name), withId(R.id.txt_product_name)))
+
+        productItem.perform(longClick())
+        scenario.onFragment {
+            fabHandler.clickFab(FabHandler.FabOption.ADD_AISLE, it.requireView())
+        }
+
+        onView(withText(android.R.string.cancel))
+            .inRoot(isDialog())
+            .perform(click())
+
+        sleep(1000)
+
+        val actionBar = onView(withResourceName("action_mode_bar"))
+        actionBar.check(matches(not(isDisplayed())))
+    }
+
+    @Test
+    fun onClickAddProductFab_ActionModeIsActive_DismissActionModeContextMenu() = runTest {
+        val shoppingList = getShoppingList()
+        val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
+        val scenario = getFragmentScenario(bundle)
+        val product = getProduct(shoppingList, false)
+        val productItem = onView(allOf(withText(product.name), withId(R.id.txt_product_name)))
+
+        productItem.perform(longClick())
+
+        val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
+        scenario.onFragment { fragment ->
+            navController.setGraph(R.navigation.mobile_navigation)
+            navController.setCurrentDestination(R.id.nav_shopping_list)
+            Navigation.setViewNavController(fragment.requireView(), navController)
+            fabHandler.clickFab(FabHandler.FabOption.ADD_PRODUCT, fragment.requireView())
+        }
+
+        sleep(500)
+
+        val actionBar = onView(withResourceName("action_mode_bar"))
+        actionBar.check(matches(not(isDisplayed())))
+    }
+
+    @Test
+    fun onClickAddShopFab_ActionModeIsActive_DismissActionModeContextMenu() = runTest {
+        val shoppingList = getShoppingList()
+        val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
+        val scenario = getFragmentScenario(bundle)
+        val product = getProduct(shoppingList, false)
+        val productItem = onView(allOf(withText(product.name), withId(R.id.txt_product_name)))
+
+        productItem.perform(longClick())
+        scenario.onFragment { fragment ->
+            fabHandler.setFabOnClickListener(fragment.requireActivity(), FabHandler.FabOption.ADD_SHOP) {}
+            fabHandler.clickFab(FabHandler.FabOption.ADD_SHOP, fragment.requireView())
+        }
+
+        sleep(500)
+
+        val actionBar = onView(withResourceName("action_mode_bar"))
+        actionBar.check(matches(not(isDisplayed())))
+    }
+
+    @Test
+    fun onLongClick_EarlierItemSelected_ActionBarHasNewItemTitle() = runTest {
+        val shoppingList = getShoppingList()
+        val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
+        getFragmentScenario(bundle)
+        val product = getProduct(shoppingList, false)
+        val aisle = shoppingList.aisles.first { !it.isDefault }
+
+        val productItem = onView(allOf(withText(product.name), withId(R.id.txt_product_name)))
+        productItem.perform(longClick())
+        val aisleItem = onView(allOf(withText(aisle.name), withId(R.id.txt_aisle_name)))
+        aisleItem.perform(longClick())
+
+        val actionBar = onView(withResourceName("action_mode_bar"))
+        actionBar.check(matches(hasDescendant(withText(aisle.name))))
     }
 
     /*@Test
