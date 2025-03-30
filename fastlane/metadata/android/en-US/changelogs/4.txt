@@ -1,0 +1,2 @@
+* Tweak the navigation drawer header to be more space efficient
+* Fix some inconsistencies with the selecting/deselecting items in lists
