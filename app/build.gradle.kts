@@ -32,6 +32,13 @@ apply("../gradle/jacoco.gradle")
 
 
 android {
+    dependenciesInfo {
+        // Disables dependency metadata when building APKs.
+        includeInApk = false
+        // Sets dependency metadata when building Android App Bundles.
+        includeInBundle = true
+    }
+
     signingConfigs {
         // Create a variable called keystorePropertiesFile, and initialize it to your
         // keystore.properties file, in the rootProject folder.
@@ -58,7 +65,7 @@ android {
         minSdk = 24
         targetSdk = 34
         versionCode = 4
-        versionName = "2025.4.2"
+        versionName = "2025.4.3"
         base.archivesName = "$applicationId-$versionName"
 
         testInstrumentationRunner = "com.aisleron.di.KoinInstrumentationTestRunner"
