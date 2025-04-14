@@ -55,3 +55,8 @@ Documentation is available at [Aisleron.com](https://aisleron.com/docs/documenta
   <img src="https://aisleron.com/assets/images/screenshots/light-mode/alr-320-emoji-all-items.png" width=250px  alt="Emoji All Items"/>
 </p>
 
+## Translating
+
+[![Translation status](https://hosted.weblate.org/widget/aisleron-shopping-list/open-graph.png)](https://hosted.weblate.org/engage/aisleron-shopping-list/)
+
+Contribute to tranlations on the [Aisleron Hosted Weblate page](https://hosted.weblate.org/projects/aisleron-shopping-list/).
