@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="aisleron_documentation_url" translatable="false">https://aisleron.com/docs/documentation/</string>
+    <string name="id_label">id</string>
+    <string name="edit">Edytuj</string>
+    <string name="undo">COFNIJ</string>
+    <string name="about_support_documentation_title">Dokumentacja</string>
+    <string name="product">Produkt</string>
+    <string name="action_search">Szukaj</string>
+    <string name="done">Gotowe</string>
+    <string name="menu_about">O aplikacji</string>
+    <string name="delete">Usuń</string>
+    <string name="nav_header_title" translatable="false">Aisleron</string>
+    <string name="home">Strona główna</string>
+    <string name="menu_needed">Potrzebne</string>
+    <string name="menu_settings">Ustawienia</string>
+    <string name="menu_shops">Sklepy</string>
+    <string name="menu_all_shops">Wszystkie sklepy</string>
+    <string name="theme">Motyw</string>
+    <string name="backup_restore_title">Kopia zapasowa i przywracanie</string>
+    <string name="light_theme">Jasny motyw</string>
+    <string name="dark_theme">Ciemny motyw</string>
+    <string name="app_name" translatable="false">Aisleron</string>
+    <string name="never">Nigdy</string>
+    <string name="about_support_header">Wsparcie</string>
+    <string name="save">Zapisz</string>
+</resources>

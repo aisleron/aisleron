@@ -1,0 +1,2 @@
+* Modification de l'en-tête du menu afin d'économiser de l'espace
+* Correction de quelques incohérences dans la sélection/désélection d'éléments dans les listes
