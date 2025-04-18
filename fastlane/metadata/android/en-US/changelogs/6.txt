@@ -1,0 +1,1 @@
+* Add French and Polish translations from Hosted Weblate.
