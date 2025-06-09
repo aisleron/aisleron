@@ -40,5 +40,5 @@ android {
 
 dependencies {
     compileOnly(project(":app"))
-    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
+    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
 }

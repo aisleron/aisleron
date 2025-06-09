@@ -908,11 +908,11 @@ class ShoppingListFragmentTest : KoinTest {
             fabHandler.clickFab(FabHandler.FabOption.ADD_AISLE, it.requireView())
         }
 
+        sleep(500)
+
         onView(withText(android.R.string.cancel))
             .inRoot(isDialog())
             .perform(click())
-
-        sleep(1000)
 
         val actionBar = onView(withResourceName("action_mode_bar"))
         actionBar.check(matches(not(isDisplayed())))

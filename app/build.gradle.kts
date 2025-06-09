@@ -69,10 +69,10 @@ android {
         base.archivesName = "$applicationId-$versionName"
 
         testInstrumentationRunner = "com.aisleron.di.KoinInstrumentationTestRunner"
+    }
 
-        ksp {
-            arg("room.schemaLocation", "$projectDir/schemas")
-        }
+    ksp {
+        arg("room.schemaLocation", "$projectDir/schemas")
     }
 
     buildTypes {
@@ -129,61 +129,66 @@ android {
 
 dependencies {
 
-    implementation("androidx.core:core-ktx:1.15.0")
-    implementation("androidx.appcompat:appcompat:1.7.0")
+    implementation("androidx.core:core-ktx:1.16.0")
+    implementation("androidx.appcompat:appcompat:1.7.1")
     implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.recyclerview:recyclerview:1.4.0")
-    implementation("androidx.fragment:fragment-ktx:1.8.6")
+    implementation("androidx.fragment:fragment-ktx:1.8.8")
     implementation("androidx.activity:activity-ktx:1.10.1")
     implementation("androidx.collection:collection-ktx:1.5.0")
     implementation("androidx.cardview:cardview:1.0.0")
     implementation("androidx.drawerlayout:drawerlayout:1.2.0")
     implementation("androidx.constraintlayout:constraintlayout:2.2.1")
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.3.0")
-    implementation("androidx.customview:customview:1.1.0")
+    implementation("androidx.customview:customview:1.2.0")
     implementation("androidx.annotation:annotation:1.9.1")
-    implementation("androidx.documentfile:documentfile:1.0.1")
+    implementation("androidx.documentfile:documentfile:1.1.0")
     implementation("androidx.preference:preference-ktx:1.2.1")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
-    implementation("androidx.navigation:navigation-fragment-ktx:2.8.9")
-    implementation("androidx.navigation:navigation-ui-ktx:2.8.9")
-    implementation("androidx.navigation:navigation-common:2.8.9")
-    implementation("androidx.navigation:navigation-runtime-ktx:2.8.9")
-    implementation("org.jetbrains.kotlin:kotlin-parcelize-runtime:2.1.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.9.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.1")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.9.0")
+    implementation("androidx.navigation:navigation-ui-ktx:2.9.0")
+    implementation("androidx.navigation:navigation-common:2.9.0")
+    implementation("androidx.navigation:navigation-runtime-ktx:2.9.0")
+    implementation("org.jetbrains.kotlin:kotlin-parcelize-runtime:2.1.21")
 
     //Database
-    implementation("androidx.sqlite:sqlite-ktx:2.4.0")
-    implementation("androidx.room:room-ktx:2.6.1")
-    implementation("androidx.room:room-runtime:2.6.1")
-    implementation("androidx.room:room-common:2.6.1")
-    ksp("androidx.room:room-compiler:2.6.1")
+    implementation("androidx.sqlite:sqlite-ktx:2.5.1")
+    implementation("androidx.room:room-ktx:2.7.1")
+    implementation("androidx.room:room-runtime:2.7.1")
+    implementation("androidx.room:room-common:2.7.1")
+    ksp("androidx.room:room-compiler:2.7.1")
 
     //Dependency Injection
-    implementation("io.insert-koin:koin-android:4.0.3")
-    implementation("io.insert-koin:koin-core-viewmodel:4.0.3")
-    implementation("io.insert-koin:koin-core:4.0.3")
+    implementation("io.insert-koin:koin-android:4.0.4")
+    implementation("io.insert-koin:koin-core-viewmodel:4.0.4")
+    implementation("io.insert-koin:koin-core:4.0.4")
 
     //Coroutines
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
 
     //Testing
-    implementation("androidx.lifecycle:lifecycle-runtime-testing:2.8.7")
+    implementation("androidx.lifecycle:lifecycle-runtime-testing:2.9.1")
     implementation("androidx.test.espresso:espresso-contrib:3.6.1")
+
     testImplementation(project(":testData"))
-    testImplementation("org.junit.jupiter:junit-jupiter:5.12.1")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.1")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.13.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
+
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
     androidTestImplementation(project(":testData"))
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
-    androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.1")
-    androidTestImplementation("io.insert-koin:koin-test:4.0.3")
+    androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
+    androidTestImplementation("io.insert-koin:koin-test:4.0.4")
     androidTestImplementation("androidx.test:core-ktx:1.6.1")
     androidTestImplementation("androidx.test.espresso:espresso-intents:3.6.1")
-    androidTestImplementation("androidx.navigation:navigation-testing:2.8.9")
+    androidTestImplementation("androidx.navigation:navigation-testing:2.9.0")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
+    //org.hamcrest:hamcrest:2.2 is a androidx.test.espresso:espresso-core:3.6.1 dependency
     androidTestImplementation("org.hamcrest:hamcrest:2.2")
-    debugImplementation("androidx.fragment:fragment-testing:1.8.6")
+
+    debugImplementation("androidx.fragment:fragment-testing:1.8.8")
 }
 java {
     toolchain {
