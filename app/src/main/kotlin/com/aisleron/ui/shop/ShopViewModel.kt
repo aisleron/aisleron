@@ -38,10 +38,11 @@ class ShopViewModel(
     coroutineScopeProvider: CoroutineScope? = null
 ) : ViewModel() {
     private val coroutineScope = coroutineScopeProvider ?: this.viewModelScope
-    val pinned: Boolean get() = location?.pinned ?: false
+    val pinned: Boolean get() = location?.pinned == true
     val defaultFilter: FilterType? get() = location?.defaultFilter
     val type: LocationType? get() = location?.type
     val locationName: String? get() = location?.name
+    val showDefaultAisle: Boolean get() = location?.showDefaultAisle != false
 
     private var location: Location? = null
 
@@ -56,11 +57,16 @@ class ShopViewModel(
         }
     }
 
-    fun saveLocation(name: String, pinned: Boolean) {
+    fun saveLocation(name: String, pinned: Boolean, showDefaultAisle: Boolean) {
         coroutineScope.launch {
             _shopUiState.value = ShopUiState.Loading
             try {
-                location?.let { updateLocation(it, name, pinned) } ?: addLocation(name, pinned)
+                location?.let { updateLocation(it, name, pinned, showDefaultAisle) } ?: addLocation(
+                    name,
+                    pinned,
+                    showDefaultAisle
+                )
+
                 _shopUiState.value = ShopUiState.Success
             } catch (e: AisleronException) {
                 _shopUiState.value = ShopUiState.Error(e.exceptionCode, e.message)
@@ -71,13 +77,16 @@ class ShopViewModel(
         }
     }
 
-    private suspend fun updateLocation(location: Location, name: String, pinned: Boolean) {
-        val updateLocation = location.copy(name = name, pinned = pinned)
+    private suspend fun updateLocation(
+        location: Location, name: String, pinned: Boolean, showDefaultAisle: Boolean
+    ) {
+        val updateLocation =
+            location.copy(name = name, pinned = pinned, showDefaultAisle = showDefaultAisle)
         updateLocationUseCase(updateLocation)
         hydrate(updateLocation.id)
     }
 
-    private suspend fun addLocation(name: String, pinned: Boolean) {
+    private suspend fun addLocation(name: String, pinned: Boolean, showDefaultAisle: Boolean) {
         val id = addLocationUseCase(
             Location(
                 type = LocationType.SHOP,
@@ -85,7 +94,8 @@ class ShopViewModel(
                 name = name,
                 pinned = pinned,
                 aisles = emptyList(),
-                id = 0
+                id = 0,
+                showDefaultAisle = showDefaultAisle
             )
         )
         hydrate(id)

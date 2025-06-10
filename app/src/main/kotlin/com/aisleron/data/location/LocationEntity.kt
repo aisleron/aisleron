@@ -17,6 +17,7 @@
 
 package com.aisleron.data.location
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.aisleron.domain.FilterType
@@ -28,5 +29,6 @@ data class LocationEntity(
     val type: LocationType,
     val defaultFilter: FilterType,
     val name: String,
-    val pinned: Boolean
+    val pinned: Boolean,
+    @ColumnInfo(defaultValue = "true") val showDefaultAisle: Boolean
 )

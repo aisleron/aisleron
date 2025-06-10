@@ -122,6 +122,11 @@ android {
         )
     }
 
+    sourceSets {
+        // Adds exported schema location as test app assets.
+        getByName("androidTest").assets.srcDir("$projectDir/schemas")
+    }
+
     //testOptions {
     //    animationsDisabled = true
     //}
@@ -157,6 +162,7 @@ dependencies {
     implementation("androidx.room:room-ktx:2.7.1")
     implementation("androidx.room:room-runtime:2.7.1")
     implementation("androidx.room:room-common:2.7.1")
+    implementation("androidx.room:room-testing-android:2.7.1")
     ksp("androidx.room:room-compiler:2.7.1")
 
     //Dependency Injection
@@ -174,6 +180,7 @@ dependencies {
     testImplementation(project(":testData"))
     testImplementation("org.junit.jupiter:junit-jupiter:5.13.0")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
+    testImplementation("androidx.room:room-testing:2.7.1")
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 

@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 1,
-    "identityHash": "f53709b2977828a9ec05f9fa3092fd44",
+    "version": 2,
+    "identityHash": "778530e79b49a8c3614f95a24d967b91",
     "entities": [
       {
         "tableName": "Aisle",
@@ -48,7 +48,7 @@
       },
       {
         "tableName": "Location",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `type` TEXT NOT NULL, `defaultFilter` TEXT NOT NULL, `name` TEXT NOT NULL, `pinned` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `type` TEXT NOT NULL, `defaultFilter` TEXT NOT NULL, `name` TEXT NOT NULL, `pinned` INTEGER NOT NULL, `showDefaultAisle` INTEGER NOT NULL DEFAULT true)",
         "fields": [
           {
             "fieldPath": "id",
@@ -79,6 +79,13 @@
             "columnName": "pinned",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "showDefaultAisle",
+            "columnName": "showDefaultAisle",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "true"
           }
         ],
         "primaryKey": {
@@ -169,7 +176,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f53709b2977828a9ec05f9fa3092fd44')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '778530e79b49a8c3614f95a24d967b91')"
     ]
   }
 }

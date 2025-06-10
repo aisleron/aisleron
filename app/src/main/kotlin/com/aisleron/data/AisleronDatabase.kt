@@ -17,6 +17,7 @@
 
 package com.aisleron.data
 
+import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.aisleron.data.aisle.AisleDao
@@ -31,7 +32,10 @@ import com.aisleron.data.product.ProductEntity
 
 @Database(
     entities = [AisleEntity::class, LocationEntity::class, ProductEntity::class, AisleProductEntity::class],
-    version = 1
+    version = 2,
+    autoMigrations = [
+        AutoMigration(from = 1, to = 2)
+    ]
 )
 abstract class AisleronDatabase : AisleronDb, RoomDatabase() {
     abstract override fun aisleDao(): AisleDao
