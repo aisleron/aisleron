@@ -93,7 +93,8 @@ class ShoppingListViewModelTest : KoinTest {
             defaultFilter = FilterType.NEEDED,
             name = "No Aisle Shop",
             pinned = false,
-            aisles = emptyList()
+            aisles = emptyList(),
+            showDefaultAisle = true
         )
 
         val locationId = get<LocationRepository>().add(location)
@@ -526,6 +527,10 @@ class ShoppingListViewModelTest : KoinTest {
         val removedAisle = aisleRepository.get(existingAisle.id)
         Assert.assertNull(removedAisle)
     }
+
+    /**
+     * TODO: Add tests for showDefaultAisle
+     */
 
 
 }
