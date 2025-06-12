@@ -21,8 +21,8 @@ import com.aisleron.data.location.LocationDao
 import com.aisleron.data.location.LocationEntity
 import com.aisleron.data.location.LocationWithAisles
 import com.aisleron.data.location.LocationWithAislesWithProducts
-import com.aisleron.testdata.data.aisle.AisleDaoTestImpl
 import com.aisleron.domain.location.LocationType
+import com.aisleron.testdata.data.aisle.AisleDaoTestImpl
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
@@ -48,7 +48,8 @@ class LocationDaoTestImpl(private val aisleDao: AisleDaoTestImpl) : LocationDao 
                 type = it.type,
                 defaultFilter = it.defaultFilter,
                 name = it.name,
-                pinned = it.pinned
+                pinned = it.pinned,
+                showDefaultAisle = it.showDefaultAisle
             )
 
             locationList.add(newEntity)

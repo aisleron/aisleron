@@ -1,0 +1,1 @@
+* Add option to show or hide default aisle on a Shop. Hiding the default aisle will hide any products not mapped to a specific aisle.

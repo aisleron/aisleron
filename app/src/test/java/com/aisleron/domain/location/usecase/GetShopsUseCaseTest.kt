@@ -61,7 +61,8 @@ class GetShopsUseCaseTest {
                             defaultFilter = FilterType.NEEDED,
                             name = "Shop 1",
                             pinned = false,
-                            aisles = emptyList()
+                            aisles = emptyList(),
+                            showDefaultAisle = true
                         ),
                         Location(
                             id = 2000,
@@ -69,7 +70,8 @@ class GetShopsUseCaseTest {
                             defaultFilter = FilterType.NEEDED,
                             name = "Shop 2",
                             pinned = false,
-                            aisles = emptyList()
+                            aisles = emptyList(),
+                            showDefaultAisle = true
                         ),
                     )
                 )

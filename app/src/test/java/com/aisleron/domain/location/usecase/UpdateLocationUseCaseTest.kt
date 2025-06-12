@@ -29,6 +29,10 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
+import java.util.stream.Stream
 
 class UpdateLocationUseCaseTest {
 
@@ -62,7 +66,8 @@ class UpdateLocationUseCaseTest {
                     defaultFilter = FilterType.NEEDED,
                     name = "Shop 99",
                     pinned = false,
-                    aisles = emptyList()
+                    aisles = emptyList(),
+                    showDefaultAisle = true
                 )
             )
 
@@ -74,12 +79,14 @@ class UpdateLocationUseCaseTest {
         }
     }
 
-    @Test
-    fun updateLocation_IsExistingLocation_LocationUpdated() {
+    @ParameterizedTest(name = "Test UpdateLocation when showDefaultAisle is {0}")
+    @MethodSource("showDefaultAisleArguments")
+    fun updateLocation_IsExistingLocation_LocationUpdated(showDefaultAisle: Boolean) {
         val updateLocation =
             existingLocation.copy(
                 name = existingLocation.name + " Updated",
-                pinned = !existingLocation.pinned
+                pinned = !existingLocation.pinned,
+                showDefaultAisle = showDefaultAisle
             )
         val updatedLocation: Location?
         val countBefore: Int
@@ -98,6 +105,7 @@ class UpdateLocationUseCaseTest {
         assertEquals(updateLocation.type, updatedLocation?.type)
         assertEquals(updateLocation.pinned, updatedLocation?.pinned)
         assertEquals(updateLocation.defaultFilter, updatedLocation?.defaultFilter)
+        assertEquals(showDefaultAisle, updatedLocation?.showDefaultAisle)
     }
 
     @Test
@@ -122,5 +130,13 @@ class UpdateLocationUseCaseTest {
         assertEquals(newLocation.type, updatedLocation?.type)
         assertEquals(newLocation.pinned, updatedLocation?.pinned)
         assertEquals(newLocation.defaultFilter, updatedLocation?.defaultFilter)
+    }
+
+    private companion object {
+        @JvmStatic
+        fun showDefaultAisleArguments(): Stream<Arguments> = Stream.of(
+            Arguments.of(true),
+            Arguments.of(false)
+        )
     }
 }

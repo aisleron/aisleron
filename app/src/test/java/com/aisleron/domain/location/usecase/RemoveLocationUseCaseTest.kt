@@ -123,7 +123,8 @@ class RemoveLocationUseCaseTest {
                     defaultFilter = FilterType.NEEDED,
                     name = "Dummy Shop",
                     pinned = false,
-                    aisles = emptyList()
+                    aisles = emptyList(),
+                    showDefaultAisle = true
                 )
             )
             val newLocation = locationRepository.get(newLocationId)!!
