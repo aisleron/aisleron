@@ -31,7 +31,8 @@ data class ProductShoppingListItemViewModel(
     override val inStock: Boolean,
     private val aisleProductId: Int,
     private val updateAisleProductRankUseCase: UpdateAisleProductRankUseCase,
-    private val removeProductUseCase: RemoveProductUseCase
+    private val removeProductUseCase: RemoveProductUseCase,
+    override val isDefaultAisle: Boolean
 ) : ProductShoppingListItem, ShoppingListItemViewModel {
 
     override suspend fun remove() {

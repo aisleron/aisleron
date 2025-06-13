@@ -357,7 +357,7 @@ class ShoppingListFragment(
     }
 
     private fun editShoppingListItem(item: ShoppingListItem) {
-        when (item) {
+            when (item) {
             is AisleShoppingListItem -> showAisleDialog(requireContext(), item)
             is ProductShoppingListItem -> navigateToEditProduct(item.id)
         }
@@ -368,7 +368,7 @@ class ShoppingListFragment(
     }
 
     override fun onQueryTextChange(newText: String?): Boolean {
-        shoppingListViewModel.submitProductSearch(query = newText ?: "")
+        shoppingListViewModel.submitProductSearch(productNameFilter = newText ?: "")
         return false
     }
 

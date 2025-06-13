@@ -35,6 +35,7 @@ import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.location.LocationType
+import com.aisleron.domain.location.usecase.AddLocationUseCase
 import com.aisleron.domain.product.ProductRepository
 import com.aisleron.domain.product.usecase.RemoveProductUseCase
 import com.aisleron.domain.product.usecase.UpdateProductStatusUseCase
@@ -50,6 +51,8 @@ import org.junit.Test
 import org.koin.test.KoinTest
 import org.koin.test.get
 import org.koin.test.mock.declare
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class ShoppingListViewModelTest : KoinTest {
@@ -139,7 +142,7 @@ class ShoppingListViewModelTest : KoinTest {
             rank = existingAisle.rank,
             id = existingAisle.id,
             name = existingAisle.name,
-            isDefault = existingAisle.isDefault,
+            isDefaultAisle = existingAisle.isDefault,
             locationId = existingLocation.id,
             childCount = 0,
             updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
@@ -163,7 +166,7 @@ class ShoppingListViewModelTest : KoinTest {
             rank = existingAisle.rank,
             id = existingAisle.id,
             name = existingAisle.name,
-            isDefault = existingAisle.isDefault,
+            isDefaultAisle = existingAisle.isDefault,
             childCount = 0,
             locationId = -1,
             updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
@@ -187,7 +190,7 @@ class ShoppingListViewModelTest : KoinTest {
             rank = existingAisle.rank,
             id = existingAisle.id,
             name = existingAisle.name,
-            isDefault = existingAisle.isDefault,
+            isDefaultAisle = existingAisle.isDefault,
             childCount = 0,
             locationId = existingLocation.id,
             updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
@@ -221,7 +224,8 @@ class ShoppingListViewModelTest : KoinTest {
             aisleId = existingAisle.id,
             aisleProductId = aisleProduct.id,
             updateAisleProductRankUseCase = get<UpdateAisleProductRankUseCase>(),
-            removeProductUseCase = get<RemoveProductUseCase>()
+            removeProductUseCase = get<RemoveProductUseCase>(),
+            isDefaultAisle = existingAisle.isDefault
         )
 
         shoppingListViewModel.hydrate(shoppingList.id, shoppingList.defaultFilter)
@@ -253,7 +257,8 @@ class ShoppingListViewModelTest : KoinTest {
             aisleId = existingAisle.id,
             aisleProductId = aisleProduct.id,
             updateAisleProductRankUseCase = get<UpdateAisleProductRankUseCase>(),
-            removeProductUseCase = get<RemoveProductUseCase>()
+            removeProductUseCase = get<RemoveProductUseCase>(),
+            isDefaultAisle = existingAisle.isDefault
         )
 
         shoppingListViewModel.hydrate(shoppingList.id, shoppingList.defaultFilter)
@@ -383,7 +388,7 @@ class ShoppingListViewModelTest : KoinTest {
             rank = 1000,
             id = -1,
             name = "Dummy",
-            isDefault = false,
+            isDefaultAisle = false,
             childCount = 0,
             locationId = 1,
             updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
@@ -444,7 +449,7 @@ class ShoppingListViewModelTest : KoinTest {
             rank = 1000,
             id = -1,
             name = "Dummy",
-            isDefault = false,
+            isDefaultAisle = false,
             childCount = 0,
             locationId = 1,
             updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
@@ -472,7 +477,7 @@ class ShoppingListViewModelTest : KoinTest {
             rank = movedAisle.rank,
             id = movedAisle.id,
             name = movedAisle.name,
-            isDefault = movedAisle.isDefault,
+            isDefaultAisle = movedAisle.isDefault,
             childCount = 0,
             locationId = movedAisle.locationId,
             updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
@@ -487,7 +492,7 @@ class ShoppingListViewModelTest : KoinTest {
             rank = precedingAisle.rank,
             id = precedingAisle.id,
             name = precedingAisle.name,
-            isDefault = precedingAisle.isDefault,
+            isDefaultAisle = precedingAisle.isDefault,
             childCount = 0,
             locationId = precedingAisle.locationId,
             updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
@@ -513,7 +518,7 @@ class ShoppingListViewModelTest : KoinTest {
             rank = existingAisle.rank,
             id = existingAisle.id,
             name = existingAisle.name,
-            isDefault = existingAisle.isDefault,
+            isDefaultAisle = existingAisle.isDefault,
             childCount = 0,
             locationId = existingAisle.locationId,
             updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
@@ -532,5 +537,36 @@ class ShoppingListViewModelTest : KoinTest {
      * TODO: Add tests for showDefaultAisle
      */
 
+    private fun defaultAisleTestArrangeAct(showDefaultAisle: Boolean): ShoppingListItem? {
+        runBlocking {
+            val location = get<LocationRepository>().getShops().first().first().copy(
+                id = 0,
+                name = "Show Default Aisle $showDefaultAisle",
+                showDefaultAisle = showDefaultAisle
+            )
 
+            val locationId = get<AddLocationUseCase>().invoke(location)
+
+            shoppingListViewModel.hydrate(locationId, location.defaultFilter)
+        }
+
+        return (shoppingListViewModel.shoppingListUiState.value as ShoppingListViewModel.ShoppingListUiState.Updated)
+            .shoppingList.firstOrNull { it.itemType == ShoppingListItem.ItemType.AISLE && it.isDefaultAisle }
+    }
+
+    @Test
+    fun hydrate_ShopShowsDefaultAisle_DefaultAisleIncluded() = runTest {
+        val defaultAisle = defaultAisleTestArrangeAct(true)
+
+        // Assert
+        assertNotNull(defaultAisle)
+    }
+
+    @Test
+    fun hydrate_ShopHidesDefaultAisle_DefaultAisleExcluded() = runTest {
+        val defaultAisle = defaultAisleTestArrangeAct(false)
+
+        // Assert
+        assertNull(defaultAisle)
+    }
 }

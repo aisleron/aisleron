@@ -50,6 +50,9 @@ class ShoppingListViewModel(
     coroutineScopeProvider: CoroutineScope? = null
 ) : ViewModel() {
     private val coroutineScope = coroutineScopeProvider ?: this.viewModelScope
+    private val shoppingList = mutableListOf<ShoppingListItem>()
+    private var _showDefaultAisle: Boolean = true
+
     private var _locationName: String = ""
     val locationName: String get() = _locationName
 
@@ -59,12 +62,10 @@ class ShoppingListViewModel(
     private var _defaultFilter: FilterType = FilterType.NEEDED
     val defaultFilter: FilterType get() = _defaultFilter
 
-    private val shoppingList = mutableListOf<ShoppingListItem>()
     private var _locationId: Int = 0
     val locationId: Int get() = _locationId
 
-    private var _listFilter: (ShoppingListItem) -> Boolean =
-        getListFilterByProductFilter(_defaultFilter)
+    private lateinit var _listFilter: (ShoppingListItem) -> Boolean
     private val _shoppingListUiState = MutableStateFlow<ShoppingListUiState>(
         ShoppingListUiState.Empty
     )
@@ -73,19 +74,36 @@ class ShoppingListViewModel(
 
     fun hydrate(locationId: Int, filterType: FilterType) {
         _defaultFilter = filterType
-        _listFilter = getListFilterByProductFilter(_defaultFilter)
         refreshListItems(locationId)
     }
 
-    private fun getListFilterByProductFilter(filter: FilterType): (ShoppingListItem) -> Boolean {
+    private fun isValidAisleSli(sli: AisleShoppingListItem): Boolean {
+        return true
+    }
+
+    private fun isValidProductSli(
+        sli: ProductShoppingListItem, filter: FilterType, productNameFilter: String
+    ): Boolean {
+        return ((sli.inStock && filter == FilterType.IN_STOCK)
+                || (!sli.inStock && filter == FilterType.NEEDED)
+                || (filter == FilterType.ALL)
+                ) &&
+                (productNameFilter == "" || (sli.name.contains(productNameFilter.trim(), true)))
+    }
+
+    private fun buildListFilter(
+        filter: FilterType, showDefaultAisle: Boolean, productNameFilter: String = ""
+    ): (ShoppingListItem) -> Boolean {
         return { sli: ShoppingListItem ->
-            (sli is AisleShoppingListItem) || (
-                    (sli is ProductShoppingListItem) && (
-                            (sli.inStock && filter == FilterType.IN_STOCK) ||
-                                    (!sli.inStock && filter == FilterType.NEEDED) ||
-                                    (filter == FilterType.ALL)
-                            )
-                    )
+            (showDefaultAisle || !sli.isDefaultAisle) &&
+                    when (sli) {
+                        is AisleShoppingListItem -> isValidAisleSli(sli)
+                        is ProductShoppingListItem -> isValidProductSli(
+                            sli, filter, productNameFilter
+                        )
+
+                        else -> false
+                    }
         }
     }
 
@@ -98,6 +116,7 @@ class ShoppingListViewModel(
                     _locationName = it.name
                     _locationType = it.type
                     _locationId = it.id
+                    _showDefaultAisle = it.showDefaultAisle
 
                     it.aisles.forEach { a ->
                         shoppingList.add(
@@ -105,7 +124,7 @@ class ShoppingListViewModel(
                                 rank = a.rank,
                                 id = a.id,
                                 name = a.name,
-                                isDefault = a.isDefault,
+                                isDefaultAisle = a.isDefault,
                                 updateAisleRankUseCase = updateAisleRankUseCase,
                                 getAisleUseCase = getAisleUseCase,
                                 removeAisleUseCase = removeAisleUseCase,
@@ -127,7 +146,8 @@ class ShoppingListViewModel(
                                 aisleId = p.aisleId,
                                 aisleProductId = p.id,
                                 removeProductUseCase = removeProductUseCase,
-                                updateAisleProductRankUseCase = updateAisleProductRankUseCase
+                                updateAisleProductRankUseCase = updateAisleProductRankUseCase,
+                                isDefaultAisle = a.isDefault
                             )
                         }
                     }
@@ -141,6 +161,10 @@ class ShoppingListViewModel(
                         { it.rank },
                         { it.name })
                 )
+
+                if (!::_listFilter.isInitialized) _listFilter =
+                    buildListFilter(_defaultFilter, _showDefaultAisle)
+
                 _shoppingListUiState.value =
                     ShoppingListUiState.Updated(shoppingList.filter(_listFilter))
             }
@@ -166,10 +190,8 @@ class ShoppingListViewModel(
                         id = 0
                     )
                 )
-
             } catch (e: AisleronException) {
                 _shoppingListUiState.value = ShoppingListUiState.Error(e.exceptionCode, e.message)
-
             } catch (e: Exception) {
                 _shoppingListUiState.value =
                     ShoppingListUiState.Error(
@@ -187,14 +209,13 @@ class ShoppingListViewModel(
                         name = newName,
                         products = emptyList(),
                         locationId = aisle.locationId,
-                        isDefault = aisle.isDefault,
+                        isDefault = aisle.isDefaultAisle,
                         rank = aisle.rank,
                         id = aisle.id
                     )
                 )
             } catch (e: AisleronException) {
                 _shoppingListUiState.value = ShoppingListUiState.Error(e.exceptionCode, e.message)
-
             } catch (e: Exception) {
                 _shoppingListUiState.value =
                     ShoppingListUiState.Error(
@@ -210,13 +231,8 @@ class ShoppingListViewModel(
         }
     }
 
-    fun submitProductSearch(query: String) {
-        _listFilter = { sli ->
-            (sli is AisleShoppingListItem) || (
-                    (sli is ProductShoppingListItem)
-                            && (sli.name.contains(query, true))
-                    )
-        }
+    fun submitProductSearch(productNameFilter: String) {
+        _listFilter = buildListFilter(FilterType.ALL, true, productNameFilter)
         coroutineScope.launch {
             _shoppingListUiState.value = ShoppingListUiState.Loading
             val searchResults = shoppingList.filter(_listFilter)
@@ -225,7 +241,7 @@ class ShoppingListViewModel(
     }
 
     fun requestDefaultList() {
-        _listFilter = getListFilterByProductFilter(_defaultFilter)
+        _listFilter = buildListFilter(_defaultFilter, _showDefaultAisle)
         coroutineScope.launch {
             _shoppingListUiState.value = ShoppingListUiState.Loading
             _shoppingListUiState.value =
@@ -239,7 +255,6 @@ class ShoppingListViewModel(
                 (item as ShoppingListItemViewModel).remove()
             } catch (e: AisleronException) {
                 _shoppingListUiState.value = ShoppingListUiState.Error(e.exceptionCode, e.message)
-
             } catch (e: Exception) {
                 _shoppingListUiState.value =
                     ShoppingListUiState.Error(

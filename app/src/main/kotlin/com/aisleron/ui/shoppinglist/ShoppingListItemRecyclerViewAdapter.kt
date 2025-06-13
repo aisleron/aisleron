@@ -111,7 +111,7 @@ class ShoppingListItemRecyclerViewAdapter(
         fun bind(item: AisleShoppingListItem) {
             itemView.isLongClickable = true
             contentView.text = item.name
-            if (item.isDefault) {
+            if (item.isDefaultAisle) {
                 contentView.setTypeface(null, Typeface.ITALIC)
             } else {
                 contentView.setTypeface(null, Typeface.NORMAL)

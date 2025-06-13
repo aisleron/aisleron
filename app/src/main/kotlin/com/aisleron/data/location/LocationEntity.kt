@@ -30,5 +30,5 @@ data class LocationEntity(
     val defaultFilter: FilterType,
     val name: String,
     val pinned: Boolean,
-    @ColumnInfo(defaultValue = "true") val showDefaultAisle: Boolean
+    @ColumnInfo(defaultValue = "1") val showDefaultAisle: Boolean
 )

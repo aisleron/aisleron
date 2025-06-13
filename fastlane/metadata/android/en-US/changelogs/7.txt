@@ -1,1 +1,5 @@
-* Add option to show or hide default aisle on a Shop. Hiding the default aisle will hide any products not mapped to a specific aisle.
+Enhancements
+* Add option to show or hide default aisle on a Shop.
+* Hide unmapped products in a shop if the default aisle is hidden.
+
+Bug Fixes

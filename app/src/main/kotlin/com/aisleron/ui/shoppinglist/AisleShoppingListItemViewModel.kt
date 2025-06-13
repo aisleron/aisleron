@@ -26,7 +26,7 @@ data class AisleShoppingListItemViewModel(
     override val rank: Int,
     override val id: Int,
     override val name: String,
-    override val isDefault: Boolean,
+    override val isDefaultAisle: Boolean,
     override val childCount: Int,
     override val locationId: Int,
     private val updateAisleRankUseCase: UpdateAisleRankUseCase,
@@ -47,7 +47,7 @@ data class AisleShoppingListItemViewModel(
                 products = emptyList(),
                 locationId = locationId,
                 rank = precedingItem?.let { it.aisleRank + 1 } ?: 1,
-                isDefault = isDefault
+                isDefault = isDefaultAisle
             )
         )
     }
