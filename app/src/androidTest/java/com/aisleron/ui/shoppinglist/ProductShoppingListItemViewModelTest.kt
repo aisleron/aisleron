@@ -70,7 +70,8 @@ class ProductShoppingListItemViewModelTest : KoinTest {
         aisleProductId = aisleProduct.id,
         updateAisleProductRankUseCase = get<UpdateAisleProductRankUseCase>(),
         removeProductUseCase = get<RemoveProductUseCase>(),
-        isDefaultAisle = aisle.isDefault
+        isDefaultAisle = aisle.isDefault,
+        aisleExpanded = aisle.expanded
     )
 
     private fun getShoppingList(): Location {
@@ -105,7 +106,8 @@ class ProductShoppingListItemViewModelTest : KoinTest {
             aisleProductId = 1,
             updateAisleProductRankUseCase = get<UpdateAisleProductRankUseCase>(),
             removeProductUseCase = get<RemoveProductUseCase>(),
-            isDefaultAisle = false
+            isDefaultAisle = false,
+            aisleExpanded = true
         )
 
         val productRepository = get<ProductRepository>()
@@ -148,6 +150,7 @@ class ProductShoppingListItemViewModelTest : KoinTest {
             isDefaultAisle = targetAisle.isDefault,
             childCount = 0,
             locationId = targetAisle.locationId,
+            aisleExpanded = targetAisle.expanded,
             updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
             getAisleUseCase = get<GetAisleUseCase>(),
             removeAisleUseCase = get<RemoveAisleUseCase>()

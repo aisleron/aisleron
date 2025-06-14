@@ -58,6 +58,7 @@ class AisleShoppingListItemViewModelTest : KoinTest {
             isDefaultAisle = existingAisle.isDefault,
             childCount = 0,
             locationId = existingAisle.locationId,
+            aisleExpanded = existingAisle.expanded,
             updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
             getAisleUseCase = get<GetAisleUseCase>(),
             removeAisleUseCase = get<RemoveAisleUseCase>()
@@ -92,6 +93,7 @@ class AisleShoppingListItemViewModelTest : KoinTest {
             isDefaultAisle = false,
             childCount = 0,
             locationId = -1,
+            aisleExpanded = true,
             updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
             getAisleUseCase = get<GetAisleUseCase>(),
             removeAisleUseCase = get<RemoveAisleUseCase>()
@@ -133,5 +135,9 @@ class AisleShoppingListItemViewModelTest : KoinTest {
 
         Assert.assertEquals(1, updatedAisle?.rank)
     }
+
+    /**
+     * TODO: Add tests for expanded
+     */
 
 }

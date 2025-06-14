@@ -52,7 +52,8 @@ class DbInitializer(
                 name = "No Aisle",
                 locationId = homeId,
                 rank = 1000,
-                isDefault = true
+                isDefault = true,
+                expanded = true
             )
 
             aisleDao.upsert(aisle)

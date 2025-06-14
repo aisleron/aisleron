@@ -25,6 +25,7 @@ interface ShoppingListItem {
     val aisleId: Int
     val itemType: ItemType
     val isDefaultAisle: Boolean
+    val aisleExpanded: Boolean
 
     override fun equals(other: Any?): Boolean
 

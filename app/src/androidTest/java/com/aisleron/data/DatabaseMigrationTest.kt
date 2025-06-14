@@ -20,6 +20,7 @@ package com.aisleron.data
 import android.content.ContentValues
 import android.database.Cursor
 import androidx.room.testing.MigrationTestHelper
+import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.db.SupportSQLiteQueryBuilder
 import androidx.test.platform.app.InstrumentationRegistry
 import com.aisleron.domain.FilterType
@@ -39,21 +40,33 @@ class DatabaseMigrationTest {
         AisleronDatabase::class.java
     )
 
+    private fun populateV1Database(db: SupportSQLiteDatabase) {
+        val locationValues = ContentValues()
+        locationValues.put("type", LocationType.HOME.toString())
+        locationValues.put("defaultFilter", FilterType.NEEDED.toString())
+        locationValues.put("name", "Home")
+        locationValues.put("pinned", false)
+
+        // Database has schema version 1. Insert some data using SQL queries.
+        // You can't use DAO classes because they expect the latest schema.
+        val locationId = db.insert(
+            "Location", android.database.sqlite.SQLiteDatabase.CONFLICT_FAIL, locationValues
+        )
+
+        val aisleValues = ContentValues()
+        aisleValues.put("name", "No Aisle")
+        aisleValues.put("locationId", locationId)
+        aisleValues.put("rank", 1)
+        aisleValues.put("isDefault", true)
+
+        db.insert("Aisle", android.database.sqlite.SQLiteDatabase.CONFLICT_FAIL, aisleValues)
+    }
+
     @Test
     @Throws(IOException::class)
     fun migrate1To2() {
-        val locationName = "Home"
-
         helper.createDatabase(testDb, 1).apply {
-            val insertValues = ContentValues()
-            insertValues.put("type", LocationType.HOME.toString())
-            insertValues.put("defaultFilter", FilterType.NEEDED.toString())
-            insertValues.put("name", locationName)
-            insertValues.put("pinned", false)
-
-            // Database has schema version 1. Insert some data using SQL queries.
-            // You can't use DAO classes because they expect the latest schema.
-            insert("Location", android.database.sqlite.SQLiteDatabase.CONFLICT_FAIL, insertValues)
+            populateV1Database(this)
 
             // Prepare for the next version.
             close()
@@ -69,7 +82,7 @@ class DatabaseMigrationTest {
         db.apply {
             val queryBuilder = SupportSQLiteQueryBuilder
                 .builder("Location")
-                .selection("name = ?", arrayOf(locationName))//.columns(arrayOf("showDefaultAisle"))
+            //.selection("name = ?", arrayOf(locationName))//.columns(arrayOf("showDefaultAisle"))
 
             val cursor: Cursor = query(queryBuilder.create())
             cursor.moveToFirst()

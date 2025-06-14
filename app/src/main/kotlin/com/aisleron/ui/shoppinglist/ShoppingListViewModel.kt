@@ -129,6 +129,7 @@ class ShoppingListViewModel(
                                 getAisleUseCase = getAisleUseCase,
                                 removeAisleUseCase = removeAisleUseCase,
                                 locationId = _locationId,
+                                aisleExpanded = a.expanded,
                                 childCount = a.products.count { p ->
                                     (p.product.inStock && defaultFilter == FilterType.IN_STOCK)
                                             || (!p.product.inStock && defaultFilter == FilterType.NEEDED)
@@ -147,7 +148,8 @@ class ShoppingListViewModel(
                                 aisleProductId = p.id,
                                 removeProductUseCase = removeProductUseCase,
                                 updateAisleProductRankUseCase = updateAisleProductRankUseCase,
-                                isDefaultAisle = a.isDefault
+                                isDefaultAisle = a.isDefault,
+                                aisleExpanded = a.expanded
                             )
                         }
                     }
@@ -187,7 +189,8 @@ class ShoppingListViewModel(
                         locationId = _locationId,
                         isDefault = false,
                         rank = 0,
-                        id = 0
+                        id = 0,
+                        expanded = true
                     )
                 )
             } catch (e: AisleronException) {
@@ -211,7 +214,8 @@ class ShoppingListViewModel(
                         locationId = aisle.locationId,
                         isDefault = aisle.isDefaultAisle,
                         rank = aisle.rank,
-                        id = aisle.id
+                        id = aisle.id,
+                        expanded = aisle.aisleExpanded
                     )
                 )
             } catch (e: AisleronException) {

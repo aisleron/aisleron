@@ -41,7 +41,8 @@ class GetAisleMaxRankUseCaseTest {
                 locationId = locationId,
                 rank = 1000,
                 isDefault = false,
-                products = emptyList()
+                products = emptyList(),
+                expanded = true
             )
         )
 

@@ -57,7 +57,8 @@ class AddLocationUseCaseImpl(
                 locationId = newLocationId,
                 rank = 1000,
                 isDefault = true,
-                products = emptyList()
+                products = emptyList(),
+                expanded = true
             )
         )
 

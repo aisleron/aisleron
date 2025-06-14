@@ -145,6 +145,7 @@ class ShoppingListViewModelTest : KoinTest {
             isDefaultAisle = existingAisle.isDefault,
             locationId = existingLocation.id,
             childCount = 0,
+            aisleExpanded = existingAisle.expanded,
             updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
             getAisleUseCase = get<GetAisleUseCase>(),
             removeAisleUseCase = get<RemoveAisleUseCase>()
@@ -169,6 +170,7 @@ class ShoppingListViewModelTest : KoinTest {
             isDefaultAisle = existingAisle.isDefault,
             childCount = 0,
             locationId = -1,
+            aisleExpanded = existingAisle.expanded,
             updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
             getAisleUseCase = get<GetAisleUseCase>(),
             removeAisleUseCase = get<RemoveAisleUseCase>()
@@ -193,6 +195,7 @@ class ShoppingListViewModelTest : KoinTest {
             isDefaultAisle = existingAisle.isDefault,
             childCount = 0,
             locationId = existingLocation.id,
+            aisleExpanded = existingAisle.expanded,
             updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
             getAisleUseCase = get<GetAisleUseCase>(),
             removeAisleUseCase = get<RemoveAisleUseCase>()
@@ -223,6 +226,7 @@ class ShoppingListViewModelTest : KoinTest {
             inStock = existingProduct.inStock,
             aisleId = existingAisle.id,
             aisleProductId = aisleProduct.id,
+            aisleExpanded = existingAisle.expanded,
             updateAisleProductRankUseCase = get<UpdateAisleProductRankUseCase>(),
             removeProductUseCase = get<RemoveProductUseCase>(),
             isDefaultAisle = existingAisle.isDefault
@@ -256,6 +260,7 @@ class ShoppingListViewModelTest : KoinTest {
             inStock = existingProduct.inStock,
             aisleId = existingAisle.id,
             aisleProductId = aisleProduct.id,
+            aisleExpanded = existingAisle.expanded,
             updateAisleProductRankUseCase = get<UpdateAisleProductRankUseCase>(),
             removeProductUseCase = get<RemoveProductUseCase>(),
             isDefaultAisle = existingAisle.isDefault
@@ -391,6 +396,7 @@ class ShoppingListViewModelTest : KoinTest {
             isDefaultAisle = false,
             childCount = 0,
             locationId = 1,
+            aisleExpanded = true,
             updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
             getAisleUseCase = get<GetAisleUseCase>(),
             removeAisleUseCase = get<RemoveAisleUseCase>()
@@ -452,6 +458,7 @@ class ShoppingListViewModelTest : KoinTest {
             isDefaultAisle = false,
             childCount = 0,
             locationId = 1,
+            aisleExpanded = true,
             updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
             getAisleUseCase = get<GetAisleUseCase>(),
             removeAisleUseCase = get<RemoveAisleUseCase>()
@@ -480,6 +487,7 @@ class ShoppingListViewModelTest : KoinTest {
             isDefaultAisle = movedAisle.isDefault,
             childCount = 0,
             locationId = movedAisle.locationId,
+            aisleExpanded = movedAisle.expanded,
             updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
             getAisleUseCase = get<GetAisleUseCase>(),
             removeAisleUseCase = get<RemoveAisleUseCase>()
@@ -495,6 +503,7 @@ class ShoppingListViewModelTest : KoinTest {
             isDefaultAisle = precedingAisle.isDefault,
             childCount = 0,
             locationId = precedingAisle.locationId,
+            aisleExpanded = precedingAisle.expanded,
             updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
             getAisleUseCase = get<GetAisleUseCase>(),
             removeAisleUseCase = get<RemoveAisleUseCase>()
@@ -521,6 +530,7 @@ class ShoppingListViewModelTest : KoinTest {
             isDefaultAisle = existingAisle.isDefault,
             childCount = 0,
             locationId = existingAisle.locationId,
+            aisleExpanded = existingAisle.expanded,
             updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
             getAisleUseCase = get<GetAisleUseCase>(),
             removeAisleUseCase = get<RemoveAisleUseCase>()
@@ -532,10 +542,6 @@ class ShoppingListViewModelTest : KoinTest {
         val removedAisle = aisleRepository.get(existingAisle.id)
         Assert.assertNull(removedAisle)
     }
-
-    /**
-     * TODO: Add tests for showDefaultAisle
-     */
 
     private fun defaultAisleTestArrangeAct(showDefaultAisle: Boolean): ShoppingListItem? {
         runBlocking {
@@ -569,4 +575,8 @@ class ShoppingListViewModelTest : KoinTest {
         // Assert
         assertNull(defaultAisle)
     }
+
+    /**
+     * TODO: Add tests for aisle expand / collapse
+     */
 }

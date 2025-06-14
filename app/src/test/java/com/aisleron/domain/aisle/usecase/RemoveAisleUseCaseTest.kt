@@ -162,7 +162,8 @@ class RemoveAisleUseCaseTest {
                     locationId = testData.getRepository<LocationRepository>().getAll().first().id,
                     rank = 1000,
                     id = 0,
-                    isDefault = false
+                    isDefault = false,
+                    expanded = true
                 )
             )
             val emptyAisle = aisleRepository.get(emptyAisleId)!!
