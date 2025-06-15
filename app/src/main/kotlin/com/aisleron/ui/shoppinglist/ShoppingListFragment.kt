@@ -156,6 +156,13 @@ class ShoppingListFragment(
                         override fun onMoved(item: ShoppingListItem) {
                             actionMode?.finish()
                         }
+
+                        override fun onAisleExpandToggle(
+                            item: AisleShoppingListItem, expanded: Boolean
+                        ) {
+                            actionMode?.finish()
+                            shoppingListViewModel.updateAisleExpanded(item, expanded)
+                        }
                     }
                 )
 

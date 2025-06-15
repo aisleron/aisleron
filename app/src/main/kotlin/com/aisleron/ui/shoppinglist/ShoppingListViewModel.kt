@@ -24,6 +24,7 @@ import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.aisle.usecase.AddAisleUseCase
 import com.aisleron.domain.aisle.usecase.GetAisleUseCase
 import com.aisleron.domain.aisle.usecase.RemoveAisleUseCase
+import com.aisleron.domain.aisle.usecase.UpdateAisleExpandedUseCase
 import com.aisleron.domain.aisle.usecase.UpdateAisleRankUseCase
 import com.aisleron.domain.aisle.usecase.UpdateAisleUseCase
 import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductRankUseCase
@@ -47,6 +48,7 @@ class ShoppingListViewModel(
     private val removeAisleUseCase: RemoveAisleUseCase,
     private val removeProductUseCase: RemoveProductUseCase,
     private val getAisleUseCase: GetAisleUseCase,
+    private val updateAisleExpandedUseCase: UpdateAisleExpandedUseCase,
     coroutineScopeProvider: CoroutineScope? = null
 ) : ViewModel() {
     private val coroutineScope = coroutineScopeProvider ?: this.viewModelScope
@@ -82,24 +84,31 @@ class ShoppingListViewModel(
     }
 
     private fun isValidProductSli(
-        sli: ProductShoppingListItem, filter: FilterType, productNameFilter: String
+        sli: ProductShoppingListItem,
+        filter: FilterType,
+        productNameFilter: String,
+        showHiddenProducts: Boolean
     ): Boolean {
-        return ((sli.inStock && filter == FilterType.IN_STOCK)
-                || (!sli.inStock && filter == FilterType.NEEDED)
-                || (filter == FilterType.ALL)
+        return ((sli.inStock && filter == FilterType.IN_STOCK) ||
+                (!sli.inStock && filter == FilterType.NEEDED) ||
+                (filter == FilterType.ALL)
                 ) &&
-                (productNameFilter == "" || (sli.name.contains(productNameFilter.trim(), true)))
+                (productNameFilter == "" || (sli.name.contains(productNameFilter.trim(), true))) &&
+                (showHiddenProducts || sli.aisleExpanded)
     }
 
     private fun buildListFilter(
-        filter: FilterType, showDefaultAisle: Boolean, productNameFilter: String = ""
+        filter: FilterType,
+        showDefaultAisle: Boolean,
+        productNameFilter: String = "",
+        showHiddenProducts: Boolean = false
     ): (ShoppingListItem) -> Boolean {
         return { sli: ShoppingListItem ->
             (showDefaultAisle || !sli.isDefaultAisle) &&
                     when (sli) {
                         is AisleShoppingListItem -> isValidAisleSli(sli)
                         is ProductShoppingListItem -> isValidProductSli(
-                            sli, filter, productNameFilter
+                            sli, filter, productNameFilter, showHiddenProducts
                         )
 
                         else -> false
@@ -179,6 +188,12 @@ class ShoppingListViewModel(
         }
     }
 
+    fun updateAisleExpanded(item: AisleShoppingListItem, expanded: Boolean) {
+        coroutineScope.launch {
+            updateAisleExpandedUseCase(item.id, expanded)
+        }
+    }
+
     fun addAisle(aisleName: String) {
         coroutineScope.launch {
             try {
@@ -236,7 +251,7 @@ class ShoppingListViewModel(
     }
 
     fun submitProductSearch(productNameFilter: String) {
-        _listFilter = buildListFilter(FilterType.ALL, true, productNameFilter)
+        _listFilter = buildListFilter(FilterType.ALL, true, productNameFilter, true)
         coroutineScope.launch {
             _shoppingListUiState.value = ShoppingListUiState.Loading
             val searchResults = shoppingList.filter(_listFilter)

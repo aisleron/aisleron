@@ -26,6 +26,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.aisleron.R
 import com.aisleron.databinding.FragmentAisleListItemBinding
 import com.aisleron.databinding.FragmentProductListItemBinding
 import java.util.Collections
@@ -118,6 +119,24 @@ class ShoppingListItemRecyclerViewAdapter(
             }
 
             productCountView.text = if (item.childCount > 0) item.childCount.toString() else ""
+
+            setExpandedIcon(contentView, item.aisleExpanded)
+
+            contentView.setOnClickListener { _ ->
+                setExpandedIcon(contentView, !item.aisleExpanded )
+                listener.onAisleExpandToggle(item, !item.aisleExpanded)
+            }
+
+            contentView.setOnLongClickListener { _ -> itemView.performLongClick() }
+        }
+
+        private fun setExpandedIcon(view: TextView, expanded: Boolean) {
+            val expandDrawable = when (expanded) {
+                true -> R.drawable.baseline_expand_down_24
+                false -> R.drawable.baseline_expand_right_24
+            }
+
+            view.setCompoundDrawablesRelativeWithIntrinsicBounds(expandDrawable, 0, 0, 0)
         }
     }
 
@@ -134,6 +153,8 @@ class ShoppingListItemRecyclerViewAdapter(
             inStockView.setOnClickListener { _ ->
                 listener.onProductStatusChange(item, inStockView.isChecked)
             }
+
+            inStockView.setOnLongClickListener { _ -> itemView.performLongClick() }
         }
     }
 
@@ -143,6 +164,7 @@ class ShoppingListItemRecyclerViewAdapter(
         fun onListPositionChanged(item: ShoppingListItem, precedingItem: ShoppingListItem?)
         fun onLongClick(item: ShoppingListItem, view: View): Boolean
         fun onMoved(item: ShoppingListItem)
+        fun onAisleExpandToggle(item: AisleShoppingListItem, expanded: Boolean)
     }
 
     override fun onRowMoved(fromPosition: Int, toPosition: Int) {
