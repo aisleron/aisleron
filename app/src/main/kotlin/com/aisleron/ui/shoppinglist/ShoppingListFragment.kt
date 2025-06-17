@@ -110,6 +110,8 @@ class ShoppingListFragment(
             }
 
             with(view) {
+                var touchHelper: ItemTouchHelper? = null
+
                 LinearLayoutManager(context)
                 adapter = ShoppingListItemRecyclerViewAdapter(
                     object :
@@ -154,7 +156,7 @@ class ShoppingListFragment(
                         }
 
                         override fun onMoved(item: ShoppingListItem) {
-                            actionMode?.finish()
+                            //actionMode?.finish()
                         }
 
                         override fun onAisleExpandToggle(
@@ -163,13 +165,18 @@ class ShoppingListFragment(
                             actionMode?.finish()
                             shoppingListViewModel.updateAisleExpanded(item, expanded)
                         }
+
+                        override fun onDragStart(viewHolder: RecyclerView.ViewHolder) {
+                            touchHelper?.startDrag(viewHolder)
+                            //shoppingListViewModel.startItemDrag(item)
+                        }
                     }
                 )
 
                 val callback: ItemTouchHelper.Callback = ShoppingListItemMoveCallbackListener(
                     view.adapter as ShoppingListItemRecyclerViewAdapter
                 )
-                val touchHelper = ItemTouchHelper(callback)
+                touchHelper = ItemTouchHelper(callback)
                 touchHelper.attachToRecyclerView(view)
             }
         }
@@ -364,7 +371,7 @@ class ShoppingListFragment(
     }
 
     private fun editShoppingListItem(item: ShoppingListItem) {
-            when (item) {
+        when (item) {
             is AisleShoppingListItem -> showAisleDialog(requireContext(), item)
             is ProductShoppingListItem -> navigateToEditProduct(item.id)
         }
