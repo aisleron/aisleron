@@ -145,10 +145,10 @@ class ShoppingListViewModelTest : KoinTest {
             rank = existingAisle.rank,
             id = existingAisle.id,
             name = existingAisle.name,
-            isDefaultAisle = existingAisle.isDefault,
+            isDefault = existingAisle.isDefault,
             locationId = existingLocation.id,
             childCount = 0,
-            aisleExpanded = existingAisle.expanded,
+            expanded = existingAisle.expanded,
             updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
             getAisleUseCase = get<GetAisleUseCase>(),
             removeAisleUseCase = get<RemoveAisleUseCase>()
@@ -170,10 +170,10 @@ class ShoppingListViewModelTest : KoinTest {
             rank = existingAisle.rank,
             id = existingAisle.id,
             name = existingAisle.name,
-            isDefaultAisle = existingAisle.isDefault,
+            isDefault = existingAisle.isDefault,
             childCount = 0,
             locationId = -1,
-            aisleExpanded = existingAisle.expanded,
+            expanded = existingAisle.expanded,
             updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
             getAisleUseCase = get<GetAisleUseCase>(),
             removeAisleUseCase = get<RemoveAisleUseCase>()
@@ -195,10 +195,10 @@ class ShoppingListViewModelTest : KoinTest {
             rank = existingAisle.rank,
             id = existingAisle.id,
             name = existingAisle.name,
-            isDefaultAisle = existingAisle.isDefault,
+            isDefault = existingAisle.isDefault,
             childCount = 0,
             locationId = existingLocation.id,
-            aisleExpanded = existingAisle.expanded,
+            expanded = existingAisle.expanded,
             updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
             getAisleUseCase = get<GetAisleUseCase>(),
             removeAisleUseCase = get<RemoveAisleUseCase>()
@@ -226,10 +226,8 @@ class ShoppingListViewModelTest : KoinTest {
             inStock = existingProduct.inStock,
             aisleId = existingAisle.id,
             aisleProductId = aisleProduct.id,
-            aisleExpanded = existingAisle.expanded,
             updateAisleProductRankUseCase = get<UpdateAisleProductRankUseCase>(),
-            removeProductUseCase = get<RemoveProductUseCase>(),
-            isDefaultAisle = existingAisle.isDefault
+            removeProductUseCase = get<RemoveProductUseCase>()
         )
 
         shoppingListViewModel.hydrate(shoppingList.id, shoppingList.defaultFilter)
@@ -260,8 +258,8 @@ class ShoppingListViewModelTest : KoinTest {
             rank = existingAisle.rank,
             id = existingAisle.id,
             name = existingAisle.name,
-            aisleExpanded = existingAisle.expanded,
-            isDefaultAisle = existingAisle.isDefault,
+            expanded = existingAisle.expanded,
+            isDefault = existingAisle.isDefault,
             updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
             getAisleUseCase = get<GetAisleUseCase>(),
             removeAisleUseCase = get<RemoveAisleUseCase>(),
@@ -436,10 +434,10 @@ class ShoppingListViewModelTest : KoinTest {
             rank = 1000,
             id = -1,
             name = "Dummy",
-            isDefaultAisle = false,
+            isDefault = false,
             childCount = 0,
             locationId = 1,
-            aisleExpanded = true,
+            expanded = true,
             updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
             getAisleUseCase = get<GetAisleUseCase>(),
             removeAisleUseCase = get<RemoveAisleUseCase>()
@@ -498,10 +496,10 @@ class ShoppingListViewModelTest : KoinTest {
             rank = 1000,
             id = -1,
             name = "Dummy",
-            isDefaultAisle = false,
+            isDefault = false,
             childCount = 0,
             locationId = 1,
-            aisleExpanded = true,
+            expanded = true,
             updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
             getAisleUseCase = get<GetAisleUseCase>(),
             removeAisleUseCase = get<RemoveAisleUseCase>()
@@ -527,10 +525,10 @@ class ShoppingListViewModelTest : KoinTest {
             rank = movedAisle.rank,
             id = movedAisle.id,
             name = movedAisle.name,
-            isDefaultAisle = movedAisle.isDefault,
+            isDefault = movedAisle.isDefault,
             childCount = 0,
             locationId = movedAisle.locationId,
-            aisleExpanded = movedAisle.expanded,
+            expanded = movedAisle.expanded,
             updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
             getAisleUseCase = get<GetAisleUseCase>(),
             removeAisleUseCase = get<RemoveAisleUseCase>()
@@ -543,10 +541,10 @@ class ShoppingListViewModelTest : KoinTest {
             rank = precedingAisle.rank,
             id = precedingAisle.id,
             name = precedingAisle.name,
-            isDefaultAisle = precedingAisle.isDefault,
+            isDefault = precedingAisle.isDefault,
             childCount = 0,
             locationId = precedingAisle.locationId,
-            aisleExpanded = precedingAisle.expanded,
+            expanded = precedingAisle.expanded,
             updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
             getAisleUseCase = get<GetAisleUseCase>(),
             removeAisleUseCase = get<RemoveAisleUseCase>()
@@ -570,10 +568,10 @@ class ShoppingListViewModelTest : KoinTest {
             rank = existingAisle.rank,
             id = existingAisle.id,
             name = existingAisle.name,
-            isDefaultAisle = existingAisle.isDefault,
+            isDefault = existingAisle.isDefault,
             childCount = 0,
             locationId = existingAisle.locationId,
-            aisleExpanded = existingAisle.expanded,
+            expanded = existingAisle.expanded,
             updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
             getAisleUseCase = get<GetAisleUseCase>(),
             removeAisleUseCase = get<RemoveAisleUseCase>()
@@ -600,7 +598,7 @@ class ShoppingListViewModelTest : KoinTest {
         }
 
         return (shoppingListViewModel.shoppingListUiState.value as ShoppingListViewModel.ShoppingListUiState.Updated)
-            .shoppingList.firstOrNull { it.itemType == ShoppingListItem.ItemType.AISLE && it.isDefaultAisle }
+            .shoppingList.firstOrNull { it is AisleShoppingListItem && it.isDefault }
     }
 
     @Test

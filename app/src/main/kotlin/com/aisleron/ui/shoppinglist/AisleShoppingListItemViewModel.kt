@@ -26,10 +26,10 @@ data class AisleShoppingListItemViewModel(
     override val rank: Int,
     override val id: Int,
     override val name: String,
-    override val isDefaultAisle: Boolean,
-    override val childCount: Int,
+    override val isDefault: Boolean,
+    override var childCount: Int = 0,
     override val locationId: Int,
-    override val aisleExpanded: Boolean,
+    override val expanded: Boolean,
     private val updateAisleRankUseCase: UpdateAisleRankUseCase,
     private val getAisleUseCase: GetAisleUseCase,
     private val removeAisleUseCase: RemoveAisleUseCase
@@ -48,8 +48,8 @@ data class AisleShoppingListItemViewModel(
                 products = emptyList(),
                 locationId = locationId,
                 rank = precedingItem?.let { it.aisleRank + 1 } ?: 1,
-                isDefault = isDefaultAisle,
-                expanded = aisleExpanded
+                isDefault = isDefault,
+                expanded = expanded
             )
         )
     }

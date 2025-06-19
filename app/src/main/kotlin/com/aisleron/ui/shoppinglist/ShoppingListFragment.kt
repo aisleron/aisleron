@@ -382,7 +382,7 @@ class ShoppingListFragment(
     }
 
     override fun onQueryTextChange(newText: String?): Boolean {
-        shoppingListViewModel.submitProductSearch(productNameFilter = newText ?: "")
+        shoppingListViewModel.submitProductSearch(productNameQuery = newText ?: "")
         return false
     }
 

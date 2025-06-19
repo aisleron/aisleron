@@ -60,18 +60,24 @@ class ShoppingListItemRecyclerViewAdapter(
 
     class ShoppingListItemDiffCallback : DiffUtil.ItemCallback<ShoppingListItem>() {
         override fun areItemsTheSame(
-            oldItem: ShoppingListItem,
-            newItem: ShoppingListItem
+            oldItem: ShoppingListItem, newItem: ShoppingListItem
         ): Boolean {
             return (oldItem.itemType == newItem.itemType && oldItem.id == newItem.id)
         }
 
         override fun areContentsTheSame(
-            oldItem: ShoppingListItem,
-            newItem: ShoppingListItem
+            oldItem: ShoppingListItem, newItem: ShoppingListItem
         ): Boolean {
             return oldItem == newItem
         }
+
+        /*        override fun getChangePayload(oldItem: ShoppingListItem, newItem: ShoppingListItem): Any? {
+                    if (oldItem is AisleShoppingListItem && newItem is AisleShoppingListItem) {
+                        return if (oldItem.childCount != newItem.childCount) newItem.childCount else null
+                    }
+
+                    return super.getChangePayload(oldItem, newItem)
+                }*/
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -161,20 +167,20 @@ class ShoppingListItemRecyclerViewAdapter(
         @SuppressLint("ClickableViewAccessibility")
         fun bind(item: AisleShoppingListItem) {
             contentView.text = item.name
-            if (item.isDefaultAisle) {
+            if (item.isDefault) {
                 contentView.setTypeface(null, Typeface.ITALIC)
             } else {
                 contentView.setTypeface(null, Typeface.NORMAL)
             }
 
             contentView.setOnClickListener { _ ->
-                setExpandedIcon(contentView, !item.aisleExpanded)
-                listener.onAisleExpandToggle(item, !item.aisleExpanded)
+                setExpandedIcon(contentView, !item.expanded)
+                listener.onAisleExpandToggle(item, !item.expanded)
             }
 
             contentView.setOnLongClickListener { _ -> itemView.performLongClick() }
             contentView.setOnTouchListener(shoppingListOnTouchListener(this))
-            setExpandedIcon(contentView, item.aisleExpanded)
+            setExpandedIcon(contentView, item.expanded)
 
             productCountView.text = if (item.childCount > 0) item.childCount.toString() else ""
         }

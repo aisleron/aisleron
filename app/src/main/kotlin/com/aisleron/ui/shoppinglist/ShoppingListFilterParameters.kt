@@ -17,18 +17,12 @@
 
 package com.aisleron.ui.shoppinglist
 
-interface ShoppingListItem {
-    val aisleRank: Int
-    val rank: Int
-    val id: Int
-    val name: String
-    val aisleId: Int
-    val itemType: ItemType
+import com.aisleron.domain.FilterType
 
-    override fun equals(other: Any?): Boolean
-
-    enum class ItemType {
-        AISLE, PRODUCT
-    }
-}
-
+data class ShoppingListFilterParameters(
+    var filterType: FilterType = FilterType.NEEDED,
+    var showDefaultAisle: Boolean = true,
+    var productNameQuery: String = "",
+    var showAllProducts: Boolean = false,
+    var showAllAisles: Boolean = true //TODO: Change to false when aisles need to hide
+)

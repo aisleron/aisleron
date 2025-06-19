@@ -1,6 +1,7 @@
 Enhancements
-* Add option to show or hide default aisle on a Shop.
-* Hide unmapped products in a shop if the default aisle is hidden.
-* Add ability to Expand/Collapse Aisles
+* Added an option to show or hide the default aisle in a shop.
+* Improved visibility settings: unmapped products are now hidden when the default aisle is hidden.
+* Introduced expand/collapse functionality for aisles.
 
 Bug Fixes
+* Improved reliability of long-press actions on shopping list items.
