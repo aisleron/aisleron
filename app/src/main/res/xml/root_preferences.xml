@@ -32,10 +32,12 @@
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/shopping_list_options_header">
-
         <SwitchPreferenceCompat
             app:key="hide_status_change_snack_bar"
             app:title="@string/hide_status_change_snack_bar" />
+        <SwitchPreferenceCompat
+            app:key="show_empty_aisles"
+            app:title="@string/show_empty_aisles" />
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/backup_restore_title">

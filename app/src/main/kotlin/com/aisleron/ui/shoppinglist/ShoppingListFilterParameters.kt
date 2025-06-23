@@ -24,5 +24,5 @@ data class ShoppingListFilterParameters(
     var showDefaultAisle: Boolean = true,
     var productNameQuery: String = "",
     var showAllProducts: Boolean = false,
-    var showAllAisles: Boolean = true //TODO: Change to false when aisles need to hide
+    var showAllAisles: Boolean = false
 )

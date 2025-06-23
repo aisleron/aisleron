@@ -42,6 +42,7 @@ class ShoppingListItemMoveCallbackListener(private val adapter: ShoppingListItem
         viewHolder: RecyclerView.ViewHolder,
         target: RecyclerView.ViewHolder
     ): Boolean {
+        adapter.onRowMove(viewHolder, target)
         return true
     }
 
@@ -115,5 +116,6 @@ class ShoppingListItemMoveCallbackListener(private val adapter: ShoppingListItem
         fun onRowSelected(viewHolder: RecyclerView.ViewHolder)
         fun onRowClear(viewHolder: RecyclerView.ViewHolder)
         fun onRowSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int)
+        fun onRowMove(viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder)
     }
 }

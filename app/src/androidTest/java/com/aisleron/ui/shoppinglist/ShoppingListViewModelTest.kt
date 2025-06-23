@@ -354,42 +354,93 @@ class ShoppingListViewModelTest : KoinTest {
             productSearchCount,
             shoppingList.count { p -> p.name.contains(searchString) && p.itemType == ShoppingListItem.ItemType.PRODUCT }
         )
-
     }
 
     @Test
-    fun submitProductSearch_SearchRun_UiStateHasAllAisles() = runTest {
-        val location = getShoppingList()
-        val searchString = "No Product Name Matches This String Woo Yeah"
-        val aisleCount = location.aisles.count()
-
-        shoppingListViewModel.hydrate(location.id, location.defaultFilter)
-        shoppingListViewModel.submitProductSearch(searchString)
-
-        val shoppingList =
-            (shoppingListViewModel.shoppingListUiState.value as ShoppingListViewModel.ShoppingListUiState.Updated).shoppingList
-        Assert.assertEquals(
-            aisleCount, shoppingList.count { it.itemType == ShoppingListItem.ItemType.AISLE }
+    fun requestDefaultList_ShowEmptyAisles_UiStateHasAllAislesAndProducts() = runTest {
+        val locationRepo = get<LocationRepository>()
+        val locationId = locationRepo.getAll().first { it.type == LocationType.SHOP }.id
+        val emptyAisleName = "Empty Aisle"
+        get<AisleRepository>().add(
+            Aisle(
+                name = emptyAisleName,
+                locationId = locationId,
+                rank = 1001,
+                products = emptyList(),
+                id = 0,
+                isDefault = false,
+                expanded = false
+            )
         )
-    }
 
-    @Test
-    fun requestDefaultList_SearchRun_UiStateHasAllAislesAndProducts() = runTest {
-        val location = getShoppingList()
+        val location = locationRepo.getLocationWithAislesWithProducts(locationId).first()!!
         val aisleCount = location.aisles.count()
         var productCount = 0
         location.aisles.forEach {
             productCount += it.products.count()
         }
 
-        shoppingListViewModel.hydrate(location.id, FilterType.ALL)
+        shoppingListViewModel.hydrate(location.id, FilterType.ALL, true)
         shoppingListViewModel.requestDefaultList()
 
         val shoppingList =
             (shoppingListViewModel.shoppingListUiState.value as ShoppingListViewModel.ShoppingListUiState.Updated).shoppingList
+
+        Assert.assertNotNull(
+            shoppingList.firstOrNull {
+                it.itemType == ShoppingListItem.ItemType.AISLE && it.name == emptyAisleName
+            }
+        )
+
         Assert.assertEquals(
             aisleCount, shoppingList.count { it.itemType == ShoppingListItem.ItemType.AISLE }
         )
+
+        Assert.assertEquals(
+            productCount, shoppingList.count { it.itemType == ShoppingListItem.ItemType.PRODUCT }
+        )
+    }
+
+    @Test
+    fun requestDefaultList_HideEmptyAisles_UiStateHasPopulatedAislesAndAllProducts() = runTest {
+        val locationRepo = get<LocationRepository>()
+        val locationId = locationRepo.getAll().first { it.type == LocationType.SHOP }.id
+        val emptyAisleName = "Empty Aisle"
+        get<AisleRepository>().add(
+            Aisle(
+                name = emptyAisleName,
+                locationId = locationId,
+                rank = 1001,
+                products = emptyList(),
+                id = 0,
+                isDefault = false,
+                expanded = false
+            )
+        )
+
+        val location = locationRepo.getLocationWithAislesWithProducts(locationId).first()!!
+        val aisleCount = location.aisles.count()
+        var productCount = 0
+        location.aisles.forEach {
+            productCount += it.products.count()
+        }
+
+        shoppingListViewModel.hydrate(location.id, FilterType.ALL, false)
+        shoppingListViewModel.requestDefaultList()
+
+        val shoppingList =
+            (shoppingListViewModel.shoppingListUiState.value as ShoppingListViewModel.ShoppingListUiState.Updated).shoppingList
+
+        Assert.assertNull(
+            shoppingList.firstOrNull {
+                it.itemType == ShoppingListItem.ItemType.AISLE && it.name == emptyAisleName
+            }
+        )
+
+        Assert.assertTrue(
+            aisleCount > shoppingList.count { it.itemType == ShoppingListItem.ItemType.AISLE }
+        )
+
         Assert.assertEquals(
             productCount, shoppingList.count { it.itemType == ShoppingListItem.ItemType.PRODUCT }
         )

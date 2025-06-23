@@ -135,9 +135,4 @@ class AisleShoppingListItemViewModelTest : KoinTest {
 
         Assert.assertEquals(1, updatedAisle?.rank)
     }
-
-    /**
-     * TODO: Add tests for expanded
-     */
-
 }

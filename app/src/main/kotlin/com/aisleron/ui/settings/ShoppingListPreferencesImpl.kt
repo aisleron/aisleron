@@ -27,7 +27,13 @@ class ShoppingListPreferencesImpl : ShoppingListPreferences {
             PREF_HIDE_STATUS_CHANGE_SNACK_BAR, false
         )
 
+    override fun showEmptyAisles(context: Context): Boolean =
+        PreferenceManager.getDefaultSharedPreferences(context).getBoolean(
+            PREF_SHOW_EMPTY_AISLES, false
+        )
+
     companion object {
         private const val PREF_HIDE_STATUS_CHANGE_SNACK_BAR = "hide_status_change_snack_bar"
+        private const val PREF_SHOW_EMPTY_AISLES = "show_empty_aisles"
     }
 }

@@ -22,4 +22,5 @@ import android.content.Context
 interface ShoppingListPreferences {
 
     fun isStatusChangeSnackBarHidden(context: Context): Boolean
+    fun showEmptyAisles(context: Context): Boolean
 }

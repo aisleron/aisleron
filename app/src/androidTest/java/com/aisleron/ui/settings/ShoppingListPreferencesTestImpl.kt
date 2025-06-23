@@ -22,10 +22,16 @@ import android.content.Context
 class ShoppingListPreferencesTestImpl : ShoppingListPreferences {
 
     private var _hideStatusChangeSnackBar: Boolean = false
+    private var _showEmptyAisles: Boolean = false
 
     override fun isStatusChangeSnackBarHidden(context: Context): Boolean = _hideStatusChangeSnackBar
+    override fun showEmptyAisles(context: Context): Boolean = _showEmptyAisles
 
     fun setHideStatusChangeSnackBar(hideSnackBar: Boolean) {
         _hideStatusChangeSnackBar = hideSnackBar
+    }
+
+    fun setShowEmptyAisles(showEmptyAisles: Boolean) {
+        _showEmptyAisles = showEmptyAisles
     }
 }

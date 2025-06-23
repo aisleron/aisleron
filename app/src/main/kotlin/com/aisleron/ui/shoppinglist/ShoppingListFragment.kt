@@ -64,18 +64,24 @@ class ShoppingListFragment(
     private val applicationTitleUpdateListener: ApplicationTitleUpdateListener,
     private val fabHandler: FabHandler,
     private val shoppingListPreferences: ShoppingListPreferences
-) : Fragment(), SearchView.OnQueryTextListener, ActionMode.Callback, FabClickedCallBack {
+) : Fragment(), SearchView.OnQueryTextListener, ActionMode.Callback, FabClickedCallBack,
+    MenuProvider {
 
     private var actionMode: ActionMode? = null
     private var actionModeItem: ShoppingListItem? = null
     private var actionModeItemView: View? = null
+    private var editShopMenuItem: MenuItem? = null
 
     private val shoppingListViewModel: ShoppingListViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val shoppingListBundle = Bundler().getShoppingListBundle(arguments)
-        shoppingListViewModel.hydrate(shoppingListBundle.locationId, shoppingListBundle.filterType)
+        shoppingListViewModel.hydrate(
+            shoppingListBundle.locationId,
+            shoppingListBundle.filterType,
+            shoppingListPreferences.showEmptyAisles(requireContext())
+        )
     }
 
     override fun onCreateView(
@@ -98,6 +104,9 @@ class ShoppingListFragment(
 
                             is ShoppingListViewModel.ShoppingListUiState.Updated -> {
                                 updateTitle()
+                                editShopMenuItem?.isVisible =
+                                    shoppingListViewModel.locationType == LocationType.SHOP
+
                                 (view.adapter as ShoppingListItemRecyclerViewAdapter).submitList(
                                     it.shoppingList
                                 )
@@ -156,7 +165,7 @@ class ShoppingListFragment(
                         }
 
                         override fun onMoved(item: ShoppingListItem) {
-                            //actionMode?.finish()
+                            shoppingListViewModel.movedItem(item)
                         }
 
                         override fun onAisleExpandToggle(
@@ -168,8 +177,9 @@ class ShoppingListFragment(
 
                         override fun onDragStart(viewHolder: RecyclerView.ViewHolder) {
                             touchHelper?.startDrag(viewHolder)
-                            //shoppingListViewModel.startItemDrag(item)
                         }
+
+                        override fun onMove(item: ShoppingListItem) {}
                     }
                 )
 
@@ -268,39 +278,12 @@ class ShoppingListFragment(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val menuHost = requireActivity()
-        menuHost.addMenuProvider(object : MenuProvider {
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menuInflater.inflate(R.menu.shopping_list_fragment_main, menu)
+        menuHost.addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
+    }
 
-                val searchManager =
-                    getSystemService(requireContext(), SearchManager::class.java) as SearchManager
-                val searchableInfo =
-                    searchManager.getSearchableInfo(requireActivity().componentName)
-
-                val searchView = menu.findItem(R.id.action_search).actionView as SearchView
-                searchView.setMaxWidth(Integer.MAX_VALUE)
-                searchView.setSearchableInfo(searchableInfo)
-                searchView.setOnQueryTextListener(this@ShoppingListFragment)
-                searchView.setOnCloseListener {
-                    shoppingListViewModel.requestDefaultList()
-                    false
-                }
-
-                //OnAttachStateChange is here as a workaround because OnCloseListener doesn't fire
-                searchView.addOnAttachStateChangeListener(object : OnAttachStateChangeListener {
-                    override fun onViewAttachedToWindow(v: View) {}
-
-                    override fun onViewDetachedFromWindow(v: View) {
-                        shoppingListViewModel.requestDefaultList()
-                    }
-                })
-            }
-
-            //NOTE: If you override onMenuItemSelected, OnSupportNavigateUp will only be called when returning false
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                return false
-            }
-        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+    private fun navigateToEditShop(locationId: Int) {
+        val bundle = Bundler().makeEditLocationBundle(locationId)
+        this.findNavController().navigate(R.id.nav_add_shop, bundle)
     }
 
     private fun showAisleDialog(context: Context, aisle: AisleShoppingListItem? = null) {
@@ -435,6 +418,47 @@ class ShoppingListFragment(
         actionModeItemView = null
     }
 
+    override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+        menuInflater.inflate(R.menu.shopping_list_fragment_main, menu)
+
+        val searchManager =
+            getSystemService(requireContext(), SearchManager::class.java) as SearchManager
+        val searchableInfo =
+            searchManager.getSearchableInfo(requireActivity().componentName)
+
+        val searchView = menu.findItem(R.id.action_search).actionView as SearchView
+        searchView.setMaxWidth(Integer.MAX_VALUE)
+        searchView.setSearchableInfo(searchableInfo)
+        searchView.setOnQueryTextListener(this@ShoppingListFragment)
+        searchView.setOnCloseListener {
+            shoppingListViewModel.requestDefaultList()
+            false
+        }
+
+        //OnAttachStateChange is here as a workaround because OnCloseListener doesn't fire
+        searchView.addOnAttachStateChangeListener(object : OnAttachStateChangeListener {
+            override fun onViewAttachedToWindow(v: View) {}
+
+            override fun onViewDetachedFromWindow(v: View) {
+                shoppingListViewModel.requestDefaultList()
+            }
+        })
+
+        editShopMenuItem = menu.findItem(R.id.mnu_edit_shop)
+    }
+
+    //NOTE: If you override onMenuItemSelected, OnSupportNavigateUp will only be called when returning false
+    override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+        return when (menuItem.itemId) {
+            R.id.mnu_edit_shop -> {
+                navigateToEditShop(locationId = shoppingListViewModel.locationId)
+                true
+            }
+
+            else -> false
+        }
+    }
+
     companion object {
 
         private const val ARG_LOCATION_ID = "locationId"
@@ -461,4 +485,5 @@ class ShoppingListFragment(
     override fun fabClicked(fabOption: FabHandler.FabOption) {
         actionMode?.finish()
     }
+
 }

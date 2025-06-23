@@ -220,6 +220,11 @@ class ShoppingListItemRecyclerViewAdapter(
         fun onMoved(item: ShoppingListItem)
         fun onAisleExpandToggle(item: AisleShoppingListItem, expanded: Boolean)
         fun onDragStart(viewHolder: ViewHolder)
+        fun onMove(item: ShoppingListItem)
+    }
+
+    override fun onRowMove(viewHolder: ViewHolder, target: ViewHolder) {
+        listener.onMove(getItem(viewHolder.absoluteAdapterPosition))
     }
 
     override fun onRowMoved(fromPosition: Int, toPosition: Int) {

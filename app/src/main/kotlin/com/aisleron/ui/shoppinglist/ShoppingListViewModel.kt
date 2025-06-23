@@ -56,13 +56,17 @@ class ShoppingListViewModel(
     private val coroutineScope = coroutineScopeProvider ?: this.viewModelScope
 
     private var location: Location? = null
-    private val showDefaultAisle: Boolean get() = location?.showDefaultAisle != false
+    private var _showDefaultAisle: Boolean = true
+    private val showDefaultAisle: Boolean get() = _showDefaultAisle
     val locationName: String get() = location?.name ?: ""
     val locationType: LocationType get() = location?.type ?: LocationType.HOME
     val locationId: Int get() = location?.id ?: 0
 
     private var _defaultFilter: FilterType = FilterType.NEEDED
     val defaultFilter: FilterType get() = _defaultFilter
+
+    private var _showEmptyAisles: Boolean = true
+    private val showEmptyAisles: Boolean get() = _showEmptyAisles
 
     private lateinit var shoppingListFilterParameters: ShoppingListFilterParameters
 
@@ -141,19 +145,30 @@ class ShoppingListViewModel(
     private fun getDefaultFilterParameters(): ShoppingListFilterParameters {
         return ShoppingListFilterParameters(
             filterType = _defaultFilter,
-            showDefaultAisle = showDefaultAisle
+            showDefaultAisle = showDefaultAisle,
+            showAllAisles = showEmptyAisles
         )
     }
 
-    fun hydrate(locationId: Int, filterType: FilterType) {
+    fun hydrate(locationId: Int, filterType: FilterType, showEmptyAisles: Boolean = false) {
         _defaultFilter = filterType
+        _showEmptyAisles = showEmptyAisles
         coroutineScope.launch {
-            _shoppingListUiState.value = ShoppingListUiState.Loading
             getShoppingListUseCase(locationId).collect { collectedLocation ->
+                _shoppingListUiState.value = ShoppingListUiState.Loading
                 location = collectedLocation
 
                 if (!::shoppingListFilterParameters.isInitialized)
                     shoppingListFilterParameters = getDefaultFilterParameters()
+
+                shoppingListFilterParameters.showAllAisles = _showEmptyAisles
+                location?.let {
+                    // If default aisle preference has changed, update the filter parameters accordingly
+                    if (it.showDefaultAisle != _showDefaultAisle) {
+                        _showDefaultAisle = it.showDefaultAisle
+                        shoppingListFilterParameters.showDefaultAisle = _showDefaultAisle
+                    }
+                }
 
                 _shoppingListUiState.value =
                     ShoppingListUiState.Updated(
@@ -236,6 +251,7 @@ class ShoppingListViewModel(
         shoppingListFilterParameters.showDefaultAisle = true
         shoppingListFilterParameters.productNameQuery = productNameQuery
         shoppingListFilterParameters.showAllProducts = true
+        shoppingListFilterParameters.showAllAisles = showEmptyAisles
 
         coroutineScope.launch {
             _shoppingListUiState.value = ShoppingListUiState.Loading
@@ -248,8 +264,19 @@ class ShoppingListViewModel(
         shoppingListFilterParameters = getDefaultFilterParameters()
         coroutineScope.launch {
             _shoppingListUiState.value = ShoppingListUiState.Loading
-            _shoppingListUiState.value =
-                ShoppingListUiState.Updated(getShoppingList(location, shoppingListFilterParameters))
+            val searchResults = getShoppingList(location, shoppingListFilterParameters)
+            _shoppingListUiState.value = ShoppingListUiState.Updated(searchResults)
+        }
+    }
+
+    fun movedItem(item: ShoppingListItem) {
+        //TODO: Do some smarts to only expand the list if I'm dragging an aisle, dragging a product across an aisle, or reached the end of the list
+        //TODO: When dragging an aisle, hide all products
+        shoppingListFilterParameters.showAllAisles = true
+        coroutineScope.launch {
+            _shoppingListUiState.value = ShoppingListUiState.Loading
+            val searchResults = getShoppingList(location, shoppingListFilterParameters)
+            _shoppingListUiState.value = ShoppingListUiState.Updated(searchResults)
         }
     }
 
