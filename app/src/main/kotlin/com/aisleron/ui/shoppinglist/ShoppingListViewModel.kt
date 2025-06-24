@@ -32,6 +32,7 @@ import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductRankUseCase
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationType
+import com.aisleron.domain.location.usecase.SortLocationByNameUseCase
 import com.aisleron.domain.product.usecase.RemoveProductUseCase
 import com.aisleron.domain.product.usecase.UpdateProductStatusUseCase
 import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
@@ -51,6 +52,7 @@ class ShoppingListViewModel(
     private val removeProductUseCase: RemoveProductUseCase,
     private val getAisleUseCase: GetAisleUseCase,
     private val updateAisleExpandedUseCase: UpdateAisleExpandedUseCase,
+    private val sortLocationByNameUseCase: SortLocationByNameUseCase,
     coroutineScopeProvider: CoroutineScope? = null
 ) : ViewModel() {
     private val coroutineScope = coroutineScopeProvider ?: this.viewModelScope
@@ -286,6 +288,19 @@ class ShoppingListViewModel(
                 (item as ShoppingListItemViewModel).remove()
             } catch (e: AisleronException) {
                 _shoppingListUiState.value = ShoppingListUiState.Error(e.exceptionCode, e.message)
+            } catch (e: Exception) {
+                _shoppingListUiState.value =
+                    ShoppingListUiState.Error(
+                        AisleronException.ExceptionCode.GENERIC_EXCEPTION, e.message
+                    )
+            }
+        }
+    }
+
+    fun sortListByName() {
+        coroutineScope.launch {
+            try {
+                sortLocationByNameUseCase(locationId)
             } catch (e: Exception) {
                 _shoppingListUiState.value =
                     ShoppingListUiState.Error(

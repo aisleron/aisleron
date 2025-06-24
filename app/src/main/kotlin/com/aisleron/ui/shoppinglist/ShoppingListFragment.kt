@@ -455,8 +455,29 @@ class ShoppingListFragment(
                 true
             }
 
+            R.id.mnu_sort_list_by_name -> {
+                confirmSort(requireContext())
+                true
+            }
+
             else -> false
         }
+    }
+
+    private fun confirmSort(context: Context) {
+        val builder: AlertDialog.Builder = AlertDialog.Builder(context)
+        builder
+            .setTitle(getString(R.string.sort_confirm_title))
+            .setMessage(R.string.sort_confirm_message)
+            .setNegativeButton(android.R.string.cancel, null)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                shoppingListViewModel.sortListByName()
+            }
+
+        val dialog: AlertDialog = builder.create()
+
+        dialog.show()
+
     }
 
     companion object {

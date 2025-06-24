@@ -3,7 +3,8 @@ Enhancements
 * Improved visibility settings: unmapped products are now hidden when the default aisle is hidden.
 * Introduced expand/collapse functionality for aisles.
 * Added an option to show or hide empty aisles, with empty aisles hidden by default.
-* Added a menu option to edit a shop from the shopping list.
+* Added an option to edit a shop from the shopping list.
+* Added an option to sort a list by name.
 
 Bug Fixes
 * Improved reliability of long-press actions on shopping list items.

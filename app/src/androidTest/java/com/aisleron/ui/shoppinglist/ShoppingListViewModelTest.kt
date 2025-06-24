@@ -37,6 +37,7 @@ import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.location.usecase.AddLocationUseCase
+import com.aisleron.domain.location.usecase.SortLocationByNameUseCase
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
 import com.aisleron.domain.product.usecase.RemoveProductUseCase
@@ -458,7 +459,8 @@ class ShoppingListViewModelTest : KoinTest {
             get<RemoveAisleUseCase>(),
             get<RemoveProductUseCase>(),
             get<GetAisleUseCase>(),
-            get<UpdateAisleExpandedUseCase>()
+            get<UpdateAisleExpandedUseCase>(),
+            get<SortLocationByNameUseCase>()
         )
 
         Assert.assertNotNull(vm)
@@ -668,5 +670,26 @@ class ShoppingListViewModelTest : KoinTest {
         assertNull(defaultAisle)
     }
 
+    @Test
+    fun sortListByName_AisleNameIsAAA_AisleIsRankedFirst() = runTest {
+        val existingLocation = get<LocationRepository>().getAll().first()
+        val aisleRepository = get<AisleRepository>()
+        val aisleId = aisleRepository.add(
+            Aisle(
+                name = "AAA",
+                products = emptyList(),
+                locationId = existingLocation.id,
+                rank = 2001,
+                isDefault = false,
+                id = 0,
+                expanded = true
+            )
+        )
 
+        shoppingListViewModel.hydrate(existingLocation.id, existingLocation.defaultFilter)
+        shoppingListViewModel.sortListByName()
+
+        val sortedAisle = aisleRepository.get(aisleId)
+        Assert.assertEquals(1, sortedAisle?.rank)
+    }
 }

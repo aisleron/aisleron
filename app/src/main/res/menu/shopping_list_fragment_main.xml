@@ -29,8 +29,14 @@
         tools:ignore="AlwaysShowAction" />
 
     <item
+        android:id="@+id/mnu_sort_list_by_name"
+        android:icon="@drawable/baseline_sort_24"
+        android:title="@string/mnu_sort_list_by_name"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/mnu_edit_shop"
         android:icon="@drawable/baseline_edit_24"
-        android:title="@string/edit_location"
+        android:title="@string/mnu_edit_location"
         app:showAsAction="never" />
 </menu>

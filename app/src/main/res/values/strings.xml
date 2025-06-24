@@ -135,5 +135,9 @@
     <string name="shop_logo">Shop Logo</string>
     <string name="aisle_expand">Aisle expand</string>
     <string name="show_empty_aisles">Show empty aisles</string>
+    <string name="mnu_edit_location">Edit shop</string>
+    <string name="mnu_sort_list_by_name">Sort by name</string>
+    <string name="sort_confirm_title">Confirm Sort</string>
+    <string name="sort_confirm_message">Sorting by name will rearrange the list alphabetically and overwrite your current sort order. Do you want to proceed?</string>
 
 </resources>

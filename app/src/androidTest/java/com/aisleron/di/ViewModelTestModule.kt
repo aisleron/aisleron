@@ -44,6 +44,7 @@ val viewModelTestModule = module {
             removeProductUseCase = get(),
             getAisleUseCase = get(),
             updateAisleExpandedUseCase = get(),
+            sortLocationByNameUseCase = get(),
             TestScope(UnconfinedTestDispatcher())
         )
     }

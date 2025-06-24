@@ -51,6 +51,8 @@ import com.aisleron.domain.location.usecase.GetShopsUseCase
 import com.aisleron.domain.location.usecase.IsLocationNameUniqueUseCase
 import com.aisleron.domain.location.usecase.RemoveLocationUseCase
 import com.aisleron.domain.location.usecase.RemoveLocationUseCaseImpl
+import com.aisleron.domain.location.usecase.SortLocationByNameUseCase
+import com.aisleron.domain.location.usecase.SortLocationByNameUseCaseImpl
 import com.aisleron.domain.location.usecase.UpdateLocationUseCase
 import com.aisleron.domain.product.usecase.AddProductUseCase
 import com.aisleron.domain.product.usecase.AddProductUseCaseImpl
@@ -100,6 +102,14 @@ val useCaseModule = module {
             getAllProductsUseCase = get(),
             addAisleProductsUseCase = get(),
             isLocationNameUniqueUseCase = get()
+        )
+    }
+
+    factory<SortLocationByNameUseCase> {
+        SortLocationByNameUseCaseImpl(
+            locationRepository = get(),
+            updateAisleUseCase = get(),
+            updateAisleProductUseCase = get()
         )
     }
 
