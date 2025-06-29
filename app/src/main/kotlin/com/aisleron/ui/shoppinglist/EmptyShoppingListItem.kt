@@ -17,18 +17,15 @@
 
 package com.aisleron.ui.shoppinglist
 
-interface ShoppingListItem {
-    val aisleRank: Int
-    val rank: Int
-    val id: Int
-    val name: String
-    val aisleId: Int
-    val itemType: ItemType
 
-    override fun equals(other: Any?): Boolean
 
-    enum class ItemType {
-        AISLE, PRODUCT, EMPTY_LIST
-    }
+data class EmptyShoppingListItem(
+    override val rank: Int = 1,
+    override val name: String = ""
+) : ShoppingListItem {
+    override val aisleRank: Int get() = rank
+    override val id: Int get() = 0
+    override val aisleId: Int get() = id
+    override val itemType: ShoppingListItem.ItemType
+        get() = ShoppingListItem.ItemType.EMPTY_LIST
 }
-

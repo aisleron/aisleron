@@ -35,6 +35,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.aisleron.R
 import com.aisleron.databinding.FragmentAisleListItemBinding
+import com.aisleron.databinding.FragmentEmptyListItemBinding
 import com.aisleron.databinding.FragmentProductListItemBinding
 import java.util.Collections
 
@@ -50,6 +51,7 @@ class ShoppingListItemRecyclerViewAdapter(
     companion object {
         const val AISLE_VIEW = 1
         const val PRODUCT_VIEW = 2
+        const val EMPTY_LIST_VIEW = 3
     }
 
     private val longClickHandler: Handler = Handler(Looper.getMainLooper())
@@ -88,8 +90,14 @@ class ShoppingListItemRecyclerViewAdapter(
                 )
             )
 
-            else -> ProductListItemViewHolder(
+            PRODUCT_VIEW -> ProductListItemViewHolder(
                 FragmentProductListItemBinding.inflate(
+                    LayoutInflater.from(parent.context), parent, false
+                )
+            )
+
+            else -> EmptyListItemViewHolder(
+                FragmentEmptyListItemBinding.inflate(
                     LayoutInflater.from(parent.context), parent, false
                 )
             )
@@ -157,6 +165,7 @@ class ShoppingListItemRecyclerViewAdapter(
         return when (getItem(position).itemType) {
             ShoppingListItem.ItemType.AISLE -> AISLE_VIEW
             ShoppingListItem.ItemType.PRODUCT -> PRODUCT_VIEW
+            ShoppingListItem.ItemType.EMPTY_LIST -> EMPTY_LIST_VIEW
         }
     }
 
@@ -210,6 +219,11 @@ class ShoppingListItemRecyclerViewAdapter(
 
             inStockView.setOnLongClickListener { _ -> itemView.performLongClick() }
         }
+    }
+
+    inner class EmptyListItemViewHolder(binding: FragmentEmptyListItemBinding) :
+        ViewHolder(binding.root) {
+
     }
 
     interface ShoppingListItemListener {

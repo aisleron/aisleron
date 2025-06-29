@@ -148,10 +148,13 @@ class ShoppingListFragment(
                         override fun onLongClick(item: ShoppingListItem, view: View): Boolean {
                             // Finish the previous action mode and start a new one
                             actionMode?.finish()
+                            if (item.itemType == ShoppingListItem.ItemType.EMPTY_LIST) {
+                                return false
+                            }
+
                             actionModeItem = item
                             actionModeItemView = view
                             actionModeItemView?.isSelected = true
-
                             return when (actionMode) {
                                 null -> {
                                     // Start the CAB using the ActionMode.Callback defined earlier.

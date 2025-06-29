@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (C) 2025 aisleron.com
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as
+  ~ published by the Free Software Foundation, either version 3 of the
+  ~ License, or (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="16dp"
+    card_view:cardElevation="4dp"
+    card_view:cardCornerRadius="@dimen/text_margin">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/text_margin"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/txt_empty_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/empty_list_title"
+            android:textAlignment="center"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textStyle="bold" />
+
+        <View
+            android:id="@+id/ln_empty_Top"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?attr/colorSecondary"
+            android:layout_marginVertical="@dimen/text_margin" />
+
+        <TextView
+            android:id="@+id/txt_empty_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/empty_list_description"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:paddingHorizontal="8dp"
+            android:paddingBottom="8dp" />
+
+        <TextView
+            android:id="@+id/txt_empty_reasons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/empty_list_reasons"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:paddingHorizontal="@dimen/text_margin"
+            android:paddingBottom="8dp" />
+
+        <TextView
+            android:id="@+id/txt_empty_instructions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/empty_list_instructions"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:paddingHorizontal="8dp"
+            android:paddingTop="8dp" />
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

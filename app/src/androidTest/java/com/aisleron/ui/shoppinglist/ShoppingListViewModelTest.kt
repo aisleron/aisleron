@@ -93,7 +93,7 @@ class ShoppingListViewModelTest : KoinTest {
     }
 
     @Test
-    fun hydrate_LocationHasNoAisles_ShoppingListIsEmpty() = runTest {
+    fun hydrate_LocationHasNoAislesOrProducts_EmptyListItemExcluded() = runTest {
         val location = Location(
             id = 0,
             type = LocationType.SHOP,
@@ -101,13 +101,29 @@ class ShoppingListViewModelTest : KoinTest {
             name = "No Aisle Shop",
             pinned = false,
             aisles = emptyList(),
-            showDefaultAisle = true
+            showDefaultAisle = false
         )
 
         val locationId = get<LocationRepository>().add(location)
         shoppingListViewModel.hydrate(locationId, location.defaultFilter)
 
-        assertTrue((shoppingListViewModel.shoppingListUiState.value as ShoppingListViewModel.ShoppingListUiState.Updated).shoppingList.isEmpty())
+        val shoppingList =
+            (shoppingListViewModel.shoppingListUiState.value as ShoppingListViewModel.ShoppingListUiState.Updated).shoppingList
+
+        assertEquals(1, shoppingList.count())
+        assertEquals(1, shoppingList.count { it.itemType == ShoppingListItem.ItemType.EMPTY_LIST })
+    }
+
+    @Test
+    fun hydrate_ListHasAislesAndProducts_EmptyListItemExcluded() = runTest {
+        val location = getShoppingList()
+        shoppingListViewModel.hydrate(location.id, location.defaultFilter)
+
+        val shoppingList =
+            (shoppingListViewModel.shoppingListUiState.value as ShoppingListViewModel.ShoppingListUiState.Updated).shoppingList
+
+        assertTrue(shoppingList.isNotEmpty())
+        assertEquals(0, shoppingList.count { it.itemType == ShoppingListItem.ItemType.EMPTY_LIST })
     }
 
     @Test

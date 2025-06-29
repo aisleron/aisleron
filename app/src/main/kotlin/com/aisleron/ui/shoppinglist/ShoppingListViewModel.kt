@@ -141,6 +141,10 @@ class ShoppingListViewModel(
                 { it.name })
         )
 
+        if (filteredList.isEmpty()) {
+            filteredList.add(EmptyShoppingListItem())
+        }
+
         return filteredList.toList()
     }
 

@@ -95,6 +95,21 @@
     <string name="welcome_documentation">&lt;h3&gt;View the Documentation&lt;/h3&gt; View the Aisleron documentation online to find out more about the app\'s features</string>
     <string name="welcome_title">Welcome to Aisleron</string>
 
+    <!-- Empty list message strings   -->
+    <string name="empty_list_title">This list is currently empty</string>
+
+    <string name="empty_list_reasons">
+        - No items are needed at the moment
+        \n- No products or aisles have been added yet
+        \n- Items exist but aren’t assigned to a visible aisle
+    </string>
+
+    <string name="empty_list_instructions">
+        You can add products and aisles using the Add button at the bottom right,
+        or use the search bar at the top of the screen to find products and update
+        their status or aisle assignment.
+    </string>
+
     <!-- URLs -->
     <string name="aisleron_documentation_url">https://aisleron.com/docs/documentation/</string>
 
@@ -139,5 +154,6 @@
     <string name="mnu_sort_list_by_name">Sort by name</string>
     <string name="sort_confirm_title">Confirm Sort</string>
     <string name="sort_confirm_message">Sorting by name will rearrange the list alphabetically and overwrite your current sort order. Do you want to proceed?</string>
+    <string name="empty_list_description">This could be because:</string>
 
 </resources>

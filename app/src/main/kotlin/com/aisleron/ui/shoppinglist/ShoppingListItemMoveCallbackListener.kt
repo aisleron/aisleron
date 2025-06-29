@@ -29,7 +29,12 @@ class ShoppingListItemMoveCallbackListener(private val adapter: ShoppingListItem
         recyclerView: RecyclerView,
         viewHolder: RecyclerView.ViewHolder
     ): Int {
-        val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN
+        val dragFlags = when (viewHolder) {
+            is ShoppingListItemRecyclerViewAdapter.ProductListItemViewHolder,
+            is ShoppingListItemRecyclerViewAdapter.AisleViewHolder -> ItemTouchHelper.UP or ItemTouchHelper.DOWN
+
+            else -> 0
+        }
         val swipeFlags = when (viewHolder) {
             is ShoppingListItemRecyclerViewAdapter.ProductListItemViewHolder -> ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
             else -> 0

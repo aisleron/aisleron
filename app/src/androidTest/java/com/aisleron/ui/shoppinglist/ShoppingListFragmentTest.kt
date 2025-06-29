@@ -193,9 +193,7 @@ class ShoppingListFragmentTest : KoinTest {
     @Test
     fun onCreateShoppingListFragment_BundleIsAttributes_FragmentCreated() {
         val location = getLocation(LocationType.HOME)
-        val bundle = Bundle()
-        bundle.putInt("locationId", location.id)
-        bundle.putSerializable("filterType", FilterType.NEEDED)
+        val bundle = bundler.makeShoppingListBundle(location.id, location.defaultFilter)
         val scenario = getFragmentScenario(bundle)
         scenario.onFragment {
             assertEquals(
@@ -205,9 +203,28 @@ class ShoppingListFragmentTest : KoinTest {
         }
     }
 
+    @Test
+    fun onCreateShoppingListFragment_ListIsEmpty_ShowEmptyListItem() = runTest {
+        val location = Location(
+            id = 0,
+            type = LocationType.SHOP,
+            defaultFilter = FilterType.NEEDED,
+            name = "No Aisle Shop",
+            pinned = false,
+            aisles = emptyList(),
+            showDefaultAisle = false
+        )
+
+        val locationId = get<LocationRepository>().add(location)
+        getFragmentScenario(bundler.makeShoppingListBundle(locationId, location.defaultFilter))
+
+        onView(withText(R.string.empty_list_title)).check(matches(isDisplayed()))
+    }
+
     private suspend fun getShoppingList(locationId: Int? = null): Location {
         val locationRepository = get<LocationRepository>()
-        val shopId = locationId ?: locationRepository.getAll().first { it.type != LocationType.HOME }.id
+        val shopId =
+            locationId ?: locationRepository.getAll().first { it.type != LocationType.HOME }.id
         return locationRepository.getLocationWithAislesWithProducts(shopId).first()!!
     }
 
