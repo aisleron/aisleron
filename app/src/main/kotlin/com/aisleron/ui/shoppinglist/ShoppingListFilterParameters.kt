@@ -15,30 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-plugins {
-    id("com.android.library")
-    id("org.jetbrains.kotlin.android")
+package com.aisleron.ui.shoppinglist
 
-    id("com.autonomousapps.dependency-analysis")
-}
-android {
-    namespace = "com.aisleron.testdata"
-    compileSdk = 35
+import com.aisleron.domain.FilterType
 
-    defaultConfig {
-        minSdk = 24
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-    kotlinOptions {
-        jvmTarget = "11"
-    }
-}
-
-dependencies {
-    compileOnly(project(":app"))
-    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
-}
+data class ShoppingListFilterParameters(
+    var filterType: FilterType = FilterType.NEEDED,
+    var showDefaultAisle: Boolean = true,
+    var productNameQuery: String = "",
+    var showAllProducts: Boolean = false,
+    var showAllAisles: Boolean = false
+)

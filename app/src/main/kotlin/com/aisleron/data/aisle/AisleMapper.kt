@@ -27,7 +27,8 @@ class AisleMapper : MapperBaseImpl<AisleEntity, Aisle>() {
         rank = value.rank,
         locationId = value.locationId,
         products = emptyList(),
-        isDefault = value.isDefault
+        isDefault = value.isDefault,
+        expanded = value.expanded
     )
 
     override fun fromModel(value: Aisle) = AisleEntity(
@@ -35,6 +36,7 @@ class AisleMapper : MapperBaseImpl<AisleEntity, Aisle>() {
         id = value.id,
         rank = value.rank,
         locationId = value.locationId,
-        isDefault = value.isDefault
+        isDefault = value.isDefault,
+        expanded = value.expanded
     )
 }

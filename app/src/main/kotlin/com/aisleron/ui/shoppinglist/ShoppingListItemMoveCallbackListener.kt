@@ -29,7 +29,12 @@ class ShoppingListItemMoveCallbackListener(private val adapter: ShoppingListItem
         recyclerView: RecyclerView,
         viewHolder: RecyclerView.ViewHolder
     ): Int {
-        val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN
+        val dragFlags = when (viewHolder) {
+            is ShoppingListItemRecyclerViewAdapter.ProductListItemViewHolder,
+            is ShoppingListItemRecyclerViewAdapter.AisleViewHolder -> ItemTouchHelper.UP or ItemTouchHelper.DOWN
+
+            else -> 0
+        }
         val swipeFlags = when (viewHolder) {
             is ShoppingListItemRecyclerViewAdapter.ProductListItemViewHolder -> ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
             else -> 0
@@ -42,7 +47,7 @@ class ShoppingListItemMoveCallbackListener(private val adapter: ShoppingListItem
         viewHolder: RecyclerView.ViewHolder,
         target: RecyclerView.ViewHolder
     ): Boolean {
-
+        adapter.onRowMove(viewHolder, target)
         return true
     }
 
@@ -67,12 +72,13 @@ class ShoppingListItemMoveCallbackListener(private val adapter: ShoppingListItem
     }
 
     override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
+        super.onSelectedChanged(viewHolder, actionState)
+
         if (actionState != ItemTouchHelper.ACTION_STATE_IDLE) {
             if (viewHolder is RecyclerView.ViewHolder) {
                 adapter.onRowSelected(viewHolder)
             }
         }
-        super.onSelectedChanged(viewHolder, actionState)
     }
 
     override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
@@ -108,10 +114,13 @@ class ShoppingListItemMoveCallbackListener(private val adapter: ShoppingListItem
         return OUT_OF_BOUNDS_SCROLL_MULTIPLIER * direction
     }
 
+    override fun isLongPressDragEnabled(): Boolean = false
+
     interface Listener {
         fun onRowMoved(fromPosition: Int, toPosition: Int)
         fun onRowSelected(viewHolder: RecyclerView.ViewHolder)
         fun onRowClear(viewHolder: RecyclerView.ViewHolder)
         fun onRowSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int)
+        fun onRowMove(viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder)
     }
 }

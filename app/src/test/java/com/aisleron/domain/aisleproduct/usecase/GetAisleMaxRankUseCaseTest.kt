@@ -30,7 +30,7 @@ class GetAisleMaxRankUseCaseTest {
 
         val locationId = testData.getRepository<LocationRepository>().add(
             Location(
-                0, LocationType.SHOP, FilterType.NEEDED, "Rank Test Shop", false, emptyList()
+                0, LocationType.SHOP, FilterType.NEEDED, "Rank Test Shop", false, emptyList(), true
             )
         )
 
@@ -41,7 +41,8 @@ class GetAisleMaxRankUseCaseTest {
                 locationId = locationId,
                 rank = 1000,
                 isDefault = false,
-                products = emptyList()
+                products = emptyList(),
+                expanded = true
             )
         )
 

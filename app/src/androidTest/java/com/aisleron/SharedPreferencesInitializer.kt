@@ -62,9 +62,18 @@ class SharedPreferencesInitializer {
         preferencesEditor.commit()
     }
 
+    fun setShowEmptyAisles(showEmptyAisles: Boolean) {
+        val preferencesEditor = getPreferencesEditor()
+
+        preferencesEditor.clear()
+        preferencesEditor.putBoolean(PREF_SHOW_EMPTY_AISLES, showEmptyAisles)
+        preferencesEditor.commit()
+    }
+
     companion object {
         private const val IS_INITIALIZED = "is_initialised"
         private const val APPLICATION_THEME = "application_theme"
         private const val PREF_HIDE_STATUS_CHANGE_SNACK_BAR = "hide_status_change_snack_bar"
+        private const val PREF_SHOW_EMPTY_AISLES = "show_empty_aisles"
     }
 }

@@ -19,6 +19,7 @@ package com.aisleron.data
 
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
+import com.aisleron.domain.location.LocationType
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -27,6 +28,7 @@ import org.junit.After
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
+import java.lang.Thread.sleep
 
 class DbInitializerTest {
     private lateinit var db: AisleronDatabase
@@ -53,11 +55,12 @@ class DbInitializerTest {
 
     @Test
     fun invoke_NewDatabase_HomeLocationAdded() = runTest {
-        val homeBefore = db.locationDao().getHome()
+        val homeBefore = db.locationDao().getLocations().count { it.type == LocationType.HOME }
         initializer.invoke()
-        val homeAfter = db.locationDao().getHome()
-        Assert.assertNull(homeBefore)
-        Assert.assertNotNull(homeAfter)
+        sleep(100)
+        val homeAfter = db.locationDao().getLocations().count { it.type == LocationType.HOME }
+        Assert.assertEquals(0, homeBefore)
+        Assert.assertEquals(1, homeAfter)
     }
 
     @Test

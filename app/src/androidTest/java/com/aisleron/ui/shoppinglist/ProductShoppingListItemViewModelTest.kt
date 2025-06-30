@@ -146,6 +146,7 @@ class ProductShoppingListItemViewModelTest : KoinTest {
             isDefault = targetAisle.isDefault,
             childCount = 0,
             locationId = targetAisle.locationId,
+            expanded = targetAisle.expanded,
             updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
             getAisleUseCase = get<GetAisleUseCase>(),
             removeAisleUseCase = get<RemoveAisleUseCase>()

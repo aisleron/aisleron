@@ -24,10 +24,15 @@ import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.location.usecase.GetLocationUseCase
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
+import java.util.stream.Stream
 
 class UpdateAisleUseCaseTest {
     private lateinit var testData: TestDataManager
@@ -45,22 +50,24 @@ class UpdateAisleUseCaseTest {
         )
     }
 
-    @Test
-    fun updateAisle_AisleExists_RecordUpdated() {
-        val updateAisle = existingAisle.copy(name = existingAisle.name + " Updated")
-        val updatedAisle: Aisle?
-        val countBefore: Int
-        val countAfter: Int
+    @ParameterizedTest(name = "Test UpdateAisle when expanded is {0}")
+    @MethodSource("aisleExpandedArguments")
+    fun updateAisle_AisleExists_RecordUpdated(expanded: Boolean) = runTest {
+        val updateAisle =
+            existingAisle.copy(name = existingAisle.name + " Updated", expanded = expanded)
+
         val aisleRepository = testData.getRepository<AisleRepository>()
-        runBlocking {
-            countBefore = aisleRepository.getAll().count()
-            updateAisleUseCase(updateAisle)
-            updatedAisle = aisleRepository.get(existingAisle.id)
-            countAfter = aisleRepository.getAll().count()
-        }
+        val countBefore = aisleRepository.getAll().count()
+
+        updateAisleUseCase(updateAisle)
+
+        val updatedAisle = aisleRepository.get(existingAisle.id)
+        val countAfter = aisleRepository.getAll().count()
+
         Assertions.assertNotNull(updatedAisle)
         Assertions.assertEquals(countBefore, countAfter)
         Assertions.assertEquals(updateAisle, updatedAisle)
+        Assertions.assertEquals(expanded, updatedAisle?.expanded)
     }
 
     @Test
@@ -96,5 +103,13 @@ class UpdateAisleUseCaseTest {
                 updateAisleUseCase(existingAisle.copy(locationId = -1))
             }
         }
+    }
+
+    private companion object {
+        @JvmStatic
+        fun aisleExpandedArguments(): Stream<Arguments> = Stream.of(
+            Arguments.of(true),
+            Arguments.of(false)
+        )
     }
 }

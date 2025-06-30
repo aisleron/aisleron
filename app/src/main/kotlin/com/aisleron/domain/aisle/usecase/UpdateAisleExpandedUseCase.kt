@@ -15,30 +15,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-plugins {
-    id("com.android.library")
-    id("org.jetbrains.kotlin.android")
+package com.aisleron.domain.aisle.usecase
 
-    id("com.autonomousapps.dependency-analysis")
-}
-android {
-    namespace = "com.aisleron.testdata"
-    compileSdk = 35
+import com.aisleron.domain.aisle.Aisle
 
-    defaultConfig {
-        minSdk = 24
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-    kotlinOptions {
-        jvmTarget = "11"
-    }
+interface UpdateAisleExpandedUseCase {
+    suspend operator fun invoke(id: Int, expanded: Boolean): Aisle?
 }
 
-dependencies {
-    compileOnly(project(":app"))
-    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+class UpdateAisleExpandedUseCaseImpl(
+    private val getAisleUseCase: GetAisleUseCase,
+    private val updateAisleUseCase: UpdateAisleUseCase
+) : UpdateAisleExpandedUseCase {
+    override suspend operator fun invoke(id: Int, expanded: Boolean): Aisle? {
+        val aisle = getAisleUseCase(id)?.copy(expanded = expanded)
+
+        if (aisle != null) {
+            updateAisleUseCase(aisle)
+        }
+        return aisle
+    }
 }

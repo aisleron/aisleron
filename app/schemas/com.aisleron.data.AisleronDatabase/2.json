@@ -1,12 +1,12 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 1,
-    "identityHash": "f53709b2977828a9ec05f9fa3092fd44",
+    "version": 2,
+    "identityHash": "f17beea17f88c10fff14c963de453f05",
     "entities": [
       {
         "tableName": "Aisle",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `locationId` INTEGER NOT NULL, `rank` INTEGER NOT NULL, `isDefault` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `locationId` INTEGER NOT NULL, `rank` INTEGER NOT NULL, `isDefault` INTEGER NOT NULL, `expanded` INTEGER NOT NULL DEFAULT 1)",
         "fields": [
           {
             "fieldPath": "id",
@@ -37,6 +37,13 @@
             "columnName": "isDefault",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "expanded",
+            "columnName": "expanded",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "1"
           }
         ],
         "primaryKey": {
@@ -48,7 +55,7 @@
       },
       {
         "tableName": "Location",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `type` TEXT NOT NULL, `defaultFilter` TEXT NOT NULL, `name` TEXT NOT NULL, `pinned` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `type` TEXT NOT NULL, `defaultFilter` TEXT NOT NULL, `name` TEXT NOT NULL, `pinned` INTEGER NOT NULL, `showDefaultAisle` INTEGER NOT NULL DEFAULT 1)",
         "fields": [
           {
             "fieldPath": "id",
@@ -79,6 +86,13 @@
             "columnName": "pinned",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "showDefaultAisle",
+            "columnName": "showDefaultAisle",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "1"
           }
         ],
         "primaryKey": {
@@ -169,7 +183,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f53709b2977828a9ec05f9fa3092fd44')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f17beea17f88c10fff14c963de453f05')"
     ]
   }
 }

@@ -45,4 +45,12 @@
         android:text="@string/pin_shop"
         android:padding="@dimen/text_margin" />
 
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/swc_shop_show_unmapped_products"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/show_unmapped_products"
+        android:padding="@dimen/text_margin"
+        android:checked="true" />
+
 </LinearLayout>

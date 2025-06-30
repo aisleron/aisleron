@@ -15,19 +15,15 @@
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<resources>
-    <!-- Default screen margins, per the Android Design guidelines. -->
-    <dimen name="activity_horizontal_margin">16dp</dimen>
-    <dimen name="activity_vertical_margin">16dp</dimen>
-    <dimen name="nav_header_vertical_spacing">8dp</dimen>
-    <dimen name="nav_header_height">132dp</dimen>
-    <dimen name="fab_margin">16dp</dimen>
-    <dimen name="mini_fab_margin">20dp</dimen>
-    <dimen name="text_margin">16dp</dimen>
-    <dimen name="menu_padding">12dp</dimen>
-    <dimen name="icon_size">100dp</dimen>
-    <dimen name="title_margin">44dp</dimen>
-    <dimen name="subtitle_vertical_padding">4dp</dimen>
-    <dimen name="status_bar">24dp</dimen>
-    <dimen name="expand_button_padding">4dp</dimen>
-</resources>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:autoMirrored="true"
+    android:height="24dp"
+    android:viewportHeight="24"
+    android:viewportWidth="24"
+    android:width="24dp">
+
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M3,18h6v-2L3,16v2zM3,6v2h18L21,6L3,6zM3,13h12v-2L3,11v2z" />
+
+</vector>

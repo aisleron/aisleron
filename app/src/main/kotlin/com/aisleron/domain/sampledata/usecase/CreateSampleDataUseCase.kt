@@ -107,11 +107,31 @@ class CreateSampleDataUseCaseImpl(
         val homeLocation = getHomeLocationUseCase()
 
         val aisleList = listOf(
-            Aisle(HOME_AISLE_FREEZER, emptyList(), homeLocation.id, 100, 0, false),
-            Aisle(HOME_AISLE_FRIDGE, emptyList(), homeLocation.id, 200, 0, false),
-            Aisle(HOME_AISLE_PANTRY, emptyList(), homeLocation.id, 300, 0, false),
-            Aisle(HOME_AISLE_BATHROOM, emptyList(), homeLocation.id, 400, 0, false),
-            Aisle(HOME_AISLE_SPICES, emptyList(), homeLocation.id, 500, 0, false),
+            Aisle(
+                HOME_AISLE_FREEZER, emptyList(), homeLocation.id, 100, 0,
+                isDefault = false,
+                expanded = true
+            ),
+            Aisle(
+                HOME_AISLE_FRIDGE, emptyList(), homeLocation.id, 200, 0,
+                isDefault = false,
+                expanded = true
+            ),
+            Aisle(
+                HOME_AISLE_PANTRY, emptyList(), homeLocation.id, 300, 0,
+                isDefault = false,
+                expanded = true
+            ),
+            Aisle(
+                HOME_AISLE_BATHROOM, emptyList(), homeLocation.id, 400, 0,
+                isDefault = false,
+                expanded = true
+            ),
+            Aisle(
+                HOME_AISLE_SPICES, emptyList(), homeLocation.id, 500, 0,
+                isDefault = false,
+                expanded = true
+            ),
         )
 
         aisleList.forEach { addAisleUseCase(it) }
@@ -135,18 +155,26 @@ class CreateSampleDataUseCaseImpl(
 
     private suspend fun addShop() {
         val location = Location(
-            0, LocationType.SHOP, FilterType.NEEDED, SHOP_NAME, true, emptyList()
+            0, LocationType.SHOP, FilterType.NEEDED, SHOP_NAME, true, emptyList(), true
         )
 
         val shopId = addLocationUseCase(location)
 
         val aisleList = listOf(
-            Aisle(SHOP_AISLE_FRUIT_VEG, emptyList(), shopId, 100, 0, false),
-            Aisle(SHOP_AISLE_1, emptyList(), shopId, 200, 0, false),
-            Aisle(SHOP_AISLE_2, emptyList(), shopId, 300, 0, false),
-            Aisle(SHOP_AISLE_3, emptyList(), shopId, 400, 0, false),
-            Aisle(SHOP_AISLE_4, emptyList(), shopId, 500, 0, false),
-            Aisle(SHOP_AISLE_FROZEN_FOODS, emptyList(), shopId, 600, 0, false),
+            Aisle(
+                SHOP_AISLE_FRUIT_VEG, emptyList(), shopId, 100, 0,
+                isDefault = false,
+                expanded = true
+            ),
+            Aisle(SHOP_AISLE_1, emptyList(), shopId, 200, 0, isDefault = false, expanded = true),
+            Aisle(SHOP_AISLE_2, emptyList(), shopId, 300, 0, isDefault = false, expanded = true),
+            Aisle(SHOP_AISLE_3, emptyList(), shopId, 400, 0, isDefault = false, expanded = true),
+            Aisle(SHOP_AISLE_4, emptyList(), shopId, 500, 0, isDefault = false, expanded = true),
+            Aisle(
+                SHOP_AISLE_FROZEN_FOODS, emptyList(), shopId, 600, 0,
+                isDefault = false,
+                expanded = true
+            ),
         )
 
         aisleList.forEach { addAisleUseCase(it) }

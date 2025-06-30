@@ -74,7 +74,8 @@ class AddAisleUseCaseTest {
                 testData.getRepository<LocationRepository>().getAll().first().id
             },
             rank = 1000,
-            isDefault = false
+            isDefault = false,
+            expanded = true
         )
     }
 

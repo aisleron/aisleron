@@ -58,6 +58,7 @@ class AisleShoppingListItemViewModelTest : KoinTest {
             isDefault = existingAisle.isDefault,
             childCount = 0,
             locationId = existingAisle.locationId,
+            expanded = existingAisle.expanded,
             updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
             getAisleUseCase = get<GetAisleUseCase>(),
             removeAisleUseCase = get<RemoveAisleUseCase>()
@@ -92,6 +93,7 @@ class AisleShoppingListItemViewModelTest : KoinTest {
             isDefault = false,
             childCount = 0,
             locationId = -1,
+            expanded = true,
             updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
             getAisleUseCase = get<GetAisleUseCase>(),
             removeAisleUseCase = get<RemoveAisleUseCase>()
@@ -133,5 +135,4 @@ class AisleShoppingListItemViewModelTest : KoinTest {
 
         Assert.assertEquals(1, updatedAisle?.rank)
     }
-
 }

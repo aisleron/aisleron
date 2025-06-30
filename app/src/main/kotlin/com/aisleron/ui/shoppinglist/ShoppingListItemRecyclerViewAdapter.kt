@@ -17,16 +17,25 @@
 
 package com.aisleron.ui.shoppinglist
 
+import android.annotation.SuppressLint
 import android.graphics.Typeface
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
+import android.view.View.OnTouchListener
+import android.view.ViewConfiguration
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import com.aisleron.R
 import com.aisleron.databinding.FragmentAisleListItemBinding
+import com.aisleron.databinding.FragmentEmptyListItemBinding
 import com.aisleron.databinding.FragmentProductListItemBinding
 import java.util.Collections
 
@@ -36,33 +45,44 @@ import java.util.Collections
  */
 class ShoppingListItemRecyclerViewAdapter(
     private val listener: ShoppingListItemListener
-) : ListAdapter<ShoppingListItem, RecyclerView.ViewHolder>(ShoppingListItemDiffCallback()),
+) : ListAdapter<ShoppingListItem, ViewHolder>(ShoppingListItemDiffCallback()),
     ShoppingListItemMoveCallbackListener.Listener {
 
     companion object {
         const val AISLE_VIEW = 1
         const val PRODUCT_VIEW = 2
+        const val EMPTY_LIST_VIEW = 3
     }
 
+    private val longClickHandler: Handler = Handler(Looper.getMainLooper())
+
+    private var longClicked = false
+    private var dragStarted = false
     private var itemMoved: Boolean = false
 
     class ShoppingListItemDiffCallback : DiffUtil.ItemCallback<ShoppingListItem>() {
         override fun areItemsTheSame(
-            oldItem: ShoppingListItem,
-            newItem: ShoppingListItem
+            oldItem: ShoppingListItem, newItem: ShoppingListItem
         ): Boolean {
             return (oldItem.itemType == newItem.itemType && oldItem.id == newItem.id)
         }
 
         override fun areContentsTheSame(
-            oldItem: ShoppingListItem,
-            newItem: ShoppingListItem
+            oldItem: ShoppingListItem, newItem: ShoppingListItem
         ): Boolean {
             return oldItem == newItem
         }
+
+        /*        override fun getChangePayload(oldItem: ShoppingListItem, newItem: ShoppingListItem): Any? {
+                    if (oldItem is AisleShoppingListItem && newItem is AisleShoppingListItem) {
+                        return if (oldItem.childCount != newItem.childCount) newItem.childCount else null
+                    }
+
+                    return super.getChangePayload(oldItem, newItem)
+                }*/
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val newViewHolder = when (viewType) {
             AISLE_VIEW -> AisleViewHolder(
                 FragmentAisleListItemBinding.inflate(
@@ -70,8 +90,14 @@ class ShoppingListItemRecyclerViewAdapter(
                 )
             )
 
-            else -> ProductListItemViewHolder(
+            PRODUCT_VIEW -> ProductListItemViewHolder(
                 FragmentProductListItemBinding.inflate(
+                    LayoutInflater.from(parent.context), parent, false
+                )
+            )
+
+            else -> EmptyListItemViewHolder(
+                FragmentEmptyListItemBinding.inflate(
                     LayoutInflater.from(parent.context), parent, false
                 )
             )
@@ -85,11 +111,50 @@ class ShoppingListItemRecyclerViewAdapter(
         newViewHolder.itemView.setOnClickListener {
             listener.onClick(getItem(newViewHolder.absoluteAdapterPosition))
         }
+        newViewHolder.itemView.setOnTouchListener(shoppingListOnTouchListener(newViewHolder))
 
         return newViewHolder
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    private fun shoppingListOnTouchListener(viewHolder: ViewHolder): OnTouchListener {
+        return OnTouchListener { v, event ->
+            val longPressTimeout = ViewConfiguration.getLongPressTimeout().toLong()
+            var result = true
+
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    longClicked = false
+                    dragStarted = false
+                    longClickHandler.postDelayed({ //long click
+                        longClicked = true
+                        v.performLongClick()
+                    }, longPressTimeout)
+                }
+
+                MotionEvent.ACTION_UP -> {
+                    longClickHandler.removeCallbacksAndMessages(null)
+                    if (!longClicked && !dragStarted) v.performClick()
+                }
+
+                MotionEvent.ACTION_MOVE -> {
+                    if (longClicked && !dragStarted) {
+                        dragStarted = true
+                        listener.onDragStart(viewHolder)
+                    }
+                }
+
+                MotionEvent.ACTION_CANCEL -> {
+                    longClickHandler.removeCallbacksAndMessages(null)
+                }
+
+                else -> result = false
+            }
+
+            result
+        }
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         when (val item = getItem(position)) {
             is AisleShoppingListItem -> (holder as AisleViewHolder).bind(item)
             is ProductShoppingListItem -> (holder as ProductListItemViewHolder).bind(item)
@@ -100,16 +165,16 @@ class ShoppingListItemRecyclerViewAdapter(
         return when (getItem(position).itemType) {
             ShoppingListItem.ItemType.AISLE -> AISLE_VIEW
             ShoppingListItem.ItemType.PRODUCT -> PRODUCT_VIEW
+            ShoppingListItem.ItemType.EMPTY_LIST -> EMPTY_LIST_VIEW
         }
     }
 
-    inner class AisleViewHolder(binding: FragmentAisleListItemBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+    inner class AisleViewHolder(binding: FragmentAisleListItemBinding) : ViewHolder(binding.root) {
         private val contentView: TextView = binding.txtAisleName
         private val productCountView: TextView = binding.txtProductCnt
 
+        @SuppressLint("ClickableViewAccessibility")
         fun bind(item: AisleShoppingListItem) {
-            itemView.isLongClickable = true
             contentView.text = item.name
             if (item.isDefault) {
                 contentView.setTypeface(null, Typeface.ITALIC)
@@ -117,24 +182,48 @@ class ShoppingListItemRecyclerViewAdapter(
                 contentView.setTypeface(null, Typeface.NORMAL)
             }
 
+            contentView.setOnClickListener { _ ->
+                setExpandedIcon(contentView, !item.expanded)
+                listener.onAisleExpandToggle(item, !item.expanded)
+            }
+
+            contentView.setOnLongClickListener { _ -> itemView.performLongClick() }
+            contentView.setOnTouchListener(shoppingListOnTouchListener(this))
+            setExpandedIcon(contentView, item.expanded)
+
             productCountView.text = if (item.childCount > 0) item.childCount.toString() else ""
+        }
+
+        private fun setExpandedIcon(view: TextView, expanded: Boolean) {
+            val expandDrawable = when (expanded) {
+                true -> R.drawable.baseline_expand_down_24
+                false -> R.drawable.baseline_expand_right_24
+            }
+
+            view.setCompoundDrawablesRelativeWithIntrinsicBounds(expandDrawable, 0, 0, 0)
         }
     }
 
     inner class ProductListItemViewHolder(binding: FragmentProductListItemBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+        ViewHolder(binding.root) {
         private val contentView: TextView = binding.txtProductName
         private val inStockView: CheckBox = binding.chkInStock
 
         fun bind(item: ProductShoppingListItem) {
-            itemView.isLongClickable = true
             contentView.text = item.name
             inStockView.isChecked = item.inStock
 
             inStockView.setOnClickListener { _ ->
                 listener.onProductStatusChange(item, inStockView.isChecked)
             }
+
+            inStockView.setOnLongClickListener { _ -> itemView.performLongClick() }
         }
+    }
+
+    inner class EmptyListItemViewHolder(binding: FragmentEmptyListItemBinding) :
+        ViewHolder(binding.root) {
+
     }
 
     interface ShoppingListItemListener {
@@ -143,6 +232,13 @@ class ShoppingListItemRecyclerViewAdapter(
         fun onListPositionChanged(item: ShoppingListItem, precedingItem: ShoppingListItem?)
         fun onLongClick(item: ShoppingListItem, view: View): Boolean
         fun onMoved(item: ShoppingListItem)
+        fun onAisleExpandToggle(item: AisleShoppingListItem, expanded: Boolean)
+        fun onDragStart(viewHolder: ViewHolder)
+        fun onMove(item: ShoppingListItem)
+    }
+
+    override fun onRowMove(viewHolder: ViewHolder, target: ViewHolder) {
+        listener.onMove(getItem(viewHolder.absoluteAdapterPosition))
     }
 
     override fun onRowMoved(fromPosition: Int, toPosition: Int) {
@@ -162,9 +258,9 @@ class ShoppingListItemRecyclerViewAdapter(
         listener.onMoved(item)
     }
 
-    override fun onRowSelected(viewHolder: RecyclerView.ViewHolder) {}
+    override fun onRowSelected(viewHolder: ViewHolder) {}
 
-    override fun onRowClear(viewHolder: RecyclerView.ViewHolder) {
+    override fun onRowClear(viewHolder: ViewHolder) {
         if (!itemMoved || viewHolder.absoluteAdapterPosition < 0) return
 
         itemMoved = false
@@ -181,7 +277,7 @@ class ShoppingListItemRecyclerViewAdapter(
         listener.onListPositionChanged(item, precedingItem)
     }
 
-    override fun onRowSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+    override fun onRowSwiped(viewHolder: ViewHolder, direction: Int) {
         val item = getItem(viewHolder.absoluteAdapterPosition) as ProductShoppingListItem
         listener.onProductStatusChange(item, !item.inStock)
     }
