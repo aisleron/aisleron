@@ -18,9 +18,10 @@
 package com.aisleron.ui.shoppinglist
 
 interface AisleShoppingListItem : ShoppingListItem {
-    val isDefault: Boolean
-    val childCount: Int
+    var childCount: Int
     val locationId: Int
+    val isDefault: Boolean
+    val expanded: Boolean
     override val aisleId: Int
         get() = id
     override val itemType: ShoppingListItem.ItemType

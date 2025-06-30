@@ -95,6 +95,9 @@ class ShopFragment(
                         is ShopViewModel.ShopUiState.Updated -> {
                             binding.edtShopName.setText(shopViewModel.locationName)
                             binding.swcShopPinned.isChecked = shopViewModel.pinned
+                            binding.swcShopShowUnmappedProducts.isChecked =
+                                shopViewModel.showDefaultAisle
+
                         }
                     }
                 }
@@ -112,9 +115,9 @@ class ShopFragment(
         ErrorSnackBar().make(requireView(), snackBarMessage, Snackbar.LENGTH_SHORT).show()
     }
 
-    private fun saveShop(shopName: String, pinned: Boolean) {
+    private fun saveShop(shopName: String, pinned: Boolean, showDefaultAisle: Boolean) {
         if (shopName.isBlank()) return
-        shopViewModel.saveLocation(shopName, pinned)
+        shopViewModel.saveLocation(shopName, pinned, showDefaultAisle)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -167,7 +170,8 @@ class ShopFragment(
             R.id.mnu_btn_save -> {
                 saveShop(
                     binding.edtShopName.text.toString(),
-                    binding.swcShopPinned.isChecked
+                    binding.swcShopPinned.isChecked,
+                    binding.swcShopShowUnmappedProducts.isChecked
                 )
                 true
             }

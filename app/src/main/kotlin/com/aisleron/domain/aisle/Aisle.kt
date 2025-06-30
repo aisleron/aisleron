@@ -25,5 +25,6 @@ data class Aisle(
     val locationId: Int,
     val rank: Int,
     val id: Int,
-    val isDefault: Boolean
+    val isDefault: Boolean,
+    val expanded: Boolean
 )

@@ -17,13 +17,13 @@
 
 package com.aisleron.domain.aisleproduct.usecase
 
+import com.aisleron.data.TestDataManager
 import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.aisle.AisleRepository
 import com.aisleron.domain.aisleproduct.AisleProduct
 import com.aisleron.domain.aisleproduct.AisleProductRepository
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.product.ProductRepository
-import com.aisleron.data.TestDataManager
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -73,7 +73,8 @@ class AddAisleProductsUseCaseTest {
             },
             rank = 1,
             isDefault = false,
-            id = 0
+            id = 0,
+            expanded = true
         )
 
         return AisleProduct(

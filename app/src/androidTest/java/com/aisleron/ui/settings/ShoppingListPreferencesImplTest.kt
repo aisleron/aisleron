@@ -42,4 +42,22 @@ class ShoppingListPreferencesImplTest {
 
         assertFalse(isStatusChangeSnackBarHidden)
     }
+
+    @Test
+    fun getShowEmptyAisles_isShown_ReturnTrue() {
+        SharedPreferencesInitializer().setShowEmptyAisles(true)
+        val showEmptyAisles =
+            ShoppingListPreferencesImpl().showEmptyAisles(getInstrumentation().targetContext)
+
+        assertTrue(showEmptyAisles)
+    }
+
+    @Test
+    fun getShowEmptyAisles_isNotShown_ReturnFalse() {
+        SharedPreferencesInitializer().setShowEmptyAisles(false)
+        val showEmptyAisles =
+            ShoppingListPreferencesImpl().isStatusChangeSnackBarHidden(getInstrumentation().targetContext)
+
+        assertFalse(showEmptyAisles)
+    }
 }

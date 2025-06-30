@@ -42,7 +42,8 @@ class DbInitializer(
             type = LocationType.HOME,
             defaultFilter = FilterType.NEEDED,
             name = "Home",
-            pinned = false
+            pinned = false,
+            showDefaultAisle = true
         )
         coroutineScope.launch {
             val homeId = locationDao.upsert(home)[0].toInt()
@@ -51,7 +52,8 @@ class DbInitializer(
                 name = "No Aisle",
                 locationId = homeId,
                 rank = 1000,
-                isDefault = true
+                isDefault = true,
+                expanded = true
             )
 
             aisleDao.upsert(aisle)

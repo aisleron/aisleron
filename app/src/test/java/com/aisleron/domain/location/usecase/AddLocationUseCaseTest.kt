@@ -37,6 +37,10 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
+import java.util.stream.Stream
 
 class AddLocationUseCaseTest {
     private lateinit var testData: TestDataManager
@@ -86,21 +90,23 @@ class AddLocationUseCaseTest {
         }
     }
 
-    private fun getNewLocation(): Location {
+    private fun getNewLocation(showDefaultAisle: Boolean): Location {
         val newLocation = Location(
             id = 0,
             type = LocationType.SHOP,
             defaultFilter = FilterType.NEEDED,
             name = "Shop Add New Location",
             pinned = false,
-            aisles = emptyList()
+            aisles = emptyList(),
+            showDefaultAisle = showDefaultAisle
         )
         return newLocation
     }
 
-    @Test
-    fun addLocation_IsNewLocation_LocationCreated() {
-        val newLocation = getNewLocation()
+    @ParameterizedTest(name = "Test AddLocation when showDefaultAisle is {0}")
+    @MethodSource("showDefaultAisleArguments")
+    fun addLocation_IsNewLocation_LocationCreated(showDefaultAisle: Boolean) {
+        val newLocation = getNewLocation(showDefaultAisle)
         val countBefore: Int
         val countAfter: Int
         val insertedLocation: Location?
@@ -117,11 +123,12 @@ class AddLocationUseCaseTest {
         assertEquals(newLocation.type, insertedLocation?.type)
         assertEquals(newLocation.pinned, insertedLocation?.pinned)
         assertEquals(newLocation.defaultFilter, insertedLocation?.defaultFilter)
+        assertEquals(showDefaultAisle, insertedLocation?.showDefaultAisle)
     }
 
     @Test
     fun addLocation_LocationInserted_AddsDefaultAisle() {
-        val newLocation = getNewLocation()
+        val newLocation = getNewLocation(true)
         val aisleCountBefore: Int
         val aisleCountAfter: Int
         val defaultAisle: Aisle?
@@ -138,7 +145,7 @@ class AddLocationUseCaseTest {
 
     @Test
     fun addLocation_LocationInserted_AddsAisleProducts() {
-        val newLocation = getNewLocation()
+        val newLocation = getNewLocation(true)
         val aisleProductCountBefore: Int
         val aisleProductCountAfter: Int
         val productCount: Int
@@ -156,5 +163,13 @@ class AddLocationUseCaseTest {
         }
         assertEquals(productCount, aisleProducts.count())
         assertEquals(aisleProductCountBefore + productCount, aisleProductCountAfter)
+    }
+
+    private companion object {
+        @JvmStatic
+        fun showDefaultAisleArguments(): Stream<Arguments> = Stream.of(
+            Arguments.of(true),
+            Arguments.of(false)
+        )
     }
 }

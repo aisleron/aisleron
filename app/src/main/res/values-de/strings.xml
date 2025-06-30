@@ -1,2 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="nav_header_subtitle">Fliege durch die Geschäfte!</string>
+    <string name="action_search">Suche</string>
+    <string name="menu_settings">Einstellungen</string>
+    <string name="menu_all_shops">Alle Geschäfte</string>
+    <string name="menu_shops">Geschäfte</string>
+    <string name="menu_about">Über</string>
+    <string name="light_theme">Helles Thema</string>
+    <string name="dark_theme">Dunkles Thema</string>
+    <string name="theme">Thema</string>
+</resources>

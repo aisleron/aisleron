@@ -111,7 +111,8 @@ class AisleDaoTestImpl(private val aisleProductDao: AisleProductDaoTestImpl) : A
                 name = it.name,
                 rank = it.rank,
                 locationId = it.locationId,
-                isDefault = it.isDefault
+                isDefault = it.isDefault,
+                expanded = it.expanded
             )
 
             aisleList.add(newEntity)

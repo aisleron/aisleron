@@ -43,7 +43,8 @@ import org.koin.test.get
 import org.koin.test.mock.declare
 
 @RunWith(value = Parameterized::class)
-class ShopViewModelTest(private val pinned: Boolean) : KoinTest {
+class ShopViewModelTest(private val pinned: Boolean, private val showDefaultAisle: Boolean) :
+    KoinTest {
     private lateinit var shopViewModel: ShopViewModel
 
     @get:Rule
@@ -65,7 +66,7 @@ class ShopViewModelTest(private val pinned: Boolean) : KoinTest {
         val countBefore: Int = locationRepository.getAll().count()
 
         shopViewModel.hydrate(existingLocation.id)
-        shopViewModel.saveLocation(updatedLocationName, pinned)
+        shopViewModel.saveLocation(updatedLocationName, pinned, showDefaultAisle)
 
         val updatedLocation = locationRepository.get(existingLocation.id)
         val countAfter: Int = locationRepository.getAll().count()
@@ -73,6 +74,7 @@ class ShopViewModelTest(private val pinned: Boolean) : KoinTest {
         Assert.assertNotNull(updatedLocation)
         Assert.assertEquals(updatedLocationName, updatedLocation?.name)
         Assert.assertEquals(pinned, updatedLocation?.pinned)
+        Assert.assertEquals(showDefaultAisle, updatedLocation?.showDefaultAisle)
         Assert.assertEquals(countBefore, countAfter)
     }
 
@@ -83,15 +85,17 @@ class ShopViewModelTest(private val pinned: Boolean) : KoinTest {
 
         shopViewModel.hydrate(0)
         val countBefore: Int = locationRepository.getAll().count()
-        shopViewModel.saveLocation(newLocationName, pinned)
+        shopViewModel.saveLocation(newLocationName, pinned, showDefaultAisle)
         val newLocation = locationRepository.getByName(newLocationName)
         val countAfter: Int = locationRepository.getAll().count()
 
         Assert.assertNotNull(newLocation)
         Assert.assertEquals(newLocationName, newLocation?.name)
         Assert.assertEquals(pinned, newLocation?.pinned)
+        Assert.assertEquals(showDefaultAisle, newLocation?.showDefaultAisle)
         Assert.assertEquals(newLocationName, shopViewModel.locationName)
         Assert.assertEquals(pinned, shopViewModel.pinned)
+        Assert.assertEquals(showDefaultAisle, shopViewModel.showDefaultAisle)
         Assert.assertEquals(countBefore + 1, countAfter)
     }
 
@@ -101,7 +105,7 @@ class ShopViewModelTest(private val pinned: Boolean) : KoinTest {
         val existingLocation: Location = get<LocationRepository>().getAll().first()
 
         shopViewModel.hydrate(existingLocation.id)
-        shopViewModel.saveLocation(updatedLocationName, pinned)
+        shopViewModel.saveLocation(updatedLocationName, pinned, showDefaultAisle)
 
         Assert.assertEquals(
             ShopViewModel.ShopUiState.Updated(shopViewModel),
@@ -120,7 +124,7 @@ class ShopViewModelTest(private val pinned: Boolean) : KoinTest {
             get<LocationRepository>().getAll().first { it.type == LocationType.SHOP }
 
         shopViewModel.hydrate(0)
-        shopViewModel.saveLocation(existingLocation.name, pinned)
+        shopViewModel.saveLocation(existingLocation.name, pinned, showDefaultAisle)
 
         Assert.assertTrue(shopViewModel.shopUiState.value is ShopViewModel.ShopUiState.Error)
     }
@@ -149,6 +153,20 @@ class ShopViewModelTest(private val pinned: Boolean) : KoinTest {
     fun testGetPinned_LocationDoesNotExists_ReturnsFalse() = runTest {
         shopViewModel.hydrate(0)
         Assert.assertFalse(shopViewModel.pinned)
+    }
+
+    @Test
+    fun testShowDefaultAisle_LocationExists_ReturnsLocationShowDefaultAisleStatus() = runTest {
+        val existingLocation: Location =
+            get<LocationRepository>().getAll().first { it.showDefaultAisle }
+        shopViewModel.hydrate(existingLocation.id)
+        Assert.assertEquals(existingLocation.showDefaultAisle, shopViewModel.showDefaultAisle)
+    }
+
+    @Test
+    fun testShowDefaultAisle_LocationDoesNotExists_ReturnsTrue() = runTest {
+        shopViewModel.hydrate(0)
+        Assert.assertTrue(shopViewModel.showDefaultAisle)
     }
 
     @Test
@@ -203,7 +221,7 @@ class ShopViewModelTest(private val pinned: Boolean) : KoinTest {
         val svm = get<ShopViewModel>()
 
         svm.hydrate(0)
-        svm.saveLocation("Bogus Product", pinned)
+        svm.saveLocation("Bogus Product", pinned, showDefaultAisle)
 
         Assert.assertTrue(svm.shopUiState.value is ShopViewModel.ShopUiState.Error)
         Assert.assertEquals(
@@ -220,9 +238,12 @@ class ShopViewModelTest(private val pinned: Boolean) : KoinTest {
         @JvmStatic
         @Parameterized.Parameters
         fun data(): Collection<Array<Any>> {
+            // parameters: pinned, showDefaultAisle
             return listOf(
-                arrayOf(true),
-                arrayOf(false)
+                arrayOf(true, true),
+                arrayOf(true, false),
+                arrayOf(false, true),
+                arrayOf(false, false)
             )
         }
     }

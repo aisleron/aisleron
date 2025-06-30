@@ -17,8 +17,10 @@
 
 package com.aisleron.ui.shoppinglist
 
+import android.content.Context
 import android.os.Bundle
 import android.widget.EditText
+import androidx.appcompat.view.menu.ActionMenuItem
 import androidx.fragment.app.testing.FragmentScenario
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.navigation.Navigation
@@ -31,6 +33,7 @@ import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.action.ViewActions.clearText
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.longClick
+import androidx.test.espresso.action.ViewActions.replaceText
 import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -51,6 +54,7 @@ import com.aisleron.di.repositoryModule
 import com.aisleron.di.useCaseModule
 import com.aisleron.di.viewModelTestModule
 import com.aisleron.domain.FilterType
+import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.aisle.AisleRepository
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationRepository
@@ -61,6 +65,7 @@ import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import com.aisleron.ui.ApplicationTitleUpdateListenerTestImpl
 import com.aisleron.ui.FabHandler
 import com.aisleron.ui.FabHandlerTestImpl
+import com.aisleron.ui.bundles.AddEditLocationBundle
 import com.aisleron.ui.bundles.AddEditProductBundle
 import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.settings.ShoppingListPreferencesTestImpl
@@ -188,9 +193,7 @@ class ShoppingListFragmentTest : KoinTest {
     @Test
     fun onCreateShoppingListFragment_BundleIsAttributes_FragmentCreated() {
         val location = getLocation(LocationType.HOME)
-        val bundle = Bundle()
-        bundle.putInt("locationId", location.id)
-        bundle.putSerializable("filterType", FilterType.NEEDED)
+        val bundle = bundler.makeShoppingListBundle(location.id, location.defaultFilter)
         val scenario = getFragmentScenario(bundle)
         scenario.onFragment {
             assertEquals(
@@ -200,10 +203,29 @@ class ShoppingListFragmentTest : KoinTest {
         }
     }
 
-    private suspend fun getShoppingList(): Location {
+    @Test
+    fun onCreateShoppingListFragment_ListIsEmpty_ShowEmptyListItem() = runTest {
+        val location = Location(
+            id = 0,
+            type = LocationType.SHOP,
+            defaultFilter = FilterType.NEEDED,
+            name = "No Aisle Shop",
+            pinned = false,
+            aisles = emptyList(),
+            showDefaultAisle = false
+        )
+
+        val locationId = get<LocationRepository>().add(location)
+        getFragmentScenario(bundler.makeShoppingListBundle(locationId, location.defaultFilter))
+
+        onView(withText(R.string.empty_list_title)).check(matches(isDisplayed()))
+    }
+
+    private suspend fun getShoppingList(locationId: Int? = null): Location {
         val locationRepository = get<LocationRepository>()
-        val locationId = locationRepository.getAll().first { it.type != LocationType.HOME }.id
-        return locationRepository.getLocationWithAislesWithProducts(locationId).first()!!
+        val shopId =
+            locationId ?: locationRepository.getAll().first { it.type != LocationType.HOME }.id
+        return locationRepository.getLocationWithAislesWithProducts(shopId).first()!!
     }
 
     @Test
@@ -213,7 +235,7 @@ class ShoppingListFragmentTest : KoinTest {
             bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
         )
 
-        val aisleName = shoppingList.aisles.first().name
+        val aisleName = getAisle(shoppingList, isDefault = false, productsInStock = false).name
         //onView(withId(R.id.frg_shopping_list)).perform(RecyclerViewActions.actionOnHolderItem(withAisleName(aisleName), longClick()))
 
         onView(withText(aisleName)).perform(longClick())
@@ -333,7 +355,7 @@ class ShoppingListFragmentTest : KoinTest {
     @Test
     fun onActionItemClicked_DeleteConfirmedOnAisle_AisleDeleted() = runTest {
         val shoppingList = getShoppingList()
-        val aisle = shoppingList.aisles.first { !it.isDefault }
+        val aisle = getAisle(shoppingList, isDefault = false, productsInStock = false)
         val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
 
         getFragmentScenario(bundle)
@@ -354,10 +376,12 @@ class ShoppingListFragmentTest : KoinTest {
     @Test
     fun onActionItemClicked_DeleteConfirmedOnDefaultAisle_ErrorSnackBarShown() = runTest {
         val shoppingList = getShoppingList()
-        val aisle = shoppingList.aisles.first { it.isDefault }
+        val aisle = getAisle(shoppingList, isDefault = true, productsInStock = null)
         val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
 
-        getFragmentScenario(bundle)
+        val preferences = ShoppingListPreferencesTestImpl()
+        preferences.setShowEmptyAisles(true)
+        getFragmentScenario(bundle, preferences)
 
         val aisleItem = onView(allOf(withText(aisle.name), withId(R.id.txt_aisle_name)))
         aisleItem.perform(longClick())
@@ -377,10 +401,19 @@ class ShoppingListFragmentTest : KoinTest {
         )
     }
 
+    private fun getAisle(
+        shoppingList: Location, isDefault: Boolean, productsInStock: Boolean?
+    ): Aisle {
+        return shoppingList.aisles.first {
+            it.isDefault == isDefault && (productsInStock == null ||
+                    it.products.count { ap ->  ap.product.inStock == productsInStock } > 0)
+        }
+    }
+
     @Test
     fun onActionItemClicked_DeleteCancelled_AisleNotDeleted() = runTest {
         val shoppingList = getShoppingList()
-        val aisle = shoppingList.aisles.first { !it.isDefault }
+        val aisle = getAisle(shoppingList, isDefault = false, productsInStock = false)
         val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
 
         getFragmentScenario(bundle)
@@ -495,7 +528,7 @@ class ShoppingListFragmentTest : KoinTest {
     @Test
     fun onActionItemClicked_ActionItemIsEditOnAisle_ShowAisleEditDialog() = runTest {
         val shoppingList = getShoppingList()
-        val aisle = shoppingList.aisles.first()
+        val aisle = getAisle(shoppingList, isDefault = false, productsInStock = false)
         val shoppingListBundle =
             bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
 
@@ -517,8 +550,8 @@ class ShoppingListFragmentTest : KoinTest {
     @Test
     fun aisleEditDialog_DoneClicked_AisleUpdated() = runTest {
         val shoppingList = getShoppingList()
-        val aisle = shoppingList.aisles.first()
-        val updateSuffix = " Updated"
+        val aisle = getAisle(shoppingList, isDefault = false, productsInStock = false)
+        val updatedAisleName = "Updated Aisle Name"
         val shoppingListBundle =
             bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
 
@@ -530,7 +563,7 @@ class ShoppingListFragmentTest : KoinTest {
 
         onView(allOf(withText(aisle.name), instanceOf(EditText::class.java)))
             .inRoot(isDialog())
-            .perform(typeText(updateSuffix))
+            .perform(replaceText(updatedAisleName))
 
         onView(withText(R.string.done))
             .inRoot(isDialog())
@@ -538,13 +571,13 @@ class ShoppingListFragmentTest : KoinTest {
 
         val updatedAisle = get<AisleRepository>().get(aisle.id)
 
-        assertEquals(aisle.name + updateSuffix, updatedAisle?.name)
+        assertEquals(updatedAisleName, updatedAisle?.name)
     }
 
     @Test
     fun aisleEditDialog_CancelClicked_AisleNotUpdated() = runTest {
         val shoppingList = getShoppingList()
-        val aisle = shoppingList.aisles.first()
+        val aisle = getAisle(shoppingList, isDefault = false, productsInStock = false)
         val updateSuffix = " Updated"
         val shoppingListBundle =
             bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
@@ -571,7 +604,7 @@ class ShoppingListFragmentTest : KoinTest {
     @Test
     fun aisleEditDialog_DoneClickedWithBlankAisleName_AisleNotUpdated() = runTest {
         val shoppingList = getShoppingList()
-        val aisle = shoppingList.aisles.first()
+        val aisle = getAisle(shoppingList, isDefault = false, productsInStock = false)
         val shoppingListBundle =
             bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
 
@@ -831,7 +864,7 @@ class ShoppingListFragmentTest : KoinTest {
             bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
         )
 
-        val aisleName = shoppingList.aisles.first().name
+        val aisleName = getAisle(shoppingList, isDefault = false, productsInStock = false).name
 
         onView(withText(aisleName)).perform(longClick())
 
@@ -857,7 +890,7 @@ class ShoppingListFragmentTest : KoinTest {
     @Test
     fun onActionItemClicked_ActionItemIsAddProductToAisle_NavigateToAddProduct() = runTest {
         val shoppingList = getShoppingList()
-        val aisle = shoppingList.aisles.first()
+        val aisle = getAisle(shoppingList, isDefault = false, productsInStock = false)
         val shoppingListBundle =
             bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
 
@@ -882,10 +915,10 @@ class ShoppingListFragmentTest : KoinTest {
     @Test
     fun onClick_OtherItemSelected_SelectedItemBecomesDeselected() = runTest {
         val shoppingList = getShoppingList()
+        val aisle = getAisle(shoppingList, isDefault = false, productsInStock = false)
         val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
         getFragmentScenario(bundle)
         val product = getProduct(shoppingList, false)
-        val aisle = shoppingList.aisles.first { !it.isDefault }
 
         val productItem = onView(allOf(withText(product.name), withId(R.id.txt_product_name)))
         productItem.perform(longClick())
@@ -908,11 +941,11 @@ class ShoppingListFragmentTest : KoinTest {
             fabHandler.clickFab(FabHandler.FabOption.ADD_AISLE, it.requireView())
         }
 
+        sleep(500)
+
         onView(withText(android.R.string.cancel))
             .inRoot(isDialog())
             .perform(click())
-
-        sleep(1000)
 
         val actionBar = onView(withResourceName("action_mode_bar"))
         actionBar.check(matches(not(isDisplayed())))
@@ -952,7 +985,10 @@ class ShoppingListFragmentTest : KoinTest {
 
         productItem.perform(longClick())
         scenario.onFragment { fragment ->
-            fabHandler.setFabOnClickListener(fragment.requireActivity(), FabHandler.FabOption.ADD_SHOP) {}
+            fabHandler.setFabOnClickListener(
+                fragment.requireActivity(),
+                FabHandler.FabOption.ADD_SHOP
+            ) {}
             fabHandler.clickFab(FabHandler.FabOption.ADD_SHOP, fragment.requireView())
         }
 
@@ -968,7 +1004,7 @@ class ShoppingListFragmentTest : KoinTest {
         val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
         getFragmentScenario(bundle)
         val product = getProduct(shoppingList, false)
-        val aisle = shoppingList.aisles.first { !it.isDefault }
+        val aisle = getAisle(shoppingList, isDefault = false, productsInStock = false)
 
         val productItem = onView(allOf(withText(product.name), withId(R.id.txt_product_name)))
         productItem.perform(longClick())
@@ -977,6 +1013,120 @@ class ShoppingListFragmentTest : KoinTest {
 
         val actionBar = onView(withResourceName("action_mode_bar"))
         actionBar.check(matches(hasDescendant(withText(aisle.name))))
+    }
+
+    private fun getMenuItem(resourceId: Int): ActionMenuItem {
+        val context: Context = getInstrumentation().targetContext
+        val menuItem = ActionMenuItem(context, 0, resourceId, 0, 0, null)
+        return menuItem
+    }
+
+    @Test
+    fun onMenuItemSelected_ItemIsEditShop_NavigateToEditShop() = runTest {
+        val shoppingList = getShoppingList()
+        val shoppingListBundle =
+            bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
+
+        val menuItem = getMenuItem(R.id.mnu_edit_shop)
+        val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
+        getFragmentScenario(shoppingListBundle).onFragment { fragment ->
+            navController.setGraph(R.navigation.mobile_navigation)
+            navController.setCurrentDestination(R.id.nav_shopping_list)
+            Navigation.setViewNavController(fragment.requireView(), navController)
+            fragment.onMenuItemSelected(menuItem)
+        }
+
+        val bundle = navController.backStack.last().arguments
+        val addEditShopBundle = bundler.getAddEditLocationBundle(bundle)
+
+        assertEquals(shoppingList.id, addEditShopBundle.locationId)
+        assertEquals(AddEditLocationBundle.LocationAction.EDIT, addEditShopBundle.actionType)
+        assertEquals(R.id.nav_add_shop, navController.currentDestination?.id)
+    }
+
+    @Test
+    fun onMenuItemSelected_ItemIsSortByName_SortConfirmDialogShown() = runTest {
+        val shoppingList = getShoppingList()
+        val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
+        val menuItem = getMenuItem(R.id.mnu_sort_list_by_name)
+        var confirmMessage = ""
+
+        getFragmentScenario(bundle).onFragment { fragment ->
+            confirmMessage = fragment.getString(R.string.sort_confirm_title)
+            fragment.onMenuItemSelected(menuItem)
+        }
+
+        onView(withText(confirmMessage))
+            .inRoot(isDialog())
+            .check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun onMenuItemSelected_SortCancelled_ListNotReordered() = runTest {
+        val locationId = getShoppingList().id
+        val aisleRepository = get<AisleRepository>()
+        val rankBefore = 2002
+        val aisleId = aisleRepository.add(
+            Aisle(
+                name = "AAA",
+                products = emptyList(),
+                locationId = locationId,
+                rank = rankBefore,
+                id = 0,
+                isDefault = false,
+                expanded = true
+            )
+        )
+
+        val shoppingList = getShoppingList(locationId)
+        val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
+        val menuItem = getMenuItem(R.id.mnu_sort_list_by_name)
+
+        getFragmentScenario(bundle).onFragment { fragment ->
+            fragment.onMenuItemSelected(menuItem)
+        }
+
+        onView(withText(android.R.string.cancel))
+            .inRoot(isDialog())
+            .check(matches(isDisplayed()))
+            .perform(click())
+
+        val reorderedAisle = aisleRepository.get(aisleId)
+        assertEquals(rankBefore, reorderedAisle?.rank)
+    }
+
+    @Test
+    fun onMenuItemSelected_SortConfirmed_ListIsReordered() = runTest {
+        val locationId = getShoppingList().id
+        val aisleRepository = get<AisleRepository>()
+        val rankBefore = 2002
+        val aisleId = aisleRepository.add(
+            Aisle(
+                name = "AAA",
+                products = emptyList(),
+                locationId = locationId,
+                rank = rankBefore,
+                id = 0,
+                isDefault = false,
+                expanded = true
+            )
+        )
+
+        val shoppingList = getShoppingList(locationId)
+        val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
+        val menuItem = getMenuItem(R.id.mnu_sort_list_by_name)
+
+        getFragmentScenario(bundle).onFragment { fragment ->
+            fragment.onMenuItemSelected(menuItem)
+        }
+
+        onView(withText(android.R.string.ok))
+            .inRoot(isDialog())
+            .check(matches(isDisplayed()))
+            .perform(click())
+
+        val reorderedAisle = aisleRepository.get(aisleId)
+        assertEquals(1, reorderedAisle?.rank)
     }
 
     /*@Test

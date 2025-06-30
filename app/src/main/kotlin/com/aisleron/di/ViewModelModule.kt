@@ -38,7 +38,9 @@ val viewModelModule = module {
             updateAisleRankUseCase = get(),
             removeAisleUseCase = get(),
             removeProductUseCase = get(),
-            getAisleUseCase = get()
+            getAisleUseCase = get(),
+            updateAisleExpandedUseCase = get(),
+            sortLocationByNameUseCase = get()
         )
     }
 

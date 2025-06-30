@@ -28,7 +28,7 @@ interface ShoppingListItem {
     override fun equals(other: Any?): Boolean
 
     enum class ItemType {
-        AISLE, PRODUCT
+        AISLE, PRODUCT, EMPTY_LIST
     }
 }
 

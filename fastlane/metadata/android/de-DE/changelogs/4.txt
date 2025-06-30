@@ -1,0 +1,2 @@
+* Die Kopfzeile der Navigationsschublade wurde überarbeitet, um mehr Platz zu sparen.
+* Behebung einiger Inkonsistenzen bei der Auswahl/Abwahl von Elementen in Listen

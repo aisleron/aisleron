@@ -17,6 +17,7 @@
 
 package com.aisleron.data.aisle
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -26,5 +27,6 @@ data class AisleEntity(
     val name: String,
     val locationId: Int,
     val rank: Int,
-    val isDefault: Boolean = false
+    val isDefault: Boolean = false,
+    @ColumnInfo(defaultValue = "1") val expanded: Boolean
 )
