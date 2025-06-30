@@ -9,6 +9,3 @@ Enhancements
 
 Bug Fixes
 * Improved the reliability of long-press actions on shopping list items.
-
-
-
