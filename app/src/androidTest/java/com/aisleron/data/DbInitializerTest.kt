@@ -67,6 +67,7 @@ class DbInitializerTest {
     fun invoke_HomeLocationAdded_DefaultAisleCreated() = runTest {
         val aisleCountBefore = db.aisleDao().getAisles().count()
         initializer.invoke()
+        sleep(100)
 
         val homeId = db.locationDao().getHome().id
         val defaultAisle = db.aisleDao().getDefaultAisleFor(homeId)
