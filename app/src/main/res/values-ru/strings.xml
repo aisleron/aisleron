@@ -53,5 +53,14 @@
     <string name="about_legal_privacy_title">Политика конфиденциальности Aisleron</string>
     <string name="about_support_version_summary">Текущая версия: %1$s</string>
     <string name="about_support_report_issue_summary">Пожаловаться на баг или предложить функцию</string>
-    <string name="about_support_sourcecode_summary">Посмотреть исходный код на Github</string>
+    <string name="about_support_sourcecode_summary">Посмотреть исходный код на GitHub</string>
+    <string name="about_legal_license_summary">GNU Affero General Public License (AGPL) version 3</string>
+    <string name="about_legal_privacy_summary">Посмотреть политику конфиденциальности онлайн</string>
+    <string name="about_support_documentation_title">Документация</string>
+    <string name="about_support_documentation_summary">Прочесть документацию онлайн</string>
+    <string name="about_legal_3rdparty_title">Сторонние лицензии</string>
+    <string name="about_legal_3rdparty_summary">Посмотреть сторонние лицензии онлайн</string>
+    <string name="welcome_app_title">Начинаем</string>
+    <string name="welcome_message">Мы рады сделать ваш опыт покупок проще и организованнее. Чтобы начать, выберите одну из следующих опций:</string>
+    <string name="welcome_add_own_product"><h3>Добавить собственные продукты</h3> Начните строить персонализированный список покупок с нуля, добавив Магазины, Отделы и Продукты.</string>
 </resources>
