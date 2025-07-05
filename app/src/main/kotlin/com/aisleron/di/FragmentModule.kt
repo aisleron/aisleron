@@ -46,7 +46,8 @@ val fragmentModule = module {
         ShopFragment(
             addEditFragmentListener = get(),
             applicationTitleUpdateListener = get(),
-            fabHandler = get()
+            fabHandler = get(),
+            loyaltyCardProvider = get()
         )
     }
 

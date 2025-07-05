@@ -48,7 +48,8 @@ val viewModelModule = module {
         ShopViewModel(
             addLocationUseCase = get(),
             updateLocationUseCase = get(),
-            getLocationUseCase = get()
+            getLocationUseCase = get(),
+            addLoyaltyCardUseCase = get()
         )
     }
 

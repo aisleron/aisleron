@@ -15,20 +15,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.domain.location
+package com.aisleron.ui.loyaltycard
 
-import com.aisleron.domain.FilterType
-import com.aisleron.domain.aisle.Aisle
+import android.content.pm.PackageManager
+import androidx.fragment.app.Fragment
 import com.aisleron.domain.loyaltycard.LoyaltyCard
-import java.io.Serializable
+import com.aisleron.domain.loyaltycard.LoyaltyCardProviderType
 
-data class Location(
-    val id: Int,
-    val type: LocationType,
-    val defaultFilter: FilterType,
-    val name: String,
-    val pinned: Boolean,
-    val aisles: List<Aisle>,
-    val showDefaultAisle: Boolean,
-    val loyaltyCard: LoyaltyCard?
-) : Serializable
+interface LoyaltyCardProvider {
+    val packageName: String
+    val packageManager: PackageManager
+    val providerType: LoyaltyCardProviderType
+
+    fun lookupLoyaltyCardShortcut()
+    fun displayLoyaltyCard(id: Int)
+    fun registerLauncher(fragment: Fragment, onLoyaltyCardSelected: (LoyaltyCard?) -> Unit)
+
+    fun isInstalled(): Boolean {
+        return try {
+            packageManager.getPackageInfo(packageName, 0)
+            true
+        } catch (e: PackageManager.NameNotFoundException) {
+            false
+        }
+    }
+}

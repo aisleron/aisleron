@@ -15,20 +15,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.domain.location
+package com.aisleron.domain.loyaltycard.usecase
 
-import com.aisleron.domain.FilterType
-import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.loyaltycard.LoyaltyCard
-import java.io.Serializable
+import com.aisleron.domain.loyaltycard.LoyaltyCardRepository
 
-data class Location(
-    val id: Int,
-    val type: LocationType,
-    val defaultFilter: FilterType,
-    val name: String,
-    val pinned: Boolean,
-    val aisles: List<Aisle>,
-    val showDefaultAisle: Boolean,
-    val loyaltyCard: LoyaltyCard?
-) : Serializable
+interface AddLoyaltyCardUseCase {
+    suspend operator fun invoke(loyaltyCard: LoyaltyCard): Int
+}
+
+class AddLoyaltyCardUseCaseImpl(
+    private val loyaltyCardRepository: LoyaltyCardRepository,
+) : AddLoyaltyCardUseCase {
+    override suspend operator fun invoke(loyaltyCard: LoyaltyCard): Int {
+        val existingId = loyaltyCardRepository.getProviderCard(
+            loyaltyCard.provider,
+            loyaltyCard.providerCardId
+        )?.id ?: 0
+
+        val newLoyaltyCard = loyaltyCard.copy(id = existingId)
+
+        return loyaltyCardRepository.add(newLoyaltyCard)
+    }
+}

@@ -26,6 +26,8 @@ import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.location.usecase.AddLocationUseCase
 import com.aisleron.domain.location.usecase.GetLocationUseCase
 import com.aisleron.domain.location.usecase.UpdateLocationUseCase
+import com.aisleron.domain.loyaltycard.LoyaltyCard
+import com.aisleron.domain.loyaltycard.usecase.AddLoyaltyCardUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -35,8 +37,12 @@ class ShopViewModel(
     private val addLocationUseCase: AddLocationUseCase,
     private val updateLocationUseCase: UpdateLocationUseCase,
     private val getLocationUseCase: GetLocationUseCase,
+    private val addLoyaltyCardUseCase: AddLoyaltyCardUseCase,
     coroutineScopeProvider: CoroutineScope? = null
 ) : ViewModel() {
+    private var _loyaltyCard: LoyaltyCard? = null
+    val loyaltyCard: LoyaltyCard? get() = _loyaltyCard
+
     private val coroutineScope = coroutineScopeProvider ?: this.viewModelScope
     val pinned: Boolean get() = location?.pinned == true
     val defaultFilter: FilterType? get() = location?.defaultFilter
@@ -61,11 +67,8 @@ class ShopViewModel(
         coroutineScope.launch {
             _shopUiState.value = ShopUiState.Loading
             try {
-                location?.let { updateLocation(it, name, pinned, showDefaultAisle) } ?: addLocation(
-                    name,
-                    pinned,
-                    showDefaultAisle
-                )
+                location?.let { updateLocation(it, name, pinned, showDefaultAisle) }
+                    ?: addLocation(name, pinned, showDefaultAisle)
 
                 _shopUiState.value = ShopUiState.Success
             } catch (e: AisleronException) {
@@ -73,6 +76,14 @@ class ShopViewModel(
             } catch (e: Exception) {
                 _shopUiState.value =
                     ShopUiState.Error(AisleronException.ExceptionCode.GENERIC_EXCEPTION, e.message)
+            }
+        }
+    }
+
+    fun addLoyaltyCard(loyaltyCard: LoyaltyCard?) {
+        coroutineScope.launch {
+            _loyaltyCard = loyaltyCard?.let {
+                it.copy(id = addLoyaltyCardUseCase(it))
             }
         }
     }
@@ -89,13 +100,15 @@ class ShopViewModel(
     private suspend fun addLocation(name: String, pinned: Boolean, showDefaultAisle: Boolean) {
         val id = addLocationUseCase(
             Location(
+                id = 0,
                 type = LocationType.SHOP,
                 defaultFilter = FilterType.NEEDED,
                 name = name,
                 pinned = pinned,
                 aisles = emptyList(),
-                id = 0,
-                showDefaultAisle = showDefaultAisle
+                showDefaultAisle = showDefaultAisle,
+                loyaltyCard = null
+                //TODO: Assign loyalty card here
             )
         )
         hydrate(id)

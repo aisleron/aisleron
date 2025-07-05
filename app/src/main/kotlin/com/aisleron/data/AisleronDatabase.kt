@@ -26,15 +26,28 @@ import com.aisleron.data.aisleproduct.AisleProductDao
 import com.aisleron.data.aisleproduct.AisleProductEntity
 import com.aisleron.data.location.LocationDao
 import com.aisleron.data.location.LocationEntity
+import com.aisleron.data.location.LocationLoyaltyCardDao
+import com.aisleron.data.location.LocationLoyaltyCardEntity
+import com.aisleron.data.loyaltycard.LoyaltyCardDao
+import com.aisleron.data.loyaltycard.LoyaltyCardEntity
 import com.aisleron.data.maintenance.MaintenanceDao
 import com.aisleron.data.product.ProductDao
 import com.aisleron.data.product.ProductEntity
 
 @Database(
-    entities = [AisleEntity::class, LocationEntity::class, ProductEntity::class, AisleProductEntity::class],
-    version = 2,
+    entities = [
+        AisleEntity::class,
+        LocationEntity::class,
+        ProductEntity::class,
+        AisleProductEntity::class,
+        LoyaltyCardEntity::class,
+        LocationLoyaltyCardEntity::class
+    ],
+
+    version = 3,
     autoMigrations = [
-        AutoMigration(from = 1, to = 2)
+        AutoMigration(from = 1, to = 2),
+        AutoMigration(from = 2, to = 3)
     ]
 )
 abstract class AisleronDatabase : AisleronDb, RoomDatabase() {
@@ -43,4 +56,6 @@ abstract class AisleronDatabase : AisleronDb, RoomDatabase() {
     abstract override fun productDao(): ProductDao
     abstract override fun aisleProductDao(): AisleProductDao
     abstract override fun maintenanceDao(): MaintenanceDao
+    abstract override fun loyaltyCardDao(): LoyaltyCardDao
+    abstract override fun locationLoyaltyCardDao(): LocationLoyaltyCardDao
 }

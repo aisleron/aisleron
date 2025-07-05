@@ -15,20 +15,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.domain.location
+package com.aisleron.data.loyaltycard
 
-import com.aisleron.domain.FilterType
-import com.aisleron.domain.aisle.Aisle
-import com.aisleron.domain.loyaltycard.LoyaltyCard
-import java.io.Serializable
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import com.aisleron.domain.loyaltycard.LoyaltyCardProviderType
 
-data class Location(
-    val id: Int,
-    val type: LocationType,
-    val defaultFilter: FilterType,
+@Entity(tableName = "LoyaltyCard")
+data class LoyaltyCardEntity(
+    @PrimaryKey(autoGenerate = true) val id: Int,
     val name: String,
-    val pinned: Boolean,
-    val aisles: List<Aisle>,
-    val showDefaultAisle: Boolean,
-    val loyaltyCard: LoyaltyCard?
-) : Serializable
+    val providerCardId: Int,
+    val provider: LoyaltyCardProviderType
+)

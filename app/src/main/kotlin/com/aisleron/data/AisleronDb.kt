@@ -20,6 +20,8 @@ package com.aisleron.data
 import com.aisleron.data.aisle.AisleDao
 import com.aisleron.data.aisleproduct.AisleProductDao
 import com.aisleron.data.location.LocationDao
+import com.aisleron.data.location.LocationLoyaltyCardDao
+import com.aisleron.data.loyaltycard.LoyaltyCardDao
 import com.aisleron.data.maintenance.MaintenanceDao
 import com.aisleron.data.product.ProductDao
 
@@ -29,4 +31,6 @@ interface AisleronDb {
     fun productDao(): ProductDao
     fun aisleProductDao(): AisleProductDao
     fun maintenanceDao(): MaintenanceDao
+    fun loyaltyCardDao(): LoyaltyCardDao
+    fun locationLoyaltyCardDao(): LocationLoyaltyCardDao
 }

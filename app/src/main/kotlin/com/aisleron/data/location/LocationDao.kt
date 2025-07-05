@@ -48,28 +48,12 @@ interface LocationDao : BaseDao<LocationEntity> {
     @Query("SELECT * FROM Location WHERE id = :locationId")
     suspend fun getLocationWithAisles(locationId: Int): LocationWithAisles
 
-    @Transaction
-    @Query("SELECT * FROM Location WHERE id in (:locationId)")
-    suspend fun getLocationsWithAisles(vararg locationId: Int): List<LocationWithAisles>
-
-    @Transaction
-    @Query("SELECT * FROM Location")
-    suspend fun getLocationsWithAisles(): List<LocationWithAisles>
-
     /**
      * Location With Aisles With Products
      */
     @Transaction
     @Query("SELECT * FROM Location WHERE id = :locationId")
     fun getLocationWithAislesWithProducts(locationId: Int): Flow<LocationWithAislesWithProducts?>
-
-    @Transaction
-    @Query("SELECT * FROM Location WHERE id in (:locationId)")
-    suspend fun getLocationsWithAislesWithProducts(vararg locationId: Int): List<LocationWithAislesWithProducts>
-
-    @Transaction
-    @Query("SELECT * FROM Location")
-    suspend fun getLocationsWithAislesWithProducts(): List<LocationWithAislesWithProducts>
 
     /**
      * Shop Specific Queries

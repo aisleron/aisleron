@@ -67,7 +67,8 @@ class UpdateLocationUseCaseTest {
                     name = "Shop 99",
                     pinned = false,
                     aisles = emptyList(),
-                    showDefaultAisle = true
+                    showDefaultAisle = true,
+                    loyaltyCard = null
                 )
             )
 

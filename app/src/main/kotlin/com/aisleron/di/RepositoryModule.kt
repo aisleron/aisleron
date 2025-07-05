@@ -23,11 +23,14 @@ import com.aisleron.data.aisleproduct.AisleProductRankMapper
 import com.aisleron.data.aisleproduct.AisleProductRepositoryImpl
 import com.aisleron.data.location.LocationMapper
 import com.aisleron.data.location.LocationRepositoryImpl
+import com.aisleron.data.loyaltycard.LoyaltyCardMapper
+import com.aisleron.data.loyaltycard.LoyaltyCardRepositoryImpl
 import com.aisleron.data.product.ProductMapper
 import com.aisleron.data.product.ProductRepositoryImpl
 import com.aisleron.domain.aisle.AisleRepository
 import com.aisleron.domain.aisleproduct.AisleProductRepository
 import com.aisleron.domain.location.LocationRepository
+import com.aisleron.domain.loyaltycard.LoyaltyCardRepository
 import com.aisleron.domain.product.ProductRepository
 import org.koin.dsl.module
 
@@ -52,5 +55,9 @@ val repositoryModule = module {
         ProductRepositoryImpl(
             productDao = get(), aisleProductDao = get(), productMapper = ProductMapper()
         )
+    }
+
+    factory<LoyaltyCardRepository> {
+        LoyaltyCardRepositoryImpl(loyaltyCardDao = get(), loyaltyCardMapper = LoyaltyCardMapper())
     }
 }

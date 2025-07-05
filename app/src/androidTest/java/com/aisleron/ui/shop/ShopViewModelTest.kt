@@ -29,6 +29,7 @@ import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.location.usecase.AddLocationUseCase
 import com.aisleron.domain.location.usecase.GetLocationUseCase
 import com.aisleron.domain.location.usecase.UpdateLocationUseCase
+import com.aisleron.domain.loyaltycard.usecase.AddLoyaltyCardUseCase
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -200,7 +201,8 @@ class ShopViewModelTest(private val pinned: Boolean, private val showDefaultAisl
         val svm = ShopViewModel(
             get<AddLocationUseCase>(),
             get<UpdateLocationUseCase>(),
-            get<GetLocationUseCase>()
+            get<GetLocationUseCase>(),
+            get<AddLoyaltyCardUseCase>()
         )
 
         Assert.assertNotNull(svm)

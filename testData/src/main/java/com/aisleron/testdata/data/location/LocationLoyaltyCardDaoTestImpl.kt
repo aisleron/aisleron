@@ -15,24 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.di
+package com.aisleron.testdata.data.location
 
-import com.aisleron.data.AisleronDb
-import com.aisleron.data.aisle.AisleDao
-import com.aisleron.data.aisleproduct.AisleProductDao
-import com.aisleron.data.location.LocationDao
 import com.aisleron.data.location.LocationLoyaltyCardDao
-import com.aisleron.data.loyaltycard.LoyaltyCardDao
-import com.aisleron.data.product.ProductDao
-import org.koin.dsl.module
+import com.aisleron.data.location.LocationLoyaltyCardEntity
 
-val daoTestModule = module {
-    includes(databaseTestModule)
+class LocationLoyaltyCardDaoTestImpl : LocationLoyaltyCardDao {
+    override suspend fun upsert(vararg entity: LocationLoyaltyCardEntity): List<Long> {
+        TODO("Not yet implemented")
+    }
 
-    single<LocationDao> { get<AisleronDb>().locationDao() }
-    single<AisleDao> { get<AisleronDb>().aisleDao() }
-    single<AisleProductDao> { get<AisleronDb>().aisleProductDao() }
-    single<ProductDao> { get<AisleronDb>().productDao() }
-    single<LoyaltyCardDao> { get<AisleronDb>().loyaltyCardDao() }
-    single<LocationLoyaltyCardDao> { get<AisleronDb>().locationLoyaltyCardDao() }
+    override suspend fun delete(vararg entity: LocationLoyaltyCardEntity) {
+        TODO("Not yet implemented")
+    }
 }

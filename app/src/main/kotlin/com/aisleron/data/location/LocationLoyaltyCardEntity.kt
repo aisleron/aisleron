@@ -17,19 +17,29 @@
 
 package com.aisleron.data.location
 
-import com.aisleron.data.aisle.AisleWithProductsMapper
-import com.aisleron.data.base.MapperBaseImpl
-import com.aisleron.domain.location.Location
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import com.aisleron.data.loyaltycard.LoyaltyCardEntity
 
-class LocationWithAislesWithProductsMapper :
-    MapperBaseImpl<LocationWithAislesWithProducts, Location>() {
-    override fun toModel(value: LocationWithAislesWithProducts): Location {
-        val location = LocationWithLoyaltyCardMapper().toModel(value.location)
-        return location.copy(aisles = AisleWithProductsMapper().toModelList(value.aisles))
-    }
-
-    override fun fromModel(value: Location) = LocationWithAislesWithProducts(
-        location = LocationWithLoyaltyCardMapper().fromModel(value),
-        aisles = AisleWithProductsMapper().fromModelList(value.aisles)
-    )
-}
+@Entity(
+    tableName = "LocationLoyaltyCard",
+    primaryKeys = ["locationId"],
+    foreignKeys = [
+        ForeignKey(
+            entity = LocationEntity::class,
+            parentColumns = arrayOf("id"),
+            childColumns = arrayOf("locationId"),
+            onDelete = ForeignKey.CASCADE
+        ),
+        ForeignKey(
+            entity = LoyaltyCardEntity::class,
+            parentColumns = arrayOf("id"),
+            childColumns = arrayOf("loyaltyCardId"),
+            onDelete = ForeignKey.CASCADE
+        )
+    ]
+)
+data class LocationLoyaltyCardEntity(
+    val locationId: Int,
+    val loyaltyCardId: Int
+)

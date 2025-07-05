@@ -54,6 +54,7 @@ val viewModelTestModule = module {
             addLocationUseCase = get(),
             updateLocationUseCase = get(),
             getLocationUseCase = get(),
+            addLoyaltyCardUseCase = get(),
             TestScope(UnconfinedTestDispatcher())
         )
     }

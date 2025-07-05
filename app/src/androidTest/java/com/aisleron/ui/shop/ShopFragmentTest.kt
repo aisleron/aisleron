@@ -42,6 +42,7 @@ import com.aisleron.ui.AddEditFragmentListenerTestImpl
 import com.aisleron.ui.ApplicationTitleUpdateListenerTestImpl
 import com.aisleron.ui.FabHandlerTestImpl
 import com.aisleron.ui.bundles.Bundler
+import com.aisleron.ui.loyaltycard.LoyaltyCardProviderTestImpl
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
@@ -201,7 +202,11 @@ class ShopFragmentTest : KoinTest {
     @Test
     fun newInstance_CallNewInstance_ReturnsFragment() {
         val fragment = ShopFragment.newInstance(
-            null, addEditFragmentListener, applicationTitleUpdateListener, fabHandler
+            null,
+            addEditFragmentListener,
+            applicationTitleUpdateListener,
+            fabHandler,
+            LoyaltyCardProviderTestImpl(InstrumentationRegistry.getInstrumentation().context)
         )
 
         Assert.assertNotNull(fragment)
@@ -219,7 +224,10 @@ class ShopFragmentTest : KoinTest {
             themeResId = R.style.Theme_Aisleron,
             instantiate = {
                 ShopFragment(
-                    addEditFragmentListener, applicationTitleUpdateListener, fabHandler
+                    addEditFragmentListener,
+                    applicationTitleUpdateListener,
+                    fabHandler,
+                    LoyaltyCardProviderTestImpl(InstrumentationRegistry.getInstrumentation().context)
                 )
             }
         )

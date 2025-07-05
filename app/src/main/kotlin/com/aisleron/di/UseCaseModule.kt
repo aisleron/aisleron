@@ -54,6 +54,8 @@ import com.aisleron.domain.location.usecase.RemoveLocationUseCaseImpl
 import com.aisleron.domain.location.usecase.SortLocationByNameUseCase
 import com.aisleron.domain.location.usecase.SortLocationByNameUseCaseImpl
 import com.aisleron.domain.location.usecase.UpdateLocationUseCase
+import com.aisleron.domain.loyaltycard.usecase.AddLoyaltyCardUseCase
+import com.aisleron.domain.loyaltycard.usecase.AddLoyaltyCardUseCaseImpl
 import com.aisleron.domain.product.usecase.AddProductUseCase
 import com.aisleron.domain.product.usecase.AddProductUseCaseImpl
 import com.aisleron.domain.product.usecase.GetAllProductsUseCase
@@ -225,5 +227,12 @@ val useCaseModule = module {
             getAllProductsUseCase = get(),
             getHomeLocationUseCase = get()
         )
+    }
+
+    /**
+     * Loyalty Card Use Cases
+     */
+    factory<AddLoyaltyCardUseCase> {
+        AddLoyaltyCardUseCaseImpl(loyaltyCardRepository = get())
     }
 }

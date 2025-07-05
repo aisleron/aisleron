@@ -98,7 +98,8 @@ class AddLocationUseCaseTest {
             name = "Shop Add New Location",
             pinned = false,
             aisles = emptyList(),
-            showDefaultAisle = showDefaultAisle
+            showDefaultAisle = showDefaultAisle,
+            loyaltyCard = null
         )
         return newLocation
     }

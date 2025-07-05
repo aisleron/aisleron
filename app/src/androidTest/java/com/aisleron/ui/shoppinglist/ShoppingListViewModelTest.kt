@@ -101,7 +101,8 @@ class ShoppingListViewModelTest : KoinTest {
             name = "No Aisle Shop",
             pinned = false,
             aisles = emptyList(),
-            showDefaultAisle = false
+            showDefaultAisle = false,
+            loyaltyCard = null
         )
 
         val locationId = get<LocationRepository>().add(location)

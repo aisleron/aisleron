@@ -23,10 +23,10 @@ import com.aisleron.data.aisle.AisleEntity
 import com.aisleron.data.aisle.AisleWithProducts
 
 data class LocationWithAislesWithProducts(
-    @Embedded val location: LocationEntity,
+    @Embedded val location: LocationWithLoyaltyCard,
     @Relation(
         entity = AisleEntity::class,
         parentColumn = "id",
         entityColumn = "locationId"
-    ) val aisles: List<AisleWithProducts>
+    ) val aisles: List<AisleWithProducts>,
 )

@@ -17,16 +17,22 @@
 
 package com.aisleron.di
 
+import androidx.test.platform.app.InstrumentationRegistry
 import com.aisleron.ui.AddEditFragmentListener
 import com.aisleron.ui.AddEditFragmentListenerTestImpl
 import com.aisleron.ui.ApplicationTitleUpdateListener
 import com.aisleron.ui.ApplicationTitleUpdateListenerTestImpl
 import com.aisleron.ui.FabHandler
 import com.aisleron.ui.FabHandlerTestImpl
+import com.aisleron.ui.loyaltycard.LoyaltyCardProvider
+import com.aisleron.ui.loyaltycard.LoyaltyCardProviderTestImpl
 import org.koin.dsl.module
 
 val generalTestModule = module {
     factory<FabHandler> { FabHandlerTestImpl() }
     factory<ApplicationTitleUpdateListener> { ApplicationTitleUpdateListenerTestImpl() }
     factory<AddEditFragmentListener> { AddEditFragmentListenerTestImpl() }
+    factory<LoyaltyCardProvider> {
+        LoyaltyCardProviderTestImpl(InstrumentationRegistry.getInstrumentation().context)
+    }
 }

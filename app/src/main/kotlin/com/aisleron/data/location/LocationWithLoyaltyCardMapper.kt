@@ -18,26 +18,19 @@
 package com.aisleron.data.location
 
 import com.aisleron.data.base.MapperBaseImpl
+import com.aisleron.data.loyaltycard.LoyaltyCardMapper
 import com.aisleron.domain.location.Location
 
-class LocationMapper : MapperBaseImpl<LocationEntity, Location>() {
-    override fun toModel(value: LocationEntity) = Location(
-        id = value.id,
-        type = value.type,
-        defaultFilter = value.defaultFilter,
-        name = value.name.trim(),
-        pinned = value.pinned,
-        aisles = emptyList(),
-        showDefaultAisle = value.showDefaultAisle,
-        loyaltyCard = null
-    )
+class LocationWithLoyaltyCardMapper : MapperBaseImpl<LocationWithLoyaltyCard, Location>() {
+    override fun toModel(value: LocationWithLoyaltyCard): Location {
+        val location = LocationMapper().toModel(value.location)
+        return location.copy(loyaltyCard = value.loyaltyCard?.let { LoyaltyCardMapper().toModel(it) })
+    }
 
-    override fun fromModel(value: Location) = LocationEntity(
-        id = value.id,
-        name = value.name.trim(),
-        defaultFilter = value.defaultFilter,
-        pinned = value.pinned,
-        type = value.type,
-        showDefaultAisle = value.showDefaultAisle
-    )
+    override fun fromModel(value: Location): LocationWithLoyaltyCard {
+        return LocationWithLoyaltyCard(
+            location = LocationMapper().fromModel(value),
+            loyaltyCard = value.loyaltyCard?.let { LoyaltyCardMapper().fromModel(it) }
+        )
+    }
 }

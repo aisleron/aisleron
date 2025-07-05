@@ -62,7 +62,8 @@ class GetShopsUseCaseTest {
                             name = "Shop 1",
                             pinned = false,
                             aisles = emptyList(),
-                            showDefaultAisle = true
+                            showDefaultAisle = true,
+                            loyaltyCard = null
                         ),
                         Location(
                             id = 2000,
@@ -71,7 +72,8 @@ class GetShopsUseCaseTest {
                             name = "Shop 2",
                             pinned = false,
                             aisles = emptyList(),
-                            showDefaultAisle = true
+                            showDefaultAisle = true,
+                            loyaltyCard = null
                         ),
                     )
                 )

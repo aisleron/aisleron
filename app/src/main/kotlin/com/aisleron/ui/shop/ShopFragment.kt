@@ -25,6 +25,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
@@ -40,6 +41,7 @@ import com.aisleron.ui.ApplicationTitleUpdateListener
 import com.aisleron.ui.FabHandler
 import com.aisleron.ui.bundles.AddEditLocationBundle
 import com.aisleron.ui.bundles.Bundler
+import com.aisleron.ui.loyaltycard.LoyaltyCardProvider
 import com.aisleron.ui.widgets.ErrorSnackBar
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
@@ -49,7 +51,8 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class ShopFragment(
     private val addEditFragmentListener: AddEditFragmentListener,
     private val applicationTitleUpdateListener: ApplicationTitleUpdateListener,
-    private val fabHandler: FabHandler
+    private val fabHandler: FabHandler,
+    private val loyaltyCardProvider: LoyaltyCardProvider
 ) : Fragment(), MenuProvider {
     private val shopViewModel: ShopViewModel by viewModel()
     private var _binding: FragmentShopBinding? = null
@@ -60,6 +63,21 @@ class ShopFragment(
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        loyaltyCardProvider.registerLauncher(this) { loyaltyCard ->
+            shopViewModel.addLoyaltyCard(loyaltyCard)
+            loyaltyCard?.let {
+                Toast.makeText(
+                    requireContext(),
+                    "Loyalty Card Selected: ${it.id}, ${it.name}",
+                    Toast.LENGTH_LONG
+                ).show()
+
+                loyaltyCardProvider.displayLoyaltyCard(it.providerCardId)
+            } ?: run {
+                Toast.makeText(requireContext(), "No Loyalty Card ID returned", Toast.LENGTH_SHORT).show()
+            }
+        }
 
         val addEditLocationBundle = Bundler().getAddEditLocationBundle(arguments)
         appTitle = when (addEditLocationBundle.actionType) {
@@ -77,6 +95,10 @@ class ShopFragment(
         fabHandler.setFabItems(this.requireActivity())
 
         _binding = FragmentShopBinding.inflate(inflater, container, false)
+
+        binding.btnGetLoyaltyCard.setOnClickListener {
+            loyaltyCardProvider.lookupLoyaltyCardShortcut()
+        }
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -151,10 +173,14 @@ class ShopFragment(
             name: String?,
             addEditFragmentListener: AddEditFragmentListener,
             applicationTitleUpdateListener: ApplicationTitleUpdateListener,
-            fabHandler: FabHandler
+            fabHandler: FabHandler,
+            loyaltyCardProvider: LoyaltyCardProvider
         ) =
             ShopFragment(
-                addEditFragmentListener, applicationTitleUpdateListener, fabHandler
+                addEditFragmentListener,
+                applicationTitleUpdateListener,
+                fabHandler,
+                loyaltyCardProvider
             ).apply {
                 arguments = Bundler().makeAddLocationBundle(name)
             }
