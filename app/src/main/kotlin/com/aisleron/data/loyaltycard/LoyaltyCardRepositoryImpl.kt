@@ -36,11 +36,6 @@ class LoyaltyCardRepositoryImpl(
             ?.let { loyaltyCardMapper.toModel(it) }
     }
 
-    override suspend fun getMultiple(vararg id: Int): List<LoyaltyCard> {
-        // '*' is a spread operator required to pass vararg down
-        return loyaltyCardMapper.toModelList(loyaltyCardDao.getLoyaltyCards(*id))
-    }
-
     override suspend fun getAll(): List<LoyaltyCard> {
         return loyaltyCardMapper.toModelList(loyaltyCardDao.getLoyaltyCards())
     }
@@ -66,6 +61,7 @@ class LoyaltyCardRepositoryImpl(
     }
 
     private suspend fun upsertLoyaltyCards(loyaltyCards: List<LoyaltyCard>): List<Int> {
+        // '*' is a spread operator required to pass vararg down
         return loyaltyCardDao
             .upsert(*loyaltyCardMapper.fromModelList(loyaltyCards).map { it }.toTypedArray())
             .map { it.toInt() }

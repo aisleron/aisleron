@@ -32,9 +32,6 @@ interface LocationDao : BaseDao<LocationEntity> {
     @Query("SELECT * FROM Location WHERE id = :locationId")
     suspend fun getLocation(locationId: Int): LocationEntity?
 
-    @Query("SELECT * FROM Location WHERE id IN (:locationId)")
-    suspend fun getLocations(vararg locationId: Int): List<LocationEntity>
-
     @Query("SELECT * FROM Location")
     suspend fun getLocations(): List<LocationEntity>
 

@@ -32,9 +32,6 @@ interface LoyaltyCardDao : BaseDao<LoyaltyCardEntity> {
         provider: LoyaltyCardProviderType, providerCardId: Int
     ): LoyaltyCardEntity?
 
-    @Query("SELECT * FROM LoyaltyCard WHERE id IN (:loyaltyCardId)")
-    suspend fun getLoyaltyCards(vararg loyaltyCardId: Int): List<LoyaltyCardEntity>
-
     @Query("SELECT * FROM LoyaltyCard")
     suspend fun getLoyaltyCards(): List<LoyaltyCardEntity>
 }

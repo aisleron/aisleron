@@ -32,10 +32,6 @@ class LoyaltyCardDaoTestImpl : LoyaltyCardDao {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getLoyaltyCards(vararg loyaltyCardId: Int): List<LoyaltyCardEntity> {
-        TODO("Not yet implemented")
-    }
-
     override suspend fun getLoyaltyCards(): List<LoyaltyCardEntity> {
         TODO("Not yet implemented")
     }

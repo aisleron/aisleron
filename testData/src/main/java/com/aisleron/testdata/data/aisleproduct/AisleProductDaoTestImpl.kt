@@ -38,10 +38,6 @@ class AisleProductDaoTestImpl(private val productDao: ProductDaoTestImpl) : Aisl
         return result
     }
 
-    override suspend fun getAisleProducts(vararg aisleProductId: Int): List<AisleProductRank> {
-        TODO("Not yet implemented")
-    }
-
     override suspend fun getAisleProductsByProduct(productId: Int): List<AisleProductEntity> {
         return aisleProductList.filter { it.productId == productId }
     }

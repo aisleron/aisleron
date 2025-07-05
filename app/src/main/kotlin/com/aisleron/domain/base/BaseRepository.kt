@@ -19,7 +19,6 @@ package com.aisleron.domain.base
 
 interface BaseRepository<T> {
     suspend fun get(id: Int): T?
-    suspend fun getMultiple(vararg id: Int): List<T>
     suspend fun getAll(): List<T>
     suspend fun add(item: T): Int
     suspend fun add(items: List<T>): List<Int>

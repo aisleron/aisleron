@@ -67,10 +67,6 @@ class LocationDaoTestImpl(private val aisleDao: AisleDaoTestImpl) : LocationDao 
         return locationList.find { it.id == locationId }
     }
 
-    override suspend fun getLocations(vararg locationId: Int): List<LocationEntity> {
-        return locationList.filter { it.id in locationId }
-    }
-
     override suspend fun getLocations(): List<LocationEntity> {
         return locationList
     }
