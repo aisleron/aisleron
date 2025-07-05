@@ -43,5 +43,15 @@
     <string name="invalid_db_restore_file_exception">ОШИБКА: Недействительная папка резервной копии подлежащей восстановлению</string>
     <string name="duplicate_product_exception">ОШИБКА: Нельзя добавить копию существующего продукта</string>
     <string name="duplicate_location_exception">ОШИБКА: Нельзя добавить копию существующего магазина</string>
-    <string name="sample_data_creation_exception">ОШИБКА: Не удалось загрузить даты примера в базу данных</string>
+    <string name="sample_data_creation_exception">ОШИБКА: Не удалось загрузить информацию примера в базу данных</string>
+    <string name="about_support_header">Техническая поддержка</string>
+    <string name="about_legal_header">Лицензии и политики</string>
+    <string name="about_support_version_title">История версий</string>
+    <string name="about_support_report_issue_title">Сообщить о проблеме (на английском)</string>
+    <string name="about_support_sourcecode_title">Исходный код</string>
+    <string name="about_legal_license_title">Лицензия Aisleron</string>
+    <string name="about_legal_privacy_title">Политика конфиденциальности Aisleron</string>
+    <string name="about_support_version_summary">Текущая версия: %1$s</string>
+    <string name="about_support_report_issue_summary">Пожаловаться на баг или предложить функцию</string>
+    <string name="about_support_sourcecode_summary">Посмотреть исходный код на Github</string>
 </resources>
