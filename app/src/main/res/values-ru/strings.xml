@@ -1,3 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="navigation_drawer_open">Открыть панель навигации</string>
+    <string name="navigation_drawer_close">Закрыть панель навигации</string>
+    <string name="nav_header_subtitle">Пролетись по магазинам!</string>
+    <string name="nav_header_desc">Навигационный заголовок</string>
+    <string name="action_search">Поиск</string>
+    <string name="menu_in_stock">Домашний запас</string>
+    <string name="menu_needed">Требуются</string>
+    <string name="menu_all_items">Все продукты</string>
+    <string name="menu_settings">Настройки</string>
+    <string name="menu_all_shops">Все магазины</string>
+    <string name="menu_shops">Магазины</string>
+    <string name="menu_about">О приложении</string>
 </resources>
