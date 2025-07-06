@@ -106,8 +106,7 @@ class ShopViewModel(
                 name = name,
                 pinned = pinned,
                 aisles = emptyList(),
-                showDefaultAisle = showDefaultAisle,
-                loyaltyCard = null
+                showDefaultAisle = showDefaultAisle
                 //TODO: Assign loyalty card here
             )
         )

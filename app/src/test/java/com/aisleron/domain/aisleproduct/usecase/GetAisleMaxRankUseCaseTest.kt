@@ -36,8 +36,7 @@ class GetAisleMaxRankUseCaseTest {
                 name = "Rank Test Shop",
                 pinned = false,
                 aisles = emptyList(),
-                showDefaultAisle = true,
-                loyaltyCard = null
+                showDefaultAisle = true
             )
         )
 

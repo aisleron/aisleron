@@ -28,8 +28,7 @@ class LocationMapper : MapperBaseImpl<LocationEntity, Location>() {
         name = value.name.trim(),
         pinned = value.pinned,
         aisles = emptyList(),
-        showDefaultAisle = value.showDefaultAisle,
-        loyaltyCard = null
+        showDefaultAisle = value.showDefaultAisle
     )
 
     override fun fromModel(value: Location) = LocationEntity(

@@ -26,17 +26,6 @@ class LocationRepositoryImpl(
     private val locationDao: LocationDao,
     private val locationMapper: LocationMapper
 ) : LocationRepository {
-
-    /*
-    override fun getByType(type: LocationType): Flow<List<Location>> {
-        return when (type) {
-            LocationType.HOME -> flowOf<List<Location>>(listOf(getHome()))
-            LocationType.SHOP -> getShops()
-        }
-    }
-
-     */
-
     override fun getShops(): Flow<List<Location>> {
         val locationEntities = locationDao.getShops()
         return locationEntities.map { locationMapper.toModelList(it) }

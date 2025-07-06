@@ -161,8 +161,7 @@ class CreateSampleDataUseCaseImpl(
             name = SHOP_NAME,
             pinned = true,
             aisles = emptyList(),
-            showDefaultAisle = true,
-            loyaltyCard = null
+            showDefaultAisle = true
         )
 
         val shopId = addLocationUseCase(location)

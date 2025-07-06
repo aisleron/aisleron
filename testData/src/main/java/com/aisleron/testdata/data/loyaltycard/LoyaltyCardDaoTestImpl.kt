@@ -36,6 +36,10 @@ class LoyaltyCardDaoTestImpl : LoyaltyCardDao {
         TODO("Not yet implemented")
     }
 
+    override suspend fun getLoyaltyCardForLocation(locationId: Int): LoyaltyCardEntity? {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun upsert(vararg entity: LoyaltyCardEntity): List<Long> {
         TODO("Not yet implemented")
     }

@@ -26,8 +26,8 @@ import com.aisleron.data.aisleproduct.AisleProductDao
 import com.aisleron.data.aisleproduct.AisleProductEntity
 import com.aisleron.data.location.LocationDao
 import com.aisleron.data.location.LocationEntity
-import com.aisleron.data.location.LocationLoyaltyCardDao
-import com.aisleron.data.location.LocationLoyaltyCardEntity
+import com.aisleron.data.loyaltycard.LocationLoyaltyCardDao
+import com.aisleron.data.loyaltycard.LocationLoyaltyCardEntity
 import com.aisleron.data.loyaltycard.LoyaltyCardDao
 import com.aisleron.data.loyaltycard.LoyaltyCardEntity
 import com.aisleron.data.maintenance.MaintenanceDao

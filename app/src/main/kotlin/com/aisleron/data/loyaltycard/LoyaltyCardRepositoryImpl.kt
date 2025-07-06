@@ -23,6 +23,7 @@ import com.aisleron.domain.loyaltycard.LoyaltyCardRepository
 
 class LoyaltyCardRepositoryImpl(
     private val loyaltyCardDao: LoyaltyCardDao,
+    private val locationLoyaltyCardDao: LocationLoyaltyCardDao,
     private val loyaltyCardMapper: LoyaltyCardMapper
 ) : LoyaltyCardRepository {
     override suspend fun get(id: Int): LoyaltyCard? {
@@ -34,6 +35,19 @@ class LoyaltyCardRepositoryImpl(
     ): LoyaltyCard? {
         return loyaltyCardDao.getProviderCard(provider, providerCardId)
             ?.let { loyaltyCardMapper.toModel(it) }
+    }
+
+    override suspend fun getForLocation(locationId: Int): LoyaltyCard? {
+        return loyaltyCardDao.getLoyaltyCardForLocation(locationId)
+            ?.let { loyaltyCardMapper.toModel(it) }
+    }
+
+    override suspend fun addToLocation(locationId: Int, loyaltyCardId: Int) {
+        locationLoyaltyCardDao.upsert(LocationLoyaltyCardEntity(locationId, loyaltyCardId))
+    }
+
+    override suspend fun removeFromLocation(locationId: Int, loyaltyCardId: Int) {
+        locationLoyaltyCardDao.delete(LocationLoyaltyCardEntity(locationId, loyaltyCardId))
     }
 
     override suspend fun getAll(): List<LoyaltyCard> {

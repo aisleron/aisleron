@@ -17,8 +17,8 @@
 
 package com.aisleron.testdata.data.location
 
-import com.aisleron.data.location.LocationLoyaltyCardDao
-import com.aisleron.data.location.LocationLoyaltyCardEntity
+import com.aisleron.data.loyaltycard.LocationLoyaltyCardDao
+import com.aisleron.data.loyaltycard.LocationLoyaltyCardEntity
 
 class LocationLoyaltyCardDaoTestImpl : LocationLoyaltyCardDao {
     override suspend fun upsert(vararg entity: LocationLoyaltyCardEntity): List<Long> {

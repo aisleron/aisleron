@@ -15,23 +15,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.data.location
+package com.aisleron.domain.loyaltycard.usecase
 
-import androidx.room.Embedded
-import androidx.room.Junction
-import androidx.room.Relation
-import com.aisleron.data.loyaltycard.LoyaltyCardEntity
+import com.aisleron.domain.location.Location
+import com.aisleron.domain.loyaltycard.LoyaltyCard
+import com.aisleron.domain.loyaltycard.LoyaltyCardRepository
 
-data class LocationWithLoyaltyCard(
-    @Embedded val location: LocationEntity,
-    @Relation(
-        parentColumn = "id",
-        entityColumn = "id",
-        associateBy = Junction(
-            value = LocationLoyaltyCardEntity::class,
-            parentColumn = "locationId",
-            entityColumn = "loyaltyCardId"
-        )
-    )
-    val loyaltyCard: LoyaltyCardEntity?
-)
+interface RemoveLoyaltyCardFromLocationUseCase {
+    suspend operator fun invoke(location: Location, loyaltyCard: LoyaltyCard)
+}
+
+class RemoveLoyaltyCardFromLocationUseCaseImpl(
+    private val loyaltyCardRepository: LoyaltyCardRepository,
+) : RemoveLoyaltyCardFromLocationUseCase {
+    override suspend operator fun invoke(location: Location, loyaltyCard: LoyaltyCard) {
+        loyaltyCardRepository.removeFromLocation(location.id, loyaltyCard.id)
+    }
+}
+

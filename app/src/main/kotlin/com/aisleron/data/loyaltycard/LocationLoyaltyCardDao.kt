@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.data.location
+package com.aisleron.data.loyaltycard
 
 import androidx.room.Dao
 import com.aisleron.data.base.BaseDao

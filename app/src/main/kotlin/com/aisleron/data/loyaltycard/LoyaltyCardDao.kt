@@ -27,11 +27,15 @@ interface LoyaltyCardDao : BaseDao<LoyaltyCardEntity> {
     @Query("SELECT * FROM LoyaltyCard WHERE id = :loyaltyCardId")
     suspend fun getLoyaltyCard(loyaltyCardId: Int): LoyaltyCardEntity?
 
-    @Query("SELECT * FROM LoyaltyCard WHERE provider = :provider AND :providerCardId = providerCardId")
+    @Query("SELECT * FROM LoyaltyCard WHERE provider = :provider AND providerCardId = :providerCardId")
     suspend fun getProviderCard(
         provider: LoyaltyCardProviderType, providerCardId: Int
     ): LoyaltyCardEntity?
 
     @Query("SELECT * FROM LoyaltyCard")
     suspend fun getLoyaltyCards(): List<LoyaltyCardEntity>
+
+    @Query("SELECT * FROM LoyaltyCard WHERE EXISTS (SELECT NULL FROM LocationLoyaltyCard WHERE locationId = :locationId AND id = loyaltyCardId)")
+    suspend fun getLoyaltyCardForLocation(locationId: Int): LoyaltyCardEntity?
+
 }

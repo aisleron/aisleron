@@ -19,7 +19,6 @@ package com.aisleron.domain.location
 
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.aisle.Aisle
-import com.aisleron.domain.loyaltycard.LoyaltyCard
 import java.io.Serializable
 
 data class Location(
@@ -29,6 +28,5 @@ data class Location(
     val name: String,
     val pinned: Boolean,
     val aisles: List<Aisle>,
-    val showDefaultAisle: Boolean,
-    val loyaltyCard: LoyaltyCard?
+    val showDefaultAisle: Boolean
 ) : Serializable

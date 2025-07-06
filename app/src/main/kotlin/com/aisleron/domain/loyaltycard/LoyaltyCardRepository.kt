@@ -23,4 +23,8 @@ interface LoyaltyCardRepository : BaseRepository<LoyaltyCard> {
     suspend fun getProviderCard(
         provider: LoyaltyCardProviderType, providerCardId: Int
     ): LoyaltyCard?
+
+    suspend fun getForLocation(locationId: Int): LoyaltyCard?
+    suspend fun addToLocation(locationId: Int, loyaltyCardId: Int)
+    suspend fun removeFromLocation(locationId: Int, loyaltyCardId: Int)
 }

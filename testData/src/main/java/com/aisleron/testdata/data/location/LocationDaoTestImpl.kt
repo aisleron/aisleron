@@ -21,7 +21,6 @@ import com.aisleron.data.location.LocationDao
 import com.aisleron.data.location.LocationEntity
 import com.aisleron.data.location.LocationWithAisles
 import com.aisleron.data.location.LocationWithAislesWithProducts
-import com.aisleron.data.location.LocationWithLoyaltyCard
 import com.aisleron.domain.location.LocationType
 import com.aisleron.testdata.data.aisle.AisleDaoTestImpl
 import kotlinx.coroutines.flow.Flow
@@ -83,12 +82,7 @@ class LocationDaoTestImpl(private val aisleDao: AisleDaoTestImpl) : LocationDao 
     }
 
     override fun getLocationWithAislesWithProducts(locationId: Int): Flow<LocationWithAislesWithProducts?> {
-        val location = locationList.firstOrNull { it.id == locationId }?.let {
-            LocationWithLoyaltyCard(
-                location = it,
-                loyaltyCard = null
-            )
-        }
+        val location = locationList.firstOrNull { it.id == locationId }
 
         var result: LocationWithAislesWithProducts? = null
 

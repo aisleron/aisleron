@@ -58,6 +58,10 @@ val repositoryModule = module {
     }
 
     factory<LoyaltyCardRepository> {
-        LoyaltyCardRepositoryImpl(loyaltyCardDao = get(), loyaltyCardMapper = LoyaltyCardMapper())
+        LoyaltyCardRepositoryImpl(
+            loyaltyCardDao = get(),
+            locationLoyaltyCardDao = get(),
+            loyaltyCardMapper = LoyaltyCardMapper()
+        )
     }
 }

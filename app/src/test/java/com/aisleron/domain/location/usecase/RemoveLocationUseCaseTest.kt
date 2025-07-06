@@ -124,8 +124,7 @@ class RemoveLocationUseCaseTest {
                     name = "Dummy Shop",
                     pinned = false,
                     aisles = emptyList(),
-                    showDefaultAisle = true,
-                    loyaltyCard = null
+                    showDefaultAisle = true
                 )
             )
             val newLocation = locationRepository.get(newLocationId)!!

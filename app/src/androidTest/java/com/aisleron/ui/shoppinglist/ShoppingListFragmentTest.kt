@@ -212,8 +212,7 @@ class ShoppingListFragmentTest : KoinTest {
             name = "No Aisle Shop",
             pinned = false,
             aisles = emptyList(),
-            showDefaultAisle = false,
-            loyaltyCard = null
+            showDefaultAisle = false
         )
 
         val locationId = get<LocationRepository>().add(location)

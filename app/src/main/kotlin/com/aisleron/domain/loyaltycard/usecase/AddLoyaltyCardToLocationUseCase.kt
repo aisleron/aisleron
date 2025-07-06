@@ -15,22 +15,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.data.location
+package com.aisleron.domain.loyaltycard.usecase
 
-import com.aisleron.data.base.MapperBaseImpl
-import com.aisleron.data.loyaltycard.LoyaltyCardMapper
 import com.aisleron.domain.location.Location
+import com.aisleron.domain.loyaltycard.LoyaltyCard
+import com.aisleron.domain.loyaltycard.LoyaltyCardRepository
 
-class LocationWithLoyaltyCardMapper : MapperBaseImpl<LocationWithLoyaltyCard, Location>() {
-    override fun toModel(value: LocationWithLoyaltyCard): Location {
-        val location = LocationMapper().toModel(value.location)
-        return location.copy(loyaltyCard = value.loyaltyCard?.let { LoyaltyCardMapper().toModel(it) })
-    }
+interface AddLoyaltyCardToLocationUseCase {
+    suspend operator fun invoke(location: Location, loyaltyCard: LoyaltyCard)
+}
 
-    override fun fromModel(value: Location): LocationWithLoyaltyCard {
-        return LocationWithLoyaltyCard(
-            location = LocationMapper().fromModel(value),
-            loyaltyCard = value.loyaltyCard?.let { LoyaltyCardMapper().fromModel(it) }
-        )
+class AddLoyaltyCardToLocationUseCaseImpl(
+    private val loyaltyCardRepository: LoyaltyCardRepository,
+) : AddLoyaltyCardToLocationUseCase {
+    override suspend operator fun invoke(location: Location, loyaltyCard: LoyaltyCard) {
+        loyaltyCardRepository.addToLocation(location.id, loyaltyCard.id)
     }
 }
+

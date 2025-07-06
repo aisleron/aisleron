@@ -15,11 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.data.location
+package com.aisleron.data.loyaltycard
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import com.aisleron.data.loyaltycard.LoyaltyCardEntity
+import com.aisleron.data.location.LocationEntity
 
 @Entity(
     tableName = "LocationLoyaltyCard",
