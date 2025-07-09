@@ -29,7 +29,10 @@ import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.location.usecase.AddLocationUseCase
 import com.aisleron.domain.location.usecase.GetLocationUseCase
 import com.aisleron.domain.location.usecase.UpdateLocationUseCase
+import com.aisleron.domain.loyaltycard.usecase.AddLoyaltyCardToLocationUseCase
 import com.aisleron.domain.loyaltycard.usecase.AddLoyaltyCardUseCase
+import com.aisleron.domain.loyaltycard.usecase.GetLoyaltyCardForLocationUseCase
+import com.aisleron.domain.loyaltycard.usecase.RemoveLoyaltyCardFromLocationUseCase
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -94,9 +97,6 @@ class ShopViewModelTest(private val pinned: Boolean, private val showDefaultAisl
         Assert.assertEquals(newLocationName, newLocation?.name)
         Assert.assertEquals(pinned, newLocation?.pinned)
         Assert.assertEquals(showDefaultAisle, newLocation?.showDefaultAisle)
-        Assert.assertEquals(newLocationName, shopViewModel.locationName)
-        Assert.assertEquals(pinned, shopViewModel.pinned)
-        Assert.assertEquals(showDefaultAisle, shopViewModel.showDefaultAisle)
         Assert.assertEquals(countBefore + 1, countAfter)
     }
 
@@ -108,15 +108,7 @@ class ShopViewModelTest(private val pinned: Boolean, private val showDefaultAisl
         shopViewModel.hydrate(existingLocation.id)
         shopViewModel.saveLocation(updatedLocationName, pinned, showDefaultAisle)
 
-        Assert.assertEquals(
-            ShopViewModel.ShopUiState.Updated(shopViewModel),
-            shopViewModel.shopUiState.value
-        )
-
-        Assert.assertEquals(
-            shopViewModel,
-            (shopViewModel.shopUiState.value as ShopViewModel.ShopUiState.Updated).shop
-        )
+        Assert.assertTrue(shopViewModel.shopUiState.value is ShopViewModel.ShopUiState.Success)
     }
 
     @Test
@@ -171,38 +163,15 @@ class ShopViewModelTest(private val pinned: Boolean, private val showDefaultAisl
     }
 
     @Test
-    fun testGetDefaultFilter_LocationExists_ReturnsLocationFilter() = runTest {
-        val existingLocation: Location = get<LocationRepository>().getAll().first()
-        shopViewModel.hydrate(existingLocation.id)
-        Assert.assertEquals(existingLocation.defaultFilter, shopViewModel.defaultFilter)
-    }
-
-    @Test
-    fun testGetDefaultFilter_LocationDoesNotExists_ReturnsNull() = runTest {
-        shopViewModel.hydrate(0)
-        Assert.assertNull(shopViewModel.defaultFilter)
-    }
-
-    @Test
-    fun testGetType_LocationExists_ReturnsLocationType() = runTest {
-        val existingLocation: Location = get<LocationRepository>().getAll().first()
-        shopViewModel.hydrate(existingLocation.id)
-        Assert.assertEquals(existingLocation.type, shopViewModel.type)
-    }
-
-    @Test
-    fun testGetType_LocationDoesNotExists_ReturnsNull() = runTest {
-        shopViewModel.hydrate(0)
-        Assert.assertNull(shopViewModel.type)
-    }
-
-    @Test
     fun constructor_NoCoroutineScopeProvided_ShopViewModelReturned() {
         val svm = ShopViewModel(
             get<AddLocationUseCase>(),
             get<UpdateLocationUseCase>(),
             get<GetLocationUseCase>(),
-            get<AddLoyaltyCardUseCase>()
+            get<AddLoyaltyCardUseCase>(),
+            get<AddLoyaltyCardToLocationUseCase>(),
+            get<RemoveLoyaltyCardFromLocationUseCase>(),
+            get<GetLoyaltyCardForLocationUseCase>()
         )
 
         Assert.assertNotNull(svm)

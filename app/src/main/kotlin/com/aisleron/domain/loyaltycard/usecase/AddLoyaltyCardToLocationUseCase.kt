@@ -17,19 +17,17 @@
 
 package com.aisleron.domain.loyaltycard.usecase
 
-import com.aisleron.domain.location.Location
-import com.aisleron.domain.loyaltycard.LoyaltyCard
 import com.aisleron.domain.loyaltycard.LoyaltyCardRepository
 
 interface AddLoyaltyCardToLocationUseCase {
-    suspend operator fun invoke(location: Location, loyaltyCard: LoyaltyCard)
+    suspend operator fun invoke(locationId: Int, loyaltyCardId: Int)
 }
 
 class AddLoyaltyCardToLocationUseCaseImpl(
     private val loyaltyCardRepository: LoyaltyCardRepository,
 ) : AddLoyaltyCardToLocationUseCase {
-    override suspend operator fun invoke(location: Location, loyaltyCard: LoyaltyCard) {
-        loyaltyCardRepository.addToLocation(location.id, loyaltyCard.id)
+    override suspend operator fun invoke(locationId: Int, loyaltyCardId: Int) {
+        loyaltyCardRepository.addToLocation(locationId, loyaltyCardId)
     }
 }
 

@@ -18,21 +18,23 @@
 package com.aisleron.ui.loyaltycard
 
 import android.content.Context
-import android.content.pm.PackageManager
 import androidx.fragment.app.Fragment
 import com.aisleron.domain.loyaltycard.LoyaltyCard
 import com.aisleron.domain.loyaltycard.LoyaltyCardProviderType
 
-class LoyaltyCardProviderTestImpl(val context: Context) : LoyaltyCardProvider {
+class LoyaltyCardProviderTestImpl() : LoyaltyCardProvider {
     override val packageName: String get() = "Test Loyalty Card Provider"
-    override val packageManager: PackageManager get() = context.packageManager
+    override val providerNameStringId: Int
+        get() = TODO("Not yet implemented")
+    override val providerWebsite: String
+        get() = TODO("Not yet implemented")
     override val providerType: LoyaltyCardProviderType get() = LoyaltyCardProviderType.CATIMA
 
-    override fun lookupLoyaltyCardShortcut() {
+    override fun lookupLoyaltyCardShortcut(context: Context) {
 
     }
 
-    override fun displayLoyaltyCard(id: Int) {
+    override fun displayLoyaltyCard(context: Context, loyaltyCard: LoyaltyCard) {
 
     }
 

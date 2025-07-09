@@ -25,7 +25,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
@@ -65,18 +64,8 @@ class ShopFragment(
         super.onCreate(savedInstanceState)
 
         loyaltyCardProvider.registerLauncher(this) { loyaltyCard ->
-            shopViewModel.addLoyaltyCard(loyaltyCard)
-            loyaltyCard?.let {
-                Toast.makeText(
-                    requireContext(),
-                    "Loyalty Card Selected: ${it.id}, ${it.name}",
-                    Toast.LENGTH_LONG
-                ).show()
-
-                loyaltyCardProvider.displayLoyaltyCard(it.providerCardId)
-            } ?: run {
-                Toast.makeText(requireContext(), "No Loyalty Card ID returned", Toast.LENGTH_SHORT).show()
-            }
+            shopViewModel.setLoyaltyCard(loyaltyCard)
+            binding.edtShopLoyaltyCard.setText(shopViewModel.loyaltyCardName)
         }
 
         val addEditLocationBundle = Bundler().getAddEditLocationBundle(arguments)
@@ -96,8 +85,13 @@ class ShopFragment(
 
         _binding = FragmentShopBinding.inflate(inflater, container, false)
 
-        binding.btnGetLoyaltyCard.setOnClickListener {
-            loyaltyCardProvider.lookupLoyaltyCardShortcut()
+        binding.btnLookupLoyaltyCard.setOnClickListener {
+            lookupLoyaltyCard()
+        }
+
+        binding.btnDeleteLoyaltyCard.setOnClickListener {
+            shopViewModel.removeLoyaltyCard()
+            binding.edtShopLoyaltyCard.setText(shopViewModel.loyaltyCardName)
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -120,6 +114,7 @@ class ShopFragment(
                             binding.swcShopShowUnmappedProducts.isChecked =
                                 shopViewModel.showDefaultAisle
 
+                            binding.edtShopLoyaltyCard.setText(shopViewModel.loyaltyCardName)
                         }
                     }
                 }
@@ -127,6 +122,16 @@ class ShopFragment(
         }
 
         return binding.root
+    }
+
+    private fun lookupLoyaltyCard() {
+        try {
+            loyaltyCardProvider.lookupLoyaltyCardShortcut(requireContext())
+        } catch (e: AisleronException.LoyaltyCardProviderException) {
+            loyaltyCardProvider.getNotInstalledDialog(requireContext()).show()
+        } catch (e: Exception) {
+            displayErrorSnackBar(AisleronException.ExceptionCode.GENERIC_EXCEPTION, e.message)
+        }
     }
 
     private fun displayErrorSnackBar(

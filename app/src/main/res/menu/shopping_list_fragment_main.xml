@@ -29,6 +29,14 @@
         tools:ignore="AlwaysShowAction" />
 
     <item
+        android:id="@+id/mnu_show_loyalty_card"
+        android:orderInCategory="200"
+        android:title="@string/loyalty_card"
+        android:visible="false"
+        android:icon="@drawable/loyalty_card_24"
+        app:showAsAction="ifRoom" />
+
+    <item
         android:id="@+id/mnu_sort_list_by_name"
         android:icon="@drawable/baseline_sort_24"
         android:title="@string/mnu_sort_list_by_name"

@@ -206,7 +206,7 @@ class ShopFragmentTest : KoinTest {
             addEditFragmentListener,
             applicationTitleUpdateListener,
             fabHandler,
-            LoyaltyCardProviderTestImpl(InstrumentationRegistry.getInstrumentation().context)
+            LoyaltyCardProviderTestImpl()
         )
 
         Assert.assertNotNull(fragment)
@@ -227,7 +227,7 @@ class ShopFragmentTest : KoinTest {
                     addEditFragmentListener,
                     applicationTitleUpdateListener,
                     fabHandler,
-                    LoyaltyCardProviderTestImpl(InstrumentationRegistry.getInstrumentation().context)
+                    LoyaltyCardProviderTestImpl()
                 )
             }
         )

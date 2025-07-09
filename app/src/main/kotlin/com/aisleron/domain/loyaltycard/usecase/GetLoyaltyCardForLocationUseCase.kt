@@ -15,16 +15,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.domain.loyaltycard
+package com.aisleron.domain.loyaltycard.usecase
 
-import com.aisleron.domain.base.BaseRepository
+import com.aisleron.domain.loyaltycard.LoyaltyCard
+import com.aisleron.domain.loyaltycard.LoyaltyCardRepository
 
-interface LoyaltyCardRepository : BaseRepository<LoyaltyCard> {
-    suspend fun getProviderCard(
-        provider: LoyaltyCardProviderType, intent: String
-    ): LoyaltyCard?
-
-    suspend fun getForLocation(locationId: Int): LoyaltyCard?
-    suspend fun addToLocation(locationId: Int, loyaltyCardId: Int)
-    suspend fun removeFromLocation(locationId: Int, loyaltyCardId: Int)
+interface GetLoyaltyCardForLocationUseCase {
+    suspend operator fun invoke(locationId: Int): LoyaltyCard?
 }
+
+class GetLoyaltyCardForLocationUseCaseImpl(
+    private val loyaltyCardRepository: LoyaltyCardRepository,
+) : GetLoyaltyCardForLocationUseCase {
+    override suspend operator fun invoke(locationId: Int): LoyaltyCard? {
+        return loyaltyCardRepository.getForLocation(locationId)
+    }
+}
+

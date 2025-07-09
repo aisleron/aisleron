@@ -17,24 +17,19 @@
 
 package com.aisleron.di
 
-import com.aisleron.ui.loyaltycard.CatimaCardProvider
-import com.aisleron.ui.loyaltycard.LoyaltyCardProvider
 import com.aisleron.ui.AddEditFragmentListener
 import com.aisleron.ui.AddEditFragmentListenerImpl
 import com.aisleron.ui.ApplicationTitleUpdateListener
 import com.aisleron.ui.ApplicationTitleUpdateListenerImpl
 import com.aisleron.ui.FabHandler
 import com.aisleron.ui.FabHandlerImpl
-import org.koin.android.ext.koin.androidApplication
+import com.aisleron.ui.loyaltycard.CatimaCardProvider
+import com.aisleron.ui.loyaltycard.LoyaltyCardProvider
 import org.koin.dsl.module
 
 val generalModule = module {
     factory<FabHandler> { FabHandlerImpl() }
     factory<ApplicationTitleUpdateListener> { ApplicationTitleUpdateListenerImpl() }
     factory<AddEditFragmentListener> { AddEditFragmentListenerImpl() }
-
-    /**
-     * LoyaltyCard
-     */
-    factory<LoyaltyCardProvider> { CatimaCardProvider(androidApplication()) }
+    factory<LoyaltyCardProvider> { CatimaCardProvider() }
 }

@@ -25,6 +25,6 @@ import com.aisleron.domain.loyaltycard.LoyaltyCardProviderType
 data class LoyaltyCardEntity(
     @PrimaryKey(autoGenerate = true) val id: Int,
     val name: String,
-    val providerCardId: Int,
-    val provider: LoyaltyCardProviderType
+    val provider: LoyaltyCardProviderType,
+    val intent: String
 )

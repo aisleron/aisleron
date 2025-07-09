@@ -20,6 +20,6 @@ package com.aisleron.domain.loyaltycard
 data class LoyaltyCard(
     val id: Int,
     val name: String,
-    val providerCardId: Int,
-    val provider: LoyaltyCardProviderType
+    val provider: LoyaltyCardProviderType,
+    val intent: String
 )

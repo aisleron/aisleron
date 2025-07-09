@@ -38,6 +38,7 @@ import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.location.usecase.AddLocationUseCase
 import com.aisleron.domain.location.usecase.SortLocationByNameUseCase
+import com.aisleron.domain.loyaltycard.usecase.GetLoyaltyCardForLocationUseCase
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
 import com.aisleron.domain.product.usecase.RemoveProductUseCase
@@ -476,7 +477,8 @@ class ShoppingListViewModelTest : KoinTest {
             get<RemoveProductUseCase>(),
             get<GetAisleUseCase>(),
             get<UpdateAisleExpandedUseCase>(),
-            get<SortLocationByNameUseCase>()
+            get<SortLocationByNameUseCase>(),
+            get<GetLoyaltyCardForLocationUseCase>()
         )
 
         Assert.assertNotNull(vm)

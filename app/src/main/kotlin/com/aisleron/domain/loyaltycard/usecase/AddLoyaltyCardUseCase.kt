@@ -28,13 +28,13 @@ class AddLoyaltyCardUseCaseImpl(
     private val loyaltyCardRepository: LoyaltyCardRepository,
 ) : AddLoyaltyCardUseCase {
     override suspend operator fun invoke(loyaltyCard: LoyaltyCard): Int {
-        val existingId = loyaltyCardRepository.getProviderCard(
-            loyaltyCard.provider,
-            loyaltyCard.providerCardId
-        )?.id ?: 0
+        val existingCard = loyaltyCardRepository.getProviderCard(
+            loyaltyCard.provider, loyaltyCard.intent
+        )
 
-        val newLoyaltyCard = loyaltyCard.copy(id = existingId)
-
-        return loyaltyCardRepository.add(newLoyaltyCard)
+        return existingCard?.let {
+            loyaltyCardRepository.update(it)
+            existingCard.id
+        } ?: loyaltyCardRepository.add(loyaltyCard)
     }
 }

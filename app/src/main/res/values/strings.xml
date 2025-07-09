@@ -67,6 +67,8 @@
     <string name="duplicate_product_exception">ERROR: Cannot add a duplicate of an existing product</string>
     <string name="duplicate_location_exception">ERROR: Cannot add a duplicate of an existing location</string>
     <string name="sample_data_creation_exception">ERROR: Cannot load sample data into an existing database</string>
+    <string name="loyalty_card_provider_missing_exception">ERROR: Loyalty card provider not installed or activity not found</string>
+1
 
     <!-- About Preferences -->
     <string name="about_support_header">Support</string>
@@ -155,5 +157,15 @@
     <string name="sort_confirm_title">Confirm Sort</string>
     <string name="sort_confirm_message">Sorting by name will rearrange the list alphabetically and overwrite your current sort order. Do you want to proceed?</string>
     <string name="empty_list_description">This could be because:</string>
+
+    <!-- Loyalty cards -->
+    <string name="shop_loyalty_card_name">Loyalty Card</string>
+    <string name="loyalty_card">Loyalty card</string>
+    <string name="delete_loyalty_card">Delete loyalty card</string>
+    <string name="get_loyalty_card">Lookup loyalty card</string>
+    <string name="loyalty_card_provider_catima">Catima — Loyalty Card Wallet</string>
+    <string name="loyalty_card_provider_missing_title">No loyalty card provider installed</string>
+    <string name="loyalty_card_provider_missing_message">&lt;b&gt;&lt;i&gt;%1$s&lt;/i&gt;&lt;/b&gt; is required to display loyalty cards. Would you like to open their website to learn more about it?</string>
+
 
 </resources>

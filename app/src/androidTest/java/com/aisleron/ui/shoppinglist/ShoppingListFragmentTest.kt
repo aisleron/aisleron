@@ -68,6 +68,8 @@ import com.aisleron.ui.FabHandlerTestImpl
 import com.aisleron.ui.bundles.AddEditLocationBundle
 import com.aisleron.ui.bundles.AddEditProductBundle
 import com.aisleron.ui.bundles.Bundler
+import com.aisleron.ui.loyaltycard.LoyaltyCardProvider
+import com.aisleron.ui.loyaltycard.LoyaltyCardProviderTestImpl
 import com.aisleron.ui.settings.ShoppingListPreferencesTestImpl
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -99,7 +101,9 @@ class ShoppingListFragmentTest : KoinTest {
     )
 
     private fun getFragmentScenario(
-        bundle: Bundle, shoppingListPreferencesTestImpl: ShoppingListPreferencesTestImpl? = null
+        bundle: Bundle,
+        shoppingListPreferencesTestImpl: ShoppingListPreferencesTestImpl? = null,
+        loyaltyCardProvider: LoyaltyCardProvider? = null
     ): FragmentScenario<ShoppingListFragment> =
         launchFragmentInContainer<ShoppingListFragment>(
             fragmentArgs = bundle,
@@ -108,7 +112,8 @@ class ShoppingListFragmentTest : KoinTest {
                 ShoppingListFragment(
                     applicationTitleUpdateListener,
                     fabHandler,
-                    shoppingListPreferencesTestImpl ?: ShoppingListPreferencesTestImpl()
+                    shoppingListPreferencesTestImpl ?: ShoppingListPreferencesTestImpl(),
+                    loyaltyCardProvider ?: LoyaltyCardProviderTestImpl()
                 )
             }
         )
@@ -133,7 +138,8 @@ class ShoppingListFragmentTest : KoinTest {
                 FilterType.ALL,
                 applicationTitleUpdateListener,
                 fabHandler,
-                ShoppingListPreferencesTestImpl()
+                ShoppingListPreferencesTestImpl(),
+                LoyaltyCardProviderTestImpl()
             )
         Assert.assertNotNull(fragment)
     }

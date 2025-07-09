@@ -17,19 +17,17 @@
 
 package com.aisleron.domain.loyaltycard.usecase
 
-import com.aisleron.domain.location.Location
-import com.aisleron.domain.loyaltycard.LoyaltyCard
 import com.aisleron.domain.loyaltycard.LoyaltyCardRepository
 
 interface RemoveLoyaltyCardFromLocationUseCase {
-    suspend operator fun invoke(location: Location, loyaltyCard: LoyaltyCard)
+    suspend operator fun invoke(locationId: Int, loyaltyCardId: Int)
 }
 
 class RemoveLoyaltyCardFromLocationUseCaseImpl(
     private val loyaltyCardRepository: LoyaltyCardRepository,
 ) : RemoveLoyaltyCardFromLocationUseCase {
-    override suspend operator fun invoke(location: Location, loyaltyCard: LoyaltyCard) {
-        loyaltyCardRepository.removeFromLocation(location.id, loyaltyCard.id)
+    override suspend operator fun invoke(locationId: Int, loyaltyCardId: Int) {
+        loyaltyCardRepository.removeFromLocation(locationId, loyaltyCardId)
     }
 }
 

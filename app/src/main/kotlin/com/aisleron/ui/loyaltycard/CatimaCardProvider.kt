@@ -18,57 +18,37 @@
 package com.aisleron.ui.loyaltycard
 
 import android.app.Activity
-import android.content.ActivityNotFoundException
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.widget.Toast
+import android.os.Build
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import com.aisleron.R
+import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.loyaltycard.LoyaltyCard
 import com.aisleron.domain.loyaltycard.LoyaltyCardProviderType
 
-class CatimaCardProvider(val context: Context) : LoyaltyCardProvider {
+class CatimaCardProvider : LoyaltyCardProvider {
     override val packageName: String get() = "me.hackerchick.catima"
-    override val packageManager: PackageManager get() = context.packageManager
+    override val providerNameStringId: Int get() = R.string.loyalty_card_provider_catima
+    override val providerWebsite: String get() = "https://catima.app/"
+
     override val providerType: LoyaltyCardProviderType get() = LoyaltyCardProviderType.CATIMA
 
     private val lookupActivityClassName = "protect.card_locker.CardShortcutConfigure"
-    private val displayActivityClassName = "protect.card_locker.LoyaltyCardViewActivity"
     private lateinit var launcher: ActivityResultLauncher<Intent>
 
-    override fun lookupLoyaltyCardShortcut() {
-        if (!isInstalled()) {
-            Toast.makeText(context, "Catima app is not installed.", Toast.LENGTH_LONG).show()
-            return
+    override fun lookupLoyaltyCardShortcut(context: Context) {
+        if (!isInstalled(context)) {
+            throw throw AisleronException.LoyaltyCardProviderException(context.getString(R.string.loyalty_card_provider_missing_exception))
         }
 
         val intent = Intent().apply {
             setClassName(packageName, lookupActivityClassName)
         }
         launcher.launch(intent)
-    }
-
-    override fun displayLoyaltyCard(id: Int) {
-        if (!isInstalled()) {
-            Toast.makeText(context, "Catima app is not installed.", Toast.LENGTH_LONG).show()
-            return
-        }
-
-        val intent = Intent().apply {
-            component = ComponentName(packageName, displayActivityClassName)
-            putExtra("id", id)
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        }
-
-        try {
-            context.startActivity(intent)
-        } catch (e: ActivityNotFoundException) {
-            Toast.makeText(context, "App not installed or activity not found.", Toast.LENGTH_SHORT).show()
-        }
     }
 
     override fun registerLauncher(
@@ -78,23 +58,27 @@ class CatimaCardProvider(val context: Context) : LoyaltyCardProvider {
             fragment.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
                 if (result.resultCode == Activity.RESULT_OK) {
                     val resultIntent = result.data
-                    val shortcutIntent =
-                        resultIntent?.getParcelableExtra<Intent>(Intent.EXTRA_SHORTCUT_INTENT)
-
-                    val providerCardId = shortcutIntent?.getIntExtra("id", 0)
                     val cardName = resultIntent?.getStringExtra(Intent.EXTRA_SHORTCUT_NAME) ?: ""
-                    val loyaltyCard: LoyaltyCard? = providerCardId?.let {
+                    val shortcutIntent =
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            resultIntent?.getParcelableExtra(
+                                Intent.EXTRA_SHORTCUT_INTENT, Intent::class.java
+                            )
+                        } else {
+                            @Suppress("DEPRECATION")
+                            resultIntent?.getParcelableExtra(Intent.EXTRA_SHORTCUT_INTENT)
+                        }
+
+                    val loyaltyCard: LoyaltyCard? = shortcutIntent?.let {
                         LoyaltyCard(
                             id = 0,
                             name = cardName,
-                            providerCardId = it,
-                            provider = providerType
+                            provider = providerType,
+                            intent = it.toUri(Intent.URI_INTENT_SCHEME)
                         )
                     }
 
                     onLoyaltyCardSelected(loyaltyCard)
-                } else {
-                    Toast.makeText(context, "Shortcut creation canceled", Toast.LENGTH_SHORT).show()
                 }
             }
     }

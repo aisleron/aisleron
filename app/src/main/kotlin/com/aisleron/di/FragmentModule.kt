@@ -30,7 +30,8 @@ val fragmentModule = module {
         ShoppingListFragment(
             applicationTitleUpdateListener = get(),
             fabHandler = get(),
-            shoppingListPreferences = get()
+            shoppingListPreferences = get(),
+            loyaltyCardProvider = get()
         )
     }
 

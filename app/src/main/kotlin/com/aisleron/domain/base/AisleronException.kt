@@ -52,6 +52,9 @@ sealed class AisleronException(
     class SampleDataCreationException(message: String? = null, cause: Throwable? = null) :
         AisleronException(ExceptionCode.SAMPLE_DATA_CREATION_EXCEPTION, message, cause)
 
+    class LoyaltyCardProviderException(message: String? = null, cause: Throwable? = null) :
+        AisleronException(ExceptionCode.LOYALTY_CARD_PROVIDER_EXCEPTION, message, cause)
+
     enum class ExceptionCode {
         GENERIC_EXCEPTION,
         DELETE_DEFAULT_AISLE_EXCEPTION,
@@ -63,6 +66,7 @@ sealed class AisleronException(
         INVALID_DB_RESTORE_FILE_EXCEPTION,
         DUPLICATE_PRODUCT_EXCEPTION,
         DUPLICATE_LOCATION_EXCEPTION,
-        SAMPLE_DATA_CREATION_EXCEPTION
+        SAMPLE_DATA_CREATION_EXCEPTION,
+        LOYALTY_CARD_PROVIDER_EXCEPTION
     }
 }

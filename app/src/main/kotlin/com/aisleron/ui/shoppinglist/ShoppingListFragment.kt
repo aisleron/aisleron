@@ -18,6 +18,7 @@
 package com.aisleron.ui.shoppinglist
 
 import android.app.SearchManager
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.os.Bundle
 import android.view.ActionMode
@@ -45,11 +46,13 @@ import com.aisleron.R
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.location.LocationType
+import com.aisleron.domain.loyaltycard.LoyaltyCard
 import com.aisleron.ui.AisleronExceptionMap
 import com.aisleron.ui.ApplicationTitleUpdateListener
 import com.aisleron.ui.FabHandler
 import com.aisleron.ui.FabHandler.FabClickedCallBack
 import com.aisleron.ui.bundles.Bundler
+import com.aisleron.ui.loyaltycard.LoyaltyCardProvider
 import com.aisleron.ui.settings.ShoppingListPreferences
 import com.aisleron.ui.widgets.ErrorSnackBar
 import com.google.android.material.snackbar.Snackbar
@@ -63,7 +66,8 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class ShoppingListFragment(
     private val applicationTitleUpdateListener: ApplicationTitleUpdateListener,
     private val fabHandler: FabHandler,
-    private val shoppingListPreferences: ShoppingListPreferences
+    private val shoppingListPreferences: ShoppingListPreferences,
+    private val loyaltyCardProvider: LoyaltyCardProvider
 ) : Fragment(), SearchView.OnQueryTextListener, ActionMode.Callback, FabClickedCallBack,
     MenuProvider {
 
@@ -71,6 +75,7 @@ class ShoppingListFragment(
     private var actionModeItem: ShoppingListItem? = null
     private var actionModeItemView: View? = null
     private var editShopMenuItem: MenuItem? = null
+    private var loyaltyCardMenuItem: MenuItem? = null
 
     private val shoppingListViewModel: ShoppingListViewModel by viewModel()
 
@@ -104,8 +109,7 @@ class ShoppingListFragment(
 
                             is ShoppingListViewModel.ShoppingListUiState.Updated -> {
                                 updateTitle()
-                                editShopMenuItem?.isVisible =
-                                    shoppingListViewModel.locationType == LocationType.SHOP
+                                setMenuItemVisibility()
 
                                 (view.adapter as ShoppingListItemRecyclerViewAdapter).submitList(
                                     it.shoppingList
@@ -194,6 +198,11 @@ class ShoppingListFragment(
             }
         }
         return view
+    }
+
+    private fun setMenuItemVisibility() {
+        editShopMenuItem?.isVisible = shoppingListViewModel.locationType == LocationType.SHOP
+        loyaltyCardMenuItem?.isVisible = shoppingListViewModel.loyaltyCard != null
     }
 
     private fun displayStatusChangeSnackBar(item: ProductShoppingListItem, inStock: Boolean) {
@@ -448,6 +457,8 @@ class ShoppingListFragment(
         })
 
         editShopMenuItem = menu.findItem(R.id.mnu_edit_shop)
+        loyaltyCardMenuItem = menu.findItem(R.id.mnu_show_loyalty_card)
+        setMenuItemVisibility()
     }
 
     //NOTE: If you override onMenuItemSelected, OnSupportNavigateUp will only be called when returning false
@@ -463,7 +474,22 @@ class ShoppingListFragment(
                 true
             }
 
+            R.id.mnu_show_loyalty_card -> {
+                shoppingListViewModel.loyaltyCard?.let { showLoyaltyCard(it) }
+                true
+            }
+
             else -> false
+        }
+    }
+
+    private fun showLoyaltyCard(loyaltyCard: LoyaltyCard) {
+        try {
+            loyaltyCardProvider.displayLoyaltyCard(requireContext(), loyaltyCard)
+        } catch (e: AisleronException.LoyaltyCardProviderException) {
+            loyaltyCardProvider.getNotInstalledDialog(requireContext()).show()
+        } catch (e: ActivityNotFoundException) {
+            displayErrorSnackBar(AisleronException.ExceptionCode.GENERIC_EXCEPTION, e.message)
         }
     }
 
@@ -480,7 +506,6 @@ class ShoppingListFragment(
         val dialog: AlertDialog = builder.create()
 
         dialog.show()
-
     }
 
     companion object {
@@ -494,10 +519,14 @@ class ShoppingListFragment(
             filterType: FilterType,
             applicationTitleUpdateListener: ApplicationTitleUpdateListener,
             fabHandler: FabHandler,
-            shoppingListPreferences: ShoppingListPreferences
+            shoppingListPreferences: ShoppingListPreferences,
+            loyaltyCardProvider: LoyaltyCardProvider
         ) =
             ShoppingListFragment(
-                applicationTitleUpdateListener, fabHandler, shoppingListPreferences
+                applicationTitleUpdateListener,
+                fabHandler,
+                shoppingListPreferences,
+                loyaltyCardProvider
             ).apply {
                 arguments = Bundle().apply {
                     putInt(ARG_LOCATION_ID, locationId.toInt())
@@ -509,5 +538,4 @@ class ShoppingListFragment(
     override fun fabClicked(fabOption: FabHandler.FabOption) {
         actionMode?.finish()
     }
-
 }

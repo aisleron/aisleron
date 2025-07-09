@@ -31,9 +31,9 @@ class LoyaltyCardRepositoryImpl(
     }
 
     override suspend fun getProviderCard(
-        provider: LoyaltyCardProviderType, providerCardId: Int
+        provider: LoyaltyCardProviderType, intent: String
     ): LoyaltyCard? {
-        return loyaltyCardDao.getProviderCard(provider, providerCardId)
+        return loyaltyCardDao.getProviderCard(provider, intent)
             ?.let { loyaltyCardMapper.toModel(it) }
     }
 
@@ -55,7 +55,7 @@ class LoyaltyCardRepositoryImpl(
     }
 
     override suspend fun add(item: LoyaltyCard): Int {
-        return loyaltyCardDao.upsert(loyaltyCardMapper.fromModel(item))[0].toInt()
+        return loyaltyCardDao.upsert(loyaltyCardMapper.fromModel(item)).single().toInt()
     }
 
     override suspend fun add(items: List<LoyaltyCard>): List<Int> {

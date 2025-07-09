@@ -24,14 +24,14 @@ class LoyaltyCardMapper : MapperBaseImpl<LoyaltyCardEntity, LoyaltyCard>() {
     override fun toModel(value: LoyaltyCardEntity) = LoyaltyCard(
         id = value.id,
         name = value.name.trim(),
-        providerCardId = value.providerCardId,
-        provider = value.provider
+        provider = value.provider,
+        intent = value.intent
     )
 
     override fun fromModel(value: LoyaltyCard) = LoyaltyCardEntity(
         id = value.id,
         name = value.name.trim(),
-        providerCardId = value.providerCardId,
-        provider = value.provider
+        provider = value.provider,
+        intent = value.intent
     )
 }

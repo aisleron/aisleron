@@ -27,7 +27,7 @@ class LoyaltyCardDaoTestImpl : LoyaltyCardDao {
     }
 
     override suspend fun getProviderCard(
-        provider: LoyaltyCardProviderType, providerCardId: Int
+        provider: LoyaltyCardProviderType, intent: String
     ): LoyaltyCardEntity? {
         TODO("Not yet implemented")
     }
