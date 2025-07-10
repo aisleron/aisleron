@@ -33,7 +33,7 @@ class AddLoyaltyCardUseCaseImpl(
         )
 
         return existingCard?.let {
-            loyaltyCardRepository.update(it)
+            loyaltyCardRepository.update(it.copy(name = loyaltyCard.name))
             existingCard.id
         } ?: loyaltyCardRepository.add(loyaltyCard)
     }

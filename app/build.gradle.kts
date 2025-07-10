@@ -186,6 +186,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:5.13.2")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
     testImplementation("androidx.room:room-testing:2.7.2")
+    testImplementation("io.mockk:mockk:1.14.4")
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 

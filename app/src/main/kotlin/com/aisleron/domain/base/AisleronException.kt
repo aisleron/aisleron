@@ -55,6 +55,9 @@ sealed class AisleronException(
     class LoyaltyCardProviderException(message: String? = null, cause: Throwable? = null) :
         AisleronException(ExceptionCode.LOYALTY_CARD_PROVIDER_EXCEPTION, message, cause)
 
+    class InvalidLoyaltyCardException(message: String? = null, cause: Throwable? = null) :
+        AisleronException(ExceptionCode.INVALID_LOYALTY_CARD_EXCEPTION, message, cause)
+
     enum class ExceptionCode {
         GENERIC_EXCEPTION,
         DELETE_DEFAULT_AISLE_EXCEPTION,
@@ -67,6 +70,7 @@ sealed class AisleronException(
         DUPLICATE_PRODUCT_EXCEPTION,
         DUPLICATE_LOCATION_EXCEPTION,
         SAMPLE_DATA_CREATION_EXCEPTION,
-        LOYALTY_CARD_PROVIDER_EXCEPTION
+        LOYALTY_CARD_PROVIDER_EXCEPTION,
+        INVALID_LOYALTY_CARD_EXCEPTION
     }
 }

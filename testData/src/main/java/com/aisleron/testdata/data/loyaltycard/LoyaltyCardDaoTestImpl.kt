@@ -21,30 +21,56 @@ import com.aisleron.data.loyaltycard.LoyaltyCardDao
 import com.aisleron.data.loyaltycard.LoyaltyCardEntity
 import com.aisleron.domain.loyaltycard.LoyaltyCardProviderType
 
-class LoyaltyCardDaoTestImpl : LoyaltyCardDao {
+class LoyaltyCardDaoTestImpl(private val locationLoyaltyCardDao: LocationLoyaltyCardDaoTestImpl) :
+    LoyaltyCardDao {
+
+    private val loyaltyCardList = mutableListOf<LoyaltyCardEntity>()
+
     override suspend fun getLoyaltyCard(loyaltyCardId: Int): LoyaltyCardEntity? {
-        TODO("Not yet implemented")
+        return loyaltyCardList.find { it.id == loyaltyCardId }
     }
 
     override suspend fun getProviderCard(
         provider: LoyaltyCardProviderType, intent: String
     ): LoyaltyCardEntity? {
-        TODO("Not yet implemented")
+        return loyaltyCardList.find { it.provider == provider && it.intent == intent }
     }
 
     override suspend fun getLoyaltyCards(): List<LoyaltyCardEntity> {
-        TODO("Not yet implemented")
+        return loyaltyCardList
     }
 
     override suspend fun getLoyaltyCardForLocation(locationId: Int): LoyaltyCardEntity? {
-        TODO("Not yet implemented")
+        return loyaltyCardList.find {
+            it.id == locationLoyaltyCardDao.getLocationLoyaltyCard(
+                locationId
+            )?.loyaltyCardId
+        }
     }
 
     override suspend fun upsert(vararg entity: LoyaltyCardEntity): List<Long> {
-        TODO("Not yet implemented")
+        val result = mutableListOf<Long>()
+        entity.forEach {
+            val existingEntity = getLoyaltyCard(it.id)
+            val id = existingEntity?.let {
+                loyaltyCardList.removeAt(loyaltyCardList.indexOf(existingEntity))
+                existingEntity.id
+            } ?: ((loyaltyCardList.maxOfOrNull { e -> e.id }?.toInt() ?: 0) + 1)
+
+            val newEntity = LoyaltyCardEntity(
+                id = id,
+                name = it.name,
+                provider = it.provider,
+                intent = it.intent
+            )
+
+            loyaltyCardList.add(newEntity)
+            result.add(existingEntity?.let { -1 } ?: newEntity.id.toLong())
+        }
+        return result
     }
 
     override suspend fun delete(vararg entity: LoyaltyCardEntity) {
-        TODO("Not yet implemented")
+        loyaltyCardList.removeIf { it in entity }
     }
 }

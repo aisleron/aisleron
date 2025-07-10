@@ -1,5 +1,5 @@
 Enhancements
-*
+* Added loyalty card lookups using Catima — Loyalty Card Wallet
 
 Bug Fixes
 *

@@ -240,7 +240,10 @@ val useCaseModule = module {
      */
     factory<AddLoyaltyCardUseCase> { AddLoyaltyCardUseCaseImpl(loyaltyCardRepository = get()) }
     factory<AddLoyaltyCardToLocationUseCase> {
-        AddLoyaltyCardToLocationUseCaseImpl(loyaltyCardRepository = get())
+        AddLoyaltyCardToLocationUseCaseImpl(
+            loyaltyCardRepository = get(),
+            getLocationUseCase = get()
+        )
     }
 
     factory<RemoveLoyaltyCardFromLocationUseCase> {

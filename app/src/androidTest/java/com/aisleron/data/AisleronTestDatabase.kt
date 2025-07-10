@@ -28,7 +28,7 @@ import com.aisleron.data.product.ProductDao
 import com.aisleron.testdata.data.aisle.AisleDaoTestImpl
 import com.aisleron.testdata.data.aisleproduct.AisleProductDaoTestImpl
 import com.aisleron.testdata.data.location.LocationDaoTestImpl
-import com.aisleron.testdata.data.location.LocationLoyaltyCardDaoTestImpl
+import com.aisleron.testdata.data.loyaltycard.LocationLoyaltyCardDaoTestImpl
 import com.aisleron.testdata.data.loyaltycard.LoyaltyCardDaoTestImpl
 import com.aisleron.testdata.data.product.ProductDaoTestImpl
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -42,8 +42,8 @@ class AisleronTestDatabase : AisleronDb {
     private val _aisleDao = AisleDaoTestImpl(_aisleProductDao)
     private val _locationDao = LocationDaoTestImpl(_aisleDao)
     private val _maintenanceDao = MaintenanceDaoTestImpl()
-    private val _loyaltyCardDao = LoyaltyCardDaoTestImpl()
     private val _locationLoyaltyCardDao = LocationLoyaltyCardDaoTestImpl()
+    private val _loyaltyCardDao = LoyaltyCardDaoTestImpl(_locationLoyaltyCardDao)
 
     override fun aisleDao(): AisleDao = _aisleDao
 

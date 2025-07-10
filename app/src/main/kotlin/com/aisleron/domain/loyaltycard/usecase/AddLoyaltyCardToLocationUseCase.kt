@@ -17,6 +17,8 @@
 
 package com.aisleron.domain.loyaltycard.usecase
 
+import com.aisleron.domain.base.AisleronException
+import com.aisleron.domain.location.usecase.GetLocationUseCase
 import com.aisleron.domain.loyaltycard.LoyaltyCardRepository
 
 interface AddLoyaltyCardToLocationUseCase {
@@ -25,8 +27,15 @@ interface AddLoyaltyCardToLocationUseCase {
 
 class AddLoyaltyCardToLocationUseCaseImpl(
     private val loyaltyCardRepository: LoyaltyCardRepository,
+    private val getLocationUseCase: GetLocationUseCase
 ) : AddLoyaltyCardToLocationUseCase {
     override suspend operator fun invoke(locationId: Int, loyaltyCardId: Int) {
+        getLocationUseCase(locationId)
+            ?: throw AisleronException.InvalidLocationException("Invalid Location Id provided")
+
+        loyaltyCardRepository.get(loyaltyCardId)
+            ?: throw AisleronException.InvalidLoyaltyCardException("Invalid Loyalty Card Id provided")
+
         loyaltyCardRepository.addToLocation(locationId, loyaltyCardId)
     }
 }
