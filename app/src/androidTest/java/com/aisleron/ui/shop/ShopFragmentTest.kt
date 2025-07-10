@@ -26,8 +26,11 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.matcher.RootMatchers.isDialog
 import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.platform.app.InstrumentationRegistry
 import com.aisleron.R
 import com.aisleron.di.KoinTestRule
@@ -37,11 +40,15 @@ import com.aisleron.di.useCaseModule
 import com.aisleron.di.viewModelTestModule
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.location.LocationType
+import com.aisleron.domain.loyaltycard.LoyaltyCard
+import com.aisleron.domain.loyaltycard.LoyaltyCardProviderType
+import com.aisleron.domain.loyaltycard.LoyaltyCardRepository
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import com.aisleron.ui.AddEditFragmentListenerTestImpl
 import com.aisleron.ui.ApplicationTitleUpdateListenerTestImpl
 import com.aisleron.ui.FabHandlerTestImpl
 import com.aisleron.ui.bundles.Bundler
+import com.aisleron.ui.loyaltycard.LoyaltyCardProvider
 import com.aisleron.ui.loyaltycard.LoyaltyCardProviderTestImpl
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -90,7 +97,7 @@ class ShopFragmentTest : KoinTest {
         val bundle = bundler.makeEditLocationBundle(existingShop.id)
         getFragmentScenario(bundle)
 
-        onView(withId(R.id.edt_shop_name)).check(matches(ViewMatchers.withText(existingShop.name)))
+        onView(withId(R.id.edt_shop_name)).check(matches(withText(existingShop.name)))
         onView(withId(R.id.swc_shop_pinned)).check(matches(ViewMatchers.isChecked()))
     }
 
@@ -118,7 +125,7 @@ class ShopFragmentTest : KoinTest {
 
         val shop = get<LocationRepository>().getAll().firstOrNull { it.name == newShopName }
 
-        onView(withId(R.id.edt_shop_name)).check(matches(ViewMatchers.withText(newShopName)))
+        onView(withId(R.id.edt_shop_name)).check(matches(withText(newShopName)))
         Assert.assertTrue(addEditFragmentListener.addEditSuccess)
         Assert.assertNotNull(shop)
     }
@@ -133,7 +140,7 @@ class ShopFragmentTest : KoinTest {
             it.onMenuItemSelected(menuItem)
         }
 
-        onView(withId(R.id.edt_shop_name)).check(matches(ViewMatchers.withText("")))
+        onView(withId(R.id.edt_shop_name)).check(matches(withText("")))
         Assert.assertFalse(addEditFragmentListener.addEditSuccess)
     }
 
@@ -153,7 +160,7 @@ class ShopFragmentTest : KoinTest {
 
         val updatedShop = get<LocationRepository>().get(existingShop.id)
 
-        onView(withId(R.id.edt_shop_name)).check(matches(ViewMatchers.withText(newShopName)))
+        onView(withId(R.id.edt_shop_name)).check(matches(withText(newShopName)))
         Assert.assertTrue(addEditFragmentListener.addEditSuccess)
         Assert.assertNotNull(updatedShop)
         Assert.assertEquals(newShopName, updatedShop?.name)
@@ -218,7 +225,9 @@ class ShopFragmentTest : KoinTest {
         return menuItem
     }
 
-    private fun getFragmentScenario(bundle: Bundle): FragmentScenario<ShopFragment> {
+    private fun getFragmentScenario(
+        bundle: Bundle, loyaltyCardProvider: LoyaltyCardProvider? = null
+    ): FragmentScenario<ShopFragment> {
         val scenario = launchFragmentInContainer<ShopFragment>(
             fragmentArgs = bundle,
             themeResId = R.style.Theme_Aisleron,
@@ -227,11 +236,101 @@ class ShopFragmentTest : KoinTest {
                     addEditFragmentListener,
                     applicationTitleUpdateListener,
                     fabHandler,
-                    LoyaltyCardProviderTestImpl()
+                    loyaltyCardProvider ?: LoyaltyCardProviderTestImpl()
                 )
             }
         )
 
         return scenario
     }
+
+    @Test
+    fun onLookupLoyaltyCardClick_ProviderReturnsLoyaltyCard_LoyaltyCardNameDisplayed() = runTest {
+        val existingShop = get<LocationRepository>().getAll().first { it.type == LocationType.SHOP }
+        val bundle = bundler.makeEditLocationBundle(existingShop.id)
+        val loyaltyCardProvider =
+            LoyaltyCardProviderTestImpl(loyaltyCardName = "Test Loyalty Card Lookup")
+
+        getFragmentScenario(bundle, loyaltyCardProvider)
+
+        onView(withId(R.id.btn_lookup_loyalty_card)).perform(ViewActions.click())
+
+        onView(withId(R.id.edt_shop_loyalty_card)).check(matches(withText("Test Loyalty Card Lookup")))
+    }
+
+    private suspend fun getLoyaltyCard(): LoyaltyCard {
+        val loyaltyCard = LoyaltyCard(
+            id = 0,
+            name = "Loyalty Card Test",
+            provider = LoyaltyCardProviderType.CATIMA,
+            intent = "Dummy Intent"
+        )
+
+        val loyaltyCardId = get<LoyaltyCardRepository>().add(loyaltyCard)
+
+        return loyaltyCard.copy(id = loyaltyCardId)
+    }
+
+    @Test
+    fun onCreateShopFragment_LocationHasLoyaltyCard_LoyaltyCardDisplayed() = runTest {
+        val existingShop = get<LocationRepository>().getAll().first { it.type == LocationType.SHOP }
+        val loyaltyCard = getLoyaltyCard()
+        get<LoyaltyCardRepository>().addToLocation(existingShop.id, loyaltyCard.id)
+        val bundle = bundler.makeEditLocationBundle(existingShop.id)
+
+        getFragmentScenario(bundle)
+
+        onView(withId(R.id.edt_shop_loyalty_card)).check(matches(withText(loyaltyCard.name)))
+    }
+
+    @Test
+    fun onRemoveLoyaltyCardClick_LocationHAsLoyaltyCard_LoyaltyCardNameCleared() = runTest {
+        val existingShop = get<LocationRepository>().getAll().first { it.type == LocationType.SHOP }
+        val loyaltyCard = getLoyaltyCard()
+        get<LoyaltyCardRepository>().addToLocation(existingShop.id, loyaltyCard.id)
+        val bundle = bundler.makeEditLocationBundle(existingShop.id)
+
+        getFragmentScenario(bundle)
+
+        onView(withId(R.id.btn_delete_loyalty_card)).perform(ViewActions.click())
+
+        onView(withId(R.id.edt_shop_loyalty_card)).check(matches(withText("")))
+    }
+
+    @Test
+    fun onLookupLoyaltyCardClick_ProviderNotInstalled_ShowNotInstalledDialog() = runTest {
+        val existingShop = get<LocationRepository>().getAll().first { it.type == LocationType.SHOP }
+        val bundle = bundler.makeEditLocationBundle(existingShop.id)
+        val loyaltyCardProvider = LoyaltyCardProviderTestImpl(throwNotInstalledException = true)
+        getFragmentScenario(bundle, loyaltyCardProvider)
+
+        onView(withId(R.id.btn_lookup_loyalty_card)).perform(ViewActions.click())
+
+        onView(withText(R.string.loyalty_card_provider_missing_title))
+            .inRoot(isDialog())
+            .check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun onLookupLoyaltyCardClick_ProviderGenericError_ShowErrorSnackBar() = runTest {
+        val existingShop = get<LocationRepository>().getAll().first { it.type == LocationType.SHOP }
+        val bundle = bundler.makeEditLocationBundle(existingShop.id)
+        val loyaltyCardProvider = LoyaltyCardProviderTestImpl(throwGenericException = true)
+        getFragmentScenario(bundle, loyaltyCardProvider)
+
+        onView(withId(R.id.btn_lookup_loyalty_card)).perform(ViewActions.click())
+
+        onView(withId(com.google.android.material.R.id.snackbar_text)).check(
+            matches(
+                ViewMatchers.withEffectiveVisibility(
+                    ViewMatchers.Visibility.VISIBLE
+                )
+            )
+        )
+    }
+
+    /**
+     * Test Provider not Installed
+     * Test Generic Exception caught
+     */
 }

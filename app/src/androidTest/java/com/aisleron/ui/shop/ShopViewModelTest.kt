@@ -29,6 +29,9 @@ import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.location.usecase.AddLocationUseCase
 import com.aisleron.domain.location.usecase.GetLocationUseCase
 import com.aisleron.domain.location.usecase.UpdateLocationUseCase
+import com.aisleron.domain.loyaltycard.LoyaltyCard
+import com.aisleron.domain.loyaltycard.LoyaltyCardProviderType
+import com.aisleron.domain.loyaltycard.LoyaltyCardRepository
 import com.aisleron.domain.loyaltycard.usecase.AddLoyaltyCardToLocationUseCase
 import com.aisleron.domain.loyaltycard.usecase.AddLoyaltyCardUseCase
 import com.aisleron.domain.loyaltycard.usecase.GetLoyaltyCardForLocationUseCase
@@ -203,6 +206,105 @@ class ShopViewModelTest(private val pinned: Boolean, private val showDefaultAisl
             exceptionMessage,
             (svm.shopUiState.value as ShopViewModel.ShopUiState.Error).errorMessage
         )
+    }
+
+    private suspend fun getLoyaltyCard(): LoyaltyCard {
+        val loyaltyCard = LoyaltyCard(
+            id = 0,
+            name = "Loyalty Card Test",
+            provider = LoyaltyCardProviderType.CATIMA,
+            intent = "Dummy Intent"
+        )
+
+        val loyaltyCardId = get<LoyaltyCardRepository>().add(loyaltyCard)
+
+        return loyaltyCard.copy(id = loyaltyCardId)
+    }
+
+    @Test
+    fun hydrate_HasLoyaltyCard_LoyaltyCardNamePopulated() = runTest {
+        val location = get<LocationRepository>().getAll().first { it.type == LocationType.SHOP }
+        val loyaltyCard = getLoyaltyCard()
+        get<LoyaltyCardRepository>().addToLocation(location.id, loyaltyCard.id)
+
+        shopViewModel.hydrate(location.id)
+
+        Assert.assertEquals(loyaltyCard.name, shopViewModel.loyaltyCardName)
+    }
+
+    @Test
+    fun hydrate_HasNoLoyaltyCard_LoyaltyCardNameIsNull() = runTest {
+        val location = get<LocationRepository>().getAll().first { it.type == LocationType.SHOP }
+
+        shopViewModel.hydrate(location.id)
+
+        Assert.assertNull(shopViewModel.loyaltyCardName)
+    }
+
+    @Test
+    fun setLoyaltyCard_HasLoyaltyCard_LoyaltyCardNameUpdated() = runTest {
+        val location = get<LocationRepository>().getAll().first { it.type == LocationType.SHOP }
+        val loyaltyCard = getLoyaltyCard()
+        shopViewModel.hydrate(location.id)
+
+        shopViewModel.setLoyaltyCard(loyaltyCard)
+
+        Assert.assertEquals(loyaltyCard.name, shopViewModel.loyaltyCardName)
+    }
+
+    @Test
+    fun removeLoyaltyCard_MethodCalled_LoyaltyCardNameIsNull() = runTest {
+        val location = get<LocationRepository>().getAll().first { it.type == LocationType.SHOP }
+        val loyaltyCard = getLoyaltyCard()
+        shopViewModel.hydrate(location.id)
+        shopViewModel.setLoyaltyCard(loyaltyCard)
+
+        shopViewModel.removeLoyaltyCard()
+
+        Assert.assertNull(shopViewModel.loyaltyCardName)
+    }
+
+    @Test
+    fun saveLocation_HasLoyaltyCard_LoyaltyCardSavedAgainstLocation() = runTest {
+        val location = get<LocationRepository>().getAll().first { it.type == LocationType.SHOP }
+        val loyaltyCard = getLoyaltyCard()
+        shopViewModel.hydrate(location.id)
+        shopViewModel.setLoyaltyCard(loyaltyCard)
+
+        shopViewModel.saveLocation(location.name, pinned, showDefaultAisle)
+
+        val savedLoyaltyCard = get<LoyaltyCardRepository>().getForLocation(location.id)
+
+        Assert.assertEquals(loyaltyCard, savedLoyaltyCard)
+    }
+
+    @Test
+    fun saveLocation_LoyaltyCardIsNull_RemoveLoyaltyCardFromLocation() = runTest {
+        val location = get<LocationRepository>().getAll().first { it.type == LocationType.SHOP }
+        val loyaltyCard = getLoyaltyCard()
+        get<LoyaltyCardRepository>().addToLocation(location.id, loyaltyCard.id)
+        shopViewModel.hydrate(location.id)
+        shopViewModel.setLoyaltyCard(null)
+
+        shopViewModel.saveLocation(location.name, pinned, showDefaultAisle)
+
+        val savedLoyaltyCard = get<LoyaltyCardRepository>().getForLocation(location.id)
+
+        Assert.assertNull(savedLoyaltyCard)
+    }
+
+    @Test
+    fun saveLocation_IsNewLocation_LoyaltyCardSavedAgainstLocation() = runTest {
+        val loyaltyCard = getLoyaltyCard()
+        shopViewModel.hydrate(0)
+        shopViewModel.setLoyaltyCard(loyaltyCard)
+
+        shopViewModel.saveLocation("Test New Location With Loyalty Card", pinned, showDefaultAisle)
+
+        val location = get<LocationRepository>().getByName("Test New Location With Loyalty Card")!!
+        val savedLoyaltyCard = get<LoyaltyCardRepository>().getForLocation(location.id)
+
+        Assert.assertEquals(loyaltyCard, savedLoyaltyCard)
     }
 
     companion object {

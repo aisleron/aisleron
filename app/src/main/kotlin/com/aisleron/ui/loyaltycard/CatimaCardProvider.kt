@@ -42,7 +42,7 @@ class CatimaCardProvider : LoyaltyCardProvider {
 
     override fun lookupLoyaltyCardShortcut(context: Context) {
         if (!isInstalled(context)) {
-            throw throw AisleronException.LoyaltyCardProviderException(context.getString(R.string.loyalty_card_provider_missing_exception))
+            throw AisleronException.LoyaltyCardProviderException(context.getString(R.string.loyalty_card_provider_missing_exception))
         }
 
         val intent = Intent().apply {

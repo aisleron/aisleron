@@ -77,7 +77,7 @@ class ShopViewModel(
             try {
                 _location?.let {
                     //Save the loyalty card details first, or it won't update correctly on the
-                    //shopping list page due to teh dat aflow collection
+                    //shopping list page due to the Location flow collection
                     saveLoyaltyCard(it.id, _initialLoyaltyCardId, _loyaltyCard)
                     updateLocation(it, name, pinned, showDefaultAisle)
                 } ?: run {
