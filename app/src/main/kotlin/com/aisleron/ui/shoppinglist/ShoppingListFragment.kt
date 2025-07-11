@@ -18,7 +18,6 @@
 package com.aisleron.ui.shoppinglist
 
 import android.app.SearchManager
-import android.content.ActivityNotFoundException
 import android.content.Context
 import android.os.Bundle
 import android.view.ActionMode
@@ -488,7 +487,7 @@ class ShoppingListFragment(
             loyaltyCardProvider.displayLoyaltyCard(requireContext(), loyaltyCard)
         } catch (e: AisleronException.LoyaltyCardProviderException) {
             loyaltyCardProvider.getNotInstalledDialog(requireContext()).show()
-        } catch (e: ActivityNotFoundException) {
+        } catch (e: Exception) {
             displayErrorSnackBar(AisleronException.ExceptionCode.GENERIC_EXCEPTION, e.message)
         }
     }

@@ -38,6 +38,9 @@ import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.location.usecase.AddLocationUseCase
 import com.aisleron.domain.location.usecase.SortLocationByNameUseCase
+import com.aisleron.domain.loyaltycard.LoyaltyCard
+import com.aisleron.domain.loyaltycard.LoyaltyCardProviderType
+import com.aisleron.domain.loyaltycard.LoyaltyCardRepository
 import com.aisleron.domain.loyaltycard.usecase.GetLoyaltyCardForLocationUseCase
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
@@ -709,5 +712,100 @@ class ShoppingListViewModelTest : KoinTest {
 
         val sortedAisle = aisleRepository.get(aisleId)
         Assert.assertEquals(1, sortedAisle?.rank)
+    }
+
+    @Test
+    fun sortListByName_ExceptionRaised_UiStateIsError() {
+        val exceptionMessage = "Error on Sort by Name"
+
+        declare<SortLocationByNameUseCase> {
+            object : SortLocationByNameUseCase {
+                override suspend operator fun invoke(locationId: Int) {
+                    throw Exception(exceptionMessage)
+                }
+            }
+        }
+
+        val vm = get<ShoppingListViewModel>()
+
+        vm.hydrate(1, FilterType.NEEDED)
+        vm.sortListByName()
+
+        val uiState = vm.shoppingListUiState.value
+        Assert.assertTrue(uiState is ShoppingListViewModel.ShoppingListUiState.Error)
+        with(uiState as ShoppingListViewModel.ShoppingListUiState.Error) {
+            Assert.assertEquals(AisleronException.ExceptionCode.GENERIC_EXCEPTION, this.errorCode)
+            Assert.assertEquals(exceptionMessage, this.errorMessage)
+        }
+    }
+
+    @Test
+    fun hydrate_LocationHasLoyaltyCard_LoyaltyCardPopulated() = runTest {
+        val existingLocation =
+            get<LocationRepository>().getAll().first { it.type == LocationType.SHOP }
+
+        val loyaltyCard = LoyaltyCard(
+            id = 0,
+            name = "Test Loyalty Card",
+            provider = LoyaltyCardProviderType.CATIMA,
+            intent = "Dummy Intent"
+        )
+
+        val loyaltyCardRepository = get<LoyaltyCardRepository>()
+        val loyaltyCardId = loyaltyCardRepository.add(loyaltyCard)
+        loyaltyCardRepository.addToLocation(existingLocation.id, loyaltyCardId)
+
+        shoppingListViewModel.hydrate(existingLocation.id, existingLocation.defaultFilter)
+
+        assertEquals(loyaltyCard.copy(id = loyaltyCardId), shoppingListViewModel.loyaltyCard)
+    }
+
+    @Test
+    fun hydrate_LocationHasNoLoyaltyCard_LoyaltyCardIsNull() = runTest {
+        val existingLocation =
+            get<LocationRepository>().getAll().first { it.type == LocationType.SHOP }
+
+        val loyaltyCardRepository = get<LoyaltyCardRepository>()
+        val loyaltyCard = loyaltyCardRepository.getForLocation(existingLocation.id)
+        loyaltyCard?.let {
+            loyaltyCardRepository.removeFromLocation(existingLocation.id, it.id)
+        }
+
+        shoppingListViewModel.hydrate(existingLocation.id, existingLocation.defaultFilter)
+
+        assertNull(shoppingListViewModel.loyaltyCard)
+    }
+
+    @Test
+    fun movedItem_ItemWasMoved_ShowAllListItems() = runTest {
+        val aisleName = "Empty Aisle"
+        val existingLocation =
+            get<LocationRepository>().getAll().first { it.type == LocationType.SHOP }
+
+        get<AddAisleUseCase>().invoke(
+            Aisle(
+                name = aisleName,
+                products = emptyList(),
+                locationId = existingLocation.id,
+                rank = 999,
+                id = 0,
+                isDefault = false,
+                expanded = true
+            ))
+
+        shoppingListViewModel.hydrate(existingLocation.id, existingLocation.defaultFilter)
+        val shoppingList =
+            (shoppingListViewModel.shoppingListUiState.value as ShoppingListViewModel.ShoppingListUiState.Updated).shoppingList
+
+        val item = shoppingList.first { it.itemType == ShoppingListItem.ItemType.AISLE }
+
+        shoppingListViewModel.movedItem(item)
+
+        val fullShoppingList =
+            (shoppingListViewModel.shoppingListUiState.value as ShoppingListViewModel.ShoppingListUiState.Updated).shoppingList
+
+        assertTrue { shoppingList.count() < fullShoppingList.count() }
+        assertNull(shoppingList.firstOrNull { it.itemType == ShoppingListItem.ItemType.AISLE && it.name == aisleName })
+        assertNotNull(fullShoppingList.firstOrNull { it.itemType == ShoppingListItem.ItemType.AISLE && it.name == aisleName })
     }
 }

@@ -29,6 +29,8 @@ class LoyaltyCardProviderTestImpl(
     val throwNotInstalledException: Boolean = false,
     val throwGenericException: Boolean = false
 ) : LoyaltyCardProvider {
+    private var _loyaltyCardDisplayed: Boolean = false
+    val loyaltyCardDisplayed: Boolean get() = _loyaltyCardDisplayed
 
     private lateinit var _onLoyaltyCardSelected: (LoyaltyCard?) -> Unit
 
@@ -57,7 +59,15 @@ class LoyaltyCardProviderTestImpl(
     }
 
     override fun displayLoyaltyCard(context: Context, loyaltyCard: LoyaltyCard) {
+        if (throwNotInstalledException) {
+            throw AisleronException.LoyaltyCardProviderException(context.getString(R.string.loyalty_card_provider_missing_exception))
+        }
 
+        if (throwGenericException) {
+            throw Exception("Something went wrong in the Loyalty Card Provider")
+        }
+
+        _loyaltyCardDisplayed = true
     }
 
     override fun registerLauncher(
