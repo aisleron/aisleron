@@ -15,6 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.io.FileInputStream
 import java.util.Properties
 
@@ -101,9 +102,13 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlinOptions {
-        jvmTarget = "11"
+
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_11)
+        }
     }
+
     buildFeatures {
         viewBinding = true
         buildConfig = true
@@ -155,20 +160,20 @@ dependencies {
     implementation("androidx.navigation:navigation-ui-ktx:2.9.0")
     implementation("androidx.navigation:navigation-common:2.9.0")
     implementation("androidx.navigation:navigation-runtime-ktx:2.9.0")
-    implementation("org.jetbrains.kotlin:kotlin-parcelize-runtime:2.1.21")
+    implementation("org.jetbrains.kotlin:kotlin-parcelize-runtime:2.2.0")
 
     //Database
-    implementation("androidx.sqlite:sqlite-ktx:2.5.1")
-    implementation("androidx.room:room-ktx:2.7.1")
-    implementation("androidx.room:room-runtime:2.7.1")
-    implementation("androidx.room:room-common:2.7.1")
-    implementation("androidx.room:room-testing-android:2.7.1")
-    ksp("androidx.room:room-compiler:2.7.1")
+    implementation("androidx.sqlite:sqlite-ktx:2.5.2")
+    implementation("androidx.room:room-ktx:2.7.2")
+    implementation("androidx.room:room-runtime:2.7.2")
+    implementation("androidx.room:room-common:2.7.2")
+    implementation("androidx.room:room-testing-android:2.7.2")
+    ksp("androidx.room:room-compiler:2.7.2")
 
     //Dependency Injection
-    implementation("io.insert-koin:koin-android:4.0.4")
-    implementation("io.insert-koin:koin-core-viewmodel:4.0.4")
-    implementation("io.insert-koin:koin-core:4.0.4")
+    implementation("io.insert-koin:koin-android:4.1.0")
+    implementation("io.insert-koin:koin-core-viewmodel:4.1.0")
+    implementation("io.insert-koin:koin-core:4.1.0")
 
     //Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
@@ -178,16 +183,16 @@ dependencies {
     implementation("androidx.test.espresso:espresso-contrib:3.6.1")
 
     testImplementation(project(":testData"))
-    testImplementation("org.junit.jupiter:junit-jupiter:5.13.0")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.13.2")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
-    testImplementation("androidx.room:room-testing:2.7.1")
+    testImplementation("androidx.room:room-testing:2.7.2")
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
     androidTestImplementation(project(":testData"))
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
-    androidTestImplementation("io.insert-koin:koin-test:4.0.4")
+    androidTestImplementation("io.insert-koin:koin-test:4.1.0")
     androidTestImplementation("androidx.test:core-ktx:1.6.1")
     androidTestImplementation("androidx.test.espresso:espresso-intents:3.6.1")
     androidTestImplementation("androidx.navigation:navigation-testing:2.9.0")

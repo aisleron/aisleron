@@ -26,6 +26,10 @@ import com.aisleron.data.aisleproduct.AisleProductRepositoryImpl
 import com.aisleron.data.location.LocationDao
 import com.aisleron.data.location.LocationMapper
 import com.aisleron.data.location.LocationRepositoryImpl
+import com.aisleron.data.loyaltycard.LocationLoyaltyCardDao
+import com.aisleron.data.loyaltycard.LoyaltyCardDao
+import com.aisleron.data.loyaltycard.LoyaltyCardMapper
+import com.aisleron.data.loyaltycard.LoyaltyCardRepositoryImpl
 import com.aisleron.data.product.ProductDao
 import com.aisleron.data.product.ProductMapper
 import com.aisleron.data.product.ProductRepositoryImpl
@@ -33,10 +37,13 @@ import com.aisleron.domain.GetCreateSampleDataUseCase
 import com.aisleron.domain.aisle.AisleRepository
 import com.aisleron.domain.aisleproduct.AisleProductRepository
 import com.aisleron.domain.location.LocationRepository
+import com.aisleron.domain.loyaltycard.LoyaltyCardRepository
 import com.aisleron.domain.product.ProductRepository
 import com.aisleron.testdata.data.aisle.AisleDaoTestImpl
 import com.aisleron.testdata.data.aisleproduct.AisleProductDaoTestImpl
 import com.aisleron.testdata.data.location.LocationDaoTestImpl
+import com.aisleron.testdata.data.loyaltycard.LocationLoyaltyCardDaoTestImpl
+import com.aisleron.testdata.data.loyaltycard.LoyaltyCardDaoTestImpl
 import com.aisleron.testdata.data.product.ProductDaoTestImpl
 import kotlinx.coroutines.runBlocking
 
@@ -46,6 +53,8 @@ class TestDataManager(private val addData: Boolean = true) {
     private val _aisleProductDao = AisleProductDaoTestImpl(_productDao)
     private val _aisleDao = AisleDaoTestImpl(_aisleProductDao)
     private val _locationDao = LocationDaoTestImpl(_aisleDao)
+    private val _locationLoyaltyCardDao = LocationLoyaltyCardDaoTestImpl()
+    private val _loyaltyCardDao = LoyaltyCardDaoTestImpl(_locationLoyaltyCardDao)
 
     fun aisleDao(): AisleDao = _aisleDao
 
@@ -54,6 +63,10 @@ class TestDataManager(private val addData: Boolean = true) {
     fun productDao(): ProductDao = _productDao
 
     fun aisleProductDao(): AisleProductDao = _aisleProductDao
+
+    fun loyaltyCardDao(): LoyaltyCardDao = _loyaltyCardDao
+
+    fun locationLoyaltyCardDao(): LocationLoyaltyCardDao = _locationLoyaltyCardDao
 
     init {
         initializeTestData()
@@ -69,7 +82,7 @@ class TestDataManager(private val addData: Boolean = true) {
                 getRepository<LocationRepository>(),
                 getRepository<AisleRepository>(),
                 getRepository<ProductRepository>(),
-                getRepository<AisleProductRepository>()
+                getRepository<AisleProductRepository>(),
             )
             runBlocking { createSampleDataUseCase() }
         }
@@ -88,6 +101,10 @@ class TestDataManager(private val addData: Boolean = true) {
 
             LocationRepository::class -> LocationRepositoryImpl(
                 locationDao(), LocationMapper()
+            ) as T
+
+            LoyaltyCardRepository::class -> LoyaltyCardRepositoryImpl(
+                loyaltyCardDao(), locationLoyaltyCardDao(), LoyaltyCardMapper()
             ) as T
 
             else -> throw Exception("Invalid repository type requested")

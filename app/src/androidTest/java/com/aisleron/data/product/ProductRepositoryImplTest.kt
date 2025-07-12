@@ -19,7 +19,6 @@ package com.aisleron.data.product
 
 import com.aisleron.data.DbInitializer
 import com.aisleron.data.aisle.AisleDao
-import com.aisleron.data.aisle.AisleMapper
 import com.aisleron.data.aisleproduct.AisleProductDao
 import com.aisleron.data.location.LocationDao
 import com.aisleron.di.KoinTestRule
@@ -27,7 +26,6 @@ import com.aisleron.di.daoModule
 import com.aisleron.di.inMemoryDatabaseTestModule
 import com.aisleron.di.repositoryModule
 import com.aisleron.di.useCaseModule
-import com.aisleron.domain.FilterType
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -77,81 +75,6 @@ class ProductRepositoryImplTest : KoinTest {
     }
 
     @Test
-    fun getInStock_ReturnsInStockProducts() {
-        val inStockCount = runBlocking { get<ProductDao>().getProducts().count { it.inStock } }
-
-        val inStockProducts = runBlocking { productRepositoryImpl.getInStock() }
-
-        assertTrue(inStockProducts.isNotEmpty())
-        assertEquals(inStockCount, inStockProducts.count())
-    }
-
-    @Test
-    fun getNeeded_ReturnsNeededProducts() = runTest {
-        val neededCount = get<ProductDao>().getProducts().count { !it.inStock }
-
-        val neededProducts = productRepositoryImpl.getNeeded()
-
-        assertTrue(neededProducts.isNotEmpty())
-        assertEquals(neededCount, neededProducts.count())
-    }
-
-    @Test
-    fun getByFilter_RequestInStock_ReturnsInStockProducts() = runTest {
-        val inStockCount = get<ProductDao>().getProducts().count { it.inStock }
-
-        val inStockProducts = productRepositoryImpl.getByFilter(FilterType.IN_STOCK)
-
-        assertTrue(inStockProducts.isNotEmpty())
-        assertEquals(inStockCount, inStockProducts.count())
-    }
-
-    @Test
-    fun getByFilter_RequestInNeeded_ReturnsNeededProducts() = runTest {
-        val neededCount = get<ProductDao>().getProducts().count { !it.inStock }
-
-        val neededProducts = productRepositoryImpl.getByFilter(FilterType.NEEDED)
-
-        assertTrue(neededProducts.isNotEmpty())
-        assertEquals(neededCount, neededProducts.count())
-    }
-
-    @Test
-    fun getByFilter_RequestAll_ReturnsAllProducts() = runTest {
-        val allCount = get<ProductDao>().getProducts().count()
-
-        val allProducts = productRepositoryImpl.getByFilter(FilterType.ALL)
-
-        assertTrue(allProducts.isNotEmpty())
-        assertEquals(allCount, allProducts.count())
-    }
-
-    @Test
-    fun getByAisle_WithAisleId_ReturnAisleProducts() = runTest {
-        val aisleId = get<AisleProductDao>().getAisleProducts().first().aisleProduct.aisleId
-        val aisleProductCount =
-            get<AisleProductDao>().getAisleProducts().count { it.aisleProduct.aisleId == aisleId }
-
-        val products = productRepositoryImpl.getByAisle(aisleId)
-
-        assertEquals(aisleProductCount, products.count())
-    }
-
-    @Test
-    fun getByAisle_WithAisleEntity_ReturnAisleProducts() = runTest {
-        val aisleId = get<AisleProductDao>().getAisleProducts().first().aisleProduct.aisleId
-        val aisle = AisleMapper().toModel(get<AisleDao>().getAisle(aisleId)!!)
-
-        val aisleProductCount =
-            get<AisleProductDao>().getAisleProducts().count { it.aisleProduct.aisleId == aisle.id }
-
-
-        val products = productRepositoryImpl.getByAisle(aisle)
-
-        assertEquals(aisleProductCount, products.count())
-    }
-
-    @Test
     fun getByName_ValidNameProvided_ReturnProduct() = runTest {
         val productName = get<ProductDao>().getProducts().first().name
 
@@ -185,32 +108,6 @@ class ProductRepositoryImplTest : KoinTest {
         val product = productRepositoryImpl.get(productId)
 
         assertNull(product)
-    }
-
-    @Test
-    fun getMultiple_MultipleValidIdsProvided_CorrectProductsReturned() = runTest {
-        val allProducts = get<ProductDao>().getProducts()
-        val productIdOne = allProducts.first().id
-        val productIdTwo = allProducts.last().id
-
-        val products = productRepositoryImpl.getMultiple(productIdOne, productIdTwo)
-
-        assertEquals(2, products.count())
-        assertNotNull(products.firstOrNull { it.id == productIdOne })
-        assertNotNull(products.firstOrNull { it.id == productIdTwo })
-    }
-
-    @Test
-    fun getMultiple_InvalidIdsProvided_OnlyCorrectProductsReturned() = runTest {
-        val allProducts = get<ProductDao>().getProducts()
-        val productIdOne = allProducts.first().id
-        val productIdTwo = -10001
-
-        val products = productRepositoryImpl.getMultiple(productIdOne, productIdTwo)
-
-        assertEquals(1, products.count())
-        assertNotNull(products.firstOrNull { it.id == productIdOne })
-        assertNull(products.firstOrNull { it.id == productIdTwo })
     }
 
     @Test

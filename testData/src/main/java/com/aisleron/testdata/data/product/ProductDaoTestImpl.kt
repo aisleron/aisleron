@@ -56,24 +56,8 @@ class ProductDaoTestImpl : ProductDao {
         return productList.find { it.id == productId }
     }
 
-    override suspend fun getProducts(vararg productId: Int): List<ProductEntity> {
-        TODO("Not yet implemented")
-    }
-
     override suspend fun getProducts(): List<ProductEntity> {
         return productList
-    }
-
-    override suspend fun getProductsForAisle(aisleId: Int): List<ProductEntity> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun getInStockProducts(): List<ProductEntity> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun getNeededProducts(): List<ProductEntity> {
-        TODO("Not yet implemented")
     }
 
     override suspend fun getProductByName(name: String): ProductEntity? {

@@ -34,6 +34,8 @@ class AisleronExceptionMap {
             ExceptionCode.DUPLICATE_PRODUCT_EXCEPTION -> R.string.duplicate_product_exception
             ExceptionCode.DUPLICATE_LOCATION_EXCEPTION -> R.string.duplicate_location_exception
             ExceptionCode.SAMPLE_DATA_CREATION_EXCEPTION -> R.string.sample_data_creation_exception
+            ExceptionCode.LOYALTY_CARD_PROVIDER_EXCEPTION -> R.string.loyalty_card_provider_missing_exception
+            ExceptionCode.INVALID_LOYALTY_CARD_EXCEPTION -> R.string.invalid_loyalty_card_exception
         }
     }
 }

@@ -66,10 +66,6 @@ class LocationDaoTestImpl(private val aisleDao: AisleDaoTestImpl) : LocationDao 
         return locationList.find { it.id == locationId }
     }
 
-    override suspend fun getLocations(vararg locationId: Int): List<LocationEntity> {
-        return locationList.filter { it.id in locationId }
-    }
-
     override suspend fun getLocations(): List<LocationEntity> {
         return locationList
     }
@@ -85,16 +81,9 @@ class LocationDaoTestImpl(private val aisleDao: AisleDaoTestImpl) : LocationDao 
         )
     }
 
-    override suspend fun getLocationsWithAisles(vararg locationId: Int): List<LocationWithAisles> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun getLocationsWithAisles(): List<LocationWithAisles> {
-        TODO("Not yet implemented")
-    }
-
     override fun getLocationWithAislesWithProducts(locationId: Int): Flow<LocationWithAislesWithProducts?> {
         val location = locationList.firstOrNull { it.id == locationId }
+
         var result: LocationWithAislesWithProducts? = null
 
         location?.let {
@@ -106,14 +95,6 @@ class LocationDaoTestImpl(private val aisleDao: AisleDaoTestImpl) : LocationDao 
             )
         }
         return flowOf(result)
-    }
-
-    override suspend fun getLocationsWithAislesWithProducts(vararg locationId: Int): List<LocationWithAislesWithProducts> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun getLocationsWithAislesWithProducts(): List<LocationWithAislesWithProducts> {
-        TODO("Not yet implemented")
     }
 
     override fun getShops(): Flow<List<LocationEntity>> {

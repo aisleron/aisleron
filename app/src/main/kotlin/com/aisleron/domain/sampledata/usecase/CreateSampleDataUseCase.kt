@@ -155,7 +155,13 @@ class CreateSampleDataUseCaseImpl(
 
     private suspend fun addShop() {
         val location = Location(
-            0, LocationType.SHOP, FilterType.NEEDED, SHOP_NAME, true, emptyList(), true
+            id = 0,
+            type = LocationType.SHOP,
+            defaultFilter = FilterType.NEEDED,
+            name = SHOP_NAME,
+            pinned = true,
+            aisles = emptyList(),
+            showDefaultAisle = true
         )
 
         val shopId = addLocationUseCase(location)

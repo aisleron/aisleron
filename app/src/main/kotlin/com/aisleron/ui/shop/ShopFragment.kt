@@ -40,6 +40,7 @@ import com.aisleron.ui.ApplicationTitleUpdateListener
 import com.aisleron.ui.FabHandler
 import com.aisleron.ui.bundles.AddEditLocationBundle
 import com.aisleron.ui.bundles.Bundler
+import com.aisleron.ui.loyaltycard.LoyaltyCardProvider
 import com.aisleron.ui.widgets.ErrorSnackBar
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
@@ -49,7 +50,8 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class ShopFragment(
     private val addEditFragmentListener: AddEditFragmentListener,
     private val applicationTitleUpdateListener: ApplicationTitleUpdateListener,
-    private val fabHandler: FabHandler
+    private val fabHandler: FabHandler,
+    private val loyaltyCardProvider: LoyaltyCardProvider
 ) : Fragment(), MenuProvider {
     private val shopViewModel: ShopViewModel by viewModel()
     private var _binding: FragmentShopBinding? = null
@@ -60,6 +62,11 @@ class ShopFragment(
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        loyaltyCardProvider.registerLauncher(this) { loyaltyCard ->
+            shopViewModel.setLoyaltyCard(loyaltyCard)
+            binding.edtShopLoyaltyCard.setText(shopViewModel.loyaltyCardName)
+        }
 
         val addEditLocationBundle = Bundler().getAddEditLocationBundle(arguments)
         appTitle = when (addEditLocationBundle.actionType) {
@@ -77,6 +84,15 @@ class ShopFragment(
         fabHandler.setFabItems(this.requireActivity())
 
         _binding = FragmentShopBinding.inflate(inflater, container, false)
+
+        binding.btnLookupLoyaltyCard.setOnClickListener {
+            lookupLoyaltyCard()
+        }
+
+        binding.btnDeleteLoyaltyCard.setOnClickListener {
+            shopViewModel.removeLoyaltyCard()
+            binding.edtShopLoyaltyCard.setText(shopViewModel.loyaltyCardName)
+        }
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -98,6 +114,7 @@ class ShopFragment(
                             binding.swcShopShowUnmappedProducts.isChecked =
                                 shopViewModel.showDefaultAisle
 
+                            binding.edtShopLoyaltyCard.setText(shopViewModel.loyaltyCardName)
                         }
                     }
                 }
@@ -105,6 +122,16 @@ class ShopFragment(
         }
 
         return binding.root
+    }
+
+    private fun lookupLoyaltyCard() {
+        try {
+            loyaltyCardProvider.lookupLoyaltyCardShortcut(requireContext())
+        } catch (e: AisleronException.LoyaltyCardProviderException) {
+            loyaltyCardProvider.getNotInstalledDialog(requireContext()).show()
+        } catch (e: Exception) {
+            displayErrorSnackBar(AisleronException.ExceptionCode.GENERIC_EXCEPTION, e.message)
+        }
     }
 
     private fun displayErrorSnackBar(
@@ -151,10 +178,14 @@ class ShopFragment(
             name: String?,
             addEditFragmentListener: AddEditFragmentListener,
             applicationTitleUpdateListener: ApplicationTitleUpdateListener,
-            fabHandler: FabHandler
+            fabHandler: FabHandler,
+            loyaltyCardProvider: LoyaltyCardProvider
         ) =
             ShopFragment(
-                addEditFragmentListener, applicationTitleUpdateListener, fabHandler
+                addEditFragmentListener,
+                applicationTitleUpdateListener,
+                fabHandler,
+                loyaltyCardProvider
             ).apply {
                 arguments = Bundler().makeAddLocationBundle(name)
             }

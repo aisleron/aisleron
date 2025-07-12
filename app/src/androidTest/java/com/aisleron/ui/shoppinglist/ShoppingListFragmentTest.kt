@@ -59,6 +59,9 @@ import com.aisleron.domain.aisle.AisleRepository
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.location.LocationType
+import com.aisleron.domain.loyaltycard.LoyaltyCard
+import com.aisleron.domain.loyaltycard.LoyaltyCardProviderType
+import com.aisleron.domain.loyaltycard.LoyaltyCardRepository
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
@@ -68,6 +71,8 @@ import com.aisleron.ui.FabHandlerTestImpl
 import com.aisleron.ui.bundles.AddEditLocationBundle
 import com.aisleron.ui.bundles.AddEditProductBundle
 import com.aisleron.ui.bundles.Bundler
+import com.aisleron.ui.loyaltycard.LoyaltyCardProvider
+import com.aisleron.ui.loyaltycard.LoyaltyCardProviderTestImpl
 import com.aisleron.ui.settings.ShoppingListPreferencesTestImpl
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -83,9 +88,11 @@ import org.junit.Test
 import org.koin.test.KoinTest
 import org.koin.test.get
 import java.lang.Thread.sleep
+import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class ShoppingListFragmentTest : KoinTest {
 
@@ -99,7 +106,9 @@ class ShoppingListFragmentTest : KoinTest {
     )
 
     private fun getFragmentScenario(
-        bundle: Bundle, shoppingListPreferencesTestImpl: ShoppingListPreferencesTestImpl? = null
+        bundle: Bundle,
+        shoppingListPreferencesTestImpl: ShoppingListPreferencesTestImpl? = null,
+        loyaltyCardProvider: LoyaltyCardProvider? = null
     ): FragmentScenario<ShoppingListFragment> =
         launchFragmentInContainer<ShoppingListFragment>(
             fragmentArgs = bundle,
@@ -108,7 +117,8 @@ class ShoppingListFragmentTest : KoinTest {
                 ShoppingListFragment(
                     applicationTitleUpdateListener,
                     fabHandler,
-                    shoppingListPreferencesTestImpl ?: ShoppingListPreferencesTestImpl()
+                    shoppingListPreferencesTestImpl ?: ShoppingListPreferencesTestImpl(),
+                    loyaltyCardProvider ?: LoyaltyCardProviderTestImpl()
                 )
             }
         )
@@ -133,7 +143,8 @@ class ShoppingListFragmentTest : KoinTest {
                 FilterType.ALL,
                 applicationTitleUpdateListener,
                 fabHandler,
-                ShoppingListPreferencesTestImpl()
+                ShoppingListPreferencesTestImpl(),
+                LoyaltyCardProviderTestImpl()
             )
         Assert.assertNotNull(fragment)
     }
@@ -1127,6 +1138,95 @@ class ShoppingListFragmentTest : KoinTest {
 
         val reorderedAisle = aisleRepository.get(aisleId)
         assertEquals(1, reorderedAisle?.rank)
+    }
+
+    private suspend fun getShoppingListWithLoyaltyCard() : Location {
+        val shoppingList = getShoppingList()
+        val loyaltyCardRepository = get<LoyaltyCardRepository>()
+        val loyaltyCardId = loyaltyCardRepository.add(
+            LoyaltyCard(
+                id = 0,
+                name = "Test Card",
+                provider = LoyaltyCardProviderType.CATIMA,
+                intent = "Dummy Intent"
+            )
+        )
+
+        loyaltyCardRepository.addToLocation(shoppingList.id, loyaltyCardId)
+        return shoppingList
+    }
+
+    @Test
+    fun onMenuItemSelected_ItemIsShowLoyaltyCardAndHasLoyaltyCard_ShowLoyaltyCard() = runTest {
+        val shoppingList = getShoppingListWithLoyaltyCard()
+        val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
+        val menuItem = getMenuItem(R.id.mnu_show_loyalty_card)
+        val loyaltyCardProvider = LoyaltyCardProviderTestImpl()
+
+        getFragmentScenario(
+            bundle, loyaltyCardProvider = loyaltyCardProvider
+        ).onFragment { fragment ->
+            fragment.onMenuItemSelected(menuItem)
+        }
+
+        assertTrue { loyaltyCardProvider.loyaltyCardDisplayed }
+    }
+
+    @Test
+    fun onMenuItemSelected_ItemIsShowLoyaltyCardAndNoLoyaltyCard_LoyaltyCardNotShown() = runTest {
+        val shoppingList = getShoppingList()
+        val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
+        val menuItem = getMenuItem(R.id.mnu_show_loyalty_card)
+        val loyaltyCardProvider = LoyaltyCardProviderTestImpl()
+
+        getFragmentScenario(
+            bundle, loyaltyCardProvider = loyaltyCardProvider
+        ).onFragment { fragment ->
+            fragment.onMenuItemSelected(menuItem)
+        }
+
+        assertFalse { loyaltyCardProvider.loyaltyCardDisplayed }
+    }
+
+
+    @Test
+    fun onMenuItemSelected_ItemIsShowLoyaltyCardAndNoProvider_ShowNotInstalledDialog() = runTest {
+        val shoppingList = getShoppingListWithLoyaltyCard()
+        val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
+        val menuItem = getMenuItem(R.id.mnu_show_loyalty_card)
+        val loyaltyCardProvider = LoyaltyCardProviderTestImpl(throwNotInstalledException = true)
+
+        getFragmentScenario(
+            bundle, loyaltyCardProvider = loyaltyCardProvider
+        ).onFragment { fragment ->
+            fragment.onMenuItemSelected(menuItem)
+        }
+
+        onView(withText(R.string.loyalty_card_provider_missing_title))
+            .inRoot(isDialog())
+            .check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun onMenuItemSelected_ItemIsShowLoyaltyCardAndGenericError_ShowErrorSnackBar() = runTest {
+        val shoppingList = getShoppingListWithLoyaltyCard()
+        val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
+        val menuItem = getMenuItem(R.id.mnu_show_loyalty_card)
+        val loyaltyCardProvider = LoyaltyCardProviderTestImpl(throwGenericException = true)
+
+        getFragmentScenario(
+            bundle, loyaltyCardProvider = loyaltyCardProvider
+        ).onFragment { fragment ->
+            fragment.onMenuItemSelected(menuItem)
+        }
+
+        onView(withId(com.google.android.material.R.id.snackbar_text)).check(
+            matches(
+                ViewMatchers.withEffectiveVisibility(
+                    ViewMatchers.Visibility.VISIBLE
+                )
+            )
+        )
     }
 
     /*@Test

@@ -17,6 +17,7 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -52,5 +53,50 @@
         android:text="@string/show_unmapped_products"
         android:padding="@dimen/text_margin"
         android:checked="true" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:hint="@string/shop_loyalty_card_name"
+            android:labelFor="@id/edt_shop_loyalty_card"
+            app:boxBackgroundColor="@android:color/transparent"
+            android:layout_weight="1">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edt_shop_loyalty_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:focusable="false"
+                android:clickable="false"
+                android:cursorVisible="false"
+                android:inputType="none" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <ImageButton
+            android:id="@+id/btn_lookup_loyalty_card"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="0"
+            android:contentDescription="@string/get_loyalty_card"
+            android:src="@drawable/themed_add_card_24"
+            style="@style/Widget.AppCompat.ActionButton" />
+
+        <ImageButton
+            android:id="@+id/btn_delete_loyalty_card"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="0"
+            android:contentDescription="@string/delete_loyalty_card"
+            android:src="@drawable/themed_delete_24"
+            style="@style/Widget.AppCompat.ActionButton" />
+
+
+    </LinearLayout>
 
 </LinearLayout>

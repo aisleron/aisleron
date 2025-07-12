@@ -32,10 +32,6 @@ interface AisleDao : BaseDao<AisleEntity> {
     suspend fun getAisle(aisleId: Int): AisleEntity?
 
     @Transaction
-    @Query("SELECT * FROM Aisle WHERE id in (:aisleId)")
-    suspend fun getAisles(vararg aisleId: Int): List<AisleEntity>
-
-    @Transaction
     @Query("SELECT * FROM Aisle")
     suspend fun getAisles(): List<AisleEntity>
 
@@ -52,30 +48,11 @@ interface AisleDao : BaseDao<AisleEntity> {
     suspend fun getDefaultAisleFor(locationId: Int): AisleEntity?
 
     /**
-     * Aisle With Location
-     */
-    @Transaction
-    @Query("SELECT * FROM Aisle WHERE id = :aisleId")
-    suspend fun getAisleWithLocation(aisleId: Int): AisleWithLocation
-
-    @Transaction
-    @Query("SELECT * FROM Aisle WHERE id in (:aisleId)")
-    suspend fun getAislesWithLocation(vararg aisleId: Int): List<AisleWithLocation>
-
-    @Transaction
-    @Query("SELECT * FROM Aisle")
-    suspend fun getAislesWithLocation(): List<AisleWithLocation>
-
-    /**
      * Aisle With Product
      */
     @Transaction
     @Query("SELECT * FROM Aisle WHERE id = :aisleId")
     suspend fun getAisleWithProducts(aisleId: Int): AisleWithProducts
-
-    @Transaction
-    @Query("SELECT * FROM Aisle WHERE id in (:aisleId)")
-    suspend fun getAislesWithProducts(vararg aisleId: Int): List<AisleWithProducts>
 
     @Transaction
     @Query("SELECT * FROM Aisle")

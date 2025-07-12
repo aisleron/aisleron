@@ -26,17 +26,6 @@ class LocationRepositoryImpl(
     private val locationDao: LocationDao,
     private val locationMapper: LocationMapper
 ) : LocationRepository {
-
-    /*
-    override fun getByType(type: LocationType): Flow<List<Location>> {
-        return when (type) {
-            LocationType.HOME -> flowOf<List<Location>>(listOf(getHome()))
-            LocationType.SHOP -> getShops()
-        }
-    }
-
-     */
-
     override fun getShops(): Flow<List<Location>> {
         val locationEntities = locationDao.getShops()
         return locationEntities.map { locationMapper.toModelList(it) }
@@ -68,11 +57,6 @@ class LocationRepositoryImpl(
         return locationDao.getLocation(id)?.let { locationMapper.toModel(it) }
     }
 
-    override suspend fun getMultiple(vararg id: Int): List<Location> {
-        // '*' is a spread operator required to pass vararg down
-        return locationMapper.toModelList(locationDao.getLocations(*id))
-    }
-
     override suspend fun getAll(): List<Location> {
         return locationMapper.toModelList(locationDao.getLocations())
     }
@@ -94,6 +78,7 @@ class LocationRepositoryImpl(
     }
 
     private suspend fun upsertLocations(locations: List<Location>): List<Int> {
+        // '*' is a spread operator required to pass vararg down
         return locationDao
             .upsert(*locationMapper.fromModelList(locations).map { it }.toTypedArray())
             .map { it.toInt() }

@@ -19,7 +19,6 @@ package com.aisleron.testdata.data.aisle
 
 import com.aisleron.data.aisle.AisleDao
 import com.aisleron.data.aisle.AisleEntity
-import com.aisleron.data.aisle.AisleWithLocation
 import com.aisleron.data.aisle.AisleWithProducts
 import com.aisleron.testdata.data.aisleproduct.AisleProductDaoTestImpl
 
@@ -29,10 +28,6 @@ class AisleDaoTestImpl(private val aisleProductDao: AisleProductDaoTestImpl) : A
 
     override suspend fun getAisle(aisleId: Int): AisleEntity? {
         return aisleList.find { it.id == aisleId }
-    }
-
-    override suspend fun getAisles(vararg aisleId: Int): List<AisleEntity> {
-        return aisleList.filter { it.id in aisleId }
     }
 
     override suspend fun getAisles(): List<AisleEntity> {
@@ -51,28 +46,12 @@ class AisleDaoTestImpl(private val aisleProductDao: AisleProductDaoTestImpl) : A
         return aisleList.find { it.locationId == locationId && it.isDefault }
     }
 
-    override suspend fun getAisleWithLocation(aisleId: Int): AisleWithLocation {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun getAislesWithLocation(vararg aisleId: Int): List<AisleWithLocation> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun getAislesWithLocation(): List<AisleWithLocation> {
-        TODO("Not yet implemented")
-    }
-
     override suspend fun getAisleWithProducts(aisleId: Int): AisleWithProducts {
         return AisleWithProducts(
             aisle = getAisle(aisleId)!!,
             products = aisleProductDao.getAisleProducts()
                 .filter { ap -> ap.aisleProduct.aisleId == aisleId }
         )
-    }
-
-    override suspend fun getAislesWithProducts(vararg aisleId: Int): List<AisleWithProducts> {
-        TODO("Not yet implemented")
     }
 
     override suspend fun getAislesWithProducts(): List<AisleWithProducts> {

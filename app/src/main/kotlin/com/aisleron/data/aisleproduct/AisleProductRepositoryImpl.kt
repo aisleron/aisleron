@@ -40,11 +40,6 @@ class AisleProductRepositoryImpl(
         return aisleProductDao.getAisleProduct(id)?.let { aisleProductRankMapper.toModel(it) }
     }
 
-    override suspend fun getMultiple(vararg id: Int): List<AisleProduct> {
-        // '*' is a spread operator required to pass vararg down
-        return aisleProductRankMapper.toModelList(aisleProductDao.getAisleProducts(*id))
-    }
-
     override suspend fun getAll(): List<AisleProduct> {
         return aisleProductRankMapper.toModelList(aisleProductDao.getAisleProducts())
     }
@@ -59,6 +54,7 @@ class AisleProductRepositoryImpl(
     }
 
     private suspend fun upsertAisleProducts(aisleProducts: List<AisleProduct>): List<Int> {
+        // '*' is a spread operator required to pass vararg down
         return aisleProductDao
             .upsert(*aisleProductRankMapper.fromModelList(aisleProducts)
                 .map { it.aisleProduct }
