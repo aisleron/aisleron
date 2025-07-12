@@ -19,7 +19,6 @@ package com.aisleron.data.aisle
 
 import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.aisle.AisleRepository
-import com.aisleron.domain.location.Location
 
 class AisleRepositoryImpl(
     private val aisleDao: AisleDao,
@@ -27,10 +26,6 @@ class AisleRepositoryImpl(
 ) : AisleRepository {
     override suspend fun getForLocation(locationId: Int): List<Aisle> {
         return aisleMapper.toModelList(aisleDao.getAislesForLocation(locationId))
-    }
-
-    override suspend fun getForLocation(location: Location): List<Aisle> {
-        return getForLocation(location.id)
     }
 
     override suspend fun getDefaultAisles(): List<Aisle> {
@@ -51,11 +46,6 @@ class AisleRepositoryImpl(
 
     override suspend fun get(id: Int): Aisle? {
         return aisleDao.getAisle(id)?.let { aisleMapper.toModel(it) }
-    }
-
-    override suspend fun getMultiple(vararg id: Int): List<Aisle> {
-        // '*' is a spread operator required to pass vararg down
-        return aisleMapper.toModelList(aisleDao.getAisles(*id))
     }
 
     override suspend fun getAll(): List<Aisle> {
@@ -83,6 +73,7 @@ class AisleRepositoryImpl(
     }
 
     private suspend fun upsertAisles(aisles: List<Aisle>): List<Int> {
+        // '*' is a spread operator required to pass vararg down
         return aisleDao
             .upsert(
                 *aisleMapper.fromModelList(aisles).map { it }.toTypedArray()

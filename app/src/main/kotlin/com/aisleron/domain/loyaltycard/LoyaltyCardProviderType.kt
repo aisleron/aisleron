@@ -15,13 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.data.aisle
+package com.aisleron.domain.loyaltycard
 
-import androidx.room.Embedded
-import androidx.room.Relation
-import com.aisleron.data.location.LocationEntity
-
-data class AisleWithLocation(
-    @Embedded val aisle: AisleEntity,
-    @Relation(parentColumn = "locationId", entityColumn = "id") val location: LocationEntity
-)
+enum class LoyaltyCardProviderType {
+    CATIMA
+}

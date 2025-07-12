@@ -30,7 +30,13 @@ class GetAisleMaxRankUseCaseTest {
 
         val locationId = testData.getRepository<LocationRepository>().add(
             Location(
-                0, LocationType.SHOP, FilterType.NEEDED, "Rank Test Shop", false, emptyList(), true
+                id = 0,
+                type = LocationType.SHOP,
+                defaultFilter = FilterType.NEEDED,
+                name = "Rank Test Shop",
+                pinned = false,
+                aisles = emptyList(),
+                showDefaultAisle = true
             )
         )
 

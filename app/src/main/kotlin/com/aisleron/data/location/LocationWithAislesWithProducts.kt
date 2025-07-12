@@ -28,5 +28,5 @@ data class LocationWithAislesWithProducts(
         entity = AisleEntity::class,
         parentColumn = "id",
         entityColumn = "locationId"
-    ) val aisles: List<AisleWithProducts>
+    ) val aisles: List<AisleWithProducts>,
 )

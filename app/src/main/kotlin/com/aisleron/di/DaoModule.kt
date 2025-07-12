@@ -21,6 +21,8 @@ import com.aisleron.data.AisleronDatabase
 import com.aisleron.data.aisle.AisleDao
 import com.aisleron.data.aisleproduct.AisleProductDao
 import com.aisleron.data.location.LocationDao
+import com.aisleron.data.loyaltycard.LocationLoyaltyCardDao
+import com.aisleron.data.loyaltycard.LoyaltyCardDao
 import com.aisleron.data.product.ProductDao
 import org.koin.dsl.module
 
@@ -29,4 +31,6 @@ val daoModule = module {
     single<AisleDao> { get<AisleronDatabase>().aisleDao() }
     single<AisleProductDao> { get<AisleronDatabase>().aisleProductDao() }
     single<ProductDao> { get<AisleronDatabase>().productDao() }
+    single<LoyaltyCardDao> { get<AisleronDatabase>().loyaltyCardDao() }
+    single<LocationLoyaltyCardDao> { get<AisleronDatabase>().locationLoyaltyCardDao() }
 }

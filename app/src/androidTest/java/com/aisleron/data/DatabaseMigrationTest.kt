@@ -19,12 +19,15 @@ package com.aisleron.data
 
 import android.content.ContentValues
 import android.database.Cursor
+import androidx.room.Room
 import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.db.SupportSQLiteQueryBuilder
 import androidx.test.platform.app.InstrumentationRegistry
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.LocationType
+import junit.framework.TestCase.assertNotNull
+import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
 import java.io.IOException
@@ -64,7 +67,7 @@ class DatabaseMigrationTest {
 
     @Test
     @Throws(IOException::class)
-    fun migrate1To2() {
+    fun migrate1to2() {
         helper.createDatabase(testDb, 1).apply {
             populateV1Database(this)
 
@@ -72,18 +75,14 @@ class DatabaseMigrationTest {
             close()
         }
 
-        // Re-open the database with version 2 and provide
-        // MIGRATION_1_2 as the migration process.
+        // Re-open the database with version 2
         val db = helper.runMigrationsAndValidate(testDb, 2, true)
 
         // MigrationTestHelper automatically verifies the schema changes,
         // but you need to validate that the data was migrated properly.
         var showDefaultAisle: Int
         db.apply {
-            val queryBuilder = SupportSQLiteQueryBuilder
-                .builder("Location")
-            //.selection("name = ?", arrayOf(locationName))//.columns(arrayOf("showDefaultAisle"))
-
+            val queryBuilder = SupportSQLiteQueryBuilder.builder("Location")
             val cursor: Cursor = query(queryBuilder.create())
             cursor.moveToFirst()
             showDefaultAisle = cursor.getInt(cursor.getColumnIndex("showDefaultAisle"))
@@ -92,6 +91,49 @@ class DatabaseMigrationTest {
         }
 
         assertEquals(1, showDefaultAisle)
+    }
+
+    @Test
+    @Throws(IOException::class)
+    fun migrate2to3() {
+        helper.createDatabase(testDb, 2).apply {
+            populateV1Database(this)
+            close()
+        }
+
+        val db = helper.runMigrationsAndValidate(testDb, 3, true)
+
+        db.apply {
+            val queryBuilder = SupportSQLiteQueryBuilder.builder("LoyaltyCard")
+            val cursor: Cursor = query(queryBuilder.create())
+            assertEquals(0, cursor.count)
+            cursor.close()
+            close()
+        }
+    }
+
+
+    @Test
+    @Throws(IOException::class)
+    fun migrateAll() {
+        helper.createDatabase(testDb, 1).apply {
+            populateV1Database(this)
+
+            // Prepare for the next version.
+            close()
+        }
+
+        val db = Room.databaseBuilder(
+            InstrumentationRegistry.getInstrumentation().targetContext,
+            AisleronDatabase::class.java,
+            testDb
+        ).build()
+
+        // Introduced in V3
+        val loyaltyCards = runBlocking { db.loyaltyCardDao().getLoyaltyCards() }
+        assertNotNull(loyaltyCards)
+
+        db.close()
     }
 }
 

@@ -33,6 +33,8 @@ import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.location.usecase.SortLocationByNameUseCase
+import com.aisleron.domain.loyaltycard.LoyaltyCard
+import com.aisleron.domain.loyaltycard.usecase.GetLoyaltyCardForLocationUseCase
 import com.aisleron.domain.product.usecase.RemoveProductUseCase
 import com.aisleron.domain.product.usecase.UpdateProductStatusUseCase
 import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
@@ -53,22 +55,26 @@ class ShoppingListViewModel(
     private val getAisleUseCase: GetAisleUseCase,
     private val updateAisleExpandedUseCase: UpdateAisleExpandedUseCase,
     private val sortLocationByNameUseCase: SortLocationByNameUseCase,
+    private val getLoyaltyCardForLocationUseCase: GetLoyaltyCardForLocationUseCase,
     coroutineScopeProvider: CoroutineScope? = null
 ) : ViewModel() {
     private val coroutineScope = coroutineScopeProvider ?: this.viewModelScope
 
-    private var location: Location? = null
+    private var _location: Location? = null
     private var _showDefaultAisle: Boolean = true
     private val showDefaultAisle: Boolean get() = _showDefaultAisle
-    val locationName: String get() = location?.name ?: ""
-    val locationType: LocationType get() = location?.type ?: LocationType.HOME
-    val locationId: Int get() = location?.id ?: 0
+    val locationName: String get() = _location?.name ?: ""
+    val locationType: LocationType get() = _location?.type ?: LocationType.HOME
+    val locationId: Int get() = _location?.id ?: 0
 
     private var _defaultFilter: FilterType = FilterType.NEEDED
     val defaultFilter: FilterType get() = _defaultFilter
 
     private var _showEmptyAisles: Boolean = true
     private val showEmptyAisles: Boolean get() = _showEmptyAisles
+
+    private var _loyaltyCard: LoyaltyCard? = null
+    val loyaltyCard: LoyaltyCard? get() = _loyaltyCard
 
     private lateinit var shoppingListFilterParameters: ShoppingListFilterParameters
 
@@ -162,23 +168,25 @@ class ShoppingListViewModel(
         coroutineScope.launch {
             getShoppingListUseCase(locationId).collect { collectedLocation ->
                 _shoppingListUiState.value = ShoppingListUiState.Loading
-                location = collectedLocation
+                _location = collectedLocation
 
                 if (!::shoppingListFilterParameters.isInitialized)
                     shoppingListFilterParameters = getDefaultFilterParameters()
 
                 shoppingListFilterParameters.showAllAisles = _showEmptyAisles
-                location?.let {
+                _location?.let {
                     // If default aisle preference has changed, update the filter parameters accordingly
                     if (it.showDefaultAisle != _showDefaultAisle) {
                         _showDefaultAisle = it.showDefaultAisle
                         shoppingListFilterParameters.showDefaultAisle = _showDefaultAisle
                     }
+
+                    _loyaltyCard = getLoyaltyCardForLocationUseCase(it.id)
                 }
 
                 _shoppingListUiState.value =
                     ShoppingListUiState.Updated(
-                        getShoppingList(location, shoppingListFilterParameters)
+                        getShoppingList(_location, shoppingListFilterParameters)
                     )
             }
         }
@@ -261,7 +269,7 @@ class ShoppingListViewModel(
 
         coroutineScope.launch {
             _shoppingListUiState.value = ShoppingListUiState.Loading
-            val searchResults = getShoppingList(location, shoppingListFilterParameters)
+            val searchResults = getShoppingList(_location, shoppingListFilterParameters)
             _shoppingListUiState.value = ShoppingListUiState.Updated(searchResults)
         }
     }
@@ -270,7 +278,7 @@ class ShoppingListViewModel(
         shoppingListFilterParameters = getDefaultFilterParameters()
         coroutineScope.launch {
             _shoppingListUiState.value = ShoppingListUiState.Loading
-            val searchResults = getShoppingList(location, shoppingListFilterParameters)
+            val searchResults = getShoppingList(_location, shoppingListFilterParameters)
             _shoppingListUiState.value = ShoppingListUiState.Updated(searchResults)
         }
     }
@@ -281,7 +289,7 @@ class ShoppingListViewModel(
         shoppingListFilterParameters.showAllAisles = true
         coroutineScope.launch {
             _shoppingListUiState.value = ShoppingListUiState.Loading
-            val searchResults = getShoppingList(location, shoppingListFilterParameters)
+            val searchResults = getShoppingList(_location, shoppingListFilterParameters)
             _shoppingListUiState.value = ShoppingListUiState.Updated(searchResults)
         }
     }

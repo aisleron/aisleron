@@ -55,4 +55,8 @@
         </activity>
     </application>
 
+    <queries>
+        <package android:name="me.hackerchick.catima" />
+    </queries>
+
 </manifest>

@@ -23,10 +23,10 @@ import com.aisleron.domain.location.Location
 class LocationMapper : MapperBaseImpl<LocationEntity, Location>() {
     override fun toModel(value: LocationEntity) = Location(
         id = value.id,
-        name = value.name.trim(),
-        defaultFilter = value.defaultFilter,
-        pinned = value.pinned,
         type = value.type,
+        defaultFilter = value.defaultFilter,
+        name = value.name.trim(),
+        pinned = value.pinned,
         aisles = emptyList(),
         showDefaultAisle = value.showDefaultAisle
     )

@@ -26,6 +26,11 @@ import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.location.usecase.AddLocationUseCase
 import com.aisleron.domain.location.usecase.GetLocationUseCase
 import com.aisleron.domain.location.usecase.UpdateLocationUseCase
+import com.aisleron.domain.loyaltycard.LoyaltyCard
+import com.aisleron.domain.loyaltycard.usecase.AddLoyaltyCardToLocationUseCase
+import com.aisleron.domain.loyaltycard.usecase.AddLoyaltyCardUseCase
+import com.aisleron.domain.loyaltycard.usecase.GetLoyaltyCardForLocationUseCase
+import com.aisleron.domain.loyaltycard.usecase.RemoveLoyaltyCardFromLocationUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -35,16 +40,23 @@ class ShopViewModel(
     private val addLocationUseCase: AddLocationUseCase,
     private val updateLocationUseCase: UpdateLocationUseCase,
     private val getLocationUseCase: GetLocationUseCase,
+    private val addLoyaltyCardUseCase: AddLoyaltyCardUseCase,
+    private val addLoyaltyCardToLocationUseCase: AddLoyaltyCardToLocationUseCase,
+    private val removeLoyaltyCardFromLocationUseCase: RemoveLoyaltyCardFromLocationUseCase,
+    private val getLoyaltyCardForLocationUseCase: GetLoyaltyCardForLocationUseCase,
     coroutineScopeProvider: CoroutineScope? = null
 ) : ViewModel() {
-    private val coroutineScope = coroutineScopeProvider ?: this.viewModelScope
-    val pinned: Boolean get() = location?.pinned == true
-    val defaultFilter: FilterType? get() = location?.defaultFilter
-    val type: LocationType? get() = location?.type
-    val locationName: String? get() = location?.name
-    val showDefaultAisle: Boolean get() = location?.showDefaultAisle != false
+    private var _initialLoyaltyCardId: Int? = null
 
-    private var location: Location? = null
+    private var _loyaltyCard: LoyaltyCard? = null
+    val loyaltyCardName: String? get() = _loyaltyCard?.name
+
+    private val coroutineScope = coroutineScopeProvider ?: this.viewModelScope
+    val pinned: Boolean get() = _location?.pinned == true
+    val locationName: String? get() = _location?.name
+    val showDefaultAisle: Boolean get() = _location?.showDefaultAisle != false
+
+    private var _location: Location? = null
 
     private val _shopUiState = MutableStateFlow<ShopUiState>(ShopUiState.Empty)
     val shopUiState: StateFlow<ShopUiState> = _shopUiState
@@ -52,7 +64,9 @@ class ShopViewModel(
     fun hydrate(locationId: Int) {
         coroutineScope.launch {
             _shopUiState.value = ShopUiState.Loading
-            location = getLocationUseCase(locationId)
+            _location = getLocationUseCase(locationId)
+            _loyaltyCard = getLoyaltyCardForLocationUseCase(locationId)
+            _initialLoyaltyCardId = _loyaltyCard?.id
             _shopUiState.value = ShopUiState.Updated(this@ShopViewModel)
         }
     }
@@ -61,11 +75,15 @@ class ShopViewModel(
         coroutineScope.launch {
             _shopUiState.value = ShopUiState.Loading
             try {
-                location?.let { updateLocation(it, name, pinned, showDefaultAisle) } ?: addLocation(
-                    name,
-                    pinned,
-                    showDefaultAisle
-                )
+                _location?.let {
+                    //Save the loyalty card details first, or it won't update correctly on the
+                    //shopping list page due to the Location flow collection
+                    saveLoyaltyCard(it.id, _initialLoyaltyCardId, _loyaltyCard)
+                    updateLocation(it, name, pinned, showDefaultAisle)
+                } ?: run {
+                    val locationId = addLocation(name, pinned, showDefaultAisle)
+                    saveLoyaltyCard(locationId, _initialLoyaltyCardId, _loyaltyCard)
+                }
 
                 _shopUiState.value = ShopUiState.Success
             } catch (e: AisleronException) {
@@ -77,28 +95,49 @@ class ShopViewModel(
         }
     }
 
+    private suspend fun saveLoyaltyCard(
+        locationId: Int, initialLoyaltyCardId: Int?, loyaltyCard: LoyaltyCard?
+    ) {
+        //Remove the existing loyalty card, if it exists
+        initialLoyaltyCardId?.let { removeLoyaltyCardFromLocationUseCase(locationId, it) }
+        loyaltyCard?.let {
+            //Add loyalty card to database
+            val cardId = addLoyaltyCardUseCase(it)
+
+            //Add loyalty card to location
+            addLoyaltyCardToLocationUseCase(locationId, cardId)
+        }
+    }
+
+    fun setLoyaltyCard(loyaltyCard: LoyaltyCard?) {
+        _loyaltyCard = loyaltyCard
+    }
+
     private suspend fun updateLocation(
         location: Location, name: String, pinned: Boolean, showDefaultAisle: Boolean
-    ) {
+    ): Int {
         val updateLocation =
             location.copy(name = name, pinned = pinned, showDefaultAisle = showDefaultAisle)
         updateLocationUseCase(updateLocation)
-        hydrate(updateLocation.id)
+        return updateLocation.id
     }
 
-    private suspend fun addLocation(name: String, pinned: Boolean, showDefaultAisle: Boolean) {
-        val id = addLocationUseCase(
+    private suspend fun addLocation(name: String, pinned: Boolean, showDefaultAisle: Boolean): Int {
+        return addLocationUseCase(
             Location(
+                id = 0,
                 type = LocationType.SHOP,
                 defaultFilter = FilterType.NEEDED,
                 name = name,
                 pinned = pinned,
                 aisles = emptyList(),
-                id = 0,
                 showDefaultAisle = showDefaultAisle
             )
         )
-        hydrate(id)
+    }
+
+    fun removeLoyaltyCard() {
+        _loyaltyCard = null
     }
 
     sealed class ShopUiState {

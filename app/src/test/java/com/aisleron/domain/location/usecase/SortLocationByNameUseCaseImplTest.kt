@@ -104,13 +104,6 @@ class SortLocationByNameUseCaseImplTest {
             sortedProducts.maxOf { it.rank }, sortedProducts.first { it.product.name == "ZZZ" }.rank
         )
     }
-
-    /**
-     * Tests:
-     * 1. Aisles sorted
-     * 2. Products sorted
-     * 3. Default Aisle is last
-     */
 }
 
 
