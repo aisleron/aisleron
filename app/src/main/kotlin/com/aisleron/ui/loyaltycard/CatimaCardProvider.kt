@@ -20,7 +20,6 @@ package com.aisleron.ui.loyaltycard
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -51,6 +50,7 @@ class CatimaCardProvider(override val packageChecker: PackageChecker) : LoyaltyC
         launcher.launch(intent)
     }
 
+    @Suppress("DEPRECATION")
     override fun registerLauncher(
         fragment: Fragment, onLoyaltyCardSelected: (LoyaltyCard?) -> Unit
     ) {
@@ -58,16 +58,12 @@ class CatimaCardProvider(override val packageChecker: PackageChecker) : LoyaltyC
             fragment.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
                 if (result.resultCode == Activity.RESULT_OK) {
                     val resultIntent = result.data
+
+                    //TODO: Find alternative to deprecated EXTRA_SHORTCUT_NAME and EXTRA_SHORTCUT_INTENT
                     val cardName = resultIntent?.getStringExtra(Intent.EXTRA_SHORTCUT_NAME) ?: ""
-                    val shortcutIntent =
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            resultIntent?.getParcelableExtra(
-                                Intent.EXTRA_SHORTCUT_INTENT, Intent::class.java
-                            )
-                        } else {
-                            @Suppress("DEPRECATION")
-                            resultIntent?.getParcelableExtra(Intent.EXTRA_SHORTCUT_INTENT)
-                        }
+                    val shortcutIntent: Intent? = resultIntent?.getParcelableExtra(
+                        Intent.EXTRA_SHORTCUT_INTENT
+                    )
 
                     val loyaltyCard: LoyaltyCard? = shortcutIntent?.let {
                         LoyaltyCard(

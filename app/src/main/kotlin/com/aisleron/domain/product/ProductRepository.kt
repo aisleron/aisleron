@@ -17,12 +17,8 @@
 
 package com.aisleron.domain.product
 
-import com.aisleron.domain.FilterType
 import com.aisleron.domain.base.BaseRepository
 
 interface ProductRepository : BaseRepository<Product> {
-    suspend fun getInStock(): List<Product>
-    suspend fun getNeeded(): List<Product>
-    suspend fun getByFilter(filter: FilterType): List<Product>
     suspend fun getByName(name: String): Product?
 }

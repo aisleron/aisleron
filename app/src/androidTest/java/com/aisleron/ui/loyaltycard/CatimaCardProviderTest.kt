@@ -6,6 +6,8 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.pm.ShortcutInfoCompat
+import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.testing.FragmentScenario
@@ -94,12 +96,14 @@ class CatimaCardProviderTest {
     @Test
     fun registerLauncher_ResultOK_ReturnsLoyaltyCard() {
         (provider.packageChecker as PackageCheckerTestImpl).isPackageInstalledResult = true
-        val resultIntent = Intent().apply {
-            putExtra(Intent.EXTRA_SHORTCUT_NAME, "TestCard")
-            putExtra(
-                Intent.EXTRA_SHORTCUT_INTENT, Intent(Intent.ACTION_VIEW, "Dummy Intent".toUri())
-            )
-        }
+
+        val shortcut = ShortcutInfoCompat.Builder(context, 1.toString())
+            .setShortLabel("TestCard")
+            .setLongLabel("TestCard")
+            .setIntent(Intent(Intent.ACTION_VIEW, "Dummy Intent".toUri()))
+            .build()
+
+        val resultIntent = ShortcutManagerCompat.createShortcutResultIntent(context, shortcut)
 
         val result = Instrumentation.ActivityResult(Activity.RESULT_OK, resultIntent)
         val scenario = getFragmentScenario(provider)

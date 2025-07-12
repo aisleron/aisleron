@@ -26,7 +26,6 @@ import com.aisleron.di.daoModule
 import com.aisleron.di.inMemoryDatabaseTestModule
 import com.aisleron.di.repositoryModule
 import com.aisleron.di.useCaseModule
-import com.aisleron.domain.FilterType
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -73,56 +72,6 @@ class ProductRepositoryImplTest : KoinTest {
             aisleProductDao = get<AisleProductDao>(),
             productMapper = ProductMapper()
         )
-    }
-
-    @Test
-    fun getInStock_ReturnsInStockProducts() {
-        val inStockCount = runBlocking { get<ProductDao>().getProducts().count { it.inStock } }
-
-        val inStockProducts = runBlocking { productRepositoryImpl.getInStock() }
-
-        assertTrue(inStockProducts.isNotEmpty())
-        assertEquals(inStockCount, inStockProducts.count())
-    }
-
-    @Test
-    fun getNeeded_ReturnsNeededProducts() = runTest {
-        val neededCount = get<ProductDao>().getProducts().count { !it.inStock }
-
-        val neededProducts = productRepositoryImpl.getNeeded()
-
-        assertTrue(neededProducts.isNotEmpty())
-        assertEquals(neededCount, neededProducts.count())
-    }
-
-    @Test
-    fun getByFilter_RequestInStock_ReturnsInStockProducts() = runTest {
-        val inStockCount = get<ProductDao>().getProducts().count { it.inStock }
-
-        val inStockProducts = productRepositoryImpl.getByFilter(FilterType.IN_STOCK)
-
-        assertTrue(inStockProducts.isNotEmpty())
-        assertEquals(inStockCount, inStockProducts.count())
-    }
-
-    @Test
-    fun getByFilter_RequestInNeeded_ReturnsNeededProducts() = runTest {
-        val neededCount = get<ProductDao>().getProducts().count { !it.inStock }
-
-        val neededProducts = productRepositoryImpl.getByFilter(FilterType.NEEDED)
-
-        assertTrue(neededProducts.isNotEmpty())
-        assertEquals(neededCount, neededProducts.count())
-    }
-
-    @Test
-    fun getByFilter_RequestAll_ReturnsAllProducts() = runTest {
-        val allCount = get<ProductDao>().getProducts().count()
-
-        val allProducts = productRepositoryImpl.getByFilter(FilterType.ALL)
-
-        assertTrue(allProducts.isNotEmpty())
-        assertEquals(allCount, allProducts.count())
     }
 
     @Test

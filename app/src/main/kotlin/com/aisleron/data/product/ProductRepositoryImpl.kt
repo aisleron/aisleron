@@ -18,7 +18,6 @@
 package com.aisleron.data.product
 
 import com.aisleron.data.aisleproduct.AisleProductDao
-import com.aisleron.domain.FilterType
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
 
@@ -27,22 +26,6 @@ class ProductRepositoryImpl(
     private val aisleProductDao: AisleProductDao,
     private val productMapper: ProductMapper
 ) : ProductRepository {
-    override suspend fun getInStock(): List<Product> {
-        return productMapper.toModelList(productDao.getInStockProducts())
-    }
-
-    override suspend fun getNeeded(): List<Product> {
-        return productMapper.toModelList(productDao.getNeededProducts())
-    }
-
-    override suspend fun getByFilter(filter: FilterType): List<Product> {
-        return when (filter) {
-            FilterType.IN_STOCK -> getInStock()
-            FilterType.NEEDED -> getNeeded()
-            FilterType.ALL -> getAll()
-        }
-    }
-
     override suspend fun getByName(name: String): Product? {
         return productDao.getProductByName(name.trim())?.let { return productMapper.toModel(it) }
     }

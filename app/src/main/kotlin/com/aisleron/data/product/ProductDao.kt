@@ -34,12 +34,6 @@ interface ProductDao : BaseDao<ProductEntity> {
     @Query("SELECT * FROM Product")
     suspend fun getProducts(): List<ProductEntity>
 
-    @Query("SELECT * FROM Product WHERE inStock = 1")
-    suspend fun getInStockProducts(): List<ProductEntity>
-
-    @Query("SELECT * FROM Product WHERE inStock = 0")
-    suspend fun getNeededProducts(): List<ProductEntity>
-
     @Transaction
     suspend fun remove(product: ProductEntity, aisleProductDao: AisleProductDao) {
         val aisleProducts = aisleProductDao.getAisleProductsByProduct(product.id)

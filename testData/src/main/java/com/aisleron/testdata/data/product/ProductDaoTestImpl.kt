@@ -60,14 +60,6 @@ class ProductDaoTestImpl : ProductDao {
         return productList
     }
 
-    override suspend fun getInStockProducts(): List<ProductEntity> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun getNeededProducts(): List<ProductEntity> {
-        TODO("Not yet implemented")
-    }
-
     override suspend fun getProductByName(name: String): ProductEntity? {
         return productList.find { it.name.uppercase() == name.uppercase() }
     }
