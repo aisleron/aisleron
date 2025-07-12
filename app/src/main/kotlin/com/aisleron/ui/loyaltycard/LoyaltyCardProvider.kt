@@ -19,7 +19,6 @@ package com.aisleron.ui.loyaltycard
 
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.text.Html
 import androidx.appcompat.app.AlertDialog
 import androidx.core.net.toUri
@@ -35,24 +34,21 @@ interface LoyaltyCardProvider {
     val providerNameStringId: Int
     val providerWebsite: String
     val providerType: LoyaltyCardProviderType
+    val packageChecker: PackageChecker
 
     fun lookupLoyaltyCardShortcut(context: Context)
     fun registerLauncher(fragment: Fragment, onLoyaltyCardSelected: (LoyaltyCard?) -> Unit)
     fun isInstalled(context: Context): Boolean {
-        return try {
-            context.packageManager.getPackageInfo(packageName, 0)
-            true
-        } catch (e: PackageManager.NameNotFoundException) {
-            false
-        }
+        return packageChecker.isPackageInstalled(context, packageName)
     }
 
     fun displayLoyaltyCard(context: Context, loyaltyCard: LoyaltyCard) {
         if (!isInstalled(context)) {
-            throw throw AisleronException.LoyaltyCardProviderException(context.getString(R.string.loyalty_card_provider_missing_exception))
+            throw AisleronException.LoyaltyCardProviderException(context.getString(R.string.loyalty_card_provider_missing_exception))
         }
 
         val intent = Intent.parseUri(loyaltyCard.intent, Intent.URI_INTENT_SCHEME)
+
         context.startActivity(intent)
     }
 

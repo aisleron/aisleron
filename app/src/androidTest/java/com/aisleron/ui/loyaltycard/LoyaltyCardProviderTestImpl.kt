@@ -27,7 +27,8 @@ import com.aisleron.domain.loyaltycard.LoyaltyCardProviderType
 class LoyaltyCardProviderTestImpl(
     val loyaltyCardName: String = "Test Loyalty Card",
     val throwNotInstalledException: Boolean = false,
-    val throwGenericException: Boolean = false
+    val throwGenericException: Boolean = false,
+    override val packageChecker: PackageChecker = PackageCheckerTestImpl()
 ) : LoyaltyCardProvider {
     private var _loyaltyCardDisplayed: Boolean = false
     val loyaltyCardDisplayed: Boolean get() = _loyaltyCardDisplayed

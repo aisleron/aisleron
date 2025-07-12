@@ -30,7 +30,7 @@ import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.loyaltycard.LoyaltyCard
 import com.aisleron.domain.loyaltycard.LoyaltyCardProviderType
 
-class CatimaCardProvider : LoyaltyCardProvider {
+class CatimaCardProvider(override val packageChecker: PackageChecker) : LoyaltyCardProvider {
     override val packageName: String get() = "me.hackerchick.catima"
     override val providerNameStringId: Int get() = R.string.loyalty_card_provider_catima
     override val providerWebsite: String get() = "https://catima.app/"
