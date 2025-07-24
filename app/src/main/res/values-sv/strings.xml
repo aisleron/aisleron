@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_search">Sök</string>
+    <string name="menu_needed">Saknas</string>
+    <string name="menu_all_items">Alla varor</string>
+    <string name="menu_settings">Inställningar</string>
+    <string name="menu_all_shops">Alla butiker</string>
+    <string name="menu_shops">Butiker</string>
+    <string name="home">Hem</string>
+    <string name="show_on_lock_screen">Visa på låsskärmen</string>
+    <string name="system_theme">Systemets tema</string>
+    <string name="light_theme">Ljust tema</string>
+    <string name="dark_theme">Mörkt tema</string>
+    <string name="theme">Tema</string>
+    <string name="backup_database">Säkerhetskopiera databasen</string>
+    <string name="restore_database">Återställ databasen</string>
+    <string name="last_backup">Senaste säkerhetskopering:</string>
+    <string name="last_restore">Senaste återställning:</string>
+    <string name="never">Aldrig</string>
+    <string name="db_backup_processing">Säkerhetskopiering pågår…</string>
+    <string name="db_backup_success">Säkerhetskopiering slutförd</string>
+    <string name="db_restore_processing">Återställning pågår…</string>
+    <string name="db_restore_success">Återställning slutförd</string>
+    <string name="nav_header_subtitle">Flyg fram genom butikerna!</string>
+    <string name="menu_about">Om</string>
+    <string name="about_support_sourcecode_title">Källkod</string>
+    <string name="about_support_version_summary">Aktuell version: %1$s</string>
+    <string name="about_support_sourcecode_summary">Se källkoden på GitHub</string>
+    <string name="about_support_documentation_title">Dokumentation</string>
+    <string name="welcome_app_title">Kom igång</string>
+    <string name="welcome_title">Välkommen till Aisleron</string>
+    <string name="empty_list_title">Denna lista är för närvarande tom</string>
+    <string name="add_location">Lägg till butik</string>
+    <string name="title_activity_about">Om Aisleron</string>
+    <string name="mnu_sort_list_by_name">Sortera efter namn</string>
+    <string name="sort_confirm_title">Bekräfta sortering</string>
+    <string name="save">Spara</string>
+    <string name="done">Klar</string>
+    <string name="delete">Ta bort</string>
+    <string name="undo">ÅNGRA</string>
+</resources>
