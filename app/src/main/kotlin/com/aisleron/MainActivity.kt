@@ -61,15 +61,20 @@ class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
     private lateinit var prefsListener: SharedPreferences.OnSharedPreferenceChangeListener
+    private var recreate: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setupKoinFragmentFactory()
+        recreate = false
 
         super.onCreate(savedInstanceState)
 
         // Needs to be a standalone variable so it is not garbage collected
         prefsListener = SharedPreferences.OnSharedPreferenceChangeListener { p, s ->
-            if (s == "application_theme") recreate()
+            when (s) {
+                "application_theme" -> recreate = true
+                "restore_database" -> recreate = true
+            }
         }
 
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
@@ -213,6 +218,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
+        if (recreate) recreate()
         return item.onNavDestinationSelected(navController) || super.onOptionsItemSelected(item)
     }
 

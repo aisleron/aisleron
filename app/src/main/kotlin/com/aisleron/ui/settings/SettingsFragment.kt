@@ -31,6 +31,7 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -96,7 +97,7 @@ class SettingsFragment : PreferenceFragmentCompat(), AisleronFragment {
 
     private fun getBackupFolderUri(): Uri {
         val uriStr = settingsViewModel.getPreferenceValue(PreferenceOption.BACKUP_FOLDER)
-        return Uri.parse(uriStr)
+        return uriStr.toUri()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -143,8 +144,14 @@ class SettingsFragment : PreferenceFragmentCompat(), AisleronFragment {
         initialUri: Uri, launcher: ActivityResultLauncher<Intent>
     ) {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-            addCategory(Intent.CATEGORY_DEFAULT)
-            type = "application/octet-stream"
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "application/*" // Required to allow multiple types
+            putExtra(
+                Intent.EXTRA_MIME_TYPES, arrayOf(
+                    "application/octet-stream", "application/vnd.sqlite3"
+                )
+            )
+
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 putExtra(DocumentsContract.EXTRA_INITIAL_URI, initialUri)

@@ -5,3 +5,4 @@ Enhancements
 
 Bug Fixes
 * Fixed bottom list item checkbox hidden behind fab.
+* Fixed issue where backup files with .sqlite extension couldn't be opened on Android 15.
