@@ -21,7 +21,7 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
+    android:fitsSystemWindows="false"
     tools:openDrawer="start">
 
     <include
@@ -35,14 +35,20 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:fitsSystemWindows="true">
+        android:fitsSystemWindows="false">
 
-        <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/fragment_navigation_drawer_container"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:name="com.aisleron.ui.menu.NavigationDrawerFragment"
-            tools:layout="@layout/fragment_navigation_drawer" />
+            android:orientation="vertical">
+
+            <androidx.fragment.app.FragmentContainerView
+                android:id="@+id/fragment_navigation_drawer_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:name="com.aisleron.ui.menu.NavigationDrawerFragment"
+                tools:layout="@layout/fragment_navigation_drawer" />
+        </LinearLayout>
 
     </com.google.android.material.navigation.NavigationView>
 </androidx.drawerlayout.widget.DrawerLayout>

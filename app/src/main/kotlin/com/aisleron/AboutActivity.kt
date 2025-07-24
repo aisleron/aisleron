@@ -17,25 +17,70 @@
 
 package com.aisleron
 
+import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
+import android.util.TypedValue
+import androidx.activity.SystemBarStyle
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import com.aisleron.databinding.ActivityAboutBinding
 
 
 class AboutActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivityAboutBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        binding = ActivityAboutBinding.inflate(layoutInflater)
 
-        //supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
-        setContentView(R.layout.activity_about)
+        setContentView(binding.root)
+        setWindowInsetListeners()
     }
 
-    /*override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-        if (id == android.R.id.home) {
-            finish()
+    private fun setWindowInsetListeners() {
+        //TODO: Change system bar style to auto to allow for black status bar text
+        enableEdgeToEdge(statusBarStyle = SystemBarStyle.dark(getStatusBarColor()))
+
+        // Need a toolbar shim here as the application toolbar is defined in the main activity.
+        val toolbarShim = binding.aboutToolbarShim
+        ViewCompat.setOnApplyWindowInsetsListener(toolbarShim) { view, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.statusBars())
+
+            val params = view.layoutParams
+            params.height = insets.top
+            view.layoutParams = params
+
+            windowInsets
         }
-        return super.onOptionsItemSelected(item)
-    }*/
+    }
+
+    private fun getStatusBarColor(): Int {
+        return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+            @Suppress("DEPRECATION")
+            resolveThemeColor(android.R.attr.statusBarColor)
+        } else {
+            Color.TRANSPARENT
+        }
+    }
+
+    private fun resolveThemeColor(attrResId: Int): Int {
+        val typedValue = TypedValue()
+
+        val wasResolved = theme.resolveAttribute(attrResId, typedValue, true)
+        if (!wasResolved) {
+            throw IllegalArgumentException("Attribute 0x${attrResId.toString(16)} not defined in theme")
+        }
+
+        return if (typedValue.resourceId != 0) {
+            ContextCompat.getColor(this, typedValue.resourceId)
+        } else {
+            typedValue.data
+        }
+    }
+
 }

@@ -26,4 +26,5 @@
     android:layout_margin="16dp"
     app:layoutManager="LinearLayoutManager"
     tools:context=".ui.shoplist.ShopListFragment"
-    tools:listitem="@layout/fragment_shop_list_item" />
+    tools:listitem="@layout/fragment_shop_list_item"
+    android:clipToPadding="false" />

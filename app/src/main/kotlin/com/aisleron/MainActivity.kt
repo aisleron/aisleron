@@ -17,12 +17,27 @@
 
 package com.aisleron
 
+import android.content.SharedPreferences
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup.MarginLayoutParams
+import android.widget.FrameLayout
+import android.widget.LinearLayout
+import androidx.activity.SystemBarStyle
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.view.ActionMode
+import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
+import androidx.core.view.updatePadding
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
@@ -45,14 +60,25 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
+    private lateinit var prefsListener: SharedPreferences.OnSharedPreferenceChangeListener
+    private var recreate: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setupKoinFragmentFactory()
+        recreate = false
 
         super.onCreate(savedInstanceState)
 
+        // Needs to be a standalone variable so it is not garbage collected
+        prefsListener = SharedPreferences.OnSharedPreferenceChangeListener { p, s ->
+            when (s) {
+                "application_theme" -> recreate = true
+                "restore_database" -> recreate = true
+            }
+        }
+
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
-        //TODO: prefs.registerOnSharedPreferenceChangeListener(this)
+        prefs.registerOnSharedPreferenceChangeListener(prefsListener)
 
         val displayPreferences = DisplayPreferencesImpl()
 
@@ -77,6 +103,8 @@ class MainActivity : AppCompatActivity() {
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
 
+        setWindowInsetListeners()
+
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_main) as NavHostFragment
         val navController = navHostFragment.navController
@@ -96,12 +124,84 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
 
         navController.addOnDestinationChangedListener { _, _, _ ->
+            val appBarLayout = binding.appBarMain.appBarLayout
+            appBarLayout.setExpanded(true, true)
+
             drawerLayout.closeDrawers()
             FabHandlerImpl().setFabItems(this)
         }
 
         if (!WelcomePreferencesImpl().isInitialized(this)) {
             navController.navigate(R.id.nav_welcome)
+        }
+    }
+
+    private fun setWindowInsetListeners() {
+        //TODO: Change system bar style to auto to allow for black status bar text
+        enableEdgeToEdge(statusBarStyle = SystemBarStyle.dark(getStatusBarColor()))
+
+        // Fab margins
+        val fab = binding.appBarMain.fab
+        ViewCompat.setOnApplyWindowInsetsListener(fab) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.navigationBars()
+                        or WindowInsetsCompat.Type.ime()
+            )
+
+            view.updateLayoutParams<MarginLayoutParams> {
+                val fabMargins = resources.getDimensionPixelSize(R.dimen.fab_margin_bottom)
+                bottomMargin = fabMargins + insets.bottom
+            }
+
+            windowInsets
+        }
+
+        // Toolbar
+        val toolbar = binding.appBarMain.toolbar
+        ViewCompat.setOnApplyWindowInsetsListener(toolbar) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.statusBars()
+                        or WindowInsetsCompat.Type.navigationBars()
+                        or WindowInsetsCompat.Type.displayCutout()
+            )
+
+            val actionBarHeight = resources.getDimensionPixelSize(R.dimen.toolbar_height)
+
+            val params = view.layoutParams
+            params.height = actionBarHeight + insets.top
+            view.layoutParams = params
+            view.updatePadding(top = insets.top, left = insets.left, right = insets.right)
+
+            windowInsets
+        }
+
+        // Status bar scrim
+        val scrim = binding.appBarMain.statusBarScrim
+        ViewCompat.setOnApplyWindowInsetsListener(scrim) { view, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.statusBars())
+
+            val params = view.layoutParams
+            params.height = insets.top
+            view.layoutParams = params
+
+            windowInsets
+        }
+
+        //Navigation Drawer
+        val drawer = binding.navView
+        ViewCompat.setOnApplyWindowInsetsListener(drawer) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.navigationBars()
+                        or WindowInsetsCompat.Type.displayCutout()
+            )
+
+            val header = view.findViewById<FrameLayout>(R.id.nav_header_frame)
+            header.updatePadding(left = insets.left)
+
+            val menu = view.findViewById<LinearLayout>(R.id.navigation_menu_items)
+            menu.updatePadding(left = insets.left, bottom = insets.bottom)
+
+            windowInsets
         }
     }
 
@@ -113,14 +213,12 @@ class MainActivity : AppCompatActivity() {
 
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
-        if (navController.currentDestination?.id == R.id.nav_settings) {
-            recreate()
-        }
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
+        if (recreate) recreate()
         return item.onNavDestinationSelected(navController) || super.onOptionsItemSelected(item)
     }
 
@@ -129,5 +227,47 @@ class MainActivity : AppCompatActivity() {
             binding.drawerLayout.closeDrawers()
         }
         super.onResume()
+    }
+
+    override fun onSupportActionModeStarted(mode: ActionMode) {
+        super.onSupportActionModeStarted(mode)
+
+        val statusBarScrim = binding.appBarMain.statusBarScrim
+
+        statusBarScrim.alpha = 0f
+        statusBarScrim.visibility = View.VISIBLE
+        statusBarScrim.animate().alpha(1f).start()
+    }
+
+    override fun onSupportActionModeFinished(mode: ActionMode) {
+        super.onSupportActionModeFinished(mode)
+        val statusBarScrim = binding.appBarMain.statusBarScrim
+        statusBarScrim.animate().alpha(0f).withEndAction {
+            statusBarScrim.visibility = View.GONE
+        }.start()
+    }
+
+    private fun getStatusBarColor(): Int {
+        return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+            @Suppress("DEPRECATION")
+            resolveThemeColor(android.R.attr.statusBarColor)
+        } else {
+            Color.TRANSPARENT
+        }
+    }
+
+    private fun resolveThemeColor(attrResId: Int): Int {
+        val typedValue = TypedValue()
+
+        val wasResolved = theme.resolveAttribute(attrResId, typedValue, true)
+        if (!wasResolved) {
+            throw IllegalArgumentException("Attribute 0x${attrResId.toString(16)} not defined in theme")
+        }
+
+        return if (typedValue.resourceId != 0) {
+            ContextCompat.getColor(this, typedValue.resourceId)
+        } else {
+            typedValue.data
+        }
     }
 }

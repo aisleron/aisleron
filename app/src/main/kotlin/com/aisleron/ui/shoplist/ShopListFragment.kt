@@ -19,7 +19,6 @@ package com.aisleron.ui.shoplist
 
 import android.content.Context
 import android.os.Bundle
-import android.view.ActionMode
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -27,6 +26,8 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.view.ActionMode
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -38,6 +39,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.aisleron.R
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.ui.AisleronExceptionMap
+import com.aisleron.ui.AisleronFragment
 import com.aisleron.ui.FabHandler
 import com.aisleron.ui.FabHandler.FabClickedCallBack
 import com.aisleron.ui.bundles.Bundler
@@ -50,7 +52,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  * A fragment representing a list of Items.
  */
 class ShopListFragment(private val fabHandler: FabHandler) : Fragment(), ActionMode.Callback,
-    ShopListItemRecyclerViewAdapter.ShopListItemListener, FabClickedCallBack {
+    ShopListItemRecyclerViewAdapter.ShopListItemListener, FabClickedCallBack, AisleronFragment {
 
     private var actionMode: ActionMode? = null
     private var actionModeItem: ShopListItemViewModel? = null
@@ -90,6 +92,7 @@ class ShopListFragment(private val fabHandler: FabHandler) : Fragment(), ActionM
 
         // Set the adapter
         if (view is RecyclerView) {
+            setWindowInsetListeners(this, view, true, null)
             viewLifecycleOwner.lifecycleScope.launch {
                 viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                     shopListViewModel.shopListUiState.collect {
@@ -219,7 +222,7 @@ class ShopListFragment(private val fabHandler: FabHandler) : Fragment(), ActionM
             null -> {
                 // Start the CAB using the ActionMode.Callback defined earlier.
                 actionMode =
-                    requireActivity().startActionMode(this@ShopListFragment)
+                    (requireActivity() as AppCompatActivity).startSupportActionMode(this@ShopListFragment)
                 true
             }
 

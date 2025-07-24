@@ -39,6 +39,7 @@
         <item name="actionModeStyle">@style/Theme.Aisleron.ActionMode</item>
         <item name="actionBarPopupTheme">@style/Theme.Aisleron.PopupOverlay</item>
         <item name="colorSelectedListItem">?android:attr/colorControlHighlight</item>
+        <item name="actionBarStyle">@style/Theme.Aisleron.ActionBarStyle</item>
         <item name="colorAisleron">@color/blue_100</item>
 
         <!--this is makes changes to the entire snackbar-->
@@ -48,6 +49,10 @@
     <style name="Theme.Aisleron.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.Aisleron.ActionBarStyle" parent="@style/Widget.AppCompat.Light.ActionBar">
+        <!-- Style removes shadow around the action bar on non-primary activities       -->
     </style>
 
     <style name="Theme.Aisleron.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
@@ -61,6 +66,8 @@
 
     <style name="Theme.Aisleron.ActionMode" parent="Widget.AppCompat.ActionMode">
         <item name="background">@drawable/action_mode_background</item>
+        <item name="android:statusBarColor">?attr/colorPrimary</item>
+        <item name="height">@dimen/toolbar_height</item>
     </style>
 
     <style name="Theme.Aisleron.NavigationDrawer" parent="Theme.Aisleron">

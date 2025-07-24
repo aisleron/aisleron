@@ -36,6 +36,7 @@ import com.aisleron.databinding.FragmentProductBinding
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.ui.AddEditFragmentListener
 import com.aisleron.ui.AisleronExceptionMap
+import com.aisleron.ui.AisleronFragment
 import com.aisleron.ui.ApplicationTitleUpdateListener
 import com.aisleron.ui.FabHandler
 import com.aisleron.ui.bundles.AddEditProductBundle
@@ -49,7 +50,7 @@ class ProductFragment(
     private val addEditFragmentListener: AddEditFragmentListener,
     private val applicationTitleUpdateListener: ApplicationTitleUpdateListener,
     private val fabHandler: FabHandler
-) : Fragment(), MenuProvider {
+) : Fragment(), MenuProvider, AisleronFragment {
 
     private val productViewModel: ProductViewModel by viewModel()
     private var _binding: FragmentProductBinding? = null
@@ -82,6 +83,7 @@ class ProductFragment(
         fabHandler.setFabItems(this.requireActivity())
 
         _binding = FragmentProductBinding.inflate(inflater, container, false)
+        setWindowInsetListeners(this, binding.root, false, R.dimen.text_margin)
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
