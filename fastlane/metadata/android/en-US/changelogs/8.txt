@@ -1,5 +1,7 @@
 Enhancements
-* Added loyalty card lookups using Catima — Loyalty Card Wallet
+* Added loyalty card lookups using Catima — Loyalty Card Wallet.
+* Added Russian translations.
+* Upgraded target SDK to Android 15 / API level 35.
 
 Bug Fixes
-*
+* Fixed bottom list item checkbox hidden behind fab.

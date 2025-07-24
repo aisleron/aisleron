@@ -16,7 +16,7 @@
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <color name="white">#FFFFFFFF</color>
     <!-- Blacks.   -->
     <color name="black">#FF000000</color>
@@ -42,4 +42,9 @@
     <color name="red_light">#FFE69490</color>
     <color name="red_dark">#FF4C100D</color>
     <color name="red_dark_opaque_60">#994C100D</color>
+
+    <!-- ActionMode status bar overrides   -->
+    <color name="abc_decor_view_status_guard" tools:override="true">@android:color/transparent</color>
+    <color name="abc_decor_view_status_guard_light" tools:override="true">@android:color/transparent</color>
+
 </resources>

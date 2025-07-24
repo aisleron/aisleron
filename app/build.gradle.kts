@@ -64,7 +64,7 @@ android {
     defaultConfig {
         applicationId = "com.aisleron"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 7
         versionName = "2025.5.0"
         base.archivesName = "$applicationId-$versionName"
@@ -99,13 +99,13 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlin {
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
+            jvmTarget.set(JvmTarget.JVM_17)
         }
     }
 
@@ -156,10 +156,10 @@ dependencies {
     implementation("androidx.preference:preference-ktx:1.2.1")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.9.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.1")
-    implementation("androidx.navigation:navigation-fragment-ktx:2.9.0")
-    implementation("androidx.navigation:navigation-ui-ktx:2.9.0")
-    implementation("androidx.navigation:navigation-common:2.9.0")
-    implementation("androidx.navigation:navigation-runtime-ktx:2.9.0")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.9.1")
+    implementation("androidx.navigation:navigation-ui-ktx:2.9.1")
+    implementation("androidx.navigation:navigation-common:2.9.1")
+    implementation("androidx.navigation:navigation-runtime-ktx:2.9.1")
     implementation("org.jetbrains.kotlin:kotlin-parcelize-runtime:2.2.0")
 
     //Database
@@ -183,7 +183,7 @@ dependencies {
     implementation("androidx.test.espresso:espresso-contrib:3.6.1")
 
     testImplementation(project(":testData"))
-    testImplementation("org.junit.jupiter:junit-jupiter:5.13.2")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.13.3")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
     testImplementation("androidx.room:room-testing:2.7.2")
 
@@ -195,7 +195,7 @@ dependencies {
     androidTestImplementation("io.insert-koin:koin-test:4.1.0")
     androidTestImplementation("androidx.test:core-ktx:1.6.1")
     androidTestImplementation("androidx.test.espresso:espresso-intents:3.6.1")
-    androidTestImplementation("androidx.navigation:navigation-testing:2.9.0")
+    androidTestImplementation("androidx.navigation:navigation-testing:2.9.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
     //org.hamcrest:hamcrest:2.2 is a androidx.test.espresso:espresso-core:3.6.1 dependency
     androidTestImplementation("org.hamcrest:hamcrest:2.2")
@@ -204,7 +204,7 @@ dependencies {
 }
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(11)
+        languageVersion = JavaLanguageVersion.of(17)
     }
 }
 

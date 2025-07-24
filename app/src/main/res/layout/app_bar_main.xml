@@ -21,18 +21,23 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/app_bar_main"
     tools:context=".MainActivity">
 
     <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/Theme.Aisleron.AppBarOverlay">
+        android:theme="@style/Theme.Aisleron.AppBarOverlay"
+        android:background="?android:statusBarColor">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:popupTheme="@style/Theme.Aisleron.PopupOverlay" />
+            android:layout_height="@dimen/toolbar_height"
+            app:popupTheme="@style/Theme.Aisleron.PopupOverlay"
+            app:layout_scrollFlags="scroll|enterAlways|snap" />
+
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -44,7 +49,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="@dimen/fab_margin"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="@dimen/fab_margin_bottom"
         android:contentDescription="@string/main_fab"
         android:theme="@style/FloatingActionButtonPrimary"
         app:srcCompat="@android:drawable/ic_input_add" />
@@ -113,6 +118,14 @@
         android:layout_gravity="top"
         android:theme="@style/FloatingActionButtonSecondary"
         app:srcCompat="@drawable/baseline_add_product_24" />
+
+    <View
+        android:id="@+id/status_bar_scrim"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/toolbar_height"
+        android:background="?android:statusBarColor"
+        android:visibility="gone"
+        android:elevation="8dp" />
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

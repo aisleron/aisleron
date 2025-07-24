@@ -18,12 +18,14 @@
 package com.aisleron.ui.about
 
 import android.os.Bundle
+import android.view.View
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.aisleron.R
+import com.aisleron.ui.AisleronFragment
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class AboutFragment : PreferenceFragmentCompat() {
+class AboutFragment : PreferenceFragmentCompat(), AisleronFragment {
 
     private val aboutViewModel: AboutViewModel by viewModel()
 
@@ -42,5 +44,11 @@ class AboutFragment : PreferenceFragmentCompat() {
             it.summary =
                 getString(R.string.about_support_version_summary, aboutViewModel.versionName)
         }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setWindowInsetListeners(this, view, false, null)
     }
 }

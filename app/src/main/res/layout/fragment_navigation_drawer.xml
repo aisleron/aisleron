@@ -21,21 +21,30 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".ui.menu.NavigationDrawerFragment">
+    tools:context=".ui.menu.NavigationDrawerFragment"
+    android:id="@+id/fragment_navigation_drawer">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/nav_header_height"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <include layout="@layout/nav_header_main" />
+        <FrameLayout
+            android:id="@+id/nav_header_frame"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/side_nav_bar">
+
+            <include layout="@layout/nav_header_main" />
+        </FrameLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:theme="@style/Theme.Aisleron.NavigationDrawer"
-            android:padding="0dp">
+            android:padding="0dp"
+            android:id="@+id/navigation_menu_items">
 
             <TextView
                 android:id="@+id/nav_home_title"

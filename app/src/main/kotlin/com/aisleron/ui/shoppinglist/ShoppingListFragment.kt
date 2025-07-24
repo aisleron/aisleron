@@ -20,7 +20,6 @@ package com.aisleron.ui.shoppinglist
 import android.app.SearchManager
 import android.content.Context
 import android.os.Bundle
-import android.view.ActionMode
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -30,6 +29,8 @@ import android.view.View.OnAttachStateChangeListener
 import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.view.ActionMode
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.view.MenuProvider
@@ -47,6 +48,7 @@ import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.loyaltycard.LoyaltyCard
 import com.aisleron.ui.AisleronExceptionMap
+import com.aisleron.ui.AisleronFragment
 import com.aisleron.ui.ApplicationTitleUpdateListener
 import com.aisleron.ui.FabHandler
 import com.aisleron.ui.FabHandler.FabClickedCallBack
@@ -68,7 +70,7 @@ class ShoppingListFragment(
     private val shoppingListPreferences: ShoppingListPreferences,
     private val loyaltyCardProvider: LoyaltyCardProvider
 ) : Fragment(), SearchView.OnQueryTextListener, ActionMode.Callback, FabClickedCallBack,
-    MenuProvider {
+    MenuProvider, AisleronFragment {
 
     private var actionMode: ActionMode? = null
     private var actionModeItem: ShoppingListItem? = null
@@ -98,12 +100,17 @@ class ShoppingListFragment(
 
         // Set the adapter
         if (view is RecyclerView) {
+            setWindowInsetListeners(this, view, true, null)
             viewLifecycleOwner.lifecycleScope.launch {
                 viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                     shoppingListViewModel.shoppingListUiState.collect {
                         when (it) {
                             is ShoppingListViewModel.ShoppingListUiState.Error -> {
-                                displayErrorSnackBar(it.errorCode, it.errorMessage)
+                                displayErrorSnackBar(
+                                    it.errorCode,
+                                    it.errorMessage,
+                                    fabHandler.getFabView(requireActivity())
+                                )
                             }
 
                             is ShoppingListViewModel.ShoppingListUiState.Updated -> {
@@ -162,7 +169,9 @@ class ShoppingListFragment(
                                 null -> {
                                     // Start the CAB using the ActionMode.Callback defined earlier.
                                     actionMode =
-                                        requireActivity().startActionMode(this@ShoppingListFragment)
+                                        (requireActivity() as AppCompatActivity).startSupportActionMode(
+                                            this@ShoppingListFragment
+                                        )
                                     true
                                 }
 
@@ -219,7 +228,7 @@ class ShoppingListFragment(
     }
 
     private fun displayErrorSnackBar(
-        errorCode: AisleronException.ExceptionCode, errorMessage: String?
+        errorCode: AisleronException.ExceptionCode, errorMessage: String?, anchorView: View?
     ) {
         val snackBarMessage =
             getString(AisleronExceptionMap().getErrorResourceId(errorCode), errorMessage)
@@ -228,7 +237,7 @@ class ShoppingListFragment(
             requireView(),
             snackBarMessage,
             Snackbar.LENGTH_SHORT,
-            fabHandler.getFabView(this.requireActivity())
+            anchorView
         ).show()
     }
 
@@ -488,7 +497,11 @@ class ShoppingListFragment(
         } catch (e: AisleronException.LoyaltyCardProviderException) {
             loyaltyCardProvider.getNotInstalledDialog(requireContext()).show()
         } catch (e: Exception) {
-            displayErrorSnackBar(AisleronException.ExceptionCode.GENERIC_EXCEPTION, e.message)
+            displayErrorSnackBar(
+                AisleronException.ExceptionCode.GENERIC_EXCEPTION,
+                e.message,
+                fabHandler.getFabView(this.requireActivity())
+            )
         }
     }
 

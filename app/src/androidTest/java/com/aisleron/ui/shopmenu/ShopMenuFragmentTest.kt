@@ -17,6 +17,8 @@
 
 package com.aisleron.ui.shopmenu
 
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.testing.FragmentScenario
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.navigation.Navigation
@@ -61,6 +63,24 @@ class ShopMenuFragmentTest : KoinTest {
             instantiate = { ShopMenuFragment() }
         )
 
+        scenario.onFragment {
+            // Add padding to the view to account for Edge-to-Edge in Android API 35
+            val rootView = it.requireView()
+            ViewCompat.setOnApplyWindowInsetsListener(rootView) { view, insets ->
+                val systemInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+                view.setPadding(
+                    view.paddingLeft,
+                    systemInsets.top,
+                    view.paddingRight,
+                    view.paddingBottom
+                )
+
+                insets
+            }
+
+            ViewCompat.requestApplyInsets(rootView)
+        }
+
         return scenario
     }
 
@@ -101,7 +121,7 @@ class ShopMenuFragmentTest : KoinTest {
 
         onView(withText(shopLocation.name)).perform(click())
 
-        val bundle = navController.backStack.last().arguments
+        val bundle = navController.currentBackStackEntry?.arguments
         val shoppingListBundle = bundler.getShoppingListBundle(bundle)
 
         Assert.assertEquals(shopLocation.id, shoppingListBundle.locationId)

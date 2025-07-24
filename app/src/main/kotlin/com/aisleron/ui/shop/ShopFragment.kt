@@ -36,6 +36,7 @@ import com.aisleron.databinding.FragmentShopBinding
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.ui.AddEditFragmentListener
 import com.aisleron.ui.AisleronExceptionMap
+import com.aisleron.ui.AisleronFragment
 import com.aisleron.ui.ApplicationTitleUpdateListener
 import com.aisleron.ui.FabHandler
 import com.aisleron.ui.bundles.AddEditLocationBundle
@@ -52,7 +53,7 @@ class ShopFragment(
     private val applicationTitleUpdateListener: ApplicationTitleUpdateListener,
     private val fabHandler: FabHandler,
     private val loyaltyCardProvider: LoyaltyCardProvider
-) : Fragment(), MenuProvider {
+) : Fragment(), MenuProvider, AisleronFragment {
     private val shopViewModel: ShopViewModel by viewModel()
     private var _binding: FragmentShopBinding? = null
 
@@ -84,6 +85,7 @@ class ShopFragment(
         fabHandler.setFabItems(this.requireActivity())
 
         _binding = FragmentShopBinding.inflate(inflater, container, false)
+        setWindowInsetListeners(this, binding.root, false, R.dimen.text_margin)
 
         binding.btnLookupLoyaltyCard.setOnClickListener {
             lookupLoyaltyCard()

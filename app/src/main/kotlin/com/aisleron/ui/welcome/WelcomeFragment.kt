@@ -35,6 +35,7 @@ import com.aisleron.databinding.FragmentWelcomeBinding
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.ui.AddEditFragmentListener
 import com.aisleron.ui.AisleronExceptionMap
+import com.aisleron.ui.AisleronFragment
 import com.aisleron.ui.FabHandler
 import com.aisleron.ui.settings.WelcomePreferences
 import com.aisleron.ui.widgets.ErrorSnackBar
@@ -47,7 +48,7 @@ class WelcomeFragment(
     private val fabHandler: FabHandler,
     private val welcomePreferences: WelcomePreferences,
     private val addEditFragmentListener: AddEditFragmentListener
-) : Fragment() {
+) : Fragment(), AisleronFragment {
 
     companion object {
         fun newInstance(
@@ -78,6 +79,7 @@ class WelcomeFragment(
         initializeFab()
 
         val binding = FragmentWelcomeBinding.inflate(inflater, container, false)
+        setWindowInsetListeners(this, binding.root, true, null)
 
         with(binding.txtWelcomeLoadSampleItems) {
             text =

@@ -39,13 +39,14 @@ import androidx.preference.PreferenceFragmentCompat
 import com.aisleron.R
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.ui.AisleronExceptionMap
+import com.aisleron.ui.AisleronFragment
 import com.aisleron.ui.widgets.ErrorSnackBar
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
 
-class SettingsFragment : PreferenceFragmentCompat() {
+class SettingsFragment : PreferenceFragmentCompat(), AisleronFragment {
 
     enum class PreferenceOption(val key: String) {
         BACKUP_FOLDER("backup_folder"),
@@ -100,6 +101,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        setWindowInsetListeners(this, view, false, null)
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
