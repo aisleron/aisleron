@@ -1,2 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="navigation_drawer_open">Abrir caja de navegacion</string>
+    <string name="navigation_drawer_close">Cerrar caja de navegaciòn</string>
+    <string name="nav_header_subtitle">Vuela a travès de las tiendas!</string>
+    <string name="nav_header_desc">Cabezal de navegacion</string>
+    <string name="action_search">Buscar</string>
+</resources>
