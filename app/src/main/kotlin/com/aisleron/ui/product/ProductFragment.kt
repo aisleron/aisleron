@@ -27,6 +27,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuProvider
+import androidx.core.view.doOnLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -142,12 +143,12 @@ class ProductFragment(
         applicationTitleUpdateListener.applicationTitleUpdated(requireActivity(), appTitle)
 
         val edtProductName = binding.edtProductName
-        edtProductName.postDelayed({
+        edtProductName.doOnLayout {
             edtProductName.requestFocus()
             val imm =
                 ContextCompat.getSystemService(requireContext(), InputMethodManager::class.java)
             imm?.showSoftInput(edtProductName, InputMethodManager.SHOW_IMPLICIT)
-        }, 100)
+        }
     }
 
     companion object {

@@ -180,8 +180,10 @@ class MainActivity : AppCompatActivity() {
         ViewCompat.setOnApplyWindowInsetsListener(scrim) { view, windowInsets ->
             val insets = windowInsets.getInsets(WindowInsetsCompat.Type.statusBars())
 
+            val actionBarHeight = resources.getDimensionPixelSize(R.dimen.toolbar_height)
+
             val params = view.layoutParams
-            params.height = insets.top
+            params.height = actionBarHeight + insets.top
             view.layoutParams = params
 
             windowInsets

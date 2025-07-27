@@ -17,25 +17,32 @@
 
 package com.aisleron.ui.shoplist
 
-import androidx.fragment.app.testing.FragmentScenario
-import androidx.fragment.app.testing.launchFragmentInContainer
+import android.view.View
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.navigation.Navigation
 import androidx.navigation.testing.TestNavHostController
+import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
+import androidx.test.espresso.UiController
+import androidx.test.espresso.ViewAction
+import androidx.test.espresso.ViewInteraction
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.longClick
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.RootMatchers.isDialog
 import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.hasDescendant
+import androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.isSelected
 import androidx.test.espresso.matcher.ViewMatchers.withId
-import androidx.test.espresso.matcher.ViewMatchers.withResourceName
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import com.aisleron.AppCompatActivityTestImpl
 import com.aisleron.R
 import com.aisleron.di.KoinTestRule
 import com.aisleron.di.daoTestModule
@@ -53,8 +60,8 @@ import com.aisleron.ui.bundles.Bundler
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.allOf
-import org.hamcrest.CoreMatchers.not
 import org.hamcrest.CoreMatchers.startsWith
+import org.hamcrest.Matcher
 import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -63,11 +70,11 @@ import org.junit.Test
 import org.koin.test.KoinTest
 import org.koin.test.get
 import org.koin.test.mock.declare
-import java.lang.Thread.sleep
 
 class ShopListFragmentTest : KoinTest {
     private lateinit var bundler: Bundler
     private lateinit var fabHandler: FabHandlerTestImpl
+    private lateinit var activityFragment: ShopListFragment
 
     @get:Rule
     val koinTestRule = KoinTestRule(
@@ -81,11 +88,27 @@ class ShopListFragmentTest : KoinTest {
         runBlocking { get<CreateSampleDataUseCase>().invoke() }
     }
 
-    private fun getFragmentScenario(): FragmentScenario<ShopListFragment> =
-        launchFragmentInContainer<ShopListFragment>(
-            themeResId = R.style.Theme_Aisleron,
-            instantiate = { ShopListFragment(fabHandler) }
-        )
+    private fun setPadding(view: View) {
+        ViewCompat.getRootWindowInsets(view)?.let { windowInsets ->
+            val actionBarHeight = view.resources.getDimensionPixelSize(R.dimen.toolbar_height)
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.updatePadding(top = actionBarHeight + insets.top)
+        }
+    }
+
+    private fun getActivityScenario(): ActivityScenario<AppCompatActivityTestImpl> {
+        val scenario = ActivityScenario.launch(AppCompatActivityTestImpl::class.java)
+        scenario.onActivity { activity ->
+            activityFragment = ShopListFragment(fabHandler)
+            activity.supportFragmentManager.beginTransaction()
+                .replace(android.R.id.content, activityFragment, "SHOP_LIST")
+                .commitNow()
+
+            setPadding(activityFragment.requireView())
+        }
+
+        return scenario
+    }
 
     @Test
     fun newInstance_CallNewInstance_ReturnsFragment() {
@@ -99,10 +122,10 @@ class ShopListFragmentTest : KoinTest {
         val shopLocation = get<LocationRepository>().getAll().first { it.id != 1 }
         val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
 
-        getFragmentScenario().onFragment { fragment ->
+        getActivityScenario().onActivity {
             navController.setGraph(R.navigation.mobile_navigation)
             navController.setCurrentDestination(R.id.nav_all_shops)
-            Navigation.setViewNavController(fragment.requireView(), navController)
+            Navigation.setViewNavController(activityFragment.requireView(), navController)
         }
 
         onView(withText(shopLocation.name)).perform(click())
@@ -119,13 +142,13 @@ class ShopListFragmentTest : KoinTest {
     fun onLongClick_ActionModeNotActive_ShowActionModeContextMenu() = runTest {
         val selectedLocation = get<LocationRepository>().getAll().first { it.id != 1 }
 
-        getFragmentScenario()
+        getActivityScenario()
         val shopItem = onView(allOf(withText(selectedLocation.name), withId(R.id.txt_shop_name)))
         shopItem.perform(longClick())
 
-        val actionBar = onView(withResourceName("action_mode_bar"))
-
         shopItem.check(matches(isSelected()))
+
+        val actionBar = onView(withId(com.google.android.material.R.id.action_context_bar))
 
         actionBar.check(matches(isDisplayed()))
         actionBar.check(matches(hasDescendant(withText(selectedLocation.name))))
@@ -140,10 +163,10 @@ class ShopListFragmentTest : KoinTest {
         val editLocation = get<LocationRepository>().getAll().first { it.id != 1 }
         val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
 
-        getFragmentScenario().onFragment { fragment ->
+        getActivityScenario().onActivity {
             navController.setGraph(R.navigation.mobile_navigation)
             navController.setCurrentDestination(R.id.nav_all_shops)
-            Navigation.setViewNavController(fragment.requireView(), navController)
+            Navigation.setViewNavController(activityFragment.requireView(), navController)
         }
 
         onView(withText(editLocation.name)).perform(longClick())
@@ -164,12 +187,12 @@ class ShopListFragmentTest : KoinTest {
         val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
         var deleteConfirmMessage = ""
 
-        getFragmentScenario().onFragment { fragment ->
+        getActivityScenario().onActivity {
             navController.setGraph(R.navigation.mobile_navigation)
             navController.setCurrentDestination(R.id.nav_all_shops)
-            Navigation.setViewNavController(fragment.requireView(), navController)
+            Navigation.setViewNavController(activityFragment.requireView(), navController)
             deleteConfirmMessage =
-                fragment.getString(R.string.delete_confirmation, deleteLocation.name)
+                activityFragment.getString(R.string.delete_confirmation, deleteLocation.name)
         }
 
         onView(withText(deleteLocation.name)).perform(longClick())
@@ -186,7 +209,7 @@ class ShopListFragmentTest : KoinTest {
         val locationRepository = get<LocationRepository>()
         val deleteLocation = locationRepository.getAll().first { it.id != 1 }
 
-        getFragmentScenario()
+        getActivityScenario()
         onView(withText(deleteLocation.name)).perform(longClick())
         openActionBarOverflowOrOptionsMenu(getInstrumentation().targetContext)
         onView(withText(R.string.delete)).perform(click())
@@ -204,7 +227,7 @@ class ShopListFragmentTest : KoinTest {
         val locationRepository = get<LocationRepository>()
         val deleteLocation = locationRepository.getAll().first { it.id != 1 }
 
-        getFragmentScenario()
+        getActivityScenario()
 
         onView(withText(deleteLocation.name)).perform(longClick())
         openActionBarOverflowOrOptionsMenu(getInstrumentation().targetContext)
@@ -233,7 +256,7 @@ class ShopListFragmentTest : KoinTest {
         val locationRepository = get<LocationRepository>()
         val deleteLocation = locationRepository.getAll().first { it.id != 1 }
 
-        getFragmentScenario()
+        getActivityScenario()
         onView(withText(deleteLocation.name)).perform(longClick())
         openActionBarOverflowOrOptionsMenu(getInstrumentation().targetContext)
         onView(withText(R.string.delete)).perform(click())
@@ -255,35 +278,59 @@ class ShopListFragmentTest : KoinTest {
     @Test
     fun onClick_ActionModeIsActive_DismissActionModeContextMenu() = runTest {
         val selectedLocation = get<LocationRepository>().getAll().first { it.id != 1 }
-        getFragmentScenario()
+        getActivityScenario()
         val shopItem = onView(allOf(withText(selectedLocation.name), withId(R.id.txt_shop_name)))
 
         shopItem.perform(longClick())
         shopItem.perform(click())
-        sleep(500)
 
-        val actionBar = onView(withResourceName("action_mode_bar"))
-        actionBar.check(matches(not(isDisplayed())))
+        val actionBar = onView(withId(com.google.android.material.R.id.action_context_bar))
+        actionBar.checkVisibility(View.GONE)
     }
 
     @Test
-    fun onClickAddShopFab_ActionModeIsActive_DismissActionModeContextMenu() = runTest {
-        val selectedLocation = get<LocationRepository>().getAll().first { it.id != 1 }
-        val scenario = getFragmentScenario()
-        val shopItem = onView(allOf(withText(selectedLocation.name), withId(R.id.txt_shop_name)))
+    fun onClickAddShopFab_ActionModeIsActive_DismissActionModeContextMenu() {
+        runTest {
+            val selectedLocation = get<LocationRepository>().getAll().first { it.id != 1 }
+            val shopItem =
+                onView(allOf(withText(selectedLocation.name), withId(R.id.txt_shop_name)))
+            val scenario = getActivityScenario()
 
-        shopItem.perform(longClick())
-        scenario.onFragment { fragment ->
-            fabHandler.setFabOnClickListener(
-                fragment.requireActivity(), FabHandler.FabOption.ADD_SHOP
-            ) {}
+            shopItem.perform(longClick())
 
-            fabHandler.clickFab(FabHandler.FabOption.ADD_SHOP, fragment.requireView())
+            scenario.onActivity { activity ->
+                fabHandler.setFabOnClickListener(
+                    activity, FabHandler.FabOption.ADD_SHOP
+                ) {}
+
+                fabHandler.clickFab(FabHandler.FabOption.ADD_SHOP, activityFragment.requireView())
+            }
+
+            val actionBar = onView(withId(com.google.android.material.R.id.action_context_bar))
+            actionBar.checkVisibility(View.GONE)
         }
+    }
 
-        sleep(500)
+    private fun ViewInteraction.checkVisibility(
+        expectedVisibility: Int,
+        timeoutMs: Long = 2000,
+        pollIntervalMs: Long = 50
+    ) {
+        this.perform(object : ViewAction {
+            override fun getConstraints(): Matcher<View> = isAssignableFrom(View::class.java)
 
-        val actionBar = onView(withResourceName("action_mode_bar"))
-        actionBar.check(matches(not(isDisplayed())))
+            override fun getDescription(): String =
+                "wait up to $timeoutMs ms for view to have visibility: $expectedVisibility"
+
+            override fun perform(uiController: UiController, view: View) {
+                val endTime = System.currentTimeMillis() + timeoutMs
+                do {
+                    if (view.visibility == expectedVisibility) return
+                    uiController.loopMainThreadForAtLeast(pollIntervalMs)
+                } while (System.currentTimeMillis() < endTime)
+
+                throw AssertionError("View did not become visibility=$expectedVisibility within $timeoutMs ms")
+            }
+        })
     }
 }
