@@ -31,7 +31,6 @@ import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
-import androidx.test.platform.app.InstrumentationRegistry
 import com.aisleron.R
 import com.aisleron.di.KoinTestRule
 import com.aisleron.di.daoTestModule
@@ -80,7 +79,7 @@ class ShopFragmentTest : KoinTest {
     }
 
     @Test
-    fun onCreateShopFragment_HasEditBundle_AppTitleIsEdit() {
+    fun onCreateShopFragment_HasEditBundle_AppTitleIsEdit() = runTest {
         val bundle = bundler.makeEditLocationBundle(1)
         val scenario = getFragmentScenario(bundle)
         scenario.onFragment {
@@ -117,11 +116,13 @@ class ShopFragmentTest : KoinTest {
     fun onSaveClick_NewShopHasUniqueName_ShopSaved() = runTest {
         val bundle = bundler.makeAddLocationBundle("New Location")
         val scenario = getFragmentScenario(bundle)
-        val menuItem = getSaveMenuItem()
         val newShopName = "Shop Add New Test"
 
         onView(withId(R.id.edt_shop_name)).perform(typeText(newShopName))
-        scenario.onFragment { it.onMenuItemSelected(menuItem) }
+        scenario.onFragment {
+            val menuItem = getSaveMenuItem(it.requireContext())
+            it.onMenuItemSelected(menuItem)
+        }
 
         val shop = get<LocationRepository>().getAll().firstOrNull { it.name == newShopName }
 
@@ -131,12 +132,12 @@ class ShopFragmentTest : KoinTest {
     }
 
     @Test
-    fun onSaveClick_NoShopNameEntered_DoNothing() {
+    fun onSaveClick_NoShopNameEntered_DoNothing() = runTest {
         val bundle = bundler.makeAddLocationBundle()
         val scenario = getFragmentScenario(bundle)
-        val menuItem = getSaveMenuItem()
 
         scenario.onFragment {
+            val menuItem = getSaveMenuItem(it.requireContext())
             it.onMenuItemSelected(menuItem)
         }
 
@@ -147,16 +148,18 @@ class ShopFragmentTest : KoinTest {
     @Test
     fun onSaveClick_ExistingShopHasUniqueName_ShopUpdated() = runTest {
         val existingShop = get<LocationRepository>().getAll().first()
-
         val bundle = bundler.makeEditLocationBundle(existingShop.id)
         val scenario = getFragmentScenario(bundle)
-        val menuItem = getSaveMenuItem()
         val newShopName = existingShop.name + " Updated"
 
         onView(withId(R.id.edt_shop_name))
             .perform(ViewActions.clearText())
             .perform(typeText(newShopName))
-        scenario.onFragment { it.onMenuItemSelected(menuItem) }
+
+        scenario.onFragment {
+            val menuItem = getSaveMenuItem(it.requireContext())
+            it.onMenuItemSelected(menuItem)
+        }
 
         val updatedShop = get<LocationRepository>().get(existingShop.id)
 
@@ -169,13 +172,14 @@ class ShopFragmentTest : KoinTest {
     @Test
     fun onSaveClick_PinnedStatusChanged_PinnedStatusUpdated() = runTest {
         val existingShop = get<LocationRepository>().getAll().first { !it.pinned }
-
         val bundle = bundler.makeEditLocationBundle(existingShop.id)
         val scenario = getFragmentScenario(bundle)
-        val menuItem = getSaveMenuItem()
 
         onView(withId(R.id.swc_shop_pinned)).perform(ViewActions.click())
-        scenario.onFragment { it.onMenuItemSelected(menuItem) }
+        scenario.onFragment {
+            val menuItem = getSaveMenuItem(it.requireContext())
+            it.onMenuItemSelected(menuItem)
+        }
 
         val updatedShop = get<LocationRepository>().get(existingShop.id)
 
@@ -187,15 +191,16 @@ class ShopFragmentTest : KoinTest {
     @Test
     fun onSaveClick_IsDuplicateName_ShowErrorSnackBar() = runTest {
         val existingShop = get<LocationRepository>().getAll().first { it.type == LocationType.SHOP }
-
         val bundle = bundler.makeAddLocationBundle()
         val scenario = getFragmentScenario(bundle)
-        val menuItem = getSaveMenuItem()
 
         onView(withId(R.id.edt_shop_name))
             .perform(ViewActions.clearText())
             .perform(typeText(existingShop.name))
-        scenario.onFragment { it.onMenuItemSelected(menuItem) }
+        scenario.onFragment {
+            val menuItem = getSaveMenuItem(it.requireContext())
+            it.onMenuItemSelected(menuItem)
+        }
 
         onView(withId(com.google.android.material.R.id.snackbar_text)).check(
             matches(
@@ -219,8 +224,7 @@ class ShopFragmentTest : KoinTest {
         Assert.assertNotNull(fragment)
     }
 
-    private fun getSaveMenuItem(): ActionMenuItem {
-        val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
+    private fun getSaveMenuItem(context: Context): ActionMenuItem {
         val menuItem = ActionMenuItem(context, 0, R.id.mnu_btn_save, 0, 0, null)
         return menuItem
     }
