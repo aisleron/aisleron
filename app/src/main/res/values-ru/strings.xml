@@ -54,7 +54,7 @@
     <string name="about_support_version_summary">Текущая версия: %1$s</string>
     <string name="about_support_report_issue_summary">Пожаловаться на баг или предложить функцию</string>
     <string name="about_support_sourcecode_summary">Посмотреть исходный код на GitHub</string>
-    <string name="about_legal_license_summary">GNU Affero General Public License (AGPL) version 3</string>
+    <string name="about_legal_license_summary">GNU Affero General Public License (AGPL) версии 3</string>
     <string name="about_legal_privacy_summary">Посмотреть политику конфиденциальности онлайн</string>
     <string name="about_support_documentation_title">Документация</string>
     <string name="about_support_documentation_summary">Прочесть документацию онлайн</string>
@@ -90,7 +90,7 @@
     <string name="delete">Удалить</string>
     <string name="delete_confirmation">Удалить %1$s?</string>
     <string name="edit_aisle">Изменить отдел</string>
-    <string name="edit_location">Изменить магазин</string>
+    <string name="edit_location">Редактировать магазин</string>
     <string name="main_fab">Главный FAB</string>
     <string name="add_shop_fab">Добавить магазин FAB</string>
     <string name="add_aisle_fab">Добавить отдел FAB</string>
@@ -110,4 +110,15 @@
     <string name="sort_confirm_title">Подтвердить сортировку</string>
     <string name="sort_confirm_message">Сортировка по имени отсортирует список в алфавитном порядке. Текущий порядок будет потерян. Продолжить?</string>
     <string name="empty_list_description">Причинами этого могут быть:</string>
+    <string name="loyalty_card_provider_missing_exception">ОШИБКА: Провайдер карт лояльности не установлен или деятельность не найдена</string>
+1
+
+    <string name="shop_loyalty_card_name">Карта лояльности</string>
+    <string name="loyalty_card">Карта постоянного клиента</string>
+    <string name="delete_loyalty_card">Удалить карту постоянного клиента</string>
+    <string name="get_loyalty_card">Поиск карты постоянного клиента</string>
+    <string name="loyalty_card_provider_catima">Catima - кошелек для карт лояльности</string>
+    <string name="loyalty_card_provider_missing_title">Не установлен провайдер карт лояльности</string>
+    <string name="loyalty_card_provider_missing_message"><b><i>%1$s</i></b> обязаны вывешивать карты лояльности. Хотите открыть их сайт, чтобы узнать о нем больше?</string>
+    <string name="invalid_loyalty_card_exception">Ошибка: Предоставлен неверный идентификатор карты лояльности</string>
 </resources>
