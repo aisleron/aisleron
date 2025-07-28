@@ -13,7 +13,7 @@ Streamline your shopping with this intuitive, easy-to-use shopping list app. Whe
 * Swipe-to-Track: Keep track of your shopping progress with a simple swipe. Swipe left or right to mark items as "Needed" or "In Stock."
 * Show on Lock Screen: No need to unlock your screen at the end of each aisle. Your shopping list will be displayed over the lock screen for convenience.
 * Easy Editing: Long-press any item to edit or delete it
-* * Loyalty Cards: Integrate with [Catima — Loyalty Card Wallet](https://catima.app/) to quickly open your store loyalty card.
+* Loyalty Cards: Integrate with [Catima — Loyalty Card Wallet](https://catima.app/) to quickly open your store loyalty card.
 
 ## Why you'll love it:
 
