@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Aisleron</string>
+    <string name="app_name" translatable="false">Aisleron</string>
     <string name="nav_header_subtitle">Vlieg deur die winkels!</string>
     <string name="product"></string>
     <string name="edit_aisle"></string>
