@@ -1,8 +1,8 @@
 Enhancements
-* Added loyalty card lookups using Catima — Loyalty Card Wallet.
-* Added Russian translations.
-* Upgraded target SDK to Android 15 / API level 35.
+* Added support for loyalty card lookups via Catima – Loyalty Card Wallet.
+* Introduced Russian language support.
+* Updated target SDK to Android 15 (API level 35) for improved compatibility.
 
 Bug Fixes
-* Fixed bottom list item checkbox hidden behind fab.
-* Fixed issue where backup files with .sqlite extension couldn't be opened on Android 15.
+* Resolved an issue where the bottom list item’s checkbox was obscured by the floating action button (FAB).
+* Fixed a problem preventing .sqlite backup files from opening on Android 15.

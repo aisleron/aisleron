@@ -65,8 +65,8 @@ android {
         applicationId = "com.aisleron"
         minSdk = 24
         targetSdk = 35
-        versionCode = 7
-        versionName = "2025.5.0"
+        versionCode = 8
+        versionName = "2025.6.0"
         base.archivesName = "$applicationId-$versionName"
 
         testInstrumentationRunner = "com.aisleron.di.KoinInstrumentationTestRunner"
@@ -154,12 +154,12 @@ dependencies {
     implementation("androidx.annotation:annotation:1.9.1")
     implementation("androidx.documentfile:documentfile:1.1.0")
     implementation("androidx.preference:preference-ktx:1.2.1")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.9.1")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.1")
-    implementation("androidx.navigation:navigation-fragment-ktx:2.9.1")
-    implementation("androidx.navigation:navigation-ui-ktx:2.9.1")
-    implementation("androidx.navigation:navigation-common:2.9.1")
-    implementation("androidx.navigation:navigation-runtime-ktx:2.9.1")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.9.2")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.2")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.9.2")
+    implementation("androidx.navigation:navigation-ui-ktx:2.9.2")
+    implementation("androidx.navigation:navigation-common:2.9.2")
+    implementation("androidx.navigation:navigation-runtime-ktx:2.9.2")
     implementation("org.jetbrains.kotlin:kotlin-parcelize-runtime:2.2.0")
 
     //Database
@@ -179,11 +179,11 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
 
     //Testing
-    implementation("androidx.lifecycle:lifecycle-runtime-testing:2.9.1")
+    implementation("androidx.lifecycle:lifecycle-runtime-testing:2.9.2")
     implementation("androidx.test.espresso:espresso-contrib:3.6.1")
 
     testImplementation(project(":testData"))
-    testImplementation("org.junit.jupiter:junit-jupiter:5.13.3")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.13.4")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
     testImplementation("androidx.room:room-testing:2.7.2")
 
@@ -195,7 +195,7 @@ dependencies {
     androidTestImplementation("io.insert-koin:koin-test:4.1.0")
     androidTestImplementation("androidx.test:core-ktx:1.6.1")
     androidTestImplementation("androidx.test.espresso:espresso-intents:3.6.1")
-    androidTestImplementation("androidx.navigation:navigation-testing:2.9.1")
+    androidTestImplementation("androidx.navigation:navigation-testing:2.9.2")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
     //org.hamcrest:hamcrest:2.2 is a androidx.test.espresso:espresso-core:3.6.1 dependency
     androidTestImplementation("org.hamcrest:hamcrest:2.2")
