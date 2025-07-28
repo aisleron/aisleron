@@ -121,7 +121,4 @@
     <string name="loyalty_card_provider_missing_title">Не установлен провайдер карт лояльности</string>
     <string name="loyalty_card_provider_missing_message"><b><i>%1$s</i></b> обязаны вывешивать карты лояльности. Хотите открыть их сайт, чтобы узнать о нем больше?</string>
     <string name="invalid_loyalty_card_exception">Ошибка: Предоставлен неверный идентификатор карты лояльности</string>
-    <string name="nav_header_title" translatable="false"></string>
-    <string name="aisleron_documentation_url" translatable="false"></string>
-    <string name="app_name" translatable="false"></string>
 </resources>
