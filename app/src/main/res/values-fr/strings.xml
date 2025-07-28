@@ -98,4 +98,30 @@
     <string name="welcome_documentation"><h3>Consultez la documentation</h3> Consultez la documentation d\'Aisleron en ligne pour en savoir plus sur les fonctionnalités de l\'application</string>
     <string name="app_name" translatable="false">Aisleron</string>
     <string name="navigation_drawer_open">Ouvrir le menu</string>
+    <string name="main_fab"></string>
+    <string name="mnu_edit_location"></string>
+    <string name="loyalty_card"></string>
+    <string name="aisle_expand"></string>
+    <string name="sort_confirm_message"></string>
+    <string name="empty_list_instructions"></string>
+    <string name="mnu_sort_list_by_name"></string>
+    <string name="delete_loyalty_card"></string>
+    <string name="empty_list_title"></string>
+    <string name="invalid_loyalty_card_exception"></string>
+    <string name="show_empty_aisles"></string>
+    <string name="loyalty_card_provider_catima"></string>
+    <string name="loyalty_card_provider_missing_message"></string>
+    <string name="shop_loyalty_card_name"></string>
+    <string name="loyalty_card_provider_missing_exception"></string>
+1
+
+    <string name="add_product_fab"></string>
+    <string name="add_aisle_fab"></string>
+    <string name="get_loyalty_card"></string>
+    <string name="add_shop_fab"></string>
+    <string name="sort_confirm_title"></string>
+    <string name="empty_list_reasons"></string>
+    <string name="empty_list_description"></string>
+    <string name="loyalty_card_provider_missing_title"></string>
+    <string name="show_unmapped_products"></string>
 </resources>
