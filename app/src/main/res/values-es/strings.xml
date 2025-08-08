@@ -5,4 +5,7 @@
     <string name="nav_header_subtitle">Vuela a travès de las tiendas!</string>
     <string name="nav_header_desc">Cabezal de navegacion</string>
     <string name="action_search">Buscar</string>
+    <string name="menu_settings">Ajustes</string>
+    <string name="home">Inicio</string>
+    <string name="show_on_lock_screen">Mostrar en la pantalla de bloqueo</string>
 </resources>
