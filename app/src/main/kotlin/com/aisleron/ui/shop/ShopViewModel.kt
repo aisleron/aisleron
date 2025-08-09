@@ -46,33 +46,46 @@ class ShopViewModel(
     private val getLoyaltyCardForLocationUseCase: GetLoyaltyCardForLocationUseCase,
     coroutineScopeProvider: CoroutineScope? = null
 ) : ViewModel() {
-    private var _initialLoyaltyCardId: Int? = null
-
-    private var _loyaltyCard: LoyaltyCard? = null
-    val loyaltyCardName: String? get() = _loyaltyCard?.name
-
-    private val coroutineScope = coroutineScopeProvider ?: this.viewModelScope
-    val pinned: Boolean get() = _location?.pinned == true
-    val locationName: String? get() = _location?.name
-    val showDefaultAisle: Boolean get() = _location?.showDefaultAisle != false
-
     private var _location: Location? = null
+    private var _initialLoyaltyCardId: Int? = null
+    private var _loyaltyCard: LoyaltyCard? = null
+    private val coroutineScope = coroutineScopeProvider ?: this.viewModelScope
+
+    private val _uiData = MutableStateFlow(ShopUiData())
+    val uiData: StateFlow<ShopUiData> = _uiData
 
     private val _shopUiState = MutableStateFlow<ShopUiState>(ShopUiState.Empty)
     val shopUiState: StateFlow<ShopUiState> = _shopUiState
 
+    private var hydrated = false
+
     fun hydrate(locationId: Int) {
+        if (hydrated) return
+        hydrated = true
+
         coroutineScope.launch {
             _shopUiState.value = ShopUiState.Loading
             _location = getLocationUseCase(locationId)
             _loyaltyCard = getLoyaltyCardForLocationUseCase(locationId)
             _initialLoyaltyCardId = _loyaltyCard?.id
-            _shopUiState.value = ShopUiState.Updated(this@ShopViewModel)
+            _uiData.value = ShopUiData(
+                locationName = _location?.name.orEmpty(),
+                pinned = _location?.pinned == true,
+                showDefaultAisle = _location?.showDefaultAisle != false,
+                loyaltyCardName = _loyaltyCard?.name.orEmpty()
+            )
+
+            _shopUiState.value = ShopUiState.Empty
         }
     }
 
-    fun saveLocation(name: String, pinned: Boolean, showDefaultAisle: Boolean) {
+    fun saveLocation() {
         coroutineScope.launch {
+            val name = _uiData.value.locationName
+            val pinned = _uiData.value.pinned
+            val showDefaultAisle = _uiData.value.showDefaultAisle
+            if (name.isBlank()) return@launch
+
             _shopUiState.value = ShopUiState.Loading
             try {
                 _location?.let {
@@ -109,8 +122,29 @@ class ShopViewModel(
         }
     }
 
-    fun setLoyaltyCard(loyaltyCard: LoyaltyCard?) {
+    fun updateLocationName(name: String) {
+        _uiData.value = _uiData.value.copy(locationName = name)
+    }
+
+    fun updatePinned(pinned: Boolean) {
+        _uiData.value = _uiData.value.copy(pinned = pinned)
+    }
+
+    fun updateShowDefaultAisle(showDefaultAisle: Boolean) {
+        _uiData.value = _uiData.value.copy(showDefaultAisle = showDefaultAisle)
+    }
+
+    private fun updateLoyaltyCard(loyaltyCard: LoyaltyCard?) {
         _loyaltyCard = loyaltyCard
+        _uiData.value = _uiData.value.copy(loyaltyCardName = loyaltyCard?.name.orEmpty())
+    }
+
+    fun setLoyaltyCard(loyaltyCard: LoyaltyCard?) {
+        updateLoyaltyCard(loyaltyCard)
+    }
+
+    fun removeLoyaltyCard() {
+        updateLoyaltyCard(null)
     }
 
     private suspend fun updateLocation(
@@ -136,10 +170,6 @@ class ShopViewModel(
         )
     }
 
-    fun removeLoyaltyCard() {
-        _loyaltyCard = null
-    }
-
     sealed class ShopUiState {
         data object Empty : ShopUiState()
         data object Loading : ShopUiState()
@@ -147,7 +177,5 @@ class ShopViewModel(
         data class Error(
             val errorCode: AisleronException.ExceptionCode, val errorMessage: String?
         ) : ShopUiState()
-
-        data class Updated(val shop: ShopViewModel) : ShopUiState()
     }
 }

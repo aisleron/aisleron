@@ -28,6 +28,8 @@ import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.uiautomator.UiDevice
 import com.aisleron.R
 import com.aisleron.di.KoinTestRule
 import com.aisleron.di.daoTestModule
@@ -206,6 +208,20 @@ class ProductFragmentTest : KoinTest {
                 )
             )
         )
+    }
+
+    @Test
+    fun onRotateDevice_ProductDetailsChanged_ProductDetailsPersist() = runTest {
+        val bundle = bundler.makeAddProductBundle("New Product")
+        val newProductName = "Product Add New Test"
+        getFragmentScenario(bundle)
+
+        onView(withId(R.id.edt_product_name)).perform(typeText(newProductName))
+
+        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+        device.setOrientationLeft()
+
+        onView(withId(R.id.edt_product_name)).check(matches(ViewMatchers.withText(newProductName)))
     }
 
     @Test

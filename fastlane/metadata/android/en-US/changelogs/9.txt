@@ -1,0 +1,2 @@
+Enhancements
+* Update for Google Play test build

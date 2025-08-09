@@ -28,6 +28,7 @@ import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuProvider
 import androidx.core.view.doOnLayout
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -69,12 +70,14 @@ class ProductFragment(
             AddEditProductBundle.ProductAction.EDIT -> getString(R.string.edit_product)
         }
 
-        productViewModel.hydrate(
-            addEditProductBundle.productId,
-            addEditProductBundle.inStock ?: false,
-            addEditProductBundle.locationId,
-            addEditProductBundle.aisleId
-        )
+        if (savedInstanceState == null) {
+            productViewModel.hydrate(
+                addEditProductBundle.productId,
+                addEditProductBundle.inStock ?: false,
+                addEditProductBundle.locationId,
+                addEditProductBundle.aisleId
+            )
+        }
     }
 
     override fun onCreateView(
@@ -88,29 +91,54 @@ class ProductFragment(
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                productViewModel.productUiState.collect {
-                    when (it) {
-                        ProductViewModel.ProductUiState.Success -> {
-                            addEditFragmentListener.addEditActionCompleted(requireActivity())
+                launch {
+                    productViewModel.uiData.collect { data ->
+                        // Update EditText only if needed to avoid cursor jumping
+                        if (binding.edtProductName.text.toString() != data.productName) {
+                            binding.edtProductName.setText(data.productName)
                         }
 
-                        ProductViewModel.ProductUiState.Empty -> Unit
-                        ProductViewModel.ProductUiState.Loading -> Unit
-                        is ProductViewModel.ProductUiState.Error -> {
-                            displayErrorSnackBar(it.errorCode, it.errorMessage)
+                        // Update CheckedTextView
+                        if (binding.chkProductInStock.isChecked != data.inStock) {
+                            binding.chkProductInStock.isChecked = data.inStock
                         }
+                    }
+                }
 
-                        is ProductViewModel.ProductUiState.Updated -> {
-                            binding.chkProductInStock.isChecked = productViewModel.inStock
-                            binding.edtProductName.setText(productViewModel.productName)
+                launch {
+                    productViewModel.productUiState.collect {
+                        when (it) {
+                            ProductViewModel.ProductUiState.Success -> {
+                                addEditFragmentListener.addEditActionCompleted(requireActivity())
+                            }
+
+                            is ProductViewModel.ProductUiState.Error -> {
+                                displayErrorSnackBar(it.errorCode, it.errorMessage)
+                            }
+
+                            ProductViewModel.ProductUiState.Loading,
+                            ProductViewModel.ProductUiState.Empty -> Unit
                         }
                     }
                 }
             }
         }
 
-        val chk = binding.chkProductInStock
-        chk.setOnClickListener { chk.isChecked = !chk.isChecked }
+        binding.edtProductName.doAfterTextChanged {
+            val newText = it?.toString() ?: ""
+            if (productViewModel.uiData.value.productName != newText) {
+                productViewModel.updateProductName(newText)
+            }
+        }
+
+        binding.chkProductInStock.setOnClickListener {
+            val chk = binding.chkProductInStock
+            chk.isChecked = !chk.isChecked
+            if (productViewModel.uiData.value.inStock != chk.isChecked) {
+                productViewModel.updateInStock(chk.isChecked)
+            }
+        }
+
         return binding.root
     }
 
@@ -120,11 +148,6 @@ class ProductFragment(
         val snackBarMessage =
             getString(AisleronExceptionMap().getErrorResourceId(errorCode), errorMessage)
         ErrorSnackBar().make(requireView(), snackBarMessage, Snackbar.LENGTH_SHORT).show()
-    }
-
-    private fun saveProduct(productName: String, inStock: Boolean) {
-        if (productName.isBlank()) return
-        productViewModel.saveProduct(productName, inStock)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -174,10 +197,7 @@ class ProductFragment(
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
         return when (menuItem.itemId) {
             R.id.mnu_btn_save -> {
-                saveProduct(
-                    binding.edtProductName.text.toString(),
-                    binding.chkProductInStock.isChecked
-                )
+                productViewModel.saveProduct()
                 true
             }
 

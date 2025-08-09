@@ -68,7 +68,10 @@ class ProductViewModelTest(private val inStock: Boolean) : KoinTest {
         val countBefore: Int = productRepository.getAll().count()
 
         productViewModel.hydrate(existingProduct.id, existingProduct.inStock)
-        productViewModel.saveProduct(updatedProductName, inStock)
+        productViewModel.updateProductName(updatedProductName)
+        productViewModel.updateInStock(inStock)
+
+        productViewModel.saveProduct()
 
         val updatedProduct = productRepository.get(existingProduct.id)
         val countAfter: Int = productRepository.getAll().count()
@@ -86,15 +89,19 @@ class ProductViewModelTest(private val inStock: Boolean) : KoinTest {
 
         productViewModel.hydrate(0, inStock)
         val countBefore: Int = productRepository.getAll().count()
-        productViewModel.saveProduct(newProductName, inStock)
+
+        productViewModel.updateProductName(newProductName)
+        productViewModel.updateInStock(inStock)
+
+        productViewModel.saveProduct()
         val newProduct = productRepository.getByName(newProductName)
         val countAfter: Int = productRepository.getAll().count()
 
         Assert.assertNotNull(newProduct)
         Assert.assertEquals(newProductName, newProduct?.name)
         Assert.assertEquals(inStock, newProduct?.inStock)
-        Assert.assertEquals(newProductName, productViewModel.productName)
-        Assert.assertEquals(inStock, productViewModel.inStock)
+        Assert.assertEquals(newProductName, productViewModel.uiData.value.productName)
+        Assert.assertEquals(inStock, productViewModel.uiData.value.inStock)
         Assert.assertEquals(countBefore + 1, countAfter)
     }
 
@@ -104,11 +111,25 @@ class ProductViewModelTest(private val inStock: Boolean) : KoinTest {
         val existingProduct: Product = get<ProductRepository>().getAll().first()
 
         productViewModel.hydrate(existingProduct.id, existingProduct.inStock)
-        productViewModel.saveProduct(updatedProductName, inStock)
+        productViewModel.updateProductName(updatedProductName)
+        productViewModel.updateInStock(inStock)
+        productViewModel.saveProduct()
 
         Assert.assertEquals(
-            ProductViewModel.ProductUiState.Updated(productViewModel),
-            productViewModel.productUiState.value
+            ProductViewModel.ProductUiState.Success, productViewModel.productUiState.value
+        )
+    }
+
+    @Test
+    fun testSaveProduct_ProductNameIsBlank_NoAction() = runTest {
+        val updatedProductName = ""
+
+        productViewModel.hydrate(0, inStock)
+        productViewModel.updateProductName(updatedProductName)
+        productViewModel.saveProduct()
+
+        Assert.assertEquals(
+            ProductViewModel.ProductUiState.Empty, productViewModel.productUiState.value
         )
     }
 
@@ -117,7 +138,9 @@ class ProductViewModelTest(private val inStock: Boolean) : KoinTest {
         val existingProduct: Product = get<ProductRepository>().getAll().first()
 
         productViewModel.hydrate(0, false)
-        productViewModel.saveProduct(existingProduct.name, inStock)
+        productViewModel.updateProductName(existingProduct.name)
+        productViewModel.updateInStock(inStock)
+        productViewModel.saveProduct()
 
         Assert.assertTrue(productViewModel.productUiState.value is ProductViewModel.ProductUiState.Error)
     }
@@ -137,7 +160,9 @@ class ProductViewModelTest(private val inStock: Boolean) : KoinTest {
         val pvm = get<ProductViewModel>()
 
         pvm.hydrate(0, false)
-        pvm.saveProduct("Bogus Product", inStock)
+        pvm.updateProductName("Bogus Product")
+        pvm.updateInStock(inStock)
+        pvm.saveProduct()
 
         Assert.assertTrue(pvm.productUiState.value is ProductViewModel.ProductUiState.Error)
         Assert.assertEquals(
@@ -154,23 +179,19 @@ class ProductViewModelTest(private val inStock: Boolean) : KoinTest {
     fun testGetProductName_ProductExists_ReturnsProductName() = runTest {
         val existingProduct: Product = get<ProductRepository>().getAll().first()
         productViewModel.hydrate(existingProduct.id, existingProduct.inStock)
-        Assert.assertEquals(existingProduct.name, productViewModel.productName)
+        Assert.assertEquals(existingProduct.name, productViewModel.uiData.value.productName)
     }
 
     @Test
-    fun testGetProductName_ProductDoesNotExists_ReturnsNullProductName() = runTest {
+    fun testGetProductName_ProductDoesNotExists_ReturnsEmptyProductName() = runTest {
         productViewModel.hydrate(0, false)
-        Assert.assertNull(productViewModel.productName)
+        Assert.assertEquals("", productViewModel.uiData.value.productName)
     }
 
     @Test
-    fun testHydrate_ProductDoesNotExists_UiStateIsUpdated() = runTest {
+    fun testHydrate_ProductDoesNotExists_UiStateIsEmpty() = runTest {
         productViewModel.hydrate(1, inStock)
-        Assert.assertTrue(productViewModel.productUiState.value is ProductViewModel.ProductUiState.Updated)
-        Assert.assertEquals(
-            productViewModel,
-            (productViewModel.productUiState.value as ProductViewModel.ProductUiState.Updated).product
-        )
+        Assert.assertTrue(productViewModel.productUiState.value is ProductViewModel.ProductUiState.Empty)
     }
 
     @Test
@@ -194,15 +215,17 @@ class ProductViewModelTest(private val inStock: Boolean) : KoinTest {
 
         productViewModel.hydrate(0, inStock, aisle.locationId, aisle.id)
         val countBefore = aisleProductRepository.getAll().count { it.aisleId == aisle.id }
-        productViewModel.saveProduct(newProductName, inStock)
+        productViewModel.updateProductName(newProductName)
+        productViewModel.updateInStock(inStock)
+        productViewModel.saveProduct()
         val newProduct = productRepository.getByName(newProductName)
         val countAfter = aisleProductRepository.getAll().count { it.aisleId == aisle.id }
 
         Assert.assertNotNull(newProduct)
         Assert.assertEquals(newProductName, newProduct?.name)
         Assert.assertEquals(inStock, newProduct?.inStock)
-        Assert.assertEquals(newProductName, productViewModel.productName)
-        Assert.assertEquals(inStock, productViewModel.inStock)
+        Assert.assertEquals(newProductName, productViewModel.uiData.value.productName)
+        Assert.assertEquals(inStock, productViewModel.uiData.value.inStock)
         Assert.assertEquals(countBefore + 1, countAfter)
     }
 

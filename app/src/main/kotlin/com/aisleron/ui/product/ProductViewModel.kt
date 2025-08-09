@@ -19,7 +19,6 @@ package com.aisleron.ui.product
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.aisle.usecase.GetAisleUseCase
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.product.Product
@@ -40,36 +39,61 @@ class ProductViewModel(
 ) : ViewModel() {
     private var _aisleId: Int? = null
     private var _locationId: Int? = null
-    private val coroutineScope = coroutineScopeProvider ?: this.viewModelScope
-    val productName: String? get() = product?.name
-
-    private var _inStock: Boolean = false
-    val inStock: Boolean get() = _inStock
-
     private var product: Product? = null
+    private val coroutineScope = coroutineScopeProvider ?: this.viewModelScope
+
+    private val _uiData = MutableStateFlow(ProductUiData())
+    val uiData: StateFlow<ProductUiData> = _uiData
 
     private val _productUiState = MutableStateFlow<ProductUiState>(ProductUiState.Empty)
     val productUiState: StateFlow<ProductUiState> = _productUiState
 
+    private var hydrated = false
 
     fun hydrate(productId: Int, inStock: Boolean, locationId: Int? = null, aisleId: Int? = null) {
+        if (hydrated) return
+        hydrated = true
+
         coroutineScope.launch {
             _locationId = locationId
             _aisleId = aisleId
             _productUiState.value = ProductUiState.Loading
             product = getProductUseCase(productId)
-            _inStock = product?.inStock ?: inStock
-            _productUiState.value = ProductUiState.Updated(this@ProductViewModel)
+            _uiData.value = ProductUiData(
+                productName = product?.name.orEmpty(),
+                inStock = product?.inStock ?: inStock
+            )
+            _productUiState.value = ProductUiState.Empty
         }
     }
 
-    fun saveProduct(name: String, inStock: Boolean) {
+    fun updateProductName(name: String) {
+        _uiData.value = _uiData.value.copy(productName = name)
+    }
+
+    fun updateInStock(inStock: Boolean) {
+        _uiData.value = _uiData.value.copy(inStock = inStock)
+    }
+
+    fun saveProduct() {
         coroutineScope.launch {
+            val name = _uiData.value.productName
+            val inStock = _uiData.value.inStock
+            if (name.isBlank()) return@launch
+
             _productUiState.value = ProductUiState.Loading
             try {
                 val aisle = _aisleId?.let { getAisleUseCase(it) }
-                product?.let { updateProduct(it, name, inStock) }
-                    ?: addProduct(name, inStock, aisle)
+                product?.let {
+                    val updated = it.copy(name = name, inStock = inStock)
+                    updateProductUseCase(updated)
+                    product = updated
+                } ?: run {
+                    val id =
+                        addProductUseCase(Product(name = name, inStock = inStock, id = 0), aisle)
+
+                    product = getProductUseCase(id)
+                }
 
                 _productUiState.value = ProductUiState.Success
             } catch (e: AisleronException) {
@@ -83,24 +107,6 @@ class ProductViewModel(
         }
     }
 
-    private suspend fun updateProduct(product: Product, name: String, inStock: Boolean) {
-        val updateProduct = product.copy(name = name, inStock = inStock)
-        updateProductUseCase(updateProduct)
-        hydrate(updateProduct.id, updateProduct.inStock)
-    }
-
-    private suspend fun addProduct(name: String, inStock: Boolean, aisle: Aisle?) {
-        val id = addProductUseCase(
-            Product(
-                name = name,
-                inStock = inStock,
-                id = 0
-            ),
-            aisle
-        )
-        hydrate(id, _inStock)
-    }
-
     sealed class ProductUiState {
         data object Empty : ProductUiState()
         data object Loading : ProductUiState()
@@ -108,8 +114,6 @@ class ProductViewModel(
         data class Error(
             val errorCode: AisleronException.ExceptionCode, val errorMessage: String?
         ) : ProductUiState()
-
-        data class Updated(val product: ProductViewModel) : ProductUiState()
     }
 
 }

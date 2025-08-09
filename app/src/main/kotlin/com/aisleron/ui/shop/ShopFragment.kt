@@ -28,6 +28,7 @@ import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuProvider
 import androidx.core.view.doOnLayout
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -67,7 +68,6 @@ class ShopFragment(
 
         loyaltyCardProvider.registerLauncher(this) { loyaltyCard ->
             shopViewModel.setLoyaltyCard(loyaltyCard)
-            binding.edtShopLoyaltyCard.setText(shopViewModel.loyaltyCardName)
         }
 
         val addEditLocationBundle = Bundler().getAddEditLocationBundle(arguments)
@@ -76,7 +76,9 @@ class ShopFragment(
             AddEditLocationBundle.LocationAction.EDIT -> getString(R.string.edit_location)
         }
 
-        shopViewModel.hydrate(addEditLocationBundle.locationId)
+        if (savedInstanceState == null) {
+            shopViewModel.hydrate(addEditLocationBundle.locationId)
+        }
     }
 
     override fun onCreateView(
@@ -94,33 +96,68 @@ class ShopFragment(
 
         binding.btnDeleteLoyaltyCard.setOnClickListener {
             shopViewModel.removeLoyaltyCard()
-            binding.edtShopLoyaltyCard.setText(shopViewModel.loyaltyCardName)
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                shopViewModel.shopUiState.collect {
-                    when (it) {
-                        ShopViewModel.ShopUiState.Success -> {
-                            addEditFragmentListener.addEditActionCompleted(requireActivity())
+                launch {
+                    shopViewModel.uiData.collect { data ->
+                        // Update EditText only if needed to avoid cursor jumping
+                        if (binding.edtShopName.text.toString() != data.locationName) {
+                            binding.edtShopName.setText(data.locationName)
                         }
 
-                        ShopViewModel.ShopUiState.Empty -> Unit
-                        ShopViewModel.ShopUiState.Loading -> Unit
-                        is ShopViewModel.ShopUiState.Error -> {
-                            displayErrorSnackBar(it.errorCode, it.errorMessage)
+                        if (binding.swcShopPinned.isChecked != data.pinned) {
+                            binding.swcShopPinned.isChecked = data.pinned
                         }
 
-                        is ShopViewModel.ShopUiState.Updated -> {
-                            binding.edtShopName.setText(shopViewModel.locationName)
-                            binding.swcShopPinned.isChecked = shopViewModel.pinned
-                            binding.swcShopShowUnmappedProducts.isChecked =
-                                shopViewModel.showDefaultAisle
+                        if (binding.swcShopShowUnmappedProducts.isChecked != data.showDefaultAisle) {
+                            binding.swcShopShowUnmappedProducts.isChecked = data.showDefaultAisle
+                        }
 
-                            binding.edtShopLoyaltyCard.setText(shopViewModel.loyaltyCardName)
+                        if (binding.edtShopLoyaltyCard.text.toString() != data.loyaltyCardName) {
+                            binding.edtShopLoyaltyCard.setText(data.loyaltyCardName)
                         }
                     }
                 }
+
+                launch {
+                    shopViewModel.shopUiState.collect {
+                        when (it) {
+                            ShopViewModel.ShopUiState.Success -> {
+                                addEditFragmentListener.addEditActionCompleted(requireActivity())
+                            }
+
+                            is ShopViewModel.ShopUiState.Error -> {
+                                displayErrorSnackBar(it.errorCode, it.errorMessage)
+                            }
+
+                            ShopViewModel.ShopUiState.Empty,
+                            ShopViewModel.ShopUiState.Loading -> Unit
+                        }
+                    }
+                }
+            }
+        }
+
+        binding.edtShopName.doAfterTextChanged {
+            val newText = it?.toString() ?: ""
+            if (shopViewModel.uiData.value.locationName != newText) {
+                shopViewModel.updateLocationName(newText)
+            }
+        }
+
+        binding.swcShopPinned.setOnClickListener {
+            val swc = binding.swcShopPinned
+            if (shopViewModel.uiData.value.pinned != swc.isChecked) {
+                shopViewModel.updatePinned(swc.isChecked)
+            }
+        }
+
+        binding.swcShopShowUnmappedProducts.setOnClickListener {
+            val swc = binding.swcShopShowUnmappedProducts
+            if (shopViewModel.uiData.value.showDefaultAisle != swc.isChecked) {
+                shopViewModel.updateShowDefaultAisle(swc.isChecked)
             }
         }
 
@@ -143,11 +180,6 @@ class ShopFragment(
         val snackBarMessage =
             getString(AisleronExceptionMap().getErrorResourceId(errorCode), errorMessage)
         ErrorSnackBar().make(requireView(), snackBarMessage, Snackbar.LENGTH_SHORT).show()
-    }
-
-    private fun saveShop(shopName: String, pinned: Boolean, showDefaultAisle: Boolean) {
-        if (shopName.isBlank()) return
-        shopViewModel.saveLocation(shopName, pinned, showDefaultAisle)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -202,11 +234,7 @@ class ShopFragment(
         //NOTE: If you override onMenuItemSelected, OnSupportNavigateUp will only be called when returning false
         return when (menuItem.itemId) {
             R.id.mnu_btn_save -> {
-                saveShop(
-                    binding.edtShopName.text.toString(),
-                    binding.swcShopPinned.isChecked,
-                    binding.swcShopShowUnmappedProducts.isChecked
-                )
+                shopViewModel.saveLocation()
                 true
             }
 

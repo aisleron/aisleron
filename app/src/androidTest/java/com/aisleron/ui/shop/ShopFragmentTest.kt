@@ -31,6 +31,8 @@ import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
+import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.uiautomator.UiDevice
 import com.aisleron.R
 import com.aisleron.di.KoinTestRule
 import com.aisleron.di.daoTestModule
@@ -333,8 +335,18 @@ class ShopFragmentTest : KoinTest {
         )
     }
 
-    /**
-     * Test Provider not Installed
-     * Test Generic Exception caught
-     */
+    @Test
+    fun onRotateDevice_ShopDetailsChanged_ShopDetailsPersist() = runTest {
+        val bundle = bundler.makeAddLocationBundle("New Location")
+        val newLocationName = "Location Add New Test"
+        getFragmentScenario(bundle)
+
+        onView(withId(R.id.edt_shop_name)).perform(typeText(newLocationName))
+
+        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+        device.setOrientationLeft()
+
+        onView(withId(R.id.edt_shop_name)).check(matches(withText(newLocationName)))
+    }
+
 }
