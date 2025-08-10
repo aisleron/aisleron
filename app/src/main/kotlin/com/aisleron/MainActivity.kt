@@ -73,7 +73,8 @@ class MainActivity : AppCompatActivity() {
         prefsListener = SharedPreferences.OnSharedPreferenceChangeListener { p, s ->
             when (s) {
                 "application_theme" -> recreate = true
-                "restore_database" -> recreate = true
+                "restore_database" -> softRestartApp()
+
             }
         }
 
@@ -271,5 +272,14 @@ class MainActivity : AppCompatActivity() {
         } else {
             typedValue.data
         }
+    }
+
+    private fun softRestartApp() {
+        viewModelStore.clear()
+        val navController = findNavController(R.id.nav_host_fragment_content_main)
+        navController.popBackStack(navController.graph.startDestinationId, false)
+        navController.navigate(navController.graph.startDestinationId)
+
+        recreate = true
     }
 }

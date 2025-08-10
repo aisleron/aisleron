@@ -2,4 +2,5 @@ Enhancements
 *
 
 Bug Fixes
-* Fix #44: Details entered on Add/Edit Product or Shop is cleared when switching apps
+* Fix #44: Details entered on Add/Edit Product or Shop is cleared when switching apps.
+* Fix #42: When restoring database Shops don't appear in Drawer.
