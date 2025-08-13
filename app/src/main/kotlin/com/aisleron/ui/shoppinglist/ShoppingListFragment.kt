@@ -34,6 +34,7 @@ import androidx.appcompat.view.ActionMode
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.view.MenuProvider
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -58,6 +59,7 @@ import com.aisleron.ui.settings.ShoppingListPreferences
 import com.aisleron.ui.widgets.ErrorSnackBar
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -77,6 +79,8 @@ class ShoppingListFragment(
     private var actionModeItemView: View? = null
     private var editShopMenuItem: MenuItem? = null
     private var loyaltyCardMenuItem: MenuItem? = null
+    private var aisleDialog: AlertDialog? = null
+    private var addMoreAisles: Boolean = false
 
     private val shoppingListViewModel: ShoppingListViewModel by viewModel()
 
@@ -106,11 +110,22 @@ class ShoppingListFragment(
                     shoppingListViewModel.shoppingListUiState.collect {
                         when (it) {
                             is ShoppingListViewModel.ShoppingListUiState.Error -> {
-                                displayErrorSnackBar(
-                                    it.errorCode,
-                                    it.errorMessage,
-                                    fabHandler.getFabView(requireActivity())
-                                )
+                                if (it.errorCode == AisleronException.ExceptionCode.DUPLICATE_AISLE_NAME_EXCEPTION && aisleDialog != null) {
+                                    val inputLayout =
+                                        aisleDialog?.findViewById<TextInputLayout>(R.id.edt_aisle_name_layout)
+
+                                    inputLayout?.error =
+                                        getString(AisleronExceptionMap().getErrorResourceId(it.errorCode))
+
+                                } else {
+                                    displayErrorSnackBar(
+                                        it.errorCode,
+                                        it.errorMessage,
+                                        fabHandler.getFabView(requireActivity())
+                                    )
+                                }
+
+                                shoppingListViewModel.clearState()
                             }
 
                             is ShoppingListViewModel.ShoppingListUiState.Updated -> {
@@ -120,6 +135,10 @@ class ShoppingListFragment(
                                 (view.adapter as ShoppingListItemRecyclerViewAdapter).submitList(
                                     it.shoppingList
                                 )
+                            }
+
+                            ShoppingListViewModel.ShoppingListUiState.AisleUpdated -> {
+                                closeAisleDialog()
                             }
 
                             else -> Unit
@@ -228,7 +247,9 @@ class ShoppingListFragment(
     }
 
     private fun displayErrorSnackBar(
-        errorCode: AisleronException.ExceptionCode, errorMessage: String?, anchorView: View?
+        errorCode: AisleronException.ExceptionCode,
+        errorMessage: String?,
+        anchorView: View?
     ) {
         val snackBarMessage =
             getString(AisleronExceptionMap().getErrorResourceId(errorCode), errorMessage)
@@ -310,11 +331,17 @@ class ShoppingListFragment(
         val inflater = requireActivity().layoutInflater
         val aisleDialogView = inflater.inflate(R.layout.dialog_aisle, null)
         val txtAisleName = aisleDialogView.findViewById<TextInputEditText>(R.id.edt_aisle_name)
+        txtAisleName.doAfterTextChanged {
+            val inputLayout = aisleDialog?.findViewById<TextInputLayout>(R.id.edt_aisle_name_layout)
+            inputLayout?.error = null
+        }
+
         val builder: AlertDialog.Builder = AlertDialog.Builder(context)
 
         builder
             .setView(aisleDialogView)
             .setNeutralButton(android.R.string.cancel, null)
+            .setPositiveButton(R.string.done, null)
 
         if (aisle == null) {
             //Add a new Aisle
@@ -324,27 +351,56 @@ class ShoppingListFragment(
                     addNewAisle(txtAisleName.text.toString())
                     showAisleDialog(context)
                 }
-                .setPositiveButton(R.string.done) { _, _ -> addNewAisle(txtAisleName.text.toString()) }
         } else {
             //Edit an Aisle
             txtAisleName.setText(aisle.name)
             builder
                 .setTitle(R.string.edit_aisle)
-                .setPositiveButton(R.string.done) { _, _ ->
-                    updateAisleName(aisle, txtAisleName.text.toString())
-                }
         }
 
-        val dialog: AlertDialog = builder.create()
+        aisleDialog = builder.create()
+        aisleDialog?.let { a ->
+            a.setOnShowListener {
+                val saveButton = a.getButton(AlertDialog.BUTTON_POSITIVE)
+                saveButton.setOnClickListener {
+                    addMoreAisles = false
+                    if (aisle == null) {
+                        addNewAisle(txtAisleName.text.toString())
+                    } else {
+                        updateAisleName(aisle, txtAisleName.text.toString())
+                    }
+                }
+
+                val saveAndAddButton = a.getButton(AlertDialog.BUTTON_NEGATIVE)
+                saveAndAddButton.setOnClickListener {
+                    addMoreAisles = true
+                    addNewAisle(txtAisleName.text.toString())
+                }
+            }
+        }
+
 
         txtAisleName.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
-                dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+                aisleDialog?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
             }
         }
 
         txtAisleName.requestFocus()
-        dialog.show()
+        aisleDialog?.show()
+    }
+
+    private fun closeAisleDialog() {
+        if (aisleDialog == null) return
+        if (!addMoreAisles) {
+            aisleDialog?.dismiss()
+            aisleDialog = null
+        } else {
+            aisleDialog?.let {
+                val txtAisleName = it.findViewById<TextInputEditText>(R.id.edt_aisle_name)
+                txtAisleName?.setText("")
+            }
+        }
     }
 
     private fun updateAisleName(aisle: AisleShoppingListItem, newName: String) {
@@ -498,6 +554,7 @@ class ShoppingListFragment(
             loyaltyCardProvider.getNotInstalledDialog(requireContext()).show()
         } catch (e: Exception) {
             displayErrorSnackBar(
+
                 AisleronException.ExceptionCode.GENERIC_EXCEPTION,
                 e.message,
                 fabHandler.getFabView(this.requireActivity())

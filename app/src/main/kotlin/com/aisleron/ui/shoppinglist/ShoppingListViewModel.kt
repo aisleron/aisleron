@@ -218,6 +218,8 @@ class ShoppingListViewModel(
                         expanded = true
                     )
                 )
+
+                _shoppingListUiState.value = ShoppingListUiState.AisleUpdated
             } catch (e: AisleronException) {
                 _shoppingListUiState.value = ShoppingListUiState.Error(e.exceptionCode, e.message)
             } catch (e: Exception) {
@@ -243,6 +245,8 @@ class ShoppingListViewModel(
                         expanded = aisle.expanded
                     )
                 )
+
+                _shoppingListUiState.value = ShoppingListUiState.AisleUpdated
             } catch (e: AisleronException) {
                 _shoppingListUiState.value = ShoppingListUiState.Error(e.exceptionCode, e.message)
             } catch (e: Exception) {
@@ -322,9 +326,14 @@ class ShoppingListViewModel(
         }
     }
 
+    fun clearState() {
+        _shoppingListUiState.value = ShoppingListUiState.Empty
+    }
+
     sealed class ShoppingListUiState {
         data object Empty : ShoppingListUiState()
         data object Loading : ShoppingListUiState()
+        data object AisleUpdated : ShoppingListUiState()
         data class Error(
             val errorCode: AisleronException.ExceptionCode, val errorMessage: String?
         ) : ShoppingListUiState()

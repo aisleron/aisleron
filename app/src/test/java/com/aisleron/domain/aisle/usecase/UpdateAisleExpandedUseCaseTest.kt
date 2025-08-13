@@ -26,7 +26,9 @@ class UpdateAisleExpandedUseCaseTest {
         updateAisleExpandedUseCase = UpdateAisleExpandedUseCaseImpl(
             GetAisleUseCaseImpl(aisleRepository),
             UpdateAisleUseCaseImpl(
-                aisleRepository, GetLocationUseCase(testData.getRepository<LocationRepository>())
+                aisleRepository,
+                GetLocationUseCase(testData.getRepository<LocationRepository>()),
+                IsAisleNameUniqueUseCase(aisleRepository)
             )
         )
     }

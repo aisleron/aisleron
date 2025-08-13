@@ -58,7 +58,7 @@ interface AisleronFragment {
                     fragment.resources.getDimensionPixelSize(R.dimen.fab_margin_bottom) * 2
 
                 val fabSize =
-                    fragment.resources.getDimensionPixelSize(com.google.android.material.R.dimen.design_fab_size_normal)
+                    fragment.resources.getDimensionPixelSize(R.dimen.design_fab_size_normal)
 
                 bottomPadding += fabSize + fabMargins
             }

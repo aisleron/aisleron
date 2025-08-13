@@ -21,6 +21,7 @@ import com.aisleron.data.TestDataManager
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -37,31 +38,31 @@ class IsProductNameUniqueUseCaseTest {
     }
 
     @Test
-    fun isNameUnique_NoMatchingNameExists_ReturnTrue() {
+    fun isNameUnique_NoMatchingNameExists_ReturnTrue() = runTest {
         val newProduct = existingProduct.copy(id = 0, name = "Product Unique Name")
-        val result = runBlocking {
-            isProductNameUniqueUseCase(newProduct)
-        }
+
+        val result = isProductNameUniqueUseCase(newProduct)
+
         Assertions.assertNotEquals(existingProduct.name, newProduct.name)
         Assertions.assertTrue(result)
     }
 
     @Test
-    fun isNameUnique_LocationIdsMatch_ReturnTrue() {
+    fun isNameUnique_ProductIdsMatch_ReturnTrue() = runTest {
         val newProduct = existingProduct.copy(inStock = true)
-        val result = runBlocking {
-            isProductNameUniqueUseCase(newProduct)
-        }
+
+        val result = isProductNameUniqueUseCase(newProduct)
+
         Assertions.assertEquals(existingProduct.id, newProduct.id)
         Assertions.assertTrue(result)
     }
 
     @Test
-    fun isNameUnique_NamesMatchIdsDiffer_ReturnFalse() {
+    fun isNameUnique_NamesMatchIdsDiffer_ReturnFalse() = runTest {
         val newProduct = existingProduct.copy(id = 0)
-        val result = runBlocking {
-            isProductNameUniqueUseCase(newProduct)
-        }
+
+        val result = isProductNameUniqueUseCase(newProduct)
+
         Assertions.assertEquals(existingProduct.name, newProduct.name)
         Assertions.assertNotEquals(existingProduct.id, newProduct.id)
         Assertions.assertFalse(result)

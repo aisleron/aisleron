@@ -28,11 +28,16 @@ interface UpdateAisleUseCase {
 
 class UpdateAisleUseCaseImpl(
     private val aisleRepository: AisleRepository,
-    private val getLocationUseCase: GetLocationUseCase
+    private val getLocationUseCase: GetLocationUseCase,
+    private val isAisleNameUniqueUseCase: IsAisleNameUniqueUseCase
 ) : UpdateAisleUseCase {
     override suspend operator fun invoke(aisle: Aisle) {
         getLocationUseCase(aisle.locationId)
             ?: throw AisleronException.InvalidLocationException("Invalid Location Id provided")
+
+        if (!isAisleNameUniqueUseCase(aisle)) {
+            throw AisleronException.DuplicateAisleNameException("Aisle Name must be unique")
+        }
 
         aisleRepository.update(aisle)
     }

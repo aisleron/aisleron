@@ -19,26 +19,18 @@ package com.aisleron.domain.aisle.usecase
 
 import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.aisle.AisleRepository
-import com.aisleron.domain.base.AisleronException
-import com.aisleron.domain.location.usecase.GetLocationUseCase
 
-interface AddAisleUseCase {
-    suspend operator fun invoke(aisle: Aisle): Int
-}
+class IsAisleNameUniqueUseCase(private val aisleRepository: AisleRepository) {
+    suspend operator fun invoke(aisle: Aisle): Boolean {
+        val aisleName = formatName(aisle.name)
+        val existingAisle: Aisle? =
+            aisleRepository.getForLocation(aisle.locationId)
+                .firstOrNull { formatName(it.name) == aisleName }
 
-class AddAisleUseCaseImpl(
-    private val aisleRepository: AisleRepository,
-    private val getLocationUseCase: GetLocationUseCase,
-    private val isAisleNameUniqueUseCase: IsAisleNameUniqueUseCase
-) : AddAisleUseCase {
-    override suspend operator fun invoke(aisle: Aisle): Int {
-        getLocationUseCase(aisle.locationId)
-            ?: throw AisleronException.InvalidLocationException("Invalid Location Id provided")
-
-        if (!isAisleNameUniqueUseCase(aisle)) {
-            throw AisleronException.DuplicateAisleNameException("Aisle Name must be unique")
-        }
-
-        return aisleRepository.add(aisle)
+        //Aisle name is unique if no existing aisle in the same store was found, or
+        // the existing aisle has the same id
+        return existingAisle?.let { it.id == aisle.id } ?: true
     }
+
+    private fun formatName(name: String) = name.trim().uppercase()
 }

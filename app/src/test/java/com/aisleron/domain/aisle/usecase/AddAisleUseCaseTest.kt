@@ -24,6 +24,7 @@ import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.location.usecase.GetLocationUseCase
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
@@ -40,7 +41,8 @@ class AddAisleUseCaseTest {
         testData = TestDataManager()
         addAisleUseCase = AddAisleUseCaseImpl(
             testData.getRepository<AisleRepository>(),
-            GetLocationUseCase(testData.getRepository<LocationRepository>())
+            GetLocationUseCase(testData.getRepository<LocationRepository>()),
+            IsAisleNameUniqueUseCase(testData.getRepository<AisleRepository>())
         )
     }
 
@@ -120,5 +122,14 @@ class AddAisleUseCaseTest {
         runBlocking {
             assertThrows<AisleronException.InvalidLocationException> { addAisleUseCase(newAisle) }
         }
+    }
+
+    @Test
+    fun addAisle_IsDuplicateAisleName_ThrowsDuplicateAisleNameException() = runTest {
+        val existingAisle =
+            testData.getRepository<AisleRepository>().getAll().first { !it.isDefault }
+
+        val newAisle = existingAisle.copy(id = 0)
+        assertThrows<AisleronException.DuplicateAisleNameException> { addAisleUseCase(newAisle) }
     }
 }

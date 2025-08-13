@@ -23,6 +23,7 @@ import com.aisleron.domain.aisle.usecase.AddAisleUseCaseImpl
 import com.aisleron.domain.aisle.usecase.GetAisleUseCase
 import com.aisleron.domain.aisle.usecase.GetAisleUseCaseImpl
 import com.aisleron.domain.aisle.usecase.GetDefaultAislesUseCase
+import com.aisleron.domain.aisle.usecase.IsAisleNameUniqueUseCase
 import com.aisleron.domain.aisle.usecase.RemoveAisleUseCase
 import com.aisleron.domain.aisle.usecase.RemoveAisleUseCaseImpl
 import com.aisleron.domain.aisle.usecase.RemoveDefaultAisleUseCase
@@ -127,18 +128,21 @@ val useCaseModule = module {
     factory<GetAisleUseCase> { GetAisleUseCaseImpl(aisleRepository = get()) }
     factory<GetDefaultAislesUseCase> { GetDefaultAislesUseCase(aisleRepository = get()) }
     factory<UpdateAisleRankUseCase> { UpdateAisleRankUseCase(aisleRepository = get()) }
+    factory<IsAisleNameUniqueUseCase> { IsAisleNameUniqueUseCase(aisleRepository = get()) }
 
     factory<AddAisleUseCase> {
         AddAisleUseCaseImpl(
             aisleRepository = get(),
-            getLocationUseCase = get()
+            getLocationUseCase = get(),
+            isAisleNameUniqueUseCase = get()
         )
     }
 
     factory<UpdateAisleUseCase> {
         UpdateAisleUseCaseImpl(
             aisleRepository = get(),
-            getLocationUseCase = get()
+            getLocationUseCase = get(),
+            isAisleNameUniqueUseCase = get()
         )
     }
 

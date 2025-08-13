@@ -219,9 +219,14 @@ class ProductFragmentTest : KoinTest {
         onView(withId(R.id.edt_product_name)).perform(typeText(newProductName))
 
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-        device.setOrientationLeft()
 
-        onView(withId(R.id.edt_product_name)).check(matches(ViewMatchers.withText(newProductName)))
+        try {
+            device.setOrientationLandscape()
+
+            onView(withId(R.id.edt_product_name)).check(matches(ViewMatchers.withText(newProductName)))
+        } finally {
+            device.setOrientationPortrait()
+        }
     }
 
     @Test

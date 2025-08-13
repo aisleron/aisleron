@@ -46,7 +46,9 @@ class UpdateAisleUseCaseTest {
 
         existingAisle = runBlocking { aisleRepository.get(1)!! }
         updateAisleUseCase = UpdateAisleUseCaseImpl(
-            aisleRepository, GetLocationUseCase(testData.getRepository<LocationRepository>())
+            aisleRepository,
+            GetLocationUseCase(testData.getRepository<LocationRepository>()),
+            IsAisleNameUniqueUseCase(aisleRepository)
         )
     }
 
@@ -103,6 +105,19 @@ class UpdateAisleUseCaseTest {
                 updateAisleUseCase(existingAisle.copy(locationId = -1))
             }
         }
+    }
+
+    @Test
+    fun updateAisle_IsDuplicateAisleName_ThrowsDuplicateAisleNameException() = runTest {
+        val aisleName = "Test Update Duplicate Name"
+        val existingAisle =
+            testData.getRepository<AisleRepository>().getAll().first { !it.isDefault }
+
+        val newAisle = existingAisle.copy(id = 0, name = aisleName)
+        testData.getRepository<AisleRepository>().add(newAisle)
+        val updateAisle = existingAisle.copy(name = aisleName)
+
+        assertThrows<AisleronException.DuplicateAisleNameException> { updateAisleUseCase(updateAisle) }
     }
 
     private companion object {

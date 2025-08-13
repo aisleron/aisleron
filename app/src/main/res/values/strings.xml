@@ -60,6 +60,7 @@
     <string name="delete_default_aisle_exception">ERROR: Default Aisle can\'t be removed</string>
     <string name="duplicate_product_name_exception">ERROR: Product Name must be unique</string>
     <string name="duplicate_location_name_exception">ERROR: Location Name must be unique</string>
+    <string name="duplicate_aisle_name_exception">ERROR: Aisle Name must be unique</string>
     <string name="invalid_location_exception">ERROR: Invalid Location Id provided</string>
     <string name="invalid_db_name_exception">ERROR: Unable to determine database name</string>
     <string name="invalid_db_backup_file_exception">ERROR: Invalid backup target</string>
@@ -68,7 +69,6 @@
     <string name="duplicate_location_exception">ERROR: Cannot add a duplicate of an existing location</string>
     <string name="sample_data_creation_exception">ERROR: Cannot load sample data into an existing database</string>
     <string name="loyalty_card_provider_missing_exception">ERROR: Loyalty card provider not installed or activity not found</string>
-1
 
     <!-- About Preferences -->
     <string name="about_support_header">Support</string>
@@ -166,7 +166,6 @@
     <string name="loyalty_card_provider_catima">Catima — Loyalty Card Wallet</string>
     <string name="loyalty_card_provider_missing_title">No loyalty card provider installed</string>
     <string name="loyalty_card_provider_missing_message">&lt;b&gt;&lt;i&gt;%1$s&lt;/i&gt;&lt;/b&gt; is required to display loyalty cards. Would you like to open their website to learn more about it?</string>
-    <string name="invalid_loyalty_card_exception">RROR: Invalid Loyalty Card Id provided</string>
-
+    <string name="invalid_loyalty_card_exception">ERROR: Invalid Loyalty Card Id provided</string>
 
 </resources>

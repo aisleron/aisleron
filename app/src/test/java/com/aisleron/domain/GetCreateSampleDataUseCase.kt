@@ -20,6 +20,7 @@ package com.aisleron.domain
 import com.aisleron.domain.aisle.AisleRepository
 import com.aisleron.domain.aisle.usecase.AddAisleUseCaseImpl
 import com.aisleron.domain.aisle.usecase.GetDefaultAislesUseCase
+import com.aisleron.domain.aisle.usecase.IsAisleNameUniqueUseCase
 import com.aisleron.domain.aisleproduct.AisleProductRepository
 import com.aisleron.domain.aisleproduct.usecase.AddAisleProductsUseCase
 import com.aisleron.domain.aisleproduct.usecase.GetAisleMaxRankUseCase
@@ -60,7 +61,9 @@ class GetCreateSampleDataUseCase {
         )
 
         val addAisleUseCase = AddAisleUseCaseImpl(
-            aisleRepository, GetLocationUseCase(locationRepository)
+            aisleRepository,
+            GetLocationUseCase(locationRepository),
+            IsAisleNameUniqueUseCase(aisleRepository)
         )
 
         val addLocationUseCase = AddLocationUseCaseImpl(

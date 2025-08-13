@@ -22,6 +22,7 @@ import com.aisleron.domain.FilterType
 import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.aisle.AisleRepository
 import com.aisleron.domain.aisle.usecase.AddAisleUseCaseImpl
+import com.aisleron.domain.aisle.usecase.IsAisleNameUniqueUseCase
 import com.aisleron.domain.aisleproduct.AisleProduct
 import com.aisleron.domain.aisleproduct.AisleProductRepository
 import com.aisleron.domain.aisleproduct.usecase.AddAisleProductsUseCase
@@ -51,11 +52,14 @@ class AddLocationUseCaseTest {
     fun setUp() {
         testData = TestDataManager()
         val locationRepository = testData.getRepository<LocationRepository>()
+        val aisleRepository = testData.getRepository<AisleRepository>()
 
         addLocationUseCase = AddLocationUseCaseImpl(
             locationRepository,
             AddAisleUseCaseImpl(
-                testData.getRepository<AisleRepository>(), GetLocationUseCase(locationRepository)
+                aisleRepository,
+                GetLocationUseCase(locationRepository),
+                IsAisleNameUniqueUseCase(aisleRepository)
             ),
             GetAllProductsUseCase(testData.getRepository<ProductRepository>()),
             AddAisleProductsUseCase(testData.getRepository<AisleProductRepository>()),

@@ -344,9 +344,14 @@ class ShopFragmentTest : KoinTest {
         onView(withId(R.id.edt_shop_name)).perform(typeText(newLocationName))
 
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-        device.setOrientationLeft()
 
-        onView(withId(R.id.edt_shop_name)).check(matches(withText(newLocationName)))
+        try {
+            device.setOrientationLandscape()
+
+            onView(withId(R.id.edt_shop_name)).check(matches(withText(newLocationName)))
+        } finally {
+            device.setOrientationPortrait()
+        }
     }
 
 }

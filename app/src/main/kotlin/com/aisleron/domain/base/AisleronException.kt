@@ -31,6 +31,9 @@ sealed class AisleronException(
     class DuplicateLocationNameException(message: String? = null, cause: Throwable? = null) :
         AisleronException(ExceptionCode.DUPLICATE_LOCATION_NAME_EXCEPTION, message, cause)
 
+    class DuplicateAisleNameException(message: String? = null, cause: Throwable? = null) :
+        AisleronException(ExceptionCode.DUPLICATE_AISLE_NAME_EXCEPTION, message, cause)
+
     class InvalidLocationException(message: String? = null, cause: Throwable? = null) :
         AisleronException(ExceptionCode.INVALID_LOCATION_EXCEPTION, message, cause)
 
@@ -63,6 +66,7 @@ sealed class AisleronException(
         DELETE_DEFAULT_AISLE_EXCEPTION,
         DUPLICATE_PRODUCT_NAME_EXCEPTION,
         DUPLICATE_LOCATION_NAME_EXCEPTION,
+        DUPLICATE_AISLE_NAME_EXCEPTION,
         INVALID_LOCATION_EXCEPTION,
         INVALID_DB_NAME_EXCEPTION,
         INVALID_DB_BACKUP_FILE_EXCEPTION,

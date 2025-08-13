@@ -5,6 +5,7 @@ import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.aisle.AisleRepository
 import com.aisleron.domain.aisle.usecase.AddAisleUseCaseImpl
 import com.aisleron.domain.aisle.usecase.GetDefaultAislesUseCase
+import com.aisleron.domain.aisle.usecase.IsAisleNameUniqueUseCase
 import com.aisleron.domain.aisle.usecase.UpdateAisleUseCaseImpl
 import com.aisleron.domain.aisleproduct.AisleProductRepository
 import com.aisleron.domain.aisleproduct.usecase.AddAisleProductsUseCase
@@ -29,11 +30,13 @@ class SortLocationByNameUseCaseImplTest {
     @BeforeEach
     fun setUp() {
         testData = TestDataManager()
+        val aisleRepository = testData.getRepository<AisleRepository>()
         sortLocationByNameUseCase = SortLocationByNameUseCaseImpl(
             locationRepository = testData.getRepository<LocationRepository>(),
             updateAisleUseCase = UpdateAisleUseCaseImpl(
-                aisleRepository = testData.getRepository<AisleRepository>(),
-                getLocationUseCase = GetLocationUseCase(testData.getRepository<LocationRepository>())
+                aisleRepository = aisleRepository,
+                getLocationUseCase = GetLocationUseCase(testData.getRepository<LocationRepository>()),
+                isAisleNameUniqueUseCase = IsAisleNameUniqueUseCase(aisleRepository)
             ),
             updateAisleProductUseCase = UpdateAisleProductsUseCase(testData.getRepository<AisleProductRepository>())
         )
@@ -42,10 +45,12 @@ class SortLocationByNameUseCaseImplTest {
     @Test
     fun sortLocationByName_WithAisles_AislesSorted() = runTest {
         val locationRepository = testData.getRepository<LocationRepository>()
+        val aisleRepository = testData.getRepository<AisleRepository>()
         val locationId = locationRepository.getShops().first().first().id
         val addAisleUseCase = AddAisleUseCaseImpl(
-            testData.getRepository<AisleRepository>(),
-            GetLocationUseCase(testData.getRepository<LocationRepository>())
+            aisleRepository,
+            GetLocationUseCase(locationRepository),
+            IsAisleNameUniqueUseCase(aisleRepository)
         )
 
         val aisle = Aisle(

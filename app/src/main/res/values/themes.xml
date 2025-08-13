@@ -30,9 +30,9 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimary</item>
 
-        <!-- Error color. -->
-        <item name="colorError">@color/red_dark</item>
-        <item name="colorOnError">@color/white</item>
+        <!-- Error snackbar color. -->
+        <item name="colorErrorSnackbarBackground">@color/red_dark</item>
+        <item name="colorErrorSnackbarText">@color/white</item>
 
         <!-- Customize your theme here. -->
         <item name="windowActionModeOverlay">true</item>
