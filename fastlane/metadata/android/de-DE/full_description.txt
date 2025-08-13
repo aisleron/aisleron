@@ -6,6 +6,7 @@ Hauptmerkmale:
 * Swipe-to-Track: Verfolge den Fortschritt deines Einkaufs mit einem einfachen Wisch. Wische nach links oder rechts, um Artikel als „Benötigt“ oder „Auf Lager“ zu markieren.
 * Auf dem Sperrbildschirm anzeigen: Du musst deinen Bildschirm nicht mehr am Ende jedes Ganges entsperren. Deine Einkaufsliste wird bequem auf dem Sperrbildschirm angezeigt.
 * Einfache Bearbeitung: Durch langes Drücken auf ein Element kann es bearbeitet oder gelöscht werden.
+* Kundenkarten: Unterstützung von Catima - Das Kartenetui zum schnellen Öffnen von Kundenkarten
 
 Warum Du es lieben wirst:
 * Bleibe organisiert und kaufe intelligenter ein.

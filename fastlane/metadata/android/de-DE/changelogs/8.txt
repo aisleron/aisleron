@@ -1,0 +1,8 @@
+Verbesserungen
+* Unterstützung für die Suche nach Kundenkarten in Catima - Das Kartenetui hinzugefügt
+* Russische Übersetzung
+* SDK auf Android 15 (API-Level 35) aktualisiert, um die Kompatibilität zu verbessern.
+
+Behobene Fehler
+* Problem mit dem vom Floating-Action-Button (FAB) verdeckten Kontrollkästchen des untersten Artikels wurde behoben.
+* Problem beim Öffnen von .sqlite-Sicherungsdateien unter Android 15 behoben.

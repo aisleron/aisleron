@@ -1,0 +1,6 @@
+Verbesserungen
+*
+
+Behobene Fehler
+* Fix #44: Eingaben bei Produkt oder Geschäft hinzufügen/ bearbeiten verschwinden beim Wechseln der App./
+* Fix #42: Nach Wiederstellung der Datenbank erscheinen Geschäfte nicht in der Navigationsleiste.

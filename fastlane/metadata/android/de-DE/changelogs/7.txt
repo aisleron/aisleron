@@ -1,0 +1,11 @@
+Verbesserungen
+* Option hinzugefügt um den Standard-Gang eines Geschäfts ein- oder auszublenden.
+* Verbesserte Darstellung: Nicht zugeordnete Produkte werden jetzt ausgeblendet, wenn der Standard-Gang ausgeblendet ist.
+* Ein-/ ausklappen für Gänge eingeführt.
+* Option hinzugefügt um leere Gänge ein- oder auszublenden, standardmäßig werden sie ausgeblendet.
+* Geschäfte können direkt aus der Einkaufsliste bearbeitet werden.
+* Option hinzugefügt um Listen alphabetisch zu sortieren.
+* Erklärungstext zu leeren Listen hinzugefügt, um zu erklären, warum keine Artikel angezeigt werden.
+
+Behobene Fehler
+* Die Zuverlässigkeit von Langdruck-Aktionen auf Einkaufslisten-Artikeln wurde verbessert.
