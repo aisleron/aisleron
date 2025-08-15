@@ -27,14 +27,12 @@ import android.view.MenuItem
 import android.view.View
 import android.view.View.OnAttachStateChangeListener
 import android.view.ViewGroup
-import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.view.MenuProvider
-import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -53,13 +51,12 @@ import com.aisleron.ui.AisleronFragment
 import com.aisleron.ui.ApplicationTitleUpdateListener
 import com.aisleron.ui.FabHandler
 import com.aisleron.ui.FabHandler.FabClickedCallBack
+import com.aisleron.ui.aisle.AisleDialog
 import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.loyaltycard.LoyaltyCardProvider
 import com.aisleron.ui.settings.ShoppingListPreferences
 import com.aisleron.ui.widgets.ErrorSnackBar
 import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -70,7 +67,8 @@ class ShoppingListFragment(
     private val applicationTitleUpdateListener: ApplicationTitleUpdateListener,
     private val fabHandler: FabHandler,
     private val shoppingListPreferences: ShoppingListPreferences,
-    private val loyaltyCardProvider: LoyaltyCardProvider
+    private val loyaltyCardProvider: LoyaltyCardProvider,
+    private val aisleDialog: AisleDialog
 ) : Fragment(), SearchView.OnQueryTextListener, ActionMode.Callback, FabClickedCallBack,
     MenuProvider, AisleronFragment {
 
@@ -79,8 +77,6 @@ class ShoppingListFragment(
     private var actionModeItemView: View? = null
     private var editShopMenuItem: MenuItem? = null
     private var loyaltyCardMenuItem: MenuItem? = null
-    private var aisleDialog: AlertDialog? = null
-    private var addMoreAisles: Boolean = false
 
     private val shoppingListViewModel: ShoppingListViewModel by viewModel()
 
@@ -110,20 +106,11 @@ class ShoppingListFragment(
                     shoppingListViewModel.shoppingListUiState.collect {
                         when (it) {
                             is ShoppingListViewModel.ShoppingListUiState.Error -> {
-                                if (it.errorCode == AisleronException.ExceptionCode.DUPLICATE_AISLE_NAME_EXCEPTION && aisleDialog != null) {
-                                    val inputLayout =
-                                        aisleDialog?.findViewById<TextInputLayout>(R.id.edt_aisle_name_layout)
-
-                                    inputLayout?.error =
-                                        getString(AisleronExceptionMap().getErrorResourceId(it.errorCode))
-
-                                } else {
-                                    displayErrorSnackBar(
-                                        it.errorCode,
-                                        it.errorMessage,
-                                        fabHandler.getFabView(requireActivity())
-                                    )
-                                }
+                                displayErrorSnackBar(
+                                    it.errorCode,
+                                    it.errorMessage,
+                                    fabHandler.getFabView(requireActivity())
+                                )
 
                                 shoppingListViewModel.clearState()
                             }
@@ -135,10 +122,6 @@ class ShoppingListFragment(
                                 (view.adapter as ShoppingListItemRecyclerViewAdapter).submitList(
                                     it.shoppingList
                                 )
-                            }
-
-                            ShoppingListViewModel.ShoppingListUiState.AisleUpdated -> {
-                                closeAisleDialog()
                             }
 
                             else -> Unit
@@ -276,7 +259,7 @@ class ShoppingListFragment(
         }
 
         fabHandler.setFabOnClickListener(this.requireActivity(), FabHandler.FabOption.ADD_AISLE) {
-            showAisleDialog(requireView().context)
+            aisleDialog.showAddDialog(requireContext(), shoppingListViewModel.locationId)
         }
     }
 
@@ -318,6 +301,7 @@ class ShoppingListFragment(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        aisleDialog.observeLifecycle(viewLifecycleOwner)
         val menuHost = requireActivity()
         menuHost.addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
@@ -325,94 +309,6 @@ class ShoppingListFragment(
     private fun navigateToEditShop(locationId: Int) {
         val bundle = Bundler().makeEditLocationBundle(locationId)
         this.findNavController().navigate(R.id.nav_add_shop, bundle)
-    }
-
-    private fun showAisleDialog(context: Context, aisle: AisleShoppingListItem? = null) {
-        val inflater = requireActivity().layoutInflater
-        val aisleDialogView = inflater.inflate(R.layout.dialog_aisle, null)
-        val txtAisleName = aisleDialogView.findViewById<TextInputEditText>(R.id.edt_aisle_name)
-        txtAisleName.doAfterTextChanged {
-            val inputLayout = aisleDialog?.findViewById<TextInputLayout>(R.id.edt_aisle_name_layout)
-            inputLayout?.error = null
-        }
-
-        val builder: AlertDialog.Builder = AlertDialog.Builder(context)
-
-        builder
-            .setView(aisleDialogView)
-            .setNeutralButton(android.R.string.cancel, null)
-            .setPositiveButton(R.string.done, null)
-
-        if (aisle == null) {
-            //Add a new Aisle
-            builder
-                .setTitle(R.string.add_aisle)
-                .setNegativeButton(R.string.add_another) { _, _ ->
-                    addNewAisle(txtAisleName.text.toString())
-                    showAisleDialog(context)
-                }
-        } else {
-            //Edit an Aisle
-            txtAisleName.setText(aisle.name)
-            builder
-                .setTitle(R.string.edit_aisle)
-        }
-
-        aisleDialog = builder.create()
-        aisleDialog?.let { a ->
-            a.setOnShowListener {
-                val saveButton = a.getButton(AlertDialog.BUTTON_POSITIVE)
-                saveButton.setOnClickListener {
-                    addMoreAisles = false
-                    if (aisle == null) {
-                        addNewAisle(txtAisleName.text.toString())
-                    } else {
-                        updateAisleName(aisle, txtAisleName.text.toString())
-                    }
-                }
-
-                val saveAndAddButton = a.getButton(AlertDialog.BUTTON_NEGATIVE)
-                saveAndAddButton.setOnClickListener {
-                    addMoreAisles = true
-                    addNewAisle(txtAisleName.text.toString())
-                }
-            }
-        }
-
-
-        txtAisleName.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) {
-                aisleDialog?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-            }
-        }
-
-        txtAisleName.requestFocus()
-        aisleDialog?.show()
-    }
-
-    private fun closeAisleDialog() {
-        if (aisleDialog == null) return
-        if (!addMoreAisles) {
-            aisleDialog?.dismiss()
-            aisleDialog = null
-        } else {
-            aisleDialog?.let {
-                val txtAisleName = it.findViewById<TextInputEditText>(R.id.edt_aisle_name)
-                txtAisleName?.setText("")
-            }
-        }
-    }
-
-    private fun updateAisleName(aisle: AisleShoppingListItem, newName: String) {
-        if (newName.isNotBlank()) {
-            shoppingListViewModel.updateAisleName(aisle, newName)
-        }
-    }
-
-    private fun addNewAisle(aisleName: String) {
-        if (aisleName.isNotBlank()) {
-            shoppingListViewModel.addAisle(aisleName)
-        }
     }
 
     private fun confirmDelete(context: Context, item: ShoppingListItem) {
@@ -431,7 +327,7 @@ class ShoppingListFragment(
 
     private fun editShoppingListItem(item: ShoppingListItem) {
         when (item) {
-            is AisleShoppingListItem -> showAisleDialog(requireContext(), item)
+            is AisleShoppingListItem -> aisleDialog.showEditDialog(requireContext(), item)
             is ProductShoppingListItem -> navigateToEditProduct(item.id)
         }
     }
@@ -589,13 +485,15 @@ class ShoppingListFragment(
             applicationTitleUpdateListener: ApplicationTitleUpdateListener,
             fabHandler: FabHandler,
             shoppingListPreferences: ShoppingListPreferences,
-            loyaltyCardProvider: LoyaltyCardProvider
+            loyaltyCardProvider: LoyaltyCardProvider,
+            alertDialog: AisleDialog
         ) =
             ShoppingListFragment(
                 applicationTitleUpdateListener,
                 fabHandler,
                 shoppingListPreferences,
-                loyaltyCardProvider
+                loyaltyCardProvider,
+                alertDialog
             ).apply {
                 arguments = Bundle().apply {
                     putInt(ARG_LOCATION_ID, locationId.toInt())

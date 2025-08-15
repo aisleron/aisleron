@@ -1,5 +1,5 @@
 Enhancements
-*
+* Added a check to ensure aisle names are unique per list.
 
 Bug Fixes
 * Fix #44: Details entered on Add/Edit Product or Shop is cleared when switching apps.

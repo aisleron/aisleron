@@ -21,12 +21,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.aisle.Aisle
-import com.aisleron.domain.aisle.usecase.AddAisleUseCase
 import com.aisleron.domain.aisle.usecase.GetAisleUseCase
 import com.aisleron.domain.aisle.usecase.RemoveAisleUseCase
 import com.aisleron.domain.aisle.usecase.UpdateAisleExpandedUseCase
 import com.aisleron.domain.aisle.usecase.UpdateAisleRankUseCase
-import com.aisleron.domain.aisle.usecase.UpdateAisleUseCase
 import com.aisleron.domain.aisleproduct.AisleProduct
 import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductRankUseCase
 import com.aisleron.domain.base.AisleronException
@@ -46,8 +44,6 @@ import kotlinx.coroutines.launch
 class ShoppingListViewModel(
     private val getShoppingListUseCase: GetShoppingListUseCase,
     private val updateProductStatusUseCase: UpdateProductStatusUseCase,
-    private val addAisleUseCase: AddAisleUseCase,
-    private val updateAisleUseCase: UpdateAisleUseCase,
     private val updateAisleProductRankUseCase: UpdateAisleProductRankUseCase,
     private val updateAisleRankUseCase: UpdateAisleRankUseCase,
     private val removeAisleUseCase: RemoveAisleUseCase,
@@ -204,60 +200,6 @@ class ShoppingListViewModel(
         }
     }
 
-    fun addAisle(aisleName: String) {
-        coroutineScope.launch {
-            try {
-                addAisleUseCase(
-                    Aisle(
-                        name = aisleName,
-                        products = emptyList(),
-                        locationId = locationId,
-                        isDefault = false,
-                        rank = 0,
-                        id = 0,
-                        expanded = true
-                    )
-                )
-
-                _shoppingListUiState.value = ShoppingListUiState.AisleUpdated
-            } catch (e: AisleronException) {
-                _shoppingListUiState.value = ShoppingListUiState.Error(e.exceptionCode, e.message)
-            } catch (e: Exception) {
-                _shoppingListUiState.value =
-                    ShoppingListUiState.Error(
-                        AisleronException.ExceptionCode.GENERIC_EXCEPTION, e.message
-                    )
-            }
-        }
-    }
-
-    fun updateAisleName(aisle: AisleShoppingListItem, newName: String) {
-        coroutineScope.launch {
-            try {
-                updateAisleUseCase(
-                    Aisle(
-                        name = newName,
-                        products = emptyList(),
-                        locationId = aisle.locationId,
-                        isDefault = aisle.isDefault,
-                        rank = aisle.rank,
-                        id = aisle.id,
-                        expanded = aisle.expanded
-                    )
-                )
-
-                _shoppingListUiState.value = ShoppingListUiState.AisleUpdated
-            } catch (e: AisleronException) {
-                _shoppingListUiState.value = ShoppingListUiState.Error(e.exceptionCode, e.message)
-            } catch (e: Exception) {
-                _shoppingListUiState.value =
-                    ShoppingListUiState.Error(
-                        AisleronException.ExceptionCode.GENERIC_EXCEPTION, e.message
-                    )
-            }
-        }
-    }
-
     fun updateItemRank(item: ShoppingListItem, precedingItem: ShoppingListItem?) {
         coroutineScope.launch {
             (item as ShoppingListItemViewModel).updateRank(precedingItem)
@@ -333,7 +275,6 @@ class ShoppingListViewModel(
     sealed class ShoppingListUiState {
         data object Empty : ShoppingListUiState()
         data object Loading : ShoppingListUiState()
-        data object AisleUpdated : ShoppingListUiState()
         data class Error(
             val errorCode: AisleronException.ExceptionCode, val errorMessage: String?
         ) : ShoppingListUiState()

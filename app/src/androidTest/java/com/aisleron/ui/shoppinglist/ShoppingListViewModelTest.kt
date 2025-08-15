@@ -30,7 +30,6 @@ import com.aisleron.domain.aisle.usecase.GetAisleUseCase
 import com.aisleron.domain.aisle.usecase.RemoveAisleUseCase
 import com.aisleron.domain.aisle.usecase.UpdateAisleExpandedUseCase
 import com.aisleron.domain.aisle.usecase.UpdateAisleRankUseCase
-import com.aisleron.domain.aisle.usecase.UpdateAisleUseCase
 import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductRankUseCase
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.location.Location
@@ -128,82 +127,6 @@ class ShoppingListViewModelTest : KoinTest {
 
         assertTrue(shoppingList.isNotEmpty())
         assertEquals(0, shoppingList.count { it.itemType == ShoppingListItem.ItemType.EMPTY_LIST })
-    }
-
-    @Test
-    fun addAisle_IsValidLocation_AisleAdded() = runTest {
-        val existingLocation = get<LocationRepository>().getAll().first()
-        val newAisleName = "Add New Aisle Test"
-
-        shoppingListViewModel.hydrate(existingLocation.id, existingLocation.defaultFilter)
-        shoppingListViewModel.addAisle(newAisleName)
-
-        val addedAisle = get<AisleRepository>().getAll().firstOrNull { it.name == newAisleName }
-
-        Assert.assertNotNull(addedAisle)
-        Assert.assertEquals(newAisleName, addedAisle?.name)
-        Assert.assertEquals(existingLocation.id, addedAisle?.locationId)
-        Assert.assertFalse(addedAisle!!.isDefault)
-    }
-
-    @Test
-    fun addAisle_IsInvalidLocation_UiStateIsError() {
-        val newAisleName = "Add New Aisle Test"
-
-        shoppingListViewModel.hydrate(-1, FilterType.NEEDED)
-        shoppingListViewModel.addAisle(newAisleName)
-
-        Assert.assertTrue(shoppingListViewModel.shoppingListUiState.value is ShoppingListViewModel.ShoppingListUiState.Error)
-    }
-
-    @Test
-    fun updateAisle_IsValidLocation_AisleAdded() = runTest {
-        val existingLocation = get<LocationRepository>().getAll().first()
-        val updatedAisleName = "Update Aisle Test"
-        val aisleRepository = get<AisleRepository>()
-        val existingAisle = aisleRepository.getAll().first()
-        val updateShoppingListItem = AisleShoppingListItemViewModel(
-            rank = existingAisle.rank,
-            id = existingAisle.id,
-            name = existingAisle.name,
-            isDefault = existingAisle.isDefault,
-            locationId = existingLocation.id,
-            childCount = 0,
-            expanded = existingAisle.expanded,
-            updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
-            getAisleUseCase = get<GetAisleUseCase>(),
-            removeAisleUseCase = get<RemoveAisleUseCase>()
-        )
-
-        shoppingListViewModel.hydrate(existingLocation.id, existingLocation.defaultFilter)
-        shoppingListViewModel.updateAisleName(updateShoppingListItem, updatedAisleName)
-
-        val updatedAisle = aisleRepository.get(existingAisle.id)
-        Assert.assertNotNull(updatedAisle)
-        Assert.assertEquals(existingAisle.copy(name = updatedAisleName), updatedAisle)
-    }
-
-    @Test
-    fun updateAisle_IsInvalidLocation_UiStateIsError() = runTest {
-        val updatedAisleName = "Update Aisle Test"
-        val existingAisle = get<AisleRepository>().getAll().first()
-        val updateShoppingListItem = AisleShoppingListItemViewModel(
-            rank = existingAisle.rank,
-            id = existingAisle.id,
-            name = existingAisle.name,
-            isDefault = existingAisle.isDefault,
-            childCount = 0,
-            locationId = -1,
-            expanded = existingAisle.expanded,
-            updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
-            getAisleUseCase = get<GetAisleUseCase>(),
-            removeAisleUseCase = get<RemoveAisleUseCase>()
-        )
-
-        shoppingListViewModel.hydrate(-1, FilterType.NEEDED)
-        shoppingListViewModel.updateAisleName(updateShoppingListItem, updatedAisleName)
-
-        Assert.assertTrue(shoppingListViewModel.shoppingListUiState.value is ShoppingListViewModel.ShoppingListUiState.Error)
     }
 
     @Test
@@ -472,8 +395,6 @@ class ShoppingListViewModelTest : KoinTest {
         val vm = ShoppingListViewModel(
             get<GetShoppingListUseCase>(),
             get<UpdateProductStatusUseCase>(),
-            get<AddAisleUseCase>(),
-            get<UpdateAisleUseCase>(),
             get<UpdateAisleProductRankUseCase>(),
             get<UpdateAisleRankUseCase>(),
             get<RemoveAisleUseCase>(),
@@ -485,70 +406,6 @@ class ShoppingListViewModelTest : KoinTest {
         )
 
         Assert.assertNotNull(vm)
-    }
-
-    @Test
-    fun updateAisle_ExceptionRaised_UiStateIsError() {
-
-        val exceptionMessage = "Error on update Aisle"
-
-        declare<UpdateAisleUseCase> {
-            object : UpdateAisleUseCase {
-                override suspend fun invoke(aisle: Aisle) {
-                    throw Exception(exceptionMessage)
-                }
-            }
-        }
-
-        val vm = get<ShoppingListViewModel>()
-
-        vm.hydrate(1, FilterType.NEEDED)
-
-        val sli = AisleShoppingListItemViewModel(
-            rank = 1000,
-            id = -1,
-            name = "Dummy",
-            isDefault = false,
-            childCount = 0,
-            locationId = 1,
-            expanded = true,
-            updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
-            getAisleUseCase = get<GetAisleUseCase>(),
-            removeAisleUseCase = get<RemoveAisleUseCase>()
-        )
-        vm.updateAisleName(sli, "Dummy Dummy")
-
-        val uiState = vm.shoppingListUiState.value
-        Assert.assertTrue(uiState is ShoppingListViewModel.ShoppingListUiState.Error)
-        with(uiState as ShoppingListViewModel.ShoppingListUiState.Error) {
-            Assert.assertEquals(AisleronException.ExceptionCode.GENERIC_EXCEPTION, this.errorCode)
-            Assert.assertEquals(exceptionMessage, this.errorMessage)
-        }
-    }
-
-    @Test
-    fun addAisle_ExceptionRaised_UiStateIsError() {
-        val exceptionMessage = "Error on update Product Status"
-
-        declare<AddAisleUseCase> {
-            object : AddAisleUseCase {
-                override suspend fun invoke(aisle: Aisle): Int {
-                    throw Exception(exceptionMessage)
-                }
-            }
-        }
-
-        val vm = get<ShoppingListViewModel>()
-
-        vm.hydrate(1, FilterType.NEEDED)
-        vm.addAisle("New Dummy Aisle")
-
-        val uiState = vm.shoppingListUiState.value
-        Assert.assertTrue(uiState is ShoppingListViewModel.ShoppingListUiState.Error)
-        with(uiState as ShoppingListViewModel.ShoppingListUiState.Error) {
-            Assert.assertEquals(AisleronException.ExceptionCode.GENERIC_EXCEPTION, this.errorCode)
-            Assert.assertEquals(exceptionMessage, this.errorMessage)
-        }
     }
 
     @Test

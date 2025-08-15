@@ -18,6 +18,7 @@
 package com.aisleron.di
 
 import com.aisleron.ui.about.AboutViewModel
+import com.aisleron.ui.aisle.AisleViewModel
 import com.aisleron.ui.product.ProductViewModel
 import com.aisleron.ui.settings.SettingsViewModel
 import com.aisleron.ui.shop.ShopViewModel
@@ -36,8 +37,6 @@ val viewModelTestModule = module {
         ShoppingListViewModel(
             getShoppingListUseCase = get(),
             updateProductStatusUseCase = get(),
-            addAisleUseCase = get(),
-            updateAisleUseCase = get(),
             updateAisleProductRankUseCase = get(),
             updateAisleRankUseCase = get(),
             removeAisleUseCase = get(),
@@ -93,6 +92,14 @@ val viewModelTestModule = module {
 
     viewModel {
         AboutViewModel()
+    }
+
+    viewModel {
+        AisleViewModel(
+            addAisleUseCase = get(),
+            updateAisleUseCase = get(),
+            TestScope(UnconfinedTestDispatcher())
+        )
     }
 
     factory<WelcomeViewModel> {

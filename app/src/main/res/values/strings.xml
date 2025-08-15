@@ -60,7 +60,7 @@
     <string name="delete_default_aisle_exception">ERROR: Default Aisle can\'t be removed</string>
     <string name="duplicate_product_name_exception">ERROR: Product Name must be unique</string>
     <string name="duplicate_location_name_exception">ERROR: Location Name must be unique</string>
-    <string name="duplicate_aisle_name_exception">ERROR: Aisle Name must be unique</string>
+    <string name="duplicate_aisle_name_exception">ERROR: Aisle Name must be unique per list</string>
     <string name="invalid_location_exception">ERROR: Invalid Location Id provided</string>
     <string name="invalid_db_name_exception">ERROR: Unable to determine database name</string>
     <string name="invalid_db_backup_file_exception">ERROR: Invalid backup target</string>

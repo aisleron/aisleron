@@ -23,6 +23,8 @@ import com.aisleron.ui.ApplicationTitleUpdateListener
 import com.aisleron.ui.ApplicationTitleUpdateListenerImpl
 import com.aisleron.ui.FabHandler
 import com.aisleron.ui.FabHandlerImpl
+import com.aisleron.ui.aisle.AisleDialog
+import com.aisleron.ui.aisle.AisleDialogImpl
 import com.aisleron.ui.loyaltycard.CatimaCardProvider
 import com.aisleron.ui.loyaltycard.LoyaltyCardProvider
 import com.aisleron.ui.loyaltycard.PackageCheckerImpl
@@ -33,4 +35,5 @@ val generalModule = module {
     factory<ApplicationTitleUpdateListener> { ApplicationTitleUpdateListenerImpl() }
     factory<AddEditFragmentListener> { AddEditFragmentListenerImpl() }
     factory<LoyaltyCardProvider> { CatimaCardProvider(PackageCheckerImpl()) }
+    factory<AisleDialog> { AisleDialogImpl(get()) }
 }

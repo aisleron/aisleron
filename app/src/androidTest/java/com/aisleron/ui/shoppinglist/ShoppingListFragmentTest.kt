@@ -39,11 +39,8 @@ import androidx.test.espresso.UiController
 import androidx.test.espresso.ViewAction
 import androidx.test.espresso.ViewInteraction
 import androidx.test.espresso.action.ViewActions
-import androidx.test.espresso.action.ViewActions.clearText
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.longClick
-import androidx.test.espresso.action.ViewActions.replaceText
-import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.RootMatchers.isDialog
@@ -78,6 +75,7 @@ import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import com.aisleron.ui.ApplicationTitleUpdateListenerTestImpl
 import com.aisleron.ui.FabHandler
 import com.aisleron.ui.FabHandlerTestImpl
+import com.aisleron.ui.aisle.AisleDialog
 import com.aisleron.ui.bundles.AddEditLocationBundle
 import com.aisleron.ui.bundles.AddEditProductBundle
 import com.aisleron.ui.bundles.Bundler
@@ -100,7 +98,6 @@ import org.koin.test.KoinTest
 import org.koin.test.get
 import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
-import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
@@ -143,7 +140,8 @@ class ShoppingListFragmentTest : KoinTest {
                 applicationTitleUpdateListener,
                 fabHandler,
                 shoppingListPreferencesTestImpl ?: ShoppingListPreferencesTestImpl(),
-                loyaltyCardProvider ?: LoyaltyCardProviderTestImpl()
+                loyaltyCardProvider ?: LoyaltyCardProviderTestImpl(),
+                get<AisleDialog>()
             ).apply {
                 arguments = fragmentArgs
             }
@@ -171,7 +169,8 @@ class ShoppingListFragmentTest : KoinTest {
                     applicationTitleUpdateListener,
                     fabHandler,
                     shoppingListPreferencesTestImpl ?: ShoppingListPreferencesTestImpl(),
-                    loyaltyCardProvider ?: LoyaltyCardProviderTestImpl()
+                    loyaltyCardProvider ?: LoyaltyCardProviderTestImpl(),
+                    get<AisleDialog>()
                 )
             }
         )
@@ -197,7 +196,8 @@ class ShoppingListFragmentTest : KoinTest {
                 applicationTitleUpdateListener,
                 fabHandler,
                 ShoppingListPreferencesTestImpl(),
-                LoyaltyCardProviderTestImpl()
+                LoyaltyCardProviderTestImpl(),
+                get<AisleDialog>()
             )
         Assert.assertNotNull(fragment)
     }
@@ -610,86 +610,6 @@ class ShoppingListFragmentTest : KoinTest {
     }
 
     @Test
-    fun aisleEditDialog_DoneClicked_AisleUpdated() = runTest {
-        val shoppingList = getShoppingList()
-        val aisle = getAisle(shoppingList, isDefault = false, productsInStock = false)
-        val updatedAisleName = "Updated Aisle Name"
-        val shoppingListBundle =
-            bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
-
-        getActivityScenario(shoppingListBundle)
-
-        val aisleItem = onView(allOf(withText(aisle.name), withId(R.id.txt_aisle_name)))
-        aisleItem.perform(longClick())
-        onView(withId(R.id.mnu_edit_shopping_list_item)).perform(click())
-
-        onView(allOf(withText(aisle.name), instanceOf(EditText::class.java)))
-            .inRoot(isDialog())
-            .perform(replaceText(updatedAisleName))
-
-        onView(withText(R.string.done))
-            .inRoot(isDialog())
-            .perform(click())
-
-        val updatedAisle = get<AisleRepository>().get(aisle.id)
-
-        assertEquals(updatedAisleName, updatedAisle?.name)
-    }
-
-    @Test
-    fun aisleEditDialog_CancelClicked_AisleNotUpdated() = runTest {
-        val shoppingList = getShoppingList()
-        val aisle = getAisle(shoppingList, isDefault = false, productsInStock = false)
-        val updateSuffix = " Updated"
-        val shoppingListBundle =
-            bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
-
-        getActivityScenario(shoppingListBundle)
-
-        val aisleItem = onView(allOf(withText(aisle.name), withId(R.id.txt_aisle_name)))
-        aisleItem.perform(longClick())
-        onView(withId(R.id.mnu_edit_shopping_list_item)).perform(click())
-
-        onView(allOf(withText(aisle.name), instanceOf(EditText::class.java)))
-            .inRoot(isDialog())
-            .perform(typeText(updateSuffix))
-
-        onView(withText(android.R.string.cancel))
-            .inRoot(isDialog())
-            .perform(click())
-
-        val updatedAisle = get<AisleRepository>().get(aisle.id)
-
-        assertEquals(aisle.name, updatedAisle?.name)
-    }
-
-    @Test
-    fun aisleEditDialog_DoneClickedWithBlankAisleName_AisleNotUpdated() = runTest {
-        val shoppingList = getShoppingList()
-        val aisle = getAisle(shoppingList, isDefault = false, productsInStock = false)
-        val shoppingListBundle =
-            bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
-
-        getActivityScenario(shoppingListBundle)
-
-        val aisleItem = onView(allOf(withText(aisle.name), withId(R.id.txt_aisle_name)))
-        aisleItem.perform(longClick())
-        onView(withId(R.id.mnu_edit_shopping_list_item)).perform(click())
-
-        onView(allOf(withText(aisle.name), instanceOf(EditText::class.java)))
-            .inRoot(isDialog())
-            .perform(clearText())
-
-        onView(withText(R.string.done))
-            .inRoot(isDialog())
-            .perform(click())
-
-        val updatedAisle = get<AisleRepository>().get(aisle.id)
-
-        assertEquals(aisle.name, updatedAisle?.name)
-    }
-
-    @Test
     fun onClickFab_IsAddProductFab_NavigateToAddProduct() = runTest {
         val shoppingList = getShoppingList()
         val shoppingListBundle =
@@ -734,108 +654,7 @@ class ShoppingListFragmentTest : KoinTest {
             .check(matches(withText("")))
     }
 
-    @Test
-    fun aisleDialogDoneClick_HasAisleName_AddNewAisle() = runTest {
-        val newAisleName = "Add Aisle Test 123321"
-        val shoppingList = getShoppingList()
-        val shoppingListBundle =
-            bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
 
-        getFragmentScenario(shoppingListBundle).onFragment {
-            fabHandler.clickFab(FabHandler.FabOption.ADD_AISLE, it.requireView())
-        }
-
-        onView(allOf(withId(R.id.edt_aisle_name), instanceOf(EditText::class.java)))
-            .inRoot(isDialog())
-            .perform(typeText(newAisleName))
-
-        onView(withText(R.string.done))
-            .inRoot(isDialog())
-            .perform(click())
-
-        val addedAisle = get<AisleRepository>().getAll().firstOrNull { it.name == newAisleName }
-
-        assertNotNull(addedAisle)
-    }
-
-    @Test
-    fun aisleDialogDoneClick_AisleNameIsEmpty_NoAisleAdded() = runTest {
-        val shoppingList = getShoppingList()
-        val shoppingListBundle =
-            bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
-
-        val aisleRepository = get<AisleRepository>()
-        val aisleCountBefore = aisleRepository.getAll().count()
-
-        getFragmentScenario(shoppingListBundle).onFragment {
-            fabHandler.clickFab(FabHandler.FabOption.ADD_AISLE, it.requireView())
-        }
-
-        onView(withText(R.string.done))
-            .inRoot(isDialog())
-            .perform(click())
-
-        val aisleCountAfter = aisleRepository.getAll().count()
-
-        assertEquals(aisleCountBefore, aisleCountAfter)
-    }
-
-    @Test
-    fun aisleDialogCancelClick_RegardlessOfAisleName_NoAisleAdded() = runTest {
-        val newAisleName = "Add Aisle Test 123321"
-        val shoppingList = getShoppingList()
-        val shoppingListBundle =
-            bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
-
-        val aisleRepository = get<AisleRepository>()
-        val aisleCountBefore = aisleRepository.getAll().count()
-
-        getFragmentScenario(shoppingListBundle).onFragment {
-            fabHandler.clickFab(FabHandler.FabOption.ADD_AISLE, it.requireView())
-        }
-
-        onView(allOf(withId(R.id.edt_aisle_name), instanceOf(EditText::class.java)))
-            .inRoot(isDialog())
-            .perform(typeText(newAisleName))
-
-        onView(withText(android.R.string.cancel))
-            .inRoot(isDialog())
-            .perform(click())
-
-        val aisleCountAfter = aisleRepository.getAll().count()
-        val addedAisle = aisleRepository.getAll().firstOrNull { it.name == newAisleName }
-
-        assertEquals(aisleCountBefore, aisleCountAfter)
-        assertNull(addedAisle)
-    }
-
-    @Test
-    fun aisleDialogAddAnotherClick_HasAisleName_AisleAddedAndShowDialogAgain() = runTest {
-        val newAisleName = "Add Aisle Test 123321"
-        val shoppingList = getShoppingList()
-        val shoppingListBundle =
-            bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
-
-        getFragmentScenario(shoppingListBundle).onFragment {
-            fabHandler.clickFab(FabHandler.FabOption.ADD_AISLE, it.requireView())
-        }
-
-        onView(allOf(withId(R.id.edt_aisle_name), instanceOf(EditText::class.java)))
-            .inRoot(isDialog())
-            .perform(typeText(newAisleName))
-
-        onView(withText(R.string.add_another))
-            .inRoot(isDialog())
-            .perform(click())
-
-        val addedAisle = get<AisleRepository>().getAll().firstOrNull { it.name == newAisleName }
-
-        onView(withText(R.string.add_aisle))
-            .inRoot(isDialog())
-            .check(matches(isDisplayed()))
-
-        assertNotNull(addedAisle)
-    }
 
     @Test
     fun onProductStatusChange_StatusUpdateSnackBarEnabled_ShowSnackBar() = runTest {
@@ -1002,8 +821,6 @@ class ShoppingListFragmentTest : KoinTest {
         scenario.onActivity {
             fabHandler.clickFab(FabHandler.FabOption.ADD_AISLE, activityFragment.requireView())
         }
-
-        //sleep(500)
 
         onView(withText(android.R.string.cancel))
             .inRoot(isDialog())
