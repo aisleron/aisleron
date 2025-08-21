@@ -325,7 +325,7 @@ class ShoppingListViewModelTest : KoinTest {
         }
 
         shoppingListViewModel.hydrate(location.id, FilterType.ALL, true)
-        shoppingListViewModel.requestDefaultList()
+        shoppingListViewModel.requestDefaultList(true)
 
         val shoppingList =
             (shoppingListViewModel.shoppingListUiState.value as ShoppingListViewModel.ShoppingListUiState.Updated).shoppingList
@@ -370,7 +370,7 @@ class ShoppingListViewModelTest : KoinTest {
         }
 
         shoppingListViewModel.hydrate(location.id, FilterType.ALL, false)
-        shoppingListViewModel.requestDefaultList()
+        shoppingListViewModel.requestDefaultList(false)
 
         val shoppingList =
             (shoppingListViewModel.shoppingListUiState.value as ShoppingListViewModel.ShoppingListUiState.Updated).shoppingList

@@ -47,4 +47,11 @@
         android:icon="@drawable/baseline_edit_24"
         android:title="@string/mnu_edit_location"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/mnu_show_empty_aisles"
+        android:title="@string/show_empty_aisles"
+        android:checkable="true"
+        app:showAsAction="never" />
+
 </menu>

@@ -78,7 +78,15 @@ class ShoppingListFragment(
     private var editShopMenuItem: MenuItem? = null
     private var loyaltyCardMenuItem: MenuItem? = null
 
+    private val showEmptyAisles: Boolean
+        get() = shoppingListPreferences.showEmptyAisles(requireContext())
+
     private val shoppingListViewModel: ShoppingListViewModel by viewModel()
+
+    override fun onResume() {
+        super.onResume()
+        shoppingListViewModel.requestDefaultList(showEmptyAisles)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -403,7 +411,7 @@ class ShoppingListFragment(
         searchView.setSearchableInfo(searchableInfo)
         searchView.setOnQueryTextListener(this@ShoppingListFragment)
         searchView.setOnCloseListener {
-            shoppingListViewModel.requestDefaultList()
+            shoppingListViewModel.requestDefaultList(showEmptyAisles)
             false
         }
 
@@ -412,9 +420,11 @@ class ShoppingListFragment(
             override fun onViewAttachedToWindow(v: View) {}
 
             override fun onViewDetachedFromWindow(v: View) {
-                shoppingListViewModel.requestDefaultList()
+                shoppingListViewModel.requestDefaultList(showEmptyAisles)
             }
         })
+
+        menu.findItem(R.id.mnu_show_empty_aisles).apply { isChecked = showEmptyAisles }
 
         editShopMenuItem = menu.findItem(R.id.mnu_edit_shop)
         loyaltyCardMenuItem = menu.findItem(R.id.mnu_show_loyalty_card)
@@ -436,6 +446,14 @@ class ShoppingListFragment(
 
             R.id.mnu_show_loyalty_card -> {
                 shoppingListViewModel.loyaltyCard?.let { showLoyaltyCard(it) }
+                true
+            }
+
+            R.id.mnu_show_empty_aisles -> {
+                shoppingListPreferences.setShowEmptyAisles(requireContext(), !showEmptyAisles)
+                menuItem.isChecked = showEmptyAisles
+                shoppingListViewModel.requestDefaultList(showEmptyAisles)
+
                 true
             }
 

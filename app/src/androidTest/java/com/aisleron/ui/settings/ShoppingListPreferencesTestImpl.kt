@@ -26,6 +26,9 @@ class ShoppingListPreferencesTestImpl : ShoppingListPreferences {
 
     override fun isStatusChangeSnackBarHidden(context: Context): Boolean = _hideStatusChangeSnackBar
     override fun showEmptyAisles(context: Context): Boolean = _showEmptyAisles
+    override fun setShowEmptyAisles(context: Context, value: Boolean) {
+        _showEmptyAisles = value
+    }
 
     fun setHideStatusChangeSnackBar(hideSnackBar: Boolean) {
         _hideStatusChangeSnackBar = hideSnackBar

@@ -18,10 +18,10 @@
 package com.aisleron.ui.settings
 
 import android.content.Context
+import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 
 class ShoppingListPreferencesImpl : ShoppingListPreferences {
-
     override fun isStatusChangeSnackBarHidden(context: Context): Boolean =
         PreferenceManager.getDefaultSharedPreferences(context).getBoolean(
             PREF_HIDE_STATUS_CHANGE_SNACK_BAR, false
@@ -32,8 +32,15 @@ class ShoppingListPreferencesImpl : ShoppingListPreferences {
             PREF_SHOW_EMPTY_AISLES, false
         )
 
+    override fun setShowEmptyAisles(context: Context, value: Boolean) {
+        PreferenceManager.getDefaultSharedPreferences(context)
+            .edit {
+                putBoolean(PREF_SHOW_EMPTY_AISLES, value)
+            }
+    }
+
     companion object {
-        private const val PREF_HIDE_STATUS_CHANGE_SNACK_BAR = "hide_status_change_snack_bar"
-        private const val PREF_SHOW_EMPTY_AISLES = "show_empty_aisles"
+        const val PREF_HIDE_STATUS_CHANGE_SNACK_BAR = "hide_status_change_snack_bar"
+        const val PREF_SHOW_EMPTY_AISLES = "show_empty_aisles"
     }
 }

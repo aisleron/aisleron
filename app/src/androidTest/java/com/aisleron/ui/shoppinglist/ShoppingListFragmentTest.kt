@@ -57,6 +57,7 @@ import com.aisleron.AppCompatActivityTestImpl
 import com.aisleron.R
 import com.aisleron.di.KoinTestRule
 import com.aisleron.di.daoTestModule
+import com.aisleron.di.generalTestModule
 import com.aisleron.di.repositoryModule
 import com.aisleron.di.useCaseModule
 import com.aisleron.di.viewModelTestModule
@@ -110,7 +111,13 @@ class ShoppingListFragmentTest : KoinTest {
 
     @get:Rule
     val koinTestRule = KoinTestRule(
-        modules = listOf(daoTestModule, viewModelTestModule, repositoryModule, useCaseModule)
+        modules = listOf(
+            daoTestModule,
+            viewModelTestModule,
+            repositoryModule,
+            useCaseModule,
+            generalTestModule
+        )
     )
 
     private fun setPadding(view: View) {
@@ -140,7 +147,7 @@ class ShoppingListFragmentTest : KoinTest {
                 applicationTitleUpdateListener,
                 fabHandler,
                 shoppingListPreferencesTestImpl ?: ShoppingListPreferencesTestImpl(),
-                loyaltyCardProvider ?: LoyaltyCardProviderTestImpl(),
+                loyaltyCardProvider ?: get<LoyaltyCardProvider>(),
                 get<AisleDialog>()
             ).apply {
                 arguments = fragmentArgs
@@ -169,7 +176,7 @@ class ShoppingListFragmentTest : KoinTest {
                     applicationTitleUpdateListener,
                     fabHandler,
                     shoppingListPreferencesTestImpl ?: ShoppingListPreferencesTestImpl(),
-                    loyaltyCardProvider ?: LoyaltyCardProviderTestImpl(),
+                    loyaltyCardProvider ?: get<LoyaltyCardProvider>(),
                     get<AisleDialog>()
                 )
             }
@@ -654,8 +661,6 @@ class ShoppingListFragmentTest : KoinTest {
             .check(matches(withText("")))
     }
 
-
-
     @Test
     fun onProductStatusChange_StatusUpdateSnackBarEnabled_ShowSnackBar() = runTest {
         val shoppingList = getShoppingList()
@@ -1114,6 +1119,25 @@ class ShoppingListFragmentTest : KoinTest {
                 throw AssertionError("View did not become visibility=$expectedVisibility within $timeoutMs ms")
             }
         })
+    }
+
+    @Test
+    fun onMenuItemSelected_ItemIsShowEmptyAisles_EmptyAislePreferenceUpdated() = runTest {
+        val shoppingList = getShoppingList()
+        val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
+        val menuItem = getMenuItem(R.id.mnu_show_empty_aisles)
+        val shoppingListPreferencesTestImpl = ShoppingListPreferencesTestImpl()
+        val valueBefore = false
+        shoppingListPreferencesTestImpl.setShowEmptyAisles(valueBefore)
+
+        getFragmentScenario(bundle, shoppingListPreferencesTestImpl).onFragment { fragment ->
+            fragment.onMenuItemSelected(menuItem)
+        }
+
+        val valueAfter =
+            shoppingListPreferencesTestImpl.showEmptyAisles(getInstrumentation().targetContext)
+
+        assertNotEquals(valueBefore, valueAfter)
     }
 
     /*@Test

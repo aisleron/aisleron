@@ -20,7 +20,7 @@ package com.aisleron.ui.settings
 import android.content.Context
 
 interface ShoppingListPreferences {
-
     fun isStatusChangeSnackBarHidden(context: Context): Boolean
     fun showEmptyAisles(context: Context): Boolean
+    fun setShowEmptyAisles(context: Context, value: Boolean)
 }

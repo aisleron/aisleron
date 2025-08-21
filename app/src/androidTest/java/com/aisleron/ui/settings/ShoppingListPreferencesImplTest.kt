@@ -17,6 +17,7 @@
 
 package com.aisleron.ui.settings
 
+import androidx.preference.PreferenceManager
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.aisleron.SharedPreferencesInitializer
 import org.junit.Test
@@ -57,6 +58,32 @@ class ShoppingListPreferencesImplTest {
         SharedPreferencesInitializer().setShowEmptyAisles(false)
         val showEmptyAisles =
             ShoppingListPreferencesImpl().isStatusChangeSnackBarHidden(getInstrumentation().targetContext)
+
+        assertFalse(showEmptyAisles)
+    }
+
+    private fun setShowEmptyAisles_ArrangeAct(showEmptyAisles: Boolean): Boolean {
+        SharedPreferencesInitializer().setShowEmptyAisles(!showEmptyAisles)
+        val context = getInstrumentation().targetContext
+
+        ShoppingListPreferencesImpl().setShowEmptyAisles(
+            getInstrumentation().targetContext, showEmptyAisles
+        )
+
+        val preference = PreferenceManager.getDefaultSharedPreferences(context)
+        return preference.getBoolean("show_empty_aisles", !showEmptyAisles)
+    }
+
+    @Test
+    fun setShowEmptyAisles_ValueTrue_PreferenceValueIsTrue() {
+        val showEmptyAisles = setShowEmptyAisles_ArrangeAct(true)
+
+        assertTrue(showEmptyAisles)
+    }
+
+    @Test
+    fun setShowEmptyAisles_ValueFalse_PreferenceValueIsFalse() {
+        val showEmptyAisles = setShowEmptyAisles_ArrangeAct(false)
 
         assertFalse(showEmptyAisles)
     }

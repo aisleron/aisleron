@@ -220,7 +220,8 @@ class ShoppingListViewModel(
         }
     }
 
-    fun requestDefaultList() {
+    fun requestDefaultList(showEmptyAisles: Boolean) {
+        _showEmptyAisles = showEmptyAisles
         shoppingListFilterParameters = getDefaultFilterParameters()
         coroutineScope.launch {
             _shoppingListUiState.value = ShoppingListUiState.Loading
