@@ -24,7 +24,6 @@ import android.os.Bundle
 import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
 import android.widget.FrameLayout
 import android.widget.LinearLayout
@@ -32,7 +31,6 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.appcompat.view.ActionMode
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -72,9 +70,8 @@ class MainActivity : AppCompatActivity() {
         // Needs to be a standalone variable so it is not garbage collected
         prefsListener = SharedPreferences.OnSharedPreferenceChangeListener { p, s ->
             when (s) {
-                "application_theme" -> recreate = true
+                "application_theme" -> recreate() //recreate = true
                 "restore_database" -> softRestartApp()
-
             }
         }
 
@@ -166,12 +163,11 @@ class MainActivity : AppCompatActivity() {
                         or WindowInsetsCompat.Type.displayCutout()
             )
 
-            val actionBarHeight = resources.getDimensionPixelSize(R.dimen.toolbar_height)
-
-            val params = view.layoutParams
-            params.height = actionBarHeight + insets.top
-            view.layoutParams = params
-            view.updatePadding(top = insets.top, left = insets.left, right = insets.right)
+            view.updateLayoutParams<MarginLayoutParams> {
+                topMargin = insets.top
+                leftMargin = insets.left
+                rightMargin = insets.right
+            }
 
             windowInsets
         }
@@ -230,24 +226,6 @@ class MainActivity : AppCompatActivity() {
             binding.drawerLayout.closeDrawers()
         }
         super.onResume()
-    }
-
-    override fun onSupportActionModeStarted(mode: ActionMode) {
-        super.onSupportActionModeStarted(mode)
-
-        val statusBarScrim = binding.appBarMain.statusBarScrim
-
-        statusBarScrim.alpha = 0f
-        statusBarScrim.visibility = View.VISIBLE
-        statusBarScrim.animate().alpha(1f).start()
-    }
-
-    override fun onSupportActionModeFinished(mode: ActionMode) {
-        super.onSupportActionModeFinished(mode)
-        val statusBarScrim = binding.appBarMain.statusBarScrim
-        statusBarScrim.animate().alpha(0f).withEndAction {
-            statusBarScrim.visibility = View.GONE
-        }.start()
     }
 
     private fun getStatusBarColor(): Int {

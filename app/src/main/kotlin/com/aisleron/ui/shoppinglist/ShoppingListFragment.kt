@@ -85,7 +85,7 @@ class ShoppingListFragment(
 
     override fun onResume() {
         super.onResume()
-        shoppingListViewModel.requestDefaultList(showEmptyAisles)
+        shoppingListViewModel.setShowEmptyAisles(showEmptyAisles)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -411,7 +411,7 @@ class ShoppingListFragment(
         searchView.setSearchableInfo(searchableInfo)
         searchView.setOnQueryTextListener(this@ShoppingListFragment)
         searchView.setOnCloseListener {
-            shoppingListViewModel.requestDefaultList(showEmptyAisles)
+            shoppingListViewModel.requestDefaultList()
             false
         }
 
@@ -420,7 +420,7 @@ class ShoppingListFragment(
             override fun onViewAttachedToWindow(v: View) {}
 
             override fun onViewDetachedFromWindow(v: View) {
-                shoppingListViewModel.requestDefaultList(showEmptyAisles)
+                shoppingListViewModel.requestDefaultList()
             }
         })
 
@@ -452,7 +452,7 @@ class ShoppingListFragment(
             R.id.mnu_show_empty_aisles -> {
                 shoppingListPreferences.setShowEmptyAisles(requireContext(), !showEmptyAisles)
                 menuItem.isChecked = showEmptyAisles
-                shoppingListViewModel.requestDefaultList(showEmptyAisles)
+                shoppingListViewModel.setShowEmptyAisles(showEmptyAisles)
 
                 true
             }

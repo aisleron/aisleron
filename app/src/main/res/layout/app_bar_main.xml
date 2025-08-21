@@ -35,8 +35,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="@dimen/toolbar_height"
-            app:popupTheme="@style/Theme.Aisleron.PopupOverlay"
-            app:layout_scrollFlags="scroll|enterAlways|snap" />
+            app:popupTheme="@style/Theme.Aisleron.PopupOverlay" />
 
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -123,9 +122,7 @@
         android:id="@+id/status_bar_scrim"
         android:layout_width="match_parent"
         android:layout_height="@dimen/toolbar_height"
-        android:background="?android:statusBarColor"
-        android:visibility="gone"
-        android:elevation="8dp" />
+        android:background="?android:statusBarColor" />
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

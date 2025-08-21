@@ -58,6 +58,7 @@ import org.koin.test.KoinTest
 import org.koin.test.get
 import org.koin.test.mock.declare
 import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -325,7 +326,7 @@ class ShoppingListViewModelTest : KoinTest {
         }
 
         shoppingListViewModel.hydrate(location.id, FilterType.ALL, true)
-        shoppingListViewModel.requestDefaultList(true)
+        shoppingListViewModel.requestDefaultList()
 
         val shoppingList =
             (shoppingListViewModel.shoppingListUiState.value as ShoppingListViewModel.ShoppingListUiState.Updated).shoppingList
@@ -370,7 +371,7 @@ class ShoppingListViewModelTest : KoinTest {
         }
 
         shoppingListViewModel.hydrate(location.id, FilterType.ALL, false)
-        shoppingListViewModel.requestDefaultList(false)
+        shoppingListViewModel.requestDefaultList()
 
         val shoppingList =
             (shoppingListViewModel.shoppingListUiState.value as ShoppingListViewModel.ShoppingListUiState.Updated).shoppingList
@@ -648,7 +649,8 @@ class ShoppingListViewModelTest : KoinTest {
                 id = 0,
                 isDefault = false,
                 expanded = true
-            ))
+            )
+        )
 
         shoppingListViewModel.hydrate(existingLocation.id, existingLocation.defaultFilter)
         val shoppingList =
@@ -664,5 +666,39 @@ class ShoppingListViewModelTest : KoinTest {
         assertTrue { shoppingList.count() < fullShoppingList.count() }
         assertNull(shoppingList.firstOrNull { it.itemType == ShoppingListItem.ItemType.AISLE && it.name == aisleName })
         assertNotNull(fullShoppingList.firstOrNull { it.itemType == ShoppingListItem.ItemType.AISLE && it.name == aisleName })
+    }
+
+    @Test
+    fun setShowEmptyAisles_ValueChanged_UiStateIsUpdated() = runTest {
+        val locationRepo = get<LocationRepository>()
+        val locationId = locationRepo.getAll().first { it.type == LocationType.SHOP }.id
+        val showEmptyAisles = false
+
+        shoppingListViewModel.hydrate(locationId, FilterType.ALL, showEmptyAisles)
+        shoppingListViewModel.clearState()
+        val uiStateBefore = shoppingListViewModel.shoppingListUiState.value
+
+        shoppingListViewModel.setShowEmptyAisles(!showEmptyAisles)
+
+        val uiStateAfter = shoppingListViewModel.shoppingListUiState.value
+
+        assertNotEquals(uiStateBefore, uiStateAfter)
+    }
+
+    @Test
+    fun setShowEmptyAisles_ValueUnchanged_UiStateIsNotUpdated() = runTest {
+        val locationRepo = get<LocationRepository>()
+        val locationId = locationRepo.getAll().first { it.type == LocationType.SHOP }.id
+        val showEmptyAisles = false
+
+        shoppingListViewModel.hydrate(locationId, FilterType.ALL, showEmptyAisles)
+        shoppingListViewModel.clearState()
+        val uiStateBefore = shoppingListViewModel.shoppingListUiState.value
+
+        shoppingListViewModel.setShowEmptyAisles(showEmptyAisles)
+
+        val uiStateAfter = shoppingListViewModel.shoppingListUiState.value
+
+        assertEquals(uiStateBefore, uiStateAfter)
     }
 }
