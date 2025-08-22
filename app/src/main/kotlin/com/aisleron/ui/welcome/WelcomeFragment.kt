@@ -18,12 +18,13 @@
 package com.aisleron.ui.welcome
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.IdRes
+import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
@@ -33,7 +34,6 @@ import androidx.navigation.fragment.findNavController
 import com.aisleron.R
 import com.aisleron.databinding.FragmentWelcomeBinding
 import com.aisleron.domain.base.AisleronException
-import com.aisleron.ui.AddEditFragmentListener
 import com.aisleron.ui.AisleronExceptionMap
 import com.aisleron.ui.AisleronFragment
 import com.aisleron.ui.FabHandler
@@ -46,26 +46,23 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class WelcomeFragment(
     private val fabHandler: FabHandler,
-    private val welcomePreferences: WelcomePreferences,
-    private val addEditFragmentListener: AddEditFragmentListener
+    private val welcomePreferences: WelcomePreferences
 ) : Fragment(), AisleronFragment {
 
     companion object {
         fun newInstance(
             fabHandler: FabHandler,
-            welcomePreferences: WelcomePreferences,
-            addEditFragmentListener: AddEditFragmentListener
+            welcomePreferences: WelcomePreferences
         ) = WelcomeFragment(
-            fabHandler, welcomePreferences, addEditFragmentListener
+            fabHandler, welcomePreferences
         )
     }
 
     private val viewModel: WelcomeViewModel by viewModel()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        // TODO: Use the ViewModel
+    override fun onResume() {
+        super.onResume()
+        viewModel.checkForProducts()
     }
 
     private fun initializeFab() {
@@ -94,7 +91,7 @@ class WelcomeFragment(
             text = Html.fromHtml(getString(R.string.welcome_add_own_product), FROM_HTML_MODE_LEGACY)
             setOnClickListener { _ ->
                 welcomePreferences.setInitialised(requireContext())
-                addEditFragmentListener.addEditActionCompleted(requireActivity())
+                navigateTo(R.id.nav_in_stock)
             }
         }
 
@@ -102,9 +99,7 @@ class WelcomeFragment(
             text = Html.fromHtml(getString(R.string.welcome_import_db), FROM_HTML_MODE_LEGACY)
             setOnClickListener { _ ->
                 welcomePreferences.setInitialised(requireContext())
-                val navController = this@WelcomeFragment.findNavController()
-                navController.popBackStack(R.id.nav_welcome, true)
-                navController.navigate(R.id.nav_settings)
+                navigateTo(R.id.nav_settings)
             }
         }
 
@@ -112,7 +107,7 @@ class WelcomeFragment(
             text = Html.fromHtml(getString(R.string.welcome_documentation), FROM_HTML_MODE_LEGACY)
             setOnClickListener { _ ->
                 val browserIntent = Intent(
-                    Intent.ACTION_VIEW, Uri.parse(getString(R.string.aisleron_documentation_url))
+                    Intent.ACTION_VIEW, getString(R.string.aisleron_documentation_url).toUri()
                 )
                 startActivity(browserIntent)
             }
@@ -120,24 +115,39 @@ class WelcomeFragment(
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.welcomeUiState.collect {
-                    when (it) {
-                        is WelcomeViewModel.WelcomeUiState.Error -> {
-                            displayErrorSnackBar(it.errorCode, it.errorMessage)
+                launch {
+                    viewModel.welcomeUiState.collect {
+                        when (it) {
+                            is WelcomeViewModel.WelcomeUiState.Error -> {
+                                displayErrorSnackBar(it.errorCode, it.errorMessage)
+                            }
+
+                            is WelcomeViewModel.WelcomeUiState.SampleDataLoaded -> {
+                                welcomePreferences.setInitialised(requireContext())
+                                navigateTo(R.id.nav_in_stock)
+                            }
+
+                            else -> Unit
                         }
 
-                        is WelcomeViewModel.WelcomeUiState.SampleDataLoaded -> {
-                            welcomePreferences.setInitialised(requireContext())
-                            addEditFragmentListener.addEditActionCompleted(requireActivity())
-                        }
+                        viewModel.clearState()
+                    }
+                }
 
-                        else -> Unit
+                launch {
+                    viewModel.productsLoaded.collect { loaded ->
+                        binding.txtWelcomeLoadSampleItems.isEnabled = !loaded
                     }
                 }
             }
         }
 
         return binding.root
+    }
+
+    private fun navigateTo(@IdRes resId: Int) {
+        val navController = findNavController()
+        navController.navigate(resId, null)
     }
 
     private fun displayErrorSnackBar(

@@ -105,6 +105,7 @@ val viewModelTestModule = module {
     factory<WelcomeViewModel> {
         WelcomeViewModel(
             createSampleDataUseCase = get(),
+            getAllProductsUseCase = get(),
             TestScope(UnconfinedTestDispatcher())
         )
     }

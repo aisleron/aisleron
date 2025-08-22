@@ -17,17 +17,31 @@
 
 package com.aisleron.ui.welcome
 
+import com.aisleron.di.KoinTestRule
+import com.aisleron.di.daoTestModule
+import com.aisleron.di.repositoryModule
+import com.aisleron.di.useCaseModule
 import com.aisleron.domain.base.AisleronException
+import com.aisleron.domain.product.usecase.GetAllProductsUseCase
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert
+import org.junit.Rule
 import org.junit.Test
+import org.koin.test.KoinTest
+import org.koin.test.get
 
-class WelcomeViewModelTest {
+@OptIn(ExperimentalCoroutinesApi::class)
+class WelcomeViewModelTest : KoinTest {
 
-    @OptIn(ExperimentalCoroutinesApi::class)
+    @get:Rule
+    val koinTestRule = KoinTestRule(
+        modules = listOf(daoTestModule, repositoryModule, useCaseModule)
+    )
+
     @Test
     fun createSampleData_ExceptionRaised_WelcomeUiStateIsError() {
         val exceptionMessage = "Error Creating Sample Data"
@@ -38,6 +52,7 @@ class WelcomeViewModelTest {
                     throw Exception(exceptionMessage)
                 }
             },
+            get<GetAllProductsUseCase>(),
             TestScope(UnconfinedTestDispatcher())
         )
 
@@ -54,7 +69,6 @@ class WelcomeViewModelTest {
         )
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun createSampleData_SampleDataCreationExceptionExceptionRaised_WelcomeUiStateIsError() {
         val exceptionMessage = "Error Creating Sample Data"
@@ -67,6 +81,7 @@ class WelcomeViewModelTest {
                     )
                 }
             },
+            get<GetAllProductsUseCase>(),
             TestScope(UnconfinedTestDispatcher())
         )
 
@@ -83,7 +98,6 @@ class WelcomeViewModelTest {
         )
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun createSampleData_CreationSuccessful_WelcomeUiStateIsSampleDataLoaded() {
         val welcomeViewModel = WelcomeViewModel(
@@ -92,6 +106,7 @@ class WelcomeViewModelTest {
                     //Do nothing, just validate that view model works if no error is returned.
                 }
             },
+            get<GetAllProductsUseCase>(),
             TestScope(UnconfinedTestDispatcher())
         )
 
@@ -106,11 +121,63 @@ class WelcomeViewModelTest {
     @Test
     fun constructor_NoCoroutineScopeProvided_WelcomeViewModelReturned() {
         val welcomeViewModel = WelcomeViewModel(
-            object : CreateSampleDataUseCase {
-                override suspend operator fun invoke() {}
-            }
+            get<CreateSampleDataUseCase>(),
+            get<GetAllProductsUseCase>(),
         )
 
         Assert.assertNotNull(welcomeViewModel)
+    }
+
+    @Test
+    fun clearState_AfterCall_StateIsEmpty() = runTest {
+        val viewModel = WelcomeViewModel(
+            object : CreateSampleDataUseCase {
+                override suspend operator fun invoke() {
+                    //Do nothing, just validate that view model works if no error is returned.
+                }
+            },
+            get<GetAllProductsUseCase>(),
+            TestScope(UnconfinedTestDispatcher())
+        )
+
+        viewModel.createSampleData()
+        val stateBefore = viewModel.welcomeUiState.value
+
+        viewModel.clearState()
+        val stateAfter = viewModel.welcomeUiState.value
+
+        Assert.assertNotEquals(stateBefore, stateAfter)
+        Assert.assertTrue(viewModel.welcomeUiState.value is WelcomeViewModel.WelcomeUiState.Empty)
+    }
+
+    @Test
+    fun checkForProducts_NoProductsExist_StateIsFalse() = runTest {
+        val viewModel = WelcomeViewModel(
+            object : CreateSampleDataUseCase {
+                override suspend operator fun invoke() {
+                    //Do nothing, just validate that view model works if no error is returned.
+                }
+            },
+            get<GetAllProductsUseCase>(),
+            TestScope(UnconfinedTestDispatcher())
+        )
+
+        viewModel.checkForProducts()
+
+        Assert.assertFalse(viewModel.productsLoaded.value)
+    }
+
+    @Test
+    fun checkForProducts_ProductsExist_StateIsTrue() = runTest {
+        val viewModel = WelcomeViewModel(
+            get<CreateSampleDataUseCase>(),
+            get<GetAllProductsUseCase>(),
+            TestScope(UnconfinedTestDispatcher())
+        )
+
+        viewModel.createSampleData()
+        viewModel.checkForProducts()
+
+        Assert.assertTrue(viewModel.productsLoaded.value)
     }
 }

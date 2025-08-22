@@ -87,7 +87,8 @@ val viewModelModule = module {
 
     viewModel {
         WelcomeViewModel(
-            createSampleDataUseCase = get()
+            createSampleDataUseCase = get(),
+            getAllProductsUseCase = get()
         )
     }
 

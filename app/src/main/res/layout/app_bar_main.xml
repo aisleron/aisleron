@@ -118,11 +118,4 @@
         android:theme="@style/FloatingActionButtonSecondary"
         app:srcCompat="@drawable/baseline_add_product_24" />
 
-    <View
-        android:id="@+id/status_bar_scrim"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/toolbar_height"
-        android:background="?android:statusBarColor" />
-
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

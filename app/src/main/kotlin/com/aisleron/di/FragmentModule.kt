@@ -58,8 +58,7 @@ val fragmentModule = module {
     fragment {
         WelcomeFragment(
             fabHandler = get(),
-            welcomePreferences = get(),
-            addEditFragmentListener = get()
+            welcomePreferences = get()
         )
     }
 

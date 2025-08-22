@@ -102,6 +102,7 @@
             android:layout_marginBottom="@dimen/text_margin"
             android:background="@drawable/background_border"
             android:clickable="true"
+            android:enabled="false"
             android:focusable="true"
             android:foreground="?android:attr/selectableItemBackground"
             android:padding="@dimen/menu_padding"

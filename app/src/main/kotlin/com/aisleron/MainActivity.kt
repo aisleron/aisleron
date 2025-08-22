@@ -70,11 +70,12 @@ class MainActivity : AppCompatActivity() {
         // Needs to be a standalone variable so it is not garbage collected
         prefsListener = SharedPreferences.OnSharedPreferenceChangeListener { p, s ->
             when (s) {
-                "application_theme" -> recreate() //recreate = true
+                "application_theme" -> recreate()
                 "restore_database" -> softRestartApp()
             }
         }
 
+        PreferenceManager.setDefaultValues(this, R.xml.root_preferences, false)
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
         prefs.registerOnSharedPreferenceChangeListener(prefsListener)
 
@@ -154,34 +155,30 @@ class MainActivity : AppCompatActivity() {
             windowInsets
         }
 
-        // Toolbar
-        val toolbar = binding.appBarMain.toolbar
-        ViewCompat.setOnApplyWindowInsetsListener(toolbar) { view, windowInsets ->
+        // AppBar
+        val appBar = binding.appBarMain.appBarLayout
+        ViewCompat.setOnApplyWindowInsetsListener(appBar) { view, windowInsets ->
             val insets = windowInsets.getInsets(
                 WindowInsetsCompat.Type.statusBars()
                         or WindowInsetsCompat.Type.navigationBars()
                         or WindowInsetsCompat.Type.displayCutout()
             )
 
-            view.updateLayoutParams<MarginLayoutParams> {
+            view.updatePadding(top = insets.top, right = insets.right, left = insets.left)
+
+            /*view.updateLayoutParams<MarginLayoutParams> {
                 topMargin = insets.top
                 leftMargin = insets.left
                 rightMargin = insets.right
             }
-
-            windowInsets
-        }
-
-        // Status bar scrim
-        val scrim = binding.appBarMain.statusBarScrim
-        ViewCompat.setOnApplyWindowInsetsListener(scrim) { view, windowInsets ->
-            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.statusBars())
-
-            val actionBarHeight = resources.getDimensionPixelSize(R.dimen.toolbar_height)
+*/
+            /*val actionBarHeight = resources.getDimensionPixelSize(R.dimen.toolbar_height)
 
             val params = view.layoutParams
             params.height = actionBarHeight + insets.top
             view.layoutParams = params
+
+            view.updatePadding(top = insets.top, right = insets.right, left = insets.left)*/
 
             windowInsets
         }
@@ -225,6 +222,7 @@ class MainActivity : AppCompatActivity() {
         if (binding.drawerLayout.isOpen) {
             binding.drawerLayout.closeDrawers()
         }
+
         super.onResume()
     }
 

@@ -20,6 +20,7 @@ package com.aisleron.ui.welcome
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aisleron.domain.base.AisleronException
+import com.aisleron.domain.product.usecase.GetAllProductsUseCase
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,8 +29,12 @@ import kotlinx.coroutines.launch
 
 class WelcomeViewModel(
     private val createSampleDataUseCase: CreateSampleDataUseCase,
+    private val getAllProductsUseCase: GetAllProductsUseCase,
     coroutineScopeProvider: CoroutineScope? = null
 ) : ViewModel() {
+    private val _productsLoaded = MutableStateFlow(false)
+    val productsLoaded = _productsLoaded.asStateFlow()
+
     private val coroutineScope = coroutineScopeProvider ?: this.viewModelScope
     private val _welcomeUiState = MutableStateFlow<WelcomeUiState>(
         WelcomeUiState.Empty
@@ -40,6 +45,7 @@ class WelcomeViewModel(
     fun createSampleData() {
         coroutineScope.launch {
             try {
+                _productsLoaded.value = true
                 createSampleDataUseCase()
                 _welcomeUiState.value = WelcomeUiState.SampleDataLoaded
             } catch (e: AisleronException) {
@@ -54,11 +60,29 @@ class WelcomeViewModel(
         }
     }
 
+    fun checkForProducts() {
+        coroutineScope.launch {
+            try {
+                val hasProducts = getAllProductsUseCase().any()
+                _productsLoaded.value = hasProducts
+            } catch (e: AisleronException) {
+                _welcomeUiState.value = WelcomeUiState.Error(e.exceptionCode, e.message)
+            } catch (e: Exception) {
+                _welcomeUiState.value = WelcomeUiState.Error(
+                    AisleronException.ExceptionCode.GENERIC_EXCEPTION, e.message
+                )
+            }
+        }
+    }
+
+    fun clearState() {
+        _welcomeUiState.value = WelcomeUiState.Empty
+    }
+
     sealed class WelcomeUiState {
         data object Empty : WelcomeUiState()
         data object SampleDataLoaded : WelcomeUiState()
 
-        //data object Loading : WelcomeUiState()
         data class Error(
             val errorCode: AisleronException.ExceptionCode, val errorMessage: String?
         ) : WelcomeUiState()
