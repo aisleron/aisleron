@@ -45,6 +45,8 @@ import com.aisleron.domain.backup.usecase.RestoreDatabaseUseCaseImpl
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.location.usecase.AddLocationUseCase
 import com.aisleron.domain.location.usecase.AddLocationUseCaseImpl
+import com.aisleron.domain.location.usecase.CopyLocationUseCase
+import com.aisleron.domain.location.usecase.CopyLocationUseCaseImpl
 import com.aisleron.domain.location.usecase.GetHomeLocationUseCase
 import com.aisleron.domain.location.usecase.GetLocationUseCase
 import com.aisleron.domain.location.usecase.GetPinnedShopsUseCase
@@ -65,6 +67,8 @@ import com.aisleron.domain.loyaltycard.usecase.RemoveLoyaltyCardFromLocationUseC
 import com.aisleron.domain.loyaltycard.usecase.RemoveLoyaltyCardFromLocationUseCaseImpl
 import com.aisleron.domain.product.usecase.AddProductUseCase
 import com.aisleron.domain.product.usecase.AddProductUseCaseImpl
+import com.aisleron.domain.product.usecase.CopyProductUseCase
+import com.aisleron.domain.product.usecase.CopyProductUseCaseImpl
 import com.aisleron.domain.product.usecase.GetAllProductsUseCase
 import com.aisleron.domain.product.usecase.GetProductUseCase
 import com.aisleron.domain.product.usecase.IsProductNameUniqueUseCase
@@ -119,6 +123,15 @@ val useCaseModule = module {
             locationRepository = get(),
             updateAisleUseCase = get(),
             updateAisleProductUseCase = get()
+        )
+    }
+
+    factory<CopyLocationUseCase> {
+        CopyLocationUseCaseImpl(
+            locationRepository = get(),
+            aisleRepository = get(),
+            aisleProductRepository = get(),
+            isLocationNameUniqueUseCase = get()
         )
     }
 
@@ -206,6 +219,14 @@ val useCaseModule = module {
         UpdateProductStatusUseCaseImpl(
             getProductUseCase = get(),
             updateProductUseCase = get()
+        )
+    }
+
+    factory<CopyProductUseCase> {
+        CopyProductUseCaseImpl(
+            productRepository = get(),
+            aisleProductRepository = get(),
+            isProductNameUniqueUseCase = get()
         )
     }
 

@@ -38,8 +38,13 @@ class AisleProductDaoTestImpl(private val productDao: ProductDaoTestImpl) : Aisl
         return result
     }
 
-    override suspend fun getAisleProductsByProduct(productId: Int): List<AisleProductEntity> {
-        return aisleProductList.filter { it.productId == productId }
+    override suspend fun getAisleProductsByProduct(productId: Int): List<AisleProductRank> {
+        return aisleProductList.filter { it.productId == productId }.map {
+            AisleProductRank(
+                aisleProduct = it,
+                product = productDao.getProduct(it.productId)!!
+            )
+        }
     }
 
     override suspend fun getAisleProducts(): List<AisleProductRank> {

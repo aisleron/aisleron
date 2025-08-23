@@ -36,6 +36,12 @@ class AisleProductRepositoryImpl(
         return aisleProductDao.getAisleMaxRank(aisleId)
     }
 
+    override suspend fun getProductAisles(productId: Int): List<AisleProduct> {
+        return aisleProductRankMapper.toModelList(
+            aisleProductDao.getAisleProductsByProduct(productId)
+        )
+    }
+
     override suspend fun get(id: Int): AisleProduct? {
         return aisleProductDao.getAisleProduct(id)?.let { aisleProductRankMapper.toModel(it) }
     }
