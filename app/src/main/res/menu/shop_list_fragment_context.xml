@@ -30,4 +30,11 @@
         android:icon="@drawable/baseline_delete_24"
         app:showAsAction="never"
         android:menuCategory="secondary" />
+
+    <item
+        android:id="@+id/mnu_copy_shop_list_item"
+        android:title="@android:string/copy"
+        android:icon="@drawable/baseline_content_copy_24"
+        app:showAsAction="never"
+        android:menuCategory="secondary" />
 </menu>

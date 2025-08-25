@@ -29,6 +29,7 @@ class AisleronExceptionMap {
             ExceptionCode.DUPLICATE_LOCATION_NAME_EXCEPTION -> R.string.duplicate_location_name_exception
             ExceptionCode.DUPLICATE_AISLE_NAME_EXCEPTION -> R.string.duplicate_aisle_name_exception
             ExceptionCode.INVALID_LOCATION_EXCEPTION -> R.string.invalid_location_exception
+            ExceptionCode.INVALID_PRODUCT_EXCEPTION -> R.string.invalid_product_exception
             ExceptionCode.INVALID_DB_NAME_EXCEPTION -> R.string.invalid_db_name_exception
             ExceptionCode.INVALID_DB_BACKUP_FILE_EXCEPTION -> R.string.invalid_db_backup_file_exception
             ExceptionCode.INVALID_DB_RESTORE_FILE_EXCEPTION -> R.string.invalid_db_restore_file_exception

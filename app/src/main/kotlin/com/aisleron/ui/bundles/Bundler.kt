@@ -22,6 +22,7 @@ import android.os.Bundle
 import android.os.Parcelable
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.LocationType
+import com.aisleron.ui.copyentity.CopyEntityType
 
 class Bundler {
 
@@ -122,10 +123,30 @@ class Bundler {
         return result
     }
 
+    fun makeCopyEntityBundle(
+        type: CopyEntityType, title: String, defaultName: String, nameHint: String
+    ): Bundle {
+        val copyEntityBundle = CopyEntityBundle(
+            type = type,
+            title = title,
+            defaultName = defaultName,
+            nameHint = nameHint
+        )
+        return makeParcelableBundle(COPY_ENTITY, copyEntityBundle)
+    }
+
+    fun getCopyEntityBundle(bundle: Bundle?): CopyEntityBundle {
+        val result =
+            getParcelableBundle(bundle, COPY_ENTITY, CopyEntityBundle::class.java)
+        return result ?: CopyEntityBundle(CopyEntityType.Location(-1))
+
+    }
+
     private companion object BundleType {
         const val ADD_EDIT_PRODUCT = "addEditProduct"
         const val ADD_EDIT_LOCATION = "addEditLocation"
         const val SHOPPING_LIST_BUNDLE = "shoppingList"
+        const val COPY_ENTITY = "copyEntity"
 
         const val ARG_LOCATION_ID = "locationId"
         const val ARG_FILTER_TYPE = "filterType"

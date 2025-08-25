@@ -37,6 +37,9 @@ sealed class AisleronException(
     class InvalidLocationException(message: String? = null, cause: Throwable? = null) :
         AisleronException(ExceptionCode.INVALID_LOCATION_EXCEPTION, message, cause)
 
+    class InvalidProductException(message: String? = null, cause: Throwable? = null) :
+        AisleronException(ExceptionCode.INVALID_PRODUCT_EXCEPTION, message, cause)
+
     class InvalidDbNameException(message: String? = null, cause: Throwable? = null) :
         AisleronException(ExceptionCode.INVALID_DB_NAME_EXCEPTION, message, cause)
 
@@ -75,6 +78,7 @@ sealed class AisleronException(
         DUPLICATE_LOCATION_EXCEPTION,
         SAMPLE_DATA_CREATION_EXCEPTION,
         LOYALTY_CARD_PROVIDER_EXCEPTION,
-        INVALID_LOYALTY_CARD_EXCEPTION
+        INVALID_LOYALTY_CARD_EXCEPTION,
+        INVALID_PRODUCT_EXCEPTION
     }
 }
