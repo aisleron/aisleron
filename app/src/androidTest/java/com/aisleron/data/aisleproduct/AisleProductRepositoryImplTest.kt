@@ -23,8 +23,10 @@ import org.koin.core.module.Module
 import org.koin.test.KoinTest
 import org.koin.test.get
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class AisleProductRepositoryImplTest : KoinTest {
     private lateinit var repository: AisleProductRepositoryImpl
@@ -103,5 +105,80 @@ class AisleProductRepositoryImplTest : KoinTest {
         val countAfter = repository.getAll().count()
 
         assertEquals(countBefore, countAfter)
+    }
+
+    @Test
+    fun getProductAisles_ValidProduct_AislesReturned() = runTest {
+        val product = get<ProductRepository>().getAll().first()
+        val aisleProducts = repository.getProductAisles(product.id)
+
+        assertTrue(aisleProducts.any())
+    }
+
+    @Test
+    fun getProductAisles_InvalidProduct_NoAislesReturned() = runTest {
+        val aisleProducts = repository.getProductAisles(-100)
+
+        assertFalse(aisleProducts.any())
+    }
+
+    @Test
+    fun removeProductsFromAisle_ValidAisle_ProductsRemoved() = runTest {
+        val countBefore = repository.getAll().count()
+        val aisleId = repository.getAll().first().aisleId
+        val productCount = repository.getAll().count { it.aisleId == aisleId }
+
+        repository.removeProductsFromAisle(aisleId)
+        val countAfter = repository.getAll().count()
+
+        assertEquals(countBefore - productCount, countAfter)
+    }
+
+    @Test
+    fun removeProductsFromAisle_InvalidAisle_NoProductsRemoved() = runTest {
+        val countBefore = repository.getAll().count()
+
+        repository.removeProductsFromAisle(-100)
+        val countAfter = repository.getAll().count()
+
+        assertEquals(countBefore, countAfter)
+    }
+
+    @Test
+    fun update_SingleAisleProductProvided_AisleProductUpdated() = runTest {
+        val dummyRank = 90000
+        val countBefore = repository.getAll().count()
+        val apBefore = repository.getAll().first()
+
+        repository.update(apBefore.copy(rank = dummyRank))
+
+        val apAfter = repository.get(apBefore.id)
+        val countAfter = repository.getAll().count()
+
+        assertEquals(countBefore, countAfter)
+        assertEquals(apBefore.copy(rank = dummyRank), apAfter)
+    }
+
+    @Test
+    fun update_MultipleAisleProductsProvided_AisleProductsUpdated() = runTest {
+        val dummyRank = 90000
+        val countBefore = repository.getAll().count()
+        val oneBefore = repository.getAll().first()
+        val twoBefore = repository.getAll().last()
+
+        val aisleProducts = listOf(
+            oneBefore.copy(rank = dummyRank),
+            twoBefore.copy(rank = dummyRank)
+        )
+
+        repository.update(aisleProducts)
+
+        val countAfter = repository.getAll().count()
+        val oneAfter = repository.get(oneBefore.id)
+        val twoAfter = repository.get(twoBefore.id)
+
+        assertEquals(countBefore, countAfter)
+        assertEquals(oneBefore.copy(rank = dummyRank), oneAfter)
+        assertEquals(twoBefore.copy(rank = dummyRank), twoAfter)
     }
 }

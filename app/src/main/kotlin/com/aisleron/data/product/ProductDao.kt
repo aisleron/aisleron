@@ -37,7 +37,7 @@ interface ProductDao : BaseDao<ProductEntity> {
     @Transaction
     suspend fun remove(product: ProductEntity, aisleProductDao: AisleProductDao) {
         val aisleProducts = aisleProductDao.getAisleProductsByProduct(product.id)
-        aisleProductDao.delete(*aisleProducts.map { it }.toTypedArray())
+        aisleProductDao.delete(*aisleProducts.map { it.aisleProduct }.toTypedArray())
         delete(product)
     }
 

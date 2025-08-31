@@ -43,6 +43,8 @@ import com.aisleron.ui.AisleronFragment
 import com.aisleron.ui.FabHandler
 import com.aisleron.ui.FabHandler.FabClickedCallBack
 import com.aisleron.ui.bundles.Bundler
+import com.aisleron.ui.copyentity.CopyEntityDialogFragment
+import com.aisleron.ui.copyentity.CopyEntityType
 import com.aisleron.ui.widgets.ErrorSnackBar
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
@@ -157,12 +159,38 @@ class ShopListFragment(private val fabHandler: FabHandler) : Fragment(), ActionM
             R.id.mnu_delete_shop_list_item ->
                 actionModeItem?.let { confirmDelete(requireContext(), it) }
 
+            R.id.mnu_copy_shop_list_item ->
+                actionModeItem?.let { showCopyLocationDialog(it) }
+
             else -> result = false
         }
 
         if (result) mode.finish()  // Action picked, so close the CAB.
 
         return result
+    }
+
+    private fun showCopyLocationDialog(item: ShopListItemViewModel) {
+        val dialog = CopyEntityDialogFragment.newInstance(
+            type = CopyEntityType.Location(item.id),
+            title = getString(R.string.copy_entity_title, item.name),
+            defaultName = "${item.name} (${getString(android.R.string.copy)})",
+            nameHint = getString(R.string.new_location_name)
+        )
+
+        dialog.onCopySuccess = {
+            requireView().postDelayed({
+                Snackbar.make(
+                    requireView(),
+                    getString(R.string.entity_copied, item.name),
+                    Snackbar.LENGTH_SHORT
+                )
+                    .setAnchorView(fabHandler.getFabView(this.requireActivity()))
+                    .show()
+            }, 250)
+        }
+
+        dialog.show(childFragmentManager, "copyDialog")
     }
 
     private fun confirmDelete(context: Context, item: ShopListItemViewModel) {

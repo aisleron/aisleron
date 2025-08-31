@@ -15,13 +15,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.domain.aisleproduct
+package com.aisleron.ui.bundles
 
-import com.aisleron.domain.base.BaseRepository
+import android.os.Parcelable
+import com.aisleron.ui.copyentity.CopyEntityType
+import kotlinx.parcelize.Parcelize
 
-interface AisleProductRepository : BaseRepository<AisleProduct> {
-    suspend fun updateAisleProductRank(item: AisleProduct)
-    suspend fun removeProductsFromAisle(aisleId: Int)
-    suspend fun getAisleMaxRank(aisleId: Int): Int
-    suspend fun getProductAisles(productId: Int): List<AisleProduct>
-}
+@Parcelize
+data class CopyEntityBundle(
+    val type: CopyEntityType,
+    val title: String = "",
+    val defaultName: String = "",
+    val nameHint: String = ""
+) : Parcelable

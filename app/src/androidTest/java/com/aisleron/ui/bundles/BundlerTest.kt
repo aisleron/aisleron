@@ -21,10 +21,12 @@ import android.os.Build
 import android.os.Bundle
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.LocationType
+import com.aisleron.ui.copyentity.CopyEntityType
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertNotNull
 import junit.framework.TestCase.assertNull
+import junit.framework.TestCase.assertTrue
 import org.junit.Before
 import org.junit.Test
 
@@ -260,5 +262,69 @@ class BundlerTest {
             getParcelableBundle(bundle, "addEditProduct", AddEditProductBundle::class.java)
 
         assertEquals(locationId, addProductBundle!!.locationId)
+    }
+
+    @Test
+    fun makeCopyEntityBundle_LocationEntityTypeProvided_BundleHasLocationEntityType() {
+        val locationId = 2
+        val title = "Test Location Bundle"
+        val defaultName = "Default Copy Name"
+        val nameHint = "New Location Name"
+        val locationCopyEntity = CopyEntityType.Location(locationId)
+
+        val bundle = bundler.makeCopyEntityBundle(locationCopyEntity, title, defaultName, nameHint)
+
+        val copyEntityBundle =
+            getParcelableBundle(bundle, "copyEntity", CopyEntityBundle::class.java)
+
+        assertTrue(copyEntityBundle!!.type is CopyEntityType.Location)
+        assertEquals(locationId, (copyEntityBundle.type as CopyEntityType.Location).sourceId)
+        assertEquals(title, copyEntityBundle.title)
+        assertEquals(defaultName, copyEntityBundle.defaultName)
+        assertEquals(nameHint, copyEntityBundle.nameHint)
+    }
+
+    @Test
+    fun makeCopyEntityBundle_ProductEntityTypeProvided_BundleHasProductEntityType() {
+        val productId = 2
+        val title = "Test Product Bundle"
+        val defaultName = "Default Copy Name"
+        val nameHint = "New Product Name"
+        val productCopyEntity = CopyEntityType.Product(productId)
+
+        val bundle = bundler.makeCopyEntityBundle(productCopyEntity, title, defaultName, nameHint)
+
+        val copyEntityBundle =
+            getParcelableBundle(bundle, "copyEntity", CopyEntityBundle::class.java)
+
+        assertTrue(copyEntityBundle!!.type is CopyEntityType.Product)
+        assertEquals(productId, (copyEntityBundle.type as CopyEntityType.Product).sourceId)
+        assertEquals(title, copyEntityBundle.title)
+        assertEquals(defaultName, copyEntityBundle.defaultName)
+        assertEquals(nameHint, copyEntityBundle.nameHint)
+    }
+
+    @Test
+    fun getCopyEntityBundle_validBundle_ReturnCopyEntityBundle() {
+        val copyEntityBundle = CopyEntityBundle(
+            type = CopyEntityType.Location(2),
+            title = "Test Copy Bundle",
+            defaultName = "Test Default Name",
+            nameHint = "New Copy Entity Name"
+        )
+
+        val bundle = Bundle()
+        bundle.putParcelable("copyEntity", copyEntityBundle)
+
+        val bundledCopyEntity = bundler.getCopyEntityBundle(bundle)
+
+        assertEquals(copyEntityBundle, bundledCopyEntity)
+    }
+
+    @Test
+    fun getCopyEntityBundle_nullBundle_ReturnDefaultCopyEntityBundle() {
+        val bundledCopyEntity = bundler.getCopyEntityBundle(null)
+
+        assertEquals(-1, (bundledCopyEntity.type as CopyEntityType.Location).sourceId)
     }
 }

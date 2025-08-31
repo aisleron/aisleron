@@ -59,11 +59,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
     private lateinit var prefsListener: SharedPreferences.OnSharedPreferenceChangeListener
-    private var recreate: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setupKoinFragmentFactory()
-        recreate = false
 
         super.onCreate(savedInstanceState)
 
@@ -214,7 +212,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
-        if (recreate) recreate()
         return item.onNavDestinationSelected(navController) || super.onOptionsItemSelected(item)
     }
 
@@ -255,7 +252,12 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         navController.popBackStack(navController.graph.startDestinationId, false)
         navController.navigate(navController.graph.startDestinationId)
+        recreate()
+    }
 
-        recreate = true
+    override fun onDestroy() {
+        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+        prefs.unregisterOnSharedPreferenceChangeListener(prefsListener)
+        super.onDestroy()
     }
 }

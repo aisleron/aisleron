@@ -62,6 +62,7 @@
     <string name="duplicate_location_name_exception">ERROR: Location Name must be unique</string>
     <string name="duplicate_aisle_name_exception">ERROR: Aisle Name must be unique per list</string>
     <string name="invalid_location_exception">ERROR: Invalid Location Id provided</string>
+    <string name="invalid_product_exception">ERROR: Invalid Product Id provided</string>
     <string name="invalid_db_name_exception">ERROR: Unable to determine database name</string>
     <string name="invalid_db_backup_file_exception">ERROR: Invalid backup target</string>
     <string name="invalid_db_restore_file_exception">ERROR: Invalid restore source</string>
@@ -99,6 +100,7 @@
 
     <!-- Empty list message strings   -->
     <string name="empty_list_title">This list is currently empty</string>
+    <string name="empty_list_description">This could be because:</string>
 
     <string name="empty_list_reasons">
         - No items are needed at the moment
@@ -114,6 +116,16 @@
 
     <!-- URLs -->
     <string name="aisleron_documentation_url">https://aisleron.com/docs/documentation/</string>
+
+    <!-- Loyalty cards -->
+    <string name="shop_loyalty_card_name">Loyalty Card</string>
+    <string name="loyalty_card">Loyalty card</string>
+    <string name="delete_loyalty_card">Delete loyalty card</string>
+    <string name="get_loyalty_card">Lookup loyalty card</string>
+    <string name="loyalty_card_provider_catima">Catima — Loyalty Card Wallet</string>
+    <string name="loyalty_card_provider_missing_title">No loyalty card provider installed</string>
+    <string name="loyalty_card_provider_missing_message">&lt;b&gt;&lt;i&gt;%1$s&lt;/i&gt;&lt;/b&gt; is required to display loyalty cards. Would you like to open their website to learn more about it?</string>
+    <string name="invalid_loyalty_card_exception">ERROR: Invalid Loyalty Card Id provided</string>
 
     <!-- Misc -->
     <string name="aisle">Aisle</string>
@@ -156,16 +168,11 @@
     <string name="mnu_sort_list_by_name">Sort by name</string>
     <string name="sort_confirm_title">Confirm Sort</string>
     <string name="sort_confirm_message">Sorting by name will rearrange the list alphabetically and overwrite your current sort order. Do you want to proceed?</string>
-    <string name="empty_list_description">This could be because:</string>
-
-    <!-- Loyalty cards -->
-    <string name="shop_loyalty_card_name">Loyalty Card</string>
-    <string name="loyalty_card">Loyalty card</string>
-    <string name="delete_loyalty_card">Delete loyalty card</string>
-    <string name="get_loyalty_card">Lookup loyalty card</string>
-    <string name="loyalty_card_provider_catima">Catima — Loyalty Card Wallet</string>
-    <string name="loyalty_card_provider_missing_title">No loyalty card provider installed</string>
-    <string name="loyalty_card_provider_missing_message">&lt;b&gt;&lt;i&gt;%1$s&lt;/i&gt;&lt;/b&gt; is required to display loyalty cards. Would you like to open their website to learn more about it?</string>
-    <string name="invalid_loyalty_card_exception">ERROR: Invalid Loyalty Card Id provided</string>
+    <string name="new_entity_name">New Entity Name</string>
+    <string name="new_location_name">New Location Name</string>
+    <string name="new_product_name">New Product Name</string>
+    <string name="copy_entity_title">Copy %1$s</string>
+    <string name="entity_copied">%1$s copied</string>
+    <string name="entity_name_required">Name cannot be empty</string>
 
 </resources>

@@ -30,7 +30,7 @@ interface AisleProductDao : BaseDao<AisleProductEntity> {
     suspend fun getAisleProduct(aisleProductId: Int): AisleProductRank?
 
     @Query("SELECT * FROM AisleProduct WHERE productId = :productId")
-    suspend fun getAisleProductsByProduct(productId: Int): List<AisleProductEntity>
+    suspend fun getAisleProductsByProduct(productId: Int): List<AisleProductRank>
 
     @Transaction
     @Query("SELECT * FROM AisleProduct")

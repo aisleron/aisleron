@@ -32,6 +32,7 @@ import androidx.test.espresso.ViewAction
 import androidx.test.espresso.ViewInteraction
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.longClick
+import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.RootMatchers.isDialog
 import androidx.test.espresso.matcher.ViewMatchers
@@ -51,6 +52,7 @@ import com.aisleron.di.useCaseModule
 import com.aisleron.di.viewModelTestModule
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationRepository
+import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.location.usecase.RemoveLocationUseCase
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import com.aisleron.ui.FabHandler
@@ -184,13 +186,9 @@ class ShopListFragmentTest : KoinTest {
     @Test
     fun onActionItemClicked_ActionItemIsDelete_DeleteDialogShown() = runTest {
         val deleteLocation = get<LocationRepository>().getAll().first { it.id != 1 }
-        val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
         var deleteConfirmMessage = ""
 
         getActivityScenario().onActivity {
-            navController.setGraph(R.navigation.mobile_navigation)
-            navController.setCurrentDestination(R.id.nav_all_shops)
-            Navigation.setViewNavController(activityFragment.requireView(), navController)
             deleteConfirmMessage =
                 activityFragment.getString(R.string.delete_confirmation, deleteLocation.name)
         }
@@ -215,7 +213,6 @@ class ShopListFragmentTest : KoinTest {
         onView(withText(R.string.delete)).perform(click())
         onView(withText(android.R.string.ok))
             .inRoot(isDialog())
-            .check(matches(isDisplayed()))
             .perform(click())
 
         val deletedLocation = locationRepository.get(deleteLocation.id)
@@ -234,7 +231,6 @@ class ShopListFragmentTest : KoinTest {
         onView(withText(R.string.delete)).perform(click())
         onView(withText(android.R.string.cancel))
             .inRoot(isDialog())
-            .check(matches(isDisplayed()))
             .perform(click())
 
         val deletedLocation = locationRepository.get(deleteLocation.id)
@@ -262,7 +258,6 @@ class ShopListFragmentTest : KoinTest {
         onView(withText(R.string.delete)).perform(click())
         onView(withText(android.R.string.ok))
             .inRoot(isDialog())
-            .check(matches(isDisplayed()))
             .perform(click())
 
         onView(withId(com.google.android.material.R.id.snackbar_text)).check(
@@ -309,6 +304,80 @@ class ShopListFragmentTest : KoinTest {
             val actionBar = onView(withId(com.google.android.material.R.id.action_context_bar))
             actionBar.checkVisibility(View.GONE)
         }
+    }
+
+    @Test
+    fun onActionItemClicked_ActionItemIsCopy_CopyDialogShown() = runTest {
+        val copyLocation = get<LocationRepository>().getAll().first { it.type == LocationType.SHOP }
+        var copyDialogTitle = ""
+
+        getActivityScenario().onActivity {
+            copyDialogTitle =
+                activityFragment.getString(R.string.copy_entity_title, copyLocation.name)
+        }
+
+        onView(withText(copyLocation.name)).perform(longClick())
+        openActionBarOverflowOrOptionsMenu(getInstrumentation().targetContext)
+        onView(withText(android.R.string.copy)).perform(click())
+
+        onView(withText(copyDialogTitle))
+            .inRoot(isDialog())
+            .check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun onActionItemClicked_CopyConfirmed_ConfirmSnackbarShown() = runTest {
+        val copyLocation = get<LocationRepository>().getAll().first { it.type == LocationType.SHOP }
+        var copyDialogTitle = ""
+        var confirmCopy = ""
+
+        getActivityScenario().onActivity {
+            confirmCopy = activityFragment.getString(R.string.entity_copied, copyLocation.name)
+            copyDialogTitle =
+                activityFragment.getString(R.string.copy_entity_title, copyLocation.name)
+        }
+
+        onView(withText(copyLocation.name)).perform(longClick())
+        openActionBarOverflowOrOptionsMenu(getInstrumentation().targetContext)
+        onView(withText(android.R.string.copy)).perform(click())
+
+        onView(withText(android.R.string.ok))
+            .inRoot(isDialog())
+            .perform(click())
+
+        onView(withText(copyDialogTitle))
+            .check(doesNotExist())
+
+        onView(withId(com.google.android.material.R.id.snackbar_text)).check(
+            matches(
+                allOf(
+                    ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE),
+                    withText(confirmCopy)
+                )
+            )
+        )
+    }
+
+    @Test
+    fun onActionItemClicked_CopyCancelled_DialogClosed() = runTest {
+        val copyLocation = get<LocationRepository>().getAll().first { it.type == LocationType.SHOP }
+        var copyDialogTitle = ""
+
+        getActivityScenario().onActivity {
+            copyDialogTitle =
+                activityFragment.getString(R.string.copy_entity_title, copyLocation.name)
+        }
+
+        onView(withText(copyLocation.name)).perform(longClick())
+        openActionBarOverflowOrOptionsMenu(getInstrumentation().targetContext)
+        onView(withText(android.R.string.copy)).perform(click())
+
+        onView(withText(android.R.string.cancel))
+            .inRoot(isDialog())
+            .perform(click())
+
+        onView(withText(copyDialogTitle))
+            .check(doesNotExist())
     }
 
     private fun ViewInteraction.checkVisibility(

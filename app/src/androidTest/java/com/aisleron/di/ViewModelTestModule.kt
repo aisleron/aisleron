@@ -19,6 +19,7 @@ package com.aisleron.di
 
 import com.aisleron.ui.about.AboutViewModel
 import com.aisleron.ui.aisle.AisleViewModel
+import com.aisleron.ui.copyentity.CopyEntityViewModel
 import com.aisleron.ui.product.ProductViewModel
 import com.aisleron.ui.settings.SettingsViewModel
 import com.aisleron.ui.shop.ShopViewModel
@@ -102,10 +103,20 @@ val viewModelTestModule = module {
         )
     }
 
-    factory<WelcomeViewModel> {
+    viewModel {
         WelcomeViewModel(
             createSampleDataUseCase = get(),
             getAllProductsUseCase = get(),
+            TestScope(UnconfinedTestDispatcher())
+        )
+    }
+
+    viewModel {
+        CopyEntityViewModel(
+            copyLocationUseCase = get(),
+            copyProductUseCase = get(),
+            getProductUseCase = get(),
+            getLocationUseCase = get(),
             TestScope(UnconfinedTestDispatcher())
         )
     }

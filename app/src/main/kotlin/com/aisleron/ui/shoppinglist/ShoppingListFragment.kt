@@ -53,6 +53,8 @@ import com.aisleron.ui.FabHandler
 import com.aisleron.ui.FabHandler.FabClickedCallBack
 import com.aisleron.ui.aisle.AisleDialog
 import com.aisleron.ui.bundles.Bundler
+import com.aisleron.ui.copyentity.CopyEntityDialogFragment
+import com.aisleron.ui.copyentity.CopyEntityType
 import com.aisleron.ui.loyaltycard.LoyaltyCardProvider
 import com.aisleron.ui.settings.ShoppingListPreferences
 import com.aisleron.ui.widgets.ErrorSnackBar
@@ -333,6 +335,29 @@ class ShoppingListFragment(
         dialog.show()
     }
 
+    private fun showCopyProductDialog(item: ShoppingListItem) {
+        val dialog = CopyEntityDialogFragment.newInstance(
+            type = CopyEntityType.Product(item.id),
+            title = getString(R.string.copy_entity_title, item.name),
+            defaultName = "${item.name} (${getString(android.R.string.copy)})",
+            nameHint = getString(R.string.new_product_name)
+        )
+
+        dialog.onCopySuccess = {
+            requireView().postDelayed({
+                Snackbar.make(
+                    requireView(),
+                    getString(R.string.entity_copied, item.name),
+                    Snackbar.LENGTH_SHORT
+                )
+                    .setAnchorView(fabHandler.getFabView(this.requireActivity()))
+                    .show()
+            }, 250)
+        }
+
+        dialog.show(childFragmentManager, "copyDialog")
+    }
+
     private fun editShoppingListItem(item: ShoppingListItem) {
         when (item) {
             is AisleShoppingListItem -> aisleDialog.showEditDialog(requireContext(), item)
@@ -364,6 +389,9 @@ class ShoppingListFragment(
         menu.findItem(R.id.mnu_add_product_to_aisle)
             .setVisible(actionModeItem?.itemType == ShoppingListItem.ItemType.AISLE)
 
+        menu.findItem(R.id.mnu_copy_shopping_list_item)
+            .setVisible(actionModeItem?.itemType == ShoppingListItem.ItemType.PRODUCT)
+
         return false // Return false if nothing is done
     }
 
@@ -382,6 +410,9 @@ class ShoppingListFragment(
                         shoppingListViewModel.defaultFilter, it.aisleId
                     )
                 }
+
+            R.id.mnu_copy_shopping_list_item ->
+                actionModeItem?.let { showCopyProductDialog(it) }
 
             else -> result = false // No action picked, so don't close the CAB.
         }
