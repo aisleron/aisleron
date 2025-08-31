@@ -2,7 +2,7 @@ Enhancements
 * Added a check to ensure aisle names are unique per list.
 * Resolve #41: Add and option in the shopping list menu to show or hide empty aisles.
 * Resolve #43: Ability to return to Welcome screen.
-
+* Resolve #40: Add the ability to copy a shop or product.
 
 Bug Fixes
 * Fix #44: Details entered on Add/Edit Product or Shop is cleared when switching apps.

@@ -84,8 +84,6 @@ class CopyEntityDialogFragment : DialogFragment() {
                     dialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled =
                         state != CopyEntityViewModel.CopyUiState.Loading
                     when (state) {
-                        CopyEntityViewModel.CopyUiState.Loading -> {}
-
                         is CopyEntityViewModel.CopyUiState.Error -> {
                             binding.edtEntityNameLayout.error = getString(
                                 AisleronExceptionMap().getErrorResourceId(state.errorCode),

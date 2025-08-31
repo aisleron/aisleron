@@ -415,7 +415,6 @@ class ShoppingListFragmentTest : KoinTest {
         onView(withText(R.string.delete)).perform(click())
         onView(withText(android.R.string.ok))
             .inRoot(isDialog())
-            .check(matches(isDisplayed()))
             .perform(click())
 
         val deletedProduct = get<ProductRepository>().getByName(product.name)
@@ -435,7 +434,6 @@ class ShoppingListFragmentTest : KoinTest {
         onView(withText(R.string.delete)).perform(click())
         onView(withText(android.R.string.ok))
             .inRoot(isDialog())
-            .check(matches(isDisplayed()))
             .perform(click())
 
         val deletedAisle = get<AisleRepository>().get(aisle.id)
@@ -458,7 +456,6 @@ class ShoppingListFragmentTest : KoinTest {
         onView(withText(R.string.delete)).perform(click())
         onView(withText(android.R.string.ok))
             .inRoot(isDialog())
-            .check(matches(isDisplayed()))
             .perform(click())
 
         onView(withId(com.google.android.material.R.id.snackbar_text)).check(
@@ -492,7 +489,6 @@ class ShoppingListFragmentTest : KoinTest {
         onView(withText(R.string.delete)).perform(click())
         onView(withText(android.R.string.cancel))
             .inRoot(isDialog())
-            .check(matches(isDisplayed()))
             .perform(click())
 
         val deletedAisle = get<AisleRepository>().get(aisle.id)
@@ -968,7 +964,6 @@ class ShoppingListFragmentTest : KoinTest {
 
         onView(withText(android.R.string.cancel))
             .inRoot(isDialog())
-            .check(matches(isDisplayed()))
             .perform(click())
 
         val reorderedAisle = aisleRepository.get(aisleId)
@@ -1002,7 +997,6 @@ class ShoppingListFragmentTest : KoinTest {
 
         onView(withText(android.R.string.ok))
             .inRoot(isDialog())
-            .check(matches(isDisplayed()))
             .perform(click())
 
         val reorderedAisle = aisleRepository.get(aisleId)
@@ -1138,6 +1132,106 @@ class ShoppingListFragmentTest : KoinTest {
             shoppingListPreferencesTestImpl.showEmptyAisles(getInstrumentation().targetContext)
 
         assertNotEquals(valueBefore, valueAfter)
+    }
+
+    @Test
+    fun onActionItemClicked_ActionItemIsCopy_CopyDialogShown() = runTest {
+        val shoppingList = getShoppingList()
+        val product = getProduct(shoppingList, false)
+        val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
+        val scenario = getActivityScenario(bundle)
+        var copyDialogTitle = ""
+
+        scenario.onActivity {
+            copyDialogTitle =
+                activityFragment.getString(R.string.copy_entity_title, product.name)
+        }
+
+        val productItem = onView(allOf(withText(product.name), withId(R.id.txt_product_name)))
+        productItem.perform(longClick())
+        openActionBarOverflowOrOptionsMenu(getInstrumentation().targetContext)
+        onView(withText(android.R.string.copy)).perform(click())
+
+        onView(withText(copyDialogTitle))
+            .inRoot(isDialog())
+            .check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun onActionItemClicked_CopyConfirmed_ConfirmSnackbarShown() = runTest {
+        val shoppingList = getShoppingList()
+        val product = getProduct(shoppingList, false)
+        val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
+        val scenario = getActivityScenario(bundle)
+        var copyDialogTitle = ""
+        var confirmCopy = ""
+
+        scenario.onActivity {
+            confirmCopy = activityFragment.getString(R.string.entity_copied, product.name)
+            copyDialogTitle =
+                activityFragment.getString(R.string.copy_entity_title, product.name)
+        }
+
+        onView(withText(product.name)).perform(longClick())
+        openActionBarOverflowOrOptionsMenu(getInstrumentation().targetContext)
+        onView(withText(android.R.string.copy)).perform(click())
+
+        onView(withText(android.R.string.ok))
+            .inRoot(isDialog())
+            .perform(click())
+
+        onView(withText(copyDialogTitle))
+            .check(doesNotExist())
+
+        onView(withId(com.google.android.material.R.id.snackbar_text)).check(
+            matches(
+                allOf(
+                    ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE),
+                    withText(confirmCopy)
+                )
+            )
+        )
+    }
+
+    @Test
+    fun onActionItemClicked_CopyCancelled_DialogClosed() = runTest {
+        val shoppingList = getShoppingList()
+        val product = getProduct(shoppingList, false)
+        val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
+        val scenario = getActivityScenario(bundle)
+        var copyDialogTitle = ""
+
+        scenario.onActivity {
+            copyDialogTitle =
+                activityFragment.getString(R.string.copy_entity_title, product.name)
+        }
+
+        onView(withText(product.name)).perform(longClick())
+        openActionBarOverflowOrOptionsMenu(getInstrumentation().targetContext)
+        onView(withText(android.R.string.copy)).perform(click())
+
+        onView(withText(android.R.string.cancel))
+            .inRoot(isDialog())
+            .perform(click())
+
+        onView(withText(copyDialogTitle))
+            .check(doesNotExist())
+    }
+
+    @Test
+    fun onLongClick_IsAisle_CopyDoesNotShow() = runTest {
+        val shoppingList = getShoppingList()
+        val aisle = getAisle(shoppingList, isDefault = false, productsInStock = false)
+        val shoppingListBundle =
+            bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
+
+        getActivityScenario(shoppingListBundle)
+
+        val aisleItem = onView(allOf(withText(aisle.name), withId(R.id.txt_aisle_name)))
+        aisleItem.perform(longClick())
+
+        openActionBarOverflowOrOptionsMenu(getInstrumentation().targetContext)
+        onView(withText(android.R.string.copy)).check(doesNotExist())
     }
 
     /*@Test
