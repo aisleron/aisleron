@@ -23,7 +23,7 @@
     android:name="com.aisleron.ui.ShopListFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="16dp"
+    android:layout_margin="@dimen/text_margin"
     app:layoutManager="LinearLayoutManager"
     tools:context=".ui.shoplist.ShopListFragment"
     tools:listitem="@layout/fragment_shop_list_item"

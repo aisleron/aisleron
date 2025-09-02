@@ -94,7 +94,7 @@ class ShopListFragment(private val fabHandler: FabHandler) : Fragment(), ActionM
 
         // Set the adapter
         if (view is RecyclerView) {
-            setWindowInsetListeners(this, view, true, null)
+            setWindowInsetListeners(this, view, true, R.dimen.text_margin)
             viewLifecycleOwner.lifecycleScope.launch {
                 viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                     shopListViewModel.shopListUiState.collect {

@@ -1,10 +1,10 @@
-Enhancements
-* Added a check to ensure aisle names are unique per list.
-* Resolve #41: Add and option in the shopping list menu to show or hide empty aisles.
-* Resolve #43: Ability to return to Welcome screen.
-* Resolve #40: Add the ability to copy a shop or product.
+Enhancements:
+* New: Copy a shop or product
+* Option to show or hide empty aisles
+* Return to Welcome screen during first run
+* Aisle names are now unique per list
 
-Bug Fixes
-* Fix #44: Details entered on Add/Edit Product or Shop is cleared when switching apps.
-* Fix #42: When restoring database Shops don't appear in Drawer.
-* Fix #46: Scrolling issues when dragging product to aisle at the top of the screen.
+Bug Fixes:
+* Product/shop details no longer clear when switching apps
+* Fixed missing pinned shops after database restore
+* Fixed scrolling when dragging products
