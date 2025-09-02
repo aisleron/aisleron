@@ -76,7 +76,7 @@ class WelcomeFragment(
         initializeFab()
 
         val binding = FragmentWelcomeBinding.inflate(inflater, container, false)
-        setWindowInsetListeners(this, binding.root, true, null)
+        setWindowInsetListeners(this, binding.root, false, null)
 
         with(binding.txtWelcomeLoadSampleItems) {
             text =
