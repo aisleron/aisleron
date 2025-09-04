@@ -174,5 +174,6 @@
     <string name="copy_entity_title">Copy %1$s</string>
     <string name="entity_copied">%1$s copied</string>
     <string name="entity_name_required">Name cannot be empty</string>
+    <string name="stock_method">Stock method</string>
 
 </resources>

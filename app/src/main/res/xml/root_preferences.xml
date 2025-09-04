@@ -38,6 +38,13 @@
         <SwitchPreferenceCompat
             app:key="show_empty_aisles"
             app:title="@string/show_empty_aisles" />
+        <ListPreference
+            android:defaultValue="checkbox"
+            android:entries="@array/stock_method_names"
+            android:entryValues="@array/stock_method_values"
+            android:key="stock_method"
+            android:title="@string/stock_method"
+            app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/backup_restore_title">

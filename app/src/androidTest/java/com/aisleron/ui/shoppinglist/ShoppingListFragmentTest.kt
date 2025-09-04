@@ -82,6 +82,7 @@ import com.aisleron.ui.bundles.AddEditProductBundle
 import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.loyaltycard.LoyaltyCardProvider
 import com.aisleron.ui.loyaltycard.LoyaltyCardProviderTestImpl
+import com.aisleron.ui.settings.ShoppingListPreferences
 import com.aisleron.ui.settings.ShoppingListPreferencesTestImpl
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -530,12 +531,7 @@ class ShoppingListFragmentTest : KoinTest {
 
         getFragmentScenario(shoppingListBundle)
 
-        onView(
-            allOf(
-                withId(R.id.chk_in_stock),
-                hasSibling(allOf(withText(product.name), withId(R.id.txt_product_name)))
-            )
-        ).perform(click())
+        getCheckboxForProduct(product).perform(click())
 
         val updatedProduct = get<ProductRepository>().get(product.id)
         assertEquals(!product.inStock, updatedProduct?.inStock)
@@ -550,12 +546,7 @@ class ShoppingListFragmentTest : KoinTest {
 
         getFragmentScenario(shoppingListBundle)
 
-        onView(
-            allOf(
-                withId(R.id.chk_in_stock),
-                hasSibling(allOf(withText(product.name), withId(R.id.txt_product_name)))
-            )
-        ).perform(click())
+        getCheckboxForProduct(product).perform(click())
 
         val updatedProduct = get<ProductRepository>().get(product.id)
         assertEquals(!product.inStock, updatedProduct?.inStock)
@@ -669,12 +660,7 @@ class ShoppingListFragmentTest : KoinTest {
 
         getFragmentScenario(shoppingListBundle, shoppingListPreferencesTestImpl)
 
-        onView(
-            allOf(
-                withId(R.id.chk_in_stock),
-                hasSibling(allOf(withText(product.name), withId(R.id.txt_product_name)))
-            )
-        ).perform(click())
+        getCheckboxForProduct(product).perform(click())
 
         onView(withId(com.google.android.material.R.id.snackbar_text)).check(
             matches(
@@ -697,12 +683,7 @@ class ShoppingListFragmentTest : KoinTest {
 
         getFragmentScenario(shoppingListBundle, shoppingListPreferencesTestImpl)
 
-        onView(
-            allOf(
-                withId(R.id.chk_in_stock),
-                hasSibling(allOf(withText(product.name), withId(R.id.txt_product_name)))
-            )
-        ).perform(click())
+        getCheckboxForProduct(product).perform(click())
 
         onView(withId(com.google.android.material.R.id.snackbar_text)).check(doesNotExist())
     }
@@ -721,12 +702,7 @@ class ShoppingListFragmentTest : KoinTest {
 
         getFragmentScenario(shoppingListBundle, shoppingListPreferencesTestImpl)
 
-        onView(
-            allOf(
-                withId(R.id.chk_in_stock),
-                hasSibling(allOf(withText(product.name), withId(R.id.txt_product_name)))
-            )
-        ).perform(click())
+        getCheckboxForProduct(product).perform(click())
 
         val productRepository = get<ProductRepository>()
         val productStatusAfterChange = productRepository.get(product.id)?.inStock
@@ -1233,6 +1209,74 @@ class ShoppingListFragmentTest : KoinTest {
         openActionBarOverflowOrOptionsMenu(getInstrumentation().targetContext)
         onView(withText(android.R.string.copy)).check(doesNotExist())
     }
+
+    private suspend fun onCreateView_StockMethod_ArrangeAct(stockMethod: ShoppingListPreferences.StockMethod): Product {
+        val shoppingListPrefs = ShoppingListPreferencesTestImpl()
+        shoppingListPrefs.setStockMethod(stockMethod)
+        val shoppingList = getShoppingList()
+        val shoppingListBundle =
+            bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
+
+        getFragmentScenario(shoppingListBundle, shoppingListPrefs)
+
+        return getProduct(shoppingList, false)
+    }
+
+    @Test
+    fun onCreateView_StockMethodIsCheckbox_OnlyCheckBoxShown() = runTest {
+        val product =
+            onCreateView_StockMethod_ArrangeAct(ShoppingListPreferences.StockMethod.CHECKBOX)
+
+        val checkbox = getCheckboxForProduct(product)
+
+        checkbox.check(matches(isDisplayed()))
+        //TODO: Check Qty is not displayed
+    }
+
+    @Test
+    fun onCreateView_StockMethodIsNone_NothingShown() = runTest {
+        val product =
+            onCreateView_StockMethod_ArrangeAct(ShoppingListPreferences.StockMethod.NONE)
+
+        getCheckboxForProduct(product).check(matches(not(isDisplayed())))
+        //TODO: Check Qty is not displayed
+    }
+
+    @Test
+    fun onCreateView_StockMethodIsQuantities_QuantityShown() = runTest {
+        val product =
+            onCreateView_StockMethod_ArrangeAct(ShoppingListPreferences.StockMethod.QUANTITIES)
+
+        getCheckboxForProduct(product).check(matches(not(isDisplayed())))
+        //TODO: Check Qty is displayed
+    }
+
+    @Test
+    fun onCreateView_StockMethodIsCheckboxQuantities_CheckboxAndQuantityShown() = runTest {
+        val product =
+            onCreateView_StockMethod_ArrangeAct(ShoppingListPreferences.StockMethod.CHECKBOX_QUANTITIES)
+
+        getCheckboxForProduct(product).check(matches(isDisplayed()))
+        //TODO: Check Qty is displayed
+    }
+
+    private fun getCheckboxForProduct(product: Product): ViewInteraction =
+        onView(
+            allOf(
+                withId(R.id.chk_in_stock),
+                hasSibling(allOf(withText(product.name), withId(R.id.txt_product_name)))
+            )
+        )
+
+
+    /**
+     * enum class StockMethod {
+     *              CHECKBOX,
+     *         QUANTITIES,
+     *         CHECKBOX_QUANTITIES,
+     *              NONE
+     *     }
+     */
 
     /*@Test
     fun onDrag_IsProduct_ProductRankUpdated() {

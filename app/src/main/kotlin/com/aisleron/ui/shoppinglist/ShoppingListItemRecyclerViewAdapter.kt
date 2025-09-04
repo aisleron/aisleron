@@ -29,6 +29,7 @@ import android.view.ViewConfiguration
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -37,6 +38,7 @@ import com.aisleron.R
 import com.aisleron.databinding.FragmentAisleListItemBinding
 import com.aisleron.databinding.FragmentEmptyListItemBinding
 import com.aisleron.databinding.FragmentProductListItemBinding
+import com.aisleron.ui.settings.ShoppingListPreferences
 import java.util.Collections
 
 /**
@@ -44,7 +46,8 @@ import java.util.Collections
  *
  */
 class ShoppingListItemRecyclerViewAdapter(
-    private val listener: ShoppingListItemListener
+    private val listener: ShoppingListItemListener,
+    private val stockMethod: ShoppingListPreferences.StockMethod
 ) : ListAdapter<ShoppingListItem, ViewHolder>(ShoppingListItemDiffCallback()),
     ShoppingListItemMoveCallbackListener.Listener {
 
@@ -212,6 +215,10 @@ class ShoppingListItemRecyclerViewAdapter(
         fun bind(item: ProductShoppingListItem) {
             contentView.text = item.name
             inStockView.isChecked = item.inStock
+            inStockView.isVisible = stockMethod in setOf(
+                ShoppingListPreferences.StockMethod.CHECKBOX,
+                ShoppingListPreferences.StockMethod.CHECKBOX_QUANTITIES
+            )
 
             inStockView.setOnClickListener { _ ->
                 listener.onProductStatusChange(item, inStockView.isChecked)

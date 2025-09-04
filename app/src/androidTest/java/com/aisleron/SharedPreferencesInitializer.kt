@@ -29,6 +29,13 @@ class SharedPreferencesInitializer {
         DARK_THEME("dark_theme"),
     }
 
+    enum class StockMethod(val value: String) {
+        CHECKBOX("checkbox"),
+        QUANTITIES("quantities"),
+        CHECKBOX_QUANTITIES("checkbox_quantities"),
+        NONE("none")
+    }
+
     private fun getPreferencesEditor(): SharedPreferences.Editor {
         val targetContext = getInstrumentation().targetContext
         return PreferenceManager.getDefaultSharedPreferences(targetContext).edit()
@@ -70,10 +77,20 @@ class SharedPreferencesInitializer {
         preferencesEditor.commit()
     }
 
+    fun setStockMethod(stockMethod: StockMethod) {
+        val preferencesEditor = getPreferencesEditor()
+
+        preferencesEditor.clear()
+        preferencesEditor.putString(PREF_STOCK_METHOD, stockMethod.value)
+        preferencesEditor.commit()
+
+    }
+
     companion object {
         private const val IS_INITIALIZED = "is_initialised"
         private const val APPLICATION_THEME = "application_theme"
         private const val PREF_HIDE_STATUS_CHANGE_SNACK_BAR = "hide_status_change_snack_bar"
         private const val PREF_SHOW_EMPTY_AISLES = "show_empty_aisles"
+        private const val PREF_STOCK_METHOD = "stock_method"
     }
 }

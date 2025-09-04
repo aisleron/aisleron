@@ -27,4 +27,22 @@
         <item>light_theme</item>
         <item>dark_theme</item>
     </array>
+
+    <array name="stock_method_names">
+        <item>@string/stock_method_checkbox</item>
+        <item>@string/stock_method_quantities</item>
+        <item>@string/stock_method_checkbox_quantities</item>
+        <item>@string/stock_method_none</item>
+    </array>
+
+    <array name="stock_method_values">
+        <item>checkbox</item>
+        <item>quantities</item>
+        <item>checkbox_quantities</item>
+        <item>none</item>
+    </array>
+    <string name="stock_method_checkbox">Checkbox</string>
+    <string name="stock_method_quantities">Quantities</string>
+    <string name="stock_method_checkbox_quantities">Checkbox and Quantities</string>
+    <string name="stock_method_none">None (swipe only)</string>
 </resources>

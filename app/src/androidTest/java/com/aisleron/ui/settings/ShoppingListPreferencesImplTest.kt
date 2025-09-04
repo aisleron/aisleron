@@ -21,6 +21,7 @@ import androidx.preference.PreferenceManager
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.aisleron.SharedPreferencesInitializer
 import org.junit.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -57,7 +58,7 @@ class ShoppingListPreferencesImplTest {
     fun getShowEmptyAisles_isNotShown_ReturnFalse() {
         SharedPreferencesInitializer().setShowEmptyAisles(false)
         val showEmptyAisles =
-            ShoppingListPreferencesImpl().isStatusChangeSnackBarHidden(getInstrumentation().targetContext)
+            ShoppingListPreferencesImpl().showEmptyAisles(getInstrumentation().targetContext)
 
         assertFalse(showEmptyAisles)
     }
@@ -86,5 +87,40 @@ class ShoppingListPreferencesImplTest {
         val showEmptyAisles = setShowEmptyAisles_ArrangeAct(false)
 
         assertFalse(showEmptyAisles)
+    }
+
+    private fun getStockMethod_ArrangeAct(stockMethod: SharedPreferencesInitializer.StockMethod): ShoppingListPreferences.StockMethod {
+        SharedPreferencesInitializer().setStockMethod(stockMethod)
+        return ShoppingListPreferencesImpl().stockMethod(getInstrumentation().targetContext)
+    }
+
+    @Test
+    fun getStockMethod_isCheckbox_ReturnCheckbox() {
+        val stockMethod =
+            getStockMethod_ArrangeAct(SharedPreferencesInitializer.StockMethod.CHECKBOX)
+
+        assertEquals(ShoppingListPreferences.StockMethod.CHECKBOX, stockMethod)
+    }
+
+    @Test
+    fun getStockMethod_isQuantities_ReturnQuantities() {
+        val stockMethod =
+            getStockMethod_ArrangeAct(SharedPreferencesInitializer.StockMethod.QUANTITIES)
+
+        assertEquals(ShoppingListPreferences.StockMethod.QUANTITIES, stockMethod)
+    }
+
+    @Test
+    fun getStockMethod_isCheckboxAndQuantities_ReturnCheckboxAndQuantities() {
+        val stockMethod =
+            getStockMethod_ArrangeAct(SharedPreferencesInitializer.StockMethod.CHECKBOX_QUANTITIES)
+
+        assertEquals(ShoppingListPreferences.StockMethod.CHECKBOX_QUANTITIES, stockMethod)
+    }
+
+    @Test
+    fun getStockMethod_isNone_ReturnNone() {
+        val stockMethod = getStockMethod_ArrangeAct(SharedPreferencesInitializer.StockMethod.NONE)
+        assertEquals(ShoppingListPreferences.StockMethod.NONE, stockMethod)
     }
 }
