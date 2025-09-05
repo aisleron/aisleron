@@ -209,7 +209,7 @@ class ShoppingListFragment(
                         override fun onMove(item: ShoppingListItem) {}
                     },
 
-                    shoppingListPreferences.stockMethod(requireContext())
+                    shoppingListPreferences.trackingMode(requireContext())
                 )
 
                 val callback: ItemTouchHelper.Callback = ShoppingListItemMoveCallbackListener(

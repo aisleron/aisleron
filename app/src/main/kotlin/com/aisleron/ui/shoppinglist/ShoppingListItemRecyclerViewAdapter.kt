@@ -21,6 +21,7 @@ import android.annotation.SuppressLint
 import android.graphics.Typeface
 import android.os.Handler
 import android.os.Looper
+import android.text.InputFilter
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -28,8 +29,12 @@ import android.view.View.OnTouchListener
 import android.view.ViewConfiguration
 import android.view.ViewGroup
 import android.widget.CheckBox
+import android.widget.EditText
+import android.widget.ImageButton
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.isVisible
+import androidx.core.view.updatePaddingRelative
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -47,7 +52,7 @@ import java.util.Collections
  */
 class ShoppingListItemRecyclerViewAdapter(
     private val listener: ShoppingListItemListener,
-    private val stockMethod: ShoppingListPreferences.StockMethod
+    private val trackingMode: ShoppingListPreferences.TrackingMode
 ) : ListAdapter<ShoppingListItem, ViewHolder>(ShoppingListItemDiffCallback()),
     ShoppingListItemMoveCallbackListener.Listener {
 
@@ -211,13 +216,17 @@ class ShoppingListItemRecyclerViewAdapter(
         ViewHolder(binding.root) {
         private val contentView: TextView = binding.txtProductName
         private val inStockView: CheckBox = binding.chkInStock
+        private val qtySelector: LinearLayout = binding.stpQtySelector
+        private val decQtyButton: ImageButton = binding.btnQtyDec
+        private val incQtyButton: ImageButton = binding.btnQtyInc
+        private val qtyEdit: EditText = binding.edtQty
 
         fun bind(item: ProductShoppingListItem) {
             contentView.text = item.name
             inStockView.isChecked = item.inStock
-            inStockView.isVisible = stockMethod in setOf(
-                ShoppingListPreferences.StockMethod.CHECKBOX,
-                ShoppingListPreferences.StockMethod.CHECKBOX_QUANTITIES
+            inStockView.isVisible = trackingMode in setOf(
+                ShoppingListPreferences.TrackingMode.CHECKBOX,
+                ShoppingListPreferences.TrackingMode.CHECKBOX_QUANTITY
             )
 
             inStockView.setOnClickListener { _ ->
@@ -225,6 +234,39 @@ class ShoppingListItemRecyclerViewAdapter(
             }
 
             inStockView.setOnLongClickListener { _ -> itemView.performLongClick() }
+
+            qtySelector.isVisible = trackingMode in setOf(
+                ShoppingListPreferences.TrackingMode.QUANTITY,
+                ShoppingListPreferences.TrackingMode.CHECKBOX_QUANTITY
+            )
+
+            if (trackingMode == ShoppingListPreferences.TrackingMode.QUANTITY) {
+                qtySelector.updatePaddingRelative(
+                    end = qtySelector.context.resources.getDimensionPixelSize(R.dimen.text_margin)
+                )
+            }
+
+            //TODO: Set Qty from data class
+            qtyEdit.setText("0")
+
+            decQtyButton.setOnClickListener {
+                val current = qtyEdit.text.toString().toIntOrNull() ?: 0
+                if (current > 0) {
+                    qtyEdit.setText((current - 1).toString())
+                }
+            }
+
+            incQtyButton.setOnClickListener {
+                val maxLength = qtyEdit.filters
+                    .filterIsInstance<InputFilter.LengthFilter>()
+                    .firstOrNull()
+                    ?.max ?: Int.MAX_VALUE
+
+                val current = ((qtyEdit.text.toString().toIntOrNull() ?: 0) + 1).toString()
+                if (current.length <= maxLength) {
+                    qtyEdit.setText(current)
+                }
+            }
         }
     }
 

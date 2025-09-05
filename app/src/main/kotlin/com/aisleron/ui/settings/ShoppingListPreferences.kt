@@ -23,12 +23,12 @@ interface ShoppingListPreferences {
     fun isStatusChangeSnackBarHidden(context: Context): Boolean
     fun showEmptyAisles(context: Context): Boolean
     fun setShowEmptyAisles(context: Context, value: Boolean)
-    fun stockMethod(context: Context): StockMethod
+    fun trackingMode(context: Context): TrackingMode
 
-    enum class StockMethod {
+    enum class TrackingMode {
         CHECKBOX,
-        QUANTITIES,
-        CHECKBOX_QUANTITIES,
+        QUANTITY,
+        CHECKBOX_QUANTITY,
         NONE
     }
 }

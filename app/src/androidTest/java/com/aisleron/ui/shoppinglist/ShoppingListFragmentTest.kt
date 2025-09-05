@@ -1210,9 +1210,9 @@ class ShoppingListFragmentTest : KoinTest {
         onView(withText(android.R.string.copy)).check(doesNotExist())
     }
 
-    private suspend fun onCreateView_StockMethod_ArrangeAct(stockMethod: ShoppingListPreferences.StockMethod): Product {
+    private suspend fun onCreateView_TrackingMode_ArrangeAct(trackingMode: ShoppingListPreferences.TrackingMode): Product {
         val shoppingListPrefs = ShoppingListPreferencesTestImpl()
-        shoppingListPrefs.setStockMethod(stockMethod)
+        shoppingListPrefs.setTrackingMode(trackingMode)
         val shoppingList = getShoppingList()
         val shoppingListBundle =
             bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
@@ -1223,41 +1223,39 @@ class ShoppingListFragmentTest : KoinTest {
     }
 
     @Test
-    fun onCreateView_StockMethodIsCheckbox_OnlyCheckBoxShown() = runTest {
+    fun onCreateView_TrackingModeIsCheckbox_OnlyCheckBoxShown() = runTest {
         val product =
-            onCreateView_StockMethod_ArrangeAct(ShoppingListPreferences.StockMethod.CHECKBOX)
-
-        val checkbox = getCheckboxForProduct(product)
-
-        checkbox.check(matches(isDisplayed()))
-        //TODO: Check Qty is not displayed
-    }
-
-    @Test
-    fun onCreateView_StockMethodIsNone_NothingShown() = runTest {
-        val product =
-            onCreateView_StockMethod_ArrangeAct(ShoppingListPreferences.StockMethod.NONE)
-
-        getCheckboxForProduct(product).check(matches(not(isDisplayed())))
-        //TODO: Check Qty is not displayed
-    }
-
-    @Test
-    fun onCreateView_StockMethodIsQuantities_QuantityShown() = runTest {
-        val product =
-            onCreateView_StockMethod_ArrangeAct(ShoppingListPreferences.StockMethod.QUANTITIES)
-
-        getCheckboxForProduct(product).check(matches(not(isDisplayed())))
-        //TODO: Check Qty is displayed
-    }
-
-    @Test
-    fun onCreateView_StockMethodIsCheckboxQuantities_CheckboxAndQuantityShown() = runTest {
-        val product =
-            onCreateView_StockMethod_ArrangeAct(ShoppingListPreferences.StockMethod.CHECKBOX_QUANTITIES)
+            onCreateView_TrackingMode_ArrangeAct(ShoppingListPreferences.TrackingMode.CHECKBOX)
 
         getCheckboxForProduct(product).check(matches(isDisplayed()))
-        //TODO: Check Qty is displayed
+        getQtyStepperForProduct(product).check(matches(not(isDisplayed())))
+    }
+
+    @Test
+    fun onCreateView_TrackingModeIsNone_NothingShown() = runTest {
+        val product =
+            onCreateView_TrackingMode_ArrangeAct(ShoppingListPreferences.TrackingMode.NONE)
+
+        getCheckboxForProduct(product).check(matches(not(isDisplayed())))
+        getQtyStepperForProduct(product).check(matches(not(isDisplayed())))
+    }
+
+    @Test
+    fun onCreateView_TrackingModeIsQuantity_QuantityShown() = runTest {
+        val product =
+            onCreateView_TrackingMode_ArrangeAct(ShoppingListPreferences.TrackingMode.QUANTITY)
+
+        getCheckboxForProduct(product).check(matches(not(isDisplayed())))
+        getQtyStepperForProduct(product).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun onCreateView_TrackingModeIsCheckboxQuantity_CheckboxAndQuantityShown() = runTest {
+        val product =
+            onCreateView_TrackingMode_ArrangeAct(ShoppingListPreferences.TrackingMode.CHECKBOX_QUANTITY)
+
+        getCheckboxForProduct(product).check(matches(isDisplayed()))
+        getQtyStepperForProduct(product).check(matches(isDisplayed()))
     }
 
     private fun getCheckboxForProduct(product: Product): ViewInteraction =
@@ -1268,15 +1266,13 @@ class ShoppingListFragmentTest : KoinTest {
             )
         )
 
-
-    /**
-     * enum class StockMethod {
-     *              CHECKBOX,
-     *         QUANTITIES,
-     *         CHECKBOX_QUANTITIES,
-     *              NONE
-     *     }
-     */
+    private fun getQtyStepperForProduct(product: Product): ViewInteraction =
+        onView(
+            allOf(
+                withId(R.id.stp_qty_selector),
+                hasSibling(allOf(withText(product.name), withId(R.id.txt_product_name)))
+            )
+        )
 
     /*@Test
     fun onDrag_IsProduct_ProductRankUpdated() {

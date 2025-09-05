@@ -39,26 +39,26 @@ class ShoppingListPreferencesImpl : ShoppingListPreferences {
             }
     }
 
-    override fun stockMethod(context: Context): ShoppingListPreferences.StockMethod {
+    override fun trackingMode(context: Context): ShoppingListPreferences.TrackingMode {
         val method = PreferenceManager.getDefaultSharedPreferences(context)
-            .getString(PREF_STOCK_METHOD, CHECKBOX)
+            .getString(PREF_TRACKING_MODE, CHECKBOX)
 
         return when (method) {
-            QUANTITIES -> ShoppingListPreferences.StockMethod.QUANTITIES
-            CHECKBOX_QUANTITIES -> ShoppingListPreferences.StockMethod.CHECKBOX_QUANTITIES
-            NONE -> ShoppingListPreferences.StockMethod.NONE
-            else -> ShoppingListPreferences.StockMethod.CHECKBOX
+            QUANTITY -> ShoppingListPreferences.TrackingMode.QUANTITY
+            CHECKBOX_QUANTITY -> ShoppingListPreferences.TrackingMode.CHECKBOX_QUANTITY
+            NONE -> ShoppingListPreferences.TrackingMode.NONE
+            else -> ShoppingListPreferences.TrackingMode.CHECKBOX
         }
     }
 
     companion object {
         const val PREF_HIDE_STATUS_CHANGE_SNACK_BAR = "hide_status_change_snack_bar"
         const val PREF_SHOW_EMPTY_AISLES = "show_empty_aisles"
-        const val PREF_STOCK_METHOD = "stock_method"
+        const val PREF_TRACKING_MODE = "tracking_mode"
 
         const val CHECKBOX = "checkbox"
-        const val QUANTITIES = "quantities"
-        const val CHECKBOX_QUANTITIES = "checkbox_quantities"
+        const val QUANTITY = "quantity"
+        const val CHECKBOX_QUANTITY = "checkbox_quantity"
         const val NONE = "none"
     }
 }

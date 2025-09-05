@@ -28,21 +28,17 @@
         <item>dark_theme</item>
     </array>
 
-    <array name="stock_method_names">
-        <item>@string/stock_method_checkbox</item>
-        <item>@string/stock_method_quantities</item>
-        <item>@string/stock_method_checkbox_quantities</item>
-        <item>@string/stock_method_none</item>
+    <array name="tracking_method_names">
+        <item>@string/tracking_checkbox</item>
+        <item>@string/tracking_quantity</item>
+        <item>@string/tracking_checkbox_quantity</item>
+        <item>@string/tracking_none</item>
     </array>
 
-    <array name="stock_method_values">
+    <array name="tracking_method_values">
         <item>checkbox</item>
-        <item>quantities</item>
-        <item>checkbox_quantities</item>
+        <item>quantity</item>
+        <item>checkbox_quantity</item>
         <item>none</item>
     </array>
-    <string name="stock_method_checkbox">Checkbox</string>
-    <string name="stock_method_quantities">Quantities</string>
-    <string name="stock_method_checkbox_quantities">Checkbox and Quantities</string>
-    <string name="stock_method_none">None (swipe only)</string>
 </resources>

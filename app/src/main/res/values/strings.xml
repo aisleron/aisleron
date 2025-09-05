@@ -127,6 +127,13 @@
     <string name="loyalty_card_provider_missing_message">&lt;b&gt;&lt;i&gt;%1$s&lt;/i&gt;&lt;/b&gt; is required to display loyalty cards. Would you like to open their website to learn more about it?</string>
     <string name="invalid_loyalty_card_exception">ERROR: Invalid Loyalty Card Id provided</string>
 
+    <!-- Tracking method   -->
+    <string name="tracking_mode">Tracking mode</string>
+    <string name="tracking_checkbox">Checkbox</string>
+    <string name="tracking_quantity">Quantity</string>
+    <string name="tracking_checkbox_quantity">Checkbox and Quantity</string>
+    <string name="tracking_none">None (swipe only)</string>
+
     <!-- Misc -->
     <string name="aisle">Aisle</string>
     <string name="product">Product</string>
@@ -174,6 +181,8 @@
     <string name="copy_entity_title">Copy %1$s</string>
     <string name="entity_copied">%1$s copied</string>
     <string name="entity_name_required">Name cannot be empty</string>
-    <string name="stock_method">Stock method</string>
+    <string name="decrement">Decrement</string>
+    <string name="increment">Increment</string>
+    <string name="qty">Qty</string>
 
 </resources>

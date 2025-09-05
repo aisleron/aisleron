@@ -89,38 +89,38 @@ class ShoppingListPreferencesImplTest {
         assertFalse(showEmptyAisles)
     }
 
-    private fun getStockMethod_ArrangeAct(stockMethod: SharedPreferencesInitializer.StockMethod): ShoppingListPreferences.StockMethod {
-        SharedPreferencesInitializer().setStockMethod(stockMethod)
-        return ShoppingListPreferencesImpl().stockMethod(getInstrumentation().targetContext)
+    private fun getTrackingMode_ArrangeAct(trackingMode: SharedPreferencesInitializer.TrackingMode): ShoppingListPreferences.TrackingMode {
+        SharedPreferencesInitializer().setTrackingMode(trackingMode)
+        return ShoppingListPreferencesImpl().trackingMode(getInstrumentation().targetContext)
     }
 
     @Test
-    fun getStockMethod_isCheckbox_ReturnCheckbox() {
-        val stockMethod =
-            getStockMethod_ArrangeAct(SharedPreferencesInitializer.StockMethod.CHECKBOX)
+    fun getTrackingMode_isCheckbox_ReturnCheckbox() {
+        val trackingMode =
+            getTrackingMode_ArrangeAct(SharedPreferencesInitializer.TrackingMode.CHECKBOX)
 
-        assertEquals(ShoppingListPreferences.StockMethod.CHECKBOX, stockMethod)
+        assertEquals(ShoppingListPreferences.TrackingMode.CHECKBOX, trackingMode)
     }
 
     @Test
-    fun getStockMethod_isQuantities_ReturnQuantities() {
-        val stockMethod =
-            getStockMethod_ArrangeAct(SharedPreferencesInitializer.StockMethod.QUANTITIES)
+    fun getTrackingMode_isQuantity_ReturnQuantity() {
+        val trackingMode =
+            getTrackingMode_ArrangeAct(SharedPreferencesInitializer.TrackingMode.QUANTITY)
 
-        assertEquals(ShoppingListPreferences.StockMethod.QUANTITIES, stockMethod)
+        assertEquals(ShoppingListPreferences.TrackingMode.QUANTITY, trackingMode)
     }
 
     @Test
-    fun getStockMethod_isCheckboxAndQuantities_ReturnCheckboxAndQuantities() {
-        val stockMethod =
-            getStockMethod_ArrangeAct(SharedPreferencesInitializer.StockMethod.CHECKBOX_QUANTITIES)
+    fun getTrackingMode_isCheckboxAndQuantity_ReturnCheckboxAndQuantity() {
+        val trackingMode =
+            getTrackingMode_ArrangeAct(SharedPreferencesInitializer.TrackingMode.CHECKBOX_QUANTITY)
 
-        assertEquals(ShoppingListPreferences.StockMethod.CHECKBOX_QUANTITIES, stockMethod)
+        assertEquals(ShoppingListPreferences.TrackingMode.CHECKBOX_QUANTITY, trackingMode)
     }
 
     @Test
-    fun getStockMethod_isNone_ReturnNone() {
-        val stockMethod = getStockMethod_ArrangeAct(SharedPreferencesInitializer.StockMethod.NONE)
-        assertEquals(ShoppingListPreferences.StockMethod.NONE, stockMethod)
+    fun getTrackingMode_isNone_ReturnNone() {
+        val trackingMode = getTrackingMode_ArrangeAct(SharedPreferencesInitializer.TrackingMode.NONE)
+        assertEquals(ShoppingListPreferences.TrackingMode.NONE, trackingMode)
     }
 }
