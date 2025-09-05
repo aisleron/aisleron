@@ -120,4 +120,10 @@
     <string name="add_aisle_fab">Gang hinzufügen FAB</string>
     <string name="add_product_fab">Produkt hinzufügen FAB</string>
     <string name="main_fab">Haupt-FAB</string>
+    <string name="invalid_product_exception">FEHLER: Üngültige Produkt-ID</string>
+    <string name="new_location_name">Neuer Einkaufsort</string>
+    <string name="new_product_name">Neues Produkt</string>
+    <string name="copy_entity_title">Kopiere %1$s</string>
+    <string name="entity_copied">%1$s kopiert</string>
+    <string name="entity_name_required">Name darf nicht leer sein</string>
 </resources>
