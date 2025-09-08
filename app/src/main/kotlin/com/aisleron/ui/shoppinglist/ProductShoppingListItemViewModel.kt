@@ -29,6 +29,7 @@ data class ProductShoppingListItemViewModel(
     override val name: String,
     override val aisleId: Int,
     override val inStock: Boolean,
+    override val qtyNeeded: Int,
     private val aisleProductId: Int,
     private val updateAisleProductRankUseCase: UpdateAisleProductRankUseCase,
     private val removeProductUseCase: RemoveProductUseCase,
@@ -47,7 +48,8 @@ data class ProductShoppingListItemViewModel(
                 product = Product(
                     id = id,
                     name = name,
-                    inStock = inStock
+                    inStock = inStock,
+                    qtyNeeded = qtyNeeded
                 )
             )
         )

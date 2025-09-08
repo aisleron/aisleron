@@ -22,6 +22,7 @@ import android.graphics.Typeface
 import android.os.Handler
 import android.os.Looper
 import android.text.InputFilter
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -35,6 +36,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.core.view.updatePaddingRelative
+import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -43,6 +45,7 @@ import com.aisleron.R
 import com.aisleron.databinding.FragmentAisleListItemBinding
 import com.aisleron.databinding.FragmentEmptyListItemBinding
 import com.aisleron.databinding.FragmentProductListItemBinding
+import com.aisleron.domain.FilterType
 import com.aisleron.ui.settings.ShoppingListPreferences
 import java.util.Collections
 
@@ -52,7 +55,8 @@ import java.util.Collections
  */
 class ShoppingListItemRecyclerViewAdapter(
     private val listener: ShoppingListItemListener,
-    private val trackingMode: ShoppingListPreferences.TrackingMode
+    private val trackingMode: ShoppingListPreferences.TrackingMode,
+    private val listFilter: FilterType
 ) : ListAdapter<ShoppingListItem, ViewHolder>(ShoppingListItemDiffCallback()),
     ShoppingListItemMoveCallbackListener.Listener {
 
@@ -221,13 +225,15 @@ class ShoppingListItemRecyclerViewAdapter(
         private val incQtyButton: ImageButton = binding.btnQtyInc
         private val qtyEdit: EditText = binding.edtQty
 
+        private var qtyWatcher: TextWatcher? = null
+
         fun bind(item: ProductShoppingListItem) {
             contentView.text = item.name
             inStockView.isChecked = item.inStock
             inStockView.isVisible = trackingMode in setOf(
                 ShoppingListPreferences.TrackingMode.CHECKBOX,
                 ShoppingListPreferences.TrackingMode.CHECKBOX_QUANTITY
-            )
+            ) || (listFilter == FilterType.ALL)
 
             inStockView.setOnClickListener { _ ->
                 listener.onProductStatusChange(item, inStockView.isChecked)
@@ -235,24 +241,39 @@ class ShoppingListItemRecyclerViewAdapter(
 
             inStockView.setOnLongClickListener { _ -> itemView.performLongClick() }
 
+            // Remove any old watcher
+            qtyWatcher?.let {
+                qtyEdit.removeTextChangedListener(it)
+                qtyWatcher = null
+            }
+
+            qtyEdit.setText(item.qtyNeeded.toString())
+            qtyEdit.setSelection(qtyEdit.text?.length ?: 0)
+
+            // Add a new watcher and keep reference
+            qtyWatcher = qtyEdit.doAfterTextChanged { editable ->
+                val newQty = editable?.toString()?.toIntOrNull()
+                if (newQty != null) {
+
+                    listener.onProductQuantityChange(item, newQty)
+                }
+            }
+
             qtySelector.isVisible = trackingMode in setOf(
                 ShoppingListPreferences.TrackingMode.QUANTITY,
                 ShoppingListPreferences.TrackingMode.CHECKBOX_QUANTITY
             )
 
-            if (trackingMode == ShoppingListPreferences.TrackingMode.QUANTITY) {
+            if (!inStockView.isVisible && qtySelector.isVisible) {
                 qtySelector.updatePaddingRelative(
                     end = qtySelector.context.resources.getDimensionPixelSize(R.dimen.text_margin)
                 )
             }
 
-            //TODO: Set Qty from data class
-            qtyEdit.setText("0")
-
             decQtyButton.setOnClickListener {
-                val current = qtyEdit.text.toString().toIntOrNull() ?: 0
-                if (current > 0) {
-                    qtyEdit.setText((current - 1).toString())
+                val newQty = (qtyEdit.text.toString().toIntOrNull() ?: 0).dec()
+                if (newQty >= 0) {
+                    qtyEdit.setText(newQty.toString())
                 }
             }
 
@@ -262,9 +283,9 @@ class ShoppingListItemRecyclerViewAdapter(
                     .firstOrNull()
                     ?.max ?: Int.MAX_VALUE
 
-                val current = ((qtyEdit.text.toString().toIntOrNull() ?: 0) + 1).toString()
-                if (current.length <= maxLength) {
-                    qtyEdit.setText(current)
+                val newQty = ((qtyEdit.text.toString().toIntOrNull() ?: 0).inc())
+                if (newQty.toString().length <= maxLength) {
+                    qtyEdit.setText(newQty.toString())
                 }
             }
         }
@@ -278,6 +299,7 @@ class ShoppingListItemRecyclerViewAdapter(
     interface ShoppingListItemListener {
         fun onClick(item: ShoppingListItem)
         fun onProductStatusChange(item: ProductShoppingListItem, inStock: Boolean)
+        fun onProductQuantityChange(item: ProductShoppingListItem, quantity: Int)
         fun onListPositionChanged(item: ShoppingListItem, precedingItem: ShoppingListItem?)
         fun onLongClick(item: ShoppingListItem, view: View): Boolean
         fun onMoved(item: ShoppingListItem)

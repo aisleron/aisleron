@@ -42,7 +42,7 @@
             android:defaultValue="checkbox"
             android:entries="@array/tracking_method_names"
             android:entryValues="@array/tracking_method_values"
-            android:key="@string/tracking_mode"
+            android:key="tracking_mode"
             android:title="@string/tracking_mode"
             app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>

@@ -39,7 +39,8 @@ class ProductDaoTestImpl : ProductDao {
             val newEntity = ProductEntity(
                 id = id,
                 name = it.name,
-                inStock = it.inStock
+                inStock = it.inStock,
+                qtyNeeded = it.qtyNeeded
             )
 
             productList.add(newEntity)

@@ -187,7 +187,8 @@ class CreateSampleDataUseCaseTest {
                 Product(
                     id = 0,
                     name = "CreateSampleDataProductExistsTest",
-                    inStock = false
+                    inStock = false,
+                    qtyNeeded = 0
                 ),
                 null
             )

@@ -17,6 +17,7 @@
 
 package com.aisleron.data.product
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -24,5 +25,6 @@ import androidx.room.PrimaryKey
 data class ProductEntity(
     @PrimaryKey(autoGenerate = true) val id: Int,
     val name: String,
-    val inStock: Boolean
+    val inStock: Boolean,
+    @ColumnInfo(defaultValue = "0") val qtyNeeded: Int
 )

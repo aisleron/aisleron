@@ -41,7 +41,8 @@ val viewModelModule = module {
             getAisleUseCase = get(),
             updateAisleExpandedUseCase = get(),
             sortLocationByNameUseCase = get(),
-            getLoyaltyCardForLocationUseCase = get()
+            getLoyaltyCardForLocationUseCase = get(),
+            updateProductQtyNeededUseCase = get()
         )
     }
 

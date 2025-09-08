@@ -34,9 +34,12 @@ import com.aisleron.domain.location.usecase.SortLocationByNameUseCase
 import com.aisleron.domain.loyaltycard.LoyaltyCard
 import com.aisleron.domain.loyaltycard.usecase.GetLoyaltyCardForLocationUseCase
 import com.aisleron.domain.product.usecase.RemoveProductUseCase
+import com.aisleron.domain.product.usecase.UpdateProductQtyNeededUseCase
 import com.aisleron.domain.product.usecase.UpdateProductStatusUseCase
 import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -52,9 +55,13 @@ class ShoppingListViewModel(
     private val updateAisleExpandedUseCase: UpdateAisleExpandedUseCase,
     private val sortLocationByNameUseCase: SortLocationByNameUseCase,
     private val getLoyaltyCardForLocationUseCase: GetLoyaltyCardForLocationUseCase,
+    private val updateProductQtyNeededUseCase: UpdateProductQtyNeededUseCase,
+    private val debounceTime: Long = 300,
     coroutineScopeProvider: CoroutineScope? = null
 ) : ViewModel() {
     private val coroutineScope = coroutineScopeProvider ?: this.viewModelScope
+    private var searchJob: Job? = null
+    private var updateQtyJob: Job? = null
 
     private var _location: Location? = null
     private var _showDefaultAisle: Boolean = true
@@ -125,6 +132,7 @@ class ShoppingListViewModel(
                                     id = ap.product.id,
                                     name = ap.product.name,
                                     inStock = ap.product.inStock,
+                                    qtyNeeded = ap.product.qtyNeeded,
                                     aisleId = ap.aisleId,
                                     aisleProductId = ap.id,
                                     removeProductUseCase = removeProductUseCase,
@@ -194,6 +202,22 @@ class ShoppingListViewModel(
         }
     }
 
+    fun updateProductNeededQuantity(item: ProductShoppingListItem, quantity: Int) {
+        updateQtyJob?.cancel()
+        updateQtyJob = coroutineScope.launch {
+            delay(debounceTime)
+            try {
+                updateProductQtyNeededUseCase(item.id, quantity)
+            } catch (e: Exception) {
+                _shoppingListUiState.value =
+                    ShoppingListUiState.Error(
+                        AisleronException.ExceptionCode.GENERIC_EXCEPTION, e.message
+                    )
+            }
+        }
+
+    }
+
     fun updateAisleExpanded(item: AisleShoppingListItem, expanded: Boolean) {
         coroutineScope.launch {
             updateAisleExpandedUseCase(item.id, expanded)
@@ -207,13 +231,17 @@ class ShoppingListViewModel(
     }
 
     fun submitProductSearch(productNameQuery: String) {
-        shoppingListFilterParameters.filterType = FilterType.ALL
-        shoppingListFilterParameters.showDefaultAisle = true
-        shoppingListFilterParameters.productNameQuery = productNameQuery
-        shoppingListFilterParameters.showAllProducts = true
-        shoppingListFilterParameters.showAllAisles = showEmptyAisles
+        searchJob?.cancel()
 
-        coroutineScope.launch {
+        searchJob = coroutineScope.launch {
+            delay(debounceTime) //Add debounce to the search so it doesn't execute every keypress
+
+            shoppingListFilterParameters.filterType = FilterType.ALL
+            shoppingListFilterParameters.showDefaultAisle = true
+            shoppingListFilterParameters.productNameQuery = productNameQuery
+            shoppingListFilterParameters.showAllProducts = true
+            shoppingListFilterParameters.showAllAisles = showEmptyAisles
+
             _shoppingListUiState.value = ShoppingListUiState.Loading
             val searchResults = getShoppingList(_location, shoppingListFilterParameters)
             _shoppingListUiState.value = ShoppingListUiState.Updated(searchResults)

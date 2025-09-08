@@ -15,12 +15,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.ui.shoppinglist
+package com.aisleron.domain.product.usecase
 
-interface ProductShoppingListItem : ShoppingListItem {
-    val inStock: Boolean
-    val qtyNeeded: Int
+import com.aisleron.domain.product.Product
 
-    override val itemType: ShoppingListItem.ItemType
-        get() = ShoppingListItem.ItemType.PRODUCT
+interface UpdateProductQtyNeededUseCase {
+    suspend operator fun invoke(id: Int, quantity: Int): Product?
+}
+
+class UpdateProductQtyNeededUseCaseImpl(
+    private val getProductUseCase: GetProductUseCase,
+    private val updateProductUseCase: UpdateProductUseCase
+) : UpdateProductQtyNeededUseCase {
+    override suspend operator fun invoke(id: Int, quantity: Int): Product? {
+        require(quantity >= 0)
+
+        val product = getProductUseCase(id)?.copy(qtyNeeded = quantity)
+        if (product != null) {
+            updateProductUseCase(product)
+        }
+
+        return product
+    }
 }

@@ -48,12 +48,7 @@ class AddProductUseCaseImpl(
             throw AisleronException.DuplicateProductException("Cannot add a duplicate of an existing Product")
         }
 
-        val newProduct = Product(
-            id = productRepository.add(product),
-            name = product.name,
-            inStock = product.inStock
-        )
-
+        val newProduct = product.copy(id = productRepository.add(product))
         val defaultAisles = getDefaultAislesUseCase().toMutableList()
 
         targetAisle?.let { target ->
