@@ -51,10 +51,16 @@ class ShoppingListPreferencesImpl : ShoppingListPreferences {
         }
     }
 
+    override fun keepScreenOn(context: Context): Boolean =
+        PreferenceManager.getDefaultSharedPreferences(context).getBoolean(
+            PREF_KEEP_SCREEN_ON, false
+        )
+
     companion object {
         const val PREF_HIDE_STATUS_CHANGE_SNACK_BAR = "hide_status_change_snack_bar"
         const val PREF_SHOW_EMPTY_AISLES = "show_empty_aisles"
         const val PREF_TRACKING_MODE = "tracking_mode"
+        const val PREF_KEEP_SCREEN_ON = "keep_screen_on"
 
         const val CHECKBOX = "checkbox"
         const val QUANTITY = "quantity"

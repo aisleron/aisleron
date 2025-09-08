@@ -86,11 +86,21 @@ class SharedPreferencesInitializer {
 
     }
 
+    fun setKeepScreenOn(keepScreenOn: Boolean) {
+        val preferencesEditor = getPreferencesEditor()
+
+        preferencesEditor.clear()
+        preferencesEditor.putBoolean(PREF_KEEP_SCREEN_ON, keepScreenOn)
+        preferencesEditor.commit()
+
+    }
+
     companion object {
         private const val IS_INITIALIZED = "is_initialised"
         private const val APPLICATION_THEME = "application_theme"
         private const val PREF_HIDE_STATUS_CHANGE_SNACK_BAR = "hide_status_change_snack_bar"
         private const val PREF_SHOW_EMPTY_AISLES = "show_empty_aisles"
         private const val PREF_TRACKING_MODE = "tracking_mode"
+        private const val PREF_KEEP_SCREEN_ON = "keep_screen_on"
     }
 }

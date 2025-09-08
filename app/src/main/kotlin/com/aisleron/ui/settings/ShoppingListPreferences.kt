@@ -24,6 +24,7 @@ interface ShoppingListPreferences {
     fun showEmptyAisles(context: Context): Boolean
     fun setShowEmptyAisles(context: Context, value: Boolean)
     fun trackingMode(context: Context): TrackingMode
+    fun keepScreenOn(context: Context): Boolean
 
     enum class TrackingMode {
         CHECKBOX,

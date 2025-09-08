@@ -54,6 +54,8 @@
     <string name="db_restore_confirmation">Are you sure you want to replace your current database with backup %1$s?</string>
     <string name="db_restore_confirmation_title">Confirm Database Restore</string>
     <string name="backup_folder_success">Backup folder set</string>
+    <string name="keep_screen_on">Keep screen on</string>
+    <string name="keep_screen_on_summary">Prevent the screen from turning off while viewing a list</string>
 
     <!-- Exception Messages   -->
     <string name="generic_error">ERROR: %1$s</string>

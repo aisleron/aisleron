@@ -323,6 +323,8 @@ class ShoppingListFragment(
         aisleDialog.observeLifecycle(viewLifecycleOwner)
         val menuHost = requireActivity()
         menuHost.addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
+
+        view.keepScreenOn = shoppingListPreferences.keepScreenOn(requireContext())
     }
 
     private fun navigateToEditShop(locationId: Int) {

@@ -123,4 +123,22 @@ class ShoppingListPreferencesImplTest {
         val trackingMode = getTrackingMode_ArrangeAct(SharedPreferencesInitializer.TrackingMode.NONE)
         assertEquals(ShoppingListPreferences.TrackingMode.NONE, trackingMode)
     }
+
+    @Test
+    fun getKeepScreenOn_isSet_ReturnTrue() {
+        SharedPreferencesInitializer().setKeepScreenOn(true)
+        val showEmptyAisles =
+            ShoppingListPreferencesImpl().keepScreenOn(getInstrumentation().targetContext)
+
+        assertTrue(showEmptyAisles)
+    }
+
+    @Test
+    fun getKeepScreenOn_isNotShown_ReturnFalse() {
+        SharedPreferencesInitializer().setKeepScreenOn(false)
+        val showEmptyAisles =
+            ShoppingListPreferencesImpl().keepScreenOn(getInstrumentation().targetContext)
+
+        assertFalse(showEmptyAisles)
+    }
 }

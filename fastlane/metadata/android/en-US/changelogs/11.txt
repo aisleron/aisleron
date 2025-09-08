@@ -1,5 +1,7 @@
 Enhancements:
 * Added Quantity tracking for Needed items (#10)
+* Added an option to keep the screen on while using the shopping list (#60)
+* Translations Updated (German)
 
 Bug Fixes:
 * Fixed 'Show on lock screen' requiring an app restart to apply

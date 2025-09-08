@@ -38,6 +38,10 @@
         <SwitchPreferenceCompat
             app:key="show_empty_aisles"
             app:title="@string/show_empty_aisles" />
+        <SwitchPreferenceCompat
+            app:key="keep_screen_on"
+            app:title="@string/keep_screen_on"
+            app:summary="@string/keep_screen_on_summary" />
         <ListPreference
             android:defaultValue="checkbox"
             android:entries="@array/tracking_method_names"

@@ -23,12 +23,15 @@ class ShoppingListPreferencesTestImpl : ShoppingListPreferences {
 
     private var _hideStatusChangeSnackBar: Boolean = false
     private var _showEmptyAisles: Boolean = false
+    private var _keepScreenOn: Boolean = false
     private var _trackingMode: ShoppingListPreferences.TrackingMode =
         ShoppingListPreferences.TrackingMode.CHECKBOX
 
     override fun isStatusChangeSnackBarHidden(context: Context): Boolean = _hideStatusChangeSnackBar
     override fun showEmptyAisles(context: Context): Boolean = _showEmptyAisles
-    override fun trackingMode(context: Context): ShoppingListPreferences.TrackingMode = _trackingMode
+    override fun keepScreenOn(context: Context): Boolean = _keepScreenOn
+    override fun trackingMode(context: Context): ShoppingListPreferences.TrackingMode =
+        _trackingMode
 
     override fun setShowEmptyAisles(context: Context, value: Boolean) {
         _showEmptyAisles = value
