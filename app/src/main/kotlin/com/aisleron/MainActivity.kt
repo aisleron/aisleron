@@ -70,6 +70,7 @@ class MainActivity : AppCompatActivity() {
             when (s) {
                 "application_theme" -> recreate()
                 "restore_database" -> softRestartApp()
+                "display_lockscreen" -> setShowOnLockScreen(p.getBoolean(s, false))
             }
         }
 
@@ -79,9 +80,7 @@ class MainActivity : AppCompatActivity() {
 
         val displayPreferences = DisplayPreferencesImpl()
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-            setShowWhenLocked(displayPreferences.showOnLockScreen(this))
-        }
+        setShowOnLockScreen(displayPreferences.showOnLockScreen(this))
 
         when (displayPreferences.applicationTheme(this)) {
             DisplayPreferences.ApplicationTheme.LIGHT_THEME ->
@@ -130,6 +129,12 @@ class MainActivity : AppCompatActivity() {
 
         if (!WelcomePreferencesImpl().isInitialized(this)) {
             navController.navigate(R.id.nav_welcome)
+        }
+    }
+
+    private fun setShowOnLockScreen(show: Boolean) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            setShowWhenLocked(show)
         }
     }
 

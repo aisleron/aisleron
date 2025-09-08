@@ -52,7 +52,8 @@ class UpdateProductUseCaseTest {
                 Product(
                     id = 2,
                     name = "Product 2",
-                    inStock = false
+                    inStock = false,
+                    qtyNeeded = 0
                 )
             )
 

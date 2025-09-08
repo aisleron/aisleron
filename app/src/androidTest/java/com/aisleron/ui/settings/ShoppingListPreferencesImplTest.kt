@@ -21,6 +21,7 @@ import androidx.preference.PreferenceManager
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.aisleron.SharedPreferencesInitializer
 import org.junit.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -57,7 +58,7 @@ class ShoppingListPreferencesImplTest {
     fun getShowEmptyAisles_isNotShown_ReturnFalse() {
         SharedPreferencesInitializer().setShowEmptyAisles(false)
         val showEmptyAisles =
-            ShoppingListPreferencesImpl().isStatusChangeSnackBarHidden(getInstrumentation().targetContext)
+            ShoppingListPreferencesImpl().showEmptyAisles(getInstrumentation().targetContext)
 
         assertFalse(showEmptyAisles)
     }
@@ -86,5 +87,40 @@ class ShoppingListPreferencesImplTest {
         val showEmptyAisles = setShowEmptyAisles_ArrangeAct(false)
 
         assertFalse(showEmptyAisles)
+    }
+
+    private fun getTrackingMode_ArrangeAct(trackingMode: SharedPreferencesInitializer.TrackingMode): ShoppingListPreferences.TrackingMode {
+        SharedPreferencesInitializer().setTrackingMode(trackingMode)
+        return ShoppingListPreferencesImpl().trackingMode(getInstrumentation().targetContext)
+    }
+
+    @Test
+    fun getTrackingMode_isCheckbox_ReturnCheckbox() {
+        val trackingMode =
+            getTrackingMode_ArrangeAct(SharedPreferencesInitializer.TrackingMode.CHECKBOX)
+
+        assertEquals(ShoppingListPreferences.TrackingMode.CHECKBOX, trackingMode)
+    }
+
+    @Test
+    fun getTrackingMode_isQuantity_ReturnQuantity() {
+        val trackingMode =
+            getTrackingMode_ArrangeAct(SharedPreferencesInitializer.TrackingMode.QUANTITY)
+
+        assertEquals(ShoppingListPreferences.TrackingMode.QUANTITY, trackingMode)
+    }
+
+    @Test
+    fun getTrackingMode_isCheckboxAndQuantity_ReturnCheckboxAndQuantity() {
+        val trackingMode =
+            getTrackingMode_ArrangeAct(SharedPreferencesInitializer.TrackingMode.CHECKBOX_QUANTITY)
+
+        assertEquals(ShoppingListPreferences.TrackingMode.CHECKBOX_QUANTITY, trackingMode)
+    }
+
+    @Test
+    fun getTrackingMode_isNone_ReturnNone() {
+        val trackingMode = getTrackingMode_ArrangeAct(SharedPreferencesInitializer.TrackingMode.NONE)
+        assertEquals(ShoppingListPreferences.TrackingMode.NONE, trackingMode)
     }
 }

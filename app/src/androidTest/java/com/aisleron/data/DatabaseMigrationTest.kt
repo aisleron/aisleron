@@ -63,6 +63,13 @@ class DatabaseMigrationTest {
         aisleValues.put("isDefault", true)
 
         db.insert("Aisle", android.database.sqlite.SQLiteDatabase.CONFLICT_FAIL, aisleValues)
+
+        val productValues = ContentValues()
+        productValues.put("name", "Migration Test Product")
+        productValues.put("inStock", true)
+
+        db.insert("Product", android.database.sqlite.SQLiteDatabase.CONFLICT_FAIL, productValues)
+
     }
 
     @Test
@@ -70,8 +77,6 @@ class DatabaseMigrationTest {
     fun migrate1to2() {
         helper.createDatabase(testDb, 1).apply {
             populateV1Database(this)
-
-            // Prepare for the next version.
             close()
         }
 
@@ -112,14 +117,33 @@ class DatabaseMigrationTest {
         }
     }
 
+    @Test
+    @Throws(IOException::class)
+    fun migrate3to4() {
+        helper.createDatabase(testDb, 3).apply {
+            populateV1Database(this)
+            close()
+        }
+
+        val db = helper.runMigrationsAndValidate(testDb, 4, true)
+        var qtyNeeded = -1
+
+        db.apply {
+            val queryBuilder = SupportSQLiteQueryBuilder.builder("Product")
+            val cursor: Cursor = query(queryBuilder.create())
+            cursor.moveToFirst()
+            qtyNeeded = cursor.getInt(cursor.getColumnIndex("qtyNeeded"))
+            cursor.close()
+            close()
+        }
+        assertEquals(0, qtyNeeded)
+    }
 
     @Test
     @Throws(IOException::class)
     fun migrateAll() {
         helper.createDatabase(testDb, 1).apply {
             populateV1Database(this)
-
-            // Prepare for the next version.
             close()
         }
 
@@ -129,14 +153,14 @@ class DatabaseMigrationTest {
             testDb
         ).build()
 
-        // Introduced in V3
+        // LoyaltyCard introduced in V3
         val loyaltyCards = runBlocking { db.loyaltyCardDao().getLoyaltyCards() }
         assertNotNull(loyaltyCards)
+
+        // Product.qtyNeeded introduced in V4
+        val product = runBlocking { db.productDao().getProducts().first() }
+        assertEquals(0, product.qtyNeeded)
 
         db.close()
     }
 }
-
-/**
- * ToDo: Test All migrations: https://developer.android.com/training/data-storage/room/migrating-db-versions#all-migrations-test
- */

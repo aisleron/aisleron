@@ -38,6 +38,13 @@
         <SwitchPreferenceCompat
             app:key="show_empty_aisles"
             app:title="@string/show_empty_aisles" />
+        <ListPreference
+            android:defaultValue="checkbox"
+            android:entries="@array/tracking_method_names"
+            android:entryValues="@array/tracking_method_values"
+            android:key="tracking_mode"
+            android:title="@string/tracking_mode"
+            app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/backup_restore_title">

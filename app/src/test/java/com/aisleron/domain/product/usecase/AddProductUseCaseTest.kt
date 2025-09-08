@@ -85,7 +85,8 @@ class AddProductUseCaseTest {
         return Product(
             id = 0,
             name = "New Product 1",
-            inStock = false
+            inStock = false,
+            qtyNeeded = 0
         )
     }
 

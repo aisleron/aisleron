@@ -27,4 +27,18 @@
         <item>light_theme</item>
         <item>dark_theme</item>
     </array>
+
+    <array name="tracking_method_names">
+        <item>@string/tracking_checkbox</item>
+        <item>@string/tracking_quantity</item>
+        <item>@string/tracking_checkbox_quantity</item>
+        <item>@string/tracking_none</item>
+    </array>
+
+    <array name="tracking_method_values">
+        <item>checkbox</item>
+        <item>quantity</item>
+        <item>checkbox_quantity</item>
+        <item>none</item>
+    </array>
 </resources>

@@ -1,0 +1,5 @@
+Enhancements:
+* Added Quantity tracking for Needed items (#10)
+
+Bug Fixes:
+* Fixed 'Show on lock screen' requiring an app restart to apply

@@ -91,7 +91,8 @@ class SortLocationByNameUseCaseImplTest {
         val product = Product(
             id = 0,
             name = "ZZZ",
-            inStock = false
+            inStock = false,
+            qtyNeeded = 0
         )
 
         val aisle = locationRepository.getLocationWithAisles(locationId).aisles.first()

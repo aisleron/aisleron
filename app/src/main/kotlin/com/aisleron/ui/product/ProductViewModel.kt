@@ -89,8 +89,10 @@ class ProductViewModel(
                     updateProductUseCase(updated)
                     product = updated
                 } ?: run {
-                    val id =
-                        addProductUseCase(Product(name = name, inStock = inStock, id = 0), aisle)
+                    val id = addProductUseCase(
+                        Product(name = name, inStock = inStock, id = 0, qtyNeeded = 0),
+                        aisle
+                    )
 
                     product = getProductUseCase(id)
                 }

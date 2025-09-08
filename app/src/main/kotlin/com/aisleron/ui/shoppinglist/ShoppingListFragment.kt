@@ -160,6 +160,12 @@ class ShoppingListFragment(
                             displayStatusChangeSnackBar(item, inStock)
                         }
 
+                        override fun onProductQuantityChange(
+                            item: ProductShoppingListItem, quantity: Int
+                        ) {
+                            shoppingListViewModel.updateProductNeededQuantity(item, quantity)
+                        }
+
                         override fun onListPositionChanged(
                             item: ShoppingListItem, precedingItem: ShoppingListItem?
                         ) {
@@ -207,7 +213,10 @@ class ShoppingListFragment(
                         }
 
                         override fun onMove(item: ShoppingListItem) {}
-                    }
+                    },
+
+                    shoppingListPreferences.trackingMode(requireContext()),
+                    shoppingListViewModel.defaultFilter
                 )
 
                 val callback: ItemTouchHelper.Callback = ShoppingListItemMoveCallbackListener(

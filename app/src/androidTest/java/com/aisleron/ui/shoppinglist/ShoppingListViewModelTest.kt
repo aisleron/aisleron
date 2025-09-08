@@ -44,6 +44,7 @@ import com.aisleron.domain.loyaltycard.usecase.GetLoyaltyCardForLocationUseCase
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
 import com.aisleron.domain.product.usecase.RemoveProductUseCase
+import com.aisleron.domain.product.usecase.UpdateProductQtyNeededUseCase
 import com.aisleron.domain.product.usecase.UpdateProductStatusUseCase
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
@@ -169,6 +170,7 @@ class ShoppingListViewModelTest : KoinTest {
             id = existingProduct.id,
             name = existingProduct.name,
             inStock = existingProduct.inStock,
+            qtyNeeded = existingProduct.qtyNeeded,
             aisleId = existingAisle.id,
             aisleProductId = aisleProduct.id,
             updateAisleProductRankUseCase = get<UpdateAisleProductRankUseCase>(),
@@ -403,7 +405,8 @@ class ShoppingListViewModelTest : KoinTest {
             get<GetAisleUseCase>(),
             get<UpdateAisleExpandedUseCase>(),
             get<SortLocationByNameUseCase>(),
-            get<GetLoyaltyCardForLocationUseCase>()
+            get<GetLoyaltyCardForLocationUseCase>(),
+            get<UpdateProductQtyNeededUseCase>()
         )
 
         Assert.assertNotNull(vm)
@@ -700,5 +703,46 @@ class ShoppingListViewModelTest : KoinTest {
         val uiStateAfter = shoppingListViewModel.shoppingListUiState.value
 
         assertEquals(uiStateBefore, uiStateAfter)
+    }
+
+    private suspend fun ShoppingListViewModelTest.updateProductNeededQuantityArrangeAct(qtyNew: Int): Int {
+        val shoppingList = getShoppingList()
+        val existingAisle =
+            shoppingList.aisles.first { it.products.count { p -> !p.product.inStock } > 0 }
+
+        val aisleProduct = existingAisle.products.first { it.product.qtyNeeded != qtyNew }
+        val productRepository = get<ProductRepository>()
+        val existingProduct = productRepository.get(aisleProduct.product.id)!!
+        val shoppingListItem = ProductShoppingListItemViewModel(
+            aisleRank = existingAisle.rank,
+            rank = aisleProduct.rank,
+            id = existingProduct.id,
+            name = existingProduct.name,
+            inStock = existingProduct.inStock,
+            qtyNeeded = existingProduct.qtyNeeded,
+            aisleId = existingAisle.id,
+            aisleProductId = aisleProduct.id,
+            updateAisleProductRankUseCase = get<UpdateAisleProductRankUseCase>(),
+            removeProductUseCase = get<RemoveProductUseCase>()
+        )
+
+        shoppingListViewModel.hydrate(shoppingList.id, shoppingList.defaultFilter)
+        shoppingListViewModel.updateProductNeededQuantity(shoppingListItem, qtyNew)
+        return existingProduct.id
+    }
+
+    @Test
+    fun updateProductNeededQuantity_ValidQty_ProductQtyNeededUpdated() = runTest {
+        val qtyNew = 10
+        val productId = updateProductNeededQuantityArrangeAct(qtyNew)
+        val updatedProduct = get<ProductRepository>().get(productId)
+        Assert.assertEquals(qtyNew, updatedProduct?.qtyNeeded)
+    }
+
+    @Test
+    fun updateProductNeededQuantity_NegativeQty_UiStateIsError() = runTest {
+        val qtyNew = -1
+        updateProductNeededQuantityArrangeAct(qtyNew)
+        Assert.assertTrue(shoppingListViewModel.shoppingListUiState.value is ShoppingListViewModel.ShoppingListUiState.Error)
     }
 }

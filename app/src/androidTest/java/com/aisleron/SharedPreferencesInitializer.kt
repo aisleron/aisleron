@@ -29,6 +29,13 @@ class SharedPreferencesInitializer {
         DARK_THEME("dark_theme"),
     }
 
+    enum class TrackingMode(val value: String) {
+        CHECKBOX("checkbox"),
+        QUANTITY("quantity"),
+        CHECKBOX_QUANTITY("checkbox_quantity"),
+        NONE("none")
+    }
+
     private fun getPreferencesEditor(): SharedPreferences.Editor {
         val targetContext = getInstrumentation().targetContext
         return PreferenceManager.getDefaultSharedPreferences(targetContext).edit()
@@ -70,10 +77,20 @@ class SharedPreferencesInitializer {
         preferencesEditor.commit()
     }
 
+    fun setTrackingMode(trackingMode: TrackingMode) {
+        val preferencesEditor = getPreferencesEditor()
+
+        preferencesEditor.clear()
+        preferencesEditor.putString(PREF_TRACKING_MODE, trackingMode.value)
+        preferencesEditor.commit()
+
+    }
+
     companion object {
         private const val IS_INITIALIZED = "is_initialised"
         private const val APPLICATION_THEME = "application_theme"
         private const val PREF_HIDE_STATUS_CHANGE_SNACK_BAR = "hide_status_change_snack_bar"
         private const val PREF_SHOW_EMPTY_AISLES = "show_empty_aisles"
+        private const val PREF_TRACKING_MODE = "tracking_mode"
     }
 }
