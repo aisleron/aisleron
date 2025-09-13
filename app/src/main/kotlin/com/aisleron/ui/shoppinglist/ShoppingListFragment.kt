@@ -161,7 +161,7 @@ class ShoppingListFragment(
                         }
 
                         override fun onProductQuantityChange(
-                            item: ProductShoppingListItem, quantity: Int
+                            item: ProductShoppingListItem, quantity: Int? //TODO: Test null Qty received
                         ) {
                             shoppingListViewModel.updateProductNeededQuantity(item, quantity)
                         }

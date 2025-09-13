@@ -37,12 +37,14 @@ import com.aisleron.domain.product.usecase.RemoveProductUseCase
 import com.aisleron.domain.product.usecase.UpdateProductQtyNeededUseCase
 import com.aisleron.domain.product.usecase.UpdateProductStatusUseCase
 import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlin.coroutines.cancellation.CancellationException
 
 class ShoppingListViewModel(
     private val getShoppingListUseCase: GetShoppingListUseCase,
@@ -202,20 +204,14 @@ class ShoppingListViewModel(
         }
     }
 
-    fun updateProductNeededQuantity(item: ProductShoppingListItem, quantity: Int) {
+    fun updateProductNeededQuantity(item: ProductShoppingListItem, quantity: Int?) {
+        //TODO: Test null qty passed in
+        //TODO: Test exceptionHandler
         updateQtyJob?.cancel()
-        updateQtyJob = coroutineScope.launch {
+        updateQtyJob = coroutineScope.launch(exceptionHandler) {
             delay(debounceTime)
-            try {
-                updateProductQtyNeededUseCase(item.id, quantity)
-            } catch (e: Exception) {
-                _shoppingListUiState.value =
-                    ShoppingListUiState.Error(
-                        AisleronException.ExceptionCode.GENERIC_EXCEPTION, e.message
-                    )
-            }
+            quantity?.let { updateProductQtyNeededUseCase(item.id, it) }
         }
-
     }
 
     fun updateAisleExpanded(item: AisleShoppingListItem, expanded: Boolean) {
@@ -305,6 +301,18 @@ class ShoppingListViewModel(
 
     fun clearState() {
         _shoppingListUiState.value = ShoppingListUiState.Empty
+    }
+
+    private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
+        when (throwable) {
+            is CancellationException -> Unit // Ignore cancellation of running task
+            is AisleronException -> _shoppingListUiState.value =
+                ShoppingListUiState.Error(throwable.exceptionCode, throwable.message)
+
+            else -> ShoppingListUiState.Error(
+                AisleronException.ExceptionCode.GENERIC_EXCEPTION, throwable.message
+            )
+        }
     }
 
     sealed class ShoppingListUiState {

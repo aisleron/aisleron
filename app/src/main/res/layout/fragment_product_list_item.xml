@@ -58,6 +58,9 @@
                 android:id="@+id/btn_qty_dec"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:paddingVertical="@dimen/text_margin"
+                android:paddingStart="@dimen/text_margin"
+                android:paddingEnd="0dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/baseline_remove_circle_outline_24"
                 android:contentDescription="@string/decrement" />
@@ -79,6 +82,9 @@
                 android:id="@+id/btn_qty_inc"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:paddingVertical="@dimen/text_margin"
+                android:paddingEnd="@dimen/text_margin"
+                android:paddingStart="0dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/baseline_add_circle_outline_24"
                 android:contentDescription="@string/increment" />

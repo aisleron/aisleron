@@ -35,7 +35,6 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.isVisible
-import androidx.core.view.updatePaddingRelative
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -253,22 +252,13 @@ class ShoppingListItemRecyclerViewAdapter(
             // Add a new watcher and keep reference
             qtyWatcher = qtyEdit.doAfterTextChanged { editable ->
                 val newQty = editable?.toString()?.toIntOrNull()
-                if (newQty != null) {
-
-                    listener.onProductQuantityChange(item, newQty)
-                }
+                listener.onProductQuantityChange(item, newQty)
             }
 
             qtySelector.isVisible = trackingMode in setOf(
                 ShoppingListPreferences.TrackingMode.QUANTITY,
                 ShoppingListPreferences.TrackingMode.CHECKBOX_QUANTITY
             )
-
-            if (!inStockView.isVisible && qtySelector.isVisible) {
-                qtySelector.updatePaddingRelative(
-                    end = qtySelector.context.resources.getDimensionPixelSize(R.dimen.text_margin)
-                )
-            }
 
             decQtyButton.setOnClickListener {
                 val newQty = (qtyEdit.text.toString().toIntOrNull() ?: 0).dec()
@@ -299,7 +289,7 @@ class ShoppingListItemRecyclerViewAdapter(
     interface ShoppingListItemListener {
         fun onClick(item: ShoppingListItem)
         fun onProductStatusChange(item: ProductShoppingListItem, inStock: Boolean)
-        fun onProductQuantityChange(item: ProductShoppingListItem, quantity: Int)
+        fun onProductQuantityChange(item: ProductShoppingListItem, quantity: Int?)
         fun onListPositionChanged(item: ShoppingListItem, precedingItem: ShoppingListItem?)
         fun onLongClick(item: ShoppingListItem, view: View): Boolean
         fun onMoved(item: ShoppingListItem)
