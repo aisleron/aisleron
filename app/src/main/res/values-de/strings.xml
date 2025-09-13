@@ -59,7 +59,7 @@
     <string name="delete_default_aisle_exception">FEHLER: Standard-Gang kann nicht entfernt werden</string>
     <string name="duplicate_product_name_exception">FEHLER: Produktname existiert bereits</string>
     <string name="duplicate_location_name_exception">FEHLER: Standortname existiert bereits</string>
-    <string name="duplicate_aisle_name_exception">FEHLER: Gang-Name existiert bereits</string>
+    <string name="duplicate_aisle_name_exception">FEHLER: Regalname existiert bereits</string>
     <string name="invalid_location_exception">FEHLER: Ungültige Standort-ID angegeben</string>
     <string name="invalid_db_name_exception">FEHLER: Name der Datenbank nicht feststellbar</string>
     <string name="invalid_db_backup_file_exception">FEHLER: Ungültiges Sicherungsziel</string>

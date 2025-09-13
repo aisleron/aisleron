@@ -5,7 +5,8 @@ Caractéristiques principales :
 * Gestion intelligente des produits : Ajoutez des produits à votre liste et affectez-les à la zone appropriée de votre maison. Réorganisez les produits par rayon dans chaque magasin en fonction de votre itinéraire d'achat.
 * Glissez pour suivre : Suivez la progression de vos achats d'un simple geste. Glissez vers la gauche ou la droite pour marquer les articles comme étant « nécessaires » ou « en stock ».
 * Afficher sur l'écran de verrouillage : Plus besoin de déverrouiller votre écran à la fin de chaque allée. Votre liste de courses s'affichera sur l'écran de verrouillage pour plus de commodité.
-* Édition facile : Appuyez longuement sur un article pour le modifier ou le supprimer
+* Édition facile : Appuyez longuement sur un article pour le modifier ou le supprimer.
+* Cartes de fidélité : Intégrez avec Catima—Loyalty Card Wallet pour ouvrir rapidement votre carte de fidélité en magasin.
 
 Pourquoi vous l'aimerez :
 * Restez organisé en faisant vos courses de manière plus intelligente.
