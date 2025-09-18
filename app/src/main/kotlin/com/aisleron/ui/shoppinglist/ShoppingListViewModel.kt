@@ -17,6 +17,7 @@
 
 package com.aisleron.ui.shoppinglist
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aisleron.domain.FilterType
@@ -37,7 +38,6 @@ import com.aisleron.domain.product.usecase.RemoveProductUseCase
 import com.aisleron.domain.product.usecase.UpdateProductQtyNeededUseCase
 import com.aisleron.domain.product.usecase.UpdateProductStatusUseCase
 import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -205,10 +205,8 @@ class ShoppingListViewModel(
     }
 
     fun updateProductNeededQuantity(item: ProductShoppingListItem, quantity: Int?) {
-        //TODO: Test null qty passed in
-        //TODO: Test exceptionHandler
         updateQtyJob?.cancel()
-        updateQtyJob = coroutineScope.launch(exceptionHandler) {
+        updateQtyJob = coroutineScope.launchHandling {
             delay(debounceTime)
             quantity?.let { updateProductQtyNeededUseCase(item.id, it) }
         }
@@ -303,14 +301,20 @@ class ShoppingListViewModel(
         _shoppingListUiState.value = ShoppingListUiState.Empty
     }
 
-    private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
-        when (throwable) {
-            is CancellationException -> Unit // Ignore cancellation of running task
-            is AisleronException -> _shoppingListUiState.value =
-                ShoppingListUiState.Error(throwable.exceptionCode, throwable.message)
-
-            else -> ShoppingListUiState.Error(
-                AisleronException.ExceptionCode.GENERIC_EXCEPTION, throwable.message
+    private fun CoroutineScope.launchHandling(
+        block: suspend CoroutineScope.() -> Unit
+    ) = launch {
+        try {
+            block()
+        } catch (e: CancellationException) {
+            Log.e("SLVM", "Cancellation")
+            throw e // propagate cancellation
+        } catch (e: AisleronException) {
+            _shoppingListUiState.value =
+                ShoppingListUiState.Error(e.exceptionCode, e.message)
+        } catch (e: Exception) {
+            _shoppingListUiState.value = ShoppingListUiState.Error(
+                AisleronException.ExceptionCode.GENERIC_EXCEPTION, e.message
             )
         }
     }

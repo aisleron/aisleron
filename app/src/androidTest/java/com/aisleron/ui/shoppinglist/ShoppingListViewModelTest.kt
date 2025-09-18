@@ -705,13 +705,14 @@ class ShoppingListViewModelTest : KoinTest {
         assertEquals(uiStateBefore, uiStateAfter)
     }
 
-    private suspend fun ShoppingListViewModelTest.updateProductNeededQuantityArrangeAct(qtyNew: Int): Int {
+    private suspend fun updateProductNeededQuantityArrangeAct(qtyInitial: Int, qtyNew: Int?): Int {
         val shoppingList = getShoppingList()
         val existingAisle =
             shoppingList.aisles.first { it.products.count { p -> !p.product.inStock } > 0 }
 
-        val aisleProduct = existingAisle.products.first { it.product.qtyNeeded != qtyNew }
+        val aisleProduct = existingAisle.products.first()
         val productRepository = get<ProductRepository>()
+        productRepository.update(aisleProduct.product.copy(qtyNeeded = qtyInitial))
         val existingProduct = productRepository.get(aisleProduct.product.id)!!
         val shoppingListItem = ProductShoppingListItemViewModel(
             aisleRank = existingAisle.rank,
@@ -733,16 +734,27 @@ class ShoppingListViewModelTest : KoinTest {
 
     @Test
     fun updateProductNeededQuantity_ValidQty_ProductQtyNeededUpdated() = runTest {
+        val qtyInitial = 5
         val qtyNew = 10
-        val productId = updateProductNeededQuantityArrangeAct(qtyNew)
+        val productId = updateProductNeededQuantityArrangeAct(qtyInitial, qtyNew)
         val updatedProduct = get<ProductRepository>().get(productId)
         Assert.assertEquals(qtyNew, updatedProduct?.qtyNeeded)
     }
 
     @Test
     fun updateProductNeededQuantity_NegativeQty_UiStateIsError() = runTest {
+        val qtyInitial = 5
         val qtyNew = -1
-        updateProductNeededQuantityArrangeAct(qtyNew)
+        updateProductNeededQuantityArrangeAct(qtyInitial, qtyNew)
         Assert.assertTrue(shoppingListViewModel.shoppingListUiState.value is ShoppingListViewModel.ShoppingListUiState.Error)
+    }
+
+    @Test
+    fun updateProductNeededQuantity_QtyIsNull_QtyNotUpdated() = runTest {
+        val qtyInitial = 5
+        val qtyNew = null
+        val productId = updateProductNeededQuantityArrangeAct(qtyInitial, qtyNew)
+        val updatedProduct = get<ProductRepository>().get(productId)
+        Assert.assertEquals(qtyInitial, updatedProduct?.qtyNeeded)
     }
 }

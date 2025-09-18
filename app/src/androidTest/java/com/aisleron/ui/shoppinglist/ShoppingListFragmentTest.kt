@@ -1371,6 +1371,18 @@ class ShoppingListFragmentTest : KoinTest {
         assertEquals(initialQty.inc(), updatedProduct?.qtyNeeded)
     }
 
+    @Test
+    fun onProductQuantityChange_qtyEditCleared_ProductQuantityNotUpdated() = runTest {
+        val initialQty = 5
+        val product = onProductQuantityChange_Arrange(initialQty)
+
+        val edtQty = getQtyStepperComponentForProduct(product, R.id.edt_qty)
+        edtQty.perform(clearText())
+
+        val updatedProduct = get<ProductRepository>().get(product.id)
+        assertEquals(initialQty, updatedProduct?.qtyNeeded)
+    }
+
     /*@Test
     fun onDrag_IsProduct_ProductRankUpdated() {
         val shoppingList = getShoppingList()
