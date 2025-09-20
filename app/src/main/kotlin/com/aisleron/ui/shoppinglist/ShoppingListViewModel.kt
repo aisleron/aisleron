@@ -250,6 +250,7 @@ class ShoppingListViewModel(
     }
 
     fun requestDefaultList() {
+        searchJob?.cancel()
         shoppingListFilterParameters = getDefaultFilterParameters()
         coroutineScope.launch {
             _shoppingListUiState.value = ShoppingListUiState.Loading
