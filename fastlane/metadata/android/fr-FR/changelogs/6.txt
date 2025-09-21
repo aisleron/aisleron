@@ -1,0 +1,1 @@
+* Ajout des traductions françaises et polonaises depuis Hosted Weblate.
