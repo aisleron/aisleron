@@ -47,4 +47,14 @@
     <string name="add_product">Lägg till produkt</string>
     <string name="product_name">Produktnamn</string>
     <string name="shop_name">Butikens namn</string>
+    <string name="display_options_header">Visningsalternativ</string>
+    <string name="backup_restore_title">Säkerhetskopiera/Återställ</string>
+    <string name="backup_folder">Mapp för säkerhetskopia</string>
+    <string name="db_restore_confirmation_title">Bekräfta återställning av databas</string>
+    <string name="invalid_product_exception">FEL: Ogiltigt produkt-ID angavs</string>
+    <string name="invalid_db_name_exception">FEL: Kan ej fastställa databasens namn</string>
+    <string name="duplicate_product_exception">FEL: Kan ej lägga till en dubblett av en existerande produkt</string>
+    <string name="about_support_header">Hjälp</string>
+    <string name="about_support_version_title">Versionshistorik</string>
+    <string name="about_support_report_issue_title">Rapportera ett problem</string>
 </resources>
