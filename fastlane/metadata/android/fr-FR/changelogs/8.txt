@@ -1,0 +1,8 @@
+Améliorations
+* Ajout du soutien pour la recherche de cartes de fidélité par l’entremise de Catima – Portefeuille de cartes de fidélité.
+* Introduit le support de la langue russe.
+* Mise à jour du SDK cible vers Android 15 (niveau d’API 35) pour une compatibilité améliorée.
+
+Corrections de bugs
+* Résolution d’un problème où la case à cocher de l’élément de la liste inférieure était masquée par le bouton d’action flottant (FAB).
+* Correction d’un problème empêchant l’ouverture des fichiers de sauvegarde . sqlite sur Android 15.
