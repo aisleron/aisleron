@@ -78,6 +78,8 @@ class ShopListFragmentTest : KoinTest {
     private lateinit var fabHandler: FabHandlerTestImpl
     private lateinit var activityFragment: ShopListFragment
 
+    private val actionContextBarResId = androidx.appcompat.R.id.action_context_bar
+
     @get:Rule
     val koinTestRule = KoinTestRule(
         modules = listOf(daoTestModule, viewModelTestModule, repositoryModule, useCaseModule)
@@ -150,7 +152,7 @@ class ShopListFragmentTest : KoinTest {
 
         shopItem.check(matches(isSelected()))
 
-        val actionBar = onView(withId(com.google.android.material.R.id.action_context_bar))
+        val actionBar = onView(withId(actionContextBarResId))
 
         actionBar.check(matches(isDisplayed()))
         actionBar.check(matches(hasDescendant(withText(selectedLocation.name))))
@@ -279,7 +281,7 @@ class ShopListFragmentTest : KoinTest {
         shopItem.perform(longClick())
         shopItem.perform(click())
 
-        val actionBar = onView(withId(com.google.android.material.R.id.action_context_bar))
+        val actionBar = onView(withId(actionContextBarResId))
         actionBar.checkVisibility(View.GONE)
     }
 
@@ -301,7 +303,7 @@ class ShopListFragmentTest : KoinTest {
                 fabHandler.clickFab(FabHandler.FabOption.ADD_SHOP, activityFragment.requireView())
             }
 
-            val actionBar = onView(withId(com.google.android.material.R.id.action_context_bar))
+            val actionBar = onView(withId(actionContextBarResId))
             actionBar.checkVisibility(View.GONE)
         }
     }

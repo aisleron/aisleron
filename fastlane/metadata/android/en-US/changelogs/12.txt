@@ -1,0 +1,6 @@
+Enhancements:
+* Updated French and Swedish translations
+* Added Ukrainian translation
+
+Bug Fixes:
+*

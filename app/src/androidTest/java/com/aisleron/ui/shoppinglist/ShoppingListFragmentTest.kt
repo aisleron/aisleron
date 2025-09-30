@@ -113,6 +113,8 @@ class ShoppingListFragmentTest : KoinTest {
     private lateinit var fabHandler: FabHandlerTestImpl
     private lateinit var activityFragment: ShoppingListFragment
 
+    private val actionContextBarResId = androidx.appcompat.R.id.action_context_bar
+
     @get:Rule
     val koinTestRule = KoinTestRule(
         modules = listOf(
@@ -315,7 +317,7 @@ class ShoppingListFragmentTest : KoinTest {
 
         onView(withText(aisleName)).perform(longClick())
 
-        val actionBar = onView(withId(com.google.android.material.R.id.action_context_bar))
+        val actionBar = onView(withId(actionContextBarResId))
         actionBar.check(matches(isDisplayed()))
         actionBar.check(matches(hasDescendant(withText(aisleName))))
         actionBar.check(matches(hasDescendant(withId(R.id.mnu_edit_shopping_list_item))))
@@ -335,7 +337,7 @@ class ShoppingListFragmentTest : KoinTest {
 
         onView(withText(product.name)).perform(longClick())
 
-        val actionBar = onView(withId(com.google.android.material.R.id.action_context_bar))
+        val actionBar = onView(withId(actionContextBarResId))
         actionBar.check(matches(isDisplayed()))
         actionBar.check(matches(hasDescendant(withText(product.name))))
         actionBar.check(matches(hasDescendant(withId(R.id.mnu_edit_shopping_list_item))))
@@ -355,7 +357,7 @@ class ShoppingListFragmentTest : KoinTest {
         productItem.perform(longClick())
         productItem.perform(click())
 
-        val actionBar = onView(withId(com.google.android.material.R.id.action_context_bar))
+        val actionBar = onView(withId(actionContextBarResId))
         actionBar.checkVisibility(View.GONE)
         scenario.onActivity {
             assertEquals(shoppingList.name, applicationTitleUpdateListener.appTitle)
@@ -373,7 +375,7 @@ class ShoppingListFragmentTest : KoinTest {
         productItem.perform(longClick())
         pressBack()
 
-        val actionBar = onView(withId(com.google.android.material.R.id.action_context_bar))
+        val actionBar = onView(withId(actionContextBarResId))
         actionBar.checkVisibility(View.GONE)
         productItem.check(matches(not(isSelected())))
 
@@ -729,7 +731,7 @@ class ShoppingListFragmentTest : KoinTest {
 
         onView(withText(aisleName)).perform(longClick())
 
-        val actionBar = onView(withId(com.google.android.material.R.id.action_context_bar))
+        val actionBar = onView(withId(actionContextBarResId))
         actionBar.check(matches(hasDescendant(withId(R.id.mnu_add_product_to_aisle))))
     }
 
@@ -744,7 +746,7 @@ class ShoppingListFragmentTest : KoinTest {
 
         onView(withText(product.name)).perform(longClick())
 
-        val actionBar = onView(withId(com.google.android.material.R.id.action_context_bar))
+        val actionBar = onView(withId(actionContextBarResId))
         actionBar.check(matches(not(hasDescendant(withId(R.id.mnu_add_product_to_aisle)))))
     }
 
@@ -806,7 +808,7 @@ class ShoppingListFragmentTest : KoinTest {
             .inRoot(isDialog())
             .perform(click())
 
-        val actionBar = onView(withId(com.google.android.material.R.id.action_context_bar))
+        val actionBar = onView(withId(actionContextBarResId))
         actionBar.checkVisibility(View.GONE)
     }
 
@@ -828,7 +830,7 @@ class ShoppingListFragmentTest : KoinTest {
             fabHandler.clickFab(FabHandler.FabOption.ADD_PRODUCT, activityFragment.requireView())
         }
 
-        val actionBar = onView(withId(com.google.android.material.R.id.action_context_bar))
+        val actionBar = onView(withId(actionContextBarResId))
         actionBar.checkVisibility(View.GONE)
     }
 
@@ -849,7 +851,7 @@ class ShoppingListFragmentTest : KoinTest {
             fabHandler.clickFab(FabHandler.FabOption.ADD_SHOP, activityFragment.requireView())
         }
 
-        val actionBar = onView(withId(com.google.android.material.R.id.action_context_bar))
+        val actionBar = onView(withId(actionContextBarResId))
         actionBar.checkVisibility(View.GONE)
     }
 
@@ -866,7 +868,7 @@ class ShoppingListFragmentTest : KoinTest {
         val aisleItem = onView(allOf(withText(aisle.name), withId(R.id.txt_aisle_name)))
         aisleItem.perform(longClick())
 
-        val actionBar = onView(withId(com.google.android.material.R.id.action_context_bar))
+        val actionBar = onView(withId(actionContextBarResId))
         actionBar.check(matches(hasDescendant(withText(aisle.name))))
     }
 

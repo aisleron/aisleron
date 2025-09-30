@@ -19,6 +19,7 @@ package com.aisleron.data.loyaltycard
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import com.aisleron.data.location.LocationEntity
 
 @Entity(
@@ -37,6 +38,9 @@ import com.aisleron.data.location.LocationEntity
             childColumns = arrayOf("loyaltyCardId"),
             onDelete = ForeignKey.CASCADE
         )
+    ],
+    indices = [
+        Index(value = ["loyaltyCardId"])
     ]
 )
 data class LocationLoyaltyCardEntity(

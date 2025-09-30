@@ -54,6 +54,8 @@ import org.koin.test.get
 class SearchBoxTest : KoinTest {
 
     private lateinit var scenario: ActivityScenario<MainActivity>
+    private val searchBoxResId = androidx.appcompat.R.id.search_src_text
+    private val searchCloseBtnResId = androidx.appcompat.R.id.search_close_btn
 
     @get:Rule
     val koinTestRule = KoinTestRule(
@@ -92,7 +94,7 @@ class SearchBoxTest : KoinTest {
 
     private fun getSearchTextBox(): ViewInteraction = onView(
         allOf(
-            withId(com.google.android.material.R.id.search_src_text),
+            withId(searchBoxResId),
             isDisplayed()
         )
     )
@@ -109,7 +111,7 @@ class SearchBoxTest : KoinTest {
     @Test
     fun onSearchClick_SearchBoxDisplayed() {
         activateSearchBox()
-        onView(withId(com.google.android.material.R.id.search_src_text)).check(matches(isDisplayed()))
+        onView(withId(searchBoxResId)).check(matches(isDisplayed()))
     }
 
     @Test
@@ -136,8 +138,7 @@ class SearchBoxTest : KoinTest {
         performSearch(searchString)
         val clearSearch = onView(
             Matchers.allOf(
-                withId(com.google.android.material.R.id.search_close_btn),
-                withContentDescription("Clear query"),
+                withId(searchCloseBtnResId),
                 isDisplayed()
             )
         )
@@ -159,9 +160,5 @@ class SearchBoxTest : KoinTest {
 
         getSearchTextBox().check(doesNotExist())
     }
-
-    /*
-        Fab shows correctly
-     */
 }
 
