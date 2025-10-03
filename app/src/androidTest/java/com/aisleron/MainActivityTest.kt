@@ -27,9 +27,19 @@ import com.aisleron.di.preferenceTestModule
 import com.aisleron.di.repositoryModule
 import com.aisleron.di.useCaseModule
 import com.aisleron.di.viewModelTestModule
+import com.aisleron.domain.FilterType
+import com.aisleron.domain.location.LocationRepository
+import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
+import com.aisleron.ui.ApplicationTitleUpdateListener
+import com.aisleron.ui.ApplicationTitleUpdateListenerImpl
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.runTest
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.koin.test.KoinTest
+import org.koin.test.get
+import org.koin.test.mock.declare
 import kotlin.test.assertEquals
 
 class MainActivityTest : KoinTest {
@@ -45,6 +55,11 @@ class MainActivityTest : KoinTest {
             preferenceTestModule
         )
     )
+
+    @Before
+    fun setUp() {
+        SharedPreferencesInitializer().clearPreferences()
+    }
 
     @Test
     fun appStart_LightThemeSet_UseLightTheme() {
@@ -70,4 +85,50 @@ class MainActivityTest : KoinTest {
         )
     }
 
+    private fun appStart_TestHomeListOptions(filterType: FilterType, expectedResId: Int){
+        declare<ApplicationTitleUpdateListener> { ApplicationTitleUpdateListenerImpl() }
+        val locationId = 1
+
+        with(SharedPreferencesInitializer()) {
+            setIsInitialized(true)
+            setStartingList(locationId, filterType)
+        }
+
+        val activity = ActivityScenario.launch(MainActivity::class.java)
+        activity.onActivity {
+            assertEquals(it.getString(expectedResId), it.supportActionBar?.title)
+        }
+    }
+
+    @Test
+    fun appStart_StartPageIsInStock_ShowInStock() {
+        appStart_TestHomeListOptions(FilterType.IN_STOCK, R.string.menu_in_stock)
+    }
+
+    @Test
+    fun appStart_StartPageIsNeeded_ShowNeeded() {
+        appStart_TestHomeListOptions(FilterType.NEEDED, R.string.menu_needed)
+    }
+
+    @Test
+    fun appStart_StartPageIsAll_ShowAll() {
+        appStart_TestHomeListOptions(FilterType.ALL, R.string.menu_all_items)
+    }
+
+    @Test
+    fun appStart_StartPageIsShop_ShowShop() = runTest {
+        declare<ApplicationTitleUpdateListener> { ApplicationTitleUpdateListenerImpl() }
+        get<CreateSampleDataUseCase>().invoke()
+        val location = get<LocationRepository>().getShops().first().first()
+
+        with(SharedPreferencesInitializer()) {
+            setIsInitialized(true)
+            setStartingList(location.id, location.defaultFilter)
+        }
+
+        val activity = ActivityScenario.launch(MainActivity::class.java)
+        activity.onActivity {
+            assertEquals(location.name, it.supportActionBar?.title)
+        }
+    }
 }

@@ -101,6 +101,7 @@ class WelcomeFragmentTest : KoinTest {
     @Before
     fun setUp() {
         fabHandler = FabHandlerTestImpl()
+        SharedPreferencesInitializer().clearPreferences()
     }
 
     @Test
@@ -144,7 +145,7 @@ class WelcomeFragmentTest : KoinTest {
             s.onActivity { a ->
                 val navController = a.findNavController(R.id.nav_host_fragment_content_main)
 
-                assertEquals(R.id.nav_in_stock, navController.currentDestination?.id)
+                assertEquals(R.id.nav_shopping_list, navController.currentDestination?.id)
                 assertEquals(a.getString(R.string.app_name), a.supportActionBar?.title)
             }
         }

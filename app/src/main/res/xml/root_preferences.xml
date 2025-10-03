@@ -33,6 +33,10 @@
             android:key="application_theme"
             android:title="@string/theme"
             app:useSimpleSummaryProvider="true" />
+        <ListPreference
+            app:key="starting_list"
+            app:title="@string/starting_list"
+            app:defaultValue="1|IN_STOCK" />
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/shopping_list_options_header">

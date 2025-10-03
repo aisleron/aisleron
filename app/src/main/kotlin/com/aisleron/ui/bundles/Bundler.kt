@@ -98,12 +98,16 @@ class Bundler {
         return result ?: AddEditLocationBundle()
     }
 
+    fun makeShoppingListBundle(shoppingListBundle: ShoppingListBundle): Bundle {
+        return makeParcelableBundle(SHOPPING_LIST_BUNDLE, shoppingListBundle)
+    }
+
     fun makeShoppingListBundle(locationId: Int, filterType: FilterType): Bundle {
         val shoppingListBundle = ShoppingListBundle(
             locationId = locationId,
             filterType = filterType
         )
-        return makeParcelableBundle(SHOPPING_LIST_BUNDLE, shoppingListBundle)
+        return makeShoppingListBundle(shoppingListBundle)
     }
 
     fun getShoppingListBundle(bundle: Bundle?): ShoppingListBundle {

@@ -20,7 +20,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/nav_in_stock">
+    app:startDestination="@+id/nav_shopping_list">
 
     <fragment
         android:id="@+id/nav_in_stock"

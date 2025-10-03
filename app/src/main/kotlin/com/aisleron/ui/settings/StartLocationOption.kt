@@ -17,20 +17,10 @@
 
 package com.aisleron.ui.settings
 
-import android.content.Context
-import com.aisleron.ui.bundles.ShoppingListBundle
+import com.aisleron.domain.FilterType
 
-interface DisplayPreferences {
-
-    enum class ApplicationTheme {
-        SYSTEM_THEME,
-        LIGHT_THEME,
-        DARK_THEME
-    }
-
-    fun showOnLockScreen(context: Context): Boolean
-
-    fun applicationTheme(context: Context): ApplicationTheme
-
-    fun startingList(context: Context): ShoppingListBundle
-}
+data class StartLocationOption(
+    val id: Int,
+    val name: String,
+    val filterType: FilterType
+)

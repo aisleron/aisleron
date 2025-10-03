@@ -79,7 +79,9 @@ val viewModelModule = module {
     viewModel {
         SettingsViewModel(
             backupDatabaseUseCase = get(),
-            restoreDatabaseUseCase = get()
+            restoreDatabaseUseCase = get(),
+            getHomeLocationUseCase = get(),
+            getPinnedShopsUseCase = get()
         )
     }
 

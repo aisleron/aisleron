@@ -19,10 +19,17 @@ package com.aisleron.ui.settings
 
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.aisleron.SharedPreferencesInitializer
+import com.aisleron.domain.FilterType
+import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
 
 class DisplayPreferencesImplTest {
+
+    @Before
+    fun setUp() {
+        SharedPreferencesInitializer().clearPreferences()
+    }
 
     @Test
     fun getApplicationTheme_SetToLightTheme_ReturnLightThemeEnum() {
@@ -49,5 +56,96 @@ class DisplayPreferencesImplTest {
             DisplayPreferencesImpl().applicationTheme(getInstrumentation().targetContext)
 
         assertEquals(DisplayPreferences.ApplicationTheme.SYSTEM_THEME, applicationTheme)
+    }
+
+    @Test
+    fun showOnLockScreen_ValueIsFalse_ReturnFalse() {
+        val showOnLockScreen = false
+        SharedPreferencesInitializer().setShowOnLockScreen(showOnLockScreen)
+        val showOnLockScreenResult =
+            DisplayPreferencesImpl().showOnLockScreen(getInstrumentation().targetContext)
+
+        assertEquals(showOnLockScreen, showOnLockScreenResult)
+    }
+
+    @Test
+    fun showOnLockScreen_ValueIsTrue_ReturnTrue() {
+        val showOnLockScreen = true
+        SharedPreferencesInitializer().setShowOnLockScreen(showOnLockScreen)
+        val showOnLockScreenResult =
+            DisplayPreferencesImpl().showOnLockScreen(getInstrumentation().targetContext)
+
+        assertEquals(showOnLockScreen, showOnLockScreenResult)
+    }
+
+    @Test
+    fun getStartingList_FilterTypeIsInStock_ReturnInStockShoppingListBundle() {
+        val locationId = 1
+        val filterType = FilterType.IN_STOCK
+        SharedPreferencesInitializer().setStartingList(locationId, filterType)
+        val shoppingListBundle =
+            DisplayPreferencesImpl().startingList(getInstrumentation().targetContext)
+
+        assertEquals(locationId, shoppingListBundle.locationId)
+        assertEquals(filterType, shoppingListBundle.filterType)
+    }
+
+    @Test
+    fun getStartingList_FilterTypeIsNeeded_ReturnNeededShoppingListBundle() {
+        val locationId = 7
+        val filterType = FilterType.NEEDED
+        SharedPreferencesInitializer().setStartingList(locationId, filterType)
+        val shoppingListBundle =
+            DisplayPreferencesImpl().startingList(getInstrumentation().targetContext)
+
+        assertEquals(locationId, shoppingListBundle.locationId)
+        assertEquals(filterType, shoppingListBundle.filterType)
+    }
+
+    @Test
+    fun getStartingList_FilterTypeIsAll_ReturnAllShoppingListBundle() {
+        val locationId = 5
+        val filterType = FilterType.ALL
+        SharedPreferencesInitializer().setStartingList(locationId, filterType)
+        val shoppingListBundle =
+            DisplayPreferencesImpl().startingList(getInstrumentation().targetContext)
+
+        assertEquals(locationId, shoppingListBundle.locationId)
+        assertEquals(filterType, shoppingListBundle.filterType)
+    }
+
+    @Test
+    fun getStartingList_NoValueDefined_ReturnInStockShoppingListBundle() {
+        val locationId = 1
+        val filterType = FilterType.IN_STOCK
+        val shoppingListBundle =
+            DisplayPreferencesImpl().startingList(getInstrumentation().targetContext)
+
+        assertEquals(locationId, shoppingListBundle.locationId)
+        assertEquals(filterType, shoppingListBundle.filterType)
+    }
+
+    @Test
+    fun getStartingList_InvalidIdSaved_ReturnId1() {
+        val locationId = 1
+        val filterType = FilterType.ALL
+        SharedPreferencesInitializer().setStartingList("x|${filterType.name}")
+        val shoppingListBundle =
+            DisplayPreferencesImpl().startingList(getInstrumentation().targetContext)
+
+        assertEquals(locationId, shoppingListBundle.locationId)
+        assertEquals(filterType, shoppingListBundle.filterType)
+    }
+
+    @Test
+    fun getStartingList_InvalidFilterTypeSaved_ReturnFilterTypeInStock() {
+        val locationId = 1
+        val filterType = FilterType.IN_STOCK
+        SharedPreferencesInitializer().setStartingList("$locationId|x")
+        val shoppingListBundle =
+            DisplayPreferencesImpl().startingList(getInstrumentation().targetContext)
+
+        assertEquals(locationId, shoppingListBundle.locationId)
+        assertEquals(filterType, shoppingListBundle.filterType)
     }
 }
