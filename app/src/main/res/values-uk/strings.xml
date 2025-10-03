@@ -137,4 +137,5 @@
     <string name="decrement">Зменшення</string>
     <string name="increment">Приріст</string>
     <string name="qty">Йти</string>
+    <string name="starting_list">Стартовий список</string>
 </resources>
