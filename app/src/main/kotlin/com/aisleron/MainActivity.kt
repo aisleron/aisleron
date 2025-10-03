@@ -47,10 +47,10 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.preference.PreferenceManager
 import com.aisleron.databinding.ActivityMainBinding
 import com.aisleron.ui.FabHandlerImpl
+import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.settings.DisplayPreferences
 import com.aisleron.ui.settings.DisplayPreferencesImpl
 import com.aisleron.ui.settings.WelcomePreferencesImpl
-import com.google.android.material.navigation.NavigationView
 import org.koin.androidx.fragment.android.setupKoinFragmentFactory
 
 
@@ -97,13 +97,20 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(binding.appBarMain.toolbar)
 
         val drawerLayout: DrawerLayout = binding.drawerLayout
-        val navView: NavigationView = binding.navView
 
         setWindowInsetListeners()
 
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_main) as NavHostFragment
+
         val navController = navHostFragment.navController
+        val navInflater = navController.navInflater
+        val navGraph = navInflater.inflate(R.navigation.mobile_navigation)
+
+        val shoppingListBundle =
+            Bundler().makeShoppingListBundle(displayPreferences.startingList(this))
+
+        navController.setGraph(navGraph, shoppingListBundle)
 
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
@@ -117,7 +124,7 @@ class MainActivity : AppCompatActivity() {
             ), drawerLayout
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
-        navView.setupWithNavController(navController)
+        binding.navView.setupWithNavController(navController)
 
         navController.addOnDestinationChangedListener { _, _, _ ->
             val appBarLayout = binding.appBarMain.appBarLayout

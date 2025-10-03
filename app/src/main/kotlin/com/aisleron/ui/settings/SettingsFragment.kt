@@ -35,9 +35,11 @@ import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.aisleron.R
+import com.aisleron.domain.FilterType
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.ui.AisleronExceptionMap
 import com.aisleron.ui.AisleronFragment
@@ -71,6 +73,8 @@ class SettingsFragment : PreferenceFragmentCompat(), AisleronFragment {
         initializeDbBackupRestorePreference(
             PreferenceOption.RESTORE_DATABASE, this::selectBackupFile, this::restoreDatabase
         )
+
+        settingsViewModel.requestLocationDetails()
     }
 
     private fun initializeDbBackupRestorePreference(
@@ -110,6 +114,31 @@ class SettingsFragment : PreferenceFragmentCompat(), AisleronFragment {
                 settingsViewModel.uiState.collect {
                     when (it) {
                         SettingsViewModel.UiState.Empty -> Unit
+                        is SettingsViewModel.UiState.LocationListUpdated -> {
+                            val pageNames = mutableListOf(
+                                getString(R.string.menu_in_stock),
+                                getString(R.string.menu_needed),
+                                getString(R.string.menu_all_items)
+                            )
+
+                            val pageValues = mutableListOf(
+                                "${it.homeLocationId}|${FilterType.IN_STOCK.name}",
+                                "${it.homeLocationId}|${FilterType.NEEDED.name}",
+                                "${it.homeLocationId}|${FilterType.ALL.name}",
+                            )
+
+                            pageNames += it.locationOptions.map { option -> option.name }
+                            pageValues += it.locationOptions.map { option -> "${option.id}|${option.filterType.name}" }
+
+                            val startLocationPref =
+                                findPreference<ListPreference>("starting_list")!!
+
+                            startLocationPref.entries = pageNames.toTypedArray()
+                            startLocationPref.entryValues = pageValues.toTypedArray()
+                            startLocationPref.summaryProvider =
+                                ListPreference.SimpleSummaryProvider.getInstance()
+                        }
+
                         is SettingsViewModel.UiState.Processing -> {
                             it.message?.let { msg ->
                                 Snackbar.make(requireView(), msg, Toast.LENGTH_SHORT).show()

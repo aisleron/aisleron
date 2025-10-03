@@ -17,252 +17,120 @@
 
 package com.aisleron.ui.settings
 
-import android.net.Uri
-import androidx.preference.Preference
-import androidx.preference.PreferenceManager
-import androidx.test.core.app.ApplicationProvider
 import com.aisleron.di.KoinTestRule
 import com.aisleron.di.daoTestModule
 import com.aisleron.di.repositoryModule
 import com.aisleron.di.useCaseModule
 import com.aisleron.di.viewModelTestModule
+import com.aisleron.domain.FilterType
 import com.aisleron.domain.backup.DatabaseMaintenance
 import com.aisleron.domain.backup.usecase.BackupDatabaseUseCase
 import com.aisleron.domain.backup.usecase.RestoreDatabaseUseCase
-import com.aisleron.domain.base.AisleronException
+import com.aisleron.domain.location.Location
+import com.aisleron.domain.location.LocationRepository
+import com.aisleron.domain.location.LocationType
+import com.aisleron.domain.location.usecase.GetHomeLocationUseCase
+import com.aisleron.domain.location.usecase.GetPinnedShopsUseCase
+import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import com.aisleron.testdata.data.maintenance.DatabaseMaintenanceDbNameTestImpl
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.Parameterized
 import org.koin.test.KoinTest
 import org.koin.test.get
 import org.koin.test.mock.declare
-import java.net.URI
+import kotlin.test.assertEquals
 
-@RunWith(value = Parameterized::class)
-class SettingsViewModelTest(
-    private val preferenceOption: SettingsFragment.PreferenceOption,
-    private val clazz: Class<BackupRestoreDbPreferenceHandler>,
-    private val setPreferenceValue: String,
-    private val getPreferenceValue: String
-) : KoinTest {
-    private lateinit var preference: Preference
+class SettingsViewModelTest : KoinTest {
+    private lateinit var settingsViewModel: SettingsViewModel
 
     @get:Rule
     val koinTestRule = KoinTestRule(
-        modules = listOf(
-            daoTestModule, repositoryModule, useCaseModule, viewModelTestModule
-        )
+        modules = listOf(daoTestModule, viewModelTestModule, repositoryModule, useCaseModule)
     )
-
-    companion object {
-        @JvmStatic
-        @Parameterized.Parameters(name = "{0}")
-        fun data(): Collection<Array<Any>> {
-            return listOf(
-                arrayOf(
-                    SettingsFragment.PreferenceOption.BACKUP_FOLDER,
-                    BackupFolderPreferenceHandler::class.java,
-                    "Set Backup Folder Value",
-                    "Get Backup Folder Value"
-                ),
-                arrayOf(
-                    SettingsFragment.PreferenceOption.BACKUP_DATABASE,
-                    BackupDbPreferenceHandler::class.java,
-                    "Set Backup Database Value",
-                    "Get Backup Database Value"
-                ),
-                arrayOf(
-                    SettingsFragment.PreferenceOption.RESTORE_DATABASE,
-                    RestoreDbPreferenceHandler::class.java,
-                    "Set Restore Database Value",
-                    "Get Restore Database Value"
-                )
-            )
-        }
-    }
 
     @Before
     fun setUp() {
-        val pm = PreferenceManager(ApplicationProvider.getApplicationContext())
-        val ps = pm.createPreferenceScreen(pm.context)
-        pm.setPreferences(ps)
-
-        preference = Preference(pm.context)
-        preference.key = preferenceOption.key
-        ps.addPreference(preference)
-
         declare<DatabaseMaintenance> { DatabaseMaintenanceDbNameTestImpl("Dummy") }
+        settingsViewModel = get<SettingsViewModel>()
+        runBlocking { get<CreateSampleDataUseCase>().invoke() }
     }
-
-    private fun getTestSettingsViewModel(): SettingsViewModel {
-        return get<SettingsViewModel>()
-    }
-
-    @Test
-    fun preferenceHandlerFactory_forGivenPreference_ReturnPreferenceHandler() {
-        val vm = getTestSettingsViewModel()
-
-        val preferenceHandler = vm.preferenceHandlerFactory(preferenceOption, preference)
-
-        Assert.assertTrue(preferenceHandler.javaClass == clazz)
-    }
-
-    @Test
-    fun setPreferenceValue_ValueProvided_PreferenceValueMatches() {
-        val vm = getTestSettingsViewModel()
-        vm.preferenceHandlerFactory(preferenceOption, preference)
-
-        vm.setPreferenceValue(preferenceOption, setPreferenceValue)
-
-        val preferenceValue = preference.sharedPreferences?.getString(preference.key, "")
-        Assert.assertEquals(setPreferenceValue, preferenceValue)
-    }
-
-    @Test
-    fun getPreferenceValue_ValueRequested_PreferenceValueMatches() {
-        preference.sharedPreferences?.edit()
-            ?.putString(preference.key, getPreferenceValue)
-            ?.apply()
-
-        val vm = getTestSettingsViewModel()
-        vm.preferenceHandlerFactory(preferenceOption, preference)
-
-        val preferenceValue = vm.getPreferenceValue(preferenceOption)
-
-        Assert.assertEquals(getPreferenceValue, preferenceValue)
-    }
-
-    @Test
-    fun handleOnPreferenceClick_OnClickSuccessful_UiStateIsSuccess() {
-        val vm = getTestSettingsViewModel()
-        val preferenceHandler = vm.preferenceHandlerFactory(preferenceOption, preference)
-
-        vm.handleOnPreferenceClick(preferenceOption, Uri.parse("DummyUri"))
-
-        Assert.assertEquals(
-            SettingsViewModel.UiState.Success(preferenceHandler.getSuccessMessage()),
-            vm.uiState.value
-        )
-
-        Assert.assertEquals(
-            preferenceHandler.getSuccessMessage(),
-            (vm.uiState.value as SettingsViewModel.UiState.Success).message
-        )
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    fun handleOnPreferenceClick_AisleronExceptionRaised_UiStateIsError() {
-        val errorMessage = "${preferenceOption.key} Aisleron Exception"
-        val vm = SettingsViewModel(
-            object : BackupDatabaseUseCase {
-                override suspend fun invoke(backupFolderUri: URI) {
-                    throw AisleronException.InvalidDbNameException(errorMessage)
-                }
-            },
-
-            object : RestoreDatabaseUseCase {
-                override suspend fun invoke(restoreFileUri: URI) {
-                    throw AisleronException.InvalidDbNameException(errorMessage)
-                }
-            },
-
-            TestScope(UnconfinedTestDispatcher())
-        )
-
-        val preferenceHandler = vm.preferenceHandlerFactory(preferenceOption, preference)
-
-        vm.handleOnPreferenceClick(preferenceOption, Uri.parse("DummyUri"))
-
-        if (preferenceOption == SettingsFragment.PreferenceOption.BACKUP_FOLDER) {
-            Assert.assertEquals(
-                SettingsViewModel.UiState.Success(preferenceHandler.getSuccessMessage()),
-                vm.uiState.value
-            )
-        } else {
-            Assert.assertEquals(
-                SettingsViewModel.UiState.Error(
-                    AisleronException.ExceptionCode.INVALID_DB_NAME_EXCEPTION, errorMessage
-                ),
-                vm.uiState.value
-            )
-
-            Assert.assertEquals(
-                errorMessage,
-                (vm.uiState.value as SettingsViewModel.UiState.Error).errorMessage
-            )
-
-            Assert.assertEquals(
-                AisleronException.ExceptionCode.INVALID_DB_NAME_EXCEPTION,
-                (vm.uiState.value as SettingsViewModel.UiState.Error).errorCode
-            )
-        }
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    fun handleOnPreferenceClick_ExceptionRaised_UiStateIsError() {
-        val errorMessage = "${preferenceOption.key} Exception"
-        val vm = SettingsViewModel(
-            object : BackupDatabaseUseCase {
-                override suspend fun invoke(backupFolderUri: URI) {
-                    throw Exception(errorMessage)
-                }
-            },
-
-            object : RestoreDatabaseUseCase {
-                override suspend fun invoke(restoreFileUri: URI) {
-                    throw Exception(errorMessage)
-                }
-            },
-
-            TestScope(UnconfinedTestDispatcher())
-        )
-
-        val preferenceHandler = vm.preferenceHandlerFactory(preferenceOption, preference)
-
-        vm.handleOnPreferenceClick(preferenceOption, Uri.parse("DummyUri"))
-
-        if (preferenceOption == SettingsFragment.PreferenceOption.BACKUP_FOLDER) {
-            Assert.assertEquals(
-                SettingsViewModel.UiState.Success(preferenceHandler.getSuccessMessage()),
-                vm.uiState.value
-            )
-        } else {
-            Assert.assertEquals(
-                SettingsViewModel.UiState.Error(
-                    AisleronException.ExceptionCode.GENERIC_EXCEPTION, errorMessage
-                ),
-                vm.uiState.value
-            )
-
-            Assert.assertEquals(
-                errorMessage,
-                (vm.uiState.value as SettingsViewModel.UiState.Error).errorMessage
-            )
-
-            Assert.assertEquals(
-                AisleronException.ExceptionCode.GENERIC_EXCEPTION,
-                (vm.uiState.value as SettingsViewModel.UiState.Error).errorCode
-            )
-        }
-    }
-
 
     @Test
     fun constructor_NoCoroutineScopeProvided_SettingsViewModelReturned() {
         val vm = SettingsViewModel(
-            get<BackupDatabaseUseCase>(),
-            get<RestoreDatabaseUseCase>()
+            backupDatabaseUseCase = get<BackupDatabaseUseCase>(),
+            restoreDatabaseUseCase = get<RestoreDatabaseUseCase>(),
+            getHomeLocationUseCase = get<GetHomeLocationUseCase>(),
+            getPinnedShopsUseCase = get<GetPinnedShopsUseCase>()
         )
 
         Assert.assertNotNull(vm)
     }
+
+    @Test
+    fun requestLocationDetails_OnRun_ReturnHomeLocationId() = runTest {
+        val homeLocation = get<LocationRepository>().getHome()
+
+        settingsViewModel.requestLocationDetails()
+
+        val result =
+            settingsViewModel.uiState.value as SettingsViewModel.UiState.LocationListUpdated
+
+        assertEquals(homeLocation.id, result.homeLocationId)
+    }
+
+    private fun requestLocationDetailsTest(location: Location) {
+        val expectedOption = StartLocationOption(
+            id = location.id,
+            name = location.name,
+            filterType = location.defaultFilter
+        )
+
+        settingsViewModel.requestLocationDetails()
+
+        val locationOption =
+            (settingsViewModel.uiState.value as SettingsViewModel.UiState.LocationListUpdated)
+                .locationOptions.single { it.id == location.id }
+
+        assertEquals(expectedOption, locationOption)
+    }
+
+    private suspend fun getLocationWithFilterType(filterType: FilterType): Location {
+        val locationRepository = get<LocationRepository>()
+        val location =
+            locationRepository.getPinnedShops().first().first { it.type == LocationType.SHOP }
+                .copy(defaultFilter = filterType)
+
+        locationRepository.update(location)
+        return location
+    }
+
+    @Test
+    fun requestLocationDetails_LocationHasNeededFilter_ReturnWithNeededFilter() = runTest {
+        val location = getLocationWithFilterType(FilterType.NEEDED)
+        requestLocationDetailsTest(location)
+    }
+
+    @Test
+    fun requestLocationDetails_LocationHasInStockFilter_ReturnWithInStockFilter() = runTest {
+        val location = getLocationWithFilterType(FilterType.IN_STOCK)
+        requestLocationDetailsTest(location)
+    }
+
+    @Test
+    fun requestLocationDetails_LocationHasAllFilter_ReturnWithAllFilter() = runTest {
+        val location = getLocationWithFilterType(FilterType.ALL)
+        requestLocationDetailsTest(location)
+    }
+
+    /**
+     * Tests:
+     *  shops returned with correct filter type
+     */
+
 }

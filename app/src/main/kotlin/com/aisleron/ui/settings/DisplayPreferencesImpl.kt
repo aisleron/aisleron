@@ -19,6 +19,8 @@ package com.aisleron.ui.settings
 
 import android.content.Context
 import androidx.preference.PreferenceManager
+import com.aisleron.domain.FilterType
+import com.aisleron.ui.bundles.ShoppingListBundle
 
 class DisplayPreferencesImpl : DisplayPreferences {
 
@@ -36,6 +38,20 @@ class DisplayPreferencesImpl : DisplayPreferences {
         }
     }
 
+    override fun startingList(context: Context): ShoppingListBundle {
+        val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+        val startList = prefs.getString(STARTING_LIST, null) ?: "1|IN_STOCK"
+        val (locationIdStr, filterTypeStr) = startList.split("|")
+        val locationId = locationIdStr.toIntOrNull() ?: 1
+        val filterType = try {
+            FilterType.valueOf(filterTypeStr)
+        } catch (e: IllegalArgumentException) {
+            FilterType.IN_STOCK
+        }
+
+        return ShoppingListBundle(locationId, filterType)
+    }
+
     companion object {
         private const val SYSTEM_THEME = "system_theme"
         private const val LIGHT_THEME = "light_theme"
@@ -43,5 +59,7 @@ class DisplayPreferencesImpl : DisplayPreferences {
 
         private const val DISPLAY_LOCKSCREEN = "display_lockscreen"
         private const val APPLICATION_THEME = "application_theme"
+
+        private const val STARTING_LIST = "starting_list"
     }
 }

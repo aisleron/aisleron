@@ -89,6 +89,8 @@ val viewModelTestModule = module {
         SettingsViewModel(
             backupDatabaseUseCase = get(),
             restoreDatabaseUseCase = get(),
+            getHomeLocationUseCase = get(),
+            getPinnedShopsUseCase = get(),
             TestScope(UnconfinedTestDispatcher())
         )
     }

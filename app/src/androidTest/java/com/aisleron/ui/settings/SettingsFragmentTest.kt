@@ -27,16 +27,19 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.findNavController
 import androidx.preference.Preference
+import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.Intents.intending
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
 import androidx.test.espresso.matcher.RootMatchers.isDialog
 import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.matcher.ViewMatchers.hasDescendant
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withContentDescription
 import androidx.test.espresso.matcher.ViewMatchers.withId
@@ -67,7 +70,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 
-
 class SettingsFragmentTest : KoinTest {
 
     @get:Rule
@@ -88,6 +90,16 @@ class SettingsFragmentTest : KoinTest {
         declare<DatabaseMaintenance> { DatabaseMaintenanceDbNameTestImpl("Dummy") }
     }
 
+    private fun clickOption(viewTextResourceId: Int) {
+        onView(withId(androidx.preference.R.id.recycler_view))
+            .perform(
+                RecyclerViewActions.actionOnItem<RecyclerView.ViewHolder>(
+                    hasDescendant(withText(viewTextResourceId)),
+                    click()
+                )
+            )
+    }
+
     private fun getFragmentScenario(): FragmentScenario<SettingsFragment> =
         launchFragmentInContainer<SettingsFragment>(
             themeResId = R.style.Theme_Aisleron,
@@ -102,8 +114,8 @@ class SettingsFragmentTest : KoinTest {
 
             scenario.onActivity {
                 navController = it.findNavController(R.id.nav_host_fragment_content_main)
-                startDestination = navController?.currentDestination
-                navController?.navigate(R.id.nav_settings)
+                startDestination = navController.currentDestination
+                navController.navigate(R.id.nav_settings)
             }
             //pressBack()
             val backAction = onView(
@@ -120,7 +132,7 @@ class SettingsFragmentTest : KoinTest {
         getFragmentScenario()
         Intents.init()
 
-        onView(withText(R.string.backup_folder)).perform(click())
+        clickOption(R.string.backup_folder)
         intended(hasAction(Intent.ACTION_OPEN_DOCUMENT_TREE))
 
         Intents.release()
@@ -153,7 +165,7 @@ class SettingsFragmentTest : KoinTest {
 
         Intents.init()
         intending(hasAction(intentAction)).respondWith(result)
-        onView(withText(viewTextResourceId)).perform(click())
+        clickOption(viewTextResourceId)
         Intents.release()
     }
 
@@ -162,7 +174,7 @@ class SettingsFragmentTest : KoinTest {
         getFragmentScenario()
         Intents.init()
 
-        onView(withText(R.string.backup_database)).perform(click())
+        clickOption(R.string.backup_database)
         intended(hasAction(Intent.ACTION_OPEN_DOCUMENT_TREE))
 
         Intents.release()
@@ -193,7 +205,8 @@ class SettingsFragmentTest : KoinTest {
         getFragmentScenario()
         Intents.init()
 
-        onView(withText(R.string.restore_database)).perform(click())
+        clickOption(R.string.restore_database)
+
         intended(hasAction(Intent.ACTION_OPEN_DOCUMENT))
 
         Intents.release()

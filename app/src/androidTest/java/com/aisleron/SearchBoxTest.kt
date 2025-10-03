@@ -72,6 +72,7 @@ class SearchBoxTest : KoinTest {
 
     @Before
     fun setUp() {
+        SharedPreferencesInitializer().clearPreferences()
         SharedPreferencesInitializer().setIsInitialized(true)
         runBlocking { get<CreateSampleDataUseCase>().invoke() }
         scenario = ActivityScenario.launch(MainActivity::class.java)

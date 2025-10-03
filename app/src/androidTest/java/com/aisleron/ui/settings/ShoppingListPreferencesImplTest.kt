@@ -20,12 +20,18 @@ package com.aisleron.ui.settings
 import androidx.preference.PreferenceManager
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.aisleron.SharedPreferencesInitializer
+import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class ShoppingListPreferencesImplTest {
+
+    @Before
+    fun setUp() {
+        SharedPreferencesInitializer().clearPreferences()
+    }
 
     @Test
     fun getSnackBarHidden_isHidden_ReturnTrue() {

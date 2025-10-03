@@ -24,14 +24,19 @@ import androidx.preference.Preference
 import com.aisleron.domain.backup.usecase.BackupDatabaseUseCase
 import com.aisleron.domain.backup.usecase.RestoreDatabaseUseCase
 import com.aisleron.domain.base.AisleronException
+import com.aisleron.domain.location.usecase.GetHomeLocationUseCase
+import com.aisleron.domain.location.usecase.GetPinnedShopsUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlin.coroutines.cancellation.CancellationException
 
 class SettingsViewModel(
     private val backupDatabaseUseCase: BackupDatabaseUseCase,
     private val restoreDatabaseUseCase: RestoreDatabaseUseCase,
+    private val getHomeLocationUseCase: GetHomeLocationUseCase,
+    private val getPinnedShopsUseCase: GetPinnedShopsUseCase,
     coroutineScopeProvider: CoroutineScope? = null
 ) : ViewModel() {
     private val coroutineScope = coroutineScopeProvider ?: this.viewModelScope
@@ -45,16 +50,9 @@ class SettingsViewModel(
         val preferenceHandler = preferenceHandlers.getValue(preferenceOption.key)
         _uiState.value = UiState.Processing(preferenceHandler.getProcessingMessage())
 
-        coroutineScope.launch {
-            try {
-                preferenceHandler.handleOnPreferenceClick(uri)
-                _uiState.value = UiState.Success(preferenceHandler.getSuccessMessage())
-            } catch (e: AisleronException) {
-                _uiState.value = UiState.Error(e.exceptionCode, e.message)
-            } catch (e: Exception) {
-                _uiState.value =
-                    UiState.Error(AisleronException.ExceptionCode.GENERIC_EXCEPTION, e.message)
-            }
+        coroutineScope.launchHandling {
+            preferenceHandler.handleOnPreferenceClick(uri)
+            _uiState.value = UiState.Success(preferenceHandler.getSuccessMessage())
         }
     }
 
@@ -85,13 +83,52 @@ class SettingsViewModel(
         return result
     }
 
+    fun requestLocationDetails() {
+        coroutineScope.launchHandling {
+            val homeLocationId = getHomeLocationUseCase.invoke().id
+            getPinnedShopsUseCase().collect {
+                val locationList = it.map { s ->
+                    StartLocationOption(
+                        id = s.id,
+                        name = s.name,
+                        filterType = s.defaultFilter
+                    )
+                }
+
+                _uiState.value = UiState.LocationListUpdated(homeLocationId, locationList)
+            }
+        }
+
+    }
+
+    private fun CoroutineScope.launchHandling(
+        block: suspend CoroutineScope.() -> Unit
+    ) = launch {
+        try {
+            block()
+        } catch (e: CancellationException) {
+            throw e // propagate cancellation
+        } catch (e: AisleronException) {
+            _uiState.value = UiState.Error(e.exceptionCode, e.message)
+        } catch (e: Exception) {
+            _uiState.value = UiState.Error(
+                AisleronException.ExceptionCode.GENERIC_EXCEPTION, e.message
+            )
+        }
+    }
+
     sealed class UiState {
         data object Empty : UiState()
         data class Processing(val message: String?) : UiState()
         data class Success(val message: String) : UiState()
+
         data class Error(
             val errorCode: AisleronException.ExceptionCode,
             val errorMessage: String?
+        ) : UiState()
+
+        data class LocationListUpdated(
+            val homeLocationId: Int, val locationOptions: List<StartLocationOption>
         ) : UiState()
     }
 }
