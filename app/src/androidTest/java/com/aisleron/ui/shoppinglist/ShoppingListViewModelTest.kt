@@ -26,6 +26,7 @@ import com.aisleron.domain.FilterType
 import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.aisle.AisleRepository
 import com.aisleron.domain.aisle.usecase.AddAisleUseCase
+import com.aisleron.domain.aisle.usecase.ExpandCollapseAislesForLocationUseCase
 import com.aisleron.domain.aisle.usecase.GetAisleUseCase
 import com.aisleron.domain.aisle.usecase.RemoveAisleUseCase
 import com.aisleron.domain.aisle.usecase.UpdateAisleExpandedUseCase
@@ -406,7 +407,8 @@ class ShoppingListViewModelTest : KoinTest {
             get<UpdateAisleExpandedUseCase>(),
             get<SortLocationByNameUseCase>(),
             get<GetLoyaltyCardForLocationUseCase>(),
-            get<UpdateProductQtyNeededUseCase>()
+            get<UpdateProductQtyNeededUseCase>(),
+            get<ExpandCollapseAislesForLocationUseCase>()
         )
 
         Assert.assertNotNull(vm)
@@ -756,5 +758,18 @@ class ShoppingListViewModelTest : KoinTest {
         val productId = updateProductNeededQuantityArrangeAct(qtyInitial, qtyNew)
         val updatedProduct = get<ProductRepository>().get(productId)
         Assert.assertEquals(qtyInitial, updatedProduct?.qtyNeeded)
+    }
+
+    @Test
+    fun expandCollapseAisles_HasAisles_ExpandedCountChanges() = runTest {
+        val locationId = get<LocationRepository>().getAll().first { it.type == LocationType.SHOP }.id
+        val aisleRepository = get<AisleRepository>()
+        val expandedBefore = aisleRepository.getAll().count { it.expanded }
+        shoppingListViewModel.hydrate(locationId, FilterType.ALL)
+
+        shoppingListViewModel.expandCollapseAisles()
+        val expandedAfter = aisleRepository.getAll().count { it.expanded }
+
+        assertTrue(expandedBefore > expandedAfter)
     }
 }
