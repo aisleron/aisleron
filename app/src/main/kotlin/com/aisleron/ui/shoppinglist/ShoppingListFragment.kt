@@ -495,7 +495,11 @@ class ShoppingListFragment(
                 shoppingListPreferences.setShowEmptyAisles(requireContext(), !showEmptyAisles)
                 menuItem.isChecked = showEmptyAisles
                 shoppingListViewModel.setShowEmptyAisles(showEmptyAisles)
+                true
+            }
 
+            R.id.mnu_expand_collapse_aisles -> {
+                shoppingListViewModel.expandCollapseAisles()
                 true
             }
 
@@ -506,7 +510,7 @@ class ShoppingListFragment(
     private fun showLoyaltyCard(loyaltyCard: LoyaltyCard) {
         try {
             loyaltyCardProvider.displayLoyaltyCard(requireContext(), loyaltyCard)
-        } catch (e: AisleronException.LoyaltyCardProviderException) {
+        } catch (_: AisleronException.LoyaltyCardProviderException) {
             loyaltyCardProvider.getNotInstalledDialog(requireContext()).show()
         } catch (e: Exception) {
             displayErrorSnackBar(

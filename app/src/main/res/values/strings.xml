@@ -56,7 +56,7 @@
     <string name="backup_folder_success">Backup folder set</string>
     <string name="keep_screen_on">Keep screen on</string>
     <string name="keep_screen_on_summary">Prevent the screen from turning off while viewing a list</string>
-    <string name="starting_list">Starting List</string>
+    <string name="starting_list">Starting list</string>
 
     <!-- Exception Messages   -->
     <string name="generic_error">ERROR: %1$s</string>
@@ -187,5 +187,6 @@
     <string name="decrement">Decrement</string>
     <string name="increment">Increment</string>
     <string name="qty">Qty</string>
+    <string name="expand_collapse_aisles">Expand/collapse aisles</string>
 
 </resources>

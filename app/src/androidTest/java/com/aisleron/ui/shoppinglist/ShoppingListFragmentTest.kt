@@ -1116,6 +1116,25 @@ class ShoppingListFragmentTest : KoinTest {
     }
 
     @Test
+    fun onMenuItemSelected_ItemExpandCollapseAisles_aisleExpansionToggled() = runTest {
+        val location = get<LocationRepository>().getHome()
+        val aisleRepository = get<AisleRepository>()
+        val expandedBefore =
+            aisleRepository.getForLocation(location.id).count { it.expanded }
+
+        val bundle = bundler.makeShoppingListBundle(location.id, location.defaultFilter)
+        getFragmentScenario(bundle).onFragment { fragment ->
+            val menuItem = getMenuItem(R.id.mnu_expand_collapse_aisles)
+            fragment.onMenuItemSelected(menuItem)
+        }
+
+        val expandedAfter =
+            aisleRepository.getForLocation(location.id).count { it.expanded }
+
+        assertTrue(expandedBefore > expandedAfter)
+    }
+
+    @Test
     fun onActionItemClicked_ActionItemIsCopy_CopyDialogShown() = runTest {
         val shoppingList = getShoppingList()
         val product = getProduct(shoppingList, false)
