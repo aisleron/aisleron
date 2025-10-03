@@ -1,0 +1,13 @@
+2025.8.0:
+* Ajout du suivi de la quantité pour les articles nécessaires
+* Nouvelle option pour garder l’écran allumé pendant le shopping
+* Traductions françaises et allemandes mises à jour
+
+2025.7.0:
+* Nouveau : copier une boutique ou un produit
+* Option pour afficher ou masquer les allées vides
+* Retour à l’écran d’accueil lors de la première exécution
+* Les noms des allées sont maintenant uniques par liste
+* Les détails du produit/de la boutique ne sont plus clairs lors du changement d’app
+* Correction des magasins épinglés manquants après la restauration de la base de données
+* Correction du défilement lors du déplacement des produits

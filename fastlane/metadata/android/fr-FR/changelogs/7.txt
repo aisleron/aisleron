@@ -1,0 +1,11 @@
+Améliorations
+* Ajout d’une option pour afficher ou masquer le rayon par défaut dans une boutique.
+* Amélioration des paramètres de visibilité : les produits non mappés sont désormais masqués lorsque l’allée par défaut est cachée.
+* Introduit la fonctionnalité d’expansion/réduction pour les allées.
+* Ajout d’une option pour afficher ou masquer les allées vides, avec les allées vides masquées par défaut.
+* Activé l’édition d’une boutique directement à partir de la liste de courses.
+* Ajout d’une option pour trier une liste par nom.
+* Ajout d’un texte explicatif aux listes blanches pour clarifier pourquoi aucun élément n’est affiché.
+
+Corrections de bugs
+* Amélioré la fiabilité des actions de pression longue sur les articles de la liste d’achat.

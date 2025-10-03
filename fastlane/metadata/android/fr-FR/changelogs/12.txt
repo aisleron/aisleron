@@ -1,0 +1,6 @@
+Améliorations :
+* Traductions françaises et suédoises mises à jour
+* Ajout d’une traduction en ukrainien
+
+Corrections de bugs :
+*
