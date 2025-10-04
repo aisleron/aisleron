@@ -21,5 +21,6 @@ data class Product(
     val id: Int,
     val name: String,
     val inStock: Boolean,
-    val qtyNeeded: Int
+    val qtyNeeded: Int,
+    val noteId: Int?
 )

@@ -86,7 +86,8 @@ class AddProductUseCaseTest {
             id = 0,
             name = "New Product 1",
             inStock = false,
-            qtyNeeded = 0
+            qtyNeeded = 0,
+            noteId = null
         )
     }
 

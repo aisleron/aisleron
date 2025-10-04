@@ -15,25 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.data.product
+package com.aisleron.data.note
 
-import com.aisleron.data.base.MapperBaseImpl
-import com.aisleron.domain.product.Product
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
-class ProductMapper : MapperBaseImpl<ProductEntity, Product>() {
-    override fun toModel(value: ProductEntity) = Product(
-        id = value.id,
-        name = value.name.trim(),
-        inStock = value.inStock,
-        qtyNeeded = value.qtyNeeded,
-        noteId = value.noteId
-    )
-
-    override fun fromModel(value: Product) = ProductEntity(
-        id = value.id,
-        name = value.name.trim(),
-        inStock = value.inStock,
-        qtyNeeded = value.qtyNeeded,
-        noteId = value.noteId
-    )
-}
+@Entity(tableName = "Note")
+data class NoteEntity(
+    @PrimaryKey(autoGenerate = true) val id: Int,
+    val note: String
+)

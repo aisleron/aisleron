@@ -15,25 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.data.product
+package com.aisleron.data.note
 
-import com.aisleron.data.base.MapperBaseImpl
-import com.aisleron.domain.product.Product
+import androidx.room.Dao
+import androidx.room.Query
+import com.aisleron.data.base.BaseDao
 
-class ProductMapper : MapperBaseImpl<ProductEntity, Product>() {
-    override fun toModel(value: ProductEntity) = Product(
-        id = value.id,
-        name = value.name.trim(),
-        inStock = value.inStock,
-        qtyNeeded = value.qtyNeeded,
-        noteId = value.noteId
-    )
+@Dao
+interface NoteDao : BaseDao<NoteEntity> {
+    @Query("SELECT * FROM Note WHERE id = :noteId")
+    suspend fun getNote(noteId: Int): NoteEntity?
 
-    override fun fromModel(value: Product) = ProductEntity(
-        id = value.id,
-        name = value.name.trim(),
-        inStock = value.inStock,
-        qtyNeeded = value.qtyNeeded,
-        noteId = value.noteId
-    )
+    @Query("SELECT * FROM Note")
+    suspend fun getNotes(): List<NoteEntity>
 }

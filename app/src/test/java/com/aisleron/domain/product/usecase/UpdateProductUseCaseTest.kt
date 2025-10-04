@@ -53,7 +53,8 @@ class UpdateProductUseCaseTest {
                     id = 2,
                     name = "Product 2",
                     inStock = false,
-                    qtyNeeded = 0
+                    qtyNeeded = 0,
+                    noteId = null
                 )
             )
 

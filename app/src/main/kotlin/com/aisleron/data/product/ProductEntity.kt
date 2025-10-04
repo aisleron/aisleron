@@ -19,12 +19,25 @@ package com.aisleron.data.product
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import com.aisleron.data.note.NoteEntity
 
-@Entity(tableName = "Product")
+@Entity(tableName = "Product",
+    foreignKeys = [
+        ForeignKey(
+            entity = NoteEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["noteId"],
+            onDelete = ForeignKey.SET_NULL,
+            onUpdate = ForeignKey.CASCADE
+        )
+    ]
+)
 data class ProductEntity(
     @PrimaryKey(autoGenerate = true) val id: Int,
     val name: String,
     val inStock: Boolean,
-    @ColumnInfo(defaultValue = "0") val qtyNeeded: Int
+    @ColumnInfo(defaultValue = "0") val qtyNeeded: Int,
+    @ColumnInfo(index = true) val noteId: Int?
 )

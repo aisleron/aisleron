@@ -47,7 +47,8 @@ class UpdateProductQtyNeededUseCaseImplTest {
             id = 0,
             name = "qtyNeeded Test Product",
             inStock = false,
-            qtyNeeded = initialQty
+            qtyNeeded = initialQty,
+            noteId = null
         )
 
         val id = testData.getRepository<ProductRepository>().add(product)

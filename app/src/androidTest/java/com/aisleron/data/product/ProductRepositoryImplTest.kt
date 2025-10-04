@@ -127,7 +127,8 @@ class ProductRepositoryImplTest : KoinTest {
             id = 0,
             name = "Product Repository Add Product Test",
             inStock = true,
-            qtyNeeded = 0
+            qtyNeeded = 0,
+            noteId = null
         )
 
         val productCountBefore = productDao.getProducts().firstOrNull { it.name == product.name }
@@ -149,13 +150,15 @@ class ProductRepositoryImplTest : KoinTest {
                 id = 0,
                 name = "Product Repository Multi Add Test Product One",
                 inStock = true,
-                qtyNeeded = 0
+                qtyNeeded = 0,
+                noteId = null
             ),
             Product(
                 id = 0,
                 name = "Product Repository Multi Add Test Product Two",
                 inStock = false,
-                qtyNeeded = 0
+                qtyNeeded = 0,
+                noteId = null
             )
         )
 
@@ -179,7 +182,8 @@ class ProductRepositoryImplTest : KoinTest {
             id = productBefore.id,
             name = "${productBefore.name} Updated",
             inStock = productBefore.inStock,
-            qtyNeeded = productBefore.qtyNeeded
+            qtyNeeded = productBefore.qtyNeeded,
+            noteId = productBefore.noteId
         )
 
         val productCountBefore = productDao.getProducts().count()
@@ -204,13 +208,15 @@ class ProductRepositoryImplTest : KoinTest {
                 id = productOneBefore.id,
                 name = "${productOneBefore.name} Updated",
                 inStock = productOneBefore.inStock,
-                qtyNeeded = productOneBefore.qtyNeeded
+                qtyNeeded = productOneBefore.qtyNeeded,
+                noteId = productOneBefore.noteId
             ),
             Product(
                 id = productTwoBefore.id,
                 name = "${productTwoBefore.name} Updated",
                 inStock = productTwoBefore.inStock,
-                qtyNeeded = productTwoBefore.qtyNeeded
+                qtyNeeded = productTwoBefore.qtyNeeded,
+                noteId = productOneBefore.noteId
             )
         )
 
@@ -233,7 +239,8 @@ class ProductRepositoryImplTest : KoinTest {
             id = productBefore.id,
             name = productBefore.name,
             inStock = productBefore.inStock,
-            qtyNeeded = productBefore.qtyNeeded
+            qtyNeeded = productBefore.qtyNeeded,
+            noteId = productBefore.noteId
         )
 
         val productCountBefore = productDao.getProducts().count()
@@ -252,7 +259,8 @@ class ProductRepositoryImplTest : KoinTest {
             id = -10001,
             name = "Test remove_InvalidProductProvided_NoProductsRemoved",
             inStock = false,
-            qtyNeeded = 0
+            qtyNeeded = 0,
+            noteId = null
         )
 
         val productCountBefore = productDao.getProducts().count()
@@ -269,7 +277,8 @@ class ProductRepositoryImplTest : KoinTest {
             id = productBefore.id,
             name = productBefore.name,
             inStock = productBefore.inStock,
-            qtyNeeded = 0
+            qtyNeeded = productBefore.qtyNeeded,
+            noteId = productBefore.noteId
         )
 
         val aisleProductDao = get<AisleProductDao>()

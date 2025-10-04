@@ -15,25 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.data.product
+package com.aisleron.domain.note
 
-import com.aisleron.data.base.MapperBaseImpl
-import com.aisleron.domain.product.Product
+import com.aisleron.domain.base.BaseRepository
 
-class ProductMapper : MapperBaseImpl<ProductEntity, Product>() {
-    override fun toModel(value: ProductEntity) = Product(
-        id = value.id,
-        name = value.name.trim(),
-        inStock = value.inStock,
-        qtyNeeded = value.qtyNeeded,
-        noteId = value.noteId
-    )
-
-    override fun fromModel(value: Product) = ProductEntity(
-        id = value.id,
-        name = value.name.trim(),
-        inStock = value.inStock,
-        qtyNeeded = value.qtyNeeded,
-        noteId = value.noteId
-    )
+interface NoteRepository : BaseRepository<Note> {
 }
