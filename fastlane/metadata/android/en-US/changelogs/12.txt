@@ -2,6 +2,7 @@ Enhancements:
 * Updated French and Swedish translations
 * Added Ukrainian translation
 * Added an option to select the application's starting list (#52)
+* Added an option to Expand/Contract all Aisles (#61)
 
 Bug Fixes:
 *

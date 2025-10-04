@@ -20,6 +20,8 @@ package com.aisleron.di
 import com.aisleron.data.maintenance.DatabaseMaintenanceImpl
 import com.aisleron.domain.aisle.usecase.AddAisleUseCase
 import com.aisleron.domain.aisle.usecase.AddAisleUseCaseImpl
+import com.aisleron.domain.aisle.usecase.ExpandCollapseAislesForLocationUseCase
+import com.aisleron.domain.aisle.usecase.ExpandCollapseAislesForLocationUseCaseImpl
 import com.aisleron.domain.aisle.usecase.GetAisleUseCase
 import com.aisleron.domain.aisle.usecase.GetAisleUseCaseImpl
 import com.aisleron.domain.aisle.usecase.GetDefaultAislesUseCase
@@ -181,6 +183,10 @@ val useCaseModule = module {
             getAisleUseCase = get(),
             updateAisleUseCase = get()
         )
+    }
+
+    factory<ExpandCollapseAislesForLocationUseCase> {
+        ExpandCollapseAislesForLocationUseCaseImpl(aisleRepository = get())
     }
 
     /**

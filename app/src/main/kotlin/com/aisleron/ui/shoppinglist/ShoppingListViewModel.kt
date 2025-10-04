@@ -22,6 +22,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.aisle.Aisle
+import com.aisleron.domain.aisle.usecase.ExpandCollapseAislesForLocationUseCase
 import com.aisleron.domain.aisle.usecase.GetAisleUseCase
 import com.aisleron.domain.aisle.usecase.RemoveAisleUseCase
 import com.aisleron.domain.aisle.usecase.UpdateAisleExpandedUseCase
@@ -58,6 +59,7 @@ class ShoppingListViewModel(
     private val sortLocationByNameUseCase: SortLocationByNameUseCase,
     private val getLoyaltyCardForLocationUseCase: GetLoyaltyCardForLocationUseCase,
     private val updateProductQtyNeededUseCase: UpdateProductQtyNeededUseCase,
+    private val expandCollapseAislesForLocationUseCase: ExpandCollapseAislesForLocationUseCase,
     private val debounceTime: Long = 300,
     coroutineScopeProvider: CoroutineScope? = null
 ) : ViewModel() {
@@ -221,6 +223,12 @@ class ShoppingListViewModel(
     fun updateItemRank(item: ShoppingListItem, precedingItem: ShoppingListItem?) {
         coroutineScope.launch {
             (item as ShoppingListItemViewModel).updateRank(precedingItem)
+        }
+    }
+
+    fun expandCollapseAisles() {
+        coroutineScope.launch {
+            expandCollapseAislesForLocationUseCase(locationId)
         }
     }
 
