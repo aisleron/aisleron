@@ -69,7 +69,7 @@ class GetProductUseCaseTest {
         val noteText = "Test note returns for product"
         val note = Note(
             id = testData.getRepository<NoteRepository>().add(Note(0, noteText)),
-            note = noteText
+            noteText = noteText
         )
 
         repository.update(product.copy(noteId = note.id))

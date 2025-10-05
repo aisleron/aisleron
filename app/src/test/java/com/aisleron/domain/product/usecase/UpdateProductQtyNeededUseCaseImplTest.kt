@@ -19,7 +19,10 @@ package com.aisleron.domain.product.usecase
 
 import com.aisleron.data.TestDataManager
 import com.aisleron.domain.note.NoteRepository
+import com.aisleron.domain.note.usecase.AddNoteUseCaseImpl
 import com.aisleron.domain.note.usecase.GetNoteUseCaseImpl
+import com.aisleron.domain.note.usecase.RemoveNoteUseCaseImpl
+import com.aisleron.domain.note.usecase.UpdateNoteUseCaseImpl
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
 import kotlinx.coroutines.test.runTest
@@ -38,13 +41,20 @@ class UpdateProductQtyNeededUseCaseImplTest {
     fun setUp() {
         testData = TestDataManager()
         val productRepository = testData.getRepository<ProductRepository>()
+        val noteRepository = testData.getRepository<NoteRepository>()
         updateProductQtyNeededUseCase = UpdateProductQtyNeededUseCaseImpl(
             GetProductUseCaseImpl(
                 productRepository,
                 GetNoteUseCaseImpl(testData.getRepository<NoteRepository>())
             ),
 
-            UpdateProductUseCase(productRepository, IsProductNameUniqueUseCase(productRepository))
+            UpdateProductUseCaseImpl(
+                productRepository,
+                IsProductNameUniqueUseCase(productRepository),
+                AddNoteUseCaseImpl(noteRepository),
+                UpdateNoteUseCaseImpl(noteRepository),
+                RemoveNoteUseCaseImpl(noteRepository)
+            )
         )
     }
 
@@ -69,7 +79,6 @@ class UpdateProductQtyNeededUseCaseImplTest {
         updateProductQtyNeededUseCase(productBefore.id, newQty)
 
         val productAfter = testData.getRepository<ProductRepository>().get(productBefore.id)
-
         assertNotNull(productAfter)
         assertEquals(newQty, productAfter?.qtyNeeded)
     }

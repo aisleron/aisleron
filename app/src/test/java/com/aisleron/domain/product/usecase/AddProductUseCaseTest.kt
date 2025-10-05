@@ -145,7 +145,7 @@ class AddProductUseCaseTest {
     fun addProduct_ProductHasNote_NoteAdded() = runTest {
         val note = Note(
             id = 0,
-            note = "Test add note with add product"
+            noteText = "Test add note with add product"
         )
 
         val newProduct = getNewProduct().copy(note = note)
@@ -158,6 +158,6 @@ class AddProductUseCaseTest {
         val newNote = noteRepository.get(noteId)
 
         Assertions.assertEquals(noteCountBefore + 1, noteCountAfter)
-        Assertions.assertEquals(note.note, newNote?.note)
+        Assertions.assertEquals(note.noteText, newNote?.noteText)
     }
 }

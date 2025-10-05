@@ -90,6 +90,7 @@ import com.aisleron.domain.product.usecase.UpdateProductQtyNeededUseCaseImpl
 import com.aisleron.domain.product.usecase.UpdateProductStatusUseCase
 import com.aisleron.domain.product.usecase.UpdateProductStatusUseCaseImpl
 import com.aisleron.domain.product.usecase.UpdateProductUseCase
+import com.aisleron.domain.product.usecase.UpdateProductUseCaseImpl
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCaseImpl
 import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
@@ -229,9 +230,12 @@ val useCaseModule = module {
     factory<IsProductNameUniqueUseCase> { IsProductNameUniqueUseCase(productRepository = get()) }
 
     factory<UpdateProductUseCase> {
-        UpdateProductUseCase(
+        UpdateProductUseCaseImpl(
             productRepository = get(),
-            isProductNameUniqueUseCase = get()
+            isProductNameUniqueUseCase = get(),
+            addNoteUseCase = get(),
+            updateNoteUseCase = get(),
+            removeNoteUseCase = get()
         )
     }
 

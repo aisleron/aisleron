@@ -23,11 +23,11 @@ import com.aisleron.domain.note.Note
 class NoteMapper : MapperBaseImpl<NoteEntity, Note>() {
     override fun toModel(value: NoteEntity) = Note(
         id = value.id,
-        note = value.note.trim()
+        noteText = value.noteText.trim()
     )
 
     override fun fromModel(value: Note) = NoteEntity(
         id = value.id,
-        note = value.note.trim()
+        noteText = value.noteText.trim()
     )
 }

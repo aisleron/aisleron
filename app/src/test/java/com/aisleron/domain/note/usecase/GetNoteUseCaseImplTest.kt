@@ -48,8 +48,8 @@ class GetNoteUseCaseImplTest {
     fun invoke_ExistingNoteIdProvided_ReturnNote() = runTest {
         val note = "Existing Note"
         val existingItem = Note(
-            id = repository.add(Note(id = 0, note = note)),
-            note = note
+            id = repository.add(Note(id = 0, noteText = note)),
+            noteText = note
         )
 
         val resultItem = useCase(existingItem.id)

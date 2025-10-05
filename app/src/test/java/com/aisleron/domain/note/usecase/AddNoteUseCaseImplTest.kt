@@ -41,7 +41,7 @@ class AddNoteUseCaseImplTest {
     fun invoke_NoExistingNote_NoteCreated() = runTest {
         val newItem = Note(
             id = 0,
-            note = "New Note"
+            noteText = "New Note"
         )
 
         val countBefore = repository.getAll().count()
@@ -58,13 +58,13 @@ class AddNoteUseCaseImplTest {
     @Test
     fun invoke_IsExistingNote_NoteUpdated() = runTest {
         val updatedNote = "Updated Note"
-        val id = repository.add(Note(id = 0, note = "Existing Note"))
+        val id = repository.add(Note(id = 0, noteText = "Existing Note"))
         val existing = repository.get(id)!!
 
-        val resultId = useCase(existing.copy(note = updatedNote))
+        val resultId = useCase(existing.copy(noteText = updatedNote))
         val updated = repository.get(id)
 
         assertEquals(-1, resultId)
-        assertEquals(existing.copy(note = updatedNote), updated)
+        assertEquals(existing.copy(noteText = updatedNote), updated)
     }
 }

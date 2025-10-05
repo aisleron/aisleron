@@ -21,5 +21,5 @@ import com.aisleron.domain.base.AisleronItem
 
 data class Note(
     override val id: Int,
-    val note: String
+    val noteText: String
 ) : AisleronItem

@@ -23,5 +23,5 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "Note")
 data class NoteEntity(
     @PrimaryKey(autoGenerate = true) val id: Int,
-    val note: String
+    val noteText: String
 )

@@ -18,19 +18,50 @@
 package com.aisleron.domain.product.usecase
 
 import com.aisleron.domain.base.AisleronException
+import com.aisleron.domain.base.usecase.UpdateUseCase
+import com.aisleron.domain.note.Note
+import com.aisleron.domain.note.usecase.AddNoteUseCase
+import com.aisleron.domain.note.usecase.RemoveNoteUseCase
+import com.aisleron.domain.note.usecase.UpdateNoteUseCase
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
 
-class UpdateProductUseCase(
-    private val productRepository: ProductRepository,
-    private val isProductNameUniqueUseCase: IsProductNameUniqueUseCase
-) {
-    suspend operator fun invoke(product: Product) {
+interface UpdateProductUseCase : UpdateUseCase<Product>
 
-        if (!isProductNameUniqueUseCase(product)) {
+class UpdateProductUseCaseImpl(
+    private val productRepository: ProductRepository,
+    private val isProductNameUniqueUseCase: IsProductNameUniqueUseCase,
+    private val addNoteUseCase: AddNoteUseCase,
+    private val updateNoteUseCase: UpdateNoteUseCase,
+    private val removeNoteUseCase: RemoveNoteUseCase
+) : UpdateProductUseCase {
+    override suspend operator fun invoke(item: Product) {
+
+        if (!isProductNameUniqueUseCase(item)) {
             throw AisleronException.DuplicateProductNameException("Product Name must be unique")
         }
 
-        productRepository.update(product)
+        val noteId = handleNoteUpdate(item)
+        productRepository.update(item.copy(noteId = noteId))
+    }
+
+    private suspend fun handleNoteUpdate(product: Product): Int? {
+        val note = product.note ?: return product.noteId
+
+        return when {
+            note.noteText.isBlank() -> {
+                removeNoteUseCase(note)
+                null
+            }
+
+            product.noteId == null || product.noteId == 0 || product.noteId != note.id || note.id == 0 -> {
+                addNoteUseCase(Note(id = 0, noteText = note.noteText))
+            }
+
+            else -> {
+                updateNoteUseCase(note)
+                note.id
+            }
+        }
     }
 }

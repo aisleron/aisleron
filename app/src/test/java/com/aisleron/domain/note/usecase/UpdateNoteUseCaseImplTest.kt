@@ -40,12 +40,12 @@ class UpdateNoteUseCaseImplTest {
     @Test
     fun invoke_IsExistingNote_NoteUpdated() = runTest {
         val updatedNote = "Updated Note"
-        val id = repository.add(Note(id = 0, note = "Existing Note"))
+        val id = repository.add(Note(id = 0, noteText = "Existing Note"))
         val existing = repository.get(id)!!
 
-        useCase(existing.copy(note = updatedNote))
+        useCase(existing.copy(noteText = updatedNote))
         val result = repository.get(id)
 
-        assertEquals(existing.copy(note = updatedNote), result)
+        assertEquals(existing.copy(noteText = updatedNote), result)
     }
 }

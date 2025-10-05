@@ -42,11 +42,11 @@ class RemoveNoteUseCaseImplTest {
     fun invoke_ExistingNoteProvided_NoteRemoved() = runTest {
         val note = "Existing Note 1"
         val existingItem = Note(
-            id = repository.add(Note(id = 0, note = note)),
-            note = note
+            id = repository.add(Note(id = 0, noteText = note)),
+            noteText = note
         )
 
-        repository.add(Note(id = 0, note = "Existing Note 2"))
+        repository.add(Note(id = 0, noteText = "Existing Note 2"))
         val countBefore = repository.getAll().count()
 
         removeNoteUseCase(existingItem)
@@ -61,9 +61,9 @@ class RemoveNoteUseCaseImplTest {
     @Test
     fun invoke_NonExistingNoteProvided_NothingRemoved() = runTest {
         val note = "Existing Note 1"
-        val existingItem = Note(id = 9000, note = note)
-        repository.add(Note(id = 0, note = note))
-        repository.add(Note(id = 0, note = "Existing Note 2"))
+        val existingItem = Note(id = 9000, noteText = note)
+        repository.add(Note(id = 0, noteText = note))
+        repository.add(Note(id = 0, noteText = "Existing Note 2"))
         val countBefore = repository.getAll().count()
 
         removeNoteUseCase(existingItem)
@@ -76,8 +76,8 @@ class RemoveNoteUseCaseImplTest {
     @Test
     fun invoke_DeleteById_NoteRemoved() = runTest {
         val noteText = "Existing Note 1"
-        val noteId = repository.add(Note(id = 0, note = noteText))
-        repository.add(Note(id = 0, note = "Existing Note 2"))
+        val noteId = repository.add(Note(id = 0, noteText = noteText))
+        repository.add(Note(id = 0, noteText = "Existing Note 2"))
         val countBefore = repository.getAll().count()
 
         removeNoteUseCase(noteId)

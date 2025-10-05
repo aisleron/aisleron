@@ -25,6 +25,6 @@ data class Product(
     val name: String,
     val inStock: Boolean,
     val qtyNeeded: Int,
-    val noteId: Int?,
+    val noteId: Int? = null,
     val note: Note? = null
 ) : AisleronItem

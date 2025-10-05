@@ -42,7 +42,7 @@ class NoteDaoTestImpl : NoteDao {
 
             val newEntity = NoteEntity(
                 id = id,
-                note = it.note
+                noteText = it.noteText
             )
 
             noteList.add(newEntity)
@@ -52,6 +52,8 @@ class NoteDaoTestImpl : NoteDao {
     }
 
     override suspend fun delete(vararg entity: NoteEntity) {
-        noteList.removeIf { it in entity }
+        entity.forEach { e ->
+            noteList.removeIf { it.id == e.id}
+        }
     }
 }

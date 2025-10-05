@@ -19,95 +19,170 @@ package com.aisleron.domain.product.usecase
 
 import com.aisleron.data.TestDataManager
 import com.aisleron.domain.base.AisleronException
+import com.aisleron.domain.note.Note
+import com.aisleron.domain.note.NoteRepository
+import com.aisleron.domain.note.usecase.AddNoteUseCaseImpl
+import com.aisleron.domain.note.usecase.RemoveNoteUseCaseImpl
+import com.aisleron.domain.note.usecase.UpdateNoteUseCaseImpl
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertNull
 import org.junit.jupiter.api.assertThrows
 
 class UpdateProductUseCaseTest {
 
     private lateinit var testData: TestDataManager
     private lateinit var updateProductUseCase: UpdateProductUseCase
-    private lateinit var existingProduct: Product
+    private lateinit var repository: ProductRepository
 
     @BeforeEach
     fun setUp() {
         testData = TestDataManager()
-        val productRepository = testData.getRepository<ProductRepository>()
-        existingProduct = runBlocking { productRepository.get(1)!! }
-        updateProductUseCase = UpdateProductUseCase(
-            productRepository, IsProductNameUniqueUseCase(productRepository)
+        repository = testData.getRepository<ProductRepository>()
+        updateProductUseCase = UpdateProductUseCaseImpl(
+            repository,
+            IsProductNameUniqueUseCase(repository),
+            AddNoteUseCaseImpl(noteRepository()),
+            UpdateNoteUseCaseImpl(noteRepository()),
+            RemoveNoteUseCaseImpl(noteRepository())
         )
     }
 
-    @Test
-    fun updateProduct_IsDuplicateName_ThrowsException() {
-        runBlocking {
-            val productRepository = testData.getRepository<ProductRepository>()
-            val id = productRepository.add(
-                Product(
-                    id = 2,
-                    name = "Product 2",
-                    inStock = false,
-                    qtyNeeded = 0,
-                    noteId = null
-                )
-            )
+    private suspend fun existingProduct(): Product = repository.get(1)!!
 
-            val updateProduct = productRepository.get(id)!!.copy(name = existingProduct.name)
-            assertThrows<AisleronException.DuplicateProductNameException> {
-                updateProductUseCase(updateProduct)
-            }
+    private fun noteRepository(): NoteRepository = testData.getRepository<NoteRepository>()
+
+    @Test
+    fun updateProduct_IsDuplicateName_ThrowsException() = runTest {
+        val existingProduct = existingProduct()
+        val id = repository.add(
+            existingProduct.copy(id = 0, name = "Product 2", inStock = !existingProduct.inStock)
+        )
+
+        val updateProduct = repository.get(id)!!.copy(name = existingProduct.name)
+
+        assertThrows<AisleronException.DuplicateProductNameException> {
+            updateProductUseCase(updateProduct)
         }
     }
 
     @Test
-    fun updateProduct_ProductExists_RecordUpdated() {
-        val updateProduct =
-            existingProduct.copy(
-                name = existingProduct.name + " Updated",
-                inStock = !existingProduct.inStock
-            )
-        val updatedProduct: Product?
-        val countBefore: Int
-        val countAfter: Int
-        runBlocking {
-            val productRepository = testData.getRepository<ProductRepository>()
-            countBefore = productRepository.getAll().count()
-            updateProductUseCase(updateProduct)
-            updatedProduct = productRepository.getByName(updateProduct.name)
-            countAfter = productRepository.getAll().count()
-        }
+    fun updateProduct_ProductExists_RecordUpdated() = runTest {
+        val existingProduct = existingProduct()
+        val updateProduct = existingProduct.copy(
+            name = existingProduct.name + " Updated",
+            inStock = !existingProduct.inStock
+        )
+
+        val countBefore: Int = repository.getAll().count()
+
+        updateProductUseCase(updateProduct)
+
+        val updatedProduct: Product? = repository.getByName(updateProduct.name)
         assertNotNull(updatedProduct)
-        assertEquals(countBefore, countAfter)
         assertEquals(updateProduct.id, updatedProduct?.id)
         assertEquals(updateProduct.name, updatedProduct?.name)
         assertEquals(updateProduct.inStock, updatedProduct?.inStock)
+
+        val countAfter: Int = repository.getAll().count()
+        assertEquals(countBefore, countAfter)
     }
 
     @Test
-    fun updateProduct_ProductDoesNotExist_RecordCreated() {
+    fun updateProduct_ProductDoesNotExist_RecordCreated() = runTest {
+        val existingProduct = existingProduct()
         val newProduct = existingProduct.copy(
             id = 1030535,
             name = existingProduct.name + " Inserted"
         )
-        val updatedProduct: Product?
-        val countBefore: Int
-        val countAfter: Int
-        runBlocking {
-            val productRepository = testData.getRepository<ProductRepository>()
-            countBefore = productRepository.getAll().count()
-            updateProductUseCase(newProduct)
-            updatedProduct = productRepository.getByName(newProduct.name)
-            countAfter = productRepository.getAll().count()
-        }
+
+        val countBefore: Int = repository.getAll().count()
+
+        updateProductUseCase(newProduct)
+
+        val updatedProduct: Product? = repository.getByName(newProduct.name)
         assertNotNull(updatedProduct)
-        assertEquals(countBefore + 1, countAfter)
         assertEquals(newProduct.name, updatedProduct?.name)
         assertEquals(newProduct.inStock, updatedProduct?.inStock)
+
+        val countAfter: Int = repository.getAll().count()
+        assertEquals(countBefore + 1, countAfter)
     }
+
+    private suspend fun getProductWithNote(): Product {
+        val noteText = "Note for product update"
+        val noteId = noteRepository().add(Note(0, noteText))
+        val note = noteRepository().get(noteId)
+
+        val productWithNote = existingProduct().copy(noteId = noteId, note = note)
+        repository.update(productWithNote)
+
+        return productWithNote
+    }
+
+    @Test
+    fun updateProduct_ProductNoteChanged_NoteUpdated() = runTest {
+        val product = getProductWithNote()
+        val note = product.note!!.copy(noteText = "Updated note text")
+        val updateProduct = product.copy(note = note)
+
+        updateProductUseCase(updateProduct)
+
+        val updatedNote = testData.getRepository<NoteRepository>().get(note.id)
+        assertEquals(note, updatedNote)
+    }
+
+    @Test
+    fun updateProduct_ProductNoteAdded_NoteAdded() = runTest {
+        val note = getNewNote()
+        val updateProduct = existingProduct().copy(note = note)
+
+        updateProductUseCase(updateProduct)
+
+        val updatedProduct = repository.get(updateProduct.id)
+        assertNotNull(updatedProduct?.noteId)
+
+        val addedNote = testData.getRepository<NoteRepository>().get(updatedProduct?.noteId ?: 0)
+        assertEquals(note.noteText, addedNote?.noteText)
+    }
+
+    @Test
+    fun updateProduct_ProductNoteCleared_NoteDeleted() = runTest {
+        val product = getProductWithNote()
+        val note = product.note!!.copy(noteText = "")
+        val updateProduct = product.copy(note = note)
+
+        updateProductUseCase(updateProduct)
+
+        val updatedProduct = repository.get(product.id)
+        assertNull(updatedProduct?.noteId)
+
+        val updatedNote = testData.getRepository<NoteRepository>().get(note.id)
+        assertNull(updatedNote)
+    }
+
+    @Test
+    fun updateProduct_ProductNoteIdIsZero_NoteAdded() = runTest {
+        val note = getNewNote()
+        val updateProduct = existingProduct().copy(note = note, noteId = 0)
+
+        updateProductUseCase(updateProduct)
+
+        val updatedProduct = repository.get(updateProduct.id)
+        assertNotEquals(0, updatedProduct?.noteId)
+
+        val addedNote = testData.getRepository<NoteRepository>().get(updatedProduct?.noteId ?: 0)
+        assertEquals(note.noteText, addedNote?.noteText)
+    }
+
+    private fun getNewNote(): Note = Note(
+        id = 0,
+        noteText = "Add note to existing product"
+    )
 }
