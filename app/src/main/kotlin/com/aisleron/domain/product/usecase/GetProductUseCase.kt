@@ -17,13 +17,21 @@
 
 package com.aisleron.domain.product.usecase
 
+import com.aisleron.domain.base.usecase.GetUseCase
+import com.aisleron.domain.note.usecase.GetNoteUseCase
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
 
-class GetProductUseCase(
-    private val productRepository: ProductRepository
-) {
-    suspend operator fun invoke(id: Int): Product? {
-        return productRepository.get(id)
+interface GetProductUseCase : GetUseCase<Product>
+
+class GetProductUseCaseImpl(
+    private val productRepository: ProductRepository,
+    private val getNoteUseCase: GetNoteUseCase
+) : GetProductUseCase {
+    override suspend operator fun invoke(id: Int): Product? {
+        val product = productRepository.get(id)
+        val note = product?.noteId?.let { getNoteUseCase(it) }
+
+        return product?.copy(note = note)
     }
 }

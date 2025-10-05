@@ -18,6 +18,8 @@
 package com.aisleron.domain.product.usecase
 
 import com.aisleron.data.TestDataManager
+import com.aisleron.domain.note.NoteRepository
+import com.aisleron.domain.note.usecase.GetNoteUseCaseImpl
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
 import kotlinx.coroutines.runBlocking
@@ -41,7 +43,11 @@ class UpdateProductStatusUseCaseTest {
         testData = TestDataManager()
         val productRepository = testData.getRepository<ProductRepository>()
         updateProductStatusUseCase = UpdateProductStatusUseCaseImpl(
-            GetProductUseCase(productRepository),
+            GetProductUseCaseImpl(
+                productRepository,
+                GetNoteUseCaseImpl(testData.getRepository<NoteRepository>())
+            ),
+
             UpdateProductUseCase(productRepository, IsProductNameUniqueUseCase(productRepository))
         )
     }

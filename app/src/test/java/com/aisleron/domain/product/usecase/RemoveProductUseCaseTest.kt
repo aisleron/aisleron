@@ -38,7 +38,7 @@ class RemoveProductUseCaseTest {
         testData = TestDataManager()
         val productRepository = testData.getRepository<ProductRepository>()
 
-        removeProductUseCase = RemoveProductUseCase(productRepository)
+        removeProductUseCase = RemoveProductUseCaseImpl(productRepository)
 
         existingProduct = runBlocking { productRepository.get(1)!! }
     }
@@ -90,5 +90,21 @@ class RemoveProductUseCaseTest {
             aisleProductCountBefore - aisleProductCountProduct,
             aisleProductCountAfter
         )
+    }
+
+    @Test
+    fun removeProduct_PassProductObject_ProductRemoved() {
+        val countBefore: Int
+        val countAfter: Int
+        val removedProduct: Product?
+        runBlocking {
+            val productRepository = testData.getRepository<ProductRepository>()
+            countBefore = productRepository.getAll().count()
+            removeProductUseCase(existingProduct)
+            removedProduct = productRepository.get(existingProduct.id)
+            countAfter = productRepository.getAll().count()
+        }
+        assertNull(removedProduct)
+        assertEquals(countBefore - 1, countAfter)
     }
 }
