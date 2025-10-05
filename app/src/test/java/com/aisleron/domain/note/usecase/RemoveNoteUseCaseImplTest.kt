@@ -28,14 +28,14 @@ import org.junit.jupiter.api.assertNull
 
 class RemoveNoteUseCaseImplTest {
     private lateinit var testData: TestDataManager
-    private lateinit var useCase: RemoveNoteUseCase
+    private lateinit var removeNoteUseCase: RemoveNoteUseCase
     private lateinit var repository: NoteRepository
 
     @BeforeEach
     fun setUp() {
         testData = TestDataManager()
         repository = testData.getRepository<NoteRepository>()
-        useCase = RemoveNoteUseCaseImpl(testData.getRepository<NoteRepository>())
+        removeNoteUseCase = RemoveNoteUseCaseImpl(testData.getRepository<NoteRepository>())
     }
 
     @Test
@@ -49,7 +49,7 @@ class RemoveNoteUseCaseImplTest {
         repository.add(Note(id = 0, note = "Existing Note 2"))
         val countBefore = repository.getAll().count()
 
-        useCase(existingItem)
+        removeNoteUseCase(existingItem)
 
         val countAfter = repository.getAll().count()
         val deletedItem = repository.get(existingItem.id)
@@ -66,10 +66,26 @@ class RemoveNoteUseCaseImplTest {
         repository.add(Note(id = 0, note = "Existing Note 2"))
         val countBefore = repository.getAll().count()
 
-        useCase(existingItem)
+        removeNoteUseCase(existingItem)
 
         val countAfter = repository.getAll().count()
 
         assertEquals(countBefore, countAfter)
+    }
+
+    @Test
+    fun invoke_DeleteById_NoteRemoved() = runTest {
+        val noteText = "Existing Note 1"
+        val noteId = repository.add(Note(id = 0, note = noteText))
+        repository.add(Note(id = 0, note = "Existing Note 2"))
+        val countBefore = repository.getAll().count()
+
+        removeNoteUseCase(noteId)
+
+        val noteAfter = repository.get(noteId)
+        val countAfter = repository.getAll().count()
+
+        assertEquals(countBefore - 1, countAfter)
+        assertNull(noteAfter)
     }
 }

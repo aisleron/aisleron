@@ -21,10 +21,17 @@ import com.aisleron.domain.base.usecase.RemoveUseCase
 import com.aisleron.domain.note.Note
 import com.aisleron.domain.note.NoteRepository
 
-interface RemoveNoteUseCase : RemoveUseCase<Note>
+interface RemoveNoteUseCase : RemoveUseCase<Note> {
+    suspend operator fun invoke(noteId: Int)
+}
 
 class RemoveNoteUseCaseImpl(private val noteRepository: NoteRepository) : RemoveNoteUseCase {
     override suspend fun invoke(item: Note) {
         noteRepository.remove(item)
+    }
+
+    override suspend fun invoke(noteId: Int) {
+        val note = noteRepository.get(noteId)
+        note?.let { invoke(it) }
     }
 }

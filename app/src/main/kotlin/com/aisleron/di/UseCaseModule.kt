@@ -219,7 +219,13 @@ val useCaseModule = module {
         )
     }
 
-    factory<RemoveProductUseCase> { RemoveProductUseCaseImpl(productRepository = get()) }
+    factory<RemoveProductUseCase> {
+        RemoveProductUseCaseImpl(
+            productRepository = get(),
+            removeNoteUseCase = get()
+        )
+    }
+
     factory<IsProductNameUniqueUseCase> { IsProductNameUniqueUseCase(productRepository = get()) }
 
     factory<UpdateProductUseCase> {
