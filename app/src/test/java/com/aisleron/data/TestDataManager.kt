@@ -30,6 +30,9 @@ import com.aisleron.data.loyaltycard.LocationLoyaltyCardDao
 import com.aisleron.data.loyaltycard.LoyaltyCardDao
 import com.aisleron.data.loyaltycard.LoyaltyCardMapper
 import com.aisleron.data.loyaltycard.LoyaltyCardRepositoryImpl
+import com.aisleron.data.note.NoteDao
+import com.aisleron.data.note.NoteMapper
+import com.aisleron.data.note.NoteRepositoryImpl
 import com.aisleron.data.product.ProductDao
 import com.aisleron.data.product.ProductMapper
 import com.aisleron.data.product.ProductRepositoryImpl
@@ -38,12 +41,14 @@ import com.aisleron.domain.aisle.AisleRepository
 import com.aisleron.domain.aisleproduct.AisleProductRepository
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.loyaltycard.LoyaltyCardRepository
+import com.aisleron.domain.note.NoteRepository
 import com.aisleron.domain.product.ProductRepository
 import com.aisleron.testdata.data.aisle.AisleDaoTestImpl
 import com.aisleron.testdata.data.aisleproduct.AisleProductDaoTestImpl
 import com.aisleron.testdata.data.location.LocationDaoTestImpl
 import com.aisleron.testdata.data.loyaltycard.LocationLoyaltyCardDaoTestImpl
 import com.aisleron.testdata.data.loyaltycard.LoyaltyCardDaoTestImpl
+import com.aisleron.testdata.data.note.NoteDaoTestImpl
 import com.aisleron.testdata.data.product.ProductDaoTestImpl
 import kotlinx.coroutines.runBlocking
 
@@ -55,6 +60,7 @@ class TestDataManager(private val addData: Boolean = true) {
     private val _locationDao = LocationDaoTestImpl(_aisleDao)
     private val _locationLoyaltyCardDao = LocationLoyaltyCardDaoTestImpl()
     private val _loyaltyCardDao = LoyaltyCardDaoTestImpl(_locationLoyaltyCardDao)
+    private val _noteDao = NoteDaoTestImpl()
 
     fun aisleDao(): AisleDao = _aisleDao
 
@@ -67,6 +73,8 @@ class TestDataManager(private val addData: Boolean = true) {
     fun loyaltyCardDao(): LoyaltyCardDao = _loyaltyCardDao
 
     fun locationLoyaltyCardDao(): LocationLoyaltyCardDao = _locationLoyaltyCardDao
+
+    fun noteDao(): NoteDao = _noteDao
 
     init {
         initializeTestData()
@@ -106,6 +114,8 @@ class TestDataManager(private val addData: Boolean = true) {
             LoyaltyCardRepository::class -> LoyaltyCardRepositoryImpl(
                 loyaltyCardDao(), locationLoyaltyCardDao(), LoyaltyCardMapper()
             ) as T
+
+            NoteRepository::class -> NoteRepositoryImpl(noteDao(), NoteMapper()) as T
 
             else -> throw Exception("Invalid repository type requested")
         }

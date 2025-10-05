@@ -67,6 +67,14 @@ import com.aisleron.domain.loyaltycard.usecase.GetLoyaltyCardForLocationUseCase
 import com.aisleron.domain.loyaltycard.usecase.GetLoyaltyCardForLocationUseCaseImpl
 import com.aisleron.domain.loyaltycard.usecase.RemoveLoyaltyCardFromLocationUseCase
 import com.aisleron.domain.loyaltycard.usecase.RemoveLoyaltyCardFromLocationUseCaseImpl
+import com.aisleron.domain.note.usecase.AddNoteUseCase
+import com.aisleron.domain.note.usecase.AddNoteUseCaseImpl
+import com.aisleron.domain.note.usecase.GetNoteUseCase
+import com.aisleron.domain.note.usecase.GetNoteUseCaseImpl
+import com.aisleron.domain.note.usecase.RemoveNoteUseCase
+import com.aisleron.domain.note.usecase.RemoveNoteUseCaseImpl
+import com.aisleron.domain.note.usecase.UpdateNoteUseCase
+import com.aisleron.domain.note.usecase.UpdateNoteUseCaseImpl
 import com.aisleron.domain.product.usecase.AddProductUseCase
 import com.aisleron.domain.product.usecase.AddProductUseCaseImpl
 import com.aisleron.domain.product.usecase.CopyProductUseCase
@@ -293,4 +301,12 @@ val useCaseModule = module {
     factory<GetLoyaltyCardForLocationUseCase> {
         GetLoyaltyCardForLocationUseCaseImpl(loyaltyCardRepository = get())
     }
+
+    /**
+     * Note Use Cases
+     */
+    factory<AddNoteUseCase> { AddNoteUseCaseImpl(noteRepository = get()) }
+    factory<GetNoteUseCase> { GetNoteUseCaseImpl(noteRepository = get()) }
+    factory<RemoveNoteUseCase> { RemoveNoteUseCaseImpl(noteRepository = get()) }
+    factory<UpdateNoteUseCase> { UpdateNoteUseCaseImpl(noteRepository = get()) }
 }
