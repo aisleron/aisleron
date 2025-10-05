@@ -188,5 +188,12 @@
     <string name="increment">Increment</string>
     <string name="qty">Qty</string>
     <string name="expand_collapse_aisles">Expand/collapse aisles</string>
+    <string name="show_extra_options">Show extra options</string>
+    <string name="hide_extra_options">Hide extra options</string>
+    <string name="product_tab_notes">Notes</string>
+    <string name="product_tab_aisles">Aisles</string>
+    <string name="product_tab_barcodes">Barcodes</string>
+    <string name="product_tab_inventory">Inventory</string>
+    <string name="notes_hint">Enter notes here…</string>
 
 </resources>
