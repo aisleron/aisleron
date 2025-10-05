@@ -12,6 +12,8 @@ import com.aisleron.domain.aisleproduct.usecase.AddAisleProductsUseCase
 import com.aisleron.domain.aisleproduct.usecase.GetAisleMaxRankUseCase
 import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductsUseCase
 import com.aisleron.domain.location.LocationRepository
+import com.aisleron.domain.note.NoteRepository
+import com.aisleron.domain.note.usecase.AddNoteUseCaseImpl
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
 import com.aisleron.domain.product.usecase.AddProductUseCaseImpl
@@ -85,7 +87,8 @@ class SortLocationByNameUseCaseImplTest {
             GetDefaultAislesUseCase(testData.getRepository<AisleRepository>()),
             AddAisleProductsUseCase(testData.getRepository<AisleProductRepository>()),
             IsProductNameUniqueUseCase(testData.getRepository<ProductRepository>()),
-            GetAisleMaxRankUseCase(testData.getRepository<AisleProductRepository>())
+            GetAisleMaxRankUseCase(testData.getRepository<AisleProductRepository>()),
+            AddNoteUseCaseImpl(testData.getRepository<NoteRepository>())
         )
 
         val product = Product(

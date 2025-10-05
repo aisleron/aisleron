@@ -241,7 +241,8 @@ val useCaseModule = module {
             getDefaultAislesUseCase = get(),
             addAisleProductsUseCase = get(),
             isProductNameUniqueUseCase = get(),
-            getAisleMaxRankUseCase = get()
+            getAisleMaxRankUseCase = get(),
+            addNoteUseCase = get()
         )
     }
 

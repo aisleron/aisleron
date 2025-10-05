@@ -23,10 +23,12 @@ import com.aisleron.domain.aisleproduct.AisleProduct
 import com.aisleron.domain.aisleproduct.usecase.AddAisleProductsUseCase
 import com.aisleron.domain.aisleproduct.usecase.GetAisleMaxRankUseCase
 import com.aisleron.domain.base.AisleronException
+import com.aisleron.domain.base.usecase.AddUseCase
+import com.aisleron.domain.note.usecase.AddNoteUseCase
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
 
-interface AddProductUseCase {
+interface AddProductUseCase : AddUseCase<Product> {
     suspend operator fun invoke(product: Product, targetAisle: Aisle?): Int
 }
 
@@ -35,7 +37,8 @@ class AddProductUseCaseImpl(
     private val getDefaultAislesUseCase: GetDefaultAislesUseCase,
     private val addAisleProductsUseCase: AddAisleProductsUseCase,
     private val isProductNameUniqueUseCase: IsProductNameUniqueUseCase,
-    private val getAisleMaxRankUseCase: GetAisleMaxRankUseCase
+    private val getAisleMaxRankUseCase: GetAisleMaxRankUseCase,
+    private val addNoteUseCase: AddNoteUseCase
 
 ) : AddProductUseCase {
     override suspend operator fun invoke(product: Product, targetAisle: Aisle?): Int {
@@ -48,9 +51,13 @@ class AddProductUseCaseImpl(
             throw AisleronException.DuplicateProductException("Cannot add a duplicate of an existing Product")
         }
 
-        val newProduct = product.copy(id = productRepository.add(product))
-        val defaultAisles = getDefaultAislesUseCase().toMutableList()
+        val noteId = product.note?.let { addNoteUseCase(it) }
+        val addProduct = product.copy(noteId = noteId)
+        val newProduct = addProduct.copy(
+            id = productRepository.add(addProduct)
+        )
 
+        val defaultAisles = getDefaultAislesUseCase().toMutableList()
         targetAisle?.let { target ->
             defaultAisles.removeIf { it.locationId == target.locationId }
             defaultAisles.add(target)
@@ -66,5 +73,9 @@ class AddProductUseCaseImpl(
         })
 
         return newProduct.id
+    }
+
+    override suspend fun invoke(item: Product): Int {
+        return invoke(item, null)
     }
 }

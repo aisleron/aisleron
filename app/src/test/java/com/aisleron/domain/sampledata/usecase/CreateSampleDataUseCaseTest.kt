@@ -32,6 +32,8 @@ import com.aisleron.domain.location.usecase.AddLocationUseCaseImpl
 import com.aisleron.domain.location.usecase.GetHomeLocationUseCase
 import com.aisleron.domain.location.usecase.GetLocationUseCase
 import com.aisleron.domain.location.usecase.IsLocationNameUniqueUseCase
+import com.aisleron.domain.note.NoteRepository
+import com.aisleron.domain.note.usecase.AddNoteUseCaseImpl
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
 import com.aisleron.domain.product.usecase.AddProductUseCaseImpl
@@ -70,7 +72,8 @@ class CreateSampleDataUseCaseTest {
             GetDefaultAislesUseCase(aisleRepository),
             addAisleProductsUseCase,
             IsProductNameUniqueUseCase(productRepository),
-            GetAisleMaxRankUseCase(aisleProductRepository)
+            GetAisleMaxRankUseCase(aisleProductRepository),
+            AddNoteUseCaseImpl(testData.getRepository<NoteRepository>())
         )
 
         val addAisleUseCase = AddAisleUseCaseImpl(
@@ -180,7 +183,8 @@ class CreateSampleDataUseCaseTest {
                 GetDefaultAislesUseCase(testData.getRepository<AisleRepository>()),
                 AddAisleProductsUseCase(aisleProductRepository),
                 IsProductNameUniqueUseCase(productRepository),
-                GetAisleMaxRankUseCase(aisleProductRepository)
+                GetAisleMaxRankUseCase(aisleProductRepository),
+                AddNoteUseCaseImpl(testData.getRepository<NoteRepository>())
             )
 
             addProductUseCase(

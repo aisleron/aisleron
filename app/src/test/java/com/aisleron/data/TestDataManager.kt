@@ -91,6 +91,7 @@ class TestDataManager(private val addData: Boolean = true) {
                 getRepository<AisleRepository>(),
                 getRepository<ProductRepository>(),
                 getRepository<AisleProductRepository>(),
+                getRepository<NoteRepository>()
             )
             runBlocking { createSampleDataUseCase() }
         }
