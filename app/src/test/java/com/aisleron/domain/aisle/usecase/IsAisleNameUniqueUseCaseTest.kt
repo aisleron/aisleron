@@ -1,22 +1,28 @@
 package com.aisleron.domain.aisle.usecase
 
-import com.aisleron.data.TestDataManager
+import com.aisleron.di.TestDependencyManager
 import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.aisle.AisleRepository
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class IsAisleNameUniqueUseCaseTest {
+    private lateinit var dm: TestDependencyManager
+    private lateinit var existingAisle: Aisle
     private lateinit var isAisleNameUniqueUseCase: IsAisleNameUniqueUseCase
 
     @BeforeEach
     fun setUp() {
-        isAisleNameUniqueUseCase =
-            IsAisleNameUniqueUseCase(testData.getRepository<AisleRepository>())
+        dm = TestDependencyManager()
+
+        existingAisle = runBlocking {
+            dm.getRepository<AisleRepository>().getAll().first { !it.isDefault }
+        }
+
+        isAisleNameUniqueUseCase = dm.getUseCase()
     }
 
     @Test
@@ -62,20 +68,5 @@ class IsAisleNameUniqueUseCaseTest {
 
         Assertions.assertNotEquals(existingAisle.id, newAisle.id)
         Assertions.assertFalse(result)
-    }
-
-    companion object {
-        private lateinit var testData: TestDataManager
-        private lateinit var existingAisle: Aisle
-
-        @JvmStatic
-        @BeforeAll
-        fun beforeSpec() {
-            testData = TestDataManager()
-
-            existingAisle = runBlocking {
-                testData.getRepository<AisleRepository>().getAll().first { !it.isDefault }
-            }
-        }
     }
 }

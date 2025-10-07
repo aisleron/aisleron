@@ -17,10 +17,9 @@
 
 package com.aisleron.domain.product.usecase
 
-import com.aisleron.data.TestDataManager
+import com.aisleron.di.TestDependencyManager
 import com.aisleron.domain.note.Note
 import com.aisleron.domain.note.NoteRepository
-import com.aisleron.domain.note.usecase.GetNoteUseCaseImpl
 import com.aisleron.domain.product.ProductRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions
@@ -28,18 +27,15 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class GetProductUseCaseTest {
-    private lateinit var testData: TestDataManager
+    private lateinit var dm: TestDependencyManager
     private lateinit var getProductUseCase: GetProductUseCase
     private lateinit var repository: ProductRepository
 
     @BeforeEach
     fun setUp() {
-        testData = TestDataManager()
-        repository = testData.getRepository<ProductRepository>()
-        getProductUseCase = GetProductUseCaseImpl(
-            repository,
-            GetNoteUseCaseImpl(testData.getRepository<NoteRepository>())
-        )
+        dm = TestDependencyManager()
+        repository = dm.getRepository<ProductRepository>()
+        getProductUseCase = dm.getUseCase()
     }
 
     @Test
@@ -68,7 +64,7 @@ class GetProductUseCaseTest {
         val product = repository.getAll().first { it.noteId == null }
         val noteText = "Test note returns for product"
         val note = Note(
-            id = testData.getRepository<NoteRepository>().add(Note(0, noteText)),
+            id = dm.getRepository<NoteRepository>().add(Note(0, noteText)),
             noteText = noteText
         )
 

@@ -17,24 +17,27 @@
 
 package com.aisleron.domain.product.usecase
 
-import com.aisleron.data.TestDataManager
+import com.aisleron.di.TestDependencyManager
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class IsProductNameUniqueUseCaseTest {
-
+    private lateinit var dm: TestDependencyManager
+    private lateinit var existingProduct: Product
     private lateinit var isProductNameUniqueUseCase: IsProductNameUniqueUseCase
 
     @BeforeEach
     fun setUp() {
-        isProductNameUniqueUseCase =
-            IsProductNameUniqueUseCase(testData.getRepository<ProductRepository>())
+        dm = TestDependencyManager()
+        isProductNameUniqueUseCase = dm.getUseCase()
+        existingProduct = runBlocking {
+            dm.getRepository<ProductRepository>().get(1)!!
+        }
     }
 
     @Test
@@ -66,21 +69,5 @@ class IsProductNameUniqueUseCaseTest {
         Assertions.assertEquals(existingProduct.name, newProduct.name)
         Assertions.assertNotEquals(existingProduct.id, newProduct.id)
         Assertions.assertFalse(result)
-    }
-
-    companion object {
-
-        private lateinit var testData: TestDataManager
-        private lateinit var existingProduct: Product
-
-        @JvmStatic
-        @BeforeAll
-        fun beforeSpec() {
-            testData = TestDataManager()
-
-            existingProduct = runBlocking {
-                testData.getRepository<ProductRepository>().get(1)!!
-            }
-        }
     }
 }

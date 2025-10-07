@@ -27,7 +27,7 @@ class ProductRepositoryImpl(
     private val productMapper: ProductMapper
 ) : ProductRepository {
     override suspend fun getByName(name: String): Product? {
-        return productDao.getProductByName(name.trim())?.let { return productMapper.toModel(it) }
+        return productDao.getProductByName(name.trim())?.let { productMapper.toModel(it) }
     }
 
     override suspend fun get(id: Int): Product? {

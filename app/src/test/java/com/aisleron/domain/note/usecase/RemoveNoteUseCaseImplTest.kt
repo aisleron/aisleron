@@ -17,7 +17,7 @@
 
 package com.aisleron.domain.note.usecase
 
-import com.aisleron.data.TestDataManager
+import com.aisleron.di.TestDependencyManager
 import com.aisleron.domain.note.Note
 import com.aisleron.domain.note.NoteRepository
 import kotlinx.coroutines.test.runTest
@@ -27,15 +27,15 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertNull
 
 class RemoveNoteUseCaseImplTest {
-    private lateinit var testData: TestDataManager
+    private lateinit var dm: TestDependencyManager
     private lateinit var removeNoteUseCase: RemoveNoteUseCase
     private lateinit var repository: NoteRepository
 
     @BeforeEach
     fun setUp() {
-        testData = TestDataManager()
-        repository = testData.getRepository<NoteRepository>()
-        removeNoteUseCase = RemoveNoteUseCaseImpl(testData.getRepository<NoteRepository>())
+        dm = TestDependencyManager()
+        repository = dm.getRepository<NoteRepository>()
+        removeNoteUseCase = dm.getUseCase()
     }
 
     @Test

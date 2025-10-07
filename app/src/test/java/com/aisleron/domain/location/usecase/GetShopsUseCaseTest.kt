@@ -17,66 +17,60 @@
 
 package com.aisleron.domain.location.usecase
 
-import com.aisleron.data.TestDataManager
+import com.aisleron.di.TestDependencyManager
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.location.LocationType
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class GetShopsUseCaseTest {
-
-    private lateinit var testData: TestDataManager
+    private lateinit var dm: TestDependencyManager
     private lateinit var getShopsUseCase: GetShopsUseCase
 
     @BeforeEach
     fun setUp() {
-        testData = TestDataManager(addData = false)
-        getShopsUseCase = GetShopsUseCase(testData.getRepository<LocationRepository>())
-
+        // TODO: rework this test so it uses seed data and checks a list contains only shops
+        dm = TestDependencyManager(addData = false)
+        getShopsUseCase = dm.getUseCase()
     }
 
     @Test
-    fun getShops_NoShopsDefined_ReturnEmptyList() {
-        val resultList: List<Location> =
-            runBlocking {
-                getShopsUseCase().first()
-            }
+    fun getShops_NoShopsDefined_ReturnEmptyList() = runTest {
+        val resultList = getShopsUseCase().first()
         assertEquals(0, resultList.count())
     }
 
     @Test
-    fun getShops_ShopsDefined_ReturnShopsList() {
-        val resultList: List<Location> =
-            runBlocking {
-                testData.getRepository<LocationRepository>().add(
-                    listOf(
-                        Location(
-                            id = 1000,
-                            type = LocationType.SHOP,
-                            defaultFilter = FilterType.NEEDED,
-                            name = "Shop 1",
-                            pinned = false,
-                            aisles = emptyList(),
-                            showDefaultAisle = true
-                        ),
-                        Location(
-                            id = 2000,
-                            type = LocationType.SHOP,
-                            defaultFilter = FilterType.NEEDED,
-                            name = "Shop 2",
-                            pinned = false,
-                            aisles = emptyList(),
-                            showDefaultAisle = true
-                        ),
-                    )
-                )
-                getShopsUseCase().first()
-            }
+    fun getShops_ShopsDefined_ReturnShopsList() = runTest {
+        dm.getRepository<LocationRepository>().add(
+            listOf(
+                Location(
+                    id = 1000,
+                    type = LocationType.SHOP,
+                    defaultFilter = FilterType.NEEDED,
+                    name = "Shop 1",
+                    pinned = false,
+                    aisles = emptyList(),
+                    showDefaultAisle = true
+                ),
+                Location(
+                    id = 2000,
+                    type = LocationType.SHOP,
+                    defaultFilter = FilterType.NEEDED,
+                    name = "Shop 2",
+                    pinned = false,
+                    aisles = emptyList(),
+                    showDefaultAisle = true
+                ),
+            )
+        )
+
+        val resultList = getShopsUseCase().first()
 
         assertEquals(2, resultList.count())
     }

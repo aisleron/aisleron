@@ -17,7 +17,6 @@
 
 package com.aisleron.domain.backup.usecase
 
-import com.aisleron.data.TestDataManager
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.testdata.data.maintenance.DatabaseMaintenanceDbNameTestImpl
 import com.aisleron.testdata.data.maintenance.DatabaseMaintenanceTestImpl
@@ -30,12 +29,9 @@ import org.junit.jupiter.api.assertThrows
 import java.net.URI
 
 class BackupDatabaseUseCaseImplTest {
-    private lateinit var testData: TestDataManager
 
     @BeforeEach
-    fun setUp() {
-        testData = TestDataManager()
-    }
+    fun setUp() {}
 
     @Test
     fun backupDb_IsNullDbName_ThrowsInvalidDbNameException() {

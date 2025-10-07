@@ -17,7 +17,7 @@
 
 package com.aisleron.domain.aisle.usecase
 
-import com.aisleron.data.TestDataManager
+import com.aisleron.di.TestDependencyManager
 import com.aisleron.domain.aisle.AisleRepository
 import com.aisleron.domain.location.LocationRepository
 import kotlinx.coroutines.test.runTest
@@ -26,21 +26,21 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class ExpandCollapseAislesForLocationUseCaseTest {
-    private lateinit var testData: TestDataManager
+    private lateinit var dm: TestDependencyManager
     private lateinit var useCase: ExpandCollapseAislesForLocationUseCase
 
     @BeforeEach
     fun setUp() {
-        testData = TestDataManager()
+        dm = TestDependencyManager()
         useCase = ExpandCollapseAislesForLocationUseCaseImpl(
-            testData.getRepository<AisleRepository>()
+            dm.getRepository<AisleRepository>()
         )
     }
 
     @Test
     fun expandCollapseAislesForLocation_hasExpandedAisles_CollapseAllAisles() = runTest {
-        val locationId = testData.getRepository<LocationRepository>().getHome().id
-        val aisleRepository = testData.getRepository<AisleRepository>()
+        val locationId = dm.getRepository<LocationRepository>().getHome().id
+        val aisleRepository = dm.getRepository<AisleRepository>()
         val aisles = aisleRepository.getForLocation(locationId)
         aisleRepository.update(aisles.first().copy(expanded = true))
         aisleRepository.update(aisles.last().copy(expanded = false))
@@ -54,8 +54,8 @@ class ExpandCollapseAislesForLocationUseCaseTest {
 
     @Test
     fun expandCollapseAislesForLocation_noExpandedAisles_ExpandAllAisles() = runTest {
-        val locationId = testData.getRepository<LocationRepository>().getHome().id
-        val aisleRepository = testData.getRepository<AisleRepository>()
+        val locationId = dm.getRepository<LocationRepository>().getHome().id
+        val aisleRepository = dm.getRepository<AisleRepository>()
         val aisles = aisleRepository.getForLocation(locationId)
         aisleRepository.update(aisles.map { it.copy(expanded = false) })
 
@@ -68,7 +68,7 @@ class ExpandCollapseAislesForLocationUseCaseTest {
 
     @Test
     fun expandCollapseAislesForLocation_noAislesToUpdate_NoAislesUpdated() = runTest {
-        val aisleRepository = testData.getRepository<AisleRepository>()
+        val aisleRepository = dm.getRepository<AisleRepository>()
         val expandedBefore = aisleRepository.getAll().count { it.expanded }
 
         useCase(-1)

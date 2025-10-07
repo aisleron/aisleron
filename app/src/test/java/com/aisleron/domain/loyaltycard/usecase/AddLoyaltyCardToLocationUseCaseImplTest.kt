@@ -1,10 +1,9 @@
 package com.aisleron.domain.loyaltycard.usecase
 
-import com.aisleron.data.TestDataManager
+import com.aisleron.di.TestDependencyManager
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationRepository
-import com.aisleron.domain.location.usecase.GetLocationUseCase
 import com.aisleron.domain.loyaltycard.LoyaltyCard
 import com.aisleron.domain.loyaltycard.LoyaltyCardProviderType
 import com.aisleron.domain.loyaltycard.LoyaltyCardRepository
@@ -17,21 +16,17 @@ import org.junit.jupiter.api.assertNull
 import org.junit.jupiter.api.assertThrows
 
 class AddLoyaltyCardToLocationUseCaseImplTest {
-    private lateinit var testData: TestDataManager
-    private lateinit var loyaltyCardRepository: LoyaltyCardRepository
-    private lateinit var addLoyaltyCardToLocationUseCase: AddLoyaltyCardToLocationUseCaseImpl
+    private lateinit var dm: TestDependencyManager
+    private lateinit var addLoyaltyCardToLocationUseCase: AddLoyaltyCardToLocationUseCase
 
     @BeforeEach
     fun setUp() {
-        testData = TestDataManager()
-        loyaltyCardRepository = testData.getRepository<LoyaltyCardRepository>()
-        val getLocationUseCase = GetLocationUseCase(testData.getRepository<LocationRepository>())
-        addLoyaltyCardToLocationUseCase =
-            AddLoyaltyCardToLocationUseCaseImpl(loyaltyCardRepository, getLocationUseCase)
+        dm = TestDependencyManager()
+        addLoyaltyCardToLocationUseCase = dm.getUseCase()
     }
 
     private suspend fun getLocation(): Location {
-        return testData.getRepository<LocationRepository>().getShops().first().first()
+        return dm.getRepository<LocationRepository>().getShops().first().first()
     }
 
     private suspend fun getLoyaltyCard(): LoyaltyCard {
@@ -42,7 +37,7 @@ class AddLoyaltyCardToLocationUseCaseImplTest {
             intent = "Dummy Intent"
         )
 
-        val loyaltyCardId = loyaltyCardRepository.add(loyaltyCard)
+        val loyaltyCardId = dm.getRepository<LoyaltyCardRepository>().add(loyaltyCard)
 
         return loyaltyCard.copy(id = loyaltyCardId)
     }
@@ -51,13 +46,13 @@ class AddLoyaltyCardToLocationUseCaseImplTest {
     fun invoke_ValidLocationAndCard_AddsLoyaltyCardToLocation() = runTest {
         val locationId = getLocation().id
         val loyaltyCardId = getLoyaltyCard().id
-
-        val locationLoyaltyCardBefore = loyaltyCardRepository.getForLocation(locationId)
+        val locationLoyaltyCardBefore =
+            dm.getRepository<LoyaltyCardRepository>().getForLocation(locationId)
 
         addLoyaltyCardToLocationUseCase(locationId, loyaltyCardId)
 
-        val locationLoyaltyCardAfter = loyaltyCardRepository.getForLocation(locationId)
-
+        val locationLoyaltyCardAfter =
+            dm.getRepository<LoyaltyCardRepository>().getForLocation(locationId)
         assertNull(locationLoyaltyCardBefore)
         assertEquals(loyaltyCardId, locationLoyaltyCardAfter?.id)
 

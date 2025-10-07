@@ -17,22 +17,20 @@
 
 package com.aisleron.domain.aisle.usecase
 
-import com.aisleron.data.TestDataManager
-import com.aisleron.domain.aisle.AisleRepository
+import com.aisleron.di.TestDependencyManager
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class GetAisleUseCaseTest {
-
-    private lateinit var testData: TestDataManager
+    private lateinit var dm: TestDependencyManager
     private lateinit var getAisleUseCase: GetAisleUseCase
 
     @BeforeEach
     fun setUp() {
-        testData = TestDataManager()
-        getAisleUseCase = GetAisleUseCaseImpl(testData.getRepository<AisleRepository>())
+        dm = TestDependencyManager()
+        getAisleUseCase = dm.getUseCase()
     }
 
     @Test

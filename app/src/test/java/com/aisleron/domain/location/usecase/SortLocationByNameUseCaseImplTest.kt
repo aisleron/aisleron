@@ -1,23 +1,16 @@
 package com.aisleron.domain.location.usecase
 
-import com.aisleron.data.TestDataManager
+import com.aisleron.di.TestDependencyManager
 import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.aisle.AisleRepository
 import com.aisleron.domain.aisle.usecase.AddAisleUseCaseImpl
-import com.aisleron.domain.aisle.usecase.GetDefaultAislesUseCase
 import com.aisleron.domain.aisle.usecase.IsAisleNameUniqueUseCase
 import com.aisleron.domain.aisle.usecase.UpdateAisleUseCaseImpl
 import com.aisleron.domain.aisleproduct.AisleProductRepository
-import com.aisleron.domain.aisleproduct.usecase.AddAisleProductsUseCase
-import com.aisleron.domain.aisleproduct.usecase.GetAisleMaxRankUseCase
 import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductsUseCase
 import com.aisleron.domain.location.LocationRepository
-import com.aisleron.domain.note.NoteRepository
-import com.aisleron.domain.note.usecase.AddNoteUseCaseImpl
 import com.aisleron.domain.product.Product
-import com.aisleron.domain.product.ProductRepository
-import com.aisleron.domain.product.usecase.AddProductUseCaseImpl
-import com.aisleron.domain.product.usecase.IsProductNameUniqueUseCase
+import com.aisleron.domain.product.usecase.AddProductUseCase
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -25,29 +18,28 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class SortLocationByNameUseCaseImplTest {
-
-    private lateinit var testData: TestDataManager
+    private lateinit var dm: TestDependencyManager
     private lateinit var sortLocationByNameUseCase: SortLocationByNameUseCase
 
     @BeforeEach
     fun setUp() {
-        testData = TestDataManager()
-        val aisleRepository = testData.getRepository<AisleRepository>()
+        dm = TestDependencyManager()
+        val aisleRepository = dm.getRepository<AisleRepository>()
         sortLocationByNameUseCase = SortLocationByNameUseCaseImpl(
-            locationRepository = testData.getRepository<LocationRepository>(),
+            locationRepository = dm.getRepository<LocationRepository>(),
             updateAisleUseCase = UpdateAisleUseCaseImpl(
                 aisleRepository = aisleRepository,
-                getLocationUseCase = GetLocationUseCase(testData.getRepository<LocationRepository>()),
+                getLocationUseCase = GetLocationUseCase(dm.getRepository<LocationRepository>()),
                 isAisleNameUniqueUseCase = IsAisleNameUniqueUseCase(aisleRepository)
             ),
-            updateAisleProductUseCase = UpdateAisleProductsUseCase(testData.getRepository<AisleProductRepository>())
+            updateAisleProductUseCase = UpdateAisleProductsUseCase(dm.getRepository<AisleProductRepository>())
         )
     }
 
     @Test
     fun sortLocationByName_WithAisles_AislesSorted() = runTest {
-        val locationRepository = testData.getRepository<LocationRepository>()
-        val aisleRepository = testData.getRepository<AisleRepository>()
+        val locationRepository = dm.getRepository<LocationRepository>()
+        val aisleRepository = dm.getRepository<AisleRepository>()
         val locationId = locationRepository.getShops().first().first().id
         val addAisleUseCase = AddAisleUseCaseImpl(
             aisleRepository,
@@ -80,16 +72,9 @@ class SortLocationByNameUseCaseImplTest {
 
     @Test
     fun sortLocationByName_WithProducts_ProductsSorted() = runTest {
-        val locationRepository = testData.getRepository<LocationRepository>()
+        val locationRepository = dm.getRepository<LocationRepository>()
         val locationId = locationRepository.getShops().first().first().id
-        val addProductUseCase = AddProductUseCaseImpl(
-            testData.getRepository<ProductRepository>(),
-            GetDefaultAislesUseCase(testData.getRepository<AisleRepository>()),
-            AddAisleProductsUseCase(testData.getRepository<AisleProductRepository>()),
-            IsProductNameUniqueUseCase(testData.getRepository<ProductRepository>()),
-            GetAisleMaxRankUseCase(testData.getRepository<AisleProductRepository>()),
-            AddNoteUseCaseImpl(testData.getRepository<NoteRepository>())
-        )
+        val addProductUseCase = dm.getUseCase<AddProductUseCase>()
 
         val product = Product(
             id = 0,

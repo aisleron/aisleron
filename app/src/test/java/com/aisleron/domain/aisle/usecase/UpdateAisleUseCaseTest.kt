@@ -17,12 +17,10 @@
 
 package com.aisleron.domain.aisle.usecase
 
-import com.aisleron.data.TestDataManager
+import com.aisleron.di.TestDependencyManager
 import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.aisle.AisleRepository
 import com.aisleron.domain.base.AisleronException
-import com.aisleron.domain.location.LocationRepository
-import com.aisleron.domain.location.usecase.GetLocationUseCase
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions
@@ -35,21 +33,16 @@ import org.junit.jupiter.params.provider.MethodSource
 import java.util.stream.Stream
 
 class UpdateAisleUseCaseTest {
-    private lateinit var testData: TestDataManager
+    private lateinit var dm: TestDependencyManager
     private lateinit var updateAisleUseCase: UpdateAisleUseCase
     private lateinit var existingAisle: Aisle
 
     @BeforeEach
     fun setUp() {
-        testData = TestDataManager()
-        val aisleRepository = testData.getRepository<AisleRepository>()
-
+        dm = TestDependencyManager()
+        val aisleRepository = dm.getRepository<AisleRepository>()
+        updateAisleUseCase = dm.getUseCase()
         existingAisle = runBlocking { aisleRepository.get(1)!! }
-        updateAisleUseCase = UpdateAisleUseCaseImpl(
-            aisleRepository,
-            GetLocationUseCase(testData.getRepository<LocationRepository>()),
-            IsAisleNameUniqueUseCase(aisleRepository)
-        )
     }
 
     @ParameterizedTest(name = "Test UpdateAisle when expanded is {0}")
@@ -58,52 +51,47 @@ class UpdateAisleUseCaseTest {
         val updateAisle =
             existingAisle.copy(name = existingAisle.name + " Updated", expanded = expanded)
 
-        val aisleRepository = testData.getRepository<AisleRepository>()
+        val aisleRepository = dm.getRepository<AisleRepository>()
         val countBefore = aisleRepository.getAll().count()
 
         updateAisleUseCase(updateAisle)
 
         val updatedAisle = aisleRepository.get(existingAisle.id)
-        val countAfter = aisleRepository.getAll().count()
-
-        Assertions.assertNotNull(updatedAisle)
-        Assertions.assertEquals(countBefore, countAfter)
         Assertions.assertEquals(updateAisle, updatedAisle)
         Assertions.assertEquals(expanded, updatedAisle?.expanded)
+
+        val countAfter = aisleRepository.getAll().count()
+        Assertions.assertEquals(countBefore, countAfter)
     }
 
     @Test
-    fun updateAisle_AisleDoesNotExist_RecordCreated() {
+    fun updateAisle_AisleDoesNotExist_RecordCreated() = runTest {
         val newAisle = existingAisle.copy(
             id = 0,
             name = existingAisle.name + " Inserted",
             isDefault = false
         )
-        val updatedAisle: Aisle?
-        val countBefore: Int
-        val countAfter: Int
-        val aisleRepository = testData.getRepository<AisleRepository>()
-        runBlocking {
-            countBefore = aisleRepository.getAll().count()
-            updateAisleUseCase(newAisle)
-            val id = aisleRepository.getAll().maxOf { it.id }
-            updatedAisle = aisleRepository.get(id)
-            countAfter = aisleRepository.getAll().count()
-        }
-        Assertions.assertNotNull(updatedAisle)
-        Assertions.assertEquals(countBefore + 1, countAfter)
-        Assertions.assertEquals(newAisle.name, updatedAisle?.name)
+
+        val aisleRepository = dm.getRepository<AisleRepository>()
+        val countBefore = aisleRepository.getAll().count()
+
+        updateAisleUseCase(newAisle)
+
+        val id = aisleRepository.getAll().maxOf { it.id }
+        val updatedAisle = aisleRepository.get(id)
         Assertions.assertEquals(newAisle.locationId, updatedAisle?.locationId)
         Assertions.assertEquals(newAisle.rank, updatedAisle?.rank)
         Assertions.assertEquals(newAisle.isDefault, updatedAisle?.isDefault)
+        Assertions.assertEquals(newAisle.name, updatedAisle?.name)
+
+        val countAfter = aisleRepository.getAll().count()
+        Assertions.assertEquals(countBefore + 1, countAfter)
     }
 
     @Test
-    fun updateAisle_IsInvalidLocation_ThrowsInvalidLocationException() {
-        runBlocking {
-            assertThrows<AisleronException.InvalidLocationException> {
-                updateAisleUseCase(existingAisle.copy(locationId = -1))
-            }
+    fun updateAisle_IsInvalidLocation_ThrowsInvalidLocationException() = runTest {
+        assertThrows<AisleronException.InvalidLocationException> {
+            updateAisleUseCase(existingAisle.copy(locationId = -1))
         }
     }
 
@@ -111,10 +99,10 @@ class UpdateAisleUseCaseTest {
     fun updateAisle_IsDuplicateAisleName_ThrowsDuplicateAisleNameException() = runTest {
         val aisleName = "Test Update Duplicate Name"
         val existingAisle =
-            testData.getRepository<AisleRepository>().getAll().first { !it.isDefault }
+            dm.getRepository<AisleRepository>().getAll().first { !it.isDefault }
 
         val newAisle = existingAisle.copy(id = 0, name = aisleName)
-        testData.getRepository<AisleRepository>().add(newAisle)
+        dm.getRepository<AisleRepository>().add(newAisle)
         val updateAisle = existingAisle.copy(name = aisleName)
 
         assertThrows<AisleronException.DuplicateAisleNameException> { updateAisleUseCase(updateAisle) }

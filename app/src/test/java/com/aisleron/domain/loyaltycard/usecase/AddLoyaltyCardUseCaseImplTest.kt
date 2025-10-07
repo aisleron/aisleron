@@ -1,6 +1,6 @@
 package com.aisleron.domain.loyaltycard.usecase
 
-import com.aisleron.data.TestDataManager
+import com.aisleron.di.TestDependencyManager
 import com.aisleron.domain.loyaltycard.LoyaltyCard
 import com.aisleron.domain.loyaltycard.LoyaltyCardProviderType
 import com.aisleron.domain.loyaltycard.LoyaltyCardRepository
@@ -11,8 +11,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertNotNull
 
 class AddLoyaltyCardUseCaseImplTest {
-    private lateinit var testData: TestDataManager
-    private lateinit var addLoyaltyCardUseCase: AddLoyaltyCardUseCaseImpl
+    private lateinit var dm: TestDependencyManager
+    private lateinit var addLoyaltyCardUseCase: AddLoyaltyCardUseCase
     private lateinit var loyaltyCardRepository: LoyaltyCardRepository
     private val loyaltyCardProvider = LoyaltyCardProviderType.CATIMA
     private val loyaltyCardName = "Test Card"
@@ -20,10 +20,9 @@ class AddLoyaltyCardUseCaseImplTest {
 
     @BeforeEach
     fun setUp() {
-        testData = TestDataManager()
-        loyaltyCardRepository = testData.getRepository<LoyaltyCardRepository>()
-        addLoyaltyCardUseCase =
-            AddLoyaltyCardUseCaseImpl(testData.getRepository<LoyaltyCardRepository>())
+        dm = TestDependencyManager()
+        loyaltyCardRepository = dm.getRepository<LoyaltyCardRepository>()
+        addLoyaltyCardUseCase = dm.getUseCase()
     }
 
     @Test
@@ -39,11 +38,11 @@ class AddLoyaltyCardUseCaseImplTest {
 
         val resultId = addLoyaltyCardUseCase(newCard)
 
-        val countAfter = loyaltyCardRepository.getAll().count()
         val addedCard = loyaltyCardRepository.get(resultId)
-
-        assertEquals(countBefore + 1, countAfter)
         assertNotNull(addedCard)
+
+        val countAfter = loyaltyCardRepository.getAll().count()
+        assertEquals(countBefore + 1, countAfter)
     }
 
     @Test
@@ -63,7 +62,6 @@ class AddLoyaltyCardUseCaseImplTest {
         val resultId = addLoyaltyCardUseCase(existingCard.copy(name = updatedName))
 
         val updatedCard = loyaltyCardRepository.get(resultId)
-
         assertEquals(cardId, resultId)
         assertEquals(existingCard.copy(name = updatedName), updatedCard)
     }

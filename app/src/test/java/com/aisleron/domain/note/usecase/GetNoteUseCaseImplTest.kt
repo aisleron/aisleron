@@ -17,7 +17,7 @@
 
 package com.aisleron.domain.note.usecase
 
-import com.aisleron.data.TestDataManager
+import com.aisleron.di.TestDependencyManager
 import com.aisleron.domain.note.Note
 import com.aisleron.domain.note.NoteRepository
 import kotlinx.coroutines.test.runTest
@@ -27,20 +27,20 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertNull
 
 class GetNoteUseCaseImplTest {
-    private lateinit var testData: TestDataManager
-    private lateinit var useCase: GetNoteUseCase
+    private lateinit var dm: TestDependencyManager
+    private lateinit var getNoteUseCase: GetNoteUseCase
     private lateinit var repository: NoteRepository
 
     @BeforeEach
     fun setUp() {
-        testData = TestDataManager()
-        repository = testData.getRepository<NoteRepository>()
-        useCase = GetNoteUseCaseImpl(testData.getRepository<NoteRepository>())
+        dm = TestDependencyManager()
+        repository = dm.getRepository<NoteRepository>()
+        getNoteUseCase = dm.getUseCase()
     }
 
     @Test
     fun invoke_NonExistingNoteIdProvided_ReturnNull() = runTest {
-        val resultItem = useCase(-1)
+        val resultItem = getNoteUseCase(-1)
         assertNull(resultItem)
     }
 
@@ -52,7 +52,7 @@ class GetNoteUseCaseImplTest {
             noteText = note
         )
 
-        val resultItem = useCase(existingItem.id)
+        val resultItem = getNoteUseCase(existingItem.id)
 
         assertEquals(existingItem, resultItem)
     }

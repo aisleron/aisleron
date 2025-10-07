@@ -17,11 +17,10 @@
 
 package com.aisleron.domain.product.usecase
 
-import com.aisleron.data.TestDataManager
+import com.aisleron.di.TestDependencyManager
 import com.aisleron.domain.aisleproduct.AisleProductRepository
 import com.aisleron.domain.note.Note
 import com.aisleron.domain.note.NoteRepository
-import com.aisleron.domain.note.usecase.RemoveNoteUseCaseImpl
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
 import kotlinx.coroutines.runBlocking
@@ -32,21 +31,16 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class RemoveProductUseCaseTest {
-    private lateinit var testData: TestDataManager
+    private lateinit var dm: TestDependencyManager
     private lateinit var removeProductUseCase: RemoveProductUseCase
     private lateinit var existingProduct: Product
     private lateinit var repository: ProductRepository
 
     @BeforeEach
     fun setUp() {
-        testData = TestDataManager()
-        repository = testData.getRepository<ProductRepository>()
-
-        removeProductUseCase = RemoveProductUseCaseImpl(
-            repository,
-            RemoveNoteUseCaseImpl(testData.getRepository<NoteRepository>())
-        )
-
+        dm = TestDependencyManager()
+        repository = dm.getRepository<ProductRepository>()
+        removeProductUseCase = dm.getUseCase()
         existingProduct = runBlocking { repository.get(1)!! }
     }
 
@@ -74,7 +68,7 @@ class RemoveProductUseCaseTest {
 
     @Test
     fun removeProduct_ProductRemoved_AisleProductsRemoved() = runTest {
-        val aisleProductRepository = testData.getRepository<AisleProductRepository>()
+        val aisleProductRepository = dm.getRepository<AisleProductRepository>()
         val aisleProductList = aisleProductRepository.getAll()
             .filter { it.product.id == existingProduct.id }
 
@@ -104,7 +98,7 @@ class RemoveProductUseCaseTest {
 
     @Test
     fun removeProduct_ProductHasNote_NoteRemoved() = runTest {
-        val noteRepository = testData.getRepository<NoteRepository>()
+        val noteRepository = dm.getRepository<NoteRepository>()
         val product = repository.getAll().first { it.noteId == null }
         val noteText = "Test note deletes for product"
         val noteId = noteRepository.add(Note(0, noteText))

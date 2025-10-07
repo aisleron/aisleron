@@ -17,13 +17,14 @@
 
 package com.aisleron.domain.location.usecase
 
-import com.aisleron.data.TestDataManager
+import com.aisleron.di.TestDependencyManager
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.location.LocationType
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
@@ -35,101 +36,92 @@ import org.junit.jupiter.params.provider.MethodSource
 import java.util.stream.Stream
 
 class UpdateLocationUseCaseTest {
-
-    private lateinit var testData: TestDataManager
+    private lateinit var dm: TestDependencyManager
     private lateinit var updateLocationUseCase: UpdateLocationUseCase
     private lateinit var existingLocation: Location
 
     @BeforeEach
     fun setUp() {
-        testData = TestDataManager()
-        val locationRepository = testData.getRepository<LocationRepository>()
-
+        dm = TestDependencyManager()
+        val locationRepository = dm.getRepository<LocationRepository>()
+        updateLocationUseCase = dm.getUseCase()
         existingLocation = runBlocking {
             locationRepository.getAll().first { it.type == LocationType.SHOP }
         }
-
-        updateLocationUseCase = UpdateLocationUseCase(
-            locationRepository,
-            IsLocationNameUniqueUseCase(locationRepository)
-        )
     }
 
     @Test
-    fun updateLocation_IsDuplicateName_ThrowsException() {
-        runBlocking {
-            val locationRepository = testData.getRepository<LocationRepository>()
-            val id = locationRepository.add(
-                Location(
-                    id = 0,
-                    type = LocationType.SHOP,
-                    defaultFilter = FilterType.NEEDED,
-                    name = "Shop 99",
-                    pinned = false,
-                    aisles = emptyList(),
-                    showDefaultAisle = true
-                )
+    fun updateLocation_IsDuplicateName_ThrowsException() = runTest {
+        val locationRepository = dm.getRepository<LocationRepository>()
+        val id = locationRepository.add(
+            Location(
+                id = 0,
+                type = LocationType.SHOP,
+                defaultFilter = FilterType.NEEDED,
+                name = "Shop 99",
+                pinned = false,
+                aisles = emptyList(),
+                showDefaultAisle = true
             )
+        )
 
-            val updateLocation =
-                locationRepository.get(id)!!.copy(name = existingLocation.name)
-            assertThrows<AisleronException.DuplicateLocationNameException> {
-                updateLocationUseCase(updateLocation)
-            }
+        val updateLocation =
+            locationRepository.get(id)!!.copy(name = existingLocation.name)
+
+        assertThrows<AisleronException.DuplicateLocationNameException> {
+            updateLocationUseCase(updateLocation)
         }
     }
 
     @ParameterizedTest(name = "Test UpdateLocation when showDefaultAisle is {0}")
     @MethodSource("showDefaultAisleArguments")
-    fun updateLocation_IsExistingLocation_LocationUpdated(showDefaultAisle: Boolean) {
+    fun updateLocation_IsExistingLocation_LocationUpdated(showDefaultAisle: Boolean) = runTest {
         val updateLocation =
             existingLocation.copy(
                 name = existingLocation.name + " Updated",
                 pinned = !existingLocation.pinned,
                 showDefaultAisle = showDefaultAisle
             )
-        val updatedLocation: Location?
-        val countBefore: Int
-        val countAfter: Int
-        runBlocking {
-            val locationRepository = testData.getRepository<LocationRepository>()
-            countBefore = locationRepository.getAll().count()
-            updateLocationUseCase(updateLocation)
-            updatedLocation = locationRepository.getByName(updateLocation.name)
-            countAfter = locationRepository.getAll().count()
-        }
+
+        val locationRepository = dm.getRepository<LocationRepository>()
+        val countBefore = locationRepository.getAll().count()
+
+        updateLocationUseCase(updateLocation)
+
+        val updatedLocation = locationRepository.getByName(updateLocation.name)
         assertNotNull(updatedLocation)
-        assertEquals(countBefore, countAfter)
         assertEquals(updateLocation.id, updatedLocation?.id)
         assertEquals(updateLocation.name, updatedLocation?.name)
         assertEquals(updateLocation.type, updatedLocation?.type)
         assertEquals(updateLocation.pinned, updatedLocation?.pinned)
         assertEquals(updateLocation.defaultFilter, updatedLocation?.defaultFilter)
         assertEquals(showDefaultAisle, updatedLocation?.showDefaultAisle)
+
+        val countAfter = locationRepository.getAll().count()
+        assertEquals(countBefore, countAfter)
     }
 
     @Test
-    fun updateLocation_IsNewLocation_RecordCreated() {
+    fun updateLocation_IsNewLocation_RecordCreated() = runTest {
         val newLocation = existingLocation.copy(
             id = 0,
             name = existingLocation.name + " Inserted"
         )
-        val updatedLocation: Location?
-        val countBefore: Int
-        val countAfter: Int
-        runBlocking {
-            val locationRepository = testData.getRepository<LocationRepository>()
-            countBefore = locationRepository.getAll().count()
-            updateLocationUseCase(newLocation)
-            updatedLocation = locationRepository.getByName(newLocation.name)
-            countAfter = locationRepository.getAll().count()
-        }
+
+        val locationRepository = dm.getRepository<LocationRepository>()
+        val countBefore = locationRepository.getAll().count()
+
+        updateLocationUseCase(newLocation)
+
+        val updatedLocation = locationRepository.getByName(newLocation.name)
         assertNotNull(updatedLocation)
-        assertEquals(countBefore + 1, countAfter)
         assertEquals(newLocation.name, updatedLocation?.name)
         assertEquals(newLocation.type, updatedLocation?.type)
         assertEquals(newLocation.pinned, updatedLocation?.pinned)
         assertEquals(newLocation.defaultFilter, updatedLocation?.defaultFilter)
+
+        val countAfter = locationRepository.getAll().count()
+        assertEquals(countBefore + 1, countAfter)
     }
 
     private companion object {

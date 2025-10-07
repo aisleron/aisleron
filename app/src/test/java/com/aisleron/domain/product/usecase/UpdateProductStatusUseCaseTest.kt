@@ -17,13 +17,14 @@
 
 package com.aisleron.domain.product.usecase
 
-import com.aisleron.data.TestDataManager
+import com.aisleron.di.TestDependencyManager
 import com.aisleron.domain.note.NoteRepository
 import com.aisleron.domain.note.usecase.AddNoteUseCaseImpl
 import com.aisleron.domain.note.usecase.GetNoteUseCaseImpl
 import com.aisleron.domain.note.usecase.RemoveNoteUseCaseImpl
 import com.aisleron.domain.note.usecase.UpdateNoteUseCaseImpl
 import com.aisleron.domain.product.ProductRepository
+import com.aisleron.testdata.data.TransactionRunnerTestImpl
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -37,18 +38,18 @@ import java.util.stream.Stream
 
 class UpdateProductStatusUseCaseTest {
 
-    private lateinit var testData: TestDataManager
+    private lateinit var dm: TestDependencyManager
     private lateinit var updateProductStatusUseCase: UpdateProductStatusUseCase
 
     @BeforeEach
     fun setUp() {
-        testData = TestDataManager()
-        val productRepository = testData.getRepository<ProductRepository>()
-        val noteRepository = testData.getRepository<NoteRepository>()
+        dm = TestDependencyManager()
+        val productRepository = dm.getRepository<ProductRepository>()
+        val noteRepository = dm.getRepository<NoteRepository>()
         updateProductStatusUseCase = UpdateProductStatusUseCaseImpl(
             GetProductUseCaseImpl(
                 productRepository,
-                GetNoteUseCaseImpl(testData.getRepository<NoteRepository>())
+                GetNoteUseCaseImpl(dm.getRepository<NoteRepository>())
             ),
 
             UpdateProductUseCaseImpl(
@@ -56,7 +57,8 @@ class UpdateProductStatusUseCaseTest {
                 IsProductNameUniqueUseCase(productRepository),
                 AddNoteUseCaseImpl(noteRepository),
                 UpdateNoteUseCaseImpl(noteRepository),
-                RemoveNoteUseCaseImpl(noteRepository)
+                RemoveNoteUseCaseImpl(noteRepository),
+                TransactionRunnerTestImpl()
             )
         )
     }
@@ -64,7 +66,7 @@ class UpdateProductStatusUseCaseTest {
     @ParameterizedTest(name = "Test when inStock Status is {0}")
     @MethodSource("inStockArguments")
     fun updateProductStatus_ProductExists_StatusUpdated(inStock: Boolean) = runTest {
-        val existingProduct = testData.getRepository<ProductRepository>().getAll().first()
+        val existingProduct = dm.getRepository<ProductRepository>().getAll().first()
 
         val updatedProduct = updateProductStatusUseCase(existingProduct.id, inStock)
 

@@ -17,7 +17,7 @@
 
 package com.aisleron.domain.note.usecase
 
-import com.aisleron.data.TestDataManager
+import com.aisleron.di.TestDependencyManager
 import com.aisleron.domain.note.Note
 import com.aisleron.domain.note.NoteRepository
 import kotlinx.coroutines.test.runTest
@@ -26,15 +26,15 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class AddNoteUseCaseImplTest {
-    private lateinit var testData: TestDataManager
-    private lateinit var useCase: AddNoteUseCase
+    private lateinit var dm: TestDependencyManager
+    private lateinit var addNoteUseCase: AddNoteUseCase
     private lateinit var repository: NoteRepository
 
     @BeforeEach
     fun setUp() {
-        testData = TestDataManager()
-        repository = testData.getRepository<NoteRepository>()
-        useCase = AddNoteUseCaseImpl(testData.getRepository<NoteRepository>())
+        dm = TestDependencyManager()
+        repository = dm.getRepository<NoteRepository>()
+        addNoteUseCase = dm.getUseCase()
     }
 
     @Test
@@ -46,7 +46,7 @@ class AddNoteUseCaseImplTest {
 
         val countBefore = repository.getAll().count()
 
-        val resultId = useCase(newItem)
+        val resultId = addNoteUseCase(newItem)
 
         val countAfter = repository.getAll().count()
         val addedItem = repository.get(resultId)
@@ -61,7 +61,7 @@ class AddNoteUseCaseImplTest {
         val id = repository.add(Note(id = 0, noteText = "Existing Note"))
         val existing = repository.get(id)!!
 
-        val resultId = useCase(existing.copy(noteText = updatedNote))
+        val resultId = addNoteUseCase(existing.copy(noteText = updatedNote))
         val updated = repository.get(id)
 
         assertEquals(-1, resultId)
