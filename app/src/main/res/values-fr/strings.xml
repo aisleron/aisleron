@@ -140,4 +140,6 @@
     <string name="decrement">Décrémenter</string>
     <string name="increment">Incrémenter</string>
     <string name="qty">Qté</string>
+    <string name="starting_list">Liste de départ</string>
+    <string name="expand_collapse_aisles">Agrandir/réduire les allées</string>
 </resources>
