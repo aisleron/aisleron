@@ -69,6 +69,8 @@ import com.aisleron.domain.loyaltycard.usecase.RemoveLoyaltyCardFromLocationUseC
 import com.aisleron.domain.loyaltycard.usecase.RemoveLoyaltyCardFromLocationUseCaseImpl
 import com.aisleron.domain.note.usecase.AddNoteUseCase
 import com.aisleron.domain.note.usecase.AddNoteUseCaseImpl
+import com.aisleron.domain.note.usecase.CopyNoteUseCase
+import com.aisleron.domain.note.usecase.CopyNoteUseCaseImpl
 import com.aisleron.domain.note.usecase.GetNoteUseCase
 import com.aisleron.domain.note.usecase.GetNoteUseCaseImpl
 import com.aisleron.domain.note.usecase.HandleNotedUpdateUseCase
@@ -270,7 +272,9 @@ val useCaseModule = module {
         CopyProductUseCaseImpl(
             productRepository = get(),
             aisleProductRepository = get(),
-            isProductNameUniqueUseCase = get()
+            isProductNameUniqueUseCase = get(),
+            copyNoteUseCase = get(),
+            transactionRunner = get()
         )
     }
 
@@ -327,6 +331,10 @@ val useCaseModule = module {
      * Note Use Cases
      */
     factory<AddNoteUseCase> { AddNoteUseCaseImpl(noteRepository = get()) }
+    factory<CopyNoteUseCase> {
+        CopyNoteUseCaseImpl(addNoteUseCase = get(), getNoteUseCase = get())
+    }
+
     factory<GetNoteUseCase> { GetNoteUseCaseImpl(noteRepository = get()) }
     factory<RemoveNoteUseCase> { RemoveNoteUseCaseImpl(noteRepository = get()) }
     factory<UpdateNoteUseCase> { UpdateNoteUseCaseImpl(noteRepository = get()) }

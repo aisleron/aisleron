@@ -58,6 +58,8 @@ import com.aisleron.domain.loyaltycard.usecase.RemoveLoyaltyCardFromLocationUseC
 import com.aisleron.domain.loyaltycard.usecase.RemoveLoyaltyCardFromLocationUseCaseImpl
 import com.aisleron.domain.note.usecase.AddNoteUseCase
 import com.aisleron.domain.note.usecase.AddNoteUseCaseImpl
+import com.aisleron.domain.note.usecase.CopyNoteUseCase
+import com.aisleron.domain.note.usecase.CopyNoteUseCaseImpl
 import com.aisleron.domain.note.usecase.GetNoteUseCase
 import com.aisleron.domain.note.usecase.GetNoteUseCaseImpl
 import com.aisleron.domain.note.usecase.HandleNotedUpdateUseCase
@@ -252,6 +254,10 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
         AddNoteUseCaseImpl(repositoryFactory.noteRepository)
     }
 
+    val copyNoteUseCase: CopyNoteUseCase by lazy {
+        CopyNoteUseCaseImpl(addNoteUseCase, getNoteUseCase)
+    }
+
     val getNoteUseCase: GetNoteUseCase by lazy {
         GetNoteUseCaseImpl(repositoryFactory.noteRepository)
     }
@@ -291,7 +297,9 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
         CopyProductUseCaseImpl(
             repositoryFactory.productRepository,
             repositoryFactory.aisleProductRepository,
-            isProductNameUniqueUseCase = isProductNameUniqueUseCase
+            isProductNameUniqueUseCase = isProductNameUniqueUseCase,
+            copyNoteUseCase = copyNoteUseCase,
+            transactionRunner = TransactionRunnerTestImpl()
         )
     }
 
@@ -394,6 +402,7 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
 
             // Note Use Cases
             AddNoteUseCase::class -> addNoteUseCase as T
+            CopyNoteUseCase::class -> copyNoteUseCase as T
             GetNoteUseCase::class -> getNoteUseCase as T
             HandleNotedUpdateUseCase::class -> handleNotedUpdateUseCase as T
             UpdateNoteUseCase::class -> updateNoteUseCase as T

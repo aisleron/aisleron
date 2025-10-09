@@ -3,11 +3,14 @@ package com.aisleron.domain.product.usecase
 import com.aisleron.di.TestDependencyManager
 import com.aisleron.domain.aisleproduct.AisleProductRepository
 import com.aisleron.domain.base.AisleronException
+import com.aisleron.domain.note.Note
+import com.aisleron.domain.note.NoteRepository
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -55,10 +58,24 @@ class CopyProductUseCaseTest {
         assertEquals(sourceAisles.count(), newAisles.count())
     }
 
-    /**
-     * Tests:
-     * - New Product Created
-     * - Aisle Product Entries created
-     * - Rank is max rank in Aisle
-     */
+    @Test
+    fun copyProduct_ProductHasNote_NoteCopied() = runTest {
+        val noteText = "Copied note"
+        val noteId = dm.getRepository<NoteRepository>().add(Note(0, noteText))
+        val productRepository = dm.getRepository<ProductRepository>()
+        productRepository.update(existingProduct.copy(noteId = noteId))
+        val notedProduct = productRepository.get(existingProduct.id)!!
+        val newName = "Copied Product Name"
+
+        val newProductId = copyProductUseCase(notedProduct, newName)
+
+        val newProduct = productRepository.get(newProductId)!!
+        assertNotNull(newProduct.noteId)
+        assertNotEquals(notedProduct.noteId, newProduct.noteId)
+
+        val newNote = dm.getRepository<NoteRepository>().get(newProduct.noteId)
+        assertEquals(noteText, newNote?.noteText)
+        assertNotEquals(noteId, newNote?.id)
+    }
+
 }

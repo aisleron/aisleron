@@ -17,8 +17,10 @@
 
 package com.aisleron.domain.product.usecase
 
+import com.aisleron.domain.TransactionRunner
 import com.aisleron.domain.aisleproduct.AisleProductRepository
 import com.aisleron.domain.base.AisleronException
+import com.aisleron.domain.note.usecase.CopyNoteUseCase
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
 
@@ -29,7 +31,9 @@ interface CopyProductUseCase {
 class CopyProductUseCaseImpl(
     private val productRepository: ProductRepository,
     private val aisleProductRepository: AisleProductRepository,
-    private val isProductNameUniqueUseCase: IsProductNameUniqueUseCase
+    private val isProductNameUniqueUseCase: IsProductNameUniqueUseCase,
+    private val copyNoteUseCase: CopyNoteUseCase,
+    private val transactionRunner: TransactionRunner
 ) : CopyProductUseCase {
     override suspend fun invoke(source: Product, newProductName: String): Int {
         val newProduct = source.copy(
@@ -41,19 +45,22 @@ class CopyProductUseCaseImpl(
             throw AisleronException.DuplicateProductNameException("Product Name must be unique")
         }
 
-        return productRepository.add(newProduct).let { newProductId ->
-            productRepository.get(newProductId)?.let { addedProduct ->
-                aisleProductRepository.getProductAisles(source.id).forEach { ap ->
-                    aisleProductRepository.add(
-                        ap.copy(
-                            id = 0,
-                            product = addedProduct,
-                            rank = aisleProductRepository.getAisleMaxRank(ap.aisleId) + 1
+        return transactionRunner.run {
+            val noteId = copyNoteUseCase(newProduct.noteId)
+            productRepository.add(newProduct.copy(noteId = noteId)).let { newProductId ->
+                productRepository.get(newProductId)?.let { addedProduct ->
+                    aisleProductRepository.getProductAisles(source.id).forEach { ap ->
+                        aisleProductRepository.add(
+                            ap.copy(
+                                id = 0,
+                                product = addedProduct,
+                                rank = aisleProductRepository.getAisleMaxRank(ap.aisleId) + 1
+                            )
                         )
-                    )
+                    }
                 }
+                newProductId
             }
-            newProductId
         }
     }
 }
