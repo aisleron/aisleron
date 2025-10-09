@@ -17,17 +17,13 @@
 
 package com.aisleron.domain.product.usecase
 
-import com.aisleron.data.TestDataManager
+import com.aisleron.di.TestDependencyManager
 import com.aisleron.domain.aisle.AisleRepository
-import com.aisleron.domain.aisle.usecase.GetDefaultAislesUseCase
 import com.aisleron.domain.aisleproduct.AisleProductRepository
-import com.aisleron.domain.aisleproduct.usecase.AddAisleProductsUseCase
-import com.aisleron.domain.aisleproduct.usecase.GetAisleMaxRankUseCase
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.note.Note
 import com.aisleron.domain.note.NoteRepository
-import com.aisleron.domain.note.usecase.AddNoteUseCaseImpl
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
 import kotlinx.coroutines.runBlocking
@@ -38,24 +34,16 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
 class AddProductUseCaseTest {
-    private lateinit var testData: TestDataManager
+    private lateinit var dm: TestDependencyManager
     private lateinit var addProductUseCase: AddProductUseCase
     private lateinit var existingProduct: Product
     private lateinit var repository: ProductRepository
 
     @BeforeEach
     fun setUp() {
-        testData = TestDataManager()
-        repository = testData.getRepository<ProductRepository>()
-        addProductUseCase = AddProductUseCaseImpl(
-            repository,
-            GetDefaultAislesUseCase(testData.getRepository<AisleRepository>()),
-            AddAisleProductsUseCase(testData.getRepository<AisleProductRepository>()),
-            IsProductNameUniqueUseCase(repository),
-            GetAisleMaxRankUseCase(testData.getRepository<AisleProductRepository>()),
-            AddNoteUseCaseImpl(testData.getRepository<NoteRepository>())
-        )
-
+        dm = TestDependencyManager()
+        repository = dm.getRepository<ProductRepository>()
+        addProductUseCase = dm.getUseCase<AddProductUseCase>()
         existingProduct = runBlocking {
             repository.getAll()[1]
         }
@@ -112,8 +100,8 @@ class AddProductUseCaseTest {
         val newProduct = getNewProduct()
         val aisleProductCountBefore: Int
         val aisleProductCountAfter: Int
-        val aisleProductRepository = testData.getRepository<AisleProductRepository>()
-        val locationCount: Int = testData.getRepository<LocationRepository>().getAll().count()
+        val aisleProductRepository = dm.getRepository<AisleProductRepository>()
+        val locationCount: Int = dm.getRepository<LocationRepository>().getAll().count()
         aisleProductCountBefore = aisleProductRepository.getAll().count()
 
         addProductUseCase(newProduct, null)
@@ -125,8 +113,8 @@ class AddProductUseCaseTest {
     @Test
     fun addProduct_AisleProvided_ProductAddedToAisle() = runTest {
         val newProduct = getNewProduct()
-        val aisle = testData.getRepository<AisleRepository>().getAll().first { !it.isDefault }
-        val aisleProductRepository = testData.getRepository<AisleProductRepository>()
+        val aisle = dm.getRepository<AisleRepository>().getAll().first { !it.isDefault }
+        val aisleProductRepository = dm.getRepository<AisleProductRepository>()
         val aisleProductCountBefore =
             aisleProductRepository.getAll().count { it.aisleId == aisle.id }
 
@@ -149,7 +137,7 @@ class AddProductUseCaseTest {
         )
 
         val newProduct = getNewProduct().copy(note = note)
-        val noteRepository = testData.getRepository<NoteRepository>()
+        val noteRepository = dm.getRepository<NoteRepository>()
         val noteCountBefore: Int = noteRepository.getAll().count()
 
         val newProductId = addProductUseCase(newProduct)

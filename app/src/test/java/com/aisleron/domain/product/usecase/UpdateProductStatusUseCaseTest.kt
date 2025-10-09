@@ -18,13 +18,7 @@
 package com.aisleron.domain.product.usecase
 
 import com.aisleron.di.TestDependencyManager
-import com.aisleron.domain.note.NoteRepository
-import com.aisleron.domain.note.usecase.AddNoteUseCaseImpl
-import com.aisleron.domain.note.usecase.GetNoteUseCaseImpl
-import com.aisleron.domain.note.usecase.RemoveNoteUseCaseImpl
-import com.aisleron.domain.note.usecase.UpdateNoteUseCaseImpl
 import com.aisleron.domain.product.ProductRepository
-import com.aisleron.testdata.data.TransactionRunnerTestImpl
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -37,30 +31,13 @@ import org.junit.jupiter.params.provider.MethodSource
 import java.util.stream.Stream
 
 class UpdateProductStatusUseCaseTest {
-
     private lateinit var dm: TestDependencyManager
     private lateinit var updateProductStatusUseCase: UpdateProductStatusUseCase
 
     @BeforeEach
     fun setUp() {
         dm = TestDependencyManager()
-        val productRepository = dm.getRepository<ProductRepository>()
-        val noteRepository = dm.getRepository<NoteRepository>()
-        updateProductStatusUseCase = UpdateProductStatusUseCaseImpl(
-            GetProductUseCaseImpl(
-                productRepository,
-                GetNoteUseCaseImpl(dm.getRepository<NoteRepository>())
-            ),
-
-            UpdateProductUseCaseImpl(
-                productRepository,
-                IsProductNameUniqueUseCase(productRepository),
-                AddNoteUseCaseImpl(noteRepository),
-                UpdateNoteUseCaseImpl(noteRepository),
-                RemoveNoteUseCaseImpl(noteRepository),
-                TransactionRunnerTestImpl()
-            )
-        )
+        updateProductStatusUseCase = dm.getUseCase()
     }
 
     @ParameterizedTest(name = "Test when inStock Status is {0}")

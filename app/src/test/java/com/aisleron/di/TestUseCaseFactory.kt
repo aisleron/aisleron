@@ -60,6 +60,8 @@ import com.aisleron.domain.note.usecase.AddNoteUseCase
 import com.aisleron.domain.note.usecase.AddNoteUseCaseImpl
 import com.aisleron.domain.note.usecase.GetNoteUseCase
 import com.aisleron.domain.note.usecase.GetNoteUseCaseImpl
+import com.aisleron.domain.note.usecase.HandleNotedUpdateUseCase
+import com.aisleron.domain.note.usecase.HandleNotedUpdateUseCaseImpl
 import com.aisleron.domain.note.usecase.RemoveNoteUseCase
 import com.aisleron.domain.note.usecase.RemoveNoteUseCaseImpl
 import com.aisleron.domain.note.usecase.UpdateNoteUseCase
@@ -74,6 +76,8 @@ import com.aisleron.domain.product.usecase.GetProductUseCaseImpl
 import com.aisleron.domain.product.usecase.IsProductNameUniqueUseCase
 import com.aisleron.domain.product.usecase.RemoveProductUseCase
 import com.aisleron.domain.product.usecase.RemoveProductUseCaseImpl
+import com.aisleron.domain.product.usecase.UpdateProductStatusUseCase
+import com.aisleron.domain.product.usecase.UpdateProductStatusUseCaseImpl
 import com.aisleron.domain.product.usecase.UpdateProductUseCase
 import com.aisleron.domain.product.usecase.UpdateProductUseCaseImpl
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
@@ -252,6 +256,14 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
         GetNoteUseCaseImpl(repositoryFactory.noteRepository)
     }
 
+    val handleNotedUpdateUseCase: HandleNotedUpdateUseCase by lazy {
+        HandleNotedUpdateUseCaseImpl (
+            addNoteUseCase = addNoteUseCase,
+            updateNoteUseCase = updateNoteUseCase,
+            removeNoteUseCase = removeNoteUseCase,
+        )
+    }
+
     val updateNoteUseCase: UpdateNoteUseCase by lazy {
         UpdateNoteUseCaseImpl(repositoryFactory.noteRepository)
     }
@@ -305,13 +317,18 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
         )
     }
 
+    val updateProductStatusUseCase: UpdateProductStatusUseCase by lazy {
+        UpdateProductStatusUseCaseImpl(
+            getProductUseCase = getProductUseCase,
+            updateProductUseCase = updateProductUseCase
+        )
+    }
+
     val updateProductUseCase: UpdateProductUseCase by lazy {
         UpdateProductUseCaseImpl(
             productRepository = repositoryFactory.productRepository,
             isProductNameUniqueUseCase = isProductNameUniqueUseCase,
-            addNoteUseCase = addNoteUseCase,
-            updateNoteUseCase = updateNoteUseCase,
-            removeNoteUseCase = removeNoteUseCase,
+            handleNotedUpdateUseCase = handleNotedUpdateUseCase,
             transactionRunner = TransactionRunnerTestImpl()
         )
     }
@@ -378,6 +395,7 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
             // Note Use Cases
             AddNoteUseCase::class -> addNoteUseCase as T
             GetNoteUseCase::class -> getNoteUseCase as T
+            HandleNotedUpdateUseCase::class -> handleNotedUpdateUseCase as T
             UpdateNoteUseCase::class -> updateNoteUseCase as T
             RemoveNoteUseCase::class -> removeNoteUseCase as T
 
@@ -388,6 +406,7 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
             GetProductUseCase::class -> getProductUseCase as T
             IsProductNameUniqueUseCase::class -> isProductNameUniqueUseCase as T
             RemoveProductUseCase::class -> removeProductUseCase as T
+            UpdateProductStatusUseCase::class -> updateProductStatusUseCase as T
             UpdateProductUseCase::class -> updateProductUseCase as T
 
             // Create Sample Data Use Case

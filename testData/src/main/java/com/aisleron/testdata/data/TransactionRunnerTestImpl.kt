@@ -15,22 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.di
+package com.aisleron.testdata.data
 
-import androidx.room.Room
-import androidx.test.platform.app.InstrumentationRegistry
-import com.aisleron.data.AisleronDatabase
-import com.aisleron.data.RoomTransactionRunner
 import com.aisleron.domain.TransactionRunner
-import org.koin.dsl.module
 
-val inMemoryDatabaseTestModule = module {
-    single<AisleronDatabase> {
-        Room.inMemoryDatabaseBuilder(
-            InstrumentationRegistry.getInstrumentation().context,
-            AisleronDatabase::class.java
-        ).build()
-    }
-
-    single<TransactionRunner> { RoomTransactionRunner(get()) }
+class TransactionRunnerTestImpl : TransactionRunner {
+    override suspend fun <T> run(block: suspend () -> T): T = block()
 }

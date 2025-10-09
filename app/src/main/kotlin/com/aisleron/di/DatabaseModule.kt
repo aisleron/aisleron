@@ -22,6 +22,8 @@ import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.aisleron.data.AisleronDatabase
 import com.aisleron.data.DbInitializer
+import com.aisleron.data.RoomTransactionRunner
+import com.aisleron.domain.TransactionRunner
 import org.koin.android.ext.koin.androidApplication
 import org.koin.dsl.module
 
@@ -38,4 +40,6 @@ val databaseModule = module {
             }
         }).build()
     }
+
+    single<TransactionRunner> { RoomTransactionRunner(get()) }
 }

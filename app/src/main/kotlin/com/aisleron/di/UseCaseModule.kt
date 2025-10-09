@@ -71,6 +71,8 @@ import com.aisleron.domain.note.usecase.AddNoteUseCase
 import com.aisleron.domain.note.usecase.AddNoteUseCaseImpl
 import com.aisleron.domain.note.usecase.GetNoteUseCase
 import com.aisleron.domain.note.usecase.GetNoteUseCaseImpl
+import com.aisleron.domain.note.usecase.HandleNotedUpdateUseCase
+import com.aisleron.domain.note.usecase.HandleNotedUpdateUseCaseImpl
 import com.aisleron.domain.note.usecase.RemoveNoteUseCase
 import com.aisleron.domain.note.usecase.RemoveNoteUseCaseImpl
 import com.aisleron.domain.note.usecase.UpdateNoteUseCase
@@ -233,9 +235,8 @@ val useCaseModule = module {
         UpdateProductUseCaseImpl(
             productRepository = get(),
             isProductNameUniqueUseCase = get(),
-            addNoteUseCase = get(),
-            updateNoteUseCase = get(),
-            removeNoteUseCase = get()
+            handleNotedUpdateUseCase = get(),
+            transactionRunner = get()
         )
     }
 
@@ -246,7 +247,8 @@ val useCaseModule = module {
             addAisleProductsUseCase = get(),
             isProductNameUniqueUseCase = get(),
             getAisleMaxRankUseCase = get(),
-            addNoteUseCase = get()
+            addNoteUseCase = get(),
+            transactionRunner = get()
         )
     }
 
@@ -328,4 +330,11 @@ val useCaseModule = module {
     factory<GetNoteUseCase> { GetNoteUseCaseImpl(noteRepository = get()) }
     factory<RemoveNoteUseCase> { RemoveNoteUseCaseImpl(noteRepository = get()) }
     factory<UpdateNoteUseCase> { UpdateNoteUseCaseImpl(noteRepository = get()) }
+    factory<HandleNotedUpdateUseCase> {
+        HandleNotedUpdateUseCaseImpl(
+            addNoteUseCase = get(),
+            updateNoteUseCase = get(),
+            removeNoteUseCase = get()
+        )
+    }
 }

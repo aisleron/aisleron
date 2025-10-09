@@ -17,13 +17,10 @@
 
 package com.aisleron.domain.product.usecase
 
-import com.aisleron.data.TestDataManager
+import com.aisleron.di.TestDependencyManager
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.note.Note
 import com.aisleron.domain.note.NoteRepository
-import com.aisleron.domain.note.usecase.AddNoteUseCaseImpl
-import com.aisleron.domain.note.usecase.RemoveNoteUseCaseImpl
-import com.aisleron.domain.note.usecase.UpdateNoteUseCaseImpl
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
 import kotlinx.coroutines.test.runTest
@@ -37,26 +34,20 @@ import org.junit.jupiter.api.assertThrows
 
 class UpdateProductUseCaseTest {
 
-    private lateinit var testData: TestDataManager
+    private lateinit var dm: TestDependencyManager
     private lateinit var updateProductUseCase: UpdateProductUseCase
     private lateinit var repository: ProductRepository
 
     @BeforeEach
     fun setUp() {
-        testData = TestDataManager()
-        repository = testData.getRepository<ProductRepository>()
-        updateProductUseCase = UpdateProductUseCaseImpl(
-            repository,
-            IsProductNameUniqueUseCase(repository),
-            AddNoteUseCaseImpl(noteRepository()),
-            UpdateNoteUseCaseImpl(noteRepository()),
-            RemoveNoteUseCaseImpl(noteRepository())
-        )
+        dm = TestDependencyManager()
+        repository = dm.getRepository<ProductRepository>()
+        updateProductUseCase = dm.getUseCase<UpdateProductUseCase>()
     }
 
     private suspend fun existingProduct(): Product = repository.get(1)!!
 
-    private fun noteRepository(): NoteRepository = testData.getRepository<NoteRepository>()
+    private fun noteRepository(): NoteRepository = dm.getRepository<NoteRepository>()
 
     @Test
     fun updateProduct_IsDuplicateName_ThrowsException() = runTest {
@@ -134,7 +125,7 @@ class UpdateProductUseCaseTest {
 
         updateProductUseCase(updateProduct)
 
-        val updatedNote = testData.getRepository<NoteRepository>().get(note.id)
+        val updatedNote = noteRepository().get(note.id)
         assertEquals(note, updatedNote)
     }
 
@@ -148,7 +139,7 @@ class UpdateProductUseCaseTest {
         val updatedProduct = repository.get(updateProduct.id)
         assertNotNull(updatedProduct?.noteId)
 
-        val addedNote = testData.getRepository<NoteRepository>().get(updatedProduct?.noteId ?: 0)
+        val addedNote = noteRepository().get(updatedProduct?.noteId ?: 0)
         assertEquals(note.noteText, addedNote?.noteText)
     }
 
@@ -163,7 +154,7 @@ class UpdateProductUseCaseTest {
         val updatedProduct = repository.get(product.id)
         assertNull(updatedProduct?.noteId)
 
-        val updatedNote = testData.getRepository<NoteRepository>().get(note.id)
+        val updatedNote = noteRepository().get(note.id)
         assertNull(updatedNote)
     }
 
@@ -177,7 +168,7 @@ class UpdateProductUseCaseTest {
         val updatedProduct = repository.get(updateProduct.id)
         assertNotEquals(0, updatedProduct?.noteId)
 
-        val addedNote = testData.getRepository<NoteRepository>().get(updatedProduct?.noteId ?: 0)
+        val addedNote = noteRepository().get(updatedProduct?.noteId ?: 0)
         assertEquals(note.noteText, addedNote?.noteText)
     }
 
