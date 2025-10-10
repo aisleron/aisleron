@@ -21,13 +21,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aisleron.domain.aisle.usecase.GetAisleUseCase
 import com.aisleron.domain.base.AisleronException
+import com.aisleron.domain.note.Note
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.usecase.AddProductUseCase
 import com.aisleron.domain.product.usecase.GetProductUseCase
 import com.aisleron.domain.product.usecase.UpdateProductUseCase
+import com.aisleron.ui.note.NoteViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class ProductViewModel(
@@ -36,7 +41,7 @@ class ProductViewModel(
     private val getProductUseCase: GetProductUseCase,
     private val getAisleUseCase: GetAisleUseCase,
     coroutineScopeProvider: CoroutineScope? = null
-) : ViewModel() {
+) : ViewModel(), NoteViewModel {
     private var _aisleId: Int? = null
     private var _locationId: Int? = null
     private var product: Product? = null
@@ -47,6 +52,13 @@ class ProductViewModel(
 
     private val _productUiState = MutableStateFlow<ProductUiState>(ProductUiState.Empty)
     val productUiState: StateFlow<ProductUiState> = _productUiState
+
+    override val noteFlow: StateFlow<String>
+        get() = _uiData.map { it.noteText }.stateIn(
+            coroutineScope,
+            SharingStarted.Lazily,
+            _uiData.value.noteText
+        )
 
     private var hydrated = false
 
@@ -61,7 +73,8 @@ class ProductViewModel(
             product = getProductUseCase(productId)
             _uiData.value = ProductUiData(
                 productName = product?.name.orEmpty(),
-                inStock = product?.inStock ?: inStock
+                inStock = product?.inStock ?: inStock,
+                noteText = product?.note?.noteText ?: ""
             )
             _productUiState.value = ProductUiState.Empty
         }
@@ -75,22 +88,40 @@ class ProductViewModel(
         _uiData.value = _uiData.value.copy(inStock = inStock)
     }
 
+    override fun updateNote(note: String) {
+        _uiData.value = _uiData.value.copy(noteText = note)
+    }
+
     fun saveProduct() {
         coroutineScope.launch {
             val name = _uiData.value.productName
             val inStock = _uiData.value.inStock
+            val noteText = _uiData.value.noteText
             if (name.isBlank()) return@launch
 
             _productUiState.value = ProductUiState.Loading
             try {
+                val newNote = if (noteText.isNotBlank()) {
+                    Note(0, noteText)
+                } else {
+                    null
+                }
+
                 val aisle = _aisleId?.let { getAisleUseCase(it) }
                 product?.let {
-                    val updated = it.copy(name = name, inStock = inStock)
+                    val note = it.note?.copy(noteText = noteText) ?: newNote
+                    val updated = it.copy(name = name, inStock = inStock, note = note)
                     updateProductUseCase(updated)
                     product = updated
                 } ?: run {
                     val id = addProductUseCase(
-                        Product(name = name, inStock = inStock, id = 0, qtyNeeded = 0),
+                        Product(
+                            name = name,
+                            inStock = inStock,
+                            id = 0,
+                            qtyNeeded = 0,
+                            note = newNote
+                        ),
                         aisle
                     )
 

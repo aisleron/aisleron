@@ -27,6 +27,8 @@ import com.aisleron.domain.aisle.AisleRepository
 import com.aisleron.domain.aisle.usecase.GetAisleUseCase
 import com.aisleron.domain.aisleproduct.AisleProductRepository
 import com.aisleron.domain.base.AisleronException
+import com.aisleron.domain.note.Note
+import com.aisleron.domain.note.NoteRepository
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
 import com.aisleron.domain.product.usecase.AddProductUseCase
@@ -44,6 +46,9 @@ import org.junit.runners.Parameterized
 import org.koin.test.KoinTest
 import org.koin.test.get
 import org.koin.test.mock.declare
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 @RunWith(value = Parameterized::class)
 class ProductViewModelTest(private val inStock: Boolean) : KoinTest {
@@ -70,15 +75,14 @@ class ProductViewModelTest(private val inStock: Boolean) : KoinTest {
         productViewModel.hydrate(existingProduct.id, existingProduct.inStock)
         productViewModel.updateProductName(updatedProductName)
         productViewModel.updateInStock(inStock)
-
         productViewModel.saveProduct()
 
         val updatedProduct = productRepository.get(existingProduct.id)
-        val countAfter: Int = productRepository.getAll().count()
-
         Assert.assertNotNull(updatedProduct)
         Assert.assertEquals(updatedProductName, updatedProduct?.name)
         Assert.assertEquals(inStock, updatedProduct?.inStock)
+
+        val countAfter: Int = productRepository.getAll().count()
         Assert.assertEquals(countBefore, countAfter)
     }
 
@@ -86,22 +90,21 @@ class ProductViewModelTest(private val inStock: Boolean) : KoinTest {
     fun testSaveProduct_ProductDoesNotExists_CreateProduct() = runTest {
         val newProductName = "New Product Name"
         val productRepository = get<ProductRepository>()
-
-        productViewModel.hydrate(0, inStock)
         val countBefore: Int = productRepository.getAll().count()
 
+        productViewModel.hydrate(0, inStock)
         productViewModel.updateProductName(newProductName)
         productViewModel.updateInStock(inStock)
-
         productViewModel.saveProduct()
-        val newProduct = productRepository.getByName(newProductName)
-        val countAfter: Int = productRepository.getAll().count()
 
+        val newProduct = productRepository.getByName(newProductName)
         Assert.assertNotNull(newProduct)
         Assert.assertEquals(newProductName, newProduct?.name)
         Assert.assertEquals(inStock, newProduct?.inStock)
         Assert.assertEquals(newProductName, productViewModel.uiData.value.productName)
         Assert.assertEquals(inStock, productViewModel.uiData.value.inStock)
+
+        val countAfter: Int = productRepository.getAll().count()
         Assert.assertEquals(countBefore + 1, countAfter)
     }
 
@@ -153,6 +156,10 @@ class ProductViewModelTest(private val inStock: Boolean) : KoinTest {
             object : AddProductUseCase {
                 override suspend fun invoke(product: Product, targetAisle: Aisle?): Int {
                     throw Exception(exceptionMessage)
+                }
+
+                override suspend fun invoke(item: Product): Int {
+                    return invoke(item, null)
                 }
             }
         }
@@ -218,16 +225,103 @@ class ProductViewModelTest(private val inStock: Boolean) : KoinTest {
         productViewModel.updateProductName(newProductName)
         productViewModel.updateInStock(inStock)
         productViewModel.saveProduct()
-        val newProduct = productRepository.getByName(newProductName)
-        val countAfter = aisleProductRepository.getAll().count { it.aisleId == aisle.id }
 
-        Assert.assertNotNull(newProduct)
-        Assert.assertEquals(newProductName, newProduct?.name)
-        Assert.assertEquals(inStock, newProduct?.inStock)
         Assert.assertEquals(newProductName, productViewModel.uiData.value.productName)
         Assert.assertEquals(inStock, productViewModel.uiData.value.inStock)
+
+        val newProduct = productRepository.getByName(newProductName)
+        Assert.assertEquals(newProductName, newProduct?.name)
+        Assert.assertEquals(inStock, newProduct?.inStock)
+
+        val countAfter = aisleProductRepository.getAll().count { it.aisleId == aisle.id }
         Assert.assertEquals(countBefore + 1, countAfter)
     }
+
+    @Test
+    fun hydrate_ProductHasNote_NoteReturned() = runTest {
+        val noteText = "Test note on product"
+        val noteId = get<NoteRepository>().add(Note(0, noteText))
+        val productRepository = get<ProductRepository>()
+        val existingProduct: Product = productRepository.getAll().first()
+        productRepository.update(existingProduct.copy(noteId = noteId))
+
+        productViewModel.hydrate(existingProduct.id, existingProduct.inStock)
+
+        Assert.assertEquals(noteText, productViewModel.noteFlow.value)
+    }
+
+    @Test
+    fun updateNote_NewNoteProvided_NoteValueUpdated() = runTest {
+        val noteText = "Test note on product"
+        val noteId = get<NoteRepository>().add(Note(0, noteText))
+        val productRepository = get<ProductRepository>()
+        val existingProduct: Product = productRepository.getAll().first()
+        productRepository.update(existingProduct.copy(noteId = noteId))
+        productViewModel.hydrate(existingProduct.id, existingProduct.inStock)
+
+        val updatedNote = "Updated note text"
+        productViewModel.updateNote(updatedNote)
+
+        Assert.assertEquals(updatedNote, productViewModel.noteFlow.value)
+    }
+
+    @Test
+    fun saveProduct_NoteIsBlankString_NoNoteCreated() = runTest {
+        val existingProduct = get<ProductRepository>().getAll().first()
+        productViewModel.hydrate(existingProduct.id, existingProduct.inStock)
+        productViewModel.updateProductName("${existingProduct.name} Updated")
+
+        productViewModel.saveProduct()
+
+        val updatedProduct = get<ProductRepository>().get(existingProduct.id)!!
+        assertNull(updatedProduct.noteId)
+
+        val noteCount = get<NoteRepository>().getAll().count()
+        assertEquals(0, noteCount)
+    }
+
+    @Test
+    fun saveProduct_ProductHasNoNote_NoteCreated() = runTest {
+        val existingProduct = get<ProductRepository>().getAll().first()
+        productViewModel.hydrate(existingProduct.id, existingProduct.inStock)
+        productViewModel.updateProductName("${existingProduct.name} Updated")
+        val noteText = "New note created"
+        productViewModel.updateNote(noteText)
+
+        productViewModel.saveProduct()
+
+        val updatedProduct = get<ProductRepository>().get(existingProduct.id)!!
+        assertNotNull(updatedProduct.noteId)
+
+        val note = get<NoteRepository>().get(updatedProduct.noteId)
+        assertEquals(noteText, note?.noteText)
+    }
+
+    @Test
+    fun saveProduct_ProductHasNote_NoteUpdated() = runTest {
+        val noteId = get<NoteRepository>().add(Note(0, "Test note on product"))
+        val productRepository = get<ProductRepository>()
+        val existingProduct: Product = productRepository.getAll().first()
+        productRepository.update(existingProduct.copy(noteId = noteId))
+        productViewModel.hydrate(existingProduct.id, existingProduct.inStock)
+        val noteText = "New note created"
+        productViewModel.updateNote(noteText)
+
+        productViewModel.saveProduct()
+
+        val updatedProduct = get<ProductRepository>().get(existingProduct.id)!!
+        assertEquals(noteId, updatedProduct.noteId)
+
+        val note = get<NoteRepository>().get(updatedProduct.noteId!!)
+        assertEquals(noteText, note?.noteText)
+
+    }
+
+    /**
+     * Note Tests:
+     *  SaveProduct -> Product with note -> Update Existing
+     *
+     */
 
     companion object {
         @JvmStatic
