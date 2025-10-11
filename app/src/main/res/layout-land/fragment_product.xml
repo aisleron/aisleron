@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (C) 2025 aisleron.com
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as
+  ~ published by the Free Software Foundation, either version 3 of the
+  ~ License, or (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:baselineAligned="false"
+    android:orientation="horizontal"
+    android:layout_margin="@dimen/text_margin"
+    tools:context=".ui.product.ProductFragment">
+
+    <!-- Left Column: Main Inputs -->
+    <LinearLayout
+        android:id="@+id/layout_main_inputs"
+        android:orientation="vertical"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="match_parent">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/product_name"
+            android:labelFor="@id/edt_product_name"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edt_product_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textCapWords" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <CheckedTextView
+            android:id="@+id/chk_product_in_stock"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/in_stock_at_home"
+            android:gravity="center_vertical"
+            android:checked="false"
+            android:padding="@dimen/text_margin"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:checkMark="?android:attr/listChoiceIndicatorMultiple"
+            android:checkMarkTint="?attr/colorSecondary" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/txt_toggle_extra_options"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/show_extra_options"
+                android:gravity="center_vertical"
+                android:paddingVertical="@dimen/text_margin"
+                android:paddingStart="0dp"
+                android:paddingEnd="@dimen/text_margin"
+                android:layout_weight="0"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                app:drawableStartCompat="@drawable/baseline_expand_right_24"
+                android:drawablePadding="@dimen/expand_button_padding" />
+
+            <View
+                android:id="@+id/divider"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:background="?attr/colorSecondary" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Right Column -->
+    <LinearLayout
+        android:id="@+id/layout_extra_options"
+        android:orientation="vertical"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tab_product_options"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/pgr_product_options"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+
+</LinearLayout>
