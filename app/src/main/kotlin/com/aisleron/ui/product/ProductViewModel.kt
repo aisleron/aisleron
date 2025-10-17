@@ -22,6 +22,7 @@ import androidx.lifecycle.viewModelScope
 import com.aisleron.domain.aisle.usecase.GetAisleUseCase
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.note.Note
+import com.aisleron.domain.note.usecase.ApplyNoteChangesUseCase
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.usecase.AddProductUseCase
 import com.aisleron.domain.product.usecase.GetProductUseCase
@@ -40,6 +41,7 @@ class ProductViewModel(
     private val updateProductUseCase: UpdateProductUseCase,
     private val getProductUseCase: GetProductUseCase,
     private val getAisleUseCase: GetAisleUseCase,
+    private val applyNoteChangesUseCase: ApplyNoteChangesUseCase,
     coroutineScopeProvider: CoroutineScope? = null
 ) : ViewModel(), NoteViewModel {
     private var _aisleId: Int? = null
@@ -101,16 +103,9 @@ class ProductViewModel(
 
             _productUiState.value = ProductUiState.Loading
             try {
-                val newNote = if (noteText.isNotBlank()) {
-                    Note(0, noteText)
-                } else {
-                    null
-                }
-
                 val aisle = _aisleId?.let { getAisleUseCase(it) }
                 product?.let {
-                    val note = it.note?.copy(noteText = noteText) ?: newNote
-                    val updated = it.copy(name = name, inStock = inStock, note = note)
+                    val updated = it.copy(name = name, inStock = inStock)
                     updateProductUseCase(updated)
                     product = updated
                 } ?: run {
@@ -119,13 +114,17 @@ class ProductViewModel(
                             name = name,
                             inStock = inStock,
                             id = 0,
-                            qtyNeeded = 0,
-                            note = newNote
+                            qtyNeeded = 0
                         ),
                         aisle
                     )
 
                     product = getProductUseCase(id)
+                }
+
+                product?.let {
+                    val note = Note(it.noteId ?: 0, noteText)
+                    applyNoteChangesUseCase(it, note)
                 }
 
                 _productUiState.value = ProductUiState.Success
