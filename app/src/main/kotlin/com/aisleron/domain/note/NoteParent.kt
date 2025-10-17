@@ -15,17 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.domain.product
+package com.aisleron.domain.note
 
 import com.aisleron.domain.base.AisleronItem
-import com.aisleron.domain.note.Note
-import com.aisleron.domain.note.NoteParent
 
-data class Product(
-    override val id: Int,
-    val name: String,
-    val inStock: Boolean,
-    val qtyNeeded: Int,
-    override val noteId: Int? = null,
-    override val note: Note? = null
-) : AisleronItem, NoteParent
+interface NoteParent : AisleronItem {
+    val noteId: Int?
+    val note: Note?
+}

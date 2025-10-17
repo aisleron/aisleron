@@ -17,21 +17,32 @@
 
 package com.aisleron.domain.note.usecase
 
-import com.aisleron.domain.base.usecase.RemoveUseCase
+import com.aisleron.domain.TransactionRunner
 import com.aisleron.domain.note.Note
+import com.aisleron.domain.note.NoteParent
 import com.aisleron.domain.note.NoteRepository
 
-interface RemoveNoteUseCase : RemoveUseCase<Note> {
-    suspend operator fun invoke(noteId: Int)
+interface RemoveNoteUseCase {
+    suspend operator fun invoke(noteParent: NoteParent, note: Note)
+    suspend operator fun invoke(noteParent: NoteParent, noteId: Int)
 }
 
-class RemoveNoteUseCaseImpl(private val noteRepository: NoteRepository) : RemoveNoteUseCase {
-    override suspend fun invoke(item: Note) {
-        noteRepository.remove(item)
+class RemoveNoteUseCaseImpl(
+    private val noteRepository: NoteRepository,
+    private val removeNoteFromParentUseCase: RemoveNoteFromParentUseCase,
+    private val transactionRunner: TransactionRunner
+) : RemoveNoteUseCase {
+    override suspend fun invoke(noteParent: NoteParent, note: Note) {
+        if (noteParent.noteId != note.id) return
+
+        transactionRunner.run {
+            removeNoteFromParentUseCase(noteParent, note.id)
+            noteRepository.remove(note)
+        }
     }
 
-    override suspend fun invoke(noteId: Int) {
+    override suspend fun invoke(noteParent: NoteParent, noteId: Int) {
         val note = noteRepository.get(noteId)
-        note?.let { invoke(it) }
+        note?.let { invoke(noteParent, it) }
     }
 }

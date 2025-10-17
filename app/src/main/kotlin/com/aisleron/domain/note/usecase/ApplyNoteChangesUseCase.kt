@@ -18,23 +18,23 @@
 package com.aisleron.domain.note.usecase
 
 import com.aisleron.domain.note.Note
-import com.aisleron.domain.note.Noted
+import com.aisleron.domain.note.NoteParent
 
-interface HandleNotedUpdateUseCase {
-    suspend operator fun invoke(item: Noted): Int?
+interface ApplyNoteChangesUseCase {
+    suspend operator fun invoke(item: NoteParent, note: Note?): Int?
 }
 
-class HandleNotedUpdateUseCaseImpl(
+class ApplyNoteChangesUseCaseImpl(
     private val addNoteUseCase: AddNoteUseCase,
     private val updateNoteUseCase: UpdateNoteUseCase,
     private val removeNoteUseCase: RemoveNoteUseCase
-) : HandleNotedUpdateUseCase {
-    override suspend fun invoke(item: Noted): Int? {
-        val note = item.note ?: return null
+) : ApplyNoteChangesUseCase {
+    override suspend fun invoke(item: NoteParent, note: Note?): Int? {
+        note ?: return null
 
         return when {
             note.noteText.isBlank() -> {
-                removeNoteUseCase(note)
+                removeNoteUseCase(item, note)
                 null
             }
 
@@ -44,7 +44,7 @@ class HandleNotedUpdateUseCaseImpl(
             }
 
             else -> {
-                addNoteUseCase(Note(id = 0, noteText = note.noteText))
+                addNoteUseCase(item, Note(id = 0, noteText = note.noteText))
             }
         }
     }

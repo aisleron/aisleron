@@ -17,12 +17,25 @@
 
 package com.aisleron.domain.note.usecase
 
-import com.aisleron.domain.base.usecase.AddUseCase
+import com.aisleron.domain.TransactionRunner
 import com.aisleron.domain.note.Note
+import com.aisleron.domain.note.NoteParent
 import com.aisleron.domain.note.NoteRepository
 
-interface AddNoteUseCase : AddUseCase<Note>
+interface AddNoteUseCase {
+    suspend operator fun invoke(noteParent: NoteParent, item: Note): Int
+}
 
-class AddNoteUseCaseImpl(private val noteRepository: NoteRepository) : AddNoteUseCase {
-    override suspend fun invoke(item: Note): Int = noteRepository.add(item)
+class AddNoteUseCaseImpl(
+    private val noteRepository: NoteRepository,
+    private val addNoteToParentUseCase: AddNoteToParentUseCase,
+    private val transactionRunner: TransactionRunner
+) : AddNoteUseCase {
+    override suspend fun invoke(noteParent: NoteParent, item: Note): Int {
+        return transactionRunner.run {
+            val noteId = noteRepository.add(item)
+            addNoteToParentUseCase(noteParent, noteId)
+            noteId
+        }
+    }
 }

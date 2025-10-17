@@ -550,14 +550,14 @@ class ShoppingListFragment(
             fabHandler: FabHandler,
             shoppingListPreferences: ShoppingListPreferences,
             loyaltyCardProvider: LoyaltyCardProvider,
-            alertDialog: AisleDialog
+            aisleDialog: AisleDialog
         ) =
             ShoppingListFragment(
                 applicationTitleUpdateListener,
                 fabHandler,
                 shoppingListPreferences,
                 loyaltyCardProvider,
-                alertDialog
+                aisleDialog
             ).apply {
                 arguments = Bundle().apply {
                     putInt(ARG_LOCATION_ID, locationId.toInt())

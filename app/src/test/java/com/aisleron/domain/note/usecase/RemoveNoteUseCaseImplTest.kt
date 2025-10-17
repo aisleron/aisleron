@@ -20,10 +20,13 @@ package com.aisleron.domain.note.usecase
 import com.aisleron.di.TestDependencyManager
 import com.aisleron.domain.note.Note
 import com.aisleron.domain.note.NoteRepository
+import com.aisleron.domain.product.Product
+import com.aisleron.domain.product.ProductRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertNotNull
 import org.junit.jupiter.api.assertNull
 
 class RemoveNoteUseCaseImplTest {
@@ -38,54 +41,114 @@ class RemoveNoteUseCaseImplTest {
         removeNoteUseCase = dm.getUseCase()
     }
 
+    private suspend fun getProductWithNote(): Product {
+        val noteText = "Note to test Remove"
+        val noteId = repository.add(Note(0, noteText))
+        val note = repository.get(noteId)
+
+        val productRepository = dm.getRepository<ProductRepository>()
+        val productWithNote = productRepository.getAll().first().copy(noteId = noteId, note = note)
+        productRepository.update(productWithNote)
+
+        return productWithNote
+    }
+
     @Test
     fun invoke_ExistingNoteProvided_NoteRemoved() = runTest {
-        val note = "Existing Note 1"
-        val existingItem = Note(
-            id = repository.add(Note(id = 0, noteText = note)),
-            noteText = note
-        )
-
+        val parent = getProductWithNote()
+        val existingItem = parent.note!!
         repository.add(Note(id = 0, noteText = "Existing Note 2"))
         val countBefore = repository.getAll().count()
 
-        removeNoteUseCase(existingItem)
+        removeNoteUseCase(parent, existingItem)
+
+        val deletedItem = repository.get(existingItem.id)
+        assertNull(deletedItem)
 
         val countAfter = repository.getAll().count()
-        val deletedItem = repository.get(existingItem.id)
-
         assertEquals(countBefore - 1, countAfter)
-        assertNull(deletedItem)
     }
 
     @Test
     fun invoke_NonExistingNoteProvided_NothingRemoved() = runTest {
+        val parent = getProductWithNote()
         val note = "Existing Note 1"
         val existingItem = Note(id = 9000, noteText = note)
         repository.add(Note(id = 0, noteText = note))
         repository.add(Note(id = 0, noteText = "Existing Note 2"))
         val countBefore = repository.getAll().count()
 
-        removeNoteUseCase(existingItem)
+        removeNoteUseCase(parent, existingItem)
 
         val countAfter = repository.getAll().count()
-
         assertEquals(countBefore, countAfter)
     }
 
     @Test
     fun invoke_DeleteById_NoteRemoved() = runTest {
-        val noteText = "Existing Note 1"
-        val noteId = repository.add(Note(id = 0, noteText = noteText))
+        val parent = getProductWithNote()
+        val noteId = parent.noteId!!
         repository.add(Note(id = 0, noteText = "Existing Note 2"))
         val countBefore = repository.getAll().count()
 
-        removeNoteUseCase(noteId)
+        removeNoteUseCase(parent, noteId)
 
         val noteAfter = repository.get(noteId)
-        val countAfter = repository.getAll().count()
-
-        assertEquals(countBefore - 1, countAfter)
         assertNull(noteAfter)
+
+        val countAfter = repository.getAll().count()
+        assertEquals(countBefore - 1, countAfter)
+    }
+
+    @Test
+    fun invoke_InvalidNoteIdProvided_NothingRemoved() = runTest {
+        val parent = getProductWithNote()
+        repository.add(Note(id = 0, noteText = "Existing Note 2"))
+        val countBefore = repository.getAll().count()
+
+        removeNoteUseCase(parent, -1)
+
+        val countAfter = repository.getAll().count()
+        assertEquals(countBefore, countAfter)
+    }
+
+    @Test
+    fun invoke_ParentNoteIdMismatch_NoteNotRemoved() = runTest {
+        val parent = getProductWithNote()
+        val noteId = repository.add(Note(id = 0, noteText = "Existing Note 2"))
+        val countBefore = repository.getAll().count()
+
+        removeNoteUseCase(parent, noteId)
+
+        val noteAfter = repository.get(noteId)
+        assertNotNull(noteAfter)
+
+        val countAfter = repository.getAll().count()
+        assertEquals(countBefore, countAfter)
+    }
+
+    @Test
+    fun invoke_ParentNoteIdIsNull_NoteNotRemoved() = runTest {
+        val parent = dm.getRepository<ProductRepository>().getAll().first()
+        val noteId = repository.add(Note(id = 0, noteText = "Existing Note 2"))
+        val countBefore = repository.getAll().count()
+
+        removeNoteUseCase(parent, noteId)
+
+        val noteAfter = repository.get(noteId)
+        assertNotNull(noteAfter)
+
+        val countAfter = repository.getAll().count()
+        assertEquals(countBefore, countAfter)
+    }
+
+    @Test
+    fun invoke_ParentIdMatches_RemoveNoteIdFromParent() = runTest {
+        val parent = getProductWithNote()
+
+        removeNoteUseCase(parent, parent.noteId!!)
+
+        val parentAfter = dm.getRepository<ProductRepository>().get(parent.id)!!
+        assertNull(parentAfter.noteId)
     }
 }

@@ -15,24 +15,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.domain.product.usecase
+package com.aisleron.domain.note.usecase
 
-import com.aisleron.domain.base.AisleronException
-import com.aisleron.domain.base.usecase.UpdateUseCase
-import com.aisleron.domain.product.Product
-import com.aisleron.domain.product.ProductRepository
+import com.aisleron.domain.note.NoteParent
+import com.aisleron.domain.product.usecase.GetProductUseCase
+import com.aisleron.ui.note.NoteParentType
 
-interface UpdateProductUseCase : UpdateUseCase<Product>
+interface GetNoteParentUseCase {
+    suspend operator fun invoke(noteParentType: NoteParentType, noteParentId: Int): NoteParent?
+}
 
-class UpdateProductUseCaseImpl(
-    private val productRepository: ProductRepository,
-    private val isProductNameUniqueUseCase: IsProductNameUniqueUseCase
-) : UpdateProductUseCase {
-    override suspend operator fun invoke(item: Product) {
-        if (!isProductNameUniqueUseCase(item)) {
-            throw AisleronException.DuplicateProductNameException("Product Name must be unique")
+class GetNoteParentUseCaseImpl(
+    private val getProductUseCase: GetProductUseCase
+) : GetNoteParentUseCase {
+    override suspend fun invoke(noteParentType: NoteParentType, noteParentId: Int): NoteParent? {
+        return when (noteParentType) {
+            NoteParentType.PRODUCT -> getProductUseCase(noteParentId)
         }
-
-        productRepository.update(item)
     }
 }

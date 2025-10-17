@@ -17,18 +17,18 @@
 
 package com.aisleron.domain.note.usecase
 
+import com.aisleron.domain.note.NoteParent
+
 interface CopyNoteUseCase {
-    suspend operator fun invoke(noteId: Int?): Int?
+    suspend operator fun invoke(targetNoteParent: NoteParent, noteId: Int): Int?
 }
 
 class CopyNoteUseCaseImpl(
     private val addNoteUseCase: AddNoteUseCase,
     private val getNoteUseCase: GetNoteUseCase
 ) : CopyNoteUseCase {
-    override suspend fun invoke(noteId: Int?): Int? {
-        noteId ?: return null
-
+    override suspend fun invoke(targetNoteParent: NoteParent, noteId: Int): Int? {
         val source = getNoteUseCase(noteId)
-        return source?.let { addNoteUseCase(it.copy(id = 0)) }
+        return source?.let { addNoteUseCase(targetNoteParent, it.copy(id = 0)) }
     }
 }

@@ -15,9 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.domain.note
+package com.aisleron.ui.note
 
-interface Noted {
-    val noteId: Int?
-    val note: Note?
+enum class NoteParentType {
+    PRODUCT,
+    //LOCATION
 }

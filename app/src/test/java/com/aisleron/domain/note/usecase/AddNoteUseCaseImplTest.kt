@@ -20,6 +20,8 @@ package com.aisleron.domain.note.usecase
 import com.aisleron.di.TestDependencyManager
 import com.aisleron.domain.note.Note
 import com.aisleron.domain.note.NoteRepository
+import com.aisleron.domain.product.Product
+import com.aisleron.domain.product.ProductRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -37,16 +39,23 @@ class AddNoteUseCaseImplTest {
         addNoteUseCase = dm.getUseCase()
     }
 
-    @Test
-    fun invoke_NoExistingNote_NoteCreated() = runTest {
-        val newItem = Note(
+    private suspend fun getProduct(): Product {
+        return dm.getRepository<ProductRepository>().getAll().first()
+    }
+
+    private fun getNewNote(): Note {
+        return Note(
             id = 0,
             noteText = "New Note"
         )
+    }
 
+    @Test
+    fun invoke_IsNewNote_NoteCreated() = runTest {
+        val newItem = getNewNote()
         val countBefore = repository.getAll().count()
 
-        val resultId = addNoteUseCase(newItem)
+        val resultId = addNoteUseCase(getProduct(), newItem)
 
         val countAfter = repository.getAll().count()
         val addedItem = repository.get(resultId)
@@ -58,13 +67,24 @@ class AddNoteUseCaseImplTest {
     @Test
     fun invoke_IsExistingNote_NoteUpdated() = runTest {
         val updatedNote = "Updated Note"
-        val id = repository.add(Note(id = 0, noteText = "Existing Note"))
+        val id = repository.add(getNewNote())
         val existing = repository.get(id)!!
 
-        val resultId = addNoteUseCase(existing.copy(noteText = updatedNote))
+        val resultId = addNoteUseCase(getProduct(), existing.copy(noteText = updatedNote))
         val updated = repository.get(id)
 
         assertEquals(-1, resultId)
         assertEquals(existing.copy(noteText = updatedNote), updated)
+    }
+
+    @Test
+    fun invoke_NoteCreated_NoteAddedToParent() = runTest {
+        val newItem = getNewNote()
+        val parent = getProduct()
+
+        val resultId = addNoteUseCase(parent, newItem)
+
+        val parentAfter = dm.getRepository<ProductRepository>().get(parent.id)
+        assertEquals(resultId, parentAfter?.noteId)
     }
 }

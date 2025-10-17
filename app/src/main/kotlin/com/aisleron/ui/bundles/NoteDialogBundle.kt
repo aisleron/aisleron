@@ -15,17 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.domain.product
+package com.aisleron.ui.bundles
 
-import com.aisleron.domain.base.AisleronItem
-import com.aisleron.domain.note.Note
-import com.aisleron.domain.note.NoteParent
+import android.os.Parcelable
+import com.aisleron.ui.note.NoteParentType
+import kotlinx.parcelize.Parcelize
 
-data class Product(
-    override val id: Int,
-    val name: String,
-    val inStock: Boolean,
-    val qtyNeeded: Int,
-    override val noteId: Int? = null,
-    override val note: Note? = null
-) : AisleronItem, NoteParent
+@Parcelize
+data class NoteDialogBundle(
+    val noteParentId: Int,
+    val noteParentType: NoteParentType
+) : Parcelable

@@ -20,6 +20,8 @@ package com.aisleron.domain.note.usecase
 import com.aisleron.di.TestDependencyManager
 import com.aisleron.domain.note.Note
 import com.aisleron.domain.note.NoteRepository
+import com.aisleron.domain.product.Product
+import com.aisleron.domain.product.ProductRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals
@@ -41,17 +43,15 @@ class CopyNoteUseCaseTest {
         copyNoteUseCase = dm.getUseCase()
     }
 
-    @Test
-    fun invoke_NullNoteId_ReturnsNull() = runTest {
-        val result = copyNoteUseCase(null)
-        assertNull(result, "Expected null when noteId is null")
+    private suspend fun getProduct(): Product {
+        return dm.getRepository<ProductRepository>().getAll().first()
     }
 
     @Test
     fun invoke_NoteDoesNotExist_ReturnsNull() = runTest {
         val nonexistentId = 9999
 
-        val result = copyNoteUseCase(nonexistentId)
+        val result = copyNoteUseCase(getProduct(), nonexistentId)
 
         assertNull(result, "Expected null when note does not exist")
         assertEquals(0, repository.getAll().count { it.id == nonexistentId })
@@ -62,7 +62,7 @@ class CopyNoteUseCaseTest {
         val originalText = "Original Note"
         val originalId = repository.add(Note(0, originalText))
 
-        val result = copyNoteUseCase(originalId)
+        val result = copyNoteUseCase(getProduct(), originalId)
 
         // Result should be a valid new note ID
         assertNotNull(result)
@@ -81,7 +81,7 @@ class CopyNoteUseCaseTest {
     @Test
     fun invoke_ExistingNote_ModifiesCopyOnly() = runTest {
         val noteId = repository.add(Note(0, "Original Note"))
-        val copyId = copyNoteUseCase(noteId)!!
+        val copyId = copyNoteUseCase(getProduct(), noteId)!!
 
         val copiedNote = repository.get(copyId)!!
 

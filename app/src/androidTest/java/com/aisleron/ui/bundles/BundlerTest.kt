@@ -22,6 +22,7 @@ import android.os.Bundle
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.LocationType
 import com.aisleron.ui.copyentity.CopyEntityType
+import com.aisleron.ui.note.NoteParentType
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertNotNull
@@ -326,5 +327,42 @@ class BundlerTest {
         val bundledCopyEntity = bundler.getCopyEntityBundle(null)
 
         assertEquals(-1, (bundledCopyEntity.type as CopyEntityType.Location).sourceId)
+    }
+
+    @Test
+    fun makeNoteDialogBundle_ProductParentTypeProvided_BundleHasProductParentType() {
+        val parentId = 2
+        val noteParentType = NoteParentType.PRODUCT
+
+        val bundle = bundler.makeNotesDialogBundle(parentId, noteParentType)
+
+        val noteDialogBundle =
+            getParcelableBundle(bundle, "noteDialog", NoteDialogBundle::class.java)
+
+        assertEquals(parentId, noteDialogBundle?.noteParentId)
+        assertEquals(noteParentType, noteDialogBundle?.noteParentType)
+    }
+
+    @Test
+    fun getNoteDialogBundle_validBundle_ReturnNoteDialogBundle() {
+        val noteDialogBundle = NoteDialogBundle(
+            noteParentId = 1,
+            noteParentType = NoteParentType.PRODUCT
+        )
+
+        val bundle = Bundle()
+        bundle.putParcelable("noteDialog", noteDialogBundle)
+
+        val bundledCopyEntity = bundler.getNoteDialogBundle(bundle)
+
+        assertEquals(noteDialogBundle, bundledCopyEntity)
+    }
+
+    @Test
+    fun getNoteDialogBundle_nullBundle_ReturnDefaultNoteDialogBundle() {
+        val bundledNoteDialog = bundler.getNoteDialogBundle(null)
+
+        assertEquals(-1, bundledNoteDialog.noteParentId)
+        assertEquals(NoteParentType.PRODUCT, bundledNoteDialog.noteParentType)
     }
 }

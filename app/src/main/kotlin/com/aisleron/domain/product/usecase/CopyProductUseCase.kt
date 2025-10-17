@@ -38,7 +38,9 @@ class CopyProductUseCaseImpl(
     override suspend fun invoke(source: Product, newProductName: String): Int {
         val newProduct = source.copy(
             id = 0,
-            name = newProductName
+            name = newProductName,
+            note = null,
+            noteId = null
         )
 
         if (!isProductNameUniqueUseCase(newProduct)) {
@@ -46,8 +48,7 @@ class CopyProductUseCaseImpl(
         }
 
         return transactionRunner.run {
-            val noteId = copyNoteUseCase(newProduct.noteId)
-            productRepository.add(newProduct.copy(noteId = noteId)).let { newProductId ->
+            productRepository.add(newProduct).let { newProductId ->
                 productRepository.get(newProductId)?.let { addedProduct ->
                     aisleProductRepository.getProductAisles(source.id).forEach { ap ->
                         aisleProductRepository.add(
@@ -58,7 +59,12 @@ class CopyProductUseCaseImpl(
                             )
                         )
                     }
+
+                    source.noteId?.let { sourceNoteId ->
+                        copyNoteUseCase(addedProduct, sourceNoteId)
+                    }
                 }
+
                 newProductId
             }
         }

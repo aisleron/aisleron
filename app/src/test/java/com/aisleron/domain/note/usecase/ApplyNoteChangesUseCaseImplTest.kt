@@ -20,7 +20,8 @@ package com.aisleron.domain.note.usecase
 import com.aisleron.di.TestDependencyManager
 import com.aisleron.domain.note.Note
 import com.aisleron.domain.note.NoteRepository
-import com.aisleron.domain.note.Noted
+import com.aisleron.domain.product.Product
+import com.aisleron.domain.product.ProductRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals
@@ -28,29 +29,27 @@ import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class HandleNotedUpdateUseCaseTest {
+class ApplyNoteChangesUseCaseImplTest {
     private lateinit var dm: TestDependencyManager
-    private lateinit var handleNotedUpdateUseCase: HandleNotedUpdateUseCase
+    private lateinit var applyNoteChangesUseCase: ApplyNoteChangesUseCase
     private lateinit var repository: NoteRepository
 
     @BeforeEach
     fun setup() {
         dm = TestDependencyManager()
         repository = dm.getRepository()
-        handleNotedUpdateUseCase = dm.getUseCase()
+        applyNoteChangesUseCase = dm.getUseCase()
     }
 
-    // Simple fake Noted model for test isolation
-    private data class TestNoted(
-        override val noteId: Int? = null,
-        override val note: Note? = null
-    ): Noted
+    private suspend fun getProduct(): Product {
+        return dm.getRepository<ProductRepository>().getAll().first()
+    }
 
     @Test
     fun invoke_NoteIsNull_ReturnsNullAndNoActions() = runTest {
-        val noted = TestNoted(note = null)
+        val noted = getProduct()
 
-        val result = handleNotedUpdateUseCase(noted)
+        val result = applyNoteChangesUseCase(noted, null)
 
         assertNull(result)
     }
@@ -62,9 +61,9 @@ class HandleNotedUpdateUseCaseTest {
         val note = repository.get(noteId)!!.copy(noteText = "")
         val countBefore = repository.getAll().count()
 
-        val noted = TestNoted(noteId = noteId, note = note)
+        val noted = getProduct().copy(noteId = noteId, note = note)
 
-        val result = handleNotedUpdateUseCase(noted)
+        val result = applyNoteChangesUseCase(noted, note)
 
         assertNull(result)
 
@@ -77,9 +76,9 @@ class HandleNotedUpdateUseCaseTest {
         val noteId = repository.add(Note(0, "Note 1"))
         val updatedNoteText = "Updated note"
         val note = repository.get(noteId)!!.copy(noteText = updatedNoteText)
-        val noted = TestNoted(noteId = noteId, note = note)
+        val noted = getProduct().copy(noteId = noteId, note = note)
 
-        val result = handleNotedUpdateUseCase(noted)
+        val result = applyNoteChangesUseCase(noted, note)
 
         assertEquals(noteId, result)
 
@@ -91,9 +90,9 @@ class HandleNotedUpdateUseCaseTest {
     fun invoke_NoteIdIsZero_AddsNoteAndReturnsNewId() = runTest {
         val noteText = "Add new note"
         val note = Note(id = 0, noteText = noteText)
-        val noted = TestNoted(noteId = null, note = note)
+        val noted = getProduct().copy(noteId = null, note = note)
 
-        val result = handleNotedUpdateUseCase(noted)
+        val result = applyNoteChangesUseCase(noted, note)
 
         val addedNote = repository.getAll().firstOrNull { it.noteText == noteText }
         assertEquals(result, addedNote?.id)
@@ -106,9 +105,9 @@ class HandleNotedUpdateUseCaseTest {
         val noteId1 = repository.add(Note(0, "Note 1"))
         val noteId2 = repository.add(Note(0, "Note 2"))
         val note = repository.get(noteId1)!!.copy(noteText = noteText)
-        val noted = TestNoted(noteId = noteId2, note = note)
+        val noted = getProduct().copy(noteId = noteId2, note = note)
 
-        val result = handleNotedUpdateUseCase(noted)
+        val result = applyNoteChangesUseCase(noted, note)
 
         assertNotEquals(noteId1, result)
         assertNotEquals(noteId2, result)

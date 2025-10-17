@@ -17,6 +17,7 @@
 
 package com.aisleron.di
 
+import com.aisleron.domain.TransactionRunner
 import com.aisleron.domain.aisle.usecase.AddAisleUseCase
 import com.aisleron.domain.aisle.usecase.AddAisleUseCaseImpl
 import com.aisleron.domain.aisle.usecase.GetAisleUseCase
@@ -56,14 +57,20 @@ import com.aisleron.domain.loyaltycard.usecase.GetLoyaltyCardForLocationUseCase
 import com.aisleron.domain.loyaltycard.usecase.GetLoyaltyCardForLocationUseCaseImpl
 import com.aisleron.domain.loyaltycard.usecase.RemoveLoyaltyCardFromLocationUseCase
 import com.aisleron.domain.loyaltycard.usecase.RemoveLoyaltyCardFromLocationUseCaseImpl
+import com.aisleron.domain.note.usecase.AddNoteToParentUseCase
+import com.aisleron.domain.note.usecase.AddNoteToParentUseCaseImpl
 import com.aisleron.domain.note.usecase.AddNoteUseCase
 import com.aisleron.domain.note.usecase.AddNoteUseCaseImpl
+import com.aisleron.domain.note.usecase.ApplyNoteChangesUseCase
+import com.aisleron.domain.note.usecase.ApplyNoteChangesUseCaseImpl
 import com.aisleron.domain.note.usecase.CopyNoteUseCase
 import com.aisleron.domain.note.usecase.CopyNoteUseCaseImpl
+import com.aisleron.domain.note.usecase.GetNoteParentUseCase
+import com.aisleron.domain.note.usecase.GetNoteParentUseCaseImpl
 import com.aisleron.domain.note.usecase.GetNoteUseCase
 import com.aisleron.domain.note.usecase.GetNoteUseCaseImpl
-import com.aisleron.domain.note.usecase.HandleNotedUpdateUseCase
-import com.aisleron.domain.note.usecase.HandleNotedUpdateUseCaseImpl
+import com.aisleron.domain.note.usecase.RemoveNoteFromParentUseCase
+import com.aisleron.domain.note.usecase.RemoveNoteFromParentUseCaseImpl
 import com.aisleron.domain.note.usecase.RemoveNoteUseCase
 import com.aisleron.domain.note.usecase.RemoveNoteUseCaseImpl
 import com.aisleron.domain.note.usecase.UpdateNoteUseCase
@@ -251,31 +258,51 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
      * Note Use Cases
      */
     val addNoteUseCase: AddNoteUseCase by lazy {
-        AddNoteUseCaseImpl(repositoryFactory.noteRepository)
+        AddNoteUseCaseImpl(
+            repositoryFactory.noteRepository,
+            addNoteToParentUseCase = addNoteToParentUseCase,
+            transactionRunner = transactionRunner
+        )
     }
 
-    val copyNoteUseCase: CopyNoteUseCase by lazy {
-        CopyNoteUseCaseImpl(addNoteUseCase, getNoteUseCase)
-    }
-
-    val getNoteUseCase: GetNoteUseCase by lazy {
-        GetNoteUseCaseImpl(repositoryFactory.noteRepository)
-    }
-
-    val handleNotedUpdateUseCase: HandleNotedUpdateUseCase by lazy {
-        HandleNotedUpdateUseCaseImpl (
+    val applyNoteChangesUseCase: ApplyNoteChangesUseCase by lazy {
+        ApplyNoteChangesUseCaseImpl(
             addNoteUseCase = addNoteUseCase,
             updateNoteUseCase = updateNoteUseCase,
             removeNoteUseCase = removeNoteUseCase,
         )
     }
 
+    val copyNoteUseCase: CopyNoteUseCase by lazy {
+        CopyNoteUseCaseImpl(addNoteUseCase, getNoteUseCase)
+    }
+
+    val getNoteParentUseCase: GetNoteParentUseCase by lazy {
+        GetNoteParentUseCaseImpl(getProductUseCase = getProductUseCase)
+    }
+
+    val getNoteUseCase: GetNoteUseCase by lazy {
+        GetNoteUseCaseImpl(repositoryFactory.noteRepository)
+    }
+
+    val addNoteToParentUseCase: AddNoteToParentUseCase by lazy {
+        AddNoteToParentUseCaseImpl(removeNoteUseCase, updateProductUseCase)
+    }
+
     val updateNoteUseCase: UpdateNoteUseCase by lazy {
         UpdateNoteUseCaseImpl(repositoryFactory.noteRepository)
     }
 
+    val removeNoteFromParentUseCase: RemoveNoteFromParentUseCase by lazy {
+        RemoveNoteFromParentUseCaseImpl(updateProductUseCase)
+    }
+
     val removeNoteUseCase: RemoveNoteUseCase by lazy {
-        RemoveNoteUseCaseImpl(repositoryFactory.noteRepository)
+        RemoveNoteUseCaseImpl(
+            repositoryFactory.noteRepository,
+            removeNoteFromParentUseCase = removeNoteFromParentUseCase,
+            transactionRunner = transactionRunner
+        )
     }
 
     /**
@@ -287,9 +314,8 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
             getDefaultAislesUseCase = getDefaultAislesUseCase,
             addAisleProductsUseCase = addAisleProductUseCase,
             isProductNameUniqueUseCase = isProductNameUniqueUseCase,
-            addNoteUseCase = addNoteUseCase,
             getAisleMaxRankUseCase = getAisleMaxRankUseCase,
-            transactionRunner = TransactionRunnerTestImpl()
+            transactionRunner = transactionRunner
         )
     }
 
@@ -299,7 +325,7 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
             repositoryFactory.aisleProductRepository,
             isProductNameUniqueUseCase = isProductNameUniqueUseCase,
             copyNoteUseCase = copyNoteUseCase,
-            transactionRunner = TransactionRunnerTestImpl()
+            transactionRunner = transactionRunner
         )
     }
 
@@ -321,7 +347,8 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
     val removeProductUseCase: RemoveProductUseCase by lazy {
         RemoveProductUseCaseImpl(
             repositoryFactory.productRepository,
-            removeNoteUseCase = removeNoteUseCase
+            removeNoteUseCase = removeNoteUseCase,
+            transactionRunner = transactionRunner
         )
     }
 
@@ -335,9 +362,7 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
     val updateProductUseCase: UpdateProductUseCase by lazy {
         UpdateProductUseCaseImpl(
             productRepository = repositoryFactory.productRepository,
-            isProductNameUniqueUseCase = isProductNameUniqueUseCase,
-            handleNotedUpdateUseCase = handleNotedUpdateUseCase,
-            transactionRunner = TransactionRunnerTestImpl()
+            isProductNameUniqueUseCase = isProductNameUniqueUseCase
         )
     }
 
@@ -361,6 +386,13 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
      */
     val getShoppingListUseCase: GetShoppingListUseCase by lazy {
         GetShoppingListUseCase(repositoryFactory.locationRepository)
+    }
+
+    /**
+     * Other
+     */
+    private val transactionRunner: TransactionRunner by lazy {
+        TransactionRunnerTestImpl()
     }
 
     inline fun <reified T> get(): T {
@@ -402,10 +434,13 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
 
             // Note Use Cases
             AddNoteUseCase::class -> addNoteUseCase as T
+            ApplyNoteChangesUseCase::class -> applyNoteChangesUseCase as T
             CopyNoteUseCase::class -> copyNoteUseCase as T
+            GetNoteParentUseCase::class -> getNoteParentUseCase as T
             GetNoteUseCase::class -> getNoteUseCase as T
-            HandleNotedUpdateUseCase::class -> handleNotedUpdateUseCase as T
+            AddNoteToParentUseCase::class -> addNoteToParentUseCase as T
             UpdateNoteUseCase::class -> updateNoteUseCase as T
+            RemoveNoteFromParentUseCase::class -> removeNoteFromParentUseCase as T
             RemoveNoteUseCase::class -> removeNoteUseCase as T
 
             // Product Use Cases

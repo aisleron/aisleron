@@ -22,8 +22,6 @@ import com.aisleron.domain.aisle.AisleRepository
 import com.aisleron.domain.aisleproduct.AisleProductRepository
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.location.LocationRepository
-import com.aisleron.domain.note.Note
-import com.aisleron.domain.note.NoteRepository
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
 import kotlinx.coroutines.runBlocking
@@ -127,25 +125,5 @@ class AddProductUseCaseTest {
 
         Assertions.assertEquals(aisleProductCountBefore + 1, aisleProductCountAfter)
         Assertions.assertNotNull(aisleProduct)
-    }
-
-    @Test
-    fun addProduct_ProductHasNote_NoteAdded() = runTest {
-        val note = Note(
-            id = 0,
-            noteText = "Test add note with add product"
-        )
-
-        val newProduct = getNewProduct().copy(note = note)
-        val noteRepository = dm.getRepository<NoteRepository>()
-        val noteCountBefore: Int = noteRepository.getAll().count()
-
-        val newProductId = addProductUseCase(newProduct)
-        val noteCountAfter: Int = noteRepository.getAll().count()
-        val noteId = repository.get(newProductId)?.noteId ?: 0
-        val newNote = noteRepository.get(noteId)
-
-        Assertions.assertEquals(noteCountBefore + 1, noteCountAfter)
-        Assertions.assertEquals(note.noteText, newNote?.noteText)
     }
 }

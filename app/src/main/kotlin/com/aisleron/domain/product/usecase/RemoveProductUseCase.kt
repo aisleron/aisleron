@@ -17,6 +17,7 @@
 
 package com.aisleron.domain.product.usecase
 
+import com.aisleron.domain.TransactionRunner
 import com.aisleron.domain.base.usecase.RemoveUseCase
 import com.aisleron.domain.note.usecase.RemoveNoteUseCase
 import com.aisleron.domain.product.Product
@@ -28,11 +29,14 @@ interface RemoveProductUseCase : RemoveUseCase<Product> {
 
 class RemoveProductUseCaseImpl(
     private val productRepository: ProductRepository,
-    private val removeNoteUseCase: RemoveNoteUseCase
+    private val removeNoteUseCase: RemoveNoteUseCase,
+    private val transactionRunner: TransactionRunner
 ) : RemoveProductUseCase {
     override suspend fun invoke(item: Product) {
-        item.noteId?.let { removeNoteUseCase(it) }
-        productRepository.remove(item)
+        transactionRunner.run {
+            item.noteId?.let { removeNoteUseCase(item, it) }
+            productRepository.remove(item)
+        }
     }
 
     override suspend fun invoke(productId: Int) {

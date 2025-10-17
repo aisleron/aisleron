@@ -25,7 +25,6 @@ import com.aisleron.domain.aisleproduct.usecase.AddAisleProductsUseCase
 import com.aisleron.domain.aisleproduct.usecase.GetAisleMaxRankUseCase
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.base.usecase.AddUseCase
-import com.aisleron.domain.note.usecase.AddNoteUseCase
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
 
@@ -39,7 +38,6 @@ class AddProductUseCaseImpl(
     private val addAisleProductsUseCase: AddAisleProductsUseCase,
     private val isProductNameUniqueUseCase: IsProductNameUniqueUseCase,
     private val getAisleMaxRankUseCase: GetAisleMaxRankUseCase,
-    private val addNoteUseCase: AddNoteUseCase,
     private val transactionRunner: TransactionRunner
 
 ) : AddProductUseCase {
@@ -54,11 +52,8 @@ class AddProductUseCaseImpl(
         }
 
         return transactionRunner.run {
-            val noteId = product.note?.let { addNoteUseCase(it) }
-
-            val addProduct = product.copy(noteId = noteId)
-            val newProduct = addProduct.copy(
-                id = productRepository.add(addProduct)
+            val newProduct = product.copy(
+                id = productRepository.add(product)
             )
 
             val defaultAisles = getDefaultAislesUseCase().toMutableList()
