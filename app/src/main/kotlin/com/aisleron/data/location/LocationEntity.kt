@@ -19,16 +19,31 @@ package com.aisleron.data.location
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import com.aisleron.data.note.NoteEntity
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.LocationType
 
-@Entity(tableName = "Location")
+@Entity(
+    tableName = "Location",
+    foreignKeys = [
+        ForeignKey(
+            entity = NoteEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["noteId"],
+            onDelete = ForeignKey.SET_NULL,
+            onUpdate = ForeignKey.CASCADE
+        )
+    ]
+)
+
 data class LocationEntity(
     @PrimaryKey(autoGenerate = true) val id: Int,
     val type: LocationType,
     val defaultFilter: FilterType,
     val name: String,
     val pinned: Boolean,
-    @ColumnInfo(defaultValue = "1") val showDefaultAisle: Boolean
+    @ColumnInfo(defaultValue = "1") val showDefaultAisle: Boolean,
+    @ColumnInfo(index = true) val noteId: Int?
 )

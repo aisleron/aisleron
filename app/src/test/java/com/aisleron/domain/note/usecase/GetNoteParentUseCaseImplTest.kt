@@ -18,6 +18,9 @@
 package com.aisleron.domain.note.usecase
 
 import com.aisleron.di.TestDependencyManager
+import com.aisleron.domain.location.Location
+import com.aisleron.domain.location.LocationRepository
+import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.note.Note
 import com.aisleron.domain.note.NoteRepository
 import com.aisleron.domain.product.Product
@@ -43,6 +46,11 @@ class GetNoteParentUseCaseImplTest {
         getNoteParentUseCase = dm.getUseCase()
     }
 
+    private suspend fun getLocation(): Location {
+        return dm.getRepository<LocationRepository>().getAll()
+            .first { it.type != LocationType.HOME }
+    }
+
     private suspend fun getProduct(): Product {
         return dm.getRepository<ProductRepository>().getAll().first()
     }
@@ -58,7 +66,7 @@ class GetNoteParentUseCaseImplTest {
     }
 
     @Test
-    fun invoke_InvalidParentId_ReturnNull() = runTest {
+    fun invoke_InvalidProductId_ReturnNull() = runTest {
         val parent = getNoteParentUseCase(NoteParentRef.Product(-1))
 
         assertNull(parent)
@@ -77,7 +85,7 @@ class GetNoteParentUseCaseImplTest {
     }
 
     @Test
-    fun invoke_ParentHasNote_ReturnParentWithNote() = runTest {
+    fun invoke_ProductHasNote_ReturnParentWithNote() = runTest {
         val product = getProductWithNote()
 
         val parent = getNoteParentUseCase(NoteParentRef.Product(product.id))!!
@@ -87,10 +95,71 @@ class GetNoteParentUseCaseImplTest {
     }
 
     @Test
-    fun invoke_ParentHasNoNote_ReturnParentWithNullNote() = runTest {
+    fun invoke_ProductHasNoNote_ReturnParentWithNullNote() = runTest {
         val product = getProduct()
 
         val parent = getNoteParentUseCase(NoteParentRef.Product(product.id))
+
+        assertNotNull(parent)
+        assertNull(parent.note)
+    }
+
+    @Test
+    fun invoke_ParentIsLocation_ReturnLocation() = runTest {
+        val locationId = getLocation().id
+
+        val parent = getNoteParentUseCase(NoteParentRef.Location(locationId))
+
+        assertNotNull(parent)
+        assertTrue(parent is Location)
+    }
+
+    private suspend fun getLocationWithNote(): Location {
+        val noteText = "Note for product update"
+        val noteId = repository.add(Note(0, noteText))
+        val note = repository.get(noteId)
+
+        val locationRepository = dm.getRepository<LocationRepository>()
+        val locationWithNote =
+            locationRepository.getAll().first().copy(noteId = noteId, note = note)
+        locationRepository.update(locationWithNote)
+
+        return locationWithNote
+    }
+
+    @Test
+    fun invoke_LocationHasNote_ReturnLocationWithNote() = runTest {
+        val location = getLocationWithNote()
+
+        val parent = getNoteParentUseCase(NoteParentRef.Location(location.id))
+
+        assertNotNull(parent?.note)
+        assertEquals(location.note, parent.note)
+    }
+
+    @Test
+    fun invoke_LocationHasNoNote_ReturnParentWithNullNote() = runTest {
+        val location = getLocation()
+
+        val parent = getNoteParentUseCase(NoteParentRef.Location(location.id))
+
+        assertNotNull(parent)
+        assertNull(parent.note)
+    }
+
+    @Test
+    fun invoke_InvalidLocationId_ReturnNull() = runTest {
+        val parent = getNoteParentUseCase(NoteParentRef.Location(-1))
+
+        assertNull(parent)
+    }
+
+    @Test
+    fun invoke_ParentHasInvalidNoteId_ReturnNullNote() = runTest {
+        val location = getLocation().copy(noteId = -1)
+        dm.getRepository<LocationRepository>().update(location)
+
+        val parent = getNoteParentUseCase(NoteParentRef.Location(location.id))
 
         assertNotNull(parent)
         assertNull(parent.note)

@@ -280,6 +280,7 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
     val getNoteParentUseCase: GetNoteParentUseCase by lazy {
         GetNoteParentUseCaseImpl(
             getProductUseCase = getProductUseCase,
+            getLocationUseCase = getLocationUseCase,
             getNoteUseCase = getNoteUseCase
         )
     }

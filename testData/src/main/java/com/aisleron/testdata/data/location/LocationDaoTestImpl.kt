@@ -37,7 +37,7 @@ class LocationDaoTestImpl(private val aisleDao: AisleDaoTestImpl) : LocationDao 
             val id: Int
             val existingEntity = getLocation(it.id)
             if (existingEntity == null) {
-                id = (locationList.maxOfOrNull { e -> e.id }?.toInt() ?: 0) + 1
+                id = (locationList.maxOfOrNull { e -> e.id } ?: 0) + 1
             } else {
                 id = existingEntity.id
                 locationList.removeAt(locationList.indexOf(existingEntity))
@@ -49,7 +49,8 @@ class LocationDaoTestImpl(private val aisleDao: AisleDaoTestImpl) : LocationDao 
                 defaultFilter = it.defaultFilter,
                 name = it.name,
                 pinned = it.pinned,
-                showDefaultAisle = it.showDefaultAisle
+                showDefaultAisle = it.showDefaultAisle,
+                noteId = it.noteId
             )
 
             locationList.add(newEntity)

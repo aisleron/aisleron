@@ -23,4 +23,5 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 sealed class NoteParentRef : Parcelable {
     data class Product(val id: Int) : NoteParentRef()
+    data class Location(val id: Int) : NoteParentRef()
 }
