@@ -23,7 +23,7 @@ import android.os.Parcelable
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.LocationType
 import com.aisleron.ui.copyentity.CopyEntityType
-import com.aisleron.ui.note.NoteParentType
+import com.aisleron.ui.note.NoteParentRef
 
 class Bundler {
 
@@ -147,10 +147,8 @@ class Bundler {
 
     }
 
-    fun makeNotesDialogBundle(noteParentId: Int, noteParentType: NoteParentType): Bundle {
-        val noteDialogBundle = NoteDialogBundle(
-            noteParentId = noteParentId, noteParentType = noteParentType
-        )
+    fun makeNotesDialogBundle(noteParentRef: NoteParentRef): Bundle {
+        val noteDialogBundle = NoteDialogBundle(noteParentRef)
 
         return makeParcelableBundle(NOTE_DIALOG, noteDialogBundle)
     }
@@ -159,9 +157,7 @@ class Bundler {
         val result =
             getParcelableBundle(bundle, NOTE_DIALOG, NoteDialogBundle::class.java)
 
-        return result ?: NoteDialogBundle(
-            noteParentId = -1, noteParentType = NoteParentType.PRODUCT
-        )
+        return result ?: NoteDialogBundle(NoteParentRef.Product(-1))
     }
 
     private companion object BundleType {

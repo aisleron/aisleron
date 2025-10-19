@@ -20,19 +20,19 @@ package com.aisleron.domain.note.usecase
 import com.aisleron.domain.note.Note
 import com.aisleron.domain.note.NoteParent
 import com.aisleron.domain.product.usecase.GetProductUseCase
-import com.aisleron.ui.note.NoteParentType
+import com.aisleron.ui.note.NoteParentRef
 
 interface GetNoteParentUseCase {
-    suspend operator fun invoke(noteParentType: NoteParentType, noteParentId: Int): NoteParent?
+    suspend operator fun invoke(noteParentRef: NoteParentRef): NoteParent?
 }
 
 class GetNoteParentUseCaseImpl(
     private val getProductUseCase: GetProductUseCase,
     private val getNoteUseCase: GetNoteUseCase
 ) : GetNoteParentUseCase {
-    override suspend fun invoke(noteParentType: NoteParentType, noteParentId: Int): NoteParent? {
-        return when (noteParentType) {
-            NoteParentType.PRODUCT -> getProductNoteParent(noteParentId)
+    override suspend fun invoke(noteParentRef: NoteParentRef): NoteParent? {
+        return when (noteParentRef) {
+            is NoteParentRef.Product -> getProductNoteParent(noteParentRef.id)
         }
     }
 
@@ -40,8 +40,8 @@ class GetNoteParentUseCaseImpl(
         return getNoteUseCase(noteId)
     }
 
-    private suspend fun getProductNoteParent(noteParentId: Int): NoteParent? {
-        return getProductUseCase(noteParentId)?.let { p ->
+    private suspend fun getProductNoteParent(productId: Int): NoteParent? {
+        return getProductUseCase(productId)?.let { p ->
             p.noteId?.let { noteId -> p.copy(note = getNote(noteId)) } ?: p
         }
     }

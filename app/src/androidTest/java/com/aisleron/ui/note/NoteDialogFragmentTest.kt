@@ -67,14 +67,14 @@ class NoteDialogFragmentTest : KoinTest {
         runBlocking { get<CreateSampleDataUseCase>().invoke() }
     }
 
-    private fun newInstanceTest(noteParentId: Int, noteParentType: NoteParentType) {
-        val dialog = NoteDialogFragment.newInstance(noteParentId, noteParentType)
+    private fun newInstanceTest(noteParentRef: NoteParentRef) {
+        val dialog = NoteDialogFragment.newInstance(noteParentRef)
         assertNotNull(dialog)
     }
 
     @Test
     fun newInstance_IsCalledForProduct_ReturnNoteDialog() {
-        newInstanceTest(1, NoteParentType.PRODUCT)
+        newInstanceTest(NoteParentRef.Product(1))
     }
 
     private suspend fun getNoteParentWithoutNote(): NoteParent {
@@ -97,7 +97,7 @@ class NoteDialogFragmentTest : KoinTest {
     fun show_ValidParentWithNote_DisplayTitleAndNote() = runTest {
         var title = ""
         val noteParent = getNoteParentWithNote()
-        val dialog = NoteDialogFragment.newInstance(noteParent.id, NoteParentType.PRODUCT)
+        val dialog = NoteDialogFragment.newInstance(NoteParentRef.Product(noteParent.id))
 
         activityScenarioRule.scenario.onActivity {
             title = it.getString(R.string.note_dialog_title, noteParent.name)
@@ -117,7 +117,7 @@ class NoteDialogFragmentTest : KoinTest {
     fun show_ValidParentWithoutNote_DisplayBlankNote() = runTest {
         var title = ""
         val noteParent = getNoteParentWithoutNote()
-        val dialog = NoteDialogFragment.newInstance(noteParent.id, NoteParentType.PRODUCT)
+        val dialog = NoteDialogFragment.newInstance(NoteParentRef.Product(noteParent.id))
 
         activityScenarioRule.scenario.onActivity {
             title = it.getString(R.string.note_dialog_title, noteParent.name)
@@ -137,7 +137,7 @@ class NoteDialogFragmentTest : KoinTest {
     fun cancel_IsCalled_NoteNotChanged() = runTest {
         val noteParent = getNoteParentWithNote()
         val initialNoteText = noteParent.note!!.noteText
-        val dialog = NoteDialogFragment.newInstance(noteParent.id, NoteParentType.PRODUCT)
+        val dialog = NoteDialogFragment.newInstance(NoteParentRef.Product(noteParent.id))
 
         activityScenarioRule.scenario.onActivity {
             dialog.show(it.supportFragmentManager, "noteDialog")
@@ -168,7 +168,7 @@ class NoteDialogFragmentTest : KoinTest {
         }
 
         val noteParent = getNoteParentWithNote()
-        val dialog = NoteDialogFragment.newInstance(noteParent.id, NoteParentType.PRODUCT)
+        val dialog = NoteDialogFragment.newInstance(NoteParentRef.Product(noteParent.id))
         activityScenarioRule.scenario.onActivity {
             dialog.show(it.supportFragmentManager, "noteDialog")
             resultErrorMessage = it.getString(R.string.generic_error, exceptionMessage)
@@ -187,7 +187,7 @@ class NoteDialogFragmentTest : KoinTest {
     fun ok_IsValidNote_ApplyNoteChanges() = runTest {
         val noteParent = getNoteParentWithoutNote()
         val noteText = "Add note to parent test"
-        val dialog = NoteDialogFragment.newInstance(noteParent.id, NoteParentType.PRODUCT)
+        val dialog = NoteDialogFragment.newInstance(NoteParentRef.Product(noteParent.id))
         activityScenarioRule.scenario.onActivity {
             dialog.show(it.supportFragmentManager, "noteDialog")
         }

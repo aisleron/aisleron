@@ -18,11 +18,10 @@
 package com.aisleron.ui.bundles
 
 import android.os.Parcelable
-import com.aisleron.ui.note.NoteParentType
+import com.aisleron.ui.note.NoteParentRef
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class NoteDialogBundle(
-    val noteParentId: Int,
-    val noteParentType: NoteParentType
+    val noteParentRef: NoteParentRef
 ) : Parcelable

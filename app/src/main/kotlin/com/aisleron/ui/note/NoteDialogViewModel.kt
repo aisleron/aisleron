@@ -65,9 +65,9 @@ class NoteDialogViewModel(
         }
     }
 
-    suspend fun hydrate(noteParentType: NoteParentType, noteParentId: Int) {
+    suspend fun hydrate(noteParentRef: NoteParentRef) {
         if (_noteParent == null) {
-            _noteParent = getNoteParentUseCase(noteParentType, noteParentId)
+            _noteParent = getNoteParentUseCase(noteParentRef)
             _noteText = _noteParent?.note?.noteText.orEmpty()
         }
     }

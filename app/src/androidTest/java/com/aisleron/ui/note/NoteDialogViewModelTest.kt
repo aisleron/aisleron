@@ -88,7 +88,7 @@ class NoteDialogViewModelTest : KoinTest {
     fun hydrate_FirstRun_SetViewModelValues() = runTest {
         val parent = getNoteParentWithNote()
 
-        viewModel.hydrate(NoteParentType.PRODUCT, parent.id)
+        viewModel.hydrate(NoteParentRef.Product(parent.id))
 
         assertEquals(parent.name, viewModel.parentName)
         assertEquals(parent.note!!.noteText, viewModel.noteText)
@@ -98,17 +98,17 @@ class NoteDialogViewModelTest : KoinTest {
     fun hydrate_SecondRun_DoNotOverwriteNote() = runTest {
         val parent = getNoteParentWithNote()
         val newNoteText = "New Note text to keep after hydrate"
-        viewModel.hydrate(NoteParentType.PRODUCT, parent.id)
+        viewModel.hydrate(NoteParentRef.Product(parent.id))
         viewModel.updateNote(newNoteText)
 
-        viewModel.hydrate(NoteParentType.PRODUCT, parent.id)
+        viewModel.hydrate(NoteParentRef.Product(parent.id))
 
         assertEquals(newNoteText, viewModel.noteText)
     }
 
     @Test
     fun hydrate_InvalidParentProvided_LoadDefaultValues() = runTest {
-        viewModel.hydrate(NoteParentType.PRODUCT, -1)
+        viewModel.hydrate(NoteParentRef.Product(-1))
 
         assertEquals("", viewModel.parentName)
         assertEquals("", viewModel.noteText)
@@ -118,7 +118,7 @@ class NoteDialogViewModelTest : KoinTest {
     fun updateNote_NoteTextProvided_ViewMoelNoteTextUpdated() = runTest {
         val parent = getNoteParentWithoutNote()
         val newNoteText = "New Note text"
-        viewModel.hydrate(NoteParentType.PRODUCT, parent.id)
+        viewModel.hydrate(NoteParentRef.Product(parent.id))
 
         viewModel.updateNote(newNoteText)
 
@@ -129,7 +129,7 @@ class NoteDialogViewModelTest : KoinTest {
     fun saveNote_NewNote_NoteSaved() = runTest {
         val parent = getNoteParentWithoutNote()
         val newNoteText = "New Note text"
-        viewModel.hydrate(NoteParentType.PRODUCT, parent.id)
+        viewModel.hydrate(NoteParentRef.Product(parent.id))
         viewModel.updateNote(newNoteText)
 
         viewModel.saveNote()
@@ -147,7 +147,7 @@ class NoteDialogViewModelTest : KoinTest {
     fun saveNote_UpdatedNote_NoteSaved() = runTest {
         val parent = getNoteParentWithNote()
         val newNoteText = "New Note text"
-        viewModel.hydrate(NoteParentType.PRODUCT, parent.id)
+        viewModel.hydrate(NoteParentRef.Product(parent.id))
         viewModel.updateNote(newNoteText)
 
         viewModel.saveNote()
@@ -163,7 +163,7 @@ class NoteDialogViewModelTest : KoinTest {
         val newNoteText = "New Note text"
         val noteRepository = get<NoteRepository>()
         val countBefore = noteRepository.getAll().count()
-        viewModel.hydrate(NoteParentType.PRODUCT, -1)
+        viewModel.hydrate(NoteParentRef.Product( -1))
         viewModel.updateNote(newNoteText)
 
         viewModel.saveNote()
@@ -189,7 +189,7 @@ class NoteDialogViewModelTest : KoinTest {
 
         val vm = get<NoteDialogViewModel>()
         val parent = getNoteParentWithNote()
-        vm.hydrate(NoteParentType.PRODUCT, parent.id)
+        vm.hydrate(NoteParentRef.Product(parent.id))
 
         vm.saveNote()
 

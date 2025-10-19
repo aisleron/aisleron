@@ -59,9 +59,7 @@ class NoteDialogFragment() : DialogFragment() {
 
         val noteDialogBundle = Bundler().getNoteDialogBundle(arguments)
         lifecycleScope.launch {
-            viewModel.hydrate(
-                noteDialogBundle.noteParentType, noteDialogBundle.noteParentId
-            )
+            viewModel.hydrate(noteDialogBundle.noteParentRef)
 
             alertDialog.setTitle(getString(R.string.note_dialog_title, viewModel.parentName))
             binding.edtNotes.setText(viewModel.noteText)
@@ -97,9 +95,9 @@ class NoteDialogFragment() : DialogFragment() {
     }
 
     companion object {
-        fun newInstance(noteParentId: Int, noteParentType: NoteParentType) =
+        fun newInstance(noteParentRef: NoteParentRef) =
             NoteDialogFragment().apply {
-                arguments = Bundler().makeNotesDialogBundle(noteParentId, noteParentType)
+                arguments = Bundler().makeNotesDialogBundle(noteParentRef)
             }
     }
 }

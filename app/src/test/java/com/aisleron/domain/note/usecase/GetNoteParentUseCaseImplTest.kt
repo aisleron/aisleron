@@ -22,7 +22,7 @@ import com.aisleron.domain.note.Note
 import com.aisleron.domain.note.NoteRepository
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
-import com.aisleron.ui.note.NoteParentType
+import com.aisleron.ui.note.NoteParentRef
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
@@ -51,7 +51,7 @@ class GetNoteParentUseCaseImplTest {
     fun invoke_ParentIsProduct_ReturnProduct() = runTest {
         val productId = getProduct().id
 
-        val parent = getNoteParentUseCase(NoteParentType.PRODUCT, productId)
+        val parent = getNoteParentUseCase(NoteParentRef.Product(productId))
 
         assertNotNull(parent)
         assertTrue(parent is Product)
@@ -59,7 +59,7 @@ class GetNoteParentUseCaseImplTest {
 
     @Test
     fun invoke_InvalidParentId_ReturnNull() = runTest {
-        val parent = getNoteParentUseCase(NoteParentType.PRODUCT, -1)
+        val parent = getNoteParentUseCase(NoteParentRef.Product(-1))
 
         assertNull(parent)
     }
@@ -80,7 +80,7 @@ class GetNoteParentUseCaseImplTest {
     fun invoke_ParentHasNote_ReturnParentWithNote() = runTest {
         val product = getProductWithNote()
 
-        val parent = getNoteParentUseCase(NoteParentType.PRODUCT, product.id)!!
+        val parent = getNoteParentUseCase(NoteParentRef.Product(product.id))!!
 
         assertNotNull(parent.note)
         assertEquals(product.note, parent.note)
@@ -90,7 +90,7 @@ class GetNoteParentUseCaseImplTest {
     fun invoke_ParentHasNoNote_ReturnParentWithNullNote() = runTest {
         val product = getProduct()
 
-        val parent = getNoteParentUseCase(NoteParentType.PRODUCT, product.id)
+        val parent = getNoteParentUseCase(NoteParentRef.Product(product.id))
 
         assertNotNull(parent)
         assertNull(parent.note)

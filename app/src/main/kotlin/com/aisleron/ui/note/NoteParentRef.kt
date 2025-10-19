@@ -17,7 +17,10 @@
 
 package com.aisleron.ui.note
 
-enum class NoteParentType {
-    PRODUCT,
-    //LOCATION
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
+sealed class NoteParentRef : Parcelable {
+    data class Product(val id: Int) : NoteParentRef()
 }

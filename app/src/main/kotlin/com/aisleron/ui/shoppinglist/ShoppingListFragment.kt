@@ -57,7 +57,7 @@ import com.aisleron.ui.copyentity.CopyEntityDialogFragment
 import com.aisleron.ui.copyentity.CopyEntityType
 import com.aisleron.ui.loyaltycard.LoyaltyCardProvider
 import com.aisleron.ui.note.NoteDialogFragment
-import com.aisleron.ui.note.NoteParentType
+import com.aisleron.ui.note.NoteParentRef
 import com.aisleron.ui.settings.ShoppingListPreferences
 import com.aisleron.ui.widgets.ErrorSnackBar
 import com.google.android.material.snackbar.Snackbar
@@ -373,8 +373,7 @@ class ShoppingListFragment(
 
     private fun showNoteDialog(item: ShoppingListItem) {
         val dialog = NoteDialogFragment.newInstance(
-            noteParentId = item.id,
-            noteParentType = NoteParentType.PRODUCT
+            noteParentRef = NoteParentRef.Product(item.id)
         )
 
         dialog.show(childFragmentManager, "noteDialog")
