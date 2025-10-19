@@ -90,8 +90,8 @@ class ProductViewModel(
         _uiData.value = _uiData.value.copy(inStock = inStock)
     }
 
-    override fun updateNote(note: String) {
-        _uiData.value = _uiData.value.copy(noteText = note)
+    override fun updateNote(noteText: String) {
+        _uiData.value = _uiData.value.copy(noteText = noteText)
     }
 
     fun saveProduct() {

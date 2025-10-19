@@ -21,5 +21,5 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface NoteViewModel {
     val noteFlow: StateFlow<String>
-    fun updateNote(note: String)
+    fun updateNote(noteText: String)
 }

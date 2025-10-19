@@ -23,7 +23,7 @@ import com.aisleron.domain.note.NoteParent
 
 data class Product(
     override val id: Int,
-    val name: String,
+    override val name: String,
     val inStock: Boolean,
     val qtyNeeded: Int,
     override val noteId: Int? = null,

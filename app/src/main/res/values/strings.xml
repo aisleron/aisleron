@@ -195,5 +195,8 @@
     <string name="product_tab_barcodes">Barcodes</string>
     <string name="product_tab_inventory">Inventory</string>
     <string name="notes_hint">Enter notes here…</string>
+    <string name="show_note">Show note</string>
+    <string name="note_dialog_title">Note for %1$s</string>
+    <string name="loading">Loading…</string>
 
 </resources>

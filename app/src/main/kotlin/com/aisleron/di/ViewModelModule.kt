@@ -117,6 +117,7 @@ val viewModelModule = module {
 
     viewModel {
         NoteDialogViewModel(
+            getNoteParentUseCase = get(),
             applyNoteChangesUseCase = get()
         )
     }

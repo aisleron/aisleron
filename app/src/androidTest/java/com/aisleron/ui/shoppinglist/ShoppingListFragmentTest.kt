@@ -1219,7 +1219,7 @@ class ShoppingListFragmentTest : KoinTest {
     }
 
     @Test
-    fun onLongClick_IsAisle_CopyDoesNotShow() = runTest {
+    fun onLongClick_IsAisle_ProductActionsDoNotShow() = runTest {
         val shoppingList = getShoppingList()
         val aisle = getAisle(shoppingList, isDefault = false, productsInStock = false)
         val shoppingListBundle =
@@ -1230,8 +1230,12 @@ class ShoppingListFragmentTest : KoinTest {
         val aisleItem = onView(allOf(withText(aisle.name), withId(R.id.txt_aisle_name)))
         aisleItem.perform(longClick())
 
+        val actionBar = onView(withId(actionContextBarResId))
+        actionBar.check(matches(not(hasDescendant(withId(R.id.mnu_product_note)))))
+
         openActionBarOverflowOrOptionsMenu(getInstrumentation().targetContext)
         onView(withText(android.R.string.copy)).check(doesNotExist())
+        onView(withText(R.string.show_note)).check(doesNotExist())
     }
 
     private suspend fun onCreateView_TrackingMode_ArrangeAct(trackingMode: ShoppingListPreferences.TrackingMode): Product {
@@ -1403,6 +1407,63 @@ class ShoppingListFragmentTest : KoinTest {
         val updatedProduct = get<ProductRepository>().get(product.id)
         assertEquals(initialQty, updatedProduct?.qtyNeeded)
     }
+
+    @Test
+    fun onActionItemClicked_ActionItemIsShowNote_ShowNoteDialogShown() = runTest {
+        val shoppingList = getShoppingList()
+        val product = getProduct(shoppingList, false)
+        val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
+        val scenario = getActivityScenario(bundle)
+        var showNoteDialogTitle = ""
+
+        scenario.onActivity {
+            showNoteDialogTitle =
+                activityFragment.getString(R.string.note_dialog_title, product.name)
+        }
+
+        val productItem = onView(allOf(withText(product.name), withId(R.id.txt_product_name)))
+        productItem.perform(longClick())
+
+        onView(withId(R.id.mnu_product_note)).perform(click())
+
+        onView(withText(showNoteDialogTitle))
+            .inRoot(isDialog())
+            .check(matches(isDisplayed()))
+    }
+
+    private suspend fun testShowNoteClosed(buttonResId: Int) {
+        val shoppingList = getShoppingList()
+        val product = getProduct(shoppingList, false)
+        val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
+        val scenario = getActivityScenario(bundle)
+        var showNoteDialogTitle = ""
+
+        scenario.onActivity {
+            showNoteDialogTitle =
+                activityFragment.getString(R.string.note_dialog_title, product.name)
+        }
+
+        onView(withText(product.name)).perform(longClick())
+        onView(withId(R.id.mnu_product_note)).perform(click())
+
+        onView(withText(buttonResId))
+            .inRoot(isDialog())
+            .perform(click())
+
+        onView(withText(showNoteDialogTitle))
+            .check(doesNotExist())
+    }
+
+    @Test
+    fun onActionItemClicked_ShowNoteCancelled_DialogClosed() = runTest {
+        testShowNoteClosed(android.R.string.cancel)
+    }
+
+    @Test
+    fun onActionItemClicked_ShowNoteCompleted_DialogClosed() = runTest {
+        testShowNoteClosed(android.R.string.ok)
+    }
+
 
     /*@Test
     fun onDrag_IsProduct_ProductRankUpdated() {

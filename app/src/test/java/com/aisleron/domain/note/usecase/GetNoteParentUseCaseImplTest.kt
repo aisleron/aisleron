@@ -18,11 +18,13 @@
 package com.aisleron.domain.note.usecase
 
 import com.aisleron.di.TestDependencyManager
+import com.aisleron.domain.note.Note
 import com.aisleron.domain.note.NoteRepository
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
 import com.aisleron.ui.note.NoteParentType
 import kotlinx.coroutines.test.runTest
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
@@ -60,5 +62,37 @@ class GetNoteParentUseCaseImplTest {
         val parent = getNoteParentUseCase(NoteParentType.PRODUCT, -1)
 
         assertNull(parent)
+    }
+
+    private suspend fun getProductWithNote(): Product {
+        val noteText = "Note for product update"
+        val noteId = repository.add(Note(0, noteText))
+        val note = repository.get(noteId)
+
+        val productRepository = dm.getRepository<ProductRepository>()
+        val productWithNote = productRepository.getAll().first().copy(noteId = noteId, note = note)
+        productRepository.update(productWithNote)
+
+        return productWithNote
+    }
+
+    @Test
+    fun invoke_ParentHasNote_ReturnParentWithNote() = runTest {
+        val product = getProductWithNote()
+
+        val parent = getNoteParentUseCase(NoteParentType.PRODUCT, product.id)!!
+
+        assertNotNull(parent.note)
+        assertEquals(product.note, parent.note)
+    }
+
+    @Test
+    fun invoke_ParentHasNoNote_ReturnParentWithNullNote() = runTest {
+        val product = getProduct()
+
+        val parent = getNoteParentUseCase(NoteParentType.PRODUCT, product.id)
+
+        assertNotNull(parent)
+        assertNull(parent.note)
     }
 }

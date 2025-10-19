@@ -112,8 +112,8 @@ class NoteFragmentTest {
         private val _noteFlow = MutableStateFlow("")
         override val noteFlow: StateFlow<String> = _noteFlow
 
-        override fun updateNote(note: String) {
-            _noteText = note
+        override fun updateNote(noteText: String) {
+            _noteText = noteText
         }
 
         fun emitNote(note: String) {

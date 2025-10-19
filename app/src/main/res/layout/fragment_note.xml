@@ -17,19 +17,31 @@
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="16dp">
 
-    <EditText
-        android:id="@+id/edt_notes"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layout_notes"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:autofillHints=""
-        android:gravity="top|start"
-        android:hint="@string/notes_hint"
-        android:inputType="textMultiLine"
-        android:overScrollMode="always"
-        android:scrollbars="vertical"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:minLines="4" />
+        android:layout_height="wrap_content"
+        android:labelFor="@id/edt_notes"
+        app:errorEnabled="true"
+        app:hintEnabled="false"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/edt_notes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/notes_hint"
+            android:gravity="top|start"
+            android:inputType="textMultiLine"
+            android:overScrollMode="always"
+            android:scrollbars="vertical"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:minLines="4"
+            android:paddingVertical="12dp" />
+
+    </com.google.android.material.textfield.TextInputLayout>
 </FrameLayout>

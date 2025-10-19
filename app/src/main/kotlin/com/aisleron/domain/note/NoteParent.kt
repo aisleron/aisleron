@@ -20,6 +20,7 @@ package com.aisleron.domain.note
 import com.aisleron.domain.base.AisleronItem
 
 interface NoteParent : AisleronItem {
+    val name: String
     val noteId: Int?
     val note: Note?
 }

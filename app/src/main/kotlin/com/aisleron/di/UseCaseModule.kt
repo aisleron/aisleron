@@ -75,6 +75,8 @@ import com.aisleron.domain.note.usecase.ApplyNoteChangesUseCase
 import com.aisleron.domain.note.usecase.ApplyNoteChangesUseCaseImpl
 import com.aisleron.domain.note.usecase.CopyNoteUseCase
 import com.aisleron.domain.note.usecase.CopyNoteUseCaseImpl
+import com.aisleron.domain.note.usecase.GetNoteParentUseCase
+import com.aisleron.domain.note.usecase.GetNoteParentUseCaseImpl
 import com.aisleron.domain.note.usecase.GetNoteUseCase
 import com.aisleron.domain.note.usecase.GetNoteUseCaseImpl
 import com.aisleron.domain.note.usecase.RemoveNoteFromParentUseCase
@@ -369,6 +371,12 @@ val useCaseModule = module {
             addNoteUseCase = get(),
             updateNoteUseCase = get(),
             removeNoteUseCase = get()
+        )
+    }
+
+    factory<GetNoteParentUseCase> { GetNoteParentUseCaseImpl(
+            getProductUseCase = get(),
+            getNoteUseCase = get()
         )
     }
 }

@@ -20,6 +20,7 @@ package com.aisleron.di
 import com.aisleron.ui.about.AboutViewModel
 import com.aisleron.ui.aisle.AisleViewModel
 import com.aisleron.ui.copyentity.CopyEntityViewModel
+import com.aisleron.ui.note.NoteDialogViewModel
 import com.aisleron.ui.product.ProductViewModel
 import com.aisleron.ui.settings.SettingsViewModel
 import com.aisleron.ui.shop.ShopViewModel
@@ -123,6 +124,14 @@ val viewModelTestModule = module {
             copyProductUseCase = get(),
             getProductUseCase = get(),
             getLocationUseCase = get(),
+            TestScope(UnconfinedTestDispatcher())
+        )
+    }
+
+    viewModel {
+        NoteDialogViewModel(
+            getNoteParentUseCase = get(),
+            applyNoteChangesUseCase = get(),
             TestScope(UnconfinedTestDispatcher())
         )
     }
