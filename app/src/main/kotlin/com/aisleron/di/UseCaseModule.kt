@@ -345,12 +345,16 @@ val useCaseModule = module {
     factory<AddNoteToParentUseCase> {
         AddNoteToParentUseCaseImpl(
             removeNoteUseCase = get(),
-            updateProductUseCase = get()
+            updateProductUseCase = get(),
+            updateLocationUseCase = get(),
         )
     }
 
     factory<RemoveNoteFromParentUseCase> {
-        RemoveNoteFromParentUseCaseImpl(updateProductUseCase = get())
+        RemoveNoteFromParentUseCaseImpl(
+            updateProductUseCase = get(),
+            updateLocationUseCase = get()
+        )
     }
 
     factory<CopyNoteUseCase> {

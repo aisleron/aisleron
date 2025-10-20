@@ -18,6 +18,8 @@
 package com.aisleron.domain.note.usecase
 
 import com.aisleron.di.TestDependencyManager
+import com.aisleron.domain.location.Location
+import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.note.Note
 import com.aisleron.domain.note.NoteRepository
 import com.aisleron.domain.product.Product
@@ -52,6 +54,18 @@ class RemoveNoteFromParentUseCaseImplTest {
         return productWithNote
     }
 
+    private suspend fun getLocationWithNote(): Location {
+        val noteText = "Note for location update"
+        val noteId = repository.add(Note(0, noteText))
+        val note = repository.get(noteId)
+
+        val locationRepo = dm.getRepository<LocationRepository>()
+        val locationWithNote = locationRepo.getAll().first().copy(noteId = noteId, note = note)
+        locationRepo.update(locationWithNote)
+
+        return locationWithNote
+    }
+
     @Test
     fun invoke_ParentIsProduct_NoteRemovedFromProduct() = runTest {
         val product = getProductWithNote()
@@ -64,7 +78,7 @@ class RemoveNoteFromParentUseCaseImplTest {
     }
 
     @Test
-    fun invoke_NoteIdMismatch_NoteNotRemovedFromParent() = runTest {
+    fun invoke_ParentNoteIdMismatch_NoteNotRemovedFromParent() = runTest {
         val parent = getProductWithNote()
 
         removeNoteFromParentUseCase(parent, -1)
@@ -74,7 +88,7 @@ class RemoveNoteFromParentUseCaseImplTest {
     }
 
     @Test
-    fun invoke_ParentNoteIdIsNull_PArentNoteIdRemainsNull() = runTest {
+    fun invoke_ParentNoteIdIsNull_ParentNoteIdRemainsNull() = runTest {
         val parent = dm.getRepository<ProductRepository>().getAll().first()
 
         removeNoteFromParentUseCase(parent, -1)
@@ -82,4 +96,27 @@ class RemoveNoteFromParentUseCaseImplTest {
         val updatedParent = dm.getRepository<ProductRepository>().get(parent.id)!!
         assertNull(updatedParent.noteId)
     }
+
+    @Test
+    fun invoke_ParentIsLocation_NoteRemovedFromProduct() = runTest {
+        val location = getLocationWithNote()
+        val noteId = location.noteId!!
+
+        removeNoteFromParentUseCase(location, noteId)
+
+        val updatedParent = dm.getRepository<LocationRepository>().get(location.id)!!
+        assertNull(updatedParent.noteId)
+    }
+
+    @Test
+    fun invoke_LocationNoteIdIsNull_LocationNoteIdRemainsNull() = runTest {
+        val parent = dm.getRepository<LocationRepository>().getAll().first()
+
+        removeNoteFromParentUseCase(parent, -1)
+
+        val updatedParent = dm.getRepository<LocationRepository>().get(parent.id)!!
+        assertNull(updatedParent.noteId)
+    }
+
+
 }

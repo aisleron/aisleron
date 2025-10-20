@@ -18,6 +18,9 @@
 package com.aisleron.domain.note.usecase
 
 import com.aisleron.di.TestDependencyManager
+import com.aisleron.domain.location.Location
+import com.aisleron.domain.location.LocationRepository
+import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.note.Note
 import com.aisleron.domain.note.NoteRepository
 import com.aisleron.domain.product.Product
@@ -58,12 +61,17 @@ class AddNoteToParentUseCaseImplTest {
         return productWithNote
     }
 
+    private suspend fun getLocation(): Location {
+        return dm.getRepository<LocationRepository>().getAll()
+            .first { it.type != LocationType.HOME }
+    }
+
     @Test
     fun invoke_ParentIsProduct_ProductUpdatedWithNoteId() = runTest {
         val note = getNote("Test add to product")
         val product = getProduct()
 
-        addNoteToParentUseCase(product,note.id)
+        addNoteToParentUseCase(product, note.id)
 
         val updatedProduct = dm.getRepository<ProductRepository>().get(product.id)
         assertEquals(note.id, updatedProduct?.noteId)
@@ -74,12 +82,23 @@ class AddNoteToParentUseCaseImplTest {
         val product = getProductWithNote()
         val note = getNote("Replacement Note")
 
-        addNoteToParentUseCase(product,note.id)
+        addNoteToParentUseCase(product, note.id)
 
         val updatedProduct = dm.getRepository<ProductRepository>().get(product.id)
         assertEquals(note.id, updatedProduct?.noteId)
 
         val deletedNote = dm.getRepository<NoteRepository>().get(product.noteId!!)
         assertNull(deletedNote)
+    }
+
+    @Test
+    fun invoke_ParentIsLocation_LocationUpdatedWithNoteId() = runTest {
+        val note = getNote("Test add to location")
+        val location = getLocation()
+
+        addNoteToParentUseCase(location, note.id)
+
+        val updatedLocation = dm.getRepository<LocationRepository>().get(location.id)
+        assertEquals(note.id, updatedLocation?.noteId)
     }
 }

@@ -61,7 +61,7 @@
             android:id="@+id/txt_toggle_extra_options"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/show_extra_options"
+            android:text="@string/extra_options"
             android:gravity="center_vertical"
             android:paddingVertical="@dimen/text_margin"
             android:paddingStart="0dp"

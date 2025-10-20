@@ -17,6 +17,8 @@
 
 package com.aisleron.domain.note.usecase
 
+import com.aisleron.domain.location.Location
+import com.aisleron.domain.location.usecase.UpdateLocationUseCase
 import com.aisleron.domain.note.NoteParent
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.usecase.UpdateProductUseCase
@@ -28,6 +30,7 @@ interface AddNoteToParentUseCase {
 class AddNoteToParentUseCaseImpl(
     private val removeNoteUseCase: RemoveNoteUseCase,
     private val updateProductUseCase: UpdateProductUseCase,
+    private val updateLocationUseCase: UpdateLocationUseCase
 ) : AddNoteToParentUseCase {
     override suspend fun invoke(item: NoteParent, noteId: Int) {
         item.noteId?.let {
@@ -36,6 +39,7 @@ class AddNoteToParentUseCaseImpl(
 
         when (item) {
             is Product -> updateProductUseCase(item.copy(noteId = noteId))
+            is Location -> updateLocationUseCase(item.copy(noteId = noteId))
         }
     }
 }

@@ -19,10 +19,16 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/mnu_location_note"
+        android:title="@string/show_note"
+        android:icon="@drawable/baseline_sticky_note_2_24"
+        app:showAsAction="ifRoom"
+        android:menuCategory="container" />
+    <item
         android:id="@+id/mnu_edit_shop_list_item"
         android:title="@string/edit"
         android:icon="@drawable/baseline_edit_24"
-        app:showAsAction="ifRoom"
+        app:showAsAction="always"
         android:menuCategory="container" />
     <item
         android:id="@+id/mnu_delete_shop_list_item"

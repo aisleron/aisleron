@@ -265,7 +265,7 @@ class ProductFragmentTest : KoinTest {
         getFragmentScenario(bundle, preferences)
 
         onView(withId(R.id.txt_toggle_extra_options))
-            .check(matches(withText(R.string.show_extra_options)))
+            .check(matches(withText(R.string.extra_options)))
 
         onView(withId(R.id.layout_extra_options)).check(
             matches(
@@ -287,9 +287,6 @@ class ProductFragmentTest : KoinTest {
         val bundle = bundler.makeEditProductBundle(existingProduct.id)
 
         getFragmentScenario(bundle, preferences)
-
-        onView(withId(R.id.txt_toggle_extra_options))
-            .check(matches(withText(R.string.hide_extra_options)))
 
         onView(withId(R.id.layout_extra_options)).check(
             matches(

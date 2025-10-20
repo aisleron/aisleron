@@ -45,6 +45,8 @@ import com.aisleron.ui.FabHandler.FabClickedCallBack
 import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.copyentity.CopyEntityDialogFragment
 import com.aisleron.ui.copyentity.CopyEntityType
+import com.aisleron.ui.note.NoteDialogFragment
+import com.aisleron.ui.note.NoteParentRef
 import com.aisleron.ui.widgets.ErrorSnackBar
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
@@ -151,21 +153,19 @@ class ShopListFragment(private val fabHandler: FabHandler) : Fragment(), ActionM
     }
 
     override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
+        val selected = actionModeItem ?: return false
+
         var result = true
+
         when (item.itemId) {
-            R.id.mnu_edit_shop_list_item ->
-                actionModeItem?.let { editShopListItem(it) }
-
-            R.id.mnu_delete_shop_list_item ->
-                actionModeItem?.let { confirmDelete(requireContext(), it) }
-
-            R.id.mnu_copy_shop_list_item ->
-                actionModeItem?.let { showCopyLocationDialog(it) }
-
+            R.id.mnu_edit_shop_list_item -> editShopListItem(selected)
+            R.id.mnu_delete_shop_list_item -> confirmDelete(requireContext(), selected)
+            R.id.mnu_copy_shop_list_item -> showCopyLocationDialog(selected)
+            R.id.mnu_location_note -> showNoteDialog(selected)
             else -> result = false
         }
 
-        if (result) mode.finish()  // Action picked, so close the CAB.
+        if (result) mode.finish()
 
         return result
     }
@@ -191,6 +191,14 @@ class ShopListFragment(private val fabHandler: FabHandler) : Fragment(), ActionM
         }
 
         dialog.show(childFragmentManager, "copyDialog")
+    }
+
+    private fun showNoteDialog(item: ShopListItemViewModel) {
+        val dialog = NoteDialogFragment.newInstance(
+            noteParentRef = NoteParentRef.Location(item.id)
+        )
+
+        dialog.show(childFragmentManager, "noteDialog")
     }
 
     private fun confirmDelete(context: Context, item: ShopListItemViewModel) {

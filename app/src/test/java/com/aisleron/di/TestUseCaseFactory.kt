@@ -290,7 +290,11 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
     }
 
     val addNoteToParentUseCase: AddNoteToParentUseCase by lazy {
-        AddNoteToParentUseCaseImpl(removeNoteUseCase, updateProductUseCase)
+        AddNoteToParentUseCaseImpl(
+            removeNoteUseCase = removeNoteUseCase,
+            updateProductUseCase = updateProductUseCase,
+            updateLocationUseCase = updateLocationUseCase
+        )
     }
 
     val updateNoteUseCase: UpdateNoteUseCase by lazy {
@@ -298,7 +302,10 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
     }
 
     val removeNoteFromParentUseCase: RemoveNoteFromParentUseCase by lazy {
-        RemoveNoteFromParentUseCaseImpl(updateProductUseCase)
+        RemoveNoteFromParentUseCaseImpl(
+            updateProductUseCase = updateProductUseCase,
+            updateLocationUseCase = updateLocationUseCase
+        )
     }
 
     val removeNoteUseCase: RemoveNoteUseCase by lazy {

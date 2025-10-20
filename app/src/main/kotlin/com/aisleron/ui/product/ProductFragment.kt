@@ -156,11 +156,9 @@ class ProductFragment(
         var expandDrawable: Int
         if (productPreferences.showExtraOptions(requireContext())) {
             extraOptions.visibility = View.VISIBLE
-            toggle.text = getString(R.string.hide_extra_options)
             expandDrawable = R.drawable.baseline_expand_down_24
         } else {
             extraOptions.visibility = View.GONE
-            toggle.text = getString(R.string.show_extra_options)
             expandDrawable = R.drawable.baseline_expand_right_24
         }
 
