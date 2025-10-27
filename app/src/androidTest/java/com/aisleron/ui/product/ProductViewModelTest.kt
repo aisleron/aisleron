@@ -30,10 +30,10 @@ import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.note.Note
 import com.aisleron.domain.note.NoteRepository
 import com.aisleron.domain.note.usecase.ApplyNoteChangesUseCase
+import com.aisleron.domain.note.usecase.GetNoteParentUseCase
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
 import com.aisleron.domain.product.usecase.AddProductUseCase
-import com.aisleron.domain.product.usecase.GetProductUseCase
 import com.aisleron.domain.product.usecase.UpdateProductUseCase
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import kotlinx.coroutines.runBlocking
@@ -207,9 +207,9 @@ class ProductViewModelTest(private val inStock: Boolean) : KoinTest {
         val pvm = ProductViewModel(
             get<AddProductUseCase>(),
             get<UpdateProductUseCase>(),
-            get<GetProductUseCase>(),
             get<GetAisleUseCase>(),
-            applyNoteChangesUseCase = get<ApplyNoteChangesUseCase>()
+            get<GetNoteParentUseCase>(),
+            get<ApplyNoteChangesUseCase>()
         )
 
         Assert.assertNotNull(pvm)
@@ -316,14 +316,7 @@ class ProductViewModelTest(private val inStock: Boolean) : KoinTest {
 
         val note = get<NoteRepository>().get(updatedProduct.noteId!!)
         assertEquals(noteText, note?.noteText)
-
     }
-
-    /**
-     * Note Tests:
-     *  SaveProduct -> Product with note -> Update Existing
-     *
-     */
 
     companion object {
         @JvmStatic

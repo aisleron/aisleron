@@ -184,7 +184,7 @@ class ProductFragment(
 
         TabLayoutMediator(binding.tabProductOptions, viewPager) { tab, position ->
             tab.text = when (position) {
-                0 -> getString(R.string.product_tab_notes)
+                0 -> getString(R.string.tab_notes)
                 1 -> getString(R.string.product_tab_aisles)
                 2 -> getString(R.string.product_tab_barcodes)
                 3 -> getString(R.string.product_tab_inventory)

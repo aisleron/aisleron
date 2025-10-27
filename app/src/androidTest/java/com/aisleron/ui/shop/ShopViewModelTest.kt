@@ -27,7 +27,6 @@ import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.location.usecase.AddLocationUseCase
-import com.aisleron.domain.location.usecase.GetLocationUseCase
 import com.aisleron.domain.location.usecase.UpdateLocationUseCase
 import com.aisleron.domain.loyaltycard.LoyaltyCard
 import com.aisleron.domain.loyaltycard.LoyaltyCardProviderType
@@ -36,6 +35,10 @@ import com.aisleron.domain.loyaltycard.usecase.AddLoyaltyCardToLocationUseCase
 import com.aisleron.domain.loyaltycard.usecase.AddLoyaltyCardUseCase
 import com.aisleron.domain.loyaltycard.usecase.GetLoyaltyCardForLocationUseCase
 import com.aisleron.domain.loyaltycard.usecase.RemoveLoyaltyCardFromLocationUseCase
+import com.aisleron.domain.note.Note
+import com.aisleron.domain.note.NoteRepository
+import com.aisleron.domain.note.usecase.ApplyNoteChangesUseCase
+import com.aisleron.domain.note.usecase.GetNoteParentUseCase
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -48,6 +51,9 @@ import org.junit.runners.Parameterized
 import org.koin.test.KoinTest
 import org.koin.test.get
 import org.koin.test.mock.declare
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 @RunWith(value = Parameterized::class)
 class ShopViewModelTest(private val pinned: Boolean, private val showDefaultAisle: Boolean) :
@@ -184,11 +190,12 @@ class ShopViewModelTest(private val pinned: Boolean, private val showDefaultAisl
         val svm = ShopViewModel(
             get<AddLocationUseCase>(),
             get<UpdateLocationUseCase>(),
-            get<GetLocationUseCase>(),
             get<AddLoyaltyCardUseCase>(),
             get<AddLoyaltyCardToLocationUseCase>(),
             get<RemoveLoyaltyCardFromLocationUseCase>(),
-            get<GetLoyaltyCardForLocationUseCase>()
+            get<GetLoyaltyCardForLocationUseCase>(),
+            get<GetNoteParentUseCase>(),
+            get<ApplyNoteChangesUseCase>()
         )
 
         Assert.assertNotNull(svm)
@@ -344,6 +351,86 @@ class ShopViewModelTest(private val pinned: Boolean, private val showDefaultAisl
         Assert.assertEquals(
             ShopViewModel.ShopUiState.Empty, shopViewModel.shopUiState.value
         )
+    }
+
+    private suspend fun getShop(): Location{
+        return get<LocationRepository>().getAll().first { it.type == LocationType.SHOP }
+    }
+
+    @Test
+    fun hydrate_LocationHasNote_NoteReturned() = runTest {
+        val noteText = "Test note on location"
+        val noteId = get<NoteRepository>().add(Note(0, noteText))
+        val existingLocation = getShop()
+        get<LocationRepository>().update(existingLocation.copy(noteId = noteId))
+
+        shopViewModel.hydrate(existingLocation.id)
+
+        Assert.assertEquals(noteText, shopViewModel.noteFlow.value)
+    }
+
+    @Test
+    fun updateNote_NewNoteProvided_NoteValueUpdated() = runTest {
+        val noteText = "Test note on location"
+        val noteId = get<NoteRepository>().add(Note(0, noteText))
+        val existingLocation = getShop()
+        get<LocationRepository>().update(existingLocation.copy(noteId = noteId))
+        shopViewModel.hydrate(existingLocation.id)
+
+        val updatedNote = "Updated note text"
+        shopViewModel.updateNote(updatedNote)
+
+        Assert.assertEquals(updatedNote, shopViewModel.noteFlow.value)
+    }
+
+    @Test
+    fun saveLocation_NoteIsBlankString_NoNoteCreated() = runTest {
+        val existingLocation = getShop()
+        shopViewModel.hydrate(existingLocation.id)
+        shopViewModel.updateLocationName("${existingLocation.name} Updated")
+
+        shopViewModel.saveLocation()
+
+        val updatedLocation = get<LocationRepository>().get(existingLocation.id)!!
+        assertNull(updatedLocation.noteId)
+
+        val noteCount = get<NoteRepository>().getAll().count()
+        assertEquals(0, noteCount)
+    }
+
+    @Test
+    fun saveLocation_LocationHasNoNote_NoteCreated() = runTest {
+        val existingLocation = getShop()
+        shopViewModel.hydrate(existingLocation.id)
+        shopViewModel.updateLocationName("${existingLocation.name} Updated")
+        val noteText = "New note created"
+        shopViewModel.updateNote(noteText)
+
+        shopViewModel.saveLocation()
+
+        val updatedLocation = get<LocationRepository>().get(existingLocation.id)!!
+        assertNotNull(updatedLocation.noteId)
+
+        val note = get<NoteRepository>().get(updatedLocation.noteId)
+        assertEquals(noteText, note?.noteText)
+    }
+
+    @Test
+    fun saveLocation_LocationHasNote_NoteUpdated() = runTest {
+        val noteId = get<NoteRepository>().add(Note(0, "Test note on location"))
+        val existingLocation = getShop()
+        get<LocationRepository>().update(existingLocation.copy(noteId = noteId))
+        shopViewModel.hydrate(existingLocation.id)
+        val noteText = "New note created"
+        shopViewModel.updateNote(noteText)
+
+        shopViewModel.saveLocation()
+
+        val updatedLocation = get<LocationRepository>().get(existingLocation.id)!!
+        assertEquals(noteId, updatedLocation.noteId)
+
+        val note = get<NoteRepository>().get(updatedLocation.noteId!!)
+        assertEquals(noteText, note?.noteText)
     }
 
     companion object {

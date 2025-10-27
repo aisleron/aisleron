@@ -50,7 +50,8 @@ val fragmentModule = module {
             addEditFragmentListener = get(),
             applicationTitleUpdateListener = get(),
             fabHandler = get(),
-            loyaltyCardProvider = get()
+            loyaltyCardProvider = get(),
+            shopPreferences = get()
         )
     }
 

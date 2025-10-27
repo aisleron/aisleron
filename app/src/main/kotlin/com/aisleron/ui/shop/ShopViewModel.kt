@@ -24,28 +24,36 @@ import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.location.usecase.AddLocationUseCase
-import com.aisleron.domain.location.usecase.GetLocationUseCase
 import com.aisleron.domain.location.usecase.UpdateLocationUseCase
 import com.aisleron.domain.loyaltycard.LoyaltyCard
 import com.aisleron.domain.loyaltycard.usecase.AddLoyaltyCardToLocationUseCase
 import com.aisleron.domain.loyaltycard.usecase.AddLoyaltyCardUseCase
 import com.aisleron.domain.loyaltycard.usecase.GetLoyaltyCardForLocationUseCase
 import com.aisleron.domain.loyaltycard.usecase.RemoveLoyaltyCardFromLocationUseCase
+import com.aisleron.domain.note.Note
+import com.aisleron.domain.note.usecase.ApplyNoteChangesUseCase
+import com.aisleron.domain.note.usecase.GetNoteParentUseCase
+import com.aisleron.ui.note.NoteParentRef
+import com.aisleron.ui.note.NoteViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class ShopViewModel(
     private val addLocationUseCase: AddLocationUseCase,
     private val updateLocationUseCase: UpdateLocationUseCase,
-    private val getLocationUseCase: GetLocationUseCase,
     private val addLoyaltyCardUseCase: AddLoyaltyCardUseCase,
     private val addLoyaltyCardToLocationUseCase: AddLoyaltyCardToLocationUseCase,
     private val removeLoyaltyCardFromLocationUseCase: RemoveLoyaltyCardFromLocationUseCase,
     private val getLoyaltyCardForLocationUseCase: GetLoyaltyCardForLocationUseCase,
+    private val getNoteParentUseCase: GetNoteParentUseCase,
+    private val applyNoteChangesUseCase: ApplyNoteChangesUseCase,
     coroutineScopeProvider: CoroutineScope? = null
-) : ViewModel() {
+) : ViewModel(), NoteViewModel {
     private var _location: Location? = null
     private var _initialLoyaltyCardId: Int? = null
     private var _loyaltyCard: LoyaltyCard? = null
@@ -57,6 +65,13 @@ class ShopViewModel(
     private val _shopUiState = MutableStateFlow<ShopUiState>(ShopUiState.Empty)
     val shopUiState: StateFlow<ShopUiState> = _shopUiState
 
+    override val noteFlow: StateFlow<String>
+        get() = _uiData.map { it.noteText }.stateIn(
+            coroutineScope,
+            SharingStarted.Lazily,
+            _uiData.value.noteText
+        )
+
     private var hydrated = false
 
     fun hydrate(locationId: Int) {
@@ -65,18 +80,23 @@ class ShopViewModel(
 
         coroutineScope.launch {
             _shopUiState.value = ShopUiState.Loading
-            _location = getLocationUseCase(locationId)
+            _location = getLocation(locationId)
             _loyaltyCard = getLoyaltyCardForLocationUseCase(locationId)
             _initialLoyaltyCardId = _loyaltyCard?.id
             _uiData.value = ShopUiData(
                 locationName = _location?.name.orEmpty(),
                 pinned = _location?.pinned == true,
                 showDefaultAisle = _location?.showDefaultAisle != false,
-                loyaltyCardName = _loyaltyCard?.name.orEmpty()
+                loyaltyCardName = _loyaltyCard?.name.orEmpty(),
+                noteText = _location?.note?.noteText.orEmpty()
             )
 
             _shopUiState.value = ShopUiState.Empty
         }
+    }
+
+    private suspend fun getLocation(locationId: Int): Location? {
+        return getNoteParentUseCase(NoteParentRef.Location(locationId)) as Location?
     }
 
     fun saveLocation() {
@@ -84,6 +104,7 @@ class ShopViewModel(
             val name = _uiData.value.locationName
             val pinned = _uiData.value.pinned
             val showDefaultAisle = _uiData.value.showDefaultAisle
+            val noteText = _uiData.value.noteText
             if (name.isBlank()) return@launch
 
             _shopUiState.value = ShopUiState.Loading
@@ -96,6 +117,13 @@ class ShopViewModel(
                 } ?: run {
                     val locationId = addLocation(name, pinned, showDefaultAisle)
                     saveLoyaltyCard(locationId, _initialLoyaltyCardId, _loyaltyCard)
+
+                    _location = getLocation(locationId)
+                }
+
+                _location?.let {
+                    val note = Note(it.noteId ?: 0, noteText)
+                    applyNoteChangesUseCase(it, note)
                 }
 
                 _shopUiState.value = ShopUiState.Success
@@ -123,15 +151,21 @@ class ShopViewModel(
     }
 
     fun updateLocationName(name: String) {
-        _uiData.value = _uiData.value.copy(locationName = name)
+        if (uiData.value.locationName != name) {
+            _uiData.value = _uiData.value.copy(locationName = name)
+        }
     }
 
     fun updatePinned(pinned: Boolean) {
-        _uiData.value = _uiData.value.copy(pinned = pinned)
+        if (uiData.value.pinned != pinned) {
+            _uiData.value = _uiData.value.copy(pinned = pinned)
+        }
     }
 
     fun updateShowDefaultAisle(showDefaultAisle: Boolean) {
-        _uiData.value = _uiData.value.copy(showDefaultAisle = showDefaultAisle)
+        if (uiData.value.showDefaultAisle != showDefaultAisle) {
+            _uiData.value = _uiData.value.copy(showDefaultAisle = showDefaultAisle)
+        }
     }
 
     private fun updateLoyaltyCard(loyaltyCard: LoyaltyCard?) {
@@ -168,6 +202,10 @@ class ShopViewModel(
                 showDefaultAisle = showDefaultAisle
             )
         )
+    }
+
+    override fun updateNote(noteText: String) {
+        _uiData.value = _uiData.value.copy(noteText = noteText)
     }
 
     sealed class ShopUiState {

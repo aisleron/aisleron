@@ -345,7 +345,7 @@ class ProductFragmentTest : KoinTest {
         onView(
             allOf(
                 isDescendantOfA(withId(R.id.tab_product_options)),
-                withText(R.string.product_tab_notes)
+                withText(R.string.tab_notes)
             )
         ).perform(ViewActions.click())
 
@@ -368,7 +368,7 @@ class ProductFragmentTest : KoinTest {
         onView(
             allOf(
                 isDescendantOfA(withId(R.id.tab_product_options)),
-                withText(R.string.product_tab_notes)
+                withText(R.string.tab_notes)
             )
         ).perform(ViewActions.click())
 
@@ -388,7 +388,7 @@ class ProductFragmentTest : KoinTest {
         onView(
             allOf(
                 isDescendantOfA(withId(R.id.tab_product_options)),
-                withText(R.string.product_tab_notes)
+                withText(R.string.tab_notes)
             )
         ).perform(ViewActions.click())
 

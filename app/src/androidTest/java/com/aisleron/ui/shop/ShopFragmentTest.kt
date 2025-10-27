@@ -24,14 +24,16 @@ import androidx.fragment.app.testing.FragmentScenario
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
+import androidx.test.espresso.action.ViewActions.clearText
 import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.RootMatchers.isDialog
 import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.matcher.ViewMatchers.isDescendantOfA
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
-import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.uiautomator.UiDevice
 import com.aisleron.R
 import com.aisleron.di.KoinTestRule
@@ -39,11 +41,14 @@ import com.aisleron.di.daoTestModule
 import com.aisleron.di.repositoryModule
 import com.aisleron.di.useCaseModule
 import com.aisleron.di.viewModelTestModule
+import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.loyaltycard.LoyaltyCard
 import com.aisleron.domain.loyaltycard.LoyaltyCardProviderType
 import com.aisleron.domain.loyaltycard.LoyaltyCardRepository
+import com.aisleron.domain.note.Note
+import com.aisleron.domain.note.NoteRepository
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import com.aisleron.ui.AddEditFragmentListenerTestImpl
 import com.aisleron.ui.ApplicationTitleUpdateListenerTestImpl
@@ -51,14 +56,21 @@ import com.aisleron.ui.FabHandlerTestImpl
 import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.loyaltycard.LoyaltyCardProvider
 import com.aisleron.ui.loyaltycard.LoyaltyCardProviderTestImpl
+import com.aisleron.ui.settings.ShopPreferencesTestImpl
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import org.hamcrest.CoreMatchers.allOf
+import org.hamcrest.Matchers.emptyString
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.koin.test.KoinTest
 import org.koin.test.get
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class ShopFragmentTest : KoinTest {
     private lateinit var bundler: Bundler
@@ -155,7 +167,7 @@ class ShopFragmentTest : KoinTest {
         val newShopName = existingShop.name + " Updated"
 
         onView(withId(R.id.edt_shop_name))
-            .perform(ViewActions.clearText())
+            .perform(clearText())
             .perform(typeText(newShopName))
 
         scenario.onFragment {
@@ -197,7 +209,7 @@ class ShopFragmentTest : KoinTest {
         val scenario = getFragmentScenario(bundle)
 
         onView(withId(R.id.edt_shop_name))
-            .perform(ViewActions.clearText())
+            .perform(clearText())
             .perform(typeText(existingShop.name))
         scenario.onFragment {
             val menuItem = getSaveMenuItem(it.requireContext())
@@ -220,7 +232,8 @@ class ShopFragmentTest : KoinTest {
             addEditFragmentListener,
             applicationTitleUpdateListener,
             fabHandler,
-            LoyaltyCardProviderTestImpl()
+            LoyaltyCardProviderTestImpl(),
+            ShopPreferencesTestImpl()
         )
 
         Assert.assertNotNull(fragment)
@@ -232,7 +245,10 @@ class ShopFragmentTest : KoinTest {
     }
 
     private fun getFragmentScenario(
-        bundle: Bundle, loyaltyCardProvider: LoyaltyCardProvider? = null
+        bundle: Bundle,
+        loyaltyCardProvider: LoyaltyCardProvider? = null,
+        shopPreferences: ShopPreferencesTestImpl? = null
+
     ): FragmentScenario<ShopFragment> {
         val scenario = launchFragmentInContainer<ShopFragment>(
             fragmentArgs = bundle,
@@ -242,7 +258,8 @@ class ShopFragmentTest : KoinTest {
                     addEditFragmentListener,
                     applicationTitleUpdateListener,
                     fabHandler,
-                    loyaltyCardProvider ?: LoyaltyCardProviderTestImpl()
+                    loyaltyCardProvider ?: LoyaltyCardProviderTestImpl(),
+                    shopPreferences ?: ShopPreferencesTestImpl()
                 )
             }
         )
@@ -343,7 +360,7 @@ class ShopFragmentTest : KoinTest {
 
         onView(withId(R.id.edt_shop_name)).perform(typeText(newLocationName))
 
-        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+        val device = UiDevice.getInstance(getInstrumentation())
 
         try {
             device.setOrientationLandscape()
@@ -354,4 +371,203 @@ class ShopFragmentTest : KoinTest {
         }
     }
 
+    private fun getShowExtraOptionsPreference(showExtraOptions: Boolean): ShopPreferencesTestImpl {
+        val preferences = ShopPreferencesTestImpl()
+        preferences.setShowExtraOptions(getInstrumentation().targetContext, showExtraOptions)
+        return preferences
+    }
+
+    private suspend fun getShop(): Location {
+        return get<LocationRepository>().getAll().first { it.type == LocationType.SHOP }
+    }
+
+    @Test
+    fun onCreateView_PreferenceIsHideExtraOption_ExtraOptionsGone() = runTest {
+        val preferences = getShowExtraOptionsPreference(false)
+        val existingShop = getShop()
+        val bundle = bundler.makeEditLocationBundle(existingShop.id)
+
+        getFragmentScenario(bundle, null, preferences)
+
+        onView(withId(R.id.txt_toggle_extra_options))
+            .check(matches(withText(R.string.extra_options)))
+
+        onView(withId(R.id.layout_extra_options)).check(
+            matches(
+                ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE)
+            )
+        )
+    }
+
+    @Test
+    fun onCreateView_PreferenceIsShowExtraOption_ExtraOptionsVisible() = runTest {
+        val preferences = getShowExtraOptionsPreference(true)
+        val existingShop = getShop()
+        val bundle = bundler.makeEditLocationBundle(existingShop.id)
+
+        getFragmentScenario(bundle, null, preferences)
+
+        onView(withId(R.id.layout_extra_options)).check(
+            matches(
+                ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)
+            )
+        )
+    }
+
+    @Test
+    fun onClickExtrasToggle_ExtraOptionsIsGone_ExtraOptionsVisible() = runTest {
+        val preferences = getShowExtraOptionsPreference(false)
+        val existingShop = getShop()
+        val bundle = bundler.makeEditLocationBundle(existingShop.id)
+        getFragmentScenario(bundle, null, preferences)
+
+        onView(withId(R.id.txt_toggle_extra_options))
+            .perform(ViewActions.click())
+
+        onView(withId(R.id.layout_extra_options)).check(
+            matches(
+                ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)
+            )
+        )
+
+        val endPreference = preferences.showExtraOptions(getInstrumentation().targetContext)
+        assertTrue(endPreference)
+    }
+
+    @Test
+    fun onClickExtrasToggle_ExtraOptionsIsVisible_ExtraOptionsGone() = runTest {
+        val preferences = getShowExtraOptionsPreference(true)
+        val existingShop = getShop()
+        val bundle = bundler.makeEditLocationBundle(existingShop.id)
+
+        getFragmentScenario(bundle, null, preferences)
+        onView(withId(R.id.txt_toggle_extra_options))
+            .perform(ViewActions.click())
+
+        onView(withId(R.id.layout_extra_options)).check(
+            matches(
+                ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE)
+            )
+        )
+
+        val endPreference = preferences.showExtraOptions(getInstrumentation().targetContext)
+        assertFalse(endPreference)
+    }
+
+    @Test
+    fun onCreateView_ShopHasNoNote_NoteEmpty() = runTest {
+        val preferences = getShowExtraOptionsPreference(true)
+        val existingShop = getShop()
+        val bundle = bundler.makeEditLocationBundle(existingShop.id)
+
+        getFragmentScenario(bundle, null, preferences)
+        onView(
+            allOf(
+                isDescendantOfA(withId(R.id.tab_shop_options)),
+                withText(R.string.tab_notes)
+            )
+        ).perform(ViewActions.click())
+
+        onView(withId(R.id.edt_notes)).check(
+            matches(withText(emptyString()))
+        )
+    }
+
+    @Test
+    fun onCreateView_ShopHasNote_NoteDisplayed() = runTest {
+        val preferences = getShowExtraOptionsPreference(true)
+        val locationRepository = get<LocationRepository>()
+        val existingShop = getShop()
+        val noteText = "Test note displayed on shop"
+        val noteId = get<NoteRepository>().add(Note(0, noteText))
+        locationRepository.update(existingShop.copy(noteId = noteId))
+        val bundle = bundler.makeEditLocationBundle(existingShop.id)
+
+        getFragmentScenario(bundle, null, preferences)
+        onView(
+            allOf(
+                isDescendantOfA(withId(R.id.tab_shop_options)),
+                withText(R.string.tab_notes)
+            )
+        ).perform(ViewActions.click())
+
+        onView(withId(R.id.edt_notes)).check(
+            matches(withText(noteText))
+        )
+    }
+
+    @Test
+    fun onSaveClick_NoteEntered_NoteSaved() = runTest {
+        val preferences = getShowExtraOptionsPreference(true)
+        val locationRepository = get<LocationRepository>()
+        val existingShop = getShop()
+        val bundle = bundler.makeEditLocationBundle(existingShop.id)
+        val scenario = getFragmentScenario(bundle, null, preferences)
+
+        onView(
+            allOf(
+                isDescendantOfA(withId(R.id.tab_shop_options)),
+                withText(R.string.tab_notes)
+            )
+        ).perform(ViewActions.click())
+
+        val noteText = "Note added to shop"
+        onView(withId(R.id.edt_notes))
+            .perform(clearText())
+            .perform(typeText(noteText))
+
+        scenario.onFragment {
+            val menuItem = getSaveMenuItem(it.requireContext())
+            it.onMenuItemSelected(menuItem)
+        }
+
+        val note = get<NoteRepository>().getAll().firstOrNull { it.noteText == noteText }
+        assertNotNull(note)
+
+        val updatedShop = locationRepository.get(existingShop.id)
+        assertEquals(note.id, updatedShop?.noteId)
+    }
+
+    private suspend fun onCreateView_DefaultAisleTests_AssertAct(showDefaultAisle: Boolean): FragmentScenario<ShopFragment> {
+        val existingShop = getShop()
+        val locationRepository = get<LocationRepository>()
+        locationRepository.update(existingShop.copy(showDefaultAisle = showDefaultAisle))
+        val bundle = bundler.makeEditLocationBundle(existingShop.id)
+
+        return getFragmentScenario(bundle)
+    }
+
+    @Test
+    fun onCreateView_ShowDefaultAisleIsTrue_ShowNoAisleToggledOn() = runTest {
+        onCreateView_DefaultAisleTests_AssertAct(true)
+
+        onView(withId(R.id.swc_shop_show_unmapped_products))
+            .check(matches(ViewMatchers.isChecked()))
+    }
+
+    @Test
+    fun onCreateView_ShowDefaultAisleIsFalse_ShowNoAisleToggledOff() = runTest {
+        onCreateView_DefaultAisleTests_AssertAct(false)
+
+        onView(withId(R.id.swc_shop_show_unmapped_products))
+            .check(matches(ViewMatchers.isNotChecked()))
+    }
+
+    @Test
+    fun onSaveClick_ShowNoAisleToggleStatusSetToFalse_ShowDefaultAisleFalse() = runTest {
+        val scenario = onCreateView_DefaultAisleTests_AssertAct(true)
+
+        onView(withId(R.id.swc_shop_show_unmapped_products)).perform(ViewActions.click())
+        scenario.onFragment {
+            val menuItem = getSaveMenuItem(it.requireContext())
+            it.onMenuItemSelected(menuItem)
+        }
+
+        val updatedShop = getShop()
+        assertEquals(false, updatedShop.showDefaultAisle)
+
+        assertTrue(addEditFragmentListener.addEditSuccess)
+        onView(withId(R.id.swc_shop_show_unmapped_products))
+            .check(matches(ViewMatchers.isNotChecked()))
+    }
 }

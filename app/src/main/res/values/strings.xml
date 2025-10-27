@@ -189,7 +189,7 @@
     <string name="qty">Qty</string>
     <string name="expand_collapse_aisles">Expand/collapse aisles</string>
     <string name="extra_options">Extra options</string>
-    <string name="product_tab_notes">Notes</string>
+    <string name="tab_notes">Notes</string>
     <string name="product_tab_aisles">Aisles</string>
     <string name="product_tab_barcodes">Barcodes</string>
     <string name="product_tab_inventory">Inventory</string>

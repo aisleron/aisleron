@@ -15,12 +15,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.ui.shop
+package com.aisleron.ui.settings
 
-data class ShopUiData(
-    val locationName: String = "",
-    val pinned: Boolean = false,
-    val showDefaultAisle: Boolean = true,
-    val loyaltyCardName: String = "",
-    val noteText: String = ""
-)
+import android.content.Context
+
+class ShopPreferencesTestImpl : ShopPreferences {
+    private var _showExtraOptions = false
+
+    override fun showExtraOptions(context: Context): Boolean = _showExtraOptions
+
+    override fun setShowExtraOptions(context: Context, value: Boolean) {
+        _showExtraOptions = value
+    }
+}

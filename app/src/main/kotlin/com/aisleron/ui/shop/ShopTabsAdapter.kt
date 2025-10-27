@@ -17,10 +17,17 @@
 
 package com.aisleron.ui.shop
 
-data class ShopUiData(
-    val locationName: String = "",
-    val pinned: Boolean = false,
-    val showDefaultAisle: Boolean = true,
-    val loyaltyCardName: String = "",
-    val noteText: String = ""
-)
+import androidx.fragment.app.Fragment
+import androidx.viewpager2.adapter.FragmentStateAdapter
+
+class ShopTabsAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
+
+    override fun getItemCount(): Int = 1
+
+    override fun createFragment(position: Int): Fragment {
+        return when (position) {
+            0 -> ShopNoteFragment()
+            else -> throw IllegalArgumentException("Invalid tab index")
+        }
+    }
+}

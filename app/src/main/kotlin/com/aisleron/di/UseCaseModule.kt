@@ -378,7 +378,8 @@ val useCaseModule = module {
         )
     }
 
-    factory<GetNoteParentUseCase> { GetNoteParentUseCaseImpl(
+    factory<GetNoteParentUseCase> {
+        GetNoteParentUseCaseImpl(
             getProductUseCase = get(),
             getLocationUseCase = get(),
             getNoteUseCase = get()

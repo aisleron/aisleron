@@ -58,11 +58,12 @@ val viewModelTestModule = module {
         ShopViewModel(
             addLocationUseCase = get(),
             updateLocationUseCase = get(),
-            getLocationUseCase = get(),
             addLoyaltyCardUseCase = get(),
             addLoyaltyCardToLocationUseCase = get(),
             removeLoyaltyCardFromLocationUseCase = get(),
             getLoyaltyCardForLocationUseCase = get(),
+            getNoteParentUseCase = get(),
+            applyNoteChangesUseCase = get(),
             TestScope(UnconfinedTestDispatcher())
         )
     }
@@ -81,8 +82,8 @@ val viewModelTestModule = module {
         ProductViewModel(
             addProductUseCase = get(),
             updateProductUseCase = get(),
-            getProductUseCase = get(),
             getAisleUseCase = get(),
+            getNoteParentUseCase = get(),
             applyNoteChangesUseCase = get(),
             TestScope(UnconfinedTestDispatcher())
         )

@@ -17,10 +17,11 @@
 
 package com.aisleron.ui.shop
 
-data class ShopUiData(
-    val locationName: String = "",
-    val pinned: Boolean = false,
-    val showDefaultAisle: Boolean = true,
-    val loyaltyCardName: String = "",
-    val noteText: String = ""
-)
+import androidx.lifecycle.ViewModelProvider
+import com.aisleron.ui.note.NoteFragment
+
+class ShopNoteFragment : NoteFragment<ShopViewModel>() {
+    override val viewModel: ShopViewModel by lazy {
+        ViewModelProvider(requireParentFragment())[ShopViewModel::class.java]
+    }
+}

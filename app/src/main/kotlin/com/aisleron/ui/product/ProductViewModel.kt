@@ -23,10 +23,11 @@ import com.aisleron.domain.aisle.usecase.GetAisleUseCase
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.note.Note
 import com.aisleron.domain.note.usecase.ApplyNoteChangesUseCase
+import com.aisleron.domain.note.usecase.GetNoteParentUseCase
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.usecase.AddProductUseCase
-import com.aisleron.domain.product.usecase.GetProductUseCase
 import com.aisleron.domain.product.usecase.UpdateProductUseCase
+import com.aisleron.ui.note.NoteParentRef
 import com.aisleron.ui.note.NoteViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,8 +40,8 @@ import kotlinx.coroutines.launch
 class ProductViewModel(
     private val addProductUseCase: AddProductUseCase,
     private val updateProductUseCase: UpdateProductUseCase,
-    private val getProductUseCase: GetProductUseCase,
     private val getAisleUseCase: GetAisleUseCase,
+    private val getNoteParentUseCase: GetNoteParentUseCase,
     private val applyNoteChangesUseCase: ApplyNoteChangesUseCase,
     coroutineScopeProvider: CoroutineScope? = null
 ) : ViewModel(), NoteViewModel {
@@ -72,7 +73,7 @@ class ProductViewModel(
             _locationId = locationId
             _aisleId = aisleId
             _productUiState.value = ProductUiState.Loading
-            product = getProductUseCase(productId)
+            product = getProduct(productId)
             _uiData.value = ProductUiData(
                 productName = product?.name.orEmpty(),
                 inStock = product?.inStock ?: inStock,
@@ -92,6 +93,10 @@ class ProductViewModel(
 
     override fun updateNote(noteText: String) {
         _uiData.value = _uiData.value.copy(noteText = noteText)
+    }
+
+    private suspend fun getProduct(productId: Int): Product? {
+        return getNoteParentUseCase(NoteParentRef.Product(productId)) as Product?
     }
 
     fun saveProduct() {
@@ -119,7 +124,7 @@ class ProductViewModel(
                         aisle
                     )
 
-                    product = getProductUseCase(id)
+                    product = getProduct(id)
                 }
 
                 product?.let {
