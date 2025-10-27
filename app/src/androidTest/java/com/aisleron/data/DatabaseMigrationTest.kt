@@ -19,6 +19,7 @@ package com.aisleron.data
 
 import android.content.ContentValues
 import android.database.Cursor
+import androidx.core.database.getIntOrNull
 import androidx.room.Room
 import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.SupportSQLiteDatabase
@@ -32,6 +33,7 @@ import org.junit.Rule
 import org.junit.Test
 import java.io.IOException
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 
 class DatabaseMigrationTest {
@@ -141,6 +143,36 @@ class DatabaseMigrationTest {
 
     @Test
     @Throws(IOException::class)
+    fun migrate4to5() {
+        helper.createDatabase(testDb, 4).apply {
+            populateV1Database(this)
+            close()
+        }
+
+        val db = helper.runMigrationsAndValidate(testDb, 5, true)
+
+        db.apply {
+            // Check noteId exists on Product
+            val queryProduct = SupportSQLiteQueryBuilder.builder("Product")
+            val cursorProduct: Cursor = query(queryProduct.create())
+            cursorProduct.moveToFirst()
+            val noteId = cursorProduct.getIntOrNull(cursorProduct.getColumnIndex("noteId"))
+            cursorProduct.close()
+
+            assertNull(noteId)
+
+            // Check Note table exists
+            val queryNote = SupportSQLiteQueryBuilder.builder("Note")
+            val cursorNote: Cursor = query(queryNote.create())
+            assertEquals(0, cursorNote.count)
+            cursorNote.close()
+
+            close()
+        }
+    }
+
+    @Test
+    @Throws(IOException::class)
     fun migrateAll() {
         helper.createDatabase(testDb, 1).apply {
             populateV1Database(this)
@@ -157,9 +189,17 @@ class DatabaseMigrationTest {
         val loyaltyCards = runBlocking { db.loyaltyCardDao().getLoyaltyCards() }
         assertNotNull(loyaltyCards)
 
-        // Product.qtyNeeded introduced in V4
         val product = runBlocking { db.productDao().getProducts().first() }
+
+        // Product.qtyNeeded introduced in V4
         assertEquals(0, product.qtyNeeded)
+
+        // Product.noteId introduced in V5
+        assertNull(product.noteId)
+
+        // Note introduced in V5
+        val notes = runBlocking { db.noteDao().getNotes() }
+        assertNotNull(notes)
 
         db.close()
     }

@@ -17,7 +17,6 @@
 
 package com.aisleron.domain.backup.usecase
 
-import com.aisleron.data.TestDataManager
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.testdata.data.maintenance.DatabaseMaintenanceTestImpl
 import kotlinx.coroutines.runBlocking
@@ -28,11 +27,9 @@ import org.junit.jupiter.api.assertThrows
 import java.net.URI
 
 class RestoreDatabaseUseCaseImplTest {
-    private lateinit var testData: TestDataManager
 
     @BeforeEach
     fun setUp() {
-        testData = TestDataManager()
     }
 
     @Test

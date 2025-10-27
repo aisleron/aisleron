@@ -17,10 +17,9 @@
 
 package com.aisleron.domain.product.usecase
 
-import com.aisleron.data.TestDataManager
-import com.aisleron.domain.product.Product
+import com.aisleron.di.TestDependencyManager
 import com.aisleron.domain.product.ProductRepository
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
@@ -32,28 +31,21 @@ import org.junit.jupiter.params.provider.MethodSource
 import java.util.stream.Stream
 
 class UpdateProductStatusUseCaseTest {
-
-    private lateinit var testData: TestDataManager
+    private lateinit var dm: TestDependencyManager
     private lateinit var updateProductStatusUseCase: UpdateProductStatusUseCase
 
     @BeforeEach
     fun setUp() {
-        testData = TestDataManager()
-        val productRepository = testData.getRepository<ProductRepository>()
-        updateProductStatusUseCase = UpdateProductStatusUseCaseImpl(
-            GetProductUseCase(productRepository),
-            UpdateProductUseCase(productRepository, IsProductNameUniqueUseCase(productRepository))
-        )
+        dm = TestDependencyManager()
+        updateProductStatusUseCase = dm.getUseCase()
     }
 
     @ParameterizedTest(name = "Test when inStock Status is {0}")
     @MethodSource("inStockArguments")
-    fun updateProductStatus_ProductExists_StatusUpdated(inStock: Boolean) {
-        val existingProduct: Product
-        val updatedProduct = runBlocking {
-            existingProduct = testData.getRepository<ProductRepository>().getAll().first()
-            updateProductStatusUseCase(existingProduct.id, inStock)
-        }
+    fun updateProductStatus_ProductExists_StatusUpdated(inStock: Boolean) = runTest {
+        val existingProduct = dm.getRepository<ProductRepository>().getAll().first()
+
+        val updatedProduct = updateProductStatusUseCase(existingProduct.id, inStock)
 
         assertNotNull(updatedProduct)
         assertEquals(existingProduct.id, updatedProduct?.id)
@@ -62,11 +54,8 @@ class UpdateProductStatusUseCaseTest {
     }
 
     @Test
-    fun updateProductStatus_ProductDoesNotExist_ReturnNull() {
-        val updatedProduct = runBlocking {
-            updateProductStatusUseCase(1001, true)
-        }
-
+    fun updateProductStatus_ProductDoesNotExist_ReturnNull() = runTest {
+        val updatedProduct = updateProductStatusUseCase(1001, true)
         assertNull(updatedProduct)
     }
 

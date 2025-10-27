@@ -137,6 +137,7 @@ class ShoppingListViewModel(
                                     name = ap.product.name,
                                     inStock = ap.product.inStock,
                                     qtyNeeded = ap.product.qtyNeeded,
+                                    noteId = ap.product.noteId,
                                     aisleId = ap.aisleId,
                                     aisleProductId = ap.id,
                                     removeProductUseCase = removeProductUseCase,

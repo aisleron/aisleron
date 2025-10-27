@@ -56,6 +56,8 @@ import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.copyentity.CopyEntityDialogFragment
 import com.aisleron.ui.copyentity.CopyEntityType
 import com.aisleron.ui.loyaltycard.LoyaltyCardProvider
+import com.aisleron.ui.note.NoteDialogFragment
+import com.aisleron.ui.note.NoteParentRef
 import com.aisleron.ui.settings.ShoppingListPreferences
 import com.aisleron.ui.widgets.ErrorSnackBar
 import com.google.android.material.snackbar.Snackbar
@@ -369,6 +371,14 @@ class ShoppingListFragment(
         dialog.show(childFragmentManager, "copyDialog")
     }
 
+    private fun showNoteDialog(item: ShoppingListItem) {
+        val dialog = NoteDialogFragment.newInstance(
+            noteParentRef = NoteParentRef.Product(item.id)
+        )
+
+        dialog.show(childFragmentManager, "noteDialog")
+    }
+
     private fun editShoppingListItem(item: ShoppingListItem) {
         when (item) {
             is AisleShoppingListItem -> aisleDialog.showEditDialog(requireContext(), item)
@@ -397,11 +407,14 @@ class ShoppingListFragment(
         menu.findItem(R.id.mnu_delete_shopping_list_item)
             .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
 
-        menu.findItem(R.id.mnu_add_product_to_aisle)
-            .setVisible(actionModeItem?.itemType == ShoppingListItem.ItemType.AISLE)
+        menu.findItem(R.id.mnu_add_product_to_aisle).isVisible =
+            actionModeItem?.itemType == ShoppingListItem.ItemType.AISLE
 
-        menu.findItem(R.id.mnu_copy_shopping_list_item)
-            .setVisible(actionModeItem?.itemType == ShoppingListItem.ItemType.PRODUCT)
+        menu.findItem(R.id.mnu_copy_shopping_list_item).isVisible =
+            actionModeItem?.itemType == ShoppingListItem.ItemType.PRODUCT
+
+        menu.findItem(R.id.mnu_product_note).isVisible =
+            actionModeItem?.itemType == ShoppingListItem.ItemType.PRODUCT
 
         return false // Return false if nothing is done
     }
@@ -424,6 +437,9 @@ class ShoppingListFragment(
 
             R.id.mnu_copy_shopping_list_item ->
                 actionModeItem?.let { showCopyProductDialog(it) }
+
+            R.id.mnu_product_note ->
+                actionModeItem?.let { showNoteDialog(it) }
 
             else -> result = false // No action picked, so don't close the CAB.
         }
@@ -550,14 +566,14 @@ class ShoppingListFragment(
             fabHandler: FabHandler,
             shoppingListPreferences: ShoppingListPreferences,
             loyaltyCardProvider: LoyaltyCardProvider,
-            alertDialog: AisleDialog
+            aisleDialog: AisleDialog
         ) =
             ShoppingListFragment(
                 applicationTitleUpdateListener,
                 fabHandler,
                 shoppingListPreferences,
                 loyaltyCardProvider,
-                alertDialog
+                aisleDialog
             ).apply {
                 arguments = Bundle().apply {
                     putInt(ARG_LOCATION_ID, locationId.toInt())

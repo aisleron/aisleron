@@ -21,6 +21,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_margin="@dimen/text_margin"
     tools:context=".ui.product.ProductFragment">
@@ -47,7 +48,56 @@
         android:gravity="center_vertical"
         android:checked="false"
         android:padding="@dimen/text_margin"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:checkMark="?android:attr/listChoiceIndicatorMultiple"
         android:checkMarkTint="?attr/colorSecondary" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/txt_toggle_extra_options"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/extra_options"
+            android:gravity="center_vertical"
+            android:paddingVertical="@dimen/text_margin"
+            android:paddingStart="0dp"
+            android:paddingEnd="@dimen/text_margin"
+            android:layout_weight="0"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            app:drawableStartCompat="@drawable/baseline_expand_right_24"
+            android:drawablePadding="@dimen/expand_button_padding" />
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:background="?attr/colorSecondary" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_extra_options"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tab_product_options"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/pgr_product_options"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+
 
 </LinearLayout>

@@ -26,10 +26,16 @@
         app:showAsAction="ifRoom"
         android:menuCategory="container" />
     <item
+        android:id="@+id/mnu_product_note"
+        android:title="@string/show_note"
+        android:icon="@drawable/baseline_sticky_note_2_24"
+        app:showAsAction="ifRoom"
+        android:menuCategory="container" />
+    <item
         android:id="@+id/mnu_edit_shopping_list_item"
         android:title="@string/edit"
         android:icon="@drawable/baseline_edit_24"
-        app:showAsAction="ifRoom"
+        app:showAsAction="always"
         android:menuCategory="container" />
     <item
         android:id="@+id/mnu_delete_shopping_list_item"

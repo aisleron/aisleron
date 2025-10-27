@@ -21,5 +21,6 @@ data class ShopUiData(
     val locationName: String = "",
     val pinned: Boolean = false,
     val showDefaultAisle: Boolean = true,
-    val loyaltyCardName: String = ""
+    val loyaltyCardName: String = "",
+    val noteText: String = ""
 )

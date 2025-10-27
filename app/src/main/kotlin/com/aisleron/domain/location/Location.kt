@@ -19,14 +19,18 @@ package com.aisleron.domain.location
 
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.aisle.Aisle
+import com.aisleron.domain.note.Note
+import com.aisleron.domain.note.NoteParent
 import java.io.Serializable
 
 data class Location(
-    val id: Int,
+    override val id: Int,
     val type: LocationType,
     val defaultFilter: FilterType,
-    val name: String,
+    override val name: String,
     val pinned: Boolean,
     val aisles: List<Aisle>,
-    val showDefaultAisle: Boolean
-) : Serializable
+    val showDefaultAisle: Boolean,
+    override val noteId: Int? = null,
+    override val note: Note? = null
+) : Serializable, NoteParent

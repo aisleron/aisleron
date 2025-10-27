@@ -1,6 +1,6 @@
 package com.aisleron.domain.aisleproduct.usecase
 
-import com.aisleron.data.TestDataManager
+import com.aisleron.di.TestDependencyManager
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.aisle.AisleRepository
@@ -16,19 +16,18 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class GetAisleMaxRankUseCaseTest {
-    private lateinit var testData: TestDataManager
+    private lateinit var dm: TestDependencyManager
     private lateinit var getAisleMaxRankUseCase: GetAisleMaxRankUseCase
 
     @BeforeEach
     fun setUp() {
-        testData = TestDataManager()
-        getAisleMaxRankUseCase =
-            GetAisleMaxRankUseCase(testData.getRepository<AisleProductRepository>())
+        dm = TestDependencyManager()
+        getAisleMaxRankUseCase = dm.getUseCase()
     }
 
     private suspend fun getAisle(): Aisle {
 
-        val locationId = testData.getRepository<LocationRepository>().add(
+        val locationId = dm.getRepository<LocationRepository>().add(
             Location(
                 id = 0,
                 type = LocationType.SHOP,
@@ -40,7 +39,7 @@ class GetAisleMaxRankUseCaseTest {
             )
         )
 
-        val aisleId = testData.getRepository<AisleRepository>().add(
+        val aisleId = dm.getRepository<AisleRepository>().add(
             Aisle(
                 id = 0,
                 name = "RankTestAisle",
@@ -52,14 +51,14 @@ class GetAisleMaxRankUseCaseTest {
             )
         )
 
-        return testData.getRepository<AisleRepository>().get(aisleId)!!
+        return dm.getRepository<AisleRepository>().get(aisleId)!!
     }
 
     @Test
     fun getAisleMaxRank_AisleHasProducts_RankIsMax() = runTest {
         val aisle = getAisle()
-        val productRepository = testData.getRepository<ProductRepository>()
-        testData.getRepository<AisleProductRepository>().add(
+        val productRepository = dm.getRepository<ProductRepository>()
+        dm.getRepository<AisleProductRepository>().add(
             listOf(
                 AisleProduct(100, aisle.id, productRepository.get(1)!!, 0),
                 AisleProduct(200, aisle.id, productRepository.get(2)!!, 0),

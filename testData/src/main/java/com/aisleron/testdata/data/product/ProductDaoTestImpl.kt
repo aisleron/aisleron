@@ -30,7 +30,7 @@ class ProductDaoTestImpl : ProductDao {
             val id: Int
             val existingEntity = getProduct(it.id)
             if (existingEntity == null) {
-                id = (productList.maxOfOrNull { e -> e.id }?.toInt() ?: 0) + 1
+                id = (productList.maxOfOrNull { e -> e.id } ?: 0) + 1
             } else {
                 id = existingEntity.id
                 productList.removeAt(productList.indexOf(existingEntity))
@@ -40,7 +40,8 @@ class ProductDaoTestImpl : ProductDao {
                 id = id,
                 name = it.name,
                 inStock = it.inStock,
-                qtyNeeded = it.qtyNeeded
+                qtyNeeded = it.qtyNeeded,
+                noteId = it.noteId
             )
 
             productList.add(newEntity)

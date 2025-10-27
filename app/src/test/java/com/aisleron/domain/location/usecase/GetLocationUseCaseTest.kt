@@ -17,9 +17,9 @@
 
 package com.aisleron.domain.location.usecase
 
-import com.aisleron.data.TestDataManager
+import com.aisleron.di.TestDependencyManager
 import com.aisleron.domain.location.LocationRepository
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
@@ -28,23 +28,23 @@ import org.junit.jupiter.api.Test
 
 class GetLocationUseCaseTest {
 
-    private lateinit var testData: TestDataManager
+    private lateinit var dm: TestDependencyManager
     private lateinit var getLocationUseCase: GetLocationUseCase
 
     @BeforeEach
     fun setUp() {
-        testData = TestDataManager()
-        getLocationUseCase = GetLocationUseCase(testData.getRepository<LocationRepository>())
+        dm = TestDependencyManager()
+        getLocationUseCase = GetLocationUseCase(dm.getRepository<LocationRepository>())
     }
 
     @Test
-    fun getLocation_NonExistentId_ReturnNull() {
-        assertNull(runBlocking { getLocationUseCase(2001) })
+    fun getLocation_NonExistentId_ReturnNull() = runTest {
+        assertNull(getLocationUseCase(2001))
     }
 
     @Test
-    fun getLocation_ExistingId_ReturnLocation() {
-        val location = runBlocking { getLocationUseCase(1) }
+    fun getLocation_ExistingId_ReturnLocation() = runTest {
+        val location = getLocationUseCase(1)
         assertNotNull(location)
         assertEquals(1, location!!.id)
     }

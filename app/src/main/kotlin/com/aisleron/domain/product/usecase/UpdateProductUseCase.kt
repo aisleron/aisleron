@@ -18,19 +18,21 @@
 package com.aisleron.domain.product.usecase
 
 import com.aisleron.domain.base.AisleronException
+import com.aisleron.domain.base.usecase.UpdateUseCase
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
 
-class UpdateProductUseCase(
+interface UpdateProductUseCase : UpdateUseCase<Product>
+
+class UpdateProductUseCaseImpl(
     private val productRepository: ProductRepository,
     private val isProductNameUniqueUseCase: IsProductNameUniqueUseCase
-) {
-    suspend operator fun invoke(product: Product) {
-
-        if (!isProductNameUniqueUseCase(product)) {
+) : UpdateProductUseCase {
+    override suspend operator fun invoke(item: Product) {
+        if (!isProductNameUniqueUseCase(item)) {
             throw AisleronException.DuplicateProductNameException("Product Name must be unique")
         }
 
-        productRepository.update(product)
+        productRepository.update(item)
     }
 }

@@ -17,9 +17,9 @@
 
 package com.aisleron.domain.aisle.usecase
 
+import com.aisleron.di.TestDependencyManager
 import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.aisle.AisleRepository
-import com.aisleron.data.TestDataManager
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -27,13 +27,13 @@ import org.junit.jupiter.api.Test
 
 class GetDefaultAislesUseCaseTest {
 
-    private lateinit var testData: TestDataManager
+    private lateinit var dm: TestDependencyManager
     private lateinit var getDefaultAislesUseCase: GetDefaultAislesUseCase
 
     @BeforeEach
     fun setUp() {
-        testData = TestDataManager()
-        getDefaultAislesUseCase = GetDefaultAislesUseCase(testData.getRepository<AisleRepository>())
+        dm = TestDependencyManager()
+        getDefaultAislesUseCase = dm.getUseCase()
     }
 
     @Test
@@ -43,7 +43,7 @@ class GetDefaultAislesUseCaseTest {
 
         runBlocking {
             repoAisleList =
-                testData.getRepository<AisleRepository>().getAll().filter { it.isDefault }
+                dm.getRepository<AisleRepository>().getAll().filter { it.isDefault }
             getAisleList = getDefaultAislesUseCase()
         }
 

@@ -17,65 +17,56 @@
 
 package com.aisleron.domain.aisleproduct.usecase
 
-import com.aisleron.data.TestDataManager
+import com.aisleron.di.TestDependencyManager
 import com.aisleron.domain.aisleproduct.AisleProduct
 import com.aisleron.domain.aisleproduct.AisleProductRepository
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class UpdateAisleProductsUseCaseTest {
-    private lateinit var testData: TestDataManager
+    private lateinit var dm: TestDependencyManager
     private lateinit var updateAisleProductsUseCase: UpdateAisleProductsUseCase
     private lateinit var existingAisleProduct: AisleProduct
     private lateinit var aisleProductRepository: AisleProductRepository
 
     @BeforeEach
     fun setUp() {
-        testData = TestDataManager()
-        aisleProductRepository = testData.getRepository<AisleProductRepository>()
-        updateAisleProductsUseCase = UpdateAisleProductsUseCase(aisleProductRepository)
+        dm = TestDependencyManager()
+        aisleProductRepository = dm.getRepository<AisleProductRepository>()
+        updateAisleProductsUseCase = dm.getUseCase()
         existingAisleProduct = runBlocking { aisleProductRepository.getAll().first() }
     }
 
     @Test
-    fun updateProduct_ProductExists_RecordUpdated() {
+    fun updateProduct_ProductExists_RecordUpdated() = runTest {
         val updateAisleProduct = existingAisleProduct.copy(rank = 10)
-        val updatedAisleProduct: AisleProduct?
-        val countBefore: Int
-        val countAfter: Int
-        runBlocking {
-            countBefore = aisleProductRepository.getAll().count()
-            updateAisleProductsUseCase(listOf(updateAisleProduct))
-            updatedAisleProduct = aisleProductRepository.get(existingAisleProduct.id)
-            countAfter = aisleProductRepository.getAll().count()
-        }
-        assertNotNull(updatedAisleProduct)
-        assertEquals(countBefore, countAfter)
+        val countBefore: Int = aisleProductRepository.getAll().count()
+
+        updateAisleProductsUseCase(listOf(updateAisleProduct))
+
+        val updatedAisleProduct: AisleProduct? = aisleProductRepository.get(existingAisleProduct.id)
         assertEquals(updateAisleProduct, updatedAisleProduct)
+
+        val countAfter: Int = aisleProductRepository.getAll().count()
+        assertEquals(countBefore, countAfter)
     }
 
     @Test
-    fun updateProduct_ProductDoesNotExist_RecordCreated() {
-        val newAisleProduct = existingAisleProduct.copy(
-            id = 0,
-            rank = 15
-        )
-        val updatedAisleProduct: AisleProduct?
-        val countBefore: Int
-        val countAfter: Int
-        runBlocking {
-            countBefore = aisleProductRepository.getAll().count()
-            updateAisleProductsUseCase(listOf(newAisleProduct))
-            updatedAisleProduct = aisleProductRepository.getAll().maxBy { it.id }
-            countAfter = aisleProductRepository.getAll().count()
-        }
-        assertNotNull(updatedAisleProduct)
+    fun updateProduct_ProductDoesNotExist_RecordCreated() = runTest {
+        val newAisleProduct = existingAisleProduct.copy(id = 0, rank = 15)
+        val countBefore: Int = aisleProductRepository.getAll().count()
+
+        updateAisleProductsUseCase(listOf(newAisleProduct))
+
+        val updatedAisleProduct = aisleProductRepository.getAll().maxBy { it.id }
+        assertEquals(newAisleProduct.rank, updatedAisleProduct.rank)
+        assertEquals(newAisleProduct.product, updatedAisleProduct.product)
+        assertEquals(newAisleProduct.aisleId, updatedAisleProduct.aisleId)
+
+        val countAfter: Int = aisleProductRepository.getAll().count()
         assertEquals(countBefore + 1, countAfter)
-        assertEquals(newAisleProduct.aisleId, updatedAisleProduct?.aisleId)
-        assertEquals(newAisleProduct.rank, updatedAisleProduct?.rank)
-        assertEquals(newAisleProduct.product, updatedAisleProduct?.product)
     }
 }

@@ -31,6 +31,8 @@ import com.aisleron.data.loyaltycard.LocationLoyaltyCardEntity
 import com.aisleron.data.loyaltycard.LoyaltyCardDao
 import com.aisleron.data.loyaltycard.LoyaltyCardEntity
 import com.aisleron.data.maintenance.MaintenanceDao
+import com.aisleron.data.note.NoteDao
+import com.aisleron.data.note.NoteEntity
 import com.aisleron.data.product.ProductDao
 import com.aisleron.data.product.ProductEntity
 
@@ -41,7 +43,8 @@ import com.aisleron.data.product.ProductEntity
         ProductEntity::class,
         AisleProductEntity::class,
         LoyaltyCardEntity::class,
-        LocationLoyaltyCardEntity::class
+        LocationLoyaltyCardEntity::class,
+        NoteEntity::class
     ],
 
     version = 5,
@@ -60,4 +63,5 @@ abstract class AisleronDatabase : AisleronDb, RoomDatabase() {
     abstract override fun maintenanceDao(): MaintenanceDao
     abstract override fun loyaltyCardDao(): LoyaltyCardDao
     abstract override fun locationLoyaltyCardDao(): LocationLoyaltyCardDao
+    abstract override fun noteDao(): NoteDao
 }

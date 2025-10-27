@@ -17,11 +17,11 @@
 
 package com.aisleron.domain.product.usecase
 
-import com.aisleron.data.TestDataManager
+import com.aisleron.di.TestDependencyManager
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
@@ -30,83 +30,73 @@ import org.junit.jupiter.api.assertThrows
 
 class UpdateProductUseCaseTest {
 
-    private lateinit var testData: TestDataManager
+    private lateinit var dm: TestDependencyManager
     private lateinit var updateProductUseCase: UpdateProductUseCase
-    private lateinit var existingProduct: Product
+    private lateinit var repository: ProductRepository
 
     @BeforeEach
     fun setUp() {
-        testData = TestDataManager()
-        val productRepository = testData.getRepository<ProductRepository>()
-        existingProduct = runBlocking { productRepository.get(1)!! }
-        updateProductUseCase = UpdateProductUseCase(
-            productRepository, IsProductNameUniqueUseCase(productRepository)
+        dm = TestDependencyManager()
+        repository = dm.getRepository<ProductRepository>()
+        updateProductUseCase = dm.getUseCase<UpdateProductUseCase>()
+    }
+
+    private suspend fun existingProduct(): Product = repository.getAll().first()
+
+    @Test
+    fun updateProduct_IsDuplicateName_ThrowsException() = runTest {
+        val existingProduct = existingProduct()
+        val id = repository.add(
+            existingProduct.copy(id = 0, name = "Product 2", inStock = !existingProduct.inStock)
         )
-    }
 
-    @Test
-    fun updateProduct_IsDuplicateName_ThrowsException() {
-        runBlocking {
-            val productRepository = testData.getRepository<ProductRepository>()
-            val id = productRepository.add(
-                Product(
-                    id = 2,
-                    name = "Product 2",
-                    inStock = false,
-                    qtyNeeded = 0
-                )
-            )
+        val updateProduct = repository.get(id)!!.copy(name = existingProduct.name)
 
-            val updateProduct = productRepository.get(id)!!.copy(name = existingProduct.name)
-            assertThrows<AisleronException.DuplicateProductNameException> {
-                updateProductUseCase(updateProduct)
-            }
-        }
-    }
-
-    @Test
-    fun updateProduct_ProductExists_RecordUpdated() {
-        val updateProduct =
-            existingProduct.copy(
-                name = existingProduct.name + " Updated",
-                inStock = !existingProduct.inStock
-            )
-        val updatedProduct: Product?
-        val countBefore: Int
-        val countAfter: Int
-        runBlocking {
-            val productRepository = testData.getRepository<ProductRepository>()
-            countBefore = productRepository.getAll().count()
+        assertThrows<AisleronException.DuplicateProductNameException> {
             updateProductUseCase(updateProduct)
-            updatedProduct = productRepository.getByName(updateProduct.name)
-            countAfter = productRepository.getAll().count()
         }
+    }
+
+    @Test
+    fun updateProduct_ProductExists_RecordUpdated() = runTest {
+        val existingProduct = existingProduct()
+        val updateProduct = existingProduct.copy(
+            name = existingProduct.name + " Updated",
+            inStock = !existingProduct.inStock
+        )
+
+        val countBefore: Int = repository.getAll().count()
+
+        updateProductUseCase(updateProduct)
+
+        val updatedProduct: Product? = repository.getByName(updateProduct.name)
         assertNotNull(updatedProduct)
-        assertEquals(countBefore, countAfter)
         assertEquals(updateProduct.id, updatedProduct?.id)
         assertEquals(updateProduct.name, updatedProduct?.name)
         assertEquals(updateProduct.inStock, updatedProduct?.inStock)
+
+        val countAfter: Int = repository.getAll().count()
+        assertEquals(countBefore, countAfter)
     }
 
     @Test
-    fun updateProduct_ProductDoesNotExist_RecordCreated() {
+    fun updateProduct_ProductDoesNotExist_RecordCreated() = runTest {
+        val existingProduct = existingProduct()
         val newProduct = existingProduct.copy(
             id = 1030535,
             name = existingProduct.name + " Inserted"
         )
-        val updatedProduct: Product?
-        val countBefore: Int
-        val countAfter: Int
-        runBlocking {
-            val productRepository = testData.getRepository<ProductRepository>()
-            countBefore = productRepository.getAll().count()
-            updateProductUseCase(newProduct)
-            updatedProduct = productRepository.getByName(newProduct.name)
-            countAfter = productRepository.getAll().count()
-        }
+
+        val countBefore: Int = repository.getAll().count()
+
+        updateProductUseCase(newProduct)
+
+        val updatedProduct: Product? = repository.getByName(newProduct.name)
         assertNotNull(updatedProduct)
-        assertEquals(countBefore + 1, countAfter)
         assertEquals(newProduct.name, updatedProduct?.name)
         assertEquals(newProduct.inStock, updatedProduct?.inStock)
+
+        val countAfter: Int = repository.getAll().count()
+        assertEquals(countBefore + 1, countAfter)
     }
 }

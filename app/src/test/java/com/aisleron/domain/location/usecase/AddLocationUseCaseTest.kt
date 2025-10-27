@@ -17,22 +17,17 @@
 
 package com.aisleron.domain.location.usecase
 
-import com.aisleron.data.TestDataManager
+import com.aisleron.di.TestDependencyManager
 import com.aisleron.domain.FilterType
-import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.aisle.AisleRepository
-import com.aisleron.domain.aisle.usecase.AddAisleUseCaseImpl
-import com.aisleron.domain.aisle.usecase.IsAisleNameUniqueUseCase
-import com.aisleron.domain.aisleproduct.AisleProduct
 import com.aisleron.domain.aisleproduct.AisleProductRepository
-import com.aisleron.domain.aisleproduct.usecase.AddAisleProductsUseCase
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.product.ProductRepository
-import com.aisleron.domain.product.usecase.GetAllProductsUseCase
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
@@ -44,53 +39,37 @@ import org.junit.jupiter.params.provider.MethodSource
 import java.util.stream.Stream
 
 class AddLocationUseCaseTest {
-    private lateinit var testData: TestDataManager
+    private lateinit var dm: TestDependencyManager
     private lateinit var addLocationUseCase: AddLocationUseCase
     private lateinit var existingLocation: Location
 
     @BeforeEach
     fun setUp() {
-        testData = TestDataManager()
-        val locationRepository = testData.getRepository<LocationRepository>()
-        val aisleRepository = testData.getRepository<AisleRepository>()
-
-        addLocationUseCase = AddLocationUseCaseImpl(
-            locationRepository,
-            AddAisleUseCaseImpl(
-                aisleRepository,
-                GetLocationUseCase(locationRepository),
-                IsAisleNameUniqueUseCase(aisleRepository)
-            ),
-            GetAllProductsUseCase(testData.getRepository<ProductRepository>()),
-            AddAisleProductsUseCase(testData.getRepository<AisleProductRepository>()),
-            IsLocationNameUniqueUseCase(locationRepository)
-        )
-
+        dm = TestDependencyManager()
+        val locationRepository = dm.getRepository<LocationRepository>()
+        addLocationUseCase = dm.getUseCase()
         existingLocation = runBlocking { locationRepository.get(1)!! }
     }
 
     @Test
-    fun addLocation_IsDuplicateName_ThrowsException() {
+    fun addLocation_IsDuplicateName_ThrowsException() = runTest {
         val newLocation = existingLocation.copy(id = 0, pinned = !existingLocation.pinned)
-        runBlocking {
-            assertThrows<AisleronException.DuplicateLocationNameException> {
-                addLocationUseCase(newLocation)
-            }
+
+        assertThrows<AisleronException.DuplicateLocationNameException> {
+            addLocationUseCase(newLocation)
         }
     }
 
     @Test
-    fun addLocation_IsExistingLocation_ThrowsException() {
+    fun addLocation_IsExistingLocation_ThrowsException() = runTest {
         val updateLocation =
             existingLocation.copy(
                 name = existingLocation.name + " Updated",
                 pinned = !existingLocation.pinned
             )
 
-        runBlocking {
-            assertThrows<AisleronException.DuplicateLocationException> {
-                addLocationUseCase(updateLocation)
-            }
+        assertThrows<AisleronException.DuplicateLocationException> {
+            addLocationUseCase(updateLocation)
         }
     }
 
@@ -109,63 +88,55 @@ class AddLocationUseCaseTest {
 
     @ParameterizedTest(name = "Test AddLocation when showDefaultAisle is {0}")
     @MethodSource("showDefaultAisleArguments")
-    fun addLocation_IsNewLocation_LocationCreated(showDefaultAisle: Boolean) {
+    fun addLocation_IsNewLocation_LocationCreated(showDefaultAisle: Boolean) = runTest {
         val newLocation = getNewLocation(showDefaultAisle)
-        val countBefore: Int
-        val countAfter: Int
-        val insertedLocation: Location?
-        runBlocking {
-            val locationRepository = testData.getRepository<LocationRepository>()
-            countBefore = locationRepository.getAll().count()
-            val id = addLocationUseCase(newLocation)
-            insertedLocation = locationRepository.get(id)
-            countAfter = locationRepository.getAll().count()
-        }
-        assertNotNull(insertedLocation)
-        assertEquals(countBefore + 1, countAfter)
+        val locationRepository = dm.getRepository<LocationRepository>()
+        val countBefore = locationRepository.getAll().count()
+
+        val id = addLocationUseCase(newLocation)
+
+        val insertedLocation = locationRepository.get(id)
         assertEquals(newLocation.name, insertedLocation?.name)
         assertEquals(newLocation.type, insertedLocation?.type)
         assertEquals(newLocation.pinned, insertedLocation?.pinned)
         assertEquals(newLocation.defaultFilter, insertedLocation?.defaultFilter)
         assertEquals(showDefaultAisle, insertedLocation?.showDefaultAisle)
+
+        val countAfter = locationRepository.getAll().count()
+        assertEquals(countBefore + 1, countAfter)
     }
 
     @Test
-    fun addLocation_LocationInserted_AddsDefaultAisle() {
+    fun addLocation_LocationInserted_AddsDefaultAisle() = runTest {
         val newLocation = getNewLocation(true)
-        val aisleCountBefore: Int
-        val aisleCountAfter: Int
-        val defaultAisle: Aisle?
-        runBlocking {
-            val aisleRepository = testData.getRepository<AisleRepository>()
-            aisleCountBefore = aisleRepository.getAll().count()
-            val id = addLocationUseCase(newLocation)
-            aisleCountAfter = aisleRepository.getAll().count()
-            defaultAisle = aisleRepository.getDefaultAisleFor(id)
-        }
+        val aisleRepository = dm.getRepository<AisleRepository>()
+        val aisleCountBefore = aisleRepository.getAll().count()
+
+        val id = addLocationUseCase(newLocation)
+
+        val defaultAisle = aisleRepository.getDefaultAisleFor(id)
         assertNotNull(defaultAisle)
+
+        val aisleCountAfter = aisleRepository.getAll().count()
         assertEquals(aisleCountBefore + 1, aisleCountAfter)
     }
 
     @Test
-    fun addLocation_LocationInserted_AddsAisleProducts() {
+    fun addLocation_LocationInserted_AddsAisleProducts() = runTest {
         val newLocation = getNewLocation(true)
-        val aisleProductCountBefore: Int
-        val aisleProductCountAfter: Int
-        val productCount: Int
-        val aisleProducts: List<AisleProduct>
-        val defaultAisle: Aisle?
-        runBlocking {
-            val aisleProductRepository = testData.getRepository<AisleProductRepository>()
-            productCount = testData.getRepository<ProductRepository>().getAll().count()
-            aisleProductCountBefore = aisleProductRepository.getAll().count()
-            val id = addLocationUseCase(newLocation)
-            aisleProductCountAfter = aisleProductRepository.getAll().count()
-            defaultAisle = testData.getRepository<AisleRepository>().getDefaultAisleFor(id)
-            aisleProducts =
-                aisleProductRepository.getAll().filter { it.aisleId == defaultAisle?.id }
-        }
+        val aisleProductRepository = dm.getRepository<AisleProductRepository>()
+        val productCount: Int = dm.getRepository<ProductRepository>().getAll().count()
+        val aisleProductCountBefore = aisleProductRepository.getAll().count()
+
+        val id = addLocationUseCase(newLocation)
+
+        val defaultAisle = dm.getRepository<AisleRepository>().getDefaultAisleFor(id)
+        val aisleProducts =
+            aisleProductRepository.getAll().filter { it.aisleId == defaultAisle?.id }
+
         assertEquals(productCount, aisleProducts.count())
+
+        val aisleProductCountAfter = aisleProductRepository.getAll().count()
         assertEquals(aisleProductCountBefore + productCount, aisleProductCountAfter)
     }
 

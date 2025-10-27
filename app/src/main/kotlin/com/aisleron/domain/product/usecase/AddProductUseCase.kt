@@ -17,16 +17,18 @@
 
 package com.aisleron.domain.product.usecase
 
+import com.aisleron.domain.TransactionRunner
 import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.aisle.usecase.GetDefaultAislesUseCase
 import com.aisleron.domain.aisleproduct.AisleProduct
 import com.aisleron.domain.aisleproduct.usecase.AddAisleProductsUseCase
 import com.aisleron.domain.aisleproduct.usecase.GetAisleMaxRankUseCase
 import com.aisleron.domain.base.AisleronException
+import com.aisleron.domain.base.usecase.AddUseCase
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
 
-interface AddProductUseCase {
+interface AddProductUseCase : AddUseCase<Product> {
     suspend operator fun invoke(product: Product, targetAisle: Aisle?): Int
 }
 
@@ -35,7 +37,8 @@ class AddProductUseCaseImpl(
     private val getDefaultAislesUseCase: GetDefaultAislesUseCase,
     private val addAisleProductsUseCase: AddAisleProductsUseCase,
     private val isProductNameUniqueUseCase: IsProductNameUniqueUseCase,
-    private val getAisleMaxRankUseCase: GetAisleMaxRankUseCase
+    private val getAisleMaxRankUseCase: GetAisleMaxRankUseCase,
+    private val transactionRunner: TransactionRunner
 
 ) : AddProductUseCase {
     override suspend operator fun invoke(product: Product, targetAisle: Aisle?): Int {
@@ -48,23 +51,31 @@ class AddProductUseCaseImpl(
             throw AisleronException.DuplicateProductException("Cannot add a duplicate of an existing Product")
         }
 
-        val newProduct = product.copy(id = productRepository.add(product))
-        val defaultAisles = getDefaultAislesUseCase().toMutableList()
-
-        targetAisle?.let { target ->
-            defaultAisles.removeIf { it.locationId == target.locationId }
-            defaultAisles.add(target)
-        }
-
-        addAisleProductsUseCase(defaultAisles.map {
-            AisleProduct(
-                aisleId = it.id,
-                product = newProduct,
-                rank = getAisleMaxRankUseCase(it) + 1,
-                id = 0
+        return transactionRunner.run {
+            val newProduct = product.copy(
+                id = productRepository.add(product)
             )
-        })
 
-        return newProduct.id
+            val defaultAisles = getDefaultAislesUseCase().toMutableList()
+            targetAisle?.let { target ->
+                defaultAisles.removeIf { it.locationId == target.locationId }
+                defaultAisles.add(target)
+            }
+
+            addAisleProductsUseCase(defaultAisles.map {
+                AisleProduct(
+                    aisleId = it.id,
+                    product = newProduct,
+                    rank = getAisleMaxRankUseCase(it) + 1,
+                    id = 0
+                )
+            })
+
+            newProduct.id
+        }
+    }
+
+    override suspend fun invoke(item: Product): Int {
+        return invoke(item, null)
     }
 }

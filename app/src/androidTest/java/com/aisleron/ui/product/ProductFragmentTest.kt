@@ -24,11 +24,14 @@ import androidx.fragment.app.testing.FragmentScenario
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
+import androidx.test.espresso.action.ViewActions.clearText
 import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.matcher.ViewMatchers.isDescendantOfA
 import androidx.test.espresso.matcher.ViewMatchers.withId
-import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.espresso.matcher.ViewMatchers.withText
+import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.uiautomator.UiDevice
 import com.aisleron.R
 import com.aisleron.di.KoinTestRule
@@ -36,20 +39,29 @@ import com.aisleron.di.daoTestModule
 import com.aisleron.di.repositoryModule
 import com.aisleron.di.useCaseModule
 import com.aisleron.di.viewModelTestModule
+import com.aisleron.domain.note.Note
+import com.aisleron.domain.note.NoteRepository
 import com.aisleron.domain.product.ProductRepository
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import com.aisleron.ui.AddEditFragmentListenerTestImpl
 import com.aisleron.ui.ApplicationTitleUpdateListenerTestImpl
 import com.aisleron.ui.FabHandlerTestImpl
 import com.aisleron.ui.bundles.Bundler
+import com.aisleron.ui.settings.ProductPreferencesTestImpl
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import org.hamcrest.CoreMatchers.allOf
+import org.hamcrest.Matchers.emptyString
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.koin.test.KoinTest
 import org.koin.test.get
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class ProductFragmentTest : KoinTest {
     private lateinit var bundler: Bundler
@@ -89,7 +101,7 @@ class ProductFragmentTest : KoinTest {
         val bundle = bundler.makeEditProductBundle(existingProduct.id)
         getFragmentScenario(bundle)
 
-        onView(withId(R.id.edt_product_name)).check(matches(ViewMatchers.withText(existingProduct.name)))
+        onView(withId(R.id.edt_product_name)).check(matches(withText(existingProduct.name)))
         onView(withId(R.id.chk_product_in_stock)).check(matches(ViewMatchers.isChecked()))
     }
 
@@ -119,7 +131,7 @@ class ProductFragmentTest : KoinTest {
 
         val product = get<ProductRepository>().getByName(newProductName)
 
-        onView(withId(R.id.edt_product_name)).check(matches(ViewMatchers.withText(newProductName)))
+        onView(withId(R.id.edt_product_name)).check(matches(withText(newProductName)))
         Assert.assertTrue(addEditFragmentListener.addEditSuccess)
         Assert.assertNotNull(product)
     }
@@ -134,7 +146,7 @@ class ProductFragmentTest : KoinTest {
             it.onMenuItemSelected(menuItem)
         }
 
-        onView(withId(R.id.edt_product_name)).check(matches(ViewMatchers.withText("")))
+        onView(withId(R.id.edt_product_name)).check(matches(withText("")))
         Assert.assertFalse(addEditFragmentListener.addEditSuccess)
     }
 
@@ -147,7 +159,7 @@ class ProductFragmentTest : KoinTest {
         val scenario = getFragmentScenario(bundle)
 
         onView(withId(R.id.edt_product_name))
-            .perform(ViewActions.clearText())
+            .perform(clearText())
             .perform(typeText(newProductName))
 
         scenario.onFragment {
@@ -157,7 +169,7 @@ class ProductFragmentTest : KoinTest {
 
         val updatedProduct = productRepository.get(existingProduct.id)
 
-        onView(withId(R.id.edt_product_name)).check(matches(ViewMatchers.withText(newProductName)))
+        onView(withId(R.id.edt_product_name)).check(matches(withText(newProductName)))
         Assert.assertTrue(addEditFragmentListener.addEditSuccess)
         Assert.assertNotNull(updatedProduct)
         Assert.assertEquals(newProductName, updatedProduct?.name)
@@ -193,7 +205,7 @@ class ProductFragmentTest : KoinTest {
         val scenario = getFragmentScenario(bundle)
 
         onView(withId(R.id.edt_product_name))
-            .perform(ViewActions.clearText())
+            .perform(clearText())
             .perform(typeText(existingProduct.name))
 
         scenario.onFragment {
@@ -218,12 +230,12 @@ class ProductFragmentTest : KoinTest {
 
         onView(withId(R.id.edt_product_name)).perform(typeText(newProductName))
 
-        val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+        val device = UiDevice.getInstance(getInstrumentation())
 
         try {
             device.setOrientationLandscape()
 
-            onView(withId(R.id.edt_product_name)).check(matches(ViewMatchers.withText(newProductName)))
+            onView(withId(R.id.edt_product_name)).check(matches(withText(newProductName)))
         } finally {
             device.setOrientationPortrait()
         }
@@ -237,24 +249,183 @@ class ProductFragmentTest : KoinTest {
                 false,
                 addEditFragmentListener,
                 applicationTitleUpdateListener,
-                fabHandler
+                fabHandler,
+                ProductPreferencesTestImpl()
             )
         Assert.assertNotNull(fragment)
     }
 
+    @Test
+    fun onCreateView_PreferenceIsHideExtraOption_ExtraOptionsGone() = runTest {
+        val preferences = ProductPreferencesTestImpl()
+        preferences.setShowExtraOptions(getInstrumentation().targetContext, false)
+        val existingProduct = get<ProductRepository>().getAll().first()
+        val bundle = bundler.makeEditProductBundle(existingProduct.id)
+
+        getFragmentScenario(bundle, preferences)
+
+        onView(withId(R.id.txt_toggle_extra_options))
+            .check(matches(withText(R.string.extra_options)))
+
+        onView(withId(R.id.layout_extra_options)).check(
+            matches(
+                ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE)
+            )
+        )
+    }
+
+    private fun getShowExtraOptionsPreference(showExtraOptions: Boolean): ProductPreferencesTestImpl {
+        val preferences = ProductPreferencesTestImpl()
+        preferences.setShowExtraOptions(getInstrumentation().targetContext,showExtraOptions)
+        return preferences
+    }
+
+    @Test
+    fun onCreateView_PreferenceIsShowExtraOption_ExtraOptionsVisible() = runTest {
+        val preferences = getShowExtraOptionsPreference(true)
+        val existingProduct = get<ProductRepository>().getAll().first()
+        val bundle = bundler.makeEditProductBundle(existingProduct.id)
+
+        getFragmentScenario(bundle, preferences)
+
+        onView(withId(R.id.layout_extra_options)).check(
+            matches(
+                ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)
+            )
+        )
+    }
+
+    @Test
+    fun onClickExtrasToggle_ExtraOptionsIsGone_ExtraOptionsVisible() = runTest {
+        val preferences = getShowExtraOptionsPreference(false)
+        val existingProduct = get<ProductRepository>().getAll().first()
+        val bundle = bundler.makeEditProductBundle(existingProduct.id)
+        getFragmentScenario(bundle, preferences)
+
+        onView(withId(R.id.txt_toggle_extra_options))
+            .perform(ViewActions.click())
+
+        onView(withId(R.id.layout_extra_options)).check(
+            matches(
+                ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)
+            )
+        )
+
+        val endPreference = preferences.showExtraOptions(getInstrumentation().targetContext)
+        assertTrue(endPreference)
+    }
+
+    @Test
+    fun onClickExtrasToggle_ExtraOptionsIsVisible_ExtraOptionsGone() = runTest {
+        val preferences = getShowExtraOptionsPreference(true)
+        val existingProduct = get<ProductRepository>().getAll().first()
+        val bundle = bundler.makeEditProductBundle(existingProduct.id)
+
+        getFragmentScenario(bundle, preferences)
+        onView(withId(R.id.txt_toggle_extra_options))
+            .perform(ViewActions.click())
+
+        onView(withId(R.id.layout_extra_options)).check(
+            matches(
+                ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE)
+            )
+        )
+
+        val endPreference = preferences.showExtraOptions(getInstrumentation().targetContext)
+        assertFalse(endPreference)
+    }
+
+    @Test
+    fun onCreateView_ProductHasNoNote_NoteEmpty() = runTest {
+        val preferences = getShowExtraOptionsPreference(true)
+        val existingProduct = get<ProductRepository>().getAll().first()
+        val bundle = bundler.makeEditProductBundle(existingProduct.id)
+
+        getFragmentScenario(bundle, preferences)
+        onView(
+            allOf(
+                isDescendantOfA(withId(R.id.tab_product_options)),
+                withText(R.string.tab_notes)
+            )
+        ).perform(ViewActions.click())
+
+        onView(withId(R.id.edt_notes)).check(
+            matches(withText(emptyString()))
+        )
+    }
+
+    @Test
+    fun onCreateView_ProductHasNote_NoteDisplayed() = runTest {
+        val preferences = getShowExtraOptionsPreference(true)
+        val productRepository = get<ProductRepository>()
+        val existingProduct = productRepository.getAll().first()
+        val noteText = "Test note displayed on product"
+        val noteId = get<NoteRepository>().add(Note(0, noteText))
+        productRepository.update(existingProduct.copy(noteId = noteId))
+        val bundle = bundler.makeEditProductBundle(existingProduct.id)
+
+        getFragmentScenario(bundle, preferences)
+        onView(
+            allOf(
+                isDescendantOfA(withId(R.id.tab_product_options)),
+                withText(R.string.tab_notes)
+            )
+        ).perform(ViewActions.click())
+
+        onView(withId(R.id.edt_notes)).check(
+            matches(withText(noteText))
+        )
+    }
+
+    @Test
+    fun onSaveClick_NoteEntered_NoteSaved() = runTest {
+        val preferences = getShowExtraOptionsPreference(true)
+        val productRepository = get<ProductRepository>()
+        val existingProduct = productRepository.getAll().first()
+        val bundle = bundler.makeEditProductBundle(existingProduct.id)
+        val scenario = getFragmentScenario(bundle, preferences)
+
+        onView(
+            allOf(
+                isDescendantOfA(withId(R.id.tab_product_options)),
+                withText(R.string.tab_notes)
+            )
+        ).perform(ViewActions.click())
+
+        val noteText = "Note added to product"
+        onView(withId(R.id.edt_notes))
+            .perform(clearText())
+            .perform(typeText(noteText))
+
+        scenario.onFragment {
+            val menuItem = getSaveMenuItem(it.requireContext())
+            it.onMenuItemSelected(menuItem)
+        }
+
+        val note = get<NoteRepository>().getAll().firstOrNull { it.noteText == noteText }
+        assertNotNull(note)
+
+        val updatedProduct = productRepository.get(existingProduct.id)
+        assertEquals(note.id, updatedProduct?.noteId)
+    }
 
     private fun getSaveMenuItem(context: Context): ActionMenuItem {
         val menuItem = ActionMenuItem(context, 0, R.id.mnu_btn_save, 0, 0, null)
         return menuItem
     }
 
-    private fun getFragmentScenario(bundle: Bundle): FragmentScenario<ProductFragment> {
+    private fun getFragmentScenario(
+        bundle: Bundle, productPreferences: ProductPreferencesTestImpl? = null
+    ): FragmentScenario<ProductFragment> {
         val scenario = launchFragmentInContainer<ProductFragment>(
             fragmentArgs = bundle,
             themeResId = R.style.Theme_Aisleron,
             instantiate = {
                 ProductFragment(
-                    addEditFragmentListener, applicationTitleUpdateListener, fabHandler
+                    addEditFragmentListener,
+                    applicationTitleUpdateListener,
+                    fabHandler,
+                    productPreferences ?: ProductPreferencesTestImpl()
                 )
             }
         )

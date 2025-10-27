@@ -17,34 +17,29 @@
 
 package com.aisleron.domain.product.usecase
 
-import com.aisleron.data.TestDataManager
-import com.aisleron.domain.product.Product
+import com.aisleron.di.TestDependencyManager
 import com.aisleron.domain.product.ProductRepository
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class GetAllProductsUseCaseTest {
 
-    private lateinit var testData: TestDataManager
+    private lateinit var dm: TestDependencyManager
     private lateinit var getAllProductsUseCase: GetAllProductsUseCase
 
     @BeforeEach
     fun setUp() {
-        testData = TestDataManager()
-        getAllProductsUseCase = GetAllProductsUseCase(testData.getRepository<ProductRepository>())
+        dm = TestDependencyManager()
+        getAllProductsUseCase = dm.getUseCase()
     }
 
     @Test
-    fun getAllProducts_ProductsReturned_MatchesRepoList() {
-        val getProductsList: List<Product>
-        val repoProductsList: List<Product>
+    fun getAllProducts_ProductsReturned_MatchesRepoList() = runTest {
+        val repoProductsList = dm.getRepository<ProductRepository>().getAll()
 
-        runBlocking {
-            repoProductsList = testData.getRepository<ProductRepository>().getAll()
-            getProductsList = getAllProductsUseCase()
-        }
+        val getProductsList = getAllProductsUseCase()
 
         assertEquals(repoProductsList, getProductsList)
     }

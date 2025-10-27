@@ -20,6 +20,7 @@ package com.aisleron.di
 import com.aisleron.ui.about.AboutViewModel
 import com.aisleron.ui.aisle.AisleViewModel
 import com.aisleron.ui.copyentity.CopyEntityViewModel
+import com.aisleron.ui.note.NoteDialogViewModel
 import com.aisleron.ui.product.ProductViewModel
 import com.aisleron.ui.settings.SettingsViewModel
 import com.aisleron.ui.shop.ShopViewModel
@@ -57,11 +58,12 @@ val viewModelTestModule = module {
         ShopViewModel(
             addLocationUseCase = get(),
             updateLocationUseCase = get(),
-            getLocationUseCase = get(),
             addLoyaltyCardUseCase = get(),
             addLoyaltyCardToLocationUseCase = get(),
             removeLoyaltyCardFromLocationUseCase = get(),
             getLoyaltyCardForLocationUseCase = get(),
+            getNoteParentUseCase = get(),
+            applyNoteChangesUseCase = get(),
             TestScope(UnconfinedTestDispatcher())
         )
     }
@@ -80,8 +82,9 @@ val viewModelTestModule = module {
         ProductViewModel(
             addProductUseCase = get(),
             updateProductUseCase = get(),
-            getProductUseCase = get(),
             getAisleUseCase = get(),
+            getNoteParentUseCase = get(),
+            applyNoteChangesUseCase = get(),
             TestScope(UnconfinedTestDispatcher())
         )
     }
@@ -122,6 +125,14 @@ val viewModelTestModule = module {
             copyProductUseCase = get(),
             getProductUseCase = get(),
             getLocationUseCase = get(),
+            TestScope(UnconfinedTestDispatcher())
+        )
+    }
+
+    viewModel {
+        NoteDialogViewModel(
+            getNoteParentUseCase = get(),
+            applyNoteChangesUseCase = get(),
             TestScope(UnconfinedTestDispatcher())
         )
     }

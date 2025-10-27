@@ -25,13 +25,15 @@ class ProductMapper : MapperBaseImpl<ProductEntity, Product>() {
         id = value.id,
         name = value.name.trim(),
         inStock = value.inStock,
-        qtyNeeded = value.qtyNeeded
+        qtyNeeded = value.qtyNeeded,
+        noteId = value.noteId
     )
 
     override fun fromModel(value: Product) = ProductEntity(
         id = value.id,
         name = value.name.trim(),
         inStock = value.inStock,
-        qtyNeeded = value.qtyNeeded
+        qtyNeeded = value.qtyNeeded,
+        noteId = value.noteId
     )
 }

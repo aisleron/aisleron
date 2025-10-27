@@ -28,6 +28,7 @@ import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuProvider
 import androidx.core.view.doOnLayout
+import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
@@ -44,8 +45,10 @@ import com.aisleron.ui.FabHandler
 import com.aisleron.ui.bundles.AddEditLocationBundle
 import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.loyaltycard.LoyaltyCardProvider
+import com.aisleron.ui.settings.ShopPreferences
 import com.aisleron.ui.widgets.ErrorSnackBar
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -54,7 +57,8 @@ class ShopFragment(
     private val addEditFragmentListener: AddEditFragmentListener,
     private val applicationTitleUpdateListener: ApplicationTitleUpdateListener,
     private val fabHandler: FabHandler,
-    private val loyaltyCardProvider: LoyaltyCardProvider
+    private val loyaltyCardProvider: LoyaltyCardProvider,
+    private val shopPreferences: ShopPreferences
 ) : Fragment(), MenuProvider, AisleronFragment {
     private val shopViewModel: ShopViewModel by viewModel()
     private var _binding: FragmentShopBinding? = null
@@ -97,6 +101,8 @@ class ShopFragment(
         binding.btnDeleteLoyaltyCard.setOnClickListener {
             shopViewModel.removeLoyaltyCard()
         }
+
+        initialiseTabs()
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -142,32 +148,66 @@ class ShopFragment(
 
         binding.edtShopName.doAfterTextChanged {
             val newText = it?.toString() ?: ""
-            if (shopViewModel.uiData.value.locationName != newText) {
-                shopViewModel.updateLocationName(newText)
-            }
+            shopViewModel.updateLocationName(newText)
         }
 
         binding.swcShopPinned.setOnClickListener {
             val swc = binding.swcShopPinned
-            if (shopViewModel.uiData.value.pinned != swc.isChecked) {
-                shopViewModel.updatePinned(swc.isChecked)
-            }
+            shopViewModel.updatePinned(swc.isChecked)
         }
 
         binding.swcShopShowUnmappedProducts.setOnClickListener {
             val swc = binding.swcShopShowUnmappedProducts
-            if (shopViewModel.uiData.value.showDefaultAisle != swc.isChecked) {
-                shopViewModel.updateShowDefaultAisle(swc.isChecked)
-            }
+            shopViewModel.updateShowDefaultAisle(swc.isChecked)
         }
 
         return binding.root
     }
 
+    private fun showHideExtraOptions() {
+        val toggle = binding.txtToggleExtraOptions
+        val extraOptions = binding.layoutExtraOptions
+        var expandDrawable: Int
+        if (shopPreferences.showExtraOptions(requireContext())) {
+            extraOptions.visibility = View.VISIBLE
+            expandDrawable = R.drawable.baseline_expand_down_24
+        } else {
+            extraOptions.visibility = View.GONE
+            expandDrawable = R.drawable.baseline_expand_right_24
+        }
+
+        toggle.setCompoundDrawablesRelativeWithIntrinsicBounds(expandDrawable, 0, 0, 0)
+
+    }
+
+    private fun initialiseTabs() {
+        showHideExtraOptions()
+
+        // Expand / collapse extra options
+        binding.txtToggleExtraOptions.setOnClickListener {
+            val visible = binding.layoutExtraOptions.isVisible
+            shopPreferences.setShowExtraOptions(requireContext(), !visible)
+            showHideExtraOptions()
+        }
+
+        // Setup tabs & pager
+        val tabsAdapter = ShopTabsAdapter(this)
+        val viewPager = binding.pgrShopOptions
+        viewPager.adapter = tabsAdapter
+
+
+        TabLayoutMediator(binding.tabShopOptions, viewPager) { tab, position ->
+            tab.text = when (position) {
+                0 -> getString(R.string.tab_notes)
+                else -> ""
+            }
+        }.attach()
+    }
+
     private fun lookupLoyaltyCard() {
         try {
             loyaltyCardProvider.lookupLoyaltyCardShortcut(requireContext())
-        } catch (e: AisleronException.LoyaltyCardProviderException) {
+        } catch (_: AisleronException.LoyaltyCardProviderException) {
             loyaltyCardProvider.getNotInstalledDialog(requireContext()).show()
         } catch (e: Exception) {
             displayErrorSnackBar(AisleronException.ExceptionCode.GENERIC_EXCEPTION, e.message)
@@ -214,13 +254,15 @@ class ShopFragment(
             addEditFragmentListener: AddEditFragmentListener,
             applicationTitleUpdateListener: ApplicationTitleUpdateListener,
             fabHandler: FabHandler,
-            loyaltyCardProvider: LoyaltyCardProvider
+            loyaltyCardProvider: LoyaltyCardProvider,
+            shopPreferences: ShopPreferences
         ) =
             ShopFragment(
                 addEditFragmentListener,
                 applicationTitleUpdateListener,
                 fabHandler,
-                loyaltyCardProvider
+                loyaltyCardProvider,
+                shopPreferences
             ).apply {
                 arguments = Bundler().makeAddLocationBundle(name)
             }

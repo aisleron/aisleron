@@ -67,19 +67,40 @@ import com.aisleron.domain.loyaltycard.usecase.GetLoyaltyCardForLocationUseCase
 import com.aisleron.domain.loyaltycard.usecase.GetLoyaltyCardForLocationUseCaseImpl
 import com.aisleron.domain.loyaltycard.usecase.RemoveLoyaltyCardFromLocationUseCase
 import com.aisleron.domain.loyaltycard.usecase.RemoveLoyaltyCardFromLocationUseCaseImpl
+import com.aisleron.domain.note.usecase.AddNoteToParentUseCase
+import com.aisleron.domain.note.usecase.AddNoteToParentUseCaseImpl
+import com.aisleron.domain.note.usecase.AddNoteUseCase
+import com.aisleron.domain.note.usecase.AddNoteUseCaseImpl
+import com.aisleron.domain.note.usecase.ApplyNoteChangesUseCase
+import com.aisleron.domain.note.usecase.ApplyNoteChangesUseCaseImpl
+import com.aisleron.domain.note.usecase.CopyNoteUseCase
+import com.aisleron.domain.note.usecase.CopyNoteUseCaseImpl
+import com.aisleron.domain.note.usecase.GetNoteParentUseCase
+import com.aisleron.domain.note.usecase.GetNoteParentUseCaseImpl
+import com.aisleron.domain.note.usecase.GetNoteUseCase
+import com.aisleron.domain.note.usecase.GetNoteUseCaseImpl
+import com.aisleron.domain.note.usecase.RemoveNoteFromParentUseCase
+import com.aisleron.domain.note.usecase.RemoveNoteFromParentUseCaseImpl
+import com.aisleron.domain.note.usecase.RemoveNoteUseCase
+import com.aisleron.domain.note.usecase.RemoveNoteUseCaseImpl
+import com.aisleron.domain.note.usecase.UpdateNoteUseCase
+import com.aisleron.domain.note.usecase.UpdateNoteUseCaseImpl
 import com.aisleron.domain.product.usecase.AddProductUseCase
 import com.aisleron.domain.product.usecase.AddProductUseCaseImpl
 import com.aisleron.domain.product.usecase.CopyProductUseCase
 import com.aisleron.domain.product.usecase.CopyProductUseCaseImpl
 import com.aisleron.domain.product.usecase.GetAllProductsUseCase
 import com.aisleron.domain.product.usecase.GetProductUseCase
+import com.aisleron.domain.product.usecase.GetProductUseCaseImpl
 import com.aisleron.domain.product.usecase.IsProductNameUniqueUseCase
 import com.aisleron.domain.product.usecase.RemoveProductUseCase
+import com.aisleron.domain.product.usecase.RemoveProductUseCaseImpl
 import com.aisleron.domain.product.usecase.UpdateProductQtyNeededUseCase
 import com.aisleron.domain.product.usecase.UpdateProductQtyNeededUseCaseImpl
 import com.aisleron.domain.product.usecase.UpdateProductStatusUseCase
 import com.aisleron.domain.product.usecase.UpdateProductStatusUseCaseImpl
 import com.aisleron.domain.product.usecase.UpdateProductUseCase
+import com.aisleron.domain.product.usecase.UpdateProductUseCaseImpl
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCaseImpl
 import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
@@ -202,12 +223,25 @@ val useCaseModule = module {
      * Product Use Cases
      */
     factory<GetAllProductsUseCase> { GetAllProductsUseCase(productRepository = get()) }
-    factory<GetProductUseCase> { GetProductUseCase(productRepository = get()) }
-    factory<RemoveProductUseCase> { RemoveProductUseCase(productRepository = get()) }
+    factory<GetProductUseCase> {
+        GetProductUseCaseImpl(
+            productRepository = get(),
+            getNoteUseCase = get()
+        )
+    }
+
+    factory<RemoveProductUseCase> {
+        RemoveProductUseCaseImpl(
+            productRepository = get(),
+            removeNoteUseCase = get(),
+            transactionRunner = get()
+        )
+    }
+
     factory<IsProductNameUniqueUseCase> { IsProductNameUniqueUseCase(productRepository = get()) }
 
     factory<UpdateProductUseCase> {
-        UpdateProductUseCase(
+        UpdateProductUseCaseImpl(
             productRepository = get(),
             isProductNameUniqueUseCase = get()
         )
@@ -219,7 +253,8 @@ val useCaseModule = module {
             getDefaultAislesUseCase = get(),
             addAisleProductsUseCase = get(),
             isProductNameUniqueUseCase = get(),
-            getAisleMaxRankUseCase = get()
+            getAisleMaxRankUseCase = get(),
+            transactionRunner = get()
         )
     }
 
@@ -241,7 +276,9 @@ val useCaseModule = module {
         CopyProductUseCaseImpl(
             productRepository = get(),
             aisleProductRepository = get(),
-            isProductNameUniqueUseCase = get()
+            isProductNameUniqueUseCase = get(),
+            copyNoteUseCase = get(),
+            transactionRunner = get()
         )
     }
 
@@ -292,5 +329,60 @@ val useCaseModule = module {
 
     factory<GetLoyaltyCardForLocationUseCase> {
         GetLoyaltyCardForLocationUseCaseImpl(loyaltyCardRepository = get())
+    }
+
+    /**
+     * Note Use Cases
+     */
+    factory<AddNoteUseCase> {
+        AddNoteUseCaseImpl(
+            noteRepository = get(),
+            addNoteToParentUseCase = get(),
+            transactionRunner = get()
+        )
+    }
+
+    factory<AddNoteToParentUseCase> {
+        AddNoteToParentUseCaseImpl(
+            removeNoteUseCase = get(),
+            updateProductUseCase = get(),
+            updateLocationUseCase = get(),
+        )
+    }
+
+    factory<RemoveNoteFromParentUseCase> {
+        RemoveNoteFromParentUseCaseImpl(
+            updateProductUseCase = get(),
+            updateLocationUseCase = get()
+        )
+    }
+
+    factory<CopyNoteUseCase> {
+        CopyNoteUseCaseImpl(addNoteUseCase = get(), getNoteUseCase = get())
+    }
+
+    factory<GetNoteUseCase> { GetNoteUseCaseImpl(noteRepository = get()) }
+    factory<RemoveNoteUseCase> {
+        RemoveNoteUseCaseImpl(
+            noteRepository = get(),
+            removeNoteFromParentUseCase = get(),
+            transactionRunner = get())
+    }
+
+    factory<UpdateNoteUseCase> { UpdateNoteUseCaseImpl(noteRepository = get()) }
+    factory<ApplyNoteChangesUseCase> {
+        ApplyNoteChangesUseCaseImpl(
+            addNoteUseCase = get(),
+            updateNoteUseCase = get(),
+            removeNoteUseCase = get()
+        )
+    }
+
+    factory<GetNoteParentUseCase> {
+        GetNoteParentUseCaseImpl(
+            getProductUseCase = get(),
+            getLocationUseCase = get(),
+            getNoteUseCase = get()
+        )
     }
 }

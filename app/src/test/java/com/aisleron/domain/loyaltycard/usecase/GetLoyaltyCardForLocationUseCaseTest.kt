@@ -1,6 +1,6 @@
 package com.aisleron.domain.loyaltycard.usecase
 
-import com.aisleron.data.TestDataManager
+import com.aisleron.di.TestDependencyManager
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.loyaltycard.LoyaltyCard
@@ -14,20 +14,19 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertNull
 
 class GetLoyaltyCardForLocationUseCaseTest {
-    private lateinit var testData: TestDataManager
+    private lateinit var dm: TestDependencyManager
     private lateinit var loyaltyCardRepository: LoyaltyCardRepository
-    private lateinit var getLoyaltyCardForLocationUseCase: GetLoyaltyCardForLocationUseCaseImpl
+    private lateinit var getLoyaltyCardForLocationUseCase: GetLoyaltyCardForLocationUseCase
 
     @BeforeEach
     fun setUp() {
-        testData = TestDataManager()
-        loyaltyCardRepository = testData.getRepository<LoyaltyCardRepository>()
-        getLoyaltyCardForLocationUseCase =
-            GetLoyaltyCardForLocationUseCaseImpl(loyaltyCardRepository)
+        dm = TestDependencyManager()
+        loyaltyCardRepository = dm.getRepository<LoyaltyCardRepository>()
+        getLoyaltyCardForLocationUseCase = dm.getUseCase()
     }
 
     private suspend fun getLocation(): Location {
-        return testData.getRepository<LocationRepository>().getShops().first().first()
+        return dm.getRepository<LocationRepository>().getShops().first().first()
     }
 
     private suspend fun getLoyaltyCard(): LoyaltyCard {

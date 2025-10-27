@@ -21,22 +21,30 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aisleron.domain.aisle.usecase.GetAisleUseCase
 import com.aisleron.domain.base.AisleronException
+import com.aisleron.domain.note.Note
+import com.aisleron.domain.note.usecase.ApplyNoteChangesUseCase
+import com.aisleron.domain.note.usecase.GetNoteParentUseCase
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.usecase.AddProductUseCase
-import com.aisleron.domain.product.usecase.GetProductUseCase
 import com.aisleron.domain.product.usecase.UpdateProductUseCase
+import com.aisleron.ui.note.NoteParentRef
+import com.aisleron.ui.note.NoteViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class ProductViewModel(
     private val addProductUseCase: AddProductUseCase,
     private val updateProductUseCase: UpdateProductUseCase,
-    private val getProductUseCase: GetProductUseCase,
     private val getAisleUseCase: GetAisleUseCase,
+    private val getNoteParentUseCase: GetNoteParentUseCase,
+    private val applyNoteChangesUseCase: ApplyNoteChangesUseCase,
     coroutineScopeProvider: CoroutineScope? = null
-) : ViewModel() {
+) : ViewModel(), NoteViewModel {
     private var _aisleId: Int? = null
     private var _locationId: Int? = null
     private var product: Product? = null
@@ -48,6 +56,13 @@ class ProductViewModel(
     private val _productUiState = MutableStateFlow<ProductUiState>(ProductUiState.Empty)
     val productUiState: StateFlow<ProductUiState> = _productUiState
 
+    override val noteFlow: StateFlow<String>
+        get() = _uiData.map { it.noteText }.stateIn(
+            coroutineScope,
+            SharingStarted.Lazily,
+            _uiData.value.noteText
+        )
+
     private var hydrated = false
 
     fun hydrate(productId: Int, inStock: Boolean, locationId: Int? = null, aisleId: Int? = null) {
@@ -58,10 +73,11 @@ class ProductViewModel(
             _locationId = locationId
             _aisleId = aisleId
             _productUiState.value = ProductUiState.Loading
-            product = getProductUseCase(productId)
+            product = getProduct(productId)
             _uiData.value = ProductUiData(
                 productName = product?.name.orEmpty(),
-                inStock = product?.inStock ?: inStock
+                inStock = product?.inStock ?: inStock,
+                noteText = product?.note?.noteText ?: ""
             )
             _productUiState.value = ProductUiState.Empty
         }
@@ -75,10 +91,19 @@ class ProductViewModel(
         _uiData.value = _uiData.value.copy(inStock = inStock)
     }
 
+    override fun updateNote(noteText: String) {
+        _uiData.value = _uiData.value.copy(noteText = noteText)
+    }
+
+    private suspend fun getProduct(productId: Int): Product? {
+        return getNoteParentUseCase(NoteParentRef.Product(productId)) as Product?
+    }
+
     fun saveProduct() {
         coroutineScope.launch {
             val name = _uiData.value.productName
             val inStock = _uiData.value.inStock
+            val noteText = _uiData.value.noteText
             if (name.isBlank()) return@launch
 
             _productUiState.value = ProductUiState.Loading
@@ -90,11 +115,21 @@ class ProductViewModel(
                     product = updated
                 } ?: run {
                     val id = addProductUseCase(
-                        Product(name = name, inStock = inStock, id = 0, qtyNeeded = 0),
+                        Product(
+                            name = name,
+                            inStock = inStock,
+                            id = 0,
+                            qtyNeeded = 0
+                        ),
                         aisle
                     )
 
-                    product = getProductUseCase(id)
+                    product = getProduct(id)
+                }
+
+                product?.let {
+                    val note = Note(it.noteId ?: 0, noteText)
+                    applyNoteChangesUseCase(it, note)
                 }
 
                 _productUiState.value = ProductUiState.Success

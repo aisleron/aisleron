@@ -102,6 +102,18 @@ class SharedPreferencesInitializer {
         preferencesEditor.commit()
     }
 
+    fun setShowProductExtraOptions(value: Boolean) {
+        val preferencesEditor = getPreferencesEditor()
+        preferencesEditor.putBoolean(PREF_SHOW_PRODUCT_EXTRA_OPTIONS, value)
+        preferencesEditor.commit()
+    }
+
+    fun setShowShopExtraOptions(value: Boolean) {
+        val preferencesEditor = getPreferencesEditor()
+        preferencesEditor.putBoolean(PREF_SHOW_SHOP_EXTRA_OPTIONS, value)
+        preferencesEditor.commit()
+    }
+
     companion object {
         private const val IS_INITIALIZED = "is_initialised"
         private const val APPLICATION_THEME = "application_theme"
@@ -111,5 +123,7 @@ class SharedPreferencesInitializer {
         private const val PREF_KEEP_SCREEN_ON = "keep_screen_on"
         private const val PREF_STARTING_LIST = "starting_list"
         private const val PREF_DISPLAY_LOCKSCREEN = "display_lockscreen"
+        private const val PREF_SHOW_PRODUCT_EXTRA_OPTIONS = "show_product_extra_options"
+        private const val PREF_SHOW_SHOP_EXTRA_OPTIONS = "show_shop_extra_options"
     }
 }

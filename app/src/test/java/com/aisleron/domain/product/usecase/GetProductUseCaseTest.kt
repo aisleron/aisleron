@@ -17,36 +17,61 @@
 
 package com.aisleron.domain.product.usecase
 
-import com.aisleron.data.TestDataManager
+import com.aisleron.di.TestDependencyManager
+import com.aisleron.domain.note.Note
+import com.aisleron.domain.note.NoteRepository
 import com.aisleron.domain.product.ProductRepository
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class GetProductUseCaseTest {
-
-    private lateinit var testData: TestDataManager
+    private lateinit var dm: TestDependencyManager
     private lateinit var getProductUseCase: GetProductUseCase
+    private lateinit var repository: ProductRepository
 
     @BeforeEach
     fun setUp() {
-        testData = TestDataManager()
-
-        getProductUseCase = GetProductUseCase(
-            testData.getRepository<ProductRepository>()
-        )
+        dm = TestDependencyManager()
+        repository = dm.getRepository<ProductRepository>()
+        getProductUseCase = dm.getUseCase()
     }
 
     @Test
-    fun getProduct_NonExistentId_ReturnNull() {
-        Assertions.assertNull(runBlocking { getProductUseCase(2001) })
+    fun getProduct_NonExistentId_ReturnNull() = runTest {
+        Assertions.assertNull( getProductUseCase(2001))
     }
 
     @Test
-    fun getProduct_ExistingId_ReturnProduct() {
-        val product = runBlocking { getProductUseCase(1) }
+    fun getProduct_ExistingId_ReturnProduct() = runTest {
+        val product = getProductUseCase(1)
         Assertions.assertNotNull(product)
         Assertions.assertEquals(1, product!!.id)
+    }
+
+    @Test
+    fun getProduct_ProductHasNoNote_NoteIsNull() = runTest {
+        val productId = repository.getAll().first { it.noteId == null }.id
+        val product = getProductUseCase(productId)
+        Assertions.assertNotNull(product)
+        Assertions.assertNull(product?.noteId)
+        Assertions.assertNull(product?.note)
+    }
+
+    @Test
+    fun getProduct_ProductHasNote_NoteReturned() = runTest {
+        val product = repository.getAll().first { it.noteId == null }
+        val noteText = "Test note returns for product"
+        val note = Note(
+            id = dm.getRepository<NoteRepository>().add(Note(0, noteText)),
+            noteText = noteText
+        )
+
+        repository.update(product.copy(noteId = note.id))
+        val productResult = getProductUseCase(product.id)
+
+        Assertions.assertEquals(note.id, productResult?.noteId)
+        Assertions.assertEquals(note, productResult?.note)
     }
 }

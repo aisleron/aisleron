@@ -382,6 +382,53 @@ class ShopListFragmentTest : KoinTest {
             .check(doesNotExist())
     }
 
+    @Test
+    fun onActionItemClicked_ActionItemIsShowNote_ShowNoteDialogShown() = runTest {
+        val noteLocation = get<LocationRepository>().getAll().first { it.type == LocationType.SHOP }
+        var showNoteDialogTitle = ""
+        getActivityScenario().onActivity {
+            showNoteDialogTitle =
+                activityFragment.getString(R.string.note_dialog_title, noteLocation.name)
+        }
+
+        onView(withText(noteLocation.name)).perform(longClick())
+
+        onView(withId(R.id.mnu_location_note)).perform(click())
+
+        onView(withText(showNoteDialogTitle))
+            .inRoot(isDialog())
+            .check(matches(isDisplayed()))
+    }
+
+    private suspend fun testShowNoteClosed(buttonResId: Int) {
+        val noteLocation = get<LocationRepository>().getAll().first { it.type == LocationType.SHOP }
+        var showNoteDialogTitle = ""
+        getActivityScenario().onActivity {
+            showNoteDialogTitle =
+                activityFragment.getString(R.string.note_dialog_title, noteLocation.name)
+        }
+
+        onView(withText(noteLocation.name)).perform(longClick())
+        onView(withId(R.id.mnu_location_note)).perform(click())
+
+        onView(withText(buttonResId))
+            .inRoot(isDialog())
+            .perform(click())
+
+        onView(withText(showNoteDialogTitle))
+            .check(doesNotExist())
+    }
+
+    @Test
+    fun onActionItemClicked_ShowNoteCancelled_DialogClosed() = runTest {
+        testShowNoteClosed(android.R.string.cancel)
+    }
+
+    @Test
+    fun onActionItemClicked_ShowNoteCompleted_DialogClosed() = runTest {
+        testShowNoteClosed(android.R.string.ok)
+    }
+
     private fun ViewInteraction.checkVisibility(
         expectedVisibility: Int,
         timeoutMs: Long = 2000,

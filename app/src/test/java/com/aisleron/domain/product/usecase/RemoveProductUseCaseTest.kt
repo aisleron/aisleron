@@ -17,78 +17,96 @@
 
 package com.aisleron.domain.product.usecase
 
-import com.aisleron.data.TestDataManager
+import com.aisleron.di.TestDependencyManager
 import com.aisleron.domain.aisleproduct.AisleProductRepository
+import com.aisleron.domain.note.Note
+import com.aisleron.domain.note.NoteRepository
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class RemoveProductUseCaseTest {
-
-    private lateinit var testData: TestDataManager
+    private lateinit var dm: TestDependencyManager
     private lateinit var removeProductUseCase: RemoveProductUseCase
     private lateinit var existingProduct: Product
+    private lateinit var repository: ProductRepository
 
     @BeforeEach
     fun setUp() {
-        testData = TestDataManager()
-        val productRepository = testData.getRepository<ProductRepository>()
-
-        removeProductUseCase = RemoveProductUseCase(productRepository)
-
-        existingProduct = runBlocking { productRepository.get(1)!! }
+        dm = TestDependencyManager()
+        repository = dm.getRepository<ProductRepository>()
+        removeProductUseCase = dm.getUseCase()
+        existingProduct = runBlocking { repository.get(1)!! }
     }
 
     @Test
-    fun removeProduct_IsExistingProduct_ProductRemoved() {
-        val countBefore: Int
-        val countAfter: Int
-        val removedProduct: Product?
-        runBlocking {
-            val productRepository = testData.getRepository<ProductRepository>()
-            countBefore = productRepository.getAll().count()
-            removeProductUseCase(existingProduct.id)
-            removedProduct = productRepository.get(existingProduct.id)
-            countAfter = productRepository.getAll().count()
-        }
+    fun removeProduct_IsExistingProduct_ProductRemoved() = runTest {
+        val countBefore: Int = repository.getAll().count()
+
+        removeProductUseCase(existingProduct.id)
+        val removedProduct: Product? = repository.get(existingProduct.id)
+        val countAfter: Int = repository.getAll().count()
+
         assertNull(removedProduct)
         assertEquals(countBefore - 1, countAfter)
     }
 
     @Test
-    fun removeProduct_IsNonExistentProduct_NoProductsRemoved() {
-        val countBefore: Int
-        val countAfter: Int
-        runBlocking {
-            val productRepository = testData.getRepository<ProductRepository>()
-            countBefore = productRepository.getAll().count()
-            removeProductUseCase(productRepository.getAll().maxOf { it.id } + 1000)
-            countAfter = productRepository.getAll().count()
-        }
+    fun removeProduct_IsNonExistentProduct_NoProductsRemoved() = runTest {
+        val countBefore: Int = repository.getAll().count()
+
+        removeProductUseCase(repository.getAll().maxOf { it.id } + 1000)
+        val countAfter: Int = repository.getAll().count()
+
         assertEquals(countBefore, countAfter)
     }
 
     @Test
-    fun removeProduct_ProductRemoved_AisleProductsRemoved() {
-        val aisleProductCountBefore: Int
-        val aisleProductCountAfter: Int
-        val aisleProductCountProduct: Int
-        runBlocking {
-            val aisleProductRepository = testData.getRepository<AisleProductRepository>()
-            val aisleProductList = aisleProductRepository.getAll()
-                .filter { it.product.id == existingProduct.id }
-            aisleProductCountProduct = aisleProductList.count()
-            aisleProductCountBefore = aisleProductRepository.getAll().count()
-            removeProductUseCase(existingProduct.id)
-            aisleProductCountAfter = aisleProductRepository.getAll().count()
-        }
+    fun removeProduct_ProductRemoved_AisleProductsRemoved() = runTest {
+        val aisleProductRepository = dm.getRepository<AisleProductRepository>()
+        val aisleProductList = aisleProductRepository.getAll()
+            .filter { it.product.id == existingProduct.id }
+
+        val aisleProductCountProduct = aisleProductList.count()
+        val aisleProductCountBefore = aisleProductRepository.getAll().count()
+
+        removeProductUseCase(existingProduct.id)
+        val aisleProductCountAfter = aisleProductRepository.getAll().count()
+
         assertEquals(
             aisleProductCountBefore - aisleProductCountProduct,
             aisleProductCountAfter
         )
+    }
+
+    @Test
+    fun removeProduct_PassProductObject_ProductRemoved() = runTest {
+        val countBefore: Int = repository.getAll().count()
+
+        removeProductUseCase(existingProduct)
+        val removedProduct: Product? = repository.get(existingProduct.id)
+        val countAfter: Int = repository.getAll().count()
+
+        assertNull(removedProduct)
+        assertEquals(countBefore - 1, countAfter)
+    }
+
+    @Test
+    fun removeProduct_ProductHasNote_NoteRemoved() = runTest {
+        val noteRepository = dm.getRepository<NoteRepository>()
+        val product = repository.getAll().first { it.noteId == null }
+        val noteText = "Test note deletes for product"
+        val noteId = noteRepository.add(Note(0, noteText))
+        repository.update(product.copy(noteId = noteId))
+
+        removeProductUseCase(product.id)
+        val noteAfter = noteRepository.get(noteId)
+
+        assertNull(noteAfter)
     }
 }

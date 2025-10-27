@@ -17,56 +17,52 @@
 
 package com.aisleron.domain.aisleproduct.usecase
 
-import com.aisleron.data.TestDataManager
+import com.aisleron.di.TestDependencyManager
 import com.aisleron.domain.aisleproduct.AisleProduct
 import com.aisleron.domain.aisleproduct.AisleProductRepository
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class UpdateAisleProductRankUseCaseTest {
-    private lateinit var testData: TestDataManager
+    private lateinit var dm: TestDependencyManager
     private lateinit var updateAisleProductRankUseCase: UpdateAisleProductRankUseCase
     private lateinit var existingAisleProduct: AisleProduct
 
     @BeforeEach
     fun setUp() {
-        testData = TestDataManager()
-        val aisleProductRepository = testData.getRepository<AisleProductRepository>()
-        updateAisleProductRankUseCase = UpdateAisleProductRankUseCase(aisleProductRepository)
+        dm = TestDependencyManager()
+        val aisleProductRepository = dm.getRepository<AisleProductRepository>()
+        updateAisleProductRankUseCase = dm.getUseCase()
         existingAisleProduct = runBlocking { aisleProductRepository.getAll().first() }
     }
 
     @Test
-    fun updateAisleProductRank_NewRankProvided_AisleProductRankUpdated() {
-        val updateAisleProduct = existingAisleProduct.copy()
-        updateAisleProduct.rank = 1001
-        val updatedAisleProduct: AisleProduct?
-        runBlocking {
-            updateAisleProductRankUseCase(updateAisleProduct)
-            updatedAisleProduct =
-                testData.getRepository<AisleProductRepository>().get(existingAisleProduct.id)
-        }
-        Assertions.assertNotNull(updatedAisleProduct)
+    fun updateAisleProductRank_NewRankProvided_AisleProductRankUpdated() = runTest {
+        val updateAisleProduct = existingAisleProduct.copy(rank = 1001)
+
+        updateAisleProductRankUseCase(updateAisleProduct)
+
+        val updatedAisleProduct =
+            dm.getRepository<AisleProductRepository>().get(existingAisleProduct.id)
+
         Assertions.assertEquals(updateAisleProduct, updatedAisleProduct)
     }
 
     @Test
-    fun updateAisleProductRank_AisleProductRankUpdated_OtherAisleProductsMoved() {
+    fun updateAisleProductRank_AisleProductRankUpdated_OtherAisleProductsMoved() = runTest {
         val updateAisleProduct = existingAisleProduct.copy(rank = existingAisleProduct.rank + 1)
-        val maxAisleProductRankBefore: Int
-        val maxAisleProductRankAfter: Int
-        runBlocking {
-            val aisleProductRepository = testData.getRepository<AisleProductRepository>()
-            maxAisleProductRankBefore = aisleProductRepository.getAll()
-                .filter { it.aisleId == existingAisleProduct.aisleId }.maxOf { it.rank }
+        val aisleProductRepository = dm.getRepository<AisleProductRepository>()
+        val maxAisleProductRankBefore = aisleProductRepository.getAll()
+            .filter { it.aisleId == existingAisleProduct.aisleId }.maxOf { it.rank }
 
-            updateAisleProductRankUseCase(updateAisleProduct)
+        updateAisleProductRankUseCase(updateAisleProduct)
 
-            maxAisleProductRankAfter = aisleProductRepository.getAll()
-                .filter { it.aisleId == existingAisleProduct.aisleId }.maxOf { it.rank }
-        }
+        val maxAisleProductRankAfter = aisleProductRepository.getAll()
+            .filter { it.aisleId == existingAisleProduct.aisleId }.maxOf { it.rank }
+
         Assertions.assertEquals(maxAisleProductRankBefore + 1, maxAisleProductRankAfter)
     }
 }

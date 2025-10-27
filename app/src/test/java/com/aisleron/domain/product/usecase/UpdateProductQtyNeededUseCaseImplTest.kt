@@ -17,7 +17,8 @@
 
 package com.aisleron.domain.product.usecase
 
-import com.aisleron.data.TestDataManager
+import com.aisleron.di.TestDependencyManager
+import com.aisleron.domain.note.usecase.GetNoteUseCaseImpl
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
 import kotlinx.coroutines.test.runTest
@@ -29,16 +30,20 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
 class UpdateProductQtyNeededUseCaseImplTest {
-    private lateinit var testData: TestDataManager
+    private lateinit var dm: TestDependencyManager
     private lateinit var updateProductQtyNeededUseCase: UpdateProductQtyNeededUseCase
 
     @BeforeEach
     fun setUp() {
-        testData = TestDataManager()
-        val productRepository = testData.getRepository<ProductRepository>()
+        dm = TestDependencyManager()
+        val productRepository = dm.getRepository<ProductRepository>()
         updateProductQtyNeededUseCase = UpdateProductQtyNeededUseCaseImpl(
-            GetProductUseCase(productRepository),
-            UpdateProductUseCase(productRepository, IsProductNameUniqueUseCase(productRepository))
+            GetProductUseCaseImpl(
+                productRepository,
+                GetNoteUseCaseImpl(dm.getRepository())
+            ),
+
+            updateProductUseCase = dm.getUseCase()
         )
     }
 
@@ -47,10 +52,11 @@ class UpdateProductQtyNeededUseCaseImplTest {
             id = 0,
             name = "qtyNeeded Test Product",
             inStock = false,
-            qtyNeeded = initialQty
+            qtyNeeded = initialQty,
+            noteId = null
         )
 
-        val id = testData.getRepository<ProductRepository>().add(product)
+        val id = dm.getRepository<ProductRepository>().add(product)
         return product.copy(id = id)
     }
 
@@ -61,8 +67,7 @@ class UpdateProductQtyNeededUseCaseImplTest {
 
         updateProductQtyNeededUseCase(productBefore.id, newQty)
 
-        val productAfter = testData.getRepository<ProductRepository>().get(productBefore.id)
-
+        val productAfter = dm.getRepository<ProductRepository>().get(productBefore.id)
         assertNotNull(productAfter)
         assertEquals(newQty, productAfter?.qtyNeeded)
     }

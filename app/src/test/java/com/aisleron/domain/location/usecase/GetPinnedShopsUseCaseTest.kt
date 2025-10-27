@@ -17,49 +17,42 @@
 
 package com.aisleron.domain.location.usecase
 
-import com.aisleron.domain.location.Location
+import com.aisleron.di.TestDependencyManager
 import com.aisleron.domain.location.LocationRepository
-import com.aisleron.data.TestDataManager
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class GetPinnedShopsUseCaseTest {
 
-    private lateinit var testData: TestDataManager
+    private lateinit var dm: TestDependencyManager
 
     private lateinit var getPinnedShopsUseCase: GetPinnedShopsUseCase
 
     @BeforeEach
     fun setUp() {
-        testData = TestDataManager()
-        getPinnedShopsUseCase = GetPinnedShopsUseCase(testData.getRepository<LocationRepository>())
+        dm = TestDependencyManager()
+        getPinnedShopsUseCase = dm.getUseCase()
     }
 
     @Test
-    fun getPinnedShops_NoPinnedShopsDefined_ReturnEmptyList() {
-        val resultList: List<Location> =
-            runBlocking {
-                val locationRepository = testData.getRepository<LocationRepository>()
-                locationRepository.getAll().filter { it.pinned }
-                    .forEach { locationRepository.remove(it) }
+    fun getPinnedShops_NoPinnedShopsDefined_ReturnEmptyList() = runTest {
+        val locationRepository = dm.getRepository<LocationRepository>()
+        locationRepository.getAll().filter { it.pinned }
+            .forEach { locationRepository.remove(it) }
 
-                getPinnedShopsUseCase().first()
-            }
+        val resultList = getPinnedShopsUseCase().first()
+
         Assertions.assertEquals(0, resultList.count())
     }
 
     @Test
-    fun getShops_PinnedShopsDefined_ReturnPinnedShopsList() {
-        val pinnedCount: Int
-        val resultList: List<Location> =
-            runBlocking {
-                pinnedCount =
-                    testData.getRepository<LocationRepository>().getAll().count { it.pinned }
-                getPinnedShopsUseCase().first()
-            }
+    fun getShops_PinnedShopsDefined_ReturnPinnedShopsList() = runTest {
+        val pinnedCount: Int = dm.getRepository<LocationRepository>().getAll().count { it.pinned }
+
+        val resultList = getPinnedShopsUseCase().first()
 
         Assertions.assertEquals(pinnedCount, resultList.count())
     }

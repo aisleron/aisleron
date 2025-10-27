@@ -17,9 +17,15 @@
 
 package com.aisleron.domain.product
 
+import com.aisleron.domain.base.AisleronItem
+import com.aisleron.domain.note.Note
+import com.aisleron.domain.note.NoteParent
+
 data class Product(
-    val id: Int,
-    val name: String,
+    override val id: Int,
+    override val name: String,
     val inStock: Boolean,
-    val qtyNeeded: Int
-)
+    val qtyNeeded: Int,
+    override val noteId: Int? = null,
+    override val note: Note? = null
+) : AisleronItem, NoteParent

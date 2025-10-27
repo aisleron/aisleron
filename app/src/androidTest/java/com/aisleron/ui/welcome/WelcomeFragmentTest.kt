@@ -249,7 +249,8 @@ class WelcomeFragmentTest : KoinTest {
                     id = 0,
                     name = "Welcome Page Sample Items Error Test",
                     inStock = false,
-                    qtyNeeded = 0
+                    qtyNeeded = 0,
+                    noteId = null
                 )
             )
         }

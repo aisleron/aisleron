@@ -20,6 +20,7 @@ package com.aisleron.ui.shoppinglist
 interface ProductShoppingListItem : ShoppingListItem {
     val inStock: Boolean
     val qtyNeeded: Int
+    val noteId: Int?
 
     override val itemType: ShoppingListItem.ItemType
         get() = ShoppingListItem.ItemType.PRODUCT

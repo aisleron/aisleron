@@ -28,6 +28,7 @@ import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuProvider
 import androidx.core.view.doOnLayout
+import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
@@ -43,15 +44,18 @@ import com.aisleron.ui.ApplicationTitleUpdateListener
 import com.aisleron.ui.FabHandler
 import com.aisleron.ui.bundles.AddEditProductBundle
 import com.aisleron.ui.bundles.Bundler
+import com.aisleron.ui.settings.ProductPreferences
 import com.aisleron.ui.widgets.ErrorSnackBar
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ProductFragment(
     private val addEditFragmentListener: AddEditFragmentListener,
     private val applicationTitleUpdateListener: ApplicationTitleUpdateListener,
-    private val fabHandler: FabHandler
+    private val fabHandler: FabHandler,
+    private val productPreferences: ProductPreferences
 ) : Fragment(), MenuProvider, AisleronFragment {
 
     private val productViewModel: ProductViewModel by viewModel()
@@ -60,6 +64,8 @@ class ProductFragment(
     private val binding get() = _binding!!
 
     private var appTitle: String = ""
+
+    private var tabsAdapter: ProductTabsAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,6 +94,8 @@ class ProductFragment(
 
         _binding = FragmentProductBinding.inflate(inflater, container, false)
         setWindowInsetListeners(this, binding.root, false, R.dimen.text_margin)
+
+        initialiseTabs()
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -142,6 +150,49 @@ class ProductFragment(
         return binding.root
     }
 
+    private fun showHideExtraOptions() {
+        val toggle = binding.txtToggleExtraOptions
+        val extraOptions = binding.layoutExtraOptions
+        var expandDrawable: Int
+        if (productPreferences.showExtraOptions(requireContext())) {
+            extraOptions.visibility = View.VISIBLE
+            expandDrawable = R.drawable.baseline_expand_down_24
+        } else {
+            extraOptions.visibility = View.GONE
+            expandDrawable = R.drawable.baseline_expand_right_24
+        }
+
+        toggle.setCompoundDrawablesRelativeWithIntrinsicBounds(expandDrawable, 0, 0, 0)
+
+    }
+
+    private fun initialiseTabs() {
+        showHideExtraOptions()
+
+        // Expand / collapse extra options
+        binding.txtToggleExtraOptions.setOnClickListener {
+            val visible = binding.layoutExtraOptions.isVisible
+            productPreferences.setShowExtraOptions(requireContext(), !visible)
+            showHideExtraOptions()
+        }
+
+        // Setup tabs & pager
+        tabsAdapter = ProductTabsAdapter(this)
+        val viewPager = binding.pgrProductOptions
+        viewPager.adapter = tabsAdapter
+
+
+        TabLayoutMediator(binding.tabProductOptions, viewPager) { tab, position ->
+            tab.text = when (position) {
+                0 -> getString(R.string.tab_notes)
+                1 -> getString(R.string.product_tab_aisles)
+                2 -> getString(R.string.product_tab_barcodes)
+                3 -> getString(R.string.product_tab_inventory)
+                else -> ""
+            }
+        }.attach()
+    }
+
     private fun displayErrorSnackBar(
         errorCode: AisleronException.ExceptionCode, errorMessage: String?
     ) {
@@ -181,10 +232,14 @@ class ProductFragment(
             inStock: Boolean,
             addEditFragmentListener: AddEditFragmentListener,
             applicationTitleUpdateListener: ApplicationTitleUpdateListener,
-            fabHandler: FabHandler
+            fabHandler: FabHandler,
+            productPreferences: ProductPreferences
         ) =
             ProductFragment(
-                addEditFragmentListener, applicationTitleUpdateListener, fabHandler
+                addEditFragmentListener,
+                applicationTitleUpdateListener,
+                fabHandler,
+                productPreferences
             ).apply {
                 arguments = Bundler().makeAddProductBundle(name, inStock)
             }

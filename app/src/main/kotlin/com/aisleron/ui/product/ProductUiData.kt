@@ -19,5 +19,6 @@ package com.aisleron.ui.product
 
 data class ProductUiData(
     val productName: String = "",
-    val inStock: Boolean = false
+    val inStock: Boolean = false,
+    val noteText: String = ""
 )
