@@ -18,14 +18,32 @@
 package com.aisleron.ui.settings
 
 import android.content.Context
+import com.aisleron.BuildConfig
 
 class WelcomePreferencesTestImpl : WelcomePreferences {
 
     private var _isInitialized: Boolean = false
+    private var _lastUpdateVersionCode: Int = 11
+    private var _lastUpdateVersionName: String = "2025.8.0"
 
     override fun isInitialized(context: Context): Boolean = _isInitialized
 
     override fun setInitialised(context: Context) {
         _isInitialized = true
+    }
+
+    override fun getLastUpdateVersionCode(context: Context): Int = _lastUpdateVersionCode
+
+    override fun getLastUpdateVersionName(context: Context): String = _lastUpdateVersionName
+
+    override fun setLastUpdateValues(context: Context) {
+        setLastUpdateValues(context, BuildConfig.VERSION_CODE, BuildConfig.VERSION_NAME)
+    }
+
+    override fun setLastUpdateValues(
+        context: Context, lastUpdateVersionCode: Int, lastUpdateVersionName: String
+    ) {
+        _lastUpdateVersionCode = lastUpdateVersionCode
+        _lastUpdateVersionName = lastUpdateVersionName
     }
 }

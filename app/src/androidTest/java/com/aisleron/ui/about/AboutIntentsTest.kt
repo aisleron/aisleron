@@ -33,6 +33,8 @@ import com.aisleron.R
 import com.aisleron.di.KoinTestRule
 import com.aisleron.di.viewModelTestModule
 import org.hamcrest.Matchers
+import org.junit.After
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -85,6 +87,16 @@ class AboutIntentsTest(private val resourceId: Int, private val expectedUri: Str
         modules = listOf(viewModelTestModule)
     )
 
+    @Before
+    fun setUp() {
+        Intents.init()
+    }
+
+    @After
+    fun tearDown() {
+        Intents.release()
+    }
+
     private fun getFragmentScenario(): FragmentScenario<AboutFragment> =
         launchFragmentInContainer<AboutFragment>(
             themeResId = R.style.Theme_Aisleron,
@@ -94,13 +106,10 @@ class AboutIntentsTest(private val resourceId: Int, private val expectedUri: Str
     @Test
     fun onAboutEntryClick_OnLaunchIntent_OpensCorrectUri() {
         getFragmentScenario()
-        Intents.init()
 
         val expectedIntent = Matchers.allOf(hasAction(Intent.ACTION_VIEW), hasData(expectedUri))
         intending(expectedIntent).respondWith(Instrumentation.ActivityResult(0, null))
         onView(withText(resourceId)).perform(click())
         intended(expectedIntent)
-
-        Intents.release()
     }
 }

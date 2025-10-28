@@ -24,4 +24,14 @@ interface WelcomePreferences {
     fun isInitialized(context: Context): Boolean
 
     fun setInitialised(context: Context)
+
+    fun getLastUpdateVersionCode(context: Context): Int
+
+    fun getLastUpdateVersionName(context: Context): String
+
+    fun setLastUpdateValues(context: Context)
+
+    fun setLastUpdateValues(
+        context: Context, lastUpdateVersionCode: Int, lastUpdateVersionName: String
+    )
 }

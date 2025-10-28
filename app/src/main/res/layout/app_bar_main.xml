@@ -36,11 +36,73 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/toolbar_height"
             app:popupTheme="@style/Theme.Aisleron.PopupOverlay" />
-
-
     </com.google.android.material.appbar.AppBarLayout>
 
-    <include layout="@layout/content_main" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/update_banner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/text_margin"
+            android:visibility="gone"
+            tools:visibility="visible"
+            app:cardCornerRadius="@dimen/text_margin"
+            app:cardElevation="4dp"
+            android:layout_gravity="top"
+            app:cardBackgroundColor="?attr/colorSurface">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="@dimen/text_margin"
+                android:paddingTop="@dimen/text_margin"
+                android:paddingBottom="8dp">
+
+                <TextView
+                    android:id="@+id/txt_update_banner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/updated_notification"
+                    android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="8dp">
+
+                    <Button
+                        android:id="@+id/btn_update_dismiss"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/dismiss"
+                        style="@style/Widget.Material3.Button.TextButton.Dialog"
+                        android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+
+                    <Button
+                        android:id="@+id/btn_update_view_changes"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/view_changes"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                        android:drawableEnd="@drawable/baseline_launch_24" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+
+        <include layout="@layout/content_main" />
+    </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"

@@ -119,6 +119,7 @@
 
     <!-- URLs -->
     <string name="aisleron_documentation_url">https://aisleron.com/docs/documentation/</string>
+    <string name="aisleron_version_history_url">https://aisleron.com/docs/version-history</string>
 
     <!-- Loyalty cards -->
     <string name="shop_loyalty_card_name">Loyalty Card</string>
@@ -197,5 +198,8 @@
     <string name="show_note">Show note</string>
     <string name="note_dialog_title">Note for %1$s</string>
     <string name="loading">Loading…</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="view_changes">View Changes</string>
+    <string name="updated_notification">Aisleron was updated from %1$s to %2$s. </string>
 
 </resources>

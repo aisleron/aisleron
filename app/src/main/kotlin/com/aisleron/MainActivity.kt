@@ -17,6 +17,7 @@
 
 package com.aisleron
 
+import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Build
@@ -24,6 +25,7 @@ import android.os.Bundle
 import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
 import android.widget.FrameLayout
 import android.widget.LinearLayout
@@ -32,6 +34,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updateLayoutParams
@@ -50,6 +53,7 @@ import com.aisleron.ui.FabHandlerImpl
 import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.settings.DisplayPreferences
 import com.aisleron.ui.settings.DisplayPreferencesImpl
+import com.aisleron.ui.settings.WelcomePreferences
 import com.aisleron.ui.settings.WelcomePreferencesImpl
 import org.koin.androidx.fragment.android.setupKoinFragmentFactory
 
@@ -134,7 +138,11 @@ class MainActivity : AppCompatActivity() {
             FabHandlerImpl().setFabItems(this)
         }
 
-        if (!WelcomePreferencesImpl().isInitialized(this)) {
+        val welcomePreferences = WelcomePreferencesImpl()
+
+        initialiseUpdateBanner(welcomePreferences)
+
+        if (!welcomePreferences.isInitialized(this)) {
             navController.navigate(R.id.nav_welcome)
         }
     }
@@ -271,5 +279,42 @@ class MainActivity : AppCompatActivity() {
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
         prefs.unregisterOnSharedPreferenceChangeListener(prefsListener)
         super.onDestroy()
+    }
+
+    private fun initialiseUpdateBanner(welcomePreferences: WelcomePreferences) {
+        binding.appBarMain.txtUpdateBanner.text =
+            getString(
+                R.string.updated_notification,
+                welcomePreferences.getLastUpdateVersionName(this),
+                BuildConfig.VERSION_NAME
+            )
+
+        binding.appBarMain.btnUpdateDismiss.setOnClickListener {
+            dismissUpdateBanner()
+        }
+
+        binding.appBarMain.btnUpdateViewChanges.setOnClickListener {
+            val uri = getString(R.string.aisleron_version_history_url).toUri()
+            val intent = Intent(Intent.ACTION_VIEW, uri)
+            startActivity(intent)
+
+            dismissUpdateBanner()
+        }
+
+        val isInitialized = welcomePreferences.isInitialized(this)
+        val lastUpdatedVersionCode = welcomePreferences.getLastUpdateVersionCode(this)
+        binding.appBarMain.updateBanner.visibility =
+            if (isInitialized && (lastUpdatedVersionCode < BuildConfig.VERSION_CODE)) {
+                View.VISIBLE
+            } else {
+                View.GONE
+            }
+    }
+
+    private fun dismissUpdateBanner() {
+        val updateBanner = binding.appBarMain.updateBanner
+        val welcomePreferences = WelcomePreferencesImpl()
+        welcomePreferences.setLastUpdateValues(this)
+        updateBanner.visibility = View.GONE
     }
 }

@@ -17,8 +17,24 @@
 
 package com.aisleron
 
+import android.app.Activity
+import android.app.Instrumentation
+import android.content.Intent
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.net.toUri
+import androidx.preference.PreferenceManager
 import androidx.test.core.app.ActivityScenario
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions
+import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.intent.Intents
+import androidx.test.espresso.intent.Intents.intended
+import androidx.test.espresso.intent.Intents.intending
+import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
+import androidx.test.espresso.intent.matcher.IntentMatchers.hasData
+import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.aisleron.di.KoinTestRule
 import com.aisleron.di.daoTestModule
 import com.aisleron.di.fragmentModule
@@ -34,6 +50,7 @@ import com.aisleron.ui.ApplicationTitleUpdateListener
 import com.aisleron.ui.ApplicationTitleUpdateListenerImpl
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
+import org.hamcrest.Matchers.allOf
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -85,7 +102,7 @@ class MainActivityTest : KoinTest {
         )
     }
 
-    private fun appStart_TestHomeListOptions(filterType: FilterType, expectedResId: Int){
+    private fun appStart_TestHomeListOptions(filterType: FilterType, expectedResId: Int) {
         declare<ApplicationTitleUpdateListener> { ApplicationTitleUpdateListenerImpl() }
         val locationId = 1
 
@@ -130,5 +147,122 @@ class MainActivityTest : KoinTest {
         activity.onActivity {
             assertEquals(location.name, it.supportActionBar?.title)
         }
+    }
+
+    @Test
+    fun onCreate_LastUpdateVersionBelowCurrentVersion_DisplayUpdateNotification() {
+        val prefs = SharedPreferencesInitializer()
+        prefs.setIsInitialized(true)
+        prefs.setLastUpdateCode(1)
+        prefs.setLastUpdateName("2025.1.0")
+
+        ActivityScenario.launch(MainActivity::class.java)
+
+        onView(withId(R.id.update_banner)).check(
+            matches(
+                ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)
+            )
+        )
+    }
+
+    @Test
+    fun onCreate_LastUpdateVersionIsCurrentVersion_DoNotDisplayUpdateNotification() {
+        val prefs = SharedPreferencesInitializer()
+        prefs.setIsInitialized(true)
+        prefs.setLastUpdateCode(BuildConfig.VERSION_CODE)
+        prefs.setLastUpdateName(BuildConfig.VERSION_NAME)
+
+        ActivityScenario.launch(MainActivity::class.java)
+
+        onView(withId(R.id.update_banner)).check(
+            matches(
+                ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE)
+            )
+        )
+    }
+
+    @Test
+    fun onCreate_AppNotInitialized_DoNotDisplayUpdateNotification() {
+        val prefs = SharedPreferencesInitializer()
+        prefs.setIsInitialized(false)
+        prefs.setLastUpdateCode(1)
+        prefs.setLastUpdateName("2025.1.0")
+
+        ActivityScenario.launch(MainActivity::class.java)
+
+        onView(withId(R.id.update_banner)).check(
+            matches(
+                ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE)
+            )
+        )
+    }
+
+    @Test
+    fun onClick_Dismiss_DismissNotification() {
+        val prefs = SharedPreferencesInitializer()
+        prefs.setIsInitialized(true)
+        prefs.setLastUpdateCode(1)
+        prefs.setLastUpdateName("2025.1.0")
+        ActivityScenario.launch(MainActivity::class.java)
+
+        onView(withId(R.id.btn_update_dismiss)).perform(ViewActions.click())
+
+        onView(withId(R.id.update_banner)).check(
+            matches(
+                ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE)
+            )
+        )
+    }
+
+    @Test
+    fun onClick_ViewChanges_ShowChangeLogAndDismissNotification() = runTest {
+        val prefs = SharedPreferencesInitializer()
+        prefs.setIsInitialized(true)
+        prefs.setLastUpdateCode(1)
+        prefs.setLastUpdateName("2025.1.0")
+        var uri = "".toUri()
+
+        ActivityScenario.launch(MainActivity::class.java).onActivity {
+            uri = it.getString(R.string.aisleron_version_history_url).toUri()
+        }
+
+        Intents.init()
+
+        intending(
+            allOf(hasAction(Intent.ACTION_VIEW), hasData(uri))
+        ).respondWith(
+            Instrumentation.ActivityResult(Activity.RESULT_OK, null)
+        )
+
+        onView(withId(R.id.btn_update_view_changes)).perform(ViewActions.click())
+
+        intended(allOf(hasAction(Intent.ACTION_VIEW), hasData(uri)))
+        onView(withId(R.id.update_banner)).check(
+            matches(
+                ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE)
+            )
+        )
+
+        Intents.release()
+    }
+
+    @Test
+    fun onClick_DismissOrViewChanges_PreferencesUpdated() {
+        val prefs = SharedPreferencesInitializer()
+        prefs.setIsInitialized(true)
+        prefs.setLastUpdateCode(1)
+        prefs.setLastUpdateName("2025.1.0")
+        ActivityScenario.launch(MainActivity::class.java)
+
+        onView(withId(R.id.btn_update_dismiss)).perform(ViewActions.click())
+
+        val sharedPrefs =
+            PreferenceManager.getDefaultSharedPreferences(getInstrumentation().targetContext)
+
+        val updateCodeAfter = sharedPrefs.getInt("last_update_code", 0)
+        assertEquals(BuildConfig.VERSION_CODE, updateCodeAfter)
+
+        val updateNameAfter = sharedPrefs.getString("last_update_name", "")
+        assertEquals(BuildConfig.VERSION_NAME, updateNameAfter)
     }
 }
