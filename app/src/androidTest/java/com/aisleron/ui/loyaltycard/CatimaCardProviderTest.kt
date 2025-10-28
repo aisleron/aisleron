@@ -132,7 +132,7 @@ class CatimaCardProviderTest {
     }
 
     @Test(expected = com.aisleron.domain.base.AisleronException.LoyaltyCardProviderException::class)
-    fun displayLoyaltyCard_ProviderNoyInstalled_ThrowLoyaltyCardProviderException() {
+    fun displayLoyaltyCard_ProviderNotInstalled_ThrowLoyaltyCardProviderException() {
         (provider.packageChecker as PackageCheckerTestImpl).isPackageInstalledResult = false
         val loyaltyCard = LoyaltyCard(
             id = 1,
@@ -174,8 +174,7 @@ class CatimaCardProviderTest {
     @Test
     fun getNotInstalledDialog_Called_DialogReturned() {
         getFragmentScenario(provider).onFragment { fragment ->
-            val alertDialog = provider.getNotInstalledDialog(fragment.requireContext())
-            alertDialog.show()
+            provider.showNotInstalledDialog(fragment.requireContext())
         }
 
         onView(withText(R.string.loyalty_card_provider_missing_title))
@@ -189,7 +188,7 @@ class CatimaCardProviderTest {
 
         getFragmentScenario(provider).onFragment { fragment ->
             alertDialog = provider.getNotInstalledDialog(fragment.requireContext())
-            alertDialog?.show()
+            alertDialog.show()
         }
 
         onView(withText(android.R.string.cancel))
@@ -213,7 +212,7 @@ class CatimaCardProviderTest {
 
         getFragmentScenario(provider).onFragment { fragment ->
             alertDialog = provider.getNotInstalledDialog(fragment.requireContext())
-            alertDialog?.show()
+            alertDialog.show()
         }
 
         onView(withText(android.R.string.ok))
@@ -224,13 +223,4 @@ class CatimaCardProviderTest {
         intended(allOf(hasAction(Intent.ACTION_VIEW), hasData(provider.providerWebsite.toUri())))
         assertEquals(false, alertDialog?.isShowing)
     }
-
-
-    /**
-     * To Test:
-     * - getNotInstalledDialog
-     *      - Dialog returned
-     *      - Cancel does nothing
-     *      - Ok launches intent
-     */
 }
