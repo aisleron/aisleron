@@ -115,7 +115,6 @@
                                     <map>
                                       <entry key="backgroundAssetType" value="COLOR" />
                                       <entry key="backgroundColor" value="448aff" />
-                                      <entry key="legacyIconShape" value="CIRCLE" />
                                       <entry key="outputName" value="ic_aisleron" />
                                     </map>
                                   </option>
@@ -310,7 +309,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/opt/android-studio/plugins/android/lib/android.jar!/images/material/icons/materialicons/sticky_note_2/baseline_sticky_note_2_24.xml" />
+                                      <entry key="url" value="jar:file:/opt/android-studio/plugins/android/lib/android.jar!/images/material/icons/materialicons/launch/baseline_launch_24.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -320,7 +319,7 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="outputName" value="baseline_sticky_note_2_24" />
+                            <entry key="outputName" value="baseline_launch_24" />
                             <entry key="sourceFile" value="$USER_HOME$/Downloads/Aisleron/loyalty_card_24dp.svg" />
                           </map>
                         </option>

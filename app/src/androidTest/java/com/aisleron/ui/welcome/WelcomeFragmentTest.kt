@@ -40,6 +40,7 @@ import androidx.test.espresso.matcher.ViewMatchers.isEnabled
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import com.aisleron.BuildConfig
 import com.aisleron.MainActivity
 import com.aisleron.R
 import com.aisleron.SharedPreferencesInitializer
@@ -375,6 +376,30 @@ class WelcomeFragmentTest : KoinTest {
                     withText(startsWith("ERROR:"))
                 )
             )
+        )
+    }
+
+    @Test
+    fun welcomePage_Initialized_UpdateVersionParametersSet() {
+        val welcomePreferences = WelcomePreferencesTestImpl()
+        val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
+        getFragmentScenario(welcomePreferences).onFragment { fragment ->
+            navController.setGraph(R.navigation.mobile_navigation)
+            navController.setCurrentDestination(R.id.nav_welcome)
+            Navigation.setViewNavController(fragment.requireView(), navController)
+        }
+
+        val welcomeOption = onView(withId(R.id.txt_welcome_load_sample_items))
+        welcomeOption.perform(click())
+
+        assertEquals(
+            welcomePreferences.getLastUpdateVersionCode(getInstrumentation().targetContext),
+            BuildConfig.VERSION_CODE
+        )
+
+        assertEquals(
+            welcomePreferences.getLastUpdateVersionName(getInstrumentation().targetContext),
+            BuildConfig.VERSION_NAME
         )
     }
 }

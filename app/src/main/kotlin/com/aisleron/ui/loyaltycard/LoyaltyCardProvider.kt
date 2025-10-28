@@ -76,4 +76,12 @@ interface LoyaltyCardProvider {
 
         return builder.create()
     }
+
+    fun showNotInstalledDialog(context: Context) {
+        val dialog = getNotInstalledDialog(context)
+        dialog.show()
+        val positive = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+        positive.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.baseline_launch_24, 0)
+        positive.compoundDrawablePadding = 12
+    }
 }

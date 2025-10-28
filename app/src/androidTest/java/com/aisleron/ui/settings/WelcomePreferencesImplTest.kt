@@ -19,9 +19,11 @@ package com.aisleron.ui.settings
 
 import androidx.preference.PreferenceManager
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import com.aisleron.BuildConfig
 import com.aisleron.SharedPreferencesInitializer
 import org.junit.Before
 import org.junit.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -60,5 +62,83 @@ class WelcomePreferencesImplTest {
                 .getBoolean("is_initialised", false)
 
         assertTrue(isInitialized)
+    }
+
+    @Test
+    fun getLastUpdateVersionCode_NoValueDefined_ReturnDefaultValue() {
+        val defaultValue = 11
+
+        val lastUpdateVersionCode =
+            WelcomePreferencesImpl().getLastUpdateVersionCode(getInstrumentation().targetContext)
+
+        assertEquals(defaultValue, lastUpdateVersionCode)
+    }
+
+    @Test
+    fun getLastUpdateVersionCode_ValueDefined_ReturnValue() {
+        val versionCode = 15
+        SharedPreferencesInitializer().setLastUpdateCode(versionCode)
+
+        val lastUpdateVersionCode =
+            WelcomePreferencesImpl().getLastUpdateVersionCode(getInstrumentation().targetContext)
+
+        assertEquals(versionCode, lastUpdateVersionCode)
+    }
+
+    @Test
+    fun getLastUpdateVersionName_NoValueDefined_ReturnDefaultValue() {
+        val defaultValue = "2025.8.0"
+
+        val lastUpdateVersionCode =
+            WelcomePreferencesImpl().getLastUpdateVersionName(getInstrumentation().targetContext)
+
+        assertEquals(defaultValue, lastUpdateVersionCode)
+    }
+
+    @Test
+    fun getLastUpdateVersionName_ValueDefined_ReturnValue() {
+        val versionName = "2025.100.0"
+        SharedPreferencesInitializer().setLastUpdateName(versionName)
+
+        val lastUpdateVersionName =
+            WelcomePreferencesImpl().getLastUpdateVersionName(getInstrumentation().targetContext)
+
+        assertEquals(versionName, lastUpdateVersionName)
+    }
+
+    @Test
+    fun setLastUpdateValues_NoValuesProvided_SetFromBuildConfig() {
+        val versionCode = BuildConfig.VERSION_CODE
+        val versionName = BuildConfig.VERSION_NAME
+
+        WelcomePreferencesImpl().setLastUpdateValues(getInstrumentation().targetContext)
+
+        val prefs =
+            PreferenceManager.getDefaultSharedPreferences(getInstrumentation().targetContext)
+
+        val updatedVersionCode = prefs.getInt("last_update_code", 0)
+        assertEquals(versionCode, updatedVersionCode)
+
+        val updatedVersionName = prefs.getString("last_update_name", "")
+        assertEquals(versionName, updatedVersionName)
+    }
+
+    @Test
+    fun setLastUpdateValues_ValuesProvided_SetToProvidedValues() {
+        val versionCode = -3
+        val versionName = "2025.100.0"
+
+        WelcomePreferencesImpl().setLastUpdateValues(
+            getInstrumentation().targetContext, versionCode, versionName
+        )
+
+        val prefs =
+            PreferenceManager.getDefaultSharedPreferences(getInstrumentation().targetContext)
+
+        val updatedVersionCode = prefs.getInt("last_update_code", 0)
+        assertEquals(versionCode, updatedVersionCode)
+
+        val updatedVersionName = prefs.getString("last_update_name", "")
+        assertEquals(versionName, updatedVersionName)
     }
 }

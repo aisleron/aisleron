@@ -208,7 +208,8 @@ class ShopFragment(
         try {
             loyaltyCardProvider.lookupLoyaltyCardShortcut(requireContext())
         } catch (_: AisleronException.LoyaltyCardProviderException) {
-            loyaltyCardProvider.getNotInstalledDialog(requireContext()).show()
+            loyaltyCardProvider.showNotInstalledDialog(requireContext())
+
         } catch (e: Exception) {
             displayErrorSnackBar(AisleronException.ExceptionCode.GENERIC_EXCEPTION, e.message)
         }

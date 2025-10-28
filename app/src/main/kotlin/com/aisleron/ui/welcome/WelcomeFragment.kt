@@ -90,7 +90,7 @@ class WelcomeFragment(
         with(binding.txtWelcomeAddOwnProduct) {
             text = Html.fromHtml(getString(R.string.welcome_add_own_product), FROM_HTML_MODE_LEGACY)
             setOnClickListener { _ ->
-                welcomePreferences.setInitialised(requireContext())
+                setInitialised()
                 navigateTo(R.id.nav_in_stock)
             }
         }
@@ -98,7 +98,7 @@ class WelcomeFragment(
         with(binding.txtWelcomeImportDb) {
             text = Html.fromHtml(getString(R.string.welcome_import_db), FROM_HTML_MODE_LEGACY)
             setOnClickListener { _ ->
-                welcomePreferences.setInitialised(requireContext())
+                setInitialised()
                 navigateTo(R.id.nav_settings)
             }
         }
@@ -123,7 +123,7 @@ class WelcomeFragment(
                             }
 
                             is WelcomeViewModel.WelcomeUiState.SampleDataLoaded -> {
-                                welcomePreferences.setInitialised(requireContext())
+                                setInitialised()
                                 navigateTo(R.id.nav_in_stock)
                             }
 
@@ -156,5 +156,10 @@ class WelcomeFragment(
         val snackBarMessage =
             getString(AisleronExceptionMap().getErrorResourceId(errorCode), errorMessage)
         ErrorSnackBar().make(requireView(), snackBarMessage, Snackbar.LENGTH_SHORT).show()
+    }
+
+    private fun setInitialised() {
+        welcomePreferences.setInitialised(requireContext())
+        welcomePreferences.setLastUpdateValues(requireContext())
     }
 }

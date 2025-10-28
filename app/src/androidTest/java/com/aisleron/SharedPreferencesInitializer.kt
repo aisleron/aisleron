@@ -42,48 +42,42 @@ class SharedPreferencesInitializer {
         return PreferenceManager.getDefaultSharedPreferences(targetContext).edit()
     }
 
-    fun setIsInitialized(isInitialized: Boolean) {
+    private fun <T> setPreferenceValue(name: String, value: T) {
         val preferencesEditor = getPreferencesEditor()
-        preferencesEditor.putBoolean(IS_INITIALIZED, isInitialized)
+        when (value) {
+            is Boolean -> preferencesEditor.putBoolean(name, value)
+            is String -> preferencesEditor.putString(name, value)
+            is Int -> preferencesEditor.putInt(name, value)
+        }
         preferencesEditor.commit()
+    }
 
+    fun setIsInitialized(isInitialized: Boolean) {
+        setPreferenceValue(IS_INITIALIZED, isInitialized)
     }
 
     fun setApplicationTheme(applicationTheme: ApplicationTheme) {
-        val preferencesEditor = getPreferencesEditor()
-        preferencesEditor.putString(APPLICATION_THEME, applicationTheme.key)
-        preferencesEditor.commit()
+        setPreferenceValue(APPLICATION_THEME, applicationTheme.key)
     }
 
     fun setHideStatusChangeSnackBar(hideStatusChangeSnackBar: Boolean) {
-        val preferencesEditor = getPreferencesEditor()
-        preferencesEditor.putBoolean(PREF_HIDE_STATUS_CHANGE_SNACK_BAR, hideStatusChangeSnackBar)
-        preferencesEditor.commit()
+        setPreferenceValue(PREF_HIDE_STATUS_CHANGE_SNACK_BAR, hideStatusChangeSnackBar)
     }
 
     fun setShowOnLockScreen(showOnLockscreen: Boolean) {
-        val preferencesEditor = getPreferencesEditor()
-        preferencesEditor.putBoolean(PREF_DISPLAY_LOCKSCREEN, showOnLockscreen)
-        preferencesEditor.commit()
+        setPreferenceValue(PREF_DISPLAY_LOCKSCREEN, showOnLockscreen)
     }
 
     fun setShowEmptyAisles(showEmptyAisles: Boolean) {
-        val preferencesEditor = getPreferencesEditor()
-        preferencesEditor.putBoolean(PREF_SHOW_EMPTY_AISLES, showEmptyAisles)
-        preferencesEditor.commit()
+        setPreferenceValue(PREF_SHOW_EMPTY_AISLES, showEmptyAisles)
     }
 
     fun setTrackingMode(trackingMode: TrackingMode) {
-        val preferencesEditor = getPreferencesEditor()
-        preferencesEditor.putString(PREF_TRACKING_MODE, trackingMode.value)
-        preferencesEditor.commit()
-
+        setPreferenceValue(PREF_TRACKING_MODE, trackingMode.value)
     }
 
     fun setKeepScreenOn(keepScreenOn: Boolean) {
-        val preferencesEditor = getPreferencesEditor()
-        preferencesEditor.putBoolean(PREF_KEEP_SCREEN_ON, keepScreenOn)
-        preferencesEditor.commit()
+        setPreferenceValue(PREF_KEEP_SCREEN_ON, keepScreenOn)
     }
 
     fun setStartingList(locationId: Int, filterType: FilterType) {
@@ -91,9 +85,7 @@ class SharedPreferencesInitializer {
     }
 
     fun setStartingList(value: String) {
-        val preferencesEditor = getPreferencesEditor()
-        preferencesEditor.putString(PREF_STARTING_LIST, value)
-        preferencesEditor.commit()
+        setPreferenceValue(PREF_STARTING_LIST, value)
     }
 
     fun clearPreferences() {
@@ -103,15 +95,19 @@ class SharedPreferencesInitializer {
     }
 
     fun setShowProductExtraOptions(value: Boolean) {
-        val preferencesEditor = getPreferencesEditor()
-        preferencesEditor.putBoolean(PREF_SHOW_PRODUCT_EXTRA_OPTIONS, value)
-        preferencesEditor.commit()
+        setPreferenceValue(PREF_SHOW_PRODUCT_EXTRA_OPTIONS, value)
     }
 
     fun setShowShopExtraOptions(value: Boolean) {
-        val preferencesEditor = getPreferencesEditor()
-        preferencesEditor.putBoolean(PREF_SHOW_SHOP_EXTRA_OPTIONS, value)
-        preferencesEditor.commit()
+        setPreferenceValue(PREF_SHOW_SHOP_EXTRA_OPTIONS, value)
+    }
+
+    fun setLastUpdateCode(value: Int) {
+        setPreferenceValue(PREF_LAST_UPDATE_CODE, value)
+    }
+
+    fun setLastUpdateName(value: String) {
+        setPreferenceValue(PREF_LAST_UPDATE_NAME, value)
     }
 
     companion object {
@@ -125,5 +121,7 @@ class SharedPreferencesInitializer {
         private const val PREF_DISPLAY_LOCKSCREEN = "display_lockscreen"
         private const val PREF_SHOW_PRODUCT_EXTRA_OPTIONS = "show_product_extra_options"
         private const val PREF_SHOW_SHOP_EXTRA_OPTIONS = "show_shop_extra_options"
+        private const val PREF_LAST_UPDATE_CODE = "last_update_code"
+        private const val PREF_LAST_UPDATE_NAME = "last_update_name"
     }
 }

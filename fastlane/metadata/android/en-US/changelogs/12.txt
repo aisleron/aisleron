@@ -4,6 +4,7 @@ Enhancements:
 * Added an option to select the application's starting list (#52)
 * Added an option to Expand/Contract all Aisles (#61)
 * Added Notes to Product and Shop (#38)
+* Added an update notification banner
 
 Bug Fixes:
 *

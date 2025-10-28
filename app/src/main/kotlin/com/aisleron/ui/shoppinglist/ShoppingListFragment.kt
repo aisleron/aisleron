@@ -527,7 +527,7 @@ class ShoppingListFragment(
         try {
             loyaltyCardProvider.displayLoyaltyCard(requireContext(), loyaltyCard)
         } catch (_: AisleronException.LoyaltyCardProviderException) {
-            loyaltyCardProvider.getNotInstalledDialog(requireContext()).show()
+            loyaltyCardProvider.showNotInstalledDialog(requireContext())
         } catch (e: Exception) {
             displayErrorSnackBar(
 
