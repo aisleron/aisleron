@@ -26,7 +26,7 @@
             android:summary="@string/about_support_version_summary">
             <intent
                 android:action="android.intent.action.VIEW"
-                android:data="https://aisleron.com/docs/version-history" />
+                android:data="@string/aisleron_version_history_url" />
         </Preference>
         <Preference
             android:key="about_documentation"
