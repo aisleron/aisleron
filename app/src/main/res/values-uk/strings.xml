@@ -139,4 +139,17 @@
     <string name="qty">Йти</string>
     <string name="starting_list">Стартовий список</string>
     <string name="expand_collapse_aisles">Розгорнути/згорнути проходи</string>
+    <string name="aisleron_version_history_url">https://aisleron.com/docs/version-history</string>
+    <string name="extra_options">Додаткові опції</string>
+    <string name="tab_notes">Нотатки</string>
+    <string name="product_tab_aisles">Проходи</string>
+    <string name="product_tab_barcodes">Штрих-коди</string>
+    <string name="product_tab_inventory">Інвентаризація</string>
+    <string name="notes_hint">Введіть тут нотатки…</string>
+    <string name="show_note">Показати нотатку</string>
+    <string name="note_dialog_title">Примітка для %1$s</string>
+    <string name="loading">Завантаження…</string>
+    <string name="dismiss">Відхилити</string>
+    <string name="view_changes">Переглянути зміни</string>
+    <string name="updated_notification">Айслерона оновлено з %1$s до %2$s.</string>
 </resources>
