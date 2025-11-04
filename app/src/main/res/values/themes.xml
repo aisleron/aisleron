@@ -95,7 +95,11 @@
     </style>
 
     <style name="Theme.Aisleron.Snackbar" parent="Widget.MaterialComponents.Snackbar">
-        <item name="shapeAppearance">@style/ShapeAppearance.Material3.Corner.Large</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.Aisleron.Rounded</item>
+    </style>
+
+    <style name="ShapeAppearance.Aisleron.Rounded" parent="ShapeAppearance.MaterialComponents.MediumComponent">
+        <item name="cornerSize">16dp</item>
     </style>
 
 </resources>
