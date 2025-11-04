@@ -1,7 +1,7 @@
 Enhancements:
-* Added Notes to Products and Shops (#38)
-* Added an option to choose the starting list when the app opens (#52)
-* Added an option to expand or collapse all aisles at once (#61)
+* Added Notes to Products and Shops
+* Added an option to choose the starting list when the app opens
+* Added an option to expand or collapse all aisles at once
 * Introduced an update notification banner to highlight new versions
 * Updated French and Swedish translations
 * Added Ukrainian translation
