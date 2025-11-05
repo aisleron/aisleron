@@ -246,17 +246,6 @@
             "locationId"
           ]
         },
-        "indices": [
-          {
-            "name": "index_LocationLoyaltyCard_loyaltyCardId",
-            "unique": false,
-            "columnNames": [
-              "loyaltyCardId"
-            ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_LocationLoyaltyCard_loyaltyCardId` ON `${TABLE_NAME}` (`loyaltyCardId`)"
-          }
-        ],
         "foreignKeys": [
           {
             "table": "Location",
@@ -285,7 +274,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '22fb3b419701d947cd4ca672d0284e50')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'bdab45e99a60d1a4f2021a3fb0b772b1')"
     ]
   }
 }

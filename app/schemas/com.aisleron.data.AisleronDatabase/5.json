@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 5,
-    "identityHash": "cc67659f71233b7c13e335e4dff89884",
+    "identityHash": "02c65dd7ed2b01c612adf4aed2681f04",
     "entities": [
       {
         "tableName": "Aisle",
@@ -304,17 +304,6 @@
             "locationId"
           ]
         },
-        "indices": [
-          {
-            "name": "index_LocationLoyaltyCard_loyaltyCardId",
-            "unique": false,
-            "columnNames": [
-              "loyaltyCardId"
-            ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_LocationLoyaltyCard_loyaltyCardId` ON `${TABLE_NAME}` (`loyaltyCardId`)"
-          }
-        ],
         "foreignKeys": [
           {
             "table": "Location",
@@ -367,7 +356,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'cc67659f71233b7c13e335e4dff89884')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '02c65dd7ed2b01c612adf4aed2681f04')"
     ]
   }
 }
