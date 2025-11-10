@@ -1,8 +1,9 @@
 Verbesserungen
-*Neu: Kopieren von Shops und Produkten möglich
-*Ein-/Ausblenden leerer Regale möglich.
-*Rückkehr zurWillkommensseite beim Erststart möglich.
+*Neu: Kopieren von Shops und Produkten 
+*Ein-/Ausblenden leerer Regale
+*Rückkehr zur Willkommensseite beim Erststart möglich.
 Regalnamen sind pro Shop eindeutig.
 Behobene Fehler
-* Fix #44: Eingaben bei Produkt oder Geschäft hinzufügen/ bearbeiten verschwinden beim Wechseln der App./
-* Fix #42: Nach Wiederstellung der Datenbank erscheinen Geschäfte nicht in der Navigationsleiste.
+* Hinzugefügte/bearbeitete Produkt oder Geschäft verschwinden nicht mehr beim Wechseln der App./
+* Verschwinden von Geschäften aus der Navigationsleiste nach Wiederstellung der Datenbank behoben.
+* Scrollproblem beim Verschieben von Produkten behoben
