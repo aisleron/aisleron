@@ -1,0 +1,11 @@
+Miglioramenti
+* Aggiunto un'opzione per mostrare o nascondere la navata predefinita in un negozio.
+* Impostazioni di visibilità migliorate: i prodotti non mappati sono ora nascosti quando la navata predefinita è nascosta.
+* Introdotto funzionalità di espansione / collasso per le navate.
+* Aggiunto un'opzione per mostrare o nascondere navate vuote, con navate vuote nascoste per impostazione predefinita.
+* Abilitato la modifica di un negozio direttamente dalla lista della spesa.
+* Aggiunto un'opzione per ordinare un elenco per nome.
+* Aggiunto testo esplicativo a liste vuote per chiarire perché non vengono mostrati elementi.
+
+Correzioni di bug
+# Migliorata l'affidabilità delle azioni a lunga pressione sugli articoli della lista della spesa.
