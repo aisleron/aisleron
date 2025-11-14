@@ -1,0 +1,2 @@
+# Tweak l'intestazione del cassetto di navigazione per essere più efficiente dello spazio
+# Fissare alcune incongruenze con la selezione / deselezionare gli elementi in liste

@@ -1,0 +1,10 @@
+Miglioramenti:
+* Nuovo: Copia un negozio o un prodotto
+* Opzione per mostrare o nascondere navate vuote
+* Ritorno alla schermata di benvenuto durante la prima esecuzione
+# I nomi di Aisle sono ora unici per l'elenco
+
+Correzioni di bug:
+* Dettagli prodotto / negozio non più chiaro quando si passano le applicazioni
+* Risolto mancanti negozi fissati dopo il ripristino del database
+* Fisso scorrere quando trascina i prodotti

@@ -1,0 +1,7 @@
+Miglioramenti:
+* Aggiunto Note a Prodotti e Negozi
+* Aggiunto un'opzione per scegliere l'elenco di partenza quando l'app si apre
+* Aggiunto un'opzione per espandere o collassare tutte le navate contemporaneamente
+# Presentato un banner di notifica di aggiornamento per evidenziare nuove versioni
+* Traduzioni francesi e svedesi aggiornate
+* Aggiunto traduzione ucraina
