@@ -1,0 +1,6 @@
+Enhancements:
+* Implemented Material 3 design
+* Added Italian translations
+
+Bug Fixes:
+*

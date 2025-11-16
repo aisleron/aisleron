@@ -31,7 +31,7 @@ import com.aisleron.ui.loyaltycard.PackageCheckerImpl
 import org.koin.dsl.module
 
 val generalModule = module {
-    factory<FabHandler> { FabHandlerImpl() }
+    single<FabHandler> { FabHandlerImpl() }
     factory<ApplicationTitleUpdateListener> { ApplicationTitleUpdateListenerImpl() }
     factory<AddEditFragmentListener> { AddEditFragmentListenerImpl() }
     factory<LoyaltyCardProvider> { CatimaCardProvider(PackageCheckerImpl()) }

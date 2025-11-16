@@ -70,6 +70,8 @@ android {
         base.archivesName = "$applicationId-$versionName"
 
         testInstrumentationRunner = "com.aisleron.di.KoinInstrumentationTestRunner"
+
+        testInstrumentationRunnerArguments["notPackage"] = "com.aisleron.screenshots"
     }
 
     ksp {
@@ -95,7 +97,6 @@ android {
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-DEBUG"
             resValue("string", "app_name", "Aisleron Debug")
-            resValue("string", "nav_header_title", "Aisleron Debug")
         }
     }
     compileOptions {
@@ -203,6 +204,8 @@ dependencies {
     // androidx.test.espresso:espresso-core:3.6.1
     // androidx.test.espresso:espresso-intents:3.7.0
     androidTestImplementation("org.hamcrest:hamcrest:2.2")
+
+    androidTestImplementation("tools.fastlane:screengrab:2.1.1")
 
     debugImplementation("androidx.fragment:fragment-testing:1.8.9")
 }

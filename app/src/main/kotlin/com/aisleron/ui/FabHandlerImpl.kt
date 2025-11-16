@@ -18,40 +18,37 @@
 package com.aisleron.ui
 
 import android.app.Activity
+import android.content.res.ColorStateList
 import android.view.View
-import android.widget.TextView
+import androidx.annotation.AttrRes
 import androidx.core.content.res.ResourcesCompat
 import androidx.navigation.findNavController
 import com.aisleron.R
 import com.aisleron.ui.FabHandler.FabClickedCallBack
 import com.aisleron.ui.bundles.Bundler
+import com.google.android.material.color.MaterialColors
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.shape.ShapeAppearanceModel
 
 class FabHandlerImpl : FabHandler {
 
     private fun fabMain(activity: Activity) = activity.findViewById<FloatingActionButton>(R.id.fab)
 
     private fun fabAddProduct(activity: Activity) =
-        activity.findViewById<FloatingActionButton>(R.id.fab_add_product)
-
-    private fun lblAddProduct(activity: Activity) =
-        activity.findViewById<TextView>(R.id.add_product_fab_label)
+        activity.findViewById<ExtendedFloatingActionButton>(R.id.fab_add_product)
 
     private fun fabAddAisle(activity: Activity) =
-        activity.findViewById<FloatingActionButton>(R.id.fab_add_aisle)
-
-    private fun lblAddAisle(activity: Activity) =
-        activity.findViewById<TextView>(R.id.add_aisle_fab_label)
+        activity.findViewById<ExtendedFloatingActionButton>(R.id.fab_add_aisle)
 
     private fun fabAddShop(activity: Activity) =
-        activity.findViewById<FloatingActionButton>(R.id.fab_add_shop)
-
-    private fun lblAddShop(activity: Activity) =
-        activity.findViewById<TextView>(R.id.add_shop_fab_label)
+        activity.findViewById<ExtendedFloatingActionButton>(R.id.fab_add_shop)
 
     private var fabEntries = mutableListOf<FabHandler.FabOption>()
 
     private var allFabAreHidden: Boolean = true
+
+    private var originalMainFabShape: ShapeAppearanceModel? = null
 
     override fun getFabView(activity: Activity): View? = fabMain(activity)
 
@@ -60,32 +57,27 @@ class FabHandlerImpl : FabHandler {
         _fabClickedCallBack = fabClickedCallBack
     }
 
-    private fun hideSingleFabViews(fab: FloatingActionButton, label: TextView) {
+    private fun hideSingleFabViews(fab: ExtendedFloatingActionButton) {
         fab.hide()
-        label.visibility = View.GONE
     }
 
-    private fun showSingleFabViews(fab: FloatingActionButton, label: TextView) {
+    private fun showSingleFabViews(fab: ExtendedFloatingActionButton) {
         fab.show()
-        label.visibility = View.VISIBLE
     }
 
     private fun hideAllFab(activity: Activity) {
         for (fabOption in FabHandler.FabOption.entries) {
             when (fabOption) {
                 FabHandler.FabOption.ADD_PRODUCT -> hideSingleFabViews(
-                    fabAddProduct(activity),
-                    lblAddProduct(activity)
+                    fabAddProduct(activity)
                 )
 
                 FabHandler.FabOption.ADD_AISLE -> hideSingleFabViews(
-                    fabAddAisle(activity),
-                    lblAddAisle(activity)
+                    fabAddAisle(activity)
                 )
 
                 FabHandler.FabOption.ADD_SHOP -> hideSingleFabViews(
-                    fabAddShop(activity),
-                    lblAddShop(activity)
+                    fabAddShop(activity)
                 )
             }
         }
@@ -97,18 +89,15 @@ class FabHandlerImpl : FabHandler {
         for (fabOption in fabEntries) {
             when (fabOption) {
                 FabHandler.FabOption.ADD_PRODUCT -> showSingleFabViews(
-                    fabAddProduct(activity),
-                    lblAddProduct(activity)
+                    fabAddProduct(activity)
                 )
 
                 FabHandler.FabOption.ADD_AISLE -> showSingleFabViews(
-                    fabAddAisle(activity),
-                    lblAddAisle(activity)
+                    fabAddAisle(activity)
                 )
 
                 FabHandler.FabOption.ADD_SHOP -> showSingleFabViews(
-                    fabAddShop(activity),
-                    lblAddShop(activity)
+                    fabAddShop(activity)
                 )
             }
         }
@@ -132,7 +121,7 @@ class FabHandlerImpl : FabHandler {
 
     private fun getFabFromOption(
         fabOption: FabHandler.FabOption, activity: Activity
-    ): FloatingActionButton =
+    ): ExtendedFloatingActionButton =
         when (fabOption) {
             FabHandler.FabOption.ADD_PRODUCT -> fabAddProduct(activity)
             FabHandler.FabOption.ADD_AISLE -> fabAddAisle(activity)
@@ -141,7 +130,7 @@ class FabHandlerImpl : FabHandler {
 
     private fun setMainFabToSingleOption(activity: Activity) {
         getFabFromOption(fabEntries.first(), activity).let {
-            fabMain(activity).setImageDrawable(it.drawable)
+            fabMain(activity).setImageDrawable(it.icon)
             fabMain(activity).setOnClickListener { _ -> it.callOnClick() }
         }
 
@@ -162,12 +151,57 @@ class FabHandlerImpl : FabHandler {
             } else {
                 hideAllFab(activity)
             }
+
+            toggleFabMenu(fab, !allFabAreHidden)
         }
 
         fab.show()
     }
 
+    private fun rotateFab(fab: FloatingActionButton, rotation: Float) {
+        fab.animate()
+            .rotation(rotation)
+            .setDuration(200)
+            .start()
+    }
+
+    private fun getColor(@AttrRes colorAttributeResId: Int, fab: FloatingActionButton): ColorStateList {
+        val color = MaterialColors.getColor(fab, colorAttributeResId)
+        return ColorStateList.valueOf(color)
+    }
+
+    private fun resetMainFab(fab: FloatingActionButton) {
+        originalMainFabShape?.let { fab.shapeAppearanceModel = it }
+        rotateFab(fab, 0f)
+
+        fab.backgroundTintList =
+            getColor(com.google.android.material.R.attr.colorPrimaryContainer, fab)
+
+        fab.imageTintList =
+            getColor(com.google.android.material.R.attr.colorOnPrimaryContainer, fab)
+    }
+
+    private fun toggleFabMenu(fab: FloatingActionButton, expanded: Boolean) {
+        if (originalMainFabShape == null) originalMainFabShape = fab.shapeAppearanceModel
+        if (expanded) {
+            rotateFab(fab, 45f)
+            fab.shapeAppearanceModel = fab.shapeAppearanceModel
+                .toBuilder()
+                .setAllCornerSizes(ShapeAppearanceModel.PILL)
+                .build()
+
+            fab.backgroundTintList =
+                getColor(com.google.android.material.R.attr.colorSecondaryContainer, fab)
+
+            fab.imageTintList =
+                getColor(com.google.android.material.R.attr.colorOnSecondaryContainer, fab)
+        } else {
+            resetMainFab(fab)
+        }
+    }
+
     override fun setFabItems(activity: Activity, vararg fabOptions: FabHandler.FabOption) {
+        resetMainFab(fabMain(activity))
         fabEntries = fabOptions.distinctBy { it.name }.toMutableList()
         when (fabEntries.count()) {
             0 -> fabMain(activity).hide()

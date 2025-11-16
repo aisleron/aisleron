@@ -18,20 +18,24 @@
 package com.aisleron.ui.widgets
 
 import android.view.View
-import com.aisleron.R
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.snackbar.Snackbar
+
 
 class ErrorSnackBar {
     fun make(view: View, text: CharSequence, duration: Int, anchorView: View? = null): Snackbar {
         val snackBar = Snackbar.make(view, text, duration)
+
         val backgroundColor =
-            MaterialColors.getColor(view, R.attr.colorErrorSnackbarBackground)
-        val textColor =
-            MaterialColors.getColor(view, R.attr.colorErrorSnackbarText)
+            MaterialColors.getColor(view, com.google.android.material.R.attr.colorErrorContainer)
 
         snackBar.setBackgroundTint(backgroundColor)
+
+        val textColor =
+            MaterialColors.getColor(view, com.google.android.material.R.attr.colorOnErrorContainer)
+
         snackBar.setTextColor(textColor)
+
         snackBar.setAnchorView(anchorView)
 
         return snackBar

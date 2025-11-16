@@ -35,4 +35,45 @@ platform :android do
     gradle(task: "clean assembleRelease")
     upload_to_play_store
   end
+
+  lane :screenshots do
+      # To run from terminal: fastlane screenshots
+      # Build the debug and AndroidTest packages so they are available for screenshots
+      gradle(
+          task: "assembleDebug assembleDebugAndroidTest"
+      )
+
+      # Dynamically locate APKs
+      app_apk = Dir.glob(File.expand_path("../app/build/outputs/apk/debug/com.aisleron-*-debug.apk")).first
+      tests_apk = Dir.glob(File.expand_path("../app/build/outputs/apk/androidTest/debug/com.aisleron-*-debug-androidTest.apk")).first
+
+      # Take light mode screenshots
+      screengrab(
+          output_directory: "fastlane/screenshots/light-mode",
+          device_type: "phone",
+          locales: ["en-US"],
+          app_package_name: "com.aisleron.debug",
+          use_tests_in_packages: ["com.aisleron.screenshots"],
+          test_instrumentation_runner: "com.aisleron.di.KoinInstrumentationTestRunner",
+          use_timestamp_suffix: false,
+          app_apk_path: app_apk,
+          tests_apk_path: tests_apk,
+          skip_open_summary: true
+      )
+
+      # Take dark mode screenshots
+      screengrab(
+          output_directory: "fastlane/screenshots/dark-mode",
+          device_type: "phone",
+          locales: ["en-US"],
+          app_package_name: "com.aisleron.debug",
+          use_tests_in_packages: ["com.aisleron.screenshots"],
+          test_instrumentation_runner: "com.aisleron.di.KoinInstrumentationTestRunner",
+          use_timestamp_suffix: false,
+          app_apk_path: app_apk,
+          tests_apk_path: tests_apk,
+          skip_open_summary: true,
+          launch_arguments: ["uiMode dark"]
+      )
+  end
 end

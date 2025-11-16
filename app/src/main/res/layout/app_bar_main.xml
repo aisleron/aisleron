@@ -27,15 +27,12 @@
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/app_bar_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/Theme.Aisleron.AppBarOverlay"
-        android:background="?android:statusBarColor">
+        android:layout_height="wrap_content">
 
-        <androidx.appcompat.widget.Toolbar
+        <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/toolbar_height"
-            app:popupTheme="@style/Theme.Aisleron.PopupOverlay" />
+            android:layout_height="@dimen/toolbar_height" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <LinearLayout
@@ -109,75 +106,55 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_marginEnd="@dimen/fab_margin"
+        android:layout_margin="@dimen/fab_margin"
         android:layout_marginBottom="@dimen/fab_margin_bottom"
         android:contentDescription="@string/main_fab"
-        android:theme="@style/FloatingActionButtonPrimary"
-        app:srcCompat="@android:drawable/ic_input_add" />
+        android:theme="@style/ThemeOverlay.Material3.FloatingActionButton.Primary"
+        app:srcCompat="@android:drawable/ic_input_add"
+        app:useCompatPadding="false"/>
 
-    <TextView
-        android:id="@+id/add_shop_fab_label"
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/add_location"
-        app:layout_anchor="@id/fab_add_shop"
-        android:layout_gravity="start|center_vertical"
-        style="@style/Theme.Aisleron.OverlayText"
-        app:layout_anchorGravity="center_vertical" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add_shop"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:contentDescription="@string/add_shop_fab"
         app:layout_anchor="@id/fab"
-        app:layout_anchorGravity="top|end"
+        app:layout_anchorGravity="center|center"
+        android:translationX="28dp"
+        android:translationY="-36dp"
         android:layout_gravity="top"
-        android:layout_marginEnd="@dimen/mini_fab_margin"
-        android:theme="@style/FloatingActionButtonSecondary"
-        app:srcCompat="@drawable/baseline_add_business_24" />
+        android:text="@string/add_location"
+        style="@style/Widget.Material3.ExtendedFloatingActionButton.Primary"
+        app:shapeAppearance="@style/Widget.Material3.ExtendedFloatingActionButton.Primary"
+        app:icon="@drawable/baseline_add_business_24" />
 
-    <TextView
-        android:id="@+id/add_aisle_fab_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/add_aisle"
-        app:layout_anchorGravity="center_vertical"
-        app:layout_anchor="@id/fab_add_aisle"
-        android:layout_gravity="start|center_vertical"
-        style="@style/Theme.Aisleron.OverlayText" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/fab_add_aisle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="@string/add_aisle_fab"
         app:layout_anchor="@id/fab_add_shop"
-        app:layout_anchorGravity="top"
-        android:layout_gravity="top|end"
-        android:theme="@style/FloatingActionButtonSecondary"
-        app:srcCompat="@drawable/baseline_add_aisle_24" />
+        app:layout_anchorGravity="top|end"
+        android:layout_gravity="top"
+        android:translationY="-4dp"
+        style="@style/Widget.Material3.ExtendedFloatingActionButton.Primary"
+        app:shapeAppearance="@style/Widget.Material3.ExtendedFloatingActionButton.Primary"
+        android:text="@string/add_aisle"
+        app:icon="@drawable/baseline_add_aisle_24" />
 
-
-    <TextView
-        android:id="@+id/add_product_fab_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/add_product"
-        app:layout_anchor="@id/fab_add_product"
-        android:layout_gravity="start|center_vertical"
-        style="@style/Theme.Aisleron.OverlayText"
-        app:layout_anchorGravity="center_vertical" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/fab_add_product"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="@string/add_product_fab"
         app:layout_anchor="@id/fab_add_aisle"
-        app:layout_anchorGravity="end"
+        app:layout_anchorGravity="top|end"
         android:layout_gravity="top"
-        android:theme="@style/FloatingActionButtonSecondary"
-        app:srcCompat="@drawable/baseline_add_product_24" />
+        android:translationY="-4dp"
+        android:text="@string/add_product"
+        android:padding="16dp"
+        style="@style/Widget.Material3.ExtendedFloatingActionButton.Primary"
+        app:shapeAppearance="@style/Widget.Material3.ExtendedFloatingActionButton.Primary"
+        app:icon="@drawable/baseline_add_product_24" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

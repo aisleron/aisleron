@@ -44,20 +44,21 @@
                 android:inputType="textCapWords" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <androidx.appcompat.widget.SwitchCompat
+        <com.google.android.material.materialswitch.MaterialSwitch
             android:id="@+id/swc_shop_pinned"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/pin_shop"
             android:padding="@dimen/text_margin" />
 
-        <androidx.appcompat.widget.SwitchCompat
+        <com.google.android.material.materialswitch.MaterialSwitch
             android:id="@+id/swc_shop_show_unmapped_products"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/show_unmapped_products"
             android:padding="@dimen/text_margin"
             android:checked="true" />
+        <!--            style="@style/Widget.Aisleron.MaterialSwitchStyle"-->
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -131,6 +132,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            tools:visibility="visible"
             android:visibility="gone">
 
             <com.google.android.material.tabs.TabLayout
@@ -141,7 +143,7 @@
             <androidx.viewpager2.widget.ViewPager2
                 android:id="@+id/pgr_shop_options"
                 android:layout_width="match_parent"
-                android:layout_height="300dp"
+                android:layout_height="wrap_content"
                 tools:ignore="NestedScrolling" />
         </LinearLayout>
 

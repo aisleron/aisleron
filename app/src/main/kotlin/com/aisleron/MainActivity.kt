@@ -22,7 +22,7 @@ import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
-import android.util.TypedValue
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -33,7 +33,7 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.content.ContextCompat
+import androidx.appcompat.view.ActionMode
 import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -108,6 +108,7 @@ class MainActivity : AppCompatActivity() {
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_main) as NavHostFragment
 
         val navController = navHostFragment.navController
+        Log.d("MainActivity", "Main navController = $navController")
         val navInflater = navController.navInflater
         val navGraph = navInflater.inflate(R.navigation.mobile_navigation)
 
@@ -154,8 +155,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setWindowInsetListeners() {
-        //TODO: Change system bar style to auto to allow for black status bar text
-        enableEdgeToEdge(statusBarStyle = SystemBarStyle.dark(getStatusBarColor()))
+        enableEdgeToEdge(statusBarStyle = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT))
 
         // Fab margins
         val fab = binding.appBarMain.fab
@@ -205,12 +205,13 @@ class MainActivity : AppCompatActivity() {
         val drawer = binding.navView
         ViewCompat.setOnApplyWindowInsetsListener(drawer) { view, windowInsets ->
             val insets = windowInsets.getInsets(
-                WindowInsetsCompat.Type.navigationBars()
+                WindowInsetsCompat.Type.statusBars()
+                        or WindowInsetsCompat.Type.navigationBars()
                         or WindowInsetsCompat.Type.displayCutout()
             )
 
             val header = view.findViewById<FrameLayout>(R.id.nav_header_frame)
-            header.updatePadding(left = insets.left)
+            header.updatePadding(left = insets.left, top = insets.top)
 
             val menu = view.findViewById<LinearLayout>(R.id.navigation_menu_items)
             menu.updatePadding(left = insets.left, bottom = insets.bottom)
@@ -241,30 +242,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         super.onResume()
-    }
-
-    private fun getStatusBarColor(): Int {
-        return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
-            @Suppress("DEPRECATION")
-            resolveThemeColor(android.R.attr.statusBarColor)
-        } else {
-            Color.TRANSPARENT
-        }
-    }
-
-    private fun resolveThemeColor(attrResId: Int): Int {
-        val typedValue = TypedValue()
-
-        val wasResolved = theme.resolveAttribute(attrResId, typedValue, true)
-        if (!wasResolved) {
-            throw IllegalArgumentException("Attribute 0x${attrResId.toString(16)} not defined in theme")
-        }
-
-        return if (typedValue.resourceId != 0) {
-            ContextCompat.getColor(this, typedValue.resourceId)
-        } else {
-            typedValue.data
-        }
     }
 
     private fun softRestartApp() {
@@ -317,4 +294,15 @@ class MainActivity : AppCompatActivity() {
         welcomePreferences.setLastUpdateValues(this)
         updateBanner.visibility = View.GONE
     }
+
+    override fun onSupportActionModeStarted(mode: ActionMode) {
+        super.onSupportActionModeStarted(mode)
+
+    }
+
+    override fun onActionModeFinished(mode: android.view.ActionMode) {
+        super.onActionModeFinished(mode)
+
+    }
+
 }

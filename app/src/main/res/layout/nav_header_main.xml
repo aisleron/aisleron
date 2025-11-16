@@ -20,16 +20,17 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/nav_header_height"
+    android:layout_height="wrap_content"
     android:gravity="bottom"
     android:orientation="vertical"
-    android:theme="@style/ThemeOverlay.AppCompat.Dark">
+    android:padding="@dimen/text_margin">
 
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="80dp"
-        android:layout_height="@dimen/icon_size"
+        android:layout_height="80dp"
         android:contentDescription="@string/aisleron_logo"
+        android:background="@drawable/background_circle"
         android:padding="@dimen/text_margin"
         android:src="@drawable/aisleron_24"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -41,18 +42,21 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:layout_marginBottom="@dimen/title_margin"
+        android:paddingTop="@dimen/text_margin"
         android:text="@string/nav_header_title"
+        android:paddingHorizontal="@dimen/text_margin"
         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/imageView"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="@string/nav_header_subtitle"
+        android:paddingHorizontal="@dimen/text_margin"
+
         android:textStyle="italic"
         android:paddingVertical="@dimen/subtitle_vertical_padding"
         app:layout_constraintEnd_toEndOf="parent"
