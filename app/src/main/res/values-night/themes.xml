@@ -16,7 +16,7 @@
   -->
 
 <resources>
-    <style name="AppTheme" parent="Theme.Material3.Dark.NoActionBar">
+    <style name="Theme.Aisleron" parent="Theme.Material3.Dark.NoActionBar">
         <item name="colorPrimary">@color/md_theme_primary</item>
         <item name="colorOnPrimary">@color/md_theme_onPrimary</item>
         <item name="colorPrimaryContainer">@color/md_theme_primaryContainer</item>
@@ -69,5 +69,22 @@
         <item name="actionModeStyle">@style/Widget.Aisleron.ActionMode</item>
         <item name="switchPreferenceCompatStyle">@style/Widget.Aisleron.SwitchPreferenceCompat</item>
         <item name="colorSelectedListItem">?android:attr/colorControlHighlight</item>
+    </style>
+
+    <style name="AisleronPureBlack" />
+
+    <style name="AisleronPureBlack.Economy" parent="AisleronPureBlack">
+        <item name="android:colorBackground">#000000</item>
+        <item name="colorSurface">#000000</item>
+        <item name="colorSurfaceVariant">#000000</item>
+    </style>
+
+    <style name="AisleronPureBlack.BusinessClass" parent="AisleronPureBlack.Economy">
+        <item name="colorSurfaceContainer">#000000</item>
+    </style>
+
+    <style name="AisleronPureBlack.FirstClass" parent="AisleronPureBlack.BusinessClass">
+        <item name="colorSurfaceContainerLow">#000000</item>
+        <item name="colorSurfaceContainerHigh">#000000</item>
     </style>
 </resources>

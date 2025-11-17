@@ -90,8 +90,10 @@
     </style>
 
     <style name="Widget.Aisleron.ActionMode" parent="Widget.Material3.ActionMode">
-        <item name="backgroundTint">?attr/colorSurface</item>
-        <item name="background">?attr/colorSurface</item>
+        <!--<item name="backgroundTint">?attr/colorSurface</item>
+        <item name="background">?attr/colorSurface</item>-->
+        <item name="backgroundTint">@android:color/transparent</item>
+        <item name="background">@android:color/transparent</item>
         <item name="height">@dimen/toolbar_height</item>
     </style>
 </resources>

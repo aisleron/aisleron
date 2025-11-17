@@ -33,11 +33,9 @@
     <color name="md_theme_onError">#690005</color>
     <color name="md_theme_errorContainer">#93000A</color>
     <color name="md_theme_onErrorContainer">#FFDAD6</color>
-    <!--    <color name="md_theme_background">#1E100C</color>-->
-    <color name="md_theme_background">#000000</color>
+    <color name="md_theme_background">#1E100C</color>
     <color name="md_theme_onBackground">#FADCD4</color>
-    <!--    <color name="md_theme_surface">#1E100C</color>-->
-    <color name="md_theme_surface">#000000</color>
+    <color name="md_theme_surface">#1E100C</color>
     <color name="md_theme_onSurface">#FADCD4</color>
     <color name="md_theme_surfaceVariant">#5B4039</color>
     <color name="md_theme_onSurfaceVariant">#E4BEB4</color>

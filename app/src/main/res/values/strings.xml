@@ -57,6 +57,12 @@
     <string name="keep_screen_on">Keep screen on</string>
     <string name="keep_screen_on_summary">Prevent the screen from turning off while viewing a list</string>
     <string name="starting_list">Starting list</string>
+    <string name="use_dynamic_color">Dynamic color</string>
+    <string name="use_dynamic_color_summary">Use system colors derived from the current wallpaper</string>
+    <string name="pure_black_default">Theme Default</string>
+    <string name="pure_black_economy">Economy</string>
+    <string name="pure_black_business_class">Business Class</string>
+    <string name="pure_black_first_class">First Class</string>
 
     <!-- Exception Messages   -->
     <string name="generic_error">ERROR: %1$s</string>
@@ -201,5 +207,6 @@
     <string name="dismiss">Dismiss</string>
     <string name="view_changes">View Changes</string>
     <string name="updated_notification">Aisleron was updated from %1$s to %2$s. </string>
+    <string name="pure_black_style">Pure Black style</string>
 
 </resources>

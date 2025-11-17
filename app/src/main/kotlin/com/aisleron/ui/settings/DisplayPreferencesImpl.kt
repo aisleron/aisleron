@@ -45,11 +45,26 @@ class DisplayPreferencesImpl : DisplayPreferences {
         val locationId = locationIdStr.toIntOrNull() ?: 1
         val filterType = try {
             FilterType.valueOf(filterTypeStr)
-        } catch (e: IllegalArgumentException) {
+        } catch (_: IllegalArgumentException) {
             FilterType.IN_STOCK
         }
 
         return ShoppingListBundle(locationId, filterType)
+    }
+
+    override fun dynamicColor(context: Context): Boolean =
+        PreferenceManager.getDefaultSharedPreferences(context).getBoolean(DYNAMIC_COLOR, false)
+
+    override fun pureBlackStyle(context: Context): DisplayPreferences.PureBlackStyle {
+        val pureBlackStyle = PreferenceManager.getDefaultSharedPreferences(context)
+            .getString(PURE_BLACK_STYLE, PURE_BLACK_DEFAULT)
+
+        return when (pureBlackStyle) {
+            PURE_BLACK_ECONOMY -> DisplayPreferences.PureBlackStyle.ECONOMY
+            PURE_BLACK_BUSINESS_CLASS -> DisplayPreferences.PureBlackStyle.BUSINESS_CLASS
+            PURE_BLACK_FIRST_CLASS -> DisplayPreferences.PureBlackStyle.FIRST_CLASS
+            else -> DisplayPreferences.PureBlackStyle.DEFAULT
+        }
     }
 
     companion object {
@@ -59,7 +74,14 @@ class DisplayPreferencesImpl : DisplayPreferences {
 
         private const val DISPLAY_LOCKSCREEN = "display_lockscreen"
         private const val APPLICATION_THEME = "application_theme"
+        private const val DYNAMIC_COLOR = "dynamic_color"
+        private const val PURE_BLACK_STYLE = "pure_black_style"
 
         private const val STARTING_LIST = "starting_list"
+
+        private const val PURE_BLACK_DEFAULT = "pure_black_default"
+        private const val PURE_BLACK_ECONOMY = "pure_black_economy"
+        private const val PURE_BLACK_BUSINESS_CLASS = "pure_black_business_class"
+        private const val PURE_BLACK_FIRST_CLASS = "pure_black_first_class"
     }
 }

@@ -28,9 +28,20 @@ interface DisplayPreferences {
         DARK_THEME
     }
 
+    enum class PureBlackStyle {
+        DEFAULT,
+        ECONOMY,
+        BUSINESS_CLASS,
+        FIRST_CLASS
+    }
+
     fun showOnLockScreen(context: Context): Boolean
 
     fun applicationTheme(context: Context): ApplicationTheme
 
     fun startingList(context: Context): ShoppingListBundle
+
+    fun dynamicColor(context: Context): Boolean
+
+    fun pureBlackStyle(context: Context): PureBlackStyle
 }

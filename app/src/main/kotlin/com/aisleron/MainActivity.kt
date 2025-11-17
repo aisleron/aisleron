@@ -55,6 +55,7 @@ import com.aisleron.ui.settings.DisplayPreferences
 import com.aisleron.ui.settings.DisplayPreferencesImpl
 import com.aisleron.ui.settings.WelcomePreferences
 import com.aisleron.ui.settings.WelcomePreferencesImpl
+import com.google.android.material.color.DynamicColors
 import org.koin.androidx.fragment.android.setupKoinFragmentFactory
 
 
@@ -72,7 +73,7 @@ class MainActivity : AppCompatActivity() {
         // Needs to be a standalone variable so it is not garbage collected
         prefsListener = SharedPreferences.OnSharedPreferenceChangeListener { p, s ->
             when (s) {
-                "application_theme" -> recreate()
+                "application_theme", "dynamic_color", "pure_black_style" -> recreate()
                 "restore_database" -> softRestartApp()
                 "display_lockscreen" -> setShowOnLockScreen(p.getBoolean(s, false))
             }
@@ -82,23 +83,12 @@ class MainActivity : AppCompatActivity() {
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
         prefs.registerOnSharedPreferenceChangeListener(prefsListener)
 
-        val displayPreferences = DisplayPreferencesImpl()
-
-        setShowOnLockScreen(displayPreferences.showOnLockScreen(this))
-
-        when (displayPreferences.applicationTheme(this)) {
-            DisplayPreferences.ApplicationTheme.LIGHT_THEME ->
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-
-            DisplayPreferences.ApplicationTheme.DARK_THEME ->
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-
-            else -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
-        }
+        setDisplayPreferences()
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.appBarMain.toolbar)
+
 
         val drawerLayout: DrawerLayout = binding.drawerLayout
 
@@ -113,7 +103,7 @@ class MainActivity : AppCompatActivity() {
         val navGraph = navInflater.inflate(R.navigation.mobile_navigation)
 
         val shoppingListBundle =
-            Bundler().makeShoppingListBundle(displayPreferences.startingList(this))
+            Bundler().makeShoppingListBundle(DisplayPreferencesImpl().startingList(this))
 
         navController.setGraph(navGraph, shoppingListBundle)
 
@@ -146,6 +136,33 @@ class MainActivity : AppCompatActivity() {
         if (!welcomePreferences.isInitialized(this)) {
             navController.navigate(R.id.nav_welcome)
         }
+    }
+
+    private fun setDisplayPreferences() {
+        val displayPreferences = DisplayPreferencesImpl()
+
+        setShowOnLockScreen(displayPreferences.showOnLockScreen(this))
+
+        val nightMode = when (displayPreferences.applicationTheme(this)) {
+            DisplayPreferences.ApplicationTheme.LIGHT_THEME -> AppCompatDelegate.MODE_NIGHT_NO
+            DisplayPreferences.ApplicationTheme.DARK_THEME -> AppCompatDelegate.MODE_NIGHT_YES
+            else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+        }
+
+        AppCompatDelegate.setDefaultNightMode(nightMode)
+
+        if (displayPreferences.dynamicColor(this)) {
+            DynamicColors.applyToActivityIfAvailable(this)
+        }
+
+        val pureBlackStyleId = when (displayPreferences.pureBlackStyle(this)) {
+            DisplayPreferences.PureBlackStyle.ECONOMY -> R.style.AisleronPureBlack_Economy
+            DisplayPreferences.PureBlackStyle.BUSINESS_CLASS -> R.style.AisleronPureBlack_BusinessClass
+            DisplayPreferences.PureBlackStyle.FIRST_CLASS -> R.style.AisleronPureBlack_FirstClass
+            else -> R.style.AisleronPureBlack
+        }
+
+        theme.applyStyle(pureBlackStyleId, true)
     }
 
     private fun setShowOnLockScreen(show: Boolean) {
@@ -297,12 +314,21 @@ class MainActivity : AppCompatActivity() {
 
     override fun onSupportActionModeStarted(mode: ActionMode) {
         super.onSupportActionModeStarted(mode)
-
+        supportActionBar?.setDisplayShowTitleEnabled(false)
+        supportActionBar?.setDisplayHomeAsUpEnabled(false)
+        supportActionBar?.setHomeButtonEnabled(false)
+        binding.appBarMain.toolbar.menu.clear()
     }
 
-    override fun onActionModeFinished(mode: android.view.ActionMode) {
-        super.onActionModeFinished(mode)
+    override fun onSupportActionModeFinished(mode: ActionMode) {
+        super.onSupportActionModeFinished(mode)
+
+        binding.appBarMain.toolbar.postDelayed( {
+            supportActionBar?.setDisplayShowTitleEnabled(true)
+            supportActionBar?.setDisplayHomeAsUpEnabled(true)
+            supportActionBar?.setHomeButtonEnabled(true)
+            invalidateOptionsMenu()
+        }, 250)
 
     }
-
 }
