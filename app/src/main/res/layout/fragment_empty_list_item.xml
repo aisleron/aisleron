@@ -15,13 +15,10 @@
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="16dp"
-    card_view:cardElevation="4dp"
-    card_view:cardCornerRadius="@dimen/text_margin">
+    android:layout_margin="16dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -50,7 +47,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/empty_list_description"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textAppearance="?attr/textAppearanceBodyLarge"
             android:paddingHorizontal="8dp"
             android:paddingBottom="8dp" />
 
@@ -59,7 +56,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/empty_list_reasons"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textAppearance="?attr/textAppearanceBodyLarge"
             android:paddingHorizontal="@dimen/text_margin"
             android:paddingBottom="8dp" />
 
@@ -68,9 +65,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/empty_list_instructions"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textAppearance="?attr/textAppearanceBodyLarge"
             android:paddingHorizontal="8dp"
             android:paddingTop="8dp" />
 
     </LinearLayout>
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>

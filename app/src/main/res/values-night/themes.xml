@@ -64,11 +64,14 @@
         <item name="colorSurfaceContainerHigh">@color/md_theme_surfaceContainerHigh</item>
         <item name="colorSurfaceContainerHighest">@color/md_theme_surfaceContainerHighest</item>
 
-        <!-- Custom items       -->
+        <!-- Theme customization.       -->
         <item name="windowActionModeOverlay">true</item>
+        <item name="colorSelectedListItem">?android:attr/colorControlHighlight</item>
+
+        <!-- Custom styles.       -->
         <item name="actionModeStyle">@style/Widget.Aisleron.ActionMode</item>
         <item name="switchPreferenceCompatStyle">@style/Widget.Aisleron.SwitchPreferenceCompat</item>
-        <item name="colorSelectedListItem">?android:attr/colorControlHighlight</item>
+        <item name="materialCardViewStyle">@style/Widget.Aisleron.CardView</item>
     </style>
 
     <style name="AisleronPureBlack" />

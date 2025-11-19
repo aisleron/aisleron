@@ -64,11 +64,14 @@
         <item name="colorSurfaceContainerHigh">@color/md_theme_surfaceContainerHigh</item>
         <item name="colorSurfaceContainerHighest">@color/md_theme_surfaceContainerHighest</item>
 
-        <!-- Custom items       -->
+        <!-- Theme customization.       -->
         <item name="windowActionModeOverlay">true</item>
+        <item name="colorSelectedListItem">?android:attr/colorControlHighlight</item>
+
+        <!-- Custom styles.       -->
         <item name="actionModeStyle">@style/Widget.Aisleron.ActionMode</item>
         <item name="switchPreferenceCompatStyle">@style/Widget.Aisleron.SwitchPreferenceCompat</item>
-        <item name="colorSelectedListItem">?android:attr/colorControlHighlight</item>
+        <item name="materialCardViewStyle">@style/Widget.Aisleron.CardView</item>
     </style>
 
     <style name="Theme.Aisleron.NavigationDrawer" parent="Theme.Aisleron">
@@ -95,5 +98,10 @@
         <item name="backgroundTint">@android:color/transparent</item>
         <item name="background">@android:color/transparent</item>
         <item name="height">@dimen/toolbar_height</item>
+    </style>
+
+    <style name="Widget.Aisleron.CardView" parent="Widget.Material3.CardView.Filled">
+        <item name="cardElevation">@dimen/card_elevation</item>
+        <item name="cardCornerRadius">@dimen/text_margin</item>
     </style>
 </resources>
