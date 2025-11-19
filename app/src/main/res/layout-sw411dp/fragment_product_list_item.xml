@@ -23,7 +23,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginVertical="4dp"
-    android:layout_marginHorizontal="@dimen/text_margin">
+    android:layout_marginStart="32dp"
+    android:layout_marginEnd="@dimen/text_margin">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -38,19 +39,15 @@
             android:layout_weight="1"
             android:ellipsize="end"
             android:gravity="center_vertical"
-            android:layout_gravity="center_vertical"
             android:maxLines="2"
-            android:paddingVertical="12dp"
-            android:paddingStart="12dp"
-            android:paddingEnd="0dp"
+            android:padding="@dimen/text_margin"
             android:text="@string/product"
-            android:textAppearance="?attr/textAppearanceBodyMedium" />
+            android:textAppearance="?attr/textAppearanceBodyLarge" />
 
         <LinearLayout
             android:id="@+id/stp_qty_selector"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
@@ -61,7 +58,7 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/decrement"
                 android:paddingVertical="@dimen/text_margin"
-                android:paddingStart="12dp"
+                android:paddingStart="@dimen/text_margin"
                 android:paddingEnd="0dp"
                 android:src="@drawable/baseline_remove_circle_outline_24" />
 
@@ -87,7 +84,7 @@
                 android:contentDescription="@string/increment"
                 android:paddingVertical="@dimen/text_margin"
                 android:paddingStart="0dp"
-                android:paddingEnd="12dp"
+                android:paddingEnd="@dimen/text_margin"
                 android:src="@drawable/baseline_add_circle_outline_24" />
         </LinearLayout>
 
@@ -99,5 +96,6 @@
             android:layout_gravity="center_vertical"
             android:checkMark="?android:attr/listChoiceIndicatorMultiple"
             android:checked="false" />
+
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

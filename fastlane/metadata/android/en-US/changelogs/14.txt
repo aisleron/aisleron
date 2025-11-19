@@ -1,5 +1,6 @@
 Enhancements:
-* Implemented Material 3 design
+* Implemented Material 3 design, Dynamic Colors, and Pure Black styles
+* Improve Product List Item Display on Small Screen Devices (#88)
 * Added Italian translations
 
 Bug Fixes:
