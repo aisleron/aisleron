@@ -16,14 +16,13 @@
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
-    tools:context=".ui.shop.ShopFragment"
-    android:layout_margin="@dimen/text_margin">
+    android:layout_margin="@dimen/text_margin"
+    tools:context=".ui.shop.ShopFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -146,6 +145,5 @@
                 android:layout_height="wrap_content"
                 tools:ignore="NestedScrolling" />
         </LinearLayout>
-
     </LinearLayout>
-</ScrollView>
+</androidx.core.widget.NestedScrollView>
