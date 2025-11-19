@@ -28,6 +28,7 @@ import com.aisleron.R
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.loyaltycard.LoyaltyCard
 import com.aisleron.domain.loyaltycard.LoyaltyCardProviderType
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 interface LoyaltyCardProvider {
     val packageName: String
@@ -62,7 +63,7 @@ interface LoyaltyCardProvider {
             ), FROM_HTML_MODE_LEGACY
         )
 
-        val builder: AlertDialog.Builder = AlertDialog.Builder(context)
+        val builder = MaterialAlertDialogBuilder(context)
         builder
             .setTitle(alertTitle)
             .setMessage(alertMessage)

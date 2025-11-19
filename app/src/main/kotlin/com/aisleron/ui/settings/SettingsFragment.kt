@@ -30,7 +30,6 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -44,6 +43,7 @@ import com.aisleron.domain.base.AisleronException
 import com.aisleron.ui.AisleronExceptionMap
 import com.aisleron.ui.AisleronFragment
 import com.aisleron.ui.widgets.ErrorSnackBar
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -224,7 +224,7 @@ class SettingsFragment : PreferenceFragmentCompat(), AisleronFragment {
 
     private fun restoreDatabase(uri: Uri) {
         val filename = requireContext().getFileName(uri)
-        val builder: AlertDialog.Builder = AlertDialog.Builder(requireContext())
+        val builder = MaterialAlertDialogBuilder(requireContext())
         builder
             .setTitle(getString(R.string.db_restore_confirmation_title))
             .setMessage(getString(R.string.db_restore_confirmation, filename))
