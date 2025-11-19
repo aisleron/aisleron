@@ -31,7 +31,6 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.view.ActionMode
 import androidx.core.net.toUri
@@ -55,11 +54,10 @@ import com.aisleron.ui.settings.DisplayPreferences
 import com.aisleron.ui.settings.DisplayPreferencesImpl
 import com.aisleron.ui.settings.WelcomePreferences
 import com.aisleron.ui.settings.WelcomePreferencesImpl
-import com.google.android.material.color.DynamicColors
 import org.koin.androidx.fragment.android.setupKoinFragmentFactory
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AisleronActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
@@ -150,19 +148,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         AppCompatDelegate.setDefaultNightMode(nightMode)
-
-        if (displayPreferences.dynamicColor(this)) {
-            DynamicColors.applyToActivityIfAvailable(this)
-        }
-
-        val pureBlackStyleId = when (displayPreferences.pureBlackStyle(this)) {
-            DisplayPreferences.PureBlackStyle.ECONOMY -> R.style.AisleronPureBlack_Economy
-            DisplayPreferences.PureBlackStyle.BUSINESS_CLASS -> R.style.AisleronPureBlack_BusinessClass
-            DisplayPreferences.PureBlackStyle.FIRST_CLASS -> R.style.AisleronPureBlack_FirstClass
-            else -> R.style.AisleronPureBlack
-        }
-
-        theme.applyStyle(pureBlackStyleId, true)
+        applyDynamicColors(displayPreferences)
+        applyPureBlackStyle(displayPreferences)
     }
 
     private fun setShowOnLockScreen(show: Boolean) {

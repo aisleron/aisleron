@@ -21,17 +21,14 @@ import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import com.aisleron.databinding.ActivityAboutBinding
-import com.aisleron.ui.settings.DisplayPreferences
 import com.aisleron.ui.settings.DisplayPreferencesImpl
-import com.google.android.material.color.DynamicColors
 
 
-class AboutActivity : AppCompatActivity() {
+class AboutActivity : AisleronActivity() {
 
     private lateinit var binding: ActivityAboutBinding
 
@@ -51,19 +48,8 @@ class AboutActivity : AppCompatActivity() {
 
     private fun setDisplayPreferences() {
         val displayPreferences = DisplayPreferencesImpl()
-
-        if (displayPreferences.dynamicColor(this)) {
-            DynamicColors.applyToActivityIfAvailable(this)
-        }
-
-        val pureBlackStyleId = when (displayPreferences.pureBlackStyle(this)) {
-            DisplayPreferences.PureBlackStyle.ECONOMY -> R.style.AisleronPureBlack_Economy
-            DisplayPreferences.PureBlackStyle.BUSINESS_CLASS -> R.style.AisleronPureBlack_BusinessClass
-            DisplayPreferences.PureBlackStyle.FIRST_CLASS -> R.style.AisleronPureBlack_FirstClass
-            else -> R.style.AisleronPureBlack
-        }
-
-        theme.applyStyle(pureBlackStyleId, true)
+        applyDynamicColors(displayPreferences)
+        applyPureBlackStyle(displayPreferences)
     }
 
     private fun setWindowInsetListeners() {

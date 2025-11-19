@@ -75,6 +75,21 @@ class SettingsFragment : PreferenceFragmentCompat(), AisleronFragment {
         )
 
         settingsViewModel.requestLocationDetails()
+        hideNotSupportedSettings()
+    }
+
+    private fun hideNotSupportedSettings() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O_MR1) {
+            findPreference<Preference>("display_lockscreen")?.isVisible = false
+        }
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+            findPreference<Preference>("dynamic_color")?.isVisible = false
+        }
+
+        /*if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            findPreference<Preference>("pure_black_style")?.isVisible = false
+        }*/
     }
 
     private fun initializeDbBackupRestorePreference(
