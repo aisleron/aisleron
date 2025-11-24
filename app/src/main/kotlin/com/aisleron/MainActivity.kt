@@ -22,7 +22,6 @@ import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -48,12 +47,13 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.preference.PreferenceManager
 import com.aisleron.databinding.ActivityMainBinding
-import com.aisleron.ui.FabHandlerImpl
+import com.aisleron.ui.FabHandler
 import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.settings.DisplayPreferences
 import com.aisleron.ui.settings.DisplayPreferencesImpl
 import com.aisleron.ui.settings.WelcomePreferences
 import com.aisleron.ui.settings.WelcomePreferencesImpl
+import org.koin.android.ext.android.inject
 import org.koin.androidx.fragment.android.setupKoinFragmentFactory
 
 
@@ -96,7 +96,6 @@ class MainActivity : AisleronActivity() {
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_main) as NavHostFragment
 
         val navController = navHostFragment.navController
-        Log.d("MainActivity", "Main navController = $navController")
         val navInflater = navController.navInflater
         val navGraph = navInflater.inflate(R.navigation.mobile_navigation)
 
@@ -124,7 +123,8 @@ class MainActivity : AisleronActivity() {
             appBarLayout.setExpanded(true, true)
 
             drawerLayout.closeDrawers()
-            FabHandlerImpl().setFabItems(this)
+            val fabHandler: FabHandler by inject()
+            fabHandler.setFabItems(this)
         }
 
         val welcomePreferences = WelcomePreferencesImpl()
@@ -299,7 +299,15 @@ class MainActivity : AisleronActivity() {
         updateBanner.visibility = View.GONE
     }
 
+    private val enableToolbarRunnable = Runnable {
+        supportActionBar?.setDisplayShowTitleEnabled(true)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setHomeButtonEnabled(true)
+        invalidateOptionsMenu()
+    }
+
     override fun onSupportActionModeStarted(mode: ActionMode) {
+        binding.appBarMain.toolbar.removeCallbacks(enableToolbarRunnable)
         super.onSupportActionModeStarted(mode)
         supportActionBar?.setDisplayShowTitleEnabled(false)
         supportActionBar?.setDisplayHomeAsUpEnabled(false)
@@ -309,13 +317,6 @@ class MainActivity : AisleronActivity() {
 
     override fun onSupportActionModeFinished(mode: ActionMode) {
         super.onSupportActionModeFinished(mode)
-
-        binding.appBarMain.toolbar.postDelayed( {
-            supportActionBar?.setDisplayShowTitleEnabled(true)
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.setHomeButtonEnabled(true)
-            invalidateOptionsMenu()
-        }, 250)
-
+        binding.appBarMain.toolbar.post(enableToolbarRunnable)
     }
 }

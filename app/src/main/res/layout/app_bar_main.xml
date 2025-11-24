@@ -110,16 +110,18 @@
         app:useCompatPadding="false"/>
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fab_add_shop"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/fab_add_shop"
         android:contentDescription="@string/add_shop_fab"
         app:layout_anchor="@id/fab"
         app:layout_anchorGravity="center|center"
+        android:layout_gravity="top"
         android:translationX="28dp"
         android:translationY="-36dp"
-        android:layout_gravity="top"
         android:text="@string/add_location"
+        android:visibility="gone"
+        tools:visibility="visible"
         style="@style/Widget.Material3.ExtendedFloatingActionButton.Primary"
         app:shapeAppearance="@style/Widget.Material3.ExtendedFloatingActionButton.Primary"
         app:icon="@drawable/baseline_add_business_24" />
@@ -133,9 +135,11 @@
         app:layout_anchorGravity="top|end"
         android:layout_gravity="top"
         android:translationY="-4dp"
+        android:text="@string/add_aisle"
+        android:visibility="gone"
+        tools:visibility="visible"
         style="@style/Widget.Material3.ExtendedFloatingActionButton.Primary"
         app:shapeAppearance="@style/Widget.Material3.ExtendedFloatingActionButton.Primary"
-        android:text="@string/add_aisle"
         app:icon="@drawable/baseline_add_aisle_24" />
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
@@ -148,7 +152,8 @@
         android:layout_gravity="top"
         android:translationY="-4dp"
         android:text="@string/add_product"
-        android:padding="16dp"
+        android:visibility="gone"
+        tools:visibility="visible"
         style="@style/Widget.Material3.ExtendedFloatingActionButton.Primary"
         app:shapeAppearance="@style/Widget.Material3.ExtendedFloatingActionButton.Primary"
         app:icon="@drawable/baseline_add_product_24" />

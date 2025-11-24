@@ -28,10 +28,13 @@ import com.aisleron.ui.aisle.AisleDialogImpl
 import com.aisleron.ui.loyaltycard.CatimaCardProvider
 import com.aisleron.ui.loyaltycard.LoyaltyCardProvider
 import com.aisleron.ui.loyaltycard.PackageCheckerImpl
+import com.aisleron.ui.resourceprovider.ResourceProvider
+import com.aisleron.ui.resourceprovider.ResourceProviderImpl
 import org.koin.dsl.module
 
 val generalModule = module {
-    single<FabHandler> { FabHandlerImpl() }
+    single<FabHandler> { FabHandlerImpl(get()) }
+    single<ResourceProvider> { ResourceProviderImpl() }
     factory<ApplicationTitleUpdateListener> { ApplicationTitleUpdateListenerImpl() }
     factory<AddEditFragmentListener> { AddEditFragmentListenerImpl() }
     factory<LoyaltyCardProvider> { CatimaCardProvider(PackageCheckerImpl()) }
