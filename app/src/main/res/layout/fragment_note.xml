@@ -27,8 +27,7 @@
         android:layout_height="wrap_content"
         android:labelFor="@id/edt_notes"
         app:errorEnabled="true"
-        app:hintEnabled="false"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
+        app:hintEnabled="false">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/edt_notes"
@@ -39,7 +38,6 @@
             android:inputType="textMultiLine"
             android:overScrollMode="always"
             android:scrollbars="vertical"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             android:minLines="4"
             android:paddingVertical="12dp" />
 

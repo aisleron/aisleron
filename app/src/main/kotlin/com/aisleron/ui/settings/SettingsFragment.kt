@@ -247,4 +247,29 @@ class SettingsFragment : PreferenceFragmentCompat(), AisleronFragment {
 
         else -> uri.path?.let(::File)?.name
     }
+
+    override fun onDisplayPreferenceDialog(preference: Preference) {
+        if (preference is ListPreference) {
+            showMaterialListDialog(preference)
+        } else {
+            super.onDisplayPreferenceDialog(preference)
+        }
+    }
+
+    private fun showMaterialListDialog(preference: ListPreference) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(preference.title)
+            .setSingleChoiceItems(
+                preference.entries,
+                preference.findIndexOfValue(preference.value)
+            ) { dialog, which ->
+                val value = preference.entryValues[which].toString()
+                if (preference.callChangeListener(value)) {
+                    preference.value = value
+                }
+                dialog.dismiss()
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
 }

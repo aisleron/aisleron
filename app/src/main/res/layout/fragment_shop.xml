@@ -34,7 +34,7 @@
             android:layout_height="wrap_content"
             android:hint="@string/shop_name"
             android:labelFor="@id/edt_shop_name"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edt_shop_name"
@@ -48,7 +48,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/pin_shop"
-            android:padding="@dimen/text_margin" />
+            android:padding="@dimen/text_margin"
+            android:textAppearance="?attr/textAppearanceBodyLarge" />
 
         <com.google.android.material.materialswitch.MaterialSwitch
             android:id="@+id/swc_shop_show_unmapped_products"
@@ -56,8 +57,8 @@
             android:layout_height="wrap_content"
             android:text="@string/show_unmapped_products"
             android:padding="@dimen/text_margin"
-            android:checked="true" />
-        <!--            style="@style/Widget.Aisleron.MaterialSwitchStyle"-->
+            android:checked="true"
+            android:textAppearance="?attr/textAppearanceBodyLarge" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -89,7 +90,7 @@
                 android:layout_height="match_parent"
                 android:contentDescription="@string/get_loyalty_card"
                 android:src="@drawable/themed_add_card_24"
-                style="@style/Widget.AppCompat.ActionButton" />
+                style="@style/Widget.Material3.Button.IconButton" />
 
             <ImageButton
                 android:id="@+id/btn_delete_loyalty_card"
@@ -97,7 +98,7 @@
                 android:layout_height="match_parent"
                 android:contentDescription="@string/delete_loyalty_card"
                 android:src="@drawable/themed_delete_24"
-                style="@style/Widget.AppCompat.ActionButton" />
+                style="@style/Widget.Material3.Button.IconButton" />
         </LinearLayout>
 
         <LinearLayout
@@ -114,8 +115,8 @@
                 android:paddingVertical="@dimen/text_margin"
                 android:paddingStart="0dp"
                 android:paddingEnd="@dimen/text_margin"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 app:drawableStartCompat="@drawable/baseline_expand_right_24"
+                android:textAppearance="?attr/textAppearanceBodyLarge"
                 android:drawablePadding="@dimen/expand_button_padding" />
 
             <View

@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:text="@string/empty_list_title"
             android:textAlignment="center"
-            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textAppearance="?attr/textAppearanceTitleMedium"
             android:textStyle="bold" />
 
         <View

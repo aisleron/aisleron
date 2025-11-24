@@ -73,7 +73,7 @@
                 android:maxLength="4"
                 android:minWidth="40dp"
                 android:paddingVertical="@dimen/text_margin"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textAppearance="?attr/textAppearanceBodyLarge"
                 tools:ignore="LabelFor" />
 
             <ImageButton
