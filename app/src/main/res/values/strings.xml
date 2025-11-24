@@ -16,10 +16,10 @@
   -->
 
 <resources>
-    <string name="app_name">Aisleron</string>
+    <string name="app_name" translatable="false">Aisleron</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">Aisleron</string>
+    <string name="nav_header_title" translatable="false">Aisleron</string>
     <string name="nav_header_subtitle">Fly through the shops!</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_search">Search</string>
@@ -124,8 +124,8 @@
     </string>
 
     <!-- URLs -->
-    <string name="aisleron_documentation_url">https://aisleron.com/docs/documentation/</string>
-    <string name="aisleron_version_history_url">https://aisleron.com/docs/version-history</string>
+    <string name="aisleron_documentation_url" translatable="false">https://aisleron.com/docs/documentation/</string>
+    <string name="aisleron_version_history_url" translatable="false">https://aisleron.com/docs/version-history</string>
 
     <!-- Loyalty cards -->
     <string name="shop_loyalty_card_name">Loyalty Card</string>
@@ -158,7 +158,7 @@
     <string name="add_aisle">Add Aisle</string>
     <string name="add_another">Add Another</string>
     <string name="aisle_name">Aisle Name</string>
-    <string name="id_label">id</string>
+    <string name="id_label" translatable="false">id</string>
     <string name="done">Done</string>
     <string name="search_product_hint">Search Products…</string>
     <string name="edit">Edit</string>

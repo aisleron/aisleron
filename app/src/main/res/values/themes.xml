@@ -71,10 +71,9 @@
 
         <!-- Custom styles.       -->
         <item name="actionModeStyle">@style/Widget.Aisleron.ActionMode</item>
-        <item name="switchPreferenceCompatStyle">@style/Widget.Aisleron.SwitchPreferenceCompat</item>
         <item name="materialCardViewStyle">@style/Widget.Aisleron.CardView</item>
         <item name="snackbarStyle">@style/Widget.Aisleron.Snackbar</item>
-        <item name="alertDialogTheme">@style/MaterialPreferenceDialog</item>
+        <item name="preferenceTheme">@style/Overlay.Aisleron.Preferences</item>
     </style>
 
     <style name="Theme.Aisleron.NavigationDrawer" parent="Theme.Aisleron">
@@ -100,7 +99,6 @@
         <item name="background">?attr/colorSurface</item>-->
         <item name="backgroundTint">@android:color/transparent</item>
         <item name="background">@android:color/transparent</item>
-        <item name="height">@dimen/toolbar_height</item>
     </style>
 
     <style name="Widget.Aisleron.CardView" parent="Widget.Material3.CardView.Filled">
@@ -108,7 +106,7 @@
         <item name="cardCornerRadius">@dimen/text_margin</item>
     </style>
 
-    <style name="Widget.Aisleron.Snackbar" parent="Widget.MaterialComponents.Snackbar">
+    <style name="Widget.Aisleron.Snackbar" parent="Widget.Material3.Snackbar">
         <item name="shapeAppearance">@style/ShapeAppearance.Aisleron.Rounded</item>
 
     </style>
@@ -117,9 +115,8 @@
         <item name="cornerSize">16dp</item>
     </style>
 
-    <style name="MaterialPreferenceDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
-        <item name="android:background">?attr/colorSurfaceContainerHigh</item>
-        <item name="dialogCornerRadius">28dp</item>
+    <style name="Overlay.Aisleron.Preferences" parent="PreferenceThemeOverlay">
+        <item name="switchPreferenceCompatStyle">@style/Widget.Aisleron.SwitchPreferenceCompat</item>
     </style>
-
 </resources>
+

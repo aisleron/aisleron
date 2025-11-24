@@ -70,10 +70,9 @@
 
         <!-- Custom styles.       -->
         <item name="actionModeStyle">@style/Widget.Aisleron.ActionMode</item>
-        <item name="switchPreferenceCompatStyle">@style/Widget.Aisleron.SwitchPreferenceCompat</item>
         <item name="materialCardViewStyle">@style/Widget.Aisleron.CardView</item>
         <item name="snackbarStyle">@style/Widget.Aisleron.Snackbar</item>
-        <item name="alertDialogTheme">@style/MaterialPreferenceDialog</item>
+        <item name="preferenceTheme">@style/Overlay.Aisleron.Preferences</item>
     </style>
 
     <style name="AisleronPureBlack" />
@@ -90,6 +89,6 @@
 
     <style name="AisleronPureBlack.FirstClass" parent="AisleronPureBlack.BusinessClass">
         <item name="colorSurfaceContainerLow">#000000</item>
-<!--        <item name="colorSurfaceContainerHigh">#000000</item>-->
+        <item name="colorSurfaceContainerHigh">#000000</item>
     </style>
 </resources>
