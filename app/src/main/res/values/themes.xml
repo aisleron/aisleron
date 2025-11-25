@@ -99,6 +99,7 @@
         <item name="background">?attr/colorSurface</item>-->
         <item name="backgroundTint">@android:color/transparent</item>
         <item name="background">@android:color/transparent</item>
+        <item name="height">@dimen/toolbar_height</item>
     </style>
 
     <style name="Widget.Aisleron.CardView" parent="Widget.Material3.CardView.Filled">

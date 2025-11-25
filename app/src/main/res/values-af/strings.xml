@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">Aisleron</string>
     <string name="nav_header_subtitle">Vlieg deur die winkels!</string>
     <string name="navigation_drawer_open">Maak navigasielaai oop</string>
     <string name="navigation_drawer_close">Maak navigasielaai toe</string>
-    <string name="nav_header_title">Aisleron</string>
     <string name="nav_header_desc">Navigasie-opskrif</string>
     <string name="action_search">Soek</string>
     <string name="menu_in_stock">Tuisvoorraad</string>
@@ -93,8 +91,6 @@
         of gebruik die soekbalk bo-aan die skerm om produkte te vind en
         hul status of gangtoewysing op te dateer.
     </string>
-    <string name="aisleron_documentation_url" translatable="false">https://aisleron.com/docs/documentation/</string>
-    <string name="aisleron_version_history_url" translatable="false">https://aisleron.com/docs/version-history</string>
     <string name="shop_loyalty_card_name">Lojaliteitskaart</string>
     <string name="loyalty_card">Lojaliteitskaart</string>
     <string name="delete_loyalty_card">Vee lojaliteitskaart uit</string>
@@ -121,7 +117,6 @@
     <string name="add_aisle">Voeg Gang By</string>
     <string name="add_another">Voeg Nog Een By</string>
     <string name="aisle_name">Gangnaam</string>
-    <string name="id_label">id</string>
     <string name="done">Klaar</string>
     <string name="search_product_hint">Soek Produkte…</string>
     <string name="edit">Wysig</string>

@@ -100,7 +100,6 @@
     <string name="add_aisle">Gang hinzufügen</string>
     <string name="add_another">Weitere hinzufügen</string>
     <string name="aisle_name">Gang-Name</string>
-    <string name="id_label">ID</string>
     <string name="done">Fertig</string>
     <string name="navigation_drawer_open">Navigationsleiste öffnen</string>
     <string name="navigation_drawer_close">Navigationsleiste schließen</string>
@@ -149,4 +148,13 @@
     <string name="qty">Mg.</string>
     <string name="expand_collapse_aisles">Aus-/einklappen Gänge</string>
     <string name="tracking_checkbox">Checkbox</string>
+    <string name="use_dynamic_color">Dynamische Farbe</string>
+    <string name="use_dynamic_color_summary">Systemfarben verwenden, die vom aktuellen Hintergrundbild abgeleitet sind</string>
+    <string name="pure_black_default">Theme-Standard</string>
+    <string name="pure_black_economy">Sparsam</string>
+    <string name="pure_black_business_class">Business-Klasse</string>
+    <string name="pure_black_first_class">Erste Klasse</string>
+    <string name="tracking_mode">Tracking-Modus</string>
+    <string name="new_entity_name">Neuer Entitätsname</string>
+    <string name="pure_black_style">Stil Reines Schwarz</string>
 </resources>
