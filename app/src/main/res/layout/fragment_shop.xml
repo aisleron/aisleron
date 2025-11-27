@@ -87,17 +87,21 @@
             <ImageButton
                 android:id="@+id/btn_lookup_loyalty_card"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:contentDescription="@string/get_loyalty_card"
                 android:src="@drawable/themed_add_card_24"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:layout_gravity="center_vertical"
                 style="@style/Widget.Material3.Button.IconButton" />
 
             <ImageButton
                 android:id="@+id/btn_delete_loyalty_card"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:contentDescription="@string/delete_loyalty_card"
                 android:src="@drawable/themed_delete_24"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:layout_gravity="center_vertical"
                 style="@style/Widget.Material3.Button.IconButton" />
         </LinearLayout>
 

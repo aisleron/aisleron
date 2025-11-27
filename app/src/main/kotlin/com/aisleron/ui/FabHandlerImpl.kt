@@ -220,4 +220,14 @@ class FabHandlerImpl(private val resourceProvider: ResourceProvider) : FabHandle
                 .navigate(R.id.nav_add_shop, bundle)
         }
     }
+
+    override fun reset() {
+        _fabMain?.let { setFabMainClosed(it) }
+        _fabMain = null
+        _fabAddProduct = null
+        _fabAddAisle = null
+        _fabAddShop = null
+        menuClosedFabShape = null
+        menuOpenFabShape = null
+    }
 }

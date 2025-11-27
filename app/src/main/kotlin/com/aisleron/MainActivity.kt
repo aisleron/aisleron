@@ -63,6 +63,8 @@ class MainActivity : AisleronActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var prefsListener: SharedPreferences.OnSharedPreferenceChangeListener
 
+    val fabHandler: FabHandler by inject()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         setupKoinFragmentFactory()
 
@@ -86,7 +88,7 @@ class MainActivity : AisleronActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.appBarMain.toolbar)
-
+        fabHandler.reset()
 
         val drawerLayout: DrawerLayout = binding.drawerLayout
 
@@ -123,7 +125,6 @@ class MainActivity : AisleronActivity() {
             appBarLayout.setExpanded(true, true)
 
             drawerLayout.closeDrawers()
-            val fabHandler: FabHandler by inject()
             fabHandler.setFabItems(this)
         }
 

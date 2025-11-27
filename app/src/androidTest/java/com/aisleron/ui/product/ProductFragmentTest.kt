@@ -249,7 +249,6 @@ class ProductFragmentTest : KoinTest {
                 false,
                 addEditFragmentListener,
                 applicationTitleUpdateListener,
-                fabHandler,
                 ProductPreferencesTestImpl()
             )
         Assert.assertNotNull(fragment)
@@ -424,7 +423,6 @@ class ProductFragmentTest : KoinTest {
                 ProductFragment(
                     addEditFragmentListener,
                     applicationTitleUpdateListener,
-                    fabHandler,
                     productPreferences ?: ProductPreferencesTestImpl()
                 )
             }

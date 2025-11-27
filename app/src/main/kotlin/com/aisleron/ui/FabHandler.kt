@@ -31,6 +31,7 @@ interface FabHandler {
     )
 
     fun setFabItems(activity: Activity, vararg fabOptions: FabOption)
+    fun reset()
 
     enum class FabOption {
         ADD_PRODUCT, ADD_AISLE, ADD_SHOP

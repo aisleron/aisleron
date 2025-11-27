@@ -352,14 +352,9 @@ class ShopListFragmentTest : KoinTest {
         onView(withText(copyDialogTitle))
             .check(doesNotExist())
 
-        onView(withId(com.google.android.material.R.id.snackbar_text)).check(
-            matches(
-                allOf(
-                    ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE),
-                    withText(confirmCopy)
-                )
-            )
-        )
+        val snackbar = onView(withId(com.google.android.material.R.id.snackbar_text))
+        snackbar.checkVisibility(View.VISIBLE)
+        snackbar.check(matches(withText(confirmCopy)))
     }
 
     @Test

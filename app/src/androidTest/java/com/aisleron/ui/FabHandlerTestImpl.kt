@@ -45,6 +45,10 @@ class FabHandlerTestImpl : FabHandler {
         fabOnClick.clear()
     }
 
+    override fun reset() {
+        fabOnClick.clear()
+    }
+
     fun clickFab(fabOption: FabHandler.FabOption, view: View) {
         fabOnClick[fabOption]?.onClick(view)
     }
