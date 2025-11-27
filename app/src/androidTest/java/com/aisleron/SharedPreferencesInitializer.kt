@@ -30,6 +30,13 @@ class SharedPreferencesInitializer {
         DARK_THEME("dark_theme"),
     }
 
+    enum class PureBlackStyle(val key: String) {
+        DEFAULT("pure_black_default"),
+        ECONOMY("pure_black_economy"),
+        BUSINESS_CLASS("pure_black_business_class"),
+        FIRST_CLASS("pure_black_first_class"),
+    }
+
     enum class TrackingMode(val value: String) {
         CHECKBOX("checkbox"),
         QUANTITY("quantity"),
@@ -88,6 +95,14 @@ class SharedPreferencesInitializer {
         setPreferenceValue(PREF_STARTING_LIST, value)
     }
 
+    fun setDynamicColor(dynamicColor: Boolean) {
+        setPreferenceValue(DYNAMIC_COLOR, dynamicColor)
+    }
+
+    fun setPureBlackStyle(pureBlackStyle: PureBlackStyle) {
+        setPreferenceValue(PURE_BLACK_STYLE, pureBlackStyle.key)
+    }
+
     fun clearPreferences() {
         val preferencesEditor = getPreferencesEditor()
         preferencesEditor.clear()
@@ -119,6 +134,8 @@ class SharedPreferencesInitializer {
         private const val PREF_KEEP_SCREEN_ON = "keep_screen_on"
         private const val PREF_STARTING_LIST = "starting_list"
         private const val PREF_DISPLAY_LOCKSCREEN = "display_lockscreen"
+        private const val DYNAMIC_COLOR = "dynamic_color"
+        private const val PURE_BLACK_STYLE = "pure_black_style"
         private const val PREF_SHOW_PRODUCT_EXTRA_OPTIONS = "show_product_extra_options"
         private const val PREF_SHOW_SHOP_EXTRA_OPTIONS = "show_shop_extra_options"
         private const val PREF_LAST_UPDATE_CODE = "last_update_code"

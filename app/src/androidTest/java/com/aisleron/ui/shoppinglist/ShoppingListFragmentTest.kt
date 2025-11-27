@@ -53,6 +53,7 @@ import androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom
 import androidx.test.espresso.matcher.ViewMatchers.isDescendantOfA
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.isSelected
+import androidx.test.espresso.matcher.ViewMatchers.withClassName
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
@@ -91,6 +92,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.allOf
+import org.hamcrest.CoreMatchers.endsWith
 import org.hamcrest.CoreMatchers.instanceOf
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.Matcher
@@ -112,8 +114,6 @@ class ShoppingListFragmentTest : KoinTest {
     private lateinit var applicationTitleUpdateListener: ApplicationTitleUpdateListenerTestImpl
     private lateinit var fabHandler: FabHandlerTestImpl
     private lateinit var activityFragment: ShoppingListFragment
-
-    private val actionContextBarResId = androidx.appcompat.R.id.action_context_bar
 
     @get:Rule
     val koinTestRule = KoinTestRule(
@@ -173,8 +173,8 @@ class ShoppingListFragmentTest : KoinTest {
         bundle: Bundle,
         shoppingListPreferencesTestImpl: ShoppingListPreferencesTestImpl? = null,
         loyaltyCardProvider: LoyaltyCardProvider? = null
-    ): FragmentScenario<ShoppingListFragment> =
-        launchFragmentInContainer<ShoppingListFragment>(
+    ): FragmentScenario<ShoppingListFragment> {
+        val fragmentScenario = launchFragmentInContainer<ShoppingListFragment>(
             fragmentArgs = bundle,
             themeResId = R.style.Theme_Aisleron,
             instantiate = {
@@ -187,6 +187,13 @@ class ShoppingListFragmentTest : KoinTest {
                 )
             }
         )
+
+        fragmentScenario.onFragment {
+            setPadding(it.requireView())
+        }
+
+        return fragmentScenario
+    }
 
     private fun getLocation(locationType: LocationType): Location = runBlocking {
         get<LocationRepository>().getAll().first { it.type == locationType }
@@ -306,28 +313,32 @@ class ShoppingListFragmentTest : KoinTest {
     }
 
     @Test
-    fun onLongClick_IsAisleAndActionModeNotActive_ShowActionModeContextMenu() = runTest {
+    fun onLongClick_IsAisle_ShowAisleActionModeContextMenu() = runTest {
         val shoppingList = getShoppingList()
         getActivityScenario(
             bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
         )
 
         val aisleName = getAisle(shoppingList, isDefault = false, productsInStock = false).name
-        //onView(withId(R.id.frg_shopping_list)).perform(RecyclerViewActions.actionOnHolderItem(withAisleName(aisleName), longClick()))
 
         onView(withText(aisleName)).perform(longClick())
 
-        val actionBar = onView(withId(actionContextBarResId))
+        val actionBar = onContextualActionBar()
         actionBar.check(matches(isDisplayed()))
         actionBar.check(matches(hasDescendant(withText(aisleName))))
+        actionBar.check(matches(hasDescendant(withId(R.id.mnu_add_product_to_aisle))))
         actionBar.check(matches(hasDescendant(withId(R.id.mnu_edit_shopping_list_item))))
+
+        actionBar.check(matches(not(hasDescendant(withId(R.id.mnu_product_note)))))
 
         openActionBarOverflowOrOptionsMenu(getInstrumentation().targetContext)
         onView(withText(R.string.delete)).check(matches(isDisplayed()))
+        onView(withText(android.R.string.copy)).check(doesNotExist())
+        onView(withText(R.string.show_note)).check(doesNotExist())
     }
 
     @Test
-    fun onLongClick_IsProductAndActionModeNotActive_ShowActionModeContextMenu() = runTest {
+    fun onLongClick_IsProduct_ShowProductActionModeContextMenu() = runTest {
         val shoppingList = getShoppingList()
         getActivityScenario(
             bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
@@ -337,13 +348,17 @@ class ShoppingListFragmentTest : KoinTest {
 
         onView(withText(product.name)).perform(longClick())
 
-        val actionBar = onView(withId(actionContextBarResId))
+        val actionBar = onContextualActionBar()
         actionBar.check(matches(isDisplayed()))
         actionBar.check(matches(hasDescendant(withText(product.name))))
+        actionBar.check(matches(hasDescendant(withId(R.id.mnu_product_note))))
         actionBar.check(matches(hasDescendant(withId(R.id.mnu_edit_shopping_list_item))))
+
+        actionBar.check(matches(not(hasDescendant(withId(R.id.mnu_add_product_to_aisle)))))
 
         openActionBarOverflowOrOptionsMenu(getInstrumentation().targetContext)
         onView(withText(R.string.delete)).check(matches(isDisplayed()))
+        onView(withText(android.R.string.copy)).check(matches(isDisplayed()))
     }
 
     @Test
@@ -357,8 +372,8 @@ class ShoppingListFragmentTest : KoinTest {
         productItem.perform(longClick())
         productItem.perform(click())
 
-        val actionBar = onView(withId(actionContextBarResId))
-        actionBar.checkVisibility(View.GONE)
+        val actionBar = onContextualActionBar()
+        actionBar.check(matches(not(isDisplayed())))
         scenario.onActivity {
             assertEquals(shoppingList.name, applicationTitleUpdateListener.appTitle)
         }
@@ -375,36 +390,13 @@ class ShoppingListFragmentTest : KoinTest {
         productItem.perform(longClick())
         pressBack()
 
-        val actionBar = onView(withId(actionContextBarResId))
-        actionBar.checkVisibility(View.GONE)
+        val actionBar = onContextualActionBar()
+        actionBar.check(matches(not(isDisplayed())))
         productItem.check(matches(not(isSelected())))
 
         scenario.onActivity {
             assertEquals(shoppingList.name, applicationTitleUpdateListener.appTitle)
         }
-    }
-
-    @Test
-    fun onActionItemClicked_ActionItemIsDelete_DeleteDialogShown() = runTest {
-        val shoppingList = getShoppingList()
-        val product = getProduct(shoppingList, false)
-        val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
-        val scenario = getActivityScenario(bundle)
-        var deleteConfirmMessage = ""
-
-        scenario.onActivity {
-            deleteConfirmMessage =
-                activityFragment.getString(R.string.delete_confirmation, product.name)
-        }
-
-        val productItem = onView(allOf(withText(product.name), withId(R.id.txt_product_name)))
-        productItem.perform(longClick())
-        openActionBarOverflowOrOptionsMenu(getInstrumentation().targetContext)
-        onView(withText(R.string.delete)).perform(click())
-
-        onView(withText(deleteConfirmMessage))
-            .inRoot(isDialog())
-            .check(matches(isDisplayed()))
     }
 
     @Test
@@ -488,11 +480,23 @@ class ShoppingListFragmentTest : KoinTest {
         val aisle = getAisle(shoppingList, isDefault = false, productsInStock = false)
         val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
 
-        getActivityScenario(bundle)
+        val scenario = getActivityScenario(bundle)
         val aisleItem = onView(allOf(withText(aisle.name), withId(R.id.txt_aisle_name)))
         aisleItem.perform(longClick())
         openActionBarOverflowOrOptionsMenu(getInstrumentation().targetContext)
         onView(withText(R.string.delete)).perform(click())
+
+        // Verify the delete dialog is shown
+        var deleteConfirmMessage = ""
+        scenario.onActivity {
+            deleteConfirmMessage =
+                activityFragment.getString(R.string.delete_confirmation, aisle.name)
+        }
+        onView(withText(deleteConfirmMessage))
+            .inRoot(isDialog())
+            .check(matches(isDisplayed()))
+
+        // Cancel the delete dialog
         onView(withText(android.R.string.cancel))
             .inRoot(isDialog())
             .perform(click())
@@ -721,36 +725,6 @@ class ShoppingListFragmentTest : KoinTest {
     }
 
     @Test
-    fun onLongClick_IsAisle_AddProductToAisleShows() = runTest {
-        val shoppingList = getShoppingList()
-        getActivityScenario(
-            bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
-        )
-
-        val aisleName = getAisle(shoppingList, isDefault = false, productsInStock = false).name
-
-        onView(withText(aisleName)).perform(longClick())
-
-        val actionBar = onView(withId(actionContextBarResId))
-        actionBar.check(matches(hasDescendant(withId(R.id.mnu_add_product_to_aisle))))
-    }
-
-    @Test
-    fun onLongClick_IsProduct_AddProductToAisleDoesNotShow() = runTest {
-        val shoppingList = getShoppingList()
-        getActivityScenario(
-            bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
-        )
-
-        val product = getProduct(shoppingList, false)
-
-        onView(withText(product.name)).perform(longClick())
-
-        val actionBar = onView(withId(actionContextBarResId))
-        actionBar.check(matches(not(hasDescendant(withId(R.id.mnu_add_product_to_aisle)))))
-    }
-
-    @Test
     fun onActionItemClicked_ActionItemIsAddProductToAisle_NavigateToAddProduct() = runTest {
         val shoppingList = getShoppingList()
         val aisle = getAisle(shoppingList, isDefault = false, productsInStock = false)
@@ -766,13 +740,14 @@ class ShoppingListFragmentTest : KoinTest {
 
         onView(withText(aisle.name)).perform(longClick())
         onView(withId(R.id.mnu_add_product_to_aisle)).perform(click())
+
+        assertEquals(R.id.nav_add_product, navController.currentDestination?.id)
+
         val bundle = navController.backStack.last().arguments
         val addEditProductBundle = bundler.getAddEditProductBundle(bundle)
-
         assertEquals(aisle.id, addEditProductBundle.aisleId)
         assertEquals(shoppingList.id, addEditProductBundle.locationId)
         assertEquals(AddEditProductBundle.ProductAction.ADD, addEditProductBundle.actionType)
-        assertEquals(R.id.nav_add_product, navController.currentDestination?.id)
     }
 
     @Test
@@ -808,8 +783,8 @@ class ShoppingListFragmentTest : KoinTest {
             .inRoot(isDialog())
             .perform(click())
 
-        val actionBar = onView(withId(actionContextBarResId))
-        actionBar.checkVisibility(View.GONE)
+        val actionBar = onContextualActionBar()
+        actionBar.check(matches(not(isDisplayed())))
     }
 
     @Test
@@ -830,8 +805,7 @@ class ShoppingListFragmentTest : KoinTest {
             fabHandler.clickFab(FabHandler.FabOption.ADD_PRODUCT, activityFragment.requireView())
         }
 
-        val actionBar = onView(withId(actionContextBarResId))
-        actionBar.checkVisibility(View.GONE)
+        onContextualActionBar().checkVisibility(View.GONE)
     }
 
     @Test
@@ -851,9 +825,11 @@ class ShoppingListFragmentTest : KoinTest {
             fabHandler.clickFab(FabHandler.FabOption.ADD_SHOP, activityFragment.requireView())
         }
 
-        val actionBar = onView(withId(actionContextBarResId))
-        actionBar.checkVisibility(View.GONE)
+        onContextualActionBar().checkVisibility(View.GONE)
     }
+
+    private fun onContextualActionBar(): ViewInteraction =
+        onView(withClassName(endsWith("ActionBarContextView")))
 
     @Test
     fun onLongClick_EarlierItemSelected_ActionBarHasNewItemTitle() = runTest {
@@ -868,7 +844,7 @@ class ShoppingListFragmentTest : KoinTest {
         val aisleItem = onView(allOf(withText(aisle.name), withId(R.id.txt_aisle_name)))
         aisleItem.perform(longClick())
 
-        val actionBar = onView(withId(actionContextBarResId))
+        val actionBar = onContextualActionBar()
         actionBar.check(matches(hasDescendant(withText(aisle.name))))
     }
 
@@ -1135,29 +1111,6 @@ class ShoppingListFragmentTest : KoinTest {
     }
 
     @Test
-    fun onActionItemClicked_ActionItemIsCopy_CopyDialogShown() = runTest {
-        val shoppingList = getShoppingList()
-        val product = getProduct(shoppingList, false)
-        val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
-        val scenario = getActivityScenario(bundle)
-        var copyDialogTitle = ""
-
-        scenario.onActivity {
-            copyDialogTitle =
-                activityFragment.getString(R.string.copy_entity_title, product.name)
-        }
-
-        val productItem = onView(allOf(withText(product.name), withId(R.id.txt_product_name)))
-        productItem.perform(longClick())
-        openActionBarOverflowOrOptionsMenu(getInstrumentation().targetContext)
-        onView(withText(android.R.string.copy)).perform(click())
-
-        onView(withText(copyDialogTitle))
-            .inRoot(isDialog())
-            .check(matches(isDisplayed()))
-    }
-
-    @Test
     fun onActionItemClicked_CopyConfirmed_ConfirmSnackbarShown() = runTest {
         val shoppingList = getShoppingList()
         val product = getProduct(shoppingList, false)
@@ -1210,32 +1163,18 @@ class ShoppingListFragmentTest : KoinTest {
         openActionBarOverflowOrOptionsMenu(getInstrumentation().targetContext)
         onView(withText(android.R.string.copy)).perform(click())
 
+        // Verify that the Copy dialog is shown
+        onView(withText(copyDialogTitle))
+            .inRoot(isDialog())
+            .check(matches(isDisplayed()))
+
+        // Cancel the Copy dialog
         onView(withText(android.R.string.cancel))
             .inRoot(isDialog())
             .perform(click())
 
         onView(withText(copyDialogTitle))
             .check(doesNotExist())
-    }
-
-    @Test
-    fun onLongClick_IsAisle_ProductActionsDoNotShow() = runTest {
-        val shoppingList = getShoppingList()
-        val aisle = getAisle(shoppingList, isDefault = false, productsInStock = false)
-        val shoppingListBundle =
-            bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
-
-        getActivityScenario(shoppingListBundle)
-
-        val aisleItem = onView(allOf(withText(aisle.name), withId(R.id.txt_aisle_name)))
-        aisleItem.perform(longClick())
-
-        val actionBar = onView(withId(actionContextBarResId))
-        actionBar.check(matches(not(hasDescendant(withId(R.id.mnu_product_note)))))
-
-        openActionBarOverflowOrOptionsMenu(getInstrumentation().targetContext)
-        onView(withText(android.R.string.copy)).check(doesNotExist())
-        onView(withText(R.string.show_note)).check(doesNotExist())
     }
 
     private suspend fun onCreateView_TrackingMode_ArrangeAct(trackingMode: ShoppingListPreferences.TrackingMode): Product {
@@ -1463,31 +1402,4 @@ class ShoppingListFragmentTest : KoinTest {
     fun onActionItemClicked_ShowNoteCompleted_DialogClosed() = runTest {
         testShowNoteClosed(android.R.string.ok)
     }
-
-
-    /*@Test
-    fun onDrag_IsProduct_ProductRankUpdated() {
-        val shoppingList = getShoppingList()
-        val product =
-            shoppingList.aisles.first { it.products.isNotEmpty() }.products.first { !it.product.inStock }.product
-        val shoppingListBundle = bundler.makeShoppingListBundle(shoppingList.id, FilterType.NEEDED)
-
-        getFragmentScenario(shoppingListBundle)
-
-        onView(
-            allOf(
-                withText(product.name),
-                withId(R.id.txt_product_name)
-            )
-        ).perform(ViewActions.swipeUp())
-
-        val updatedProduct = runBlocking { testData.productRepository.get(product.id) }
-        assertEquals(!product.inStock, updatedProduct?.inStock)
-    }*/
-
-    /*
-        Reorder
-            Aisle
-            Product
-     */
 }

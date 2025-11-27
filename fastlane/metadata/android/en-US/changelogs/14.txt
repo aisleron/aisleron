@@ -3,6 +3,7 @@ Enhancements:
 * Improve Product List Item Display on Small Screen Devices (#88)
 * Added Italian translations
 * Added Afrikaans translations
+* Updated translations
 
 Bug Fixes:
 *

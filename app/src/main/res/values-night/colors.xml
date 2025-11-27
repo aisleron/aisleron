@@ -19,8 +19,7 @@
     <color name="md_theme_primary">#FFB5A0</color>
     <color name="md_theme_onPrimary">#5F1500</color>
     <color name="md_theme_primaryContainer">#FF5722</color>
-    <!--    <color name="md_theme_onPrimaryContainer">#541200</color>-->
-    <color name="md_theme_onPrimaryContainer">#FEFCFF</color>
+    <color name="md_theme_onPrimaryContainer">#541200</color>
     <color name="md_theme_secondary">#FFB5A0</color>
     <color name="md_theme_onSecondary">#5F1500</color>
     <color name="md_theme_secondaryContainer">#7F2A10</color>

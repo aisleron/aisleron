@@ -40,6 +40,7 @@ import androidx.test.espresso.matcher.ViewMatchers.hasDescendant
 import androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.isSelected
+import androidx.test.espresso.matcher.ViewMatchers.withClassName
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
@@ -62,6 +63,8 @@ import com.aisleron.ui.bundles.Bundler
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.allOf
+import org.hamcrest.CoreMatchers.endsWith
+import org.hamcrest.CoreMatchers.not
 import org.hamcrest.CoreMatchers.startsWith
 import org.hamcrest.Matcher
 import org.junit.Assert
@@ -77,8 +80,6 @@ class ShopListFragmentTest : KoinTest {
     private lateinit var bundler: Bundler
     private lateinit var fabHandler: FabHandlerTestImpl
     private lateinit var activityFragment: ShopListFragment
-
-    private val actionContextBarResId = androidx.appcompat.R.id.action_context_bar
 
     @get:Rule
     val koinTestRule = KoinTestRule(
@@ -152,7 +153,7 @@ class ShopListFragmentTest : KoinTest {
 
         shopItem.check(matches(isSelected()))
 
-        val actionBar = onView(withId(actionContextBarResId))
+        val actionBar = onContextualActionBar()
 
         actionBar.check(matches(isDisplayed()))
         actionBar.check(matches(hasDescendant(withText(selectedLocation.name))))
@@ -281,8 +282,7 @@ class ShopListFragmentTest : KoinTest {
         shopItem.perform(longClick())
         shopItem.perform(click())
 
-        val actionBar = onView(withId(actionContextBarResId))
-        actionBar.checkVisibility(View.GONE)
+        onContextualActionBar().check(matches(not(isDisplayed())))
     }
 
     @Test
@@ -303,10 +303,12 @@ class ShopListFragmentTest : KoinTest {
                 fabHandler.clickFab(FabHandler.FabOption.ADD_SHOP, activityFragment.requireView())
             }
 
-            val actionBar = onView(withId(actionContextBarResId))
-            actionBar.checkVisibility(View.GONE)
+            onContextualActionBar().checkVisibility(View.GONE)
         }
     }
+
+    private fun onContextualActionBar(): ViewInteraction =
+        onView(withClassName(endsWith("ActionBarContextView")))
 
     @Test
     fun onActionItemClicked_ActionItemIsCopy_CopyDialogShown() = runTest {
