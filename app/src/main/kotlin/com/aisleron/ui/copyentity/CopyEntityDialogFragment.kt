@@ -31,6 +31,7 @@ import com.aisleron.R
 import com.aisleron.databinding.DialogCopyEntityBinding
 import com.aisleron.ui.AisleronExceptionMap
 import com.aisleron.ui.bundles.Bundler
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -48,7 +49,7 @@ class CopyEntityDialogFragment : DialogFragment() {
         binding.edtEntityNameLayout.hint = copyEntityBundle.nameHint
         binding.edtEntityName.setText(copyEntityBundle.defaultName)
 
-        val dialog = AlertDialog.Builder(requireContext())
+        val dialog = MaterialAlertDialogBuilder(requireContext())
             .setView(binding.root)
             .setTitle(copyEntityBundle.title)
             .setPositiveButton(android.R.string.ok, null) // We'll handle click manually

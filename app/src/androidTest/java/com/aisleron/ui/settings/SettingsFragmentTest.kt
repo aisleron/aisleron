@@ -26,6 +26,8 @@ import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.findNavController
+import androidx.preference.EditTextPreference
+import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ActivityScenario
@@ -59,7 +61,6 @@ import com.aisleron.testdata.data.maintenance.DatabaseMaintenanceDbNameTestImpl
 import org.hamcrest.CoreMatchers.allOf
 import org.hamcrest.CoreMatchers.startsWith
 import org.hamcrest.Matchers
-import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -123,7 +124,7 @@ class SettingsFragmentTest : KoinTest {
             )
             backAction.perform(click())
 
-            Assert.assertEquals(startDestination, navController?.currentDestination)
+            assertEquals(startDestination, navController?.currentDestination)
         }
     }
 
@@ -300,10 +301,59 @@ class SettingsFragmentTest : KoinTest {
         )
     }
 
-    /**
-     * UiState Success
-     * UiState Error
-     * UiState Loading Null
-     * UIState Loading Message
-     */
+    @Test
+    fun onThemeClick_SelectValue_PreferenceUpdated() {
+        var themePreference: ListPreference? = null
+        var lightThemeText = ""
+        getFragmentScenario().onFragment { fragment ->
+            themePreference = fragment.findPreference("application_theme")
+            lightThemeText = fragment.getString(R.string.light_theme)
+        }
+
+        // Open the dialog, select "Light" theme, and verify the change
+        clickOption(R.string.theme)
+        onView(withText(R.string.light_theme)).inRoot(isDialog()).perform(click())
+
+        assertEquals(lightThemeText, themePreference?.summary)
+    }
+
+    @Test
+    fun onThemeClick_CancelDialog_PreferenceNotUpdated() {
+        var themePreference: ListPreference? = null
+        getFragmentScenario().onFragment { fragment ->
+            themePreference = fragment.findPreference("application_theme")
+        }
+        val summaryBefore = themePreference?.summary
+
+        // Open the dialog and cancel it
+        clickOption(R.string.theme)
+        onView(withText(android.R.string.cancel)).inRoot(isDialog()).check(matches(isDisplayed()))
+            .perform(click())
+
+        // Verify the theme preference has not changed
+        assertEquals(summaryBefore, themePreference?.summary)
+    }
+
+    @Test
+    fun onOtherPreferenceDialog_displaysDefaultDialog() {
+        getFragmentScenario().onFragment { fragment ->
+            val editTextPreference = EditTextPreference(fragment.requireContext()).apply {
+                key = "test_edit_text_pref"
+                title = "Test Edit Text"
+            }
+            fragment.preferenceScreen.addPreference(editTextPreference)
+        }
+
+        onView(withId(androidx.preference.R.id.recycler_view))
+            .perform(
+                RecyclerViewActions.actionOnItem<RecyclerView.ViewHolder>(
+                    hasDescendant(withText("Test Edit Text")),
+                    click()
+                )
+            )
+
+        onView(withId(android.R.id.edit))
+            .inRoot(isDialog())
+            .check(matches(isDisplayed()))
+    }
 }

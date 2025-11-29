@@ -103,7 +103,6 @@
     <string name="add_aisle">Aggiungi reparto</string>
     <string name="add_another">Aggiungi un altro</string>
     <string name="aisle_name">Nome del reparto</string>
-    <string name="id_label">id</string>
     <string name="done">Fatto</string>
     <string name="search_product_hint">Ricerca prodotti…</string>
     <string name="edit">Modifica</string>
@@ -151,4 +150,11 @@
     <string name="dismiss">Chiudi</string>
     <string name="view_changes">Visualizza modifiche</string>
     <string name="updated_notification">Aisleron è stato aggiornato da %1$s a %2$s.</string>
+    <string name="use_dynamic_color">Colore dinamico</string>
+    <string name="use_dynamic_color_summary">Utilizza i colori di sistema derivati dallo sfondo corrente</string>
+    <string name="pure_black_default">Predefinito del tema</string>
+    <string name="pure_black_economy">Economico</string>
+    <string name="pure_black_business_class">Business Class</string>
+    <string name="pure_black_first_class">Prima classe</string>
+    <string name="pure_black_style">Stile nero puro</string>
 </resources>

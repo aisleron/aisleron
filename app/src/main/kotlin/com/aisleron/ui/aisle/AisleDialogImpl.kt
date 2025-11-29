@@ -30,6 +30,7 @@ import com.aisleron.R
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.ui.AisleronExceptionMap
 import com.aisleron.ui.shoppinglist.AisleShoppingListItem
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import kotlinx.coroutines.launch
@@ -98,14 +99,14 @@ class AisleDialogImpl(private val aisleViewModel: AisleViewModel) : AisleDialog 
         dialog?.show()
     }
 
-    private fun getDialogBuilder(context: Context, titleResourceId: Int): AlertDialog.Builder {
+    private fun getDialogBuilder(context: Context, titleResourceId: Int): MaterialAlertDialogBuilder {
         val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_aisle, null)
         txtAisleName = dialogView.findViewById(R.id.edt_aisle_name)
         txtAisleName.doAfterTextChanged {
             dialog?.findViewById<TextInputLayout>(R.id.edt_aisle_name_layout)?.error = ""
         }
 
-        return AlertDialog.Builder(context)
+        return MaterialAlertDialogBuilder(context)
             .setView(dialogView)
             .setNeutralButton(android.R.string.cancel, null)
             .setPositiveButton(R.string.done, null)
@@ -120,7 +121,7 @@ class AisleDialogImpl(private val aisleViewModel: AisleViewModel) : AisleDialog 
     private fun showError(code: AisleronException.ExceptionCode) {
         val layout = dialog?.findViewById<TextInputLayout>(R.id.edt_aisle_name_layout)
         layout?.error = AisleronExceptionMap().getErrorResourceId(code).let { id ->
-            layout?.context?.getString(id)
+            layout.context?.getString(id)
         }
 
         aisleViewModel.clearState()

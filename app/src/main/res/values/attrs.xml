@@ -19,6 +19,4 @@
 <resources>
     <attr format="color" name="colorAisleron" />
     <attr format="color" name="colorSelectedListItem" />
-    <attr format="color" name="colorErrorSnackbarBackground" />
-    <attr format="color" name="colorErrorSnackbarText" />
 </resources>

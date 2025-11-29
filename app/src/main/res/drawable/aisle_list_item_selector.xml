@@ -18,13 +18,13 @@
 
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
-        <color android:color="?android:attr/colorBackground" />
+        <color android:color="@android:color/transparent" />
     </item>
     <item>
         <selector>
-            <item android:state_selected="true">
-                <color android:color="?attr/colorSelectedListItem" />
-            </item>
+            <item
+                android:state_selected="true"
+                android:drawable="@drawable/aisle_list_item_selected" />
         </selector>
     </item>
 </layer-list>

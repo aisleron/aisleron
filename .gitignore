@@ -30,3 +30,6 @@ keystore.properties
 # .idea files
 /.idea/androidTestResultsUserPreferences.xml
 /.idea/deploymentTargetSelector.xml
+/fastlane/README.md
+/fastlane/report.xml
+/fastlane/screenshots/

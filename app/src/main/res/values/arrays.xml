@@ -41,4 +41,18 @@
         <item>checkbox_quantity</item>
         <item>none</item>
     </array>
+
+    <array name="pure_black_names">
+        <item>@string/pure_black_default</item>
+        <item>@string/pure_black_economy</item>
+        <item>@string/pure_black_business_class</item>
+        <item>@string/pure_black_first_class</item>
+    </array>
+
+    <array name="pure_black_values">
+        <item>pure_black_default</item>
+        <item>pure_black_economy</item>
+        <item>pure_black_business_class</item>
+        <item>pure_black_first_class</item>
+    </array>
 </resources>

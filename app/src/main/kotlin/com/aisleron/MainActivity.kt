@@ -22,7 +22,6 @@ import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
-import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -31,9 +30,8 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.content.ContextCompat
+import androidx.appcompat.view.ActionMode
 import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -49,20 +47,23 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.preference.PreferenceManager
 import com.aisleron.databinding.ActivityMainBinding
-import com.aisleron.ui.FabHandlerImpl
+import com.aisleron.ui.FabHandler
 import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.settings.DisplayPreferences
 import com.aisleron.ui.settings.DisplayPreferencesImpl
 import com.aisleron.ui.settings.WelcomePreferences
 import com.aisleron.ui.settings.WelcomePreferencesImpl
+import org.koin.android.ext.android.inject
 import org.koin.androidx.fragment.android.setupKoinFragmentFactory
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AisleronActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
     private lateinit var prefsListener: SharedPreferences.OnSharedPreferenceChangeListener
+
+    val fabHandler: FabHandler by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setupKoinFragmentFactory()
@@ -72,7 +73,7 @@ class MainActivity : AppCompatActivity() {
         // Needs to be a standalone variable so it is not garbage collected
         prefsListener = SharedPreferences.OnSharedPreferenceChangeListener { p, s ->
             when (s) {
-                "application_theme" -> recreate()
+                "application_theme", "dynamic_color", "pure_black_style" -> recreate()
                 "restore_database" -> softRestartApp()
                 "display_lockscreen" -> setShowOnLockScreen(p.getBoolean(s, false))
             }
@@ -82,23 +83,12 @@ class MainActivity : AppCompatActivity() {
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
         prefs.registerOnSharedPreferenceChangeListener(prefsListener)
 
-        val displayPreferences = DisplayPreferencesImpl()
-
-        setShowOnLockScreen(displayPreferences.showOnLockScreen(this))
-
-        when (displayPreferences.applicationTheme(this)) {
-            DisplayPreferences.ApplicationTheme.LIGHT_THEME ->
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-
-            DisplayPreferences.ApplicationTheme.DARK_THEME ->
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-
-            else -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
-        }
+        setDisplayPreferences()
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.appBarMain.toolbar)
+        fabHandler.reset()
 
         val drawerLayout: DrawerLayout = binding.drawerLayout
 
@@ -112,7 +102,7 @@ class MainActivity : AppCompatActivity() {
         val navGraph = navInflater.inflate(R.navigation.mobile_navigation)
 
         val shoppingListBundle =
-            Bundler().makeShoppingListBundle(displayPreferences.startingList(this))
+            Bundler().makeShoppingListBundle(DisplayPreferencesImpl().startingList(this))
 
         navController.setGraph(navGraph, shoppingListBundle)
 
@@ -135,7 +125,7 @@ class MainActivity : AppCompatActivity() {
             appBarLayout.setExpanded(true, true)
 
             drawerLayout.closeDrawers()
-            FabHandlerImpl().setFabItems(this)
+            fabHandler.setFabItems(this)
         }
 
         val welcomePreferences = WelcomePreferencesImpl()
@@ -147,6 +137,22 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun setDisplayPreferences() {
+        val displayPreferences = DisplayPreferencesImpl()
+
+        setShowOnLockScreen(displayPreferences.showOnLockScreen(this))
+
+        val nightMode = when (displayPreferences.applicationTheme(this)) {
+            DisplayPreferences.ApplicationTheme.LIGHT_THEME -> AppCompatDelegate.MODE_NIGHT_NO
+            DisplayPreferences.ApplicationTheme.DARK_THEME -> AppCompatDelegate.MODE_NIGHT_YES
+            else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+        }
+
+        AppCompatDelegate.setDefaultNightMode(nightMode)
+        applyDynamicColors(displayPreferences)
+        applyPureBlackStyle(displayPreferences)
+    }
+
     private fun setShowOnLockScreen(show: Boolean) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
             setShowWhenLocked(show)
@@ -154,8 +160,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setWindowInsetListeners() {
-        //TODO: Change system bar style to auto to allow for black status bar text
-        enableEdgeToEdge(statusBarStyle = SystemBarStyle.dark(getStatusBarColor()))
+        enableEdgeToEdge(statusBarStyle = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT))
 
         // Fab margins
         val fab = binding.appBarMain.fab
@@ -205,12 +210,13 @@ class MainActivity : AppCompatActivity() {
         val drawer = binding.navView
         ViewCompat.setOnApplyWindowInsetsListener(drawer) { view, windowInsets ->
             val insets = windowInsets.getInsets(
-                WindowInsetsCompat.Type.navigationBars()
+                WindowInsetsCompat.Type.statusBars()
+                        or WindowInsetsCompat.Type.navigationBars()
                         or WindowInsetsCompat.Type.displayCutout()
             )
 
             val header = view.findViewById<FrameLayout>(R.id.nav_header_frame)
-            header.updatePadding(left = insets.left)
+            header.updatePadding(left = insets.left, top = insets.top)
 
             val menu = view.findViewById<LinearLayout>(R.id.navigation_menu_items)
             menu.updatePadding(left = insets.left, bottom = insets.bottom)
@@ -241,30 +247,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         super.onResume()
-    }
-
-    private fun getStatusBarColor(): Int {
-        return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
-            @Suppress("DEPRECATION")
-            resolveThemeColor(android.R.attr.statusBarColor)
-        } else {
-            Color.TRANSPARENT
-        }
-    }
-
-    private fun resolveThemeColor(attrResId: Int): Int {
-        val typedValue = TypedValue()
-
-        val wasResolved = theme.resolveAttribute(attrResId, typedValue, true)
-        if (!wasResolved) {
-            throw IllegalArgumentException("Attribute 0x${attrResId.toString(16)} not defined in theme")
-        }
-
-        return if (typedValue.resourceId != 0) {
-            ContextCompat.getColor(this, typedValue.resourceId)
-        } else {
-            typedValue.data
-        }
     }
 
     private fun softRestartApp() {
@@ -316,5 +298,26 @@ class MainActivity : AppCompatActivity() {
         val welcomePreferences = WelcomePreferencesImpl()
         welcomePreferences.setLastUpdateValues(this)
         updateBanner.visibility = View.GONE
+    }
+
+    private val enableToolbarRunnable = Runnable {
+        supportActionBar?.setDisplayShowTitleEnabled(true)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setHomeButtonEnabled(true)
+        invalidateOptionsMenu()
+    }
+
+    override fun onSupportActionModeStarted(mode: ActionMode) {
+        binding.appBarMain.toolbar.removeCallbacks(enableToolbarRunnable)
+        super.onSupportActionModeStarted(mode)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
+        supportActionBar?.setDisplayHomeAsUpEnabled(false)
+        supportActionBar?.setHomeButtonEnabled(false)
+        binding.appBarMain.toolbar.menu.clear()
+    }
+
+    override fun onSupportActionModeFinished(mode: ActionMode) {
+        super.onSupportActionModeFinished(mode)
+        binding.appBarMain.toolbar.post(enableToolbarRunnable)
     }
 }

@@ -102,7 +102,6 @@
     <string name="add_aisle">Додати прохід</string>
     <string name="add_another">Додати ще</string>
     <string name="aisle_name">Назва проходу</string>
-    <string name="id_label">id</string>
     <string name="done">Готово</string>
     <string name="search_product_hint">Пошук товарів…</string>
     <string name="edit">Редагувати</string>
@@ -139,7 +138,6 @@
     <string name="qty">Йти</string>
     <string name="starting_list">Стартовий список</string>
     <string name="expand_collapse_aisles">Розгорнути/згорнути проходи</string>
-    <string name="aisleron_version_history_url">https://aisleron.com/docs/version-history</string>
     <string name="extra_options">Додаткові опції</string>
     <string name="tab_notes">Нотатки</string>
     <string name="product_tab_aisles">Проходи</string>
@@ -152,4 +150,11 @@
     <string name="dismiss">Відхилити</string>
     <string name="view_changes">Переглянути зміни</string>
     <string name="updated_notification">Айслерона оновлено з %1$s до %2$s.</string>
+    <string name="use_dynamic_color">Динамічний колір</string>
+    <string name="use_dynamic_color_summary">Використовуйте системні кольори, отримані з поточного фонового малюнка</string>
+    <string name="pure_black_default">Тема за замовчуванням</string>
+    <string name="pure_black_economy">Економ</string>
+    <string name="pure_black_business_class">Бізнес-клас</string>
+    <string name="pure_black_first_class">Перший клас</string>
+    <string name="pure_black_style">Чистий чорний стиль</string>
 </resources>

@@ -27,6 +27,8 @@ import com.aisleron.ui.aisle.AisleDialog
 import com.aisleron.ui.aisle.AisleDialogImpl
 import com.aisleron.ui.loyaltycard.LoyaltyCardProvider
 import com.aisleron.ui.loyaltycard.LoyaltyCardProviderTestImpl
+import com.aisleron.ui.resourceprovider.ResourceProvider
+import com.aisleron.ui.resourceprovider.ResourceProviderTestImpl
 import org.koin.dsl.module
 
 val generalTestModule = module {
@@ -35,4 +37,5 @@ val generalTestModule = module {
     factory<AddEditFragmentListener> { AddEditFragmentListenerTestImpl() }
     factory<LoyaltyCardProvider> { LoyaltyCardProviderTestImpl() }
     factory<AisleDialog> { AisleDialogImpl(get()) }
+    factory<ResourceProvider> { ResourceProviderTestImpl() }
 }

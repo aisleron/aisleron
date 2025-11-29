@@ -29,7 +29,7 @@
         android:labelFor="@id/edt_entity_name"
         app:errorEnabled="true"
         android:layout_margin="@dimen/text_margin"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/edt_entity_name"

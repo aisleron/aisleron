@@ -34,6 +34,18 @@
             android:title="@string/theme"
             app:useSimpleSummaryProvider="true" />
         <ListPreference
+            android:defaultValue="pure_black_default"
+            android:entries="@array/pure_black_names"
+            android:entryValues="@array/pure_black_values"
+            android:key="pure_black_style"
+            android:title="@string/pure_black_style"
+            app:useSimpleSummaryProvider="true" />
+
+        <SwitchPreferenceCompat
+            app:key="dynamic_color"
+            app:title="@string/use_dynamic_color"
+            app:summary="@string/use_dynamic_color_summary" />
+        <ListPreference
             app:key="starting_list"
             app:title="@string/starting_list"
             app:defaultValue="1|IN_STOCK" />

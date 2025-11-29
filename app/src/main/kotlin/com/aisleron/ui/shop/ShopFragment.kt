@@ -41,7 +41,6 @@ import com.aisleron.ui.AddEditFragmentListener
 import com.aisleron.ui.AisleronExceptionMap
 import com.aisleron.ui.AisleronFragment
 import com.aisleron.ui.ApplicationTitleUpdateListener
-import com.aisleron.ui.FabHandler
 import com.aisleron.ui.bundles.AddEditLocationBundle
 import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.loyaltycard.LoyaltyCardProvider
@@ -56,7 +55,6 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class ShopFragment(
     private val addEditFragmentListener: AddEditFragmentListener,
     private val applicationTitleUpdateListener: ApplicationTitleUpdateListener,
-    private val fabHandler: FabHandler,
     private val loyaltyCardProvider: LoyaltyCardProvider,
     private val shopPreferences: ShopPreferences
 ) : Fragment(), MenuProvider, AisleronFragment {
@@ -89,8 +87,6 @@ class ShopFragment(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        fabHandler.setFabItems(this.requireActivity())
-
         _binding = FragmentShopBinding.inflate(inflater, container, false)
         setWindowInsetListeners(this, binding.root, false, R.dimen.text_margin)
 
@@ -254,14 +250,12 @@ class ShopFragment(
             name: String?,
             addEditFragmentListener: AddEditFragmentListener,
             applicationTitleUpdateListener: ApplicationTitleUpdateListener,
-            fabHandler: FabHandler,
             loyaltyCardProvider: LoyaltyCardProvider,
             shopPreferences: ShopPreferences
         ) =
             ShopFragment(
                 addEditFragmentListener,
                 applicationTitleUpdateListener,
-                fabHandler,
                 loyaltyCardProvider,
                 shopPreferences
             ).apply {

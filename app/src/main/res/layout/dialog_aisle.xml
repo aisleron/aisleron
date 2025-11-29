@@ -31,7 +31,7 @@
         android:labelFor="@id/edt_aisle_name"
         android:layout_margin="@dimen/text_margin"
         app:errorEnabled="true"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/edt_aisle_name"

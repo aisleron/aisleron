@@ -27,7 +27,6 @@
     <string name="invalid_location_exception">ERREUR : Identifiant d\'emplacement fourni invalide</string>
     <string name="invalid_db_backup_file_exception">ERREUR : Cible de sauvegarde invalide</string>
     <string name="navigation_drawer_close">Fermer le menu</string>
-    <string name="nav_header_title" translatable="false">Aisleron</string>
     <string name="nav_header_desc">Entête de navigation</string>
     <string name="menu_in_stock">Stock</string>
     <string name="menu_needed">Nécessaire</string>
@@ -56,7 +55,6 @@
     <string name="welcome_add_own_product"><h3>Ajouter vos propres produits</h3> Commencez à créer une liste de courses personnalisée en ajoutant des magasins, des allées et des produits</string>
     <string name="welcome_load_sample_items"><h3>Chargez des exemples</h3> Essayez avec une liste pré-remplie pour vous familiariser avec le fonctionnement de l\'application</string>
     <string name="welcome_title">Bienvenue sur Aisleron</string>
-    <string name="aisleron_documentation_url" translatable="false">https://aisleron.com/docs/documentation/</string>
     <string name="aisle">Rayon</string>
     <string name="product">Produit</string>
     <string name="add_product">Ajouter un produit</string>
@@ -69,7 +67,6 @@
     <string name="add_aisle">Ajouter un rayon</string>
     <string name="add_another">Ajouter un autre</string>
     <string name="aisle_name">Nom du rayon</string>
-    <string name="id_label">ID</string>
     <string name="done">Terminé</string>
     <string name="search_product_hint">Rechercher des produits…</string>
     <string name="edit">Modifier</string>
@@ -96,7 +93,6 @@
     <string name="dark_theme">Thème sombre</string>
     <string name="invalid_db_name_exception">ERREUR : Impossible de déterminer le nom de la base de données</string>
     <string name="welcome_documentation"><h3>Consultez la documentation</h3> Consultez la documentation d\'Aisleron en ligne pour en savoir plus sur les fonctionnalités de l\'application</string>
-    <string name="app_name" translatable="false">Aisleron</string>
     <string name="navigation_drawer_open">Ouvrir le menu</string>
     <string name="keep_screen_on">Garder l\'écran allumé</string>
     <string name="keep_screen_on_summary">Empêcher l’écran de s’éteindre en regardant une liste</string>
@@ -142,4 +138,23 @@
     <string name="qty">Qté</string>
     <string name="starting_list">Liste de départ</string>
     <string name="expand_collapse_aisles">Agrandir/réduire les allées</string>
+    <string name="use_dynamic_color">Couleur dynamique</string>
+    <string name="use_dynamic_color_summary">Utiliser les couleurs du système dérivées du fond d\'écran actuel</string>
+    <string name="pure_black_default">Thème par défaut</string>
+    <string name="pure_black_economy">Économie</string>
+    <string name="pure_black_business_class">Classe affaires</string>
+    <string name="pure_black_first_class">Première classe</string>
+    <string name="extra_options">Options supplémentaires</string>
+    <string name="tab_notes">Remarques</string>
+    <string name="product_tab_aisles">Allées</string>
+    <string name="product_tab_barcodes">Codes à barres</string>
+    <string name="product_tab_inventory">Inventaire</string>
+    <string name="notes_hint">Saisissez vos notes ici…</string>
+    <string name="show_note">Afficher la note</string>
+    <string name="note_dialog_title">Note pour %1$s</string>
+    <string name="loading">Chargement…</string>
+    <string name="dismiss">Rejeter</string>
+    <string name="view_changes">Voir les modifications</string>
+    <string name="updated_notification">Aisleron a été mis à jour de %1$s à %2$s.</string>
+    <string name="pure_black_style">Style noir pur</string>
 </resources>

@@ -60,6 +60,7 @@ import com.aisleron.ui.note.NoteDialogFragment
 import com.aisleron.ui.note.NoteParentRef
 import com.aisleron.ui.settings.ShoppingListPreferences
 import com.aisleron.ui.widgets.ErrorSnackBar
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -335,7 +336,7 @@ class ShoppingListFragment(
     }
 
     private fun confirmDelete(context: Context, item: ShoppingListItem) {
-        val builder: AlertDialog.Builder = AlertDialog.Builder(context)
+        val builder = MaterialAlertDialogBuilder(context)
         builder
             .setTitle(getString(R.string.delete_confirmation, item.name))
             .setNegativeButton(android.R.string.cancel, null)
@@ -539,7 +540,7 @@ class ShoppingListFragment(
     }
 
     private fun confirmSort(context: Context) {
-        val builder: AlertDialog.Builder = AlertDialog.Builder(context)
+        val builder = MaterialAlertDialogBuilder(context)
         builder
             .setTitle(getString(R.string.sort_confirm_title))
             .setMessage(R.string.sort_confirm_message)

@@ -26,7 +26,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="@dimen/text_margin"
         tools:context=".ui.welcome.WelcomeFragment">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -34,10 +33,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
-
+            android:padding="@dimen/text_margin"
+            app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
                 android:id="@+id/imageView"
@@ -55,12 +52,13 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:paddingHorizontal="@dimen/text_margin"
+                android:paddingTop="20dp"
                 android:text="@string/welcome_title"
-                android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+                android:textAppearance="?attr/textAppearanceHeadlineSmall"
                 app:layout_constraintStart_toEndOf="@id/imageView"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:layout_marginBottom="@dimen/title_margin"/>
+                android:layout_marginBottom="@dimen/title_margin" />
 
             <TextView
                 android:id="@+id/txt_welcome_subtitle"
@@ -69,71 +67,84 @@
                 android:paddingVertical="@dimen/subtitle_vertical_padding"
                 android:paddingHorizontal="@dimen/text_margin"
                 android:text="@string/nav_header_subtitle"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
                 app:layout_constraintStart_toEndOf="@id/imageView"
                 app:layout_constraintTop_toBottomOf="@id/txt_welcome_title"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:textStyle="italic" />
+
+            <TextView
+                android:id="@+id/txt_welcome_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="@dimen/text_margin"
+                android:text="@string/welcome_message"
+                app:layout_constraintTop_toBottomOf='@id/imageView' />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <TextView
-            android:id="@+id/txt_welcome_message"
-            android:layout_width="match_parent"
+        <com.google.android.material.card.MaterialCardView
             android:layout_height="wrap_content"
-            android:layout_marginVertical="@dimen/text_margin"
-            android:text="@string/welcome_message" />
+            android:layout_width="match_parent"
+            android:layout_marginHorizontal="@dimen/text_margin"
+            android:layout_marginVertical="8dp">
 
-        <TextView
-            android:id="@+id/txt_welcome_add_own_product"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/text_margin"
-            android:background="@drawable/background_border"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?android:attr/selectableItemBackground"
-            android:padding="@dimen/menu_padding"
-            android:text="@string/welcome_add_own_product"
-            app:drawableEndCompat="@drawable/baseline_arrow_right_24" />
+            <TextView
+                android:id="@+id/txt_welcome_add_own_product"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/menu_padding"
+                android:background="?attr/selectableItemBackground"
+                android:text="@string/welcome_add_own_product"
+                app:drawableEndCompat="@drawable/baseline_arrow_right_24" />
+        </com.google.android.material.card.MaterialCardView>
 
-        <TextView
-            android:id="@+id/txt_welcome_load_sample_items"
-            android:layout_width="match_parent"
+        <com.google.android.material.card.MaterialCardView
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/text_margin"
-            android:background="@drawable/background_border"
-            android:clickable="true"
-            android:enabled="false"
-            android:focusable="true"
-            android:foreground="?android:attr/selectableItemBackground"
-            android:padding="@dimen/menu_padding"
-            android:text="@string/welcome_load_sample_items"
-            app:drawableEndCompat="@drawable/baseline_arrow_right_24" />
+            android:layout_width="match_parent"
+            android:layout_marginHorizontal="@dimen/text_margin"
+            android:layout_marginVertical="8dp">
 
-        <TextView
-            android:id="@+id/txt_welcome_import_db"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/text_margin"
-            android:background="@drawable/background_border"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?android:attr/selectableItemBackground"
-            android:padding="@dimen/menu_padding"
-            android:text="@string/welcome_import_db"
-            app:drawableEndCompat="@drawable/baseline_arrow_right_24" />
+            <TextView
+                android:id="@+id/txt_welcome_load_sample_items"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?android:attr/selectableItemBackground"
+                android:padding="@dimen/menu_padding"
+                android:text="@string/welcome_load_sample_items"
+                app:drawableEndCompat="@drawable/baseline_arrow_right_24" />
+        </com.google.android.material.card.MaterialCardView>
 
-        <TextView
-            android:id="@+id/txt_welcome_documentation"
-            android:layout_width="match_parent"
+        <com.google.android.material.card.MaterialCardView
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/text_margin"
-            android:background="@drawable/background_border"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?android:attr/selectableItemBackground"
-            android:padding="@dimen/menu_padding"
-            android:text="@string/welcome_documentation"
-            app:drawableEndCompat="@drawable/baseline_arrow_right_24" />
+            android:layout_width="match_parent"
+            android:layout_marginHorizontal="@dimen/text_margin"
+            android:layout_marginVertical="8dp">
+
+            <TextView
+                android:id="@+id/txt_welcome_import_db"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?android:attr/selectableItemBackground"
+                android:padding="@dimen/menu_padding"
+                android:text="@string/welcome_import_db"
+                app:drawableEndCompat="@drawable/baseline_arrow_right_24" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_marginHorizontal="@dimen/text_margin"
+            android:layout_marginVertical="8dp">
+
+            <TextView
+                android:id="@+id/txt_welcome_documentation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?android:attr/selectableItemBackground"
+                android:padding="@dimen/menu_padding"
+                android:text="@string/welcome_documentation"
+                app:drawableEndCompat="@drawable/baseline_arrow_right_24" />
+        </com.google.android.material.card.MaterialCardView>
 
     </LinearLayout>
 </ScrollView>

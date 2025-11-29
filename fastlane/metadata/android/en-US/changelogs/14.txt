@@ -1,0 +1,5 @@
+Enhancements:
+* Implemented Material 3 design, Dynamic Colors, and Pure Black styles.
+* Improve Product List Item Display on Small Screen Devices.
+* Added Italian and Afrikaans translations.
+* Updated translations.

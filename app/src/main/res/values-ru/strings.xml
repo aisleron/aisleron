@@ -83,7 +83,6 @@
     <string name="add_aisle">Добавить отдел</string>
     <string name="add_another">Добавить ещё</string>
     <string name="aisle_name">Имя отдела</string>
-    <string name="id_label">id</string>
     <string name="done">Готово</string>
     <string name="search_product_hint">Искать продукты…</string>
     <string name="edit">Изменить</string>
@@ -111,8 +110,6 @@
     <string name="sort_confirm_message">Сортировка по имени отсортирует список в алфавитном порядке. Текущий порядок будет потерян. Продолжить?</string>
     <string name="empty_list_description">Причинами этого могут быть:</string>
     <string name="loyalty_card_provider_missing_exception">ОШИБКА: Провайдер карт лояльности не установлен или деятельность не найдена</string>
-1
-
     <string name="shop_loyalty_card_name">Карта лояльности</string>
     <string name="loyalty_card">Карта постоянного клиента</string>
     <string name="delete_loyalty_card">Удалить карту постоянного клиента</string>
@@ -122,4 +119,42 @@
     <string name="loyalty_card_provider_missing_message"><b><i>%1$s</i></b> обязаны вывешивать карты лояльности. Хотите открыть их сайт, чтобы узнать о нем больше?</string>
     <string name="invalid_loyalty_card_exception">ОШИБКА: Неверный идентификатор карты лояльности</string>
     <string name="duplicate_aisle_name_exception">ОШИБКА: Название прохода должно быть уникальным для каждого списка</string>
+    <string name="keep_screen_on">Держать экран включенным</string>
+    <string name="keep_screen_on_summary">Не выключать экран во время просмотра списка</string>
+    <string name="starting_list">Начальный список</string>
+    <string name="use_dynamic_color">Динамический цвет</string>
+    <string name="use_dynamic_color_summary">Использовать системные цвета, полученные из текущих обоев</string>
+    <string name="pure_black_default">Тема по умолчанию</string>
+    <string name="pure_black_economy">Эконом</string>
+    <string name="pure_black_business_class">Бизнес-класс</string>
+    <string name="pure_black_first_class">Первый класс</string>
+    <string name="invalid_product_exception">ОШИБКА: Неверный идентификатор продукта</string>
+    <string name="tracking_mode">Режим отслеживания</string>
+    <string name="tracking_checkbox">Флажок</string>
+    <string name="tracking_quantity">Количество</string>
+    <string name="tracking_checkbox_quantity">Флажок и количество</string>
+    <string name="tracking_none">Нет (только свайп)</string>
+    <string name="new_entity_name">Новое имя объекта</string>
+    <string name="new_location_name">Новое имя местоположения</string>
+    <string name="new_product_name">Новое имя продукта</string>
+    <string name="copy_entity_title">Копировать %1$s</string>
+    <string name="entity_copied">%1$s скопировано</string>
+    <string name="entity_name_required">Имя не может быть пустым</string>
+    <string name="decrement">Уменьшить</string>
+    <string name="increment">Увеличить</string>
+    <string name="qty">Кол-во</string>
+    <string name="expand_collapse_aisles">Развернуть/свернуть отделы</string>
+    <string name="extra_options">Дополнительные параметры</string>
+    <string name="tab_notes">Примечания</string>
+    <string name="product_tab_aisles">Отделы</string>
+    <string name="product_tab_barcodes">Штрих-коды</string>
+    <string name="product_tab_inventory">Инвентарь</string>
+    <string name="notes_hint">Введите примечания здесь…</string>
+    <string name="show_note">Показать примечание</string>
+    <string name="note_dialog_title">Примечание для %1$s</string>
+    <string name="loading">Загрузка…</string>
+    <string name="dismiss">Закрыть</string>
+    <string name="view_changes">Просмотреть изменения</string>
+    <string name="updated_notification">Aisleron был обновлен с %1$s до %2$s.</string>
+    <string name="pure_black_style">Стиль «чистый черный»</string>
 </resources>

@@ -93,7 +93,6 @@ class WelcomeFragmentTest : KoinTest {
             themeResId = R.style.Theme_Aisleron,
             instantiate = {
                 WelcomeFragment(
-                    fabHandler,
                     welcomePreferences ?: WelcomePreferencesTestImpl()
                 )
             }
@@ -109,7 +108,6 @@ class WelcomeFragmentTest : KoinTest {
     fun newInstance_CallNewInstance_ReturnsFragment() {
         val fragment =
             WelcomeFragment.newInstance(
-                fabHandler,
                 WelcomePreferencesTestImpl()
             )
         Assert.assertNotNull(fragment)

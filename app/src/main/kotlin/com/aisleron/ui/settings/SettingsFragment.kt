@@ -30,7 +30,6 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -44,6 +43,7 @@ import com.aisleron.domain.base.AisleronException
 import com.aisleron.ui.AisleronExceptionMap
 import com.aisleron.ui.AisleronFragment
 import com.aisleron.ui.widgets.ErrorSnackBar
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -75,6 +75,21 @@ class SettingsFragment : PreferenceFragmentCompat(), AisleronFragment {
         )
 
         settingsViewModel.requestLocationDetails()
+        hideNotSupportedSettings()
+    }
+
+    private fun hideNotSupportedSettings() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O_MR1) {
+            findPreference<Preference>("display_lockscreen")?.isVisible = false
+        }
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+            findPreference<Preference>("dynamic_color")?.isVisible = false
+        }
+
+        /*if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            findPreference<Preference>("pure_black_style")?.isVisible = false
+        }*/
     }
 
     private fun initializeDbBackupRestorePreference(
@@ -209,7 +224,7 @@ class SettingsFragment : PreferenceFragmentCompat(), AisleronFragment {
 
     private fun restoreDatabase(uri: Uri) {
         val filename = requireContext().getFileName(uri)
-        val builder: AlertDialog.Builder = AlertDialog.Builder(requireContext())
+        val builder = MaterialAlertDialogBuilder(requireContext())
         builder
             .setTitle(getString(R.string.db_restore_confirmation_title))
             .setMessage(getString(R.string.db_restore_confirmation, filename))
@@ -231,5 +246,30 @@ class SettingsFragment : PreferenceFragmentCompat(), AisleronFragment {
         }
 
         else -> uri.path?.let(::File)?.name
+    }
+
+    override fun onDisplayPreferenceDialog(preference: Preference) {
+        if (preference is ListPreference) {
+            showMaterialListDialog(preference)
+        } else {
+            super.onDisplayPreferenceDialog(preference)
+        }
+    }
+
+    private fun showMaterialListDialog(preference: ListPreference) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(preference.title)
+            .setSingleChoiceItems(
+                preference.entries,
+                preference.findIndexOfValue(preference.value)
+            ) { dialog, which ->
+                val value = preference.entryValues[which].toString()
+                if (preference.callChangeListener(value)) {
+                    preference.value = value
+                }
+                dialog.dismiss()
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
     }
 }

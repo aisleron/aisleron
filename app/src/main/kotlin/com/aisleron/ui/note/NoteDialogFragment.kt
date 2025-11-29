@@ -30,6 +30,7 @@ import com.aisleron.R
 import com.aisleron.databinding.FragmentNoteBinding
 import com.aisleron.ui.AisleronExceptionMap
 import com.aisleron.ui.bundles.Bundler
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -38,7 +39,7 @@ class NoteDialogFragment() : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val binding = FragmentNoteBinding.inflate(layoutInflater)
-        val alertDialog = AlertDialog.Builder(requireContext())
+        val alertDialog = MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.loading)
             .setView(binding.root)
             .setPositiveButton(android.R.string.ok, null) // we’ll override click later

@@ -17,87 +17,88 @@
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/frg_product_list_item"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    app:cardCornerRadius="@dimen/text_margin"
-    android:layout_marginStart="32dp"
-    android:layout_marginEnd="@dimen/text_margin"
     android:layout_marginVertical="4dp"
-    app:cardElevation="4dp"
-    android:id="@+id/frg_product_list_item">
+    android:layout_marginHorizontal="@dimen/text_margin">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:background="@drawable/product_list_item_selector">
+        android:background="@drawable/product_list_item_selector"
+        android:orientation="horizontal">
 
         <TextView
             android:id="@+id/txt_product_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:padding="@dimen/text_margin"
+            android:ellipsize="end"
             android:gravity="center_vertical"
+            android:layout_gravity="center_vertical"
+            android:maxLines="2"
+            android:paddingVertical="12dp"
+            android:paddingStart="12dp"
+            android:paddingEnd="0dp"
             android:text="@string/product"
-            android:singleLine="true"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
-
+            android:textAppearance="?attr/textAppearanceBodyMedium" />
 
         <LinearLayout
             android:id="@+id/stp_qty_selector"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <ImageButton
                 android:id="@+id/btn_qty_dec"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingVertical="@dimen/text_margin"
-                android:paddingStart="@dimen/text_margin"
-                android:paddingEnd="0dp"
+                android:layout_gravity="center"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/baseline_remove_circle_outline_24"
-                android:contentDescription="@string/decrement" />
+                android:contentDescription="@string/decrement"
+                android:paddingVertical="8dp"
+                android:paddingStart="12dp"
+                android:paddingEnd="0dp"
+                android:src="@drawable/baseline_remove_circle_outline_24" />
 
             <EditText
                 android:id="@+id/edt_qty"
-                android:importantForAutofill="no"
-                android:hint="@string/qty"
-                android:minWidth="40dp"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:gravity="center"
+                android:hint="@string/qty"
+                android:importantForAutofill="no"
                 android:inputType="number"
                 android:maxLength="4"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:minWidth="40dp"
+                android:paddingVertical="12dp"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
                 tools:ignore="LabelFor" />
 
             <ImageButton
                 android:id="@+id/btn_qty_inc"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingVertical="@dimen/text_margin"
-                android:paddingEnd="@dimen/text_margin"
-                android:paddingStart="0dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/baseline_add_circle_outline_24"
-                android:contentDescription="@string/increment" />
+                android:contentDescription="@string/increment"
+                android:paddingVertical="8dp"
+                android:paddingStart="0dp"
+                android:paddingEnd="12dp"
+                android:src="@drawable/baseline_add_circle_outline_24" />
         </LinearLayout>
 
 
-        <CheckBox
+        <com.google.android.material.checkbox.MaterialCheckBox
             android:id="@+id/chk_in_stock"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
             android:checkMark="?android:attr/listChoiceIndicatorMultiple"
-            android:buttonTint="?attr/colorSecondary"
             android:checked="false" />
-
     </LinearLayout>
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>

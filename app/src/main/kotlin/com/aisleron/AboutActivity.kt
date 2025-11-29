@@ -18,36 +18,58 @@
 package com.aisleron
 
 import android.graphics.Color
-import android.os.Build
 import android.os.Bundle
-import android.util.TypedValue
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import com.aisleron.databinding.ActivityAboutBinding
+import com.aisleron.ui.settings.DisplayPreferencesImpl
 
 
-class AboutActivity : AppCompatActivity() {
+class AboutActivity : AisleronActivity() {
 
     private lateinit var binding: ActivityAboutBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        setDisplayPreferences()
+
         binding = ActivityAboutBinding.inflate(layoutInflater)
 
         setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
         setWindowInsetListeners()
     }
 
+    private fun setDisplayPreferences() {
+        val displayPreferences = DisplayPreferencesImpl()
+        applyDynamicColors(displayPreferences)
+        applyPureBlackStyle(displayPreferences)
+    }
+
     private fun setWindowInsetListeners() {
-        //TODO: Change system bar style to auto to allow for black status bar text
-        enableEdgeToEdge(statusBarStyle = SystemBarStyle.dark(getStatusBarColor()))
+        enableEdgeToEdge(statusBarStyle = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT))
+
+        val appBar = binding.appBarLayout
+        ViewCompat.setOnApplyWindowInsetsListener(appBar) { view, windowInsets ->
+            val insets = windowInsets.getInsets(
+                WindowInsetsCompat.Type.statusBars()
+                        or WindowInsetsCompat.Type.navigationBars()
+                        or WindowInsetsCompat.Type.displayCutout()
+            )
+
+            view.updatePadding(top = insets.top, right = insets.right, left = insets.left)
+
+            windowInsets
+        }
 
         // Need a toolbar shim here as the application toolbar is defined in the main activity.
-        val toolbarShim = binding.aboutToolbarShim
+        /*val toolbarShim = binding.aboutToolbarShim
         ViewCompat.setOnApplyWindowInsetsListener(toolbarShim) { view, windowInsets ->
             val insets = windowInsets.getInsets(WindowInsetsCompat.Type.statusBars())
 
@@ -56,31 +78,6 @@ class AboutActivity : AppCompatActivity() {
             view.layoutParams = params
 
             windowInsets
-        }
+        }*/
     }
-
-    private fun getStatusBarColor(): Int {
-        return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
-            @Suppress("DEPRECATION")
-            resolveThemeColor(android.R.attr.statusBarColor)
-        } else {
-            Color.TRANSPARENT
-        }
-    }
-
-    private fun resolveThemeColor(attrResId: Int): Int {
-        val typedValue = TypedValue()
-
-        val wasResolved = theme.resolveAttribute(attrResId, typedValue, true)
-        if (!wasResolved) {
-            throw IllegalArgumentException("Attribute 0x${attrResId.toString(16)} not defined in theme")
-        }
-
-        return if (typedValue.resourceId != 0) {
-            ContextCompat.getColor(this, typedValue.resourceId)
-        } else {
-            typedValue.data
-        }
-    }
-
 }

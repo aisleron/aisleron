@@ -17,6 +17,7 @@
 
 package com.aisleron.ui.settings
 
+import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.aisleron.SharedPreferencesInitializer
 import com.aisleron.domain.FilterType
@@ -26,126 +27,123 @@ import kotlin.test.assertEquals
 
 class DisplayPreferencesImplTest {
 
+    private lateinit var displayPreferences: DisplayPreferences
+    private lateinit var sharedPreferencesInitializer: SharedPreferencesInitializer
+    private lateinit var context: Context
+
     @Before
     fun setUp() {
-        SharedPreferencesInitializer().clearPreferences()
+        context = getInstrumentation().targetContext
+        sharedPreferencesInitializer = SharedPreferencesInitializer()
+        displayPreferences = DisplayPreferencesImpl()
+        sharedPreferencesInitializer.clearPreferences()
     }
 
     @Test
-    fun getApplicationTheme_SetToLightTheme_ReturnLightThemeEnum() {
-        SharedPreferencesInitializer().setApplicationTheme(SharedPreferencesInitializer.ApplicationTheme.LIGHT_THEME)
-        val applicationTheme =
-            DisplayPreferencesImpl().applicationTheme(getInstrumentation().targetContext)
+    fun getApplicationTheme_returnsCorrectEnum_forGivenSetting() {
+        val testCases = mapOf(
+            SharedPreferencesInitializer.ApplicationTheme.LIGHT_THEME to DisplayPreferences.ApplicationTheme.LIGHT_THEME,
+            SharedPreferencesInitializer.ApplicationTheme.DARK_THEME to DisplayPreferences.ApplicationTheme.DARK_THEME,
+            SharedPreferencesInitializer.ApplicationTheme.SYSTEM_THEME to DisplayPreferences.ApplicationTheme.SYSTEM_THEME
+        )
 
-        assertEquals(DisplayPreferences.ApplicationTheme.LIGHT_THEME, applicationTheme)
+        testCases.forEach { (inputValue, expectedValue) ->
+            sharedPreferencesInitializer.setApplicationTheme(inputValue)
+            val actual = displayPreferences.applicationTheme(context)
+            assertEquals(expectedValue, actual, "Failed for theme: ${inputValue.name}")
+        }
     }
 
     @Test
-    fun getApplicationTheme_SetToDarkTheme_ReturnDarkThemeEnum() {
-        SharedPreferencesInitializer().setApplicationTheme(SharedPreferencesInitializer.ApplicationTheme.DARK_THEME)
-        val applicationTheme =
-            DisplayPreferencesImpl().applicationTheme(getInstrumentation().targetContext)
-
-        assertEquals(DisplayPreferences.ApplicationTheme.DARK_THEME, applicationTheme)
+    fun showOnLockScreen_returnsCorrectBoolean_forGivenSetting() {
+        listOf(true, false).forEach { showOnLockScreen ->
+            sharedPreferencesInitializer.setShowOnLockScreen(showOnLockScreen)
+            val actual = displayPreferences.showOnLockScreen(context)
+            assertEquals(showOnLockScreen, actual, "Failed for showOnLockScreen: $showOnLockScreen")
+        }
     }
 
     @Test
-    fun getApplicationTheme_SetToSystemTheme_ReturnSystemThemeEnum() {
-        SharedPreferencesInitializer().setApplicationTheme(SharedPreferencesInitializer.ApplicationTheme.SYSTEM_THEME)
-        val applicationTheme =
-            DisplayPreferencesImpl().applicationTheme(getInstrumentation().targetContext)
+    fun getStartingList_returnsCorrectBundle_forGivenSetting() {
+        data class TestCase(
+            val description: String,
+            val setup: () -> Unit,
+            val expectedLocationId: Int,
+            val expectedFilterType: FilterType
+        )
 
-        assertEquals(DisplayPreferences.ApplicationTheme.SYSTEM_THEME, applicationTheme)
+        val testCases = listOf(
+            TestCase(
+                description = "In-Stock filter",
+                setup = { sharedPreferencesInitializer.setStartingList(1, FilterType.IN_STOCK) },
+                expectedLocationId = 1,
+                expectedFilterType = FilterType.IN_STOCK
+            ),
+            TestCase(
+                description = "Needed filter",
+                setup = { sharedPreferencesInitializer.setStartingList(7, FilterType.NEEDED) },
+                expectedLocationId = 7,
+                expectedFilterType = FilterType.NEEDED
+            ),
+            TestCase(
+                description = "All filter",
+                setup = { sharedPreferencesInitializer.setStartingList(5, FilterType.ALL) },
+                expectedLocationId = 5,
+                expectedFilterType = FilterType.ALL
+            ),
+            TestCase(
+                description = "No value defined, should default",
+                setup = { /* no setup */ },
+                expectedLocationId = 1,
+                expectedFilterType = FilterType.IN_STOCK
+            ),
+            TestCase(
+                description = "Invalid ID saved, should default ID",
+                setup = { sharedPreferencesInitializer.setStartingList("x|${FilterType.ALL.name}") },
+                expectedLocationId = 1,
+                expectedFilterType = FilterType.ALL
+            ),
+            TestCase(
+                description = "Invalid filter type, should default filter",
+                setup = { sharedPreferencesInitializer.setStartingList("1|x") },
+                expectedLocationId = 1,
+                expectedFilterType = FilterType.IN_STOCK
+            )
+        )
+
+        testCases.forEach { case ->
+            sharedPreferencesInitializer.clearPreferences() // Reset for each case
+            case.setup()
+
+            val shoppingListBundle = displayPreferences.startingList(context)
+
+            assertEquals(case.expectedLocationId, shoppingListBundle.locationId, "Failed id for: ${case.description}")
+            assertEquals(case.expectedFilterType, shoppingListBundle.filterType, "Failed filter for: ${case.description}")
+        }
     }
 
     @Test
-    fun showOnLockScreen_ValueIsFalse_ReturnFalse() {
-        val showOnLockScreen = false
-        SharedPreferencesInitializer().setShowOnLockScreen(showOnLockScreen)
-        val showOnLockScreenResult =
-            DisplayPreferencesImpl().showOnLockScreen(getInstrumentation().targetContext)
-
-        assertEquals(showOnLockScreen, showOnLockScreenResult)
+    fun dynamicColor_returnsCorrectBoolean_forGivenSetting() {
+        listOf(true, false).forEach { dynamicColor ->
+            sharedPreferencesInitializer.setDynamicColor(dynamicColor)
+            val actual = displayPreferences.dynamicColor(context)
+            assertEquals(dynamicColor, actual, "Failed for dynamicColor: $dynamicColor")
+        }
     }
 
     @Test
-    fun showOnLockScreen_ValueIsTrue_ReturnTrue() {
-        val showOnLockScreen = true
-        SharedPreferencesInitializer().setShowOnLockScreen(showOnLockScreen)
-        val showOnLockScreenResult =
-            DisplayPreferencesImpl().showOnLockScreen(getInstrumentation().targetContext)
+    fun pureBlackStyle_returnsCorrectEnum_forGivenSetting() {
+        val testCases = mapOf(
+            SharedPreferencesInitializer.PureBlackStyle.DEFAULT to DisplayPreferences.PureBlackStyle.DEFAULT,
+            SharedPreferencesInitializer.PureBlackStyle.ECONOMY to DisplayPreferences.PureBlackStyle.ECONOMY,
+            SharedPreferencesInitializer.PureBlackStyle.BUSINESS_CLASS to DisplayPreferences.PureBlackStyle.BUSINESS_CLASS,
+            SharedPreferencesInitializer.PureBlackStyle.FIRST_CLASS to DisplayPreferences.PureBlackStyle.FIRST_CLASS
+        )
 
-        assertEquals(showOnLockScreen, showOnLockScreenResult)
-    }
-
-    @Test
-    fun getStartingList_FilterTypeIsInStock_ReturnInStockShoppingListBundle() {
-        val locationId = 1
-        val filterType = FilterType.IN_STOCK
-        SharedPreferencesInitializer().setStartingList(locationId, filterType)
-        val shoppingListBundle =
-            DisplayPreferencesImpl().startingList(getInstrumentation().targetContext)
-
-        assertEquals(locationId, shoppingListBundle.locationId)
-        assertEquals(filterType, shoppingListBundle.filterType)
-    }
-
-    @Test
-    fun getStartingList_FilterTypeIsNeeded_ReturnNeededShoppingListBundle() {
-        val locationId = 7
-        val filterType = FilterType.NEEDED
-        SharedPreferencesInitializer().setStartingList(locationId, filterType)
-        val shoppingListBundle =
-            DisplayPreferencesImpl().startingList(getInstrumentation().targetContext)
-
-        assertEquals(locationId, shoppingListBundle.locationId)
-        assertEquals(filterType, shoppingListBundle.filterType)
-    }
-
-    @Test
-    fun getStartingList_FilterTypeIsAll_ReturnAllShoppingListBundle() {
-        val locationId = 5
-        val filterType = FilterType.ALL
-        SharedPreferencesInitializer().setStartingList(locationId, filterType)
-        val shoppingListBundle =
-            DisplayPreferencesImpl().startingList(getInstrumentation().targetContext)
-
-        assertEquals(locationId, shoppingListBundle.locationId)
-        assertEquals(filterType, shoppingListBundle.filterType)
-    }
-
-    @Test
-    fun getStartingList_NoValueDefined_ReturnInStockShoppingListBundle() {
-        val locationId = 1
-        val filterType = FilterType.IN_STOCK
-        val shoppingListBundle =
-            DisplayPreferencesImpl().startingList(getInstrumentation().targetContext)
-
-        assertEquals(locationId, shoppingListBundle.locationId)
-        assertEquals(filterType, shoppingListBundle.filterType)
-    }
-
-    @Test
-    fun getStartingList_InvalidIdSaved_ReturnId1() {
-        val locationId = 1
-        val filterType = FilterType.ALL
-        SharedPreferencesInitializer().setStartingList("x|${filterType.name}")
-        val shoppingListBundle =
-            DisplayPreferencesImpl().startingList(getInstrumentation().targetContext)
-
-        assertEquals(locationId, shoppingListBundle.locationId)
-        assertEquals(filterType, shoppingListBundle.filterType)
-    }
-
-    @Test
-    fun getStartingList_InvalidFilterTypeSaved_ReturnFilterTypeInStock() {
-        val locationId = 1
-        val filterType = FilterType.IN_STOCK
-        SharedPreferencesInitializer().setStartingList("$locationId|x")
-        val shoppingListBundle =
-            DisplayPreferencesImpl().startingList(getInstrumentation().targetContext)
-
-        assertEquals(locationId, shoppingListBundle.locationId)
-        assertEquals(filterType, shoppingListBundle.filterType)
+        testCases.forEach { (inputValue, expectedValue) ->
+            sharedPreferencesInitializer.setPureBlackStyle(inputValue)
+            val actual = displayPreferences.pureBlackStyle(context)
+            assertEquals(expectedValue, actual, "Failed for style: ${inputValue.name}")
+        }
     }
 }

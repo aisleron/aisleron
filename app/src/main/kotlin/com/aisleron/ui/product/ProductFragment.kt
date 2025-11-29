@@ -41,7 +41,6 @@ import com.aisleron.ui.AddEditFragmentListener
 import com.aisleron.ui.AisleronExceptionMap
 import com.aisleron.ui.AisleronFragment
 import com.aisleron.ui.ApplicationTitleUpdateListener
-import com.aisleron.ui.FabHandler
 import com.aisleron.ui.bundles.AddEditProductBundle
 import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.settings.ProductPreferences
@@ -54,7 +53,6 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class ProductFragment(
     private val addEditFragmentListener: AddEditFragmentListener,
     private val applicationTitleUpdateListener: ApplicationTitleUpdateListener,
-    private val fabHandler: FabHandler,
     private val productPreferences: ProductPreferences
 ) : Fragment(), MenuProvider, AisleronFragment {
 
@@ -90,8 +88,6 @@ class ProductFragment(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        fabHandler.setFabItems(this.requireActivity())
-
         _binding = FragmentProductBinding.inflate(inflater, container, false)
         setWindowInsetListeners(this, binding.root, false, R.dimen.text_margin)
 
@@ -232,13 +228,11 @@ class ProductFragment(
             inStock: Boolean,
             addEditFragmentListener: AddEditFragmentListener,
             applicationTitleUpdateListener: ApplicationTitleUpdateListener,
-            fabHandler: FabHandler,
             productPreferences: ProductPreferences
         ) =
             ProductFragment(
                 addEditFragmentListener,
                 applicationTitleUpdateListener,
-                fabHandler,
                 productPreferences
             ).apply {
                 arguments = Bundler().makeAddProductBundle(name, inStock)

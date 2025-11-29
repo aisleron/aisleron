@@ -33,4 +33,7 @@
     <dimen name="fab_margin_bottom">16dp</dimen>
     <dimen name="toolbar_height">56dp</dimen>
     <dimen name="design_fab_size_normal">56dp</dimen>
+
+    <!-- Aisleron dimensions.   -->
+    <dimen name="card_elevation">4dp</dimen>
 </resources>

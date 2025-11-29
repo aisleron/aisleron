@@ -36,7 +36,6 @@ import com.aisleron.databinding.FragmentWelcomeBinding
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.ui.AisleronExceptionMap
 import com.aisleron.ui.AisleronFragment
-import com.aisleron.ui.FabHandler
 import com.aisleron.ui.settings.WelcomePreferences
 import com.aisleron.ui.widgets.ErrorSnackBar
 import com.google.android.material.snackbar.Snackbar
@@ -45,17 +44,13 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 class WelcomeFragment(
-    private val fabHandler: FabHandler,
     private val welcomePreferences: WelcomePreferences
 ) : Fragment(), AisleronFragment {
 
     companion object {
         fun newInstance(
-            fabHandler: FabHandler,
             welcomePreferences: WelcomePreferences
-        ) = WelcomeFragment(
-            fabHandler, welcomePreferences
-        )
+        ) = WelcomeFragment(welcomePreferences)
     }
 
     private val viewModel: WelcomeViewModel by viewModel()
@@ -65,16 +60,10 @@ class WelcomeFragment(
         viewModel.checkForProducts()
     }
 
-    private fun initializeFab() {
-        fabHandler.setFabItems(this.requireActivity())
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        initializeFab()
-
         val binding = FragmentWelcomeBinding.inflate(inflater, container, false)
         setWindowInsetListeners(this, binding.root, false, null)
 

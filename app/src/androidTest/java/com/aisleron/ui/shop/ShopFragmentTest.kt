@@ -231,7 +231,6 @@ class ShopFragmentTest : KoinTest {
             null,
             addEditFragmentListener,
             applicationTitleUpdateListener,
-            fabHandler,
             LoyaltyCardProviderTestImpl(),
             ShopPreferencesTestImpl()
         )
@@ -257,7 +256,6 @@ class ShopFragmentTest : KoinTest {
                 ShopFragment(
                     addEditFragmentListener,
                     applicationTitleUpdateListener,
-                    fabHandler,
                     loyaltyCardProvider ?: LoyaltyCardProviderTestImpl(),
                     shopPreferences ?: ShopPreferencesTestImpl()
                 )
