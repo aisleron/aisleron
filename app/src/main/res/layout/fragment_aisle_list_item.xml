@@ -33,7 +33,7 @@
         android:padding="@dimen/text_margin"
         android:layout_weight="0"
         android:singleLine="true"
-        android:textAppearance="?attr/textAppearanceListItem"
+        android:textAppearance="?attr/textAppearanceTitleMedium"
         app:drawableStartCompat="@drawable/baseline_expand_down_24"
         android:drawablePadding="@dimen/expand_button_padding"/>
 

@@ -65,8 +65,14 @@ import com.aisleron.domain.aisle.AisleRepository
 import com.aisleron.domain.aisle.usecase.UpdateAisleExpandedUseCase
 import com.aisleron.domain.backup.DatabaseMaintenance
 import com.aisleron.domain.location.Location
+import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.location.usecase.AddLocationUseCase
+import com.aisleron.domain.location.usecase.UpdateLocationUseCase
+import com.aisleron.domain.loyaltycard.LoyaltyCard
+import com.aisleron.domain.loyaltycard.LoyaltyCardProviderType
+import com.aisleron.domain.loyaltycard.usecase.AddLoyaltyCardToLocationUseCase
+import com.aisleron.domain.loyaltycard.usecase.AddLoyaltyCardUseCase
 import com.aisleron.domain.product.ProductRepository
 import com.aisleron.domain.product.usecase.UpdateProductQtyNeededUseCase
 import com.aisleron.domain.product.usecase.UpdateProductStatusUseCase
@@ -91,6 +97,7 @@ import java.time.format.DateTimeFormatter
 @RunWith(AndroidJUnit4::class)
 class CaptureScreenshots : KoinTest {
     private val searchBoxResId = androidx.appcompat.R.id.search_src_text
+    private val saveBigSuper = "Save Big Super"
 
 
     @get:Rule
@@ -113,6 +120,7 @@ class CaptureScreenshots : KoinTest {
         prefs.setIsInitialized(true)
         prefs.setLastUpdateCode(BuildConfig.VERSION_CODE)
         prefs.setLastUpdateName(BuildConfig.VERSION_NAME)
+        prefs.setPureBlackStyle(SharedPreferencesInitializer.PureBlackStyle.DEFAULT)
         val uiMode = InstrumentationRegistry.getArguments().getString("uiMode", "light")
         val appTheme = if (uiMode == "dark") {
             Log.d("Theme", "Dark")
@@ -143,6 +151,21 @@ class CaptureScreenshots : KoinTest {
                 get<UpdateProductStatusUseCase>().invoke(it.id, false)
             }
 
+            // Add a dummy loyalty card for screenshots
+            val location = get<LocationRepository>().getByName("Save Big Supermarket")!!
+            get<UpdateLocationUseCase>().invoke(location.copy(name = saveBigSuper))
+
+
+            val loyaltyCardId = get<AddLoyaltyCardUseCase>().invoke(
+                LoyaltyCard(
+                    id = 0,
+                    name = saveBigSuper,
+                    provider = LoyaltyCardProviderType.CATIMA,
+                    intent = "dummy-intent"
+                )
+            )
+
+            get<AddLoyaltyCardToLocationUseCase>().invoke(location.id, loyaltyCardId)
         }
     }
 
@@ -412,7 +435,7 @@ class CaptureScreenshots : KoinTest {
     fun screenshot_SelectShop() {
         getActivityScenario().use {
             navigateToShopList()
-            selectShop("Save Big Supermarket")
+            selectShop(saveBigSuper)
             Screengrab.screenshot("alr-170-select-shop")
         }
     }
@@ -426,7 +449,7 @@ class CaptureScreenshots : KoinTest {
     fun screenshot_EditShop() {
         getActivityScenario().use {
             navigateToShopList()
-            selectShop("Save Big Supermarket")
+            selectShop(saveBigSuper)
             clickEditShopListItem()
             Screengrab.screenshot("alr-180-edit-shop")
         }
@@ -436,7 +459,7 @@ class CaptureScreenshots : KoinTest {
     fun screenshot_SelectShopDelete() {
         getActivityScenario().use {
             navigateToShopList()
-            selectShop("Save Big Supermarket")
+            selectShop(saveBigSuper)
             openCabOverflowMenu()
             Screengrab.screenshot("alr-190-select-shop-delete")
         }
@@ -451,7 +474,7 @@ class CaptureScreenshots : KoinTest {
     fun screenshot_DeleteShop() {
         getActivityScenario().use {
             navigateToShopList()
-            selectShop("Save Big Supermarket")
+            selectShop(saveBigSuper)
             openCabOverflowMenu()
             clickDeleteShopListItem()
             Screengrab.screenshot("alr-200-delete-shop")
@@ -467,7 +490,7 @@ class CaptureScreenshots : KoinTest {
     fun screenshot_CopyShop() {
         getActivityScenario().use {
             navigateToShopList()
-            selectShop("Save Big Supermarket")
+            selectShop(saveBigSuper)
             openCabOverflowMenu()
             clickCopyShop()
             sleep(300)
@@ -573,7 +596,7 @@ class CaptureScreenshots : KoinTest {
     @Test
     fun screenshot_StatusChangeSnackbar() {
         getActivityScenario().use {
-            navigateToPinnedShop("Save Big Supermarket")
+            navigateToPinnedShop(saveBigSuper)
             toggleProductStatus("Toothpaste")
             Screengrab.screenshot("alr-240-status-change-snackbar")
         }
@@ -590,7 +613,7 @@ class CaptureScreenshots : KoinTest {
     @Test
     fun screenshot_ShopList() {
         getActivityScenario().use {
-            navigateToPinnedShop("Save Big Supermarket")
+            navigateToPinnedShop(saveBigSuper)
             Screengrab.screenshot("alr-260-shop-list")
         }
     }
@@ -605,7 +628,7 @@ class CaptureScreenshots : KoinTest {
     fun screenshot_ShopListFull() = runTest {
         setAllProductStatus(false)
         getActivityScenario().use {
-            navigateToPinnedShop("Save Big Supermarket")
+            navigateToPinnedShop(saveBigSuper)
             Screengrab.screenshot("alr-270-shop-list-full")
         }
     }
@@ -627,7 +650,7 @@ class CaptureScreenshots : KoinTest {
     @Test
     fun screenshot_ShopListMenu() = runTest {
         getActivityScenario().use {
-            navigateToPinnedShop("Save Big Supermarket")
+            navigateToPinnedShop(saveBigSuper)
             openToolbarOverflowMenu()
             Screengrab.screenshot("alr-290-shop-list-menu")
         }
@@ -694,7 +717,7 @@ class CaptureScreenshots : KoinTest {
         SharedPreferencesInitializer().setTrackingMode(SharedPreferencesInitializer.TrackingMode.CHECKBOX_QUANTITY)
         setProductQuantity("Butter", 4)
         getActivityScenario().use {
-            navigateToPinnedShop("Save Big Supermarket")
+            navigateToPinnedShop(saveBigSuper)
             Screengrab.screenshot("alr-350-qty-chk-product")
         }
     }

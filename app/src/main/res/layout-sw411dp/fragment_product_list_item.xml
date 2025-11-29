@@ -57,7 +57,7 @@
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/decrement"
-                android:paddingVertical="@dimen/text_margin"
+                android:paddingVertical="12dp"
                 android:paddingStart="@dimen/text_margin"
                 android:paddingEnd="0dp"
                 android:src="@drawable/baseline_remove_circle_outline_24" />
@@ -82,7 +82,7 @@
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/increment"
-                android:paddingVertical="@dimen/text_margin"
+                android:paddingVertical="12dp"
                 android:paddingStart="0dp"
                 android:paddingEnd="@dimen/text_margin"
                 android:src="@drawable/baseline_add_circle_outline_24" />
