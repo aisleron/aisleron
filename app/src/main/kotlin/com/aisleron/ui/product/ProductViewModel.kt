@@ -37,6 +37,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+data class ProductAisleInfo(val locationName: String, val aisleName: String)
+
 class ProductViewModel(
     private val addProductUseCase: AddProductUseCase,
     private val updateProductUseCase: UpdateProductUseCase,
@@ -52,6 +54,9 @@ class ProductViewModel(
 
     private val _uiData = MutableStateFlow(ProductUiData())
     val uiData: StateFlow<ProductUiData> = _uiData
+
+    private val _productAisles = MutableStateFlow<List<ProductAisleInfo>>(emptyList())
+    val productAisles: StateFlow<List<ProductAisleInfo>> = _productAisles
 
     private val _productUiState = MutableStateFlow<ProductUiState>(ProductUiState.Empty)
     val productUiState: StateFlow<ProductUiState> = _productUiState
@@ -79,6 +84,7 @@ class ProductViewModel(
                 inStock = product?.inStock ?: inStock,
                 noteText = product?.note?.noteText ?: ""
             )
+            // TODO: Load product aisle information and update _productAisles
             _productUiState.value = ProductUiState.Empty
         }
     }

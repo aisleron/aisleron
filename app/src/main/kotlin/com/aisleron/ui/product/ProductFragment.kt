@@ -34,6 +34,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.viewpager2.widget.ViewPager2
 import com.aisleron.R
 import com.aisleron.databinding.FragmentProductBinding
 import com.aisleron.domain.base.AisleronException
@@ -176,17 +177,25 @@ class ProductFragment(
         tabsAdapter = ProductTabsAdapter(this)
         val viewPager = binding.pgrProductOptions
         viewPager.adapter = tabsAdapter
-
+        viewPager.isSaveEnabled = false
+        viewPager.currentItem = productPreferences.getLastSelectedTab(requireContext())
 
         TabLayoutMediator(binding.tabProductOptions, viewPager) { tab, position ->
             tab.text = when (position) {
                 0 -> getString(R.string.tab_notes)
                 1 -> getString(R.string.product_tab_aisles)
-                2 -> getString(R.string.product_tab_barcodes)
-                3 -> getString(R.string.product_tab_inventory)
+                // 2 -> getString(R.string.product_tab_barcodes)
+                // 3 -> getString(R.string.product_tab_inventory)
                 else -> ""
             }
         }.attach()
+
+        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                productPreferences.setLastSelectedTab(requireContext(), position)
+            }
+        })
     }
 
     private fun displayErrorSnackBar(

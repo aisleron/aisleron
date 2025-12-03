@@ -24,4 +24,8 @@ interface ProductPreferences {
     fun showExtraOptions(context: Context): Boolean
 
     fun setShowExtraOptions(context: Context, value: Boolean)
+
+    fun getLastSelectedTab(context: Context): Int
+
+    fun setLastSelectedTab(context: Context, position: Int)
 }

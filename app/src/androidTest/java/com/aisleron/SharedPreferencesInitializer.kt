@@ -125,6 +125,10 @@ class SharedPreferencesInitializer {
         setPreferenceValue(PREF_LAST_UPDATE_NAME, value)
     }
 
+    fun setProductLastSelectedTab(position: Int) {
+        setPreferenceValue(PRODUCT_LAST_SELECTED_TAB, position)
+    }
+
     companion object {
         private const val IS_INITIALIZED = "is_initialised"
         private const val APPLICATION_THEME = "application_theme"
@@ -140,5 +144,6 @@ class SharedPreferencesInitializer {
         private const val PREF_SHOW_SHOP_EXTRA_OPTIONS = "show_shop_extra_options"
         private const val PREF_LAST_UPDATE_CODE = "last_update_code"
         private const val PREF_LAST_UPDATE_NAME = "last_update_name"
+        private const val PRODUCT_LAST_SELECTED_TAB = "product_last_selected_tab"
     }
 }

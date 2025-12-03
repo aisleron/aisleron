@@ -33,7 +33,17 @@ class ProductPreferencesImpl : ProductPreferences {
         }
     }
 
+    override fun getLastSelectedTab(context: Context): Int =
+        PreferenceManager.getDefaultSharedPreferences(context).getInt(PRODUCT_LAST_SELECTED_TAB, 0)
+
+    override fun setLastSelectedTab(context: Context, position: Int) {
+        PreferenceManager.getDefaultSharedPreferences(context).edit {
+            putInt(PRODUCT_LAST_SELECTED_TAB, position)
+        }
+    }
+
     companion object {
         private const val SHOW_PRODUCT_EXTRA_OPTIONS = "show_product_extra_options"
+        private const val PRODUCT_LAST_SELECTED_TAB = "product_last_selected_tab"
     }
 }
