@@ -35,3 +35,7 @@ keystore.properties
 # Android Studio IDE files
 .idea/
 .gradle/
+
+# Build outputs
+/build
+/bin
