@@ -160,12 +160,31 @@ class Bundler {
         return result ?: NoteDialogBundle(NoteParentRef.Product(-1))
     }
 
+    fun makeAislePickerBundle(
+        title: String, aisles: List<AisleListEntry>, currentAisleId: Int
+    ): Bundle {
+        val aislePickerBundle = AislePickerBundle(
+            title = title,
+            aisles = aisles,
+            currentAisleId = currentAisleId
+        )
+        return makeParcelableBundle(AISLE_PICKER, aislePickerBundle)
+    }
+
+    fun getAislePickerBundle(bundle: Bundle?): AislePickerBundle {
+        val result =
+            getParcelableBundle(bundle, AISLE_PICKER, AislePickerBundle::class.java)
+        return result ?: AislePickerBundle()
+    }
+
     private companion object BundleType {
         const val ADD_EDIT_PRODUCT = "addEditProduct"
         const val ADD_EDIT_LOCATION = "addEditLocation"
         const val SHOPPING_LIST_BUNDLE = "shoppingList"
         const val COPY_ENTITY = "copyEntity"
         const val NOTE_DIALOG = "noteDialog"
+        const val AISLE_PICKER = "aislePicker"
+
 
         const val ARG_LOCATION_ID = "locationId"
         const val ARG_FILTER_TYPE = "filterType"

@@ -362,4 +362,42 @@ class BundlerTest {
 
         assertEquals(NoteParentRef.Product(-1), bundledNoteDialog.noteParentRef)
     }
+
+    @Test
+    fun makeAislePickerBundle_validData_bundleHasAislePickerData() {
+        val title = "My Location"
+        val aisles = arrayListOf(AisleListEntry(1, "Aisle 1"), AisleListEntry(2, "Aisle 2"))
+        val currentAisleId = 1
+
+        val bundle = bundler.makeAislePickerBundle(title, aisles, currentAisleId)
+
+        val aislePickerBundle =
+            getParcelableBundle(bundle, "aislePicker", AislePickerBundle::class.java)
+
+        assertNotNull(aislePickerBundle)
+        assertEquals(title, aislePickerBundle?.title)
+        assertEquals(aisles, aislePickerBundle?.aisles)
+        assertEquals(currentAisleId, aislePickerBundle?.currentAisleId)
+    }
+
+    @Test
+    fun getAislePickerBundle_validBundle_returnsAislePickerBundle() {
+        val title = "My Location"
+        val aisles = arrayListOf(AisleListEntry(1, "Aisle 1"))
+        val currentAisleId = 1
+        val aislePickerBundle = AislePickerBundle(title, aisles, currentAisleId)
+        val bundle = Bundle()
+        bundle.putParcelable("aislePicker", aislePickerBundle)
+
+        val result = bundler.getAislePickerBundle(bundle)
+
+        assertEquals(aislePickerBundle, result)
+    }
+
+    @Test
+    fun getAislePickerBundle_nullBundle_returnsDefaultAislePickerBundle() {
+        val result = bundler.getAislePickerBundle(null)
+        val defaultBundle = AislePickerBundle()
+        assertEquals(defaultBundle, result)
+    }
 }
