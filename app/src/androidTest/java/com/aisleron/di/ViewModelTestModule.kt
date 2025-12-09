@@ -85,6 +85,9 @@ val viewModelTestModule = module {
             getAisleUseCase = get(),
             getNoteParentUseCase = get(),
             applyNoteChangesUseCase = get(),
+            getProductMappingsUseCase = get(),
+            getAislesForLocationUseCase = get(),
+            changeProductAisleUseCase = get(),
             TestScope(UnconfinedTestDispatcher())
         )
     }

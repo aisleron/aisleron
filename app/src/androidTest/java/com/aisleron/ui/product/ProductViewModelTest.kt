@@ -25,7 +25,9 @@ import com.aisleron.di.viewModelTestModule
 import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.aisle.AisleRepository
 import com.aisleron.domain.aisle.usecase.GetAisleUseCase
+import com.aisleron.domain.aisle.usecase.GetAislesForLocationUseCase
 import com.aisleron.domain.aisleproduct.AisleProductRepository
+import com.aisleron.domain.aisleproduct.usecase.ChangeProductAisleUseCase
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.note.Note
 import com.aisleron.domain.note.NoteRepository
@@ -34,25 +36,25 @@ import com.aisleron.domain.note.usecase.GetNoteParentUseCase
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
 import com.aisleron.domain.product.usecase.AddProductUseCase
+import com.aisleron.domain.product.usecase.GetProductMappingsUseCase
 import com.aisleron.domain.product.usecase.UpdateProductUseCase
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
+import com.aisleron.ui.bundles.AisleListEntry
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.Parameterized
 import org.koin.test.KoinTest
 import org.koin.test.get
 import org.koin.test.mock.declare
 import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
-@RunWith(value = Parameterized::class)
-class ProductViewModelTest(private val inStock: Boolean) : KoinTest {
+class ProductViewModelTest() : KoinTest {
     private lateinit var productViewModel: ProductViewModel
 
     @get:Rule
@@ -66,8 +68,7 @@ class ProductViewModelTest(private val inStock: Boolean) : KoinTest {
         runBlocking { get<CreateSampleDataUseCase>().invoke() }
     }
 
-    @Test
-    fun testSaveProduct_ProductExists_UpdateProduct() = runTest {
+    private suspend fun testSaveProduct_ProductExists_UpdateProduct(inStock: Boolean) {
         val updatedProductName = "Updated Product Name"
         val productRepository = get<ProductRepository>()
         val existingProduct: Product = productRepository.getAll().first()
@@ -88,7 +89,16 @@ class ProductViewModelTest(private val inStock: Boolean) : KoinTest {
     }
 
     @Test
-    fun testSaveProduct_ProductDoesNotExists_CreateProduct() = runTest {
+    fun testSaveProduct_ProductExistsAndInStockTrue_UpdateProduct() = runTest {
+        testSaveProduct_ProductExists_UpdateProduct(true)
+    }
+
+    @Test
+    fun testSaveProduct_ProductExistsAndInStockFalse_UpdateProduct() = runTest {
+        testSaveProduct_ProductExists_UpdateProduct(false)
+    }
+
+    private suspend fun testSaveProduct_ProductDoesNotExists_CreateProduct(inStock: Boolean) {
         val newProductName = "New Product Name"
         val productRepository = get<ProductRepository>()
         val countBefore: Int = productRepository.getAll().count()
@@ -110,13 +120,23 @@ class ProductViewModelTest(private val inStock: Boolean) : KoinTest {
     }
 
     @Test
+    fun testSaveProduct_ProductDoesNotExistAndInStockTrue_CreateProduct() = runTest {
+        testSaveProduct_ProductDoesNotExists_CreateProduct(true)
+    }
+
+    @Test
+    fun testSaveProduct_ProductDoesNotExistAndInStockFalse_CreateProduct() = runTest {
+        testSaveProduct_ProductDoesNotExists_CreateProduct(false)
+    }
+
+    @Test
     fun testSaveProduct_SaveSuccessful_UiStateIsSuccess() = runTest {
         val updatedProductName = "Updated Product Name"
         val existingProduct: Product = get<ProductRepository>().getAll().first()
 
         productViewModel.hydrate(existingProduct.id, existingProduct.inStock)
         productViewModel.updateProductName(updatedProductName)
-        productViewModel.updateInStock(inStock)
+        productViewModel.updateInStock(existingProduct.inStock)
         productViewModel.saveProduct()
 
         Assert.assertEquals(
@@ -128,7 +148,7 @@ class ProductViewModelTest(private val inStock: Boolean) : KoinTest {
     fun testSaveProduct_ProductNameIsBlank_NoAction() = runTest {
         val updatedProductName = ""
 
-        productViewModel.hydrate(0, inStock)
+        productViewModel.hydrate(0, true)
         productViewModel.updateProductName(updatedProductName)
         productViewModel.saveProduct()
 
@@ -141,9 +161,9 @@ class ProductViewModelTest(private val inStock: Boolean) : KoinTest {
     fun testSaveProduct_AisleronErrorOnSave_UiStateIsError() = runTest {
         val existingProduct: Product = get<ProductRepository>().getAll().first()
 
-        productViewModel.hydrate(0, false)
+        productViewModel.hydrate(0, existingProduct.inStock)
         productViewModel.updateProductName(existingProduct.name)
-        productViewModel.updateInStock(inStock)
+        productViewModel.updateInStock(!existingProduct.inStock)
         productViewModel.saveProduct()
 
         Assert.assertTrue(productViewModel.productUiState.value is ProductViewModel.ProductUiState.Error)
@@ -169,7 +189,7 @@ class ProductViewModelTest(private val inStock: Boolean) : KoinTest {
 
         pvm.hydrate(0, false)
         pvm.updateProductName("Bogus Product")
-        pvm.updateInStock(inStock)
+        pvm.updateInStock(true)
         pvm.saveProduct()
 
         Assert.assertTrue(pvm.productUiState.value is ProductViewModel.ProductUiState.Error)
@@ -198,7 +218,7 @@ class ProductViewModelTest(private val inStock: Boolean) : KoinTest {
 
     @Test
     fun testHydrate_ProductDoesNotExists_UiStateIsEmpty() = runTest {
-        productViewModel.hydrate(1, inStock)
+        productViewModel.hydrate(1, true)
         Assert.assertTrue(productViewModel.productUiState.value is ProductViewModel.ProductUiState.Empty)
     }
 
@@ -209,7 +229,10 @@ class ProductViewModelTest(private val inStock: Boolean) : KoinTest {
             get<UpdateProductUseCase>(),
             get<GetAisleUseCase>(),
             get<GetNoteParentUseCase>(),
-            get<ApplyNoteChangesUseCase>()
+            get<ApplyNoteChangesUseCase>(),
+            get<GetProductMappingsUseCase>(),
+            get<GetAislesForLocationUseCase>(),
+            get<ChangeProductAisleUseCase>()
         )
 
         Assert.assertNotNull(pvm)
@@ -221,6 +244,7 @@ class ProductViewModelTest(private val inStock: Boolean) : KoinTest {
         val productRepository = get<ProductRepository>()
         val aisleProductRepository = get<AisleProductRepository>()
         val aisle = get<AisleRepository>().getAll().first { !it.isDefault }
+        val inStock = true
 
         productViewModel.hydrate(0, inStock, aisle.locationId, aisle.id)
         val countBefore = aisleProductRepository.getAll().count { it.aisleId == aisle.id }
@@ -318,14 +342,74 @@ class ProductViewModelTest(private val inStock: Boolean) : KoinTest {
         assertEquals(noteText, note?.noteText)
     }
 
-    companion object {
-        @JvmStatic
-        @Parameterized.Parameters
-        fun data(): Collection<Array<Any>> {
-            return listOf(
-                arrayOf(true),
-                arrayOf(false)
-            )
-        }
+    @Test
+    fun requestLocationAisles_itemProvided_aislesForLocationFlowIsUpdated() = runTest {
+        val product = get<ProductRepository>().getAll().first()
+        productViewModel.hydrate(product.id, product.inStock)
+        val productAisleInfo = productViewModel.productAisles.value.first()
+
+        productViewModel.requestLocationAisles(productAisleInfo)
+
+        val aislesForLocation = productViewModel.aislesForLocation.value
+        assertNotNull(aislesForLocation)
+        assertEquals(productAisleInfo.locationName, aislesForLocation.title)
+        assertEquals(productAisleInfo.aisleId, aislesForLocation.currentAisleId)
+        val locationAisles = get<AisleRepository>().getForLocation(productAisleInfo.locationId)
+            .sortedBy { it.rank }
+            .map { AisleListEntry(it.id, it.name) }
+        assertEquals(locationAisles, aislesForLocation.aisles)
+    }
+
+    @Test
+    fun onAislesDialogShown_aislesForLocationIsSet_aislesForLocationIsNulled() = runTest {
+        val product = get<ProductRepository>().getAll().first()
+        productViewModel.hydrate(product.id, product.inStock)
+        val productAisleInfo = productViewModel.productAisles.value.first()
+        productViewModel.requestLocationAisles(productAisleInfo)
+        assertNotNull(productViewModel.aislesForLocation.value)
+
+        productViewModel.onAislesDialogShown()
+
+        assertNull(productViewModel.aislesForLocation.value)
+    }
+
+    @Test
+    fun updateProductAisle_newAisleSelected_productAislesFlowIsUpdated() = runTest {
+        val product = get<ProductRepository>().getAll().first()
+        productViewModel.hydrate(product.id, product.inStock)
+        val aisleInfoToUpdate = productViewModel.productAisles.value.first { it.aisleId != 0 }
+        productViewModel.requestLocationAisles(aisleInfoToUpdate)
+        val newAisle = get<AisleRepository>().getForLocation(aisleInfoToUpdate.locationId)
+            .first { it.id != aisleInfoToUpdate.aisleId }
+
+        productViewModel.updateProductAisle(newAisle.id)
+
+        val updatedAisleInfo =
+            productViewModel.productAisles.value.first { it.locationId == aisleInfoToUpdate.locationId }
+
+        assertEquals(newAisle.id, updatedAisleInfo.aisleId)
+        assertEquals(newAisle.name, updatedAisleInfo.aisleName)
+        assertEquals(aisleInfoToUpdate.initialAisleId, updatedAisleInfo.initialAisleId)
+    }
+
+    @Test
+    fun saveProduct_aisleChanged_productAisleIsUpdatedInRepo() = runTest {
+        val product = get<ProductRepository>().getAll().first()
+        productViewModel.hydrate(product.id, product.inStock)
+        val aisleInfoToChange = productViewModel.productAisles.value.first { it.aisleId != 0 }
+        val originalAisleId = aisleInfoToChange.initialAisleId
+        productViewModel.requestLocationAisles(aisleInfoToChange)
+        val newAisle = get<AisleRepository>().getForLocation(aisleInfoToChange.locationId)
+            .first { it.id != aisleInfoToChange.aisleId }
+        productViewModel.updateProductAisle(newAisle.id)
+        val updatedAisleInfo = productViewModel.productAisles.value.first { it.locationId == aisleInfoToChange.locationId }
+        assertNotEquals(updatedAisleInfo.initialAisleId, updatedAisleInfo.aisleId)
+
+        productViewModel.saveProduct()
+
+        val aisleProductRepository = get<AisleProductRepository>()
+        val productAisles = aisleProductRepository.getProductAisles(product.id)
+        assertNull(productAisles.find { it.aisleId == originalAisleId })
+        assertNotNull(productAisles.find { it.aisleId == newAisle.id })
     }
 }

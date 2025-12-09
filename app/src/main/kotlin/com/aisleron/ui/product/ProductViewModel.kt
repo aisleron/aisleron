@@ -20,13 +20,18 @@ package com.aisleron.ui.product
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aisleron.domain.aisle.usecase.GetAisleUseCase
+import com.aisleron.domain.aisle.usecase.GetAislesForLocationUseCase
+import com.aisleron.domain.aisleproduct.usecase.ChangeProductAisleUseCase
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.note.Note
 import com.aisleron.domain.note.usecase.ApplyNoteChangesUseCase
 import com.aisleron.domain.note.usecase.GetNoteParentUseCase
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.usecase.AddProductUseCase
+import com.aisleron.domain.product.usecase.GetProductMappingsUseCase
 import com.aisleron.domain.product.usecase.UpdateProductUseCase
+import com.aisleron.ui.bundles.AisleListEntry
+import com.aisleron.ui.bundles.AislePickerBundle
 import com.aisleron.ui.note.NoteParentRef
 import com.aisleron.ui.note.NoteViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -37,14 +42,15 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-data class ProductAisleInfo(val locationName: String, val aisleName: String)
-
 class ProductViewModel(
     private val addProductUseCase: AddProductUseCase,
     private val updateProductUseCase: UpdateProductUseCase,
     private val getAisleUseCase: GetAisleUseCase,
     private val getNoteParentUseCase: GetNoteParentUseCase,
     private val applyNoteChangesUseCase: ApplyNoteChangesUseCase,
+    private val getProductMappingsUseCase: GetProductMappingsUseCase,
+    private val getAislesForLocationUseCase: GetAislesForLocationUseCase,
+    private val changeProductAisleUseCase: ChangeProductAisleUseCase,
     coroutineScopeProvider: CoroutineScope? = null
 ) : ViewModel(), NoteViewModel {
     private var _aisleId: Int? = null
@@ -60,6 +66,11 @@ class ProductViewModel(
 
     private val _productUiState = MutableStateFlow<ProductUiState>(ProductUiState.Empty)
     val productUiState: StateFlow<ProductUiState> = _productUiState
+
+    private val _aislesForLocation = MutableStateFlow<AislePickerBundle?>(null)
+    val aislesForLocation: StateFlow<AislePickerBundle?> = _aislesForLocation
+
+    private var editingAisleInfo: ProductAisleInfo? = null
 
     override val noteFlow: StateFlow<String>
         get() = _uiData.map { it.noteText }.stateIn(
@@ -84,9 +95,48 @@ class ProductViewModel(
                 inStock = product?.inStock ?: inStock,
                 noteText = product?.note?.noteText ?: ""
             )
-            // TODO: Load product aisle information and update _productAisles
+            product?.let { p ->
+                _productAisles.value = getProductMappingsUseCase(p.id).flatMap { location ->
+                    location.aisles.map { aisle ->
+                        ProductAisleInfo(
+                            locationId = location.id,
+                            locationName = location.name,
+                            aisleId = aisle.id,
+                            aisleName = aisle.name,
+                            initialAisleId = aisle.id
+                        )
+                    }
+                } + ProductAisleInfo(
+                    locationId = 0,
+                    locationName = "Add new shop",
+                    aisleId = 0,
+                    aisleName = "",
+                    initialAisleId = 0
+                )
+            }
+
+            // TODO: Load locations that don't have the product in them
             _productUiState.value = ProductUiState.Empty
         }
+    }
+
+    fun requestLocationAisles(item: ProductAisleInfo) {
+        editingAisleInfo = item
+        coroutineScope.launch {
+            val aisles = getAislesForLocationUseCase(item.locationId)
+                .sortedBy { it.rank }
+                .map { AisleListEntry(it.id, it.name) }
+
+            _aislesForLocation.value = AislePickerBundle(
+                title = item.locationName,
+                aisles = aisles,
+                currentAisleId = item.aisleId
+            )
+        }
+    }
+
+    fun onAislesDialogShown() {
+        _aislesForLocation.value = null
     }
 
     fun updateProductName(name: String) {
@@ -133,9 +183,14 @@ class ProductViewModel(
                     product = getProduct(id)
                 }
 
-                product?.let {
-                    val note = Note(it.noteId ?: 0, noteText)
-                    applyNoteChangesUseCase(it, note)
+                product?.let { p ->
+                    val note = Note(p.noteId ?: 0, noteText)
+                    applyNoteChangesUseCase(p, note)
+
+                    val aisles = _productAisles.value
+                    aisles.filter { it.aisleId != it.initialAisleId }.forEach {
+                        changeProductAisleUseCase(p.id, it.initialAisleId, it.aisleId)
+                    }
                 }
 
                 _productUiState.value = ProductUiState.Success
@@ -146,6 +201,23 @@ class ProductViewModel(
                     ProductUiState.Error(
                         AisleronException.ExceptionCode.GENERIC_EXCEPTION, e.message
                     )
+            }
+        }
+    }
+
+    fun updateProductAisle(selectedAisleId: Int) {
+        val selectedAisleInfo = editingAisleInfo ?: return
+
+        coroutineScope.launch {
+            getAisleUseCase(selectedAisleId)?.let { a ->
+                val currentAisles = _productAisles.value
+                _productAisles.value = currentAisles.map {
+                    if (it == selectedAisleInfo) {
+                        it.copy(aisleId = a.id, aisleName = a.name)
+                    } else {
+                        it
+                    }
+                }
             }
         }
     }
