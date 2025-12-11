@@ -56,6 +56,7 @@
     <string name="duplicate_location_exception">ERROR: No se puede agregar un duplicado de una ubicación existente</string>
     <string name="sample_data_creation_exception">ERROR: No se pueden cargar datos de muestra en una base de datos existente</string>
     <string name="loyalty_card_provider_missing_exception">ERROR: Proveedor de tarjeta de fidelidad no instalado o actividad no encontrada</string>
+    <string name="aisle_move_exception">ERROR: El movimiento del pasillo debe ser dentro de la misma Ubicación.</string>
     <string name="about_support_header">Soporte</string>
     <string name="about_legal_header">Licencias y políticas</string>
     <string name="about_support_version_title">Historial de versiones</string>

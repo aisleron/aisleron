@@ -56,6 +56,7 @@
     <string name="duplicate_location_exception">FOUT: Kan nie \'n duplikaat van \'n bestaande plek byvoeg nie</string>
     <string name="sample_data_creation_exception">FOUT: Kan nie voorbeeldata in \'n bestaande databasis laai nie</string>
     <string name="loyalty_card_provider_missing_exception">FOUT: Lojaliteitskaartverskaffer nie geïnstalleer of aktiwiteit nie gevind nie</string>
+    <string name="aisle_move_exception">FOUT: Gangskuif moet binne dieselfde Plek wees.</string>
     <string name="about_support_header">Ondersteuning</string>
     <string name="about_legal_header">Lisensies en Beleide</string>
     <string name="about_support_version_title">Weergawe-geskiedenis</string>

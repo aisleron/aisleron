@@ -63,6 +63,7 @@
     <string name="pure_black_economy">Economy</string>
     <string name="pure_black_business_class">Business Class</string>
     <string name="pure_black_first_class">First Class</string>
+    <string name="pure_black_style">Pure Black style</string>
 
     <!-- Exception Messages   -->
     <string name="generic_error">ERROR: %1$s</string>
@@ -79,6 +80,8 @@
     <string name="duplicate_location_exception">ERROR: Cannot add a duplicate of an existing location</string>
     <string name="sample_data_creation_exception">ERROR: Cannot load sample data into an existing database</string>
     <string name="loyalty_card_provider_missing_exception">ERROR: Loyalty card provider not installed or activity not found</string>
+    <string name="aisle_move_exception">ERROR: Aisle move must be within the same Location.</string>
+
 
     <!-- About Preferences -->
     <string name="about_support_header">Support</string>
@@ -207,6 +210,4 @@
     <string name="dismiss">Dismiss</string>
     <string name="view_changes">View Changes</string>
     <string name="updated_notification">Aisleron was updated from %1$s to %2$s. </string>
-    <string name="pure_black_style">Pure Black style</string>
-
 </resources>

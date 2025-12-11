@@ -33,6 +33,8 @@ import com.aisleron.domain.aisle.usecase.UpdateAisleRankUseCase
 import com.aisleron.domain.aisle.usecase.UpdateAisleUseCase
 import com.aisleron.domain.aisle.usecase.UpdateAisleUseCaseImpl
 import com.aisleron.domain.aisleproduct.usecase.AddAisleProductsUseCase
+import com.aisleron.domain.aisleproduct.usecase.ChangeProductAisleUseCase
+import com.aisleron.domain.aisleproduct.usecase.ChangeProductAisleUseCaseImpl
 import com.aisleron.domain.aisleproduct.usecase.GetAisleMaxRankUseCase
 import com.aisleron.domain.aisleproduct.usecase.RemoveProductsFromAisleUseCase
 import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductRankUseCase
@@ -173,6 +175,15 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
 
     val updateAisleProductsUseCase: UpdateAisleProductsUseCase by lazy {
         UpdateAisleProductsUseCase(repositoryFactory.aisleProductRepository)
+    }
+
+    val changeProductAisleUseCase: ChangeProductAisleUseCase by lazy {
+        ChangeProductAisleUseCaseImpl(
+            aisleProductRepository = repositoryFactory.aisleProductRepository,
+            getAisleUseCase = getAisleUseCase,
+            getAisleMaxRankUseCase = getAisleMaxRankUseCase,
+            updateAisleProductUseCase = updateAisleProductsUseCase
+        )
     }
 
     /**
@@ -425,8 +436,9 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
             RemoveProductsFromAisleUseCase::class -> removeProductsFromAisleUseCase as T
             UpdateAisleProductsUseCase::class -> updateAisleProductsUseCase as T
             UpdateAisleProductRankUseCase::class -> updateAisleProductRankUseCase as T
+            ChangeProductAisleUseCase::class -> changeProductAisleUseCase as T
 
-            // Location Use Cases
+                    // Location Use Cases
             AddLocationUseCase::class -> addLocationUseCase as T
             CopyLocationUseCase::class -> copyLocationUseCase as T
             GetHomeLocationUseCase::class -> getHomeLocationUseCase as T

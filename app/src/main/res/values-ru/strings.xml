@@ -44,6 +44,7 @@
     <string name="duplicate_product_exception">ОШИБКА: Нельзя добавить копию существующего продукта</string>
     <string name="duplicate_location_exception">ОШИБКА: Нельзя добавить копию существующего магазина</string>
     <string name="sample_data_creation_exception">ОШИБКА: Не удалось загрузить информацию примера в базу данных</string>
+    <string name="aisle_move_exception">ОШИБКА: Перемещение отдела должно происходить в пределах одного и того же Местоположения.</string>
     <string name="about_support_header">Техническая поддержка</string>
     <string name="about_legal_header">Лицензии и политики</string>
     <string name="about_support_version_title">История версий</string>
