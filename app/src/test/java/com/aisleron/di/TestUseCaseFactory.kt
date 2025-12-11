@@ -22,6 +22,8 @@ import com.aisleron.domain.aisle.usecase.AddAisleUseCase
 import com.aisleron.domain.aisle.usecase.AddAisleUseCaseImpl
 import com.aisleron.domain.aisle.usecase.GetAisleUseCase
 import com.aisleron.domain.aisle.usecase.GetAisleUseCaseImpl
+import com.aisleron.domain.aisle.usecase.GetAislesForLocationUseCase
+import com.aisleron.domain.aisle.usecase.GetAislesForLocationUseCaseImpl
 import com.aisleron.domain.aisle.usecase.GetDefaultAislesUseCase
 import com.aisleron.domain.aisle.usecase.IsAisleNameUniqueUseCase
 import com.aisleron.domain.aisle.usecase.RemoveAisleUseCase
@@ -110,6 +112,10 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
 
     val getAisleUseCase: GetAisleUseCase by lazy {
         GetAisleUseCaseImpl(repositoryFactory.aisleRepository)
+    }
+
+    val getAislesForLocationUseCase: GetAislesForLocationUseCase by lazy {
+        GetAislesForLocationUseCaseImpl(repositoryFactory.aisleRepository)
     }
 
     val getDefaultAislesUseCase: GetDefaultAislesUseCase by lazy {
@@ -424,6 +430,7 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
             AddAisleUseCase::class -> addAisleUseCase as T
             GetAisleMaxRankUseCase::class -> getAisleMaxRankUseCase as T
             GetAisleUseCase::class -> getAisleUseCase as T
+            GetAislesForLocationUseCase::class -> getAislesForLocationUseCase as T
             GetDefaultAislesUseCase::class -> getDefaultAislesUseCase as T
             IsAisleNameUniqueUseCase::class -> isAisleNameUniqueUseCase as T
             RemoveAisleUseCase::class -> removeAisleUseCase as T
@@ -438,7 +445,7 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
             UpdateAisleProductRankUseCase::class -> updateAisleProductRankUseCase as T
             ChangeProductAisleUseCase::class -> changeProductAisleUseCase as T
 
-                    // Location Use Cases
+            // Location Use Cases
             AddLocationUseCase::class -> addLocationUseCase as T
             CopyLocationUseCase::class -> copyLocationUseCase as T
             GetHomeLocationUseCase::class -> getHomeLocationUseCase as T
