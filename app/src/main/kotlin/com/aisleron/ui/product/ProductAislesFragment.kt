@@ -32,6 +32,8 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.aisleron.databinding.FragmentProductAislesBinding
 import com.aisleron.databinding.ListItemProductAisleBinding
+import com.aisleron.ui.aisle.AislePickerDialogFragment
+import com.aisleron.ui.bundles.AislePickerBundle
 import kotlinx.coroutines.launch
 
 class ProductAislesFragment : Fragment() {
@@ -41,6 +43,25 @@ class ProductAislesFragment : Fragment() {
 
     private val viewModel: ProductViewModel by lazy {
         ViewModelProvider(requireParentFragment())[ProductViewModel::class.java]
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        childFragmentManager.setFragmentResultListener(
+            AISLE_PICKER_REQUEST_KEY,
+            this
+        ) { _, bundle ->
+            val selectedAisleId = bundle.getInt(AislePickerDialogFragment.KEY_SELECTED_AISLE_ID, -1)
+            val addNewAisle = bundle.getBoolean(AislePickerDialogFragment.KEY_ADD_NEW_AISLE, false)
+
+            if (selectedAisleId != -1) {
+                viewModel.updateProductAisle(selectedAisleId)
+            }
+            if (addNewAisle) {
+                // TODO: Handle add new aisle
+            }
+        }
     }
 
     override fun onCreateView(
@@ -55,7 +76,9 @@ class ProductAislesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val productAislesAdapter = ProductAislesAdapter()
+        val productAislesAdapter = ProductAislesAdapter { productAisleInfo ->
+            viewModel.requestLocationAisles(productAisleInfo)
+        }
         binding.productAislesList.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = productAislesAdapter
@@ -63,11 +86,27 @@ class ProductAislesFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.productAisles.collect {
-                    productAislesAdapter.submitList(it)
+                launch {
+                    viewModel.productAisles.collect {
+                        productAislesAdapter.submitList(it)
+                    }
+                }
+
+                launch {
+                    viewModel.aislesForLocation.collect { data ->
+                        if (data != null) {
+                            showAislePickerDialog(data)
+                            viewModel.onAislesDialogShown()
+                        }
+                    }
                 }
             }
         }
+    }
+
+    private fun showAislePickerDialog(data: AislePickerBundle) {
+        AislePickerDialogFragment.newInstance(data, AISLE_PICKER_REQUEST_KEY)
+            .show(childFragmentManager, AislePickerDialogFragment.TAG)
     }
 
     override fun onDestroyView() {
@@ -75,8 +114,12 @@ class ProductAislesFragment : Fragment() {
         _binding = null
     }
 
-    private class ProductAislesAdapter :
-        ListAdapter<ProductAisleInfo, ProductAislesAdapter.ViewHolder>(ProductAisleInfoDiffCallback()) {
+    companion object {
+        private const val AISLE_PICKER_REQUEST_KEY = "aislePickerRequest"
+    }
+
+    private class ProductAislesAdapter(private val onItemClicked: (ProductAisleInfo) -> Unit) :
+        ListAdapter<ProductAisleInfo, ProductAislesAdapter.ViewHolder>(DiffCallback) {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val binding = ListItemProductAisleBinding.inflate(
@@ -88,25 +131,36 @@ class ProductAislesFragment : Fragment() {
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.bind(getItem(position))
+            holder.bind(getItem(position), onItemClicked)
         }
 
         class ViewHolder(private val binding: ListItemProductAisleBinding) :
             RecyclerView.ViewHolder(binding.root) {
-            fun bind(productAisleInfo: ProductAisleInfo) {
+            fun bind(
+                productAisleInfo: ProductAisleInfo, onItemClicked: (ProductAisleInfo) -> Unit
+            ) {
                 binding.locationName.text = productAisleInfo.locationName
                 binding.aisleName.text = productAisleInfo.aisleName
+                itemView.setOnClickListener {
+                    onItemClicked(productAisleInfo)
+                }
             }
         }
-    }
 
-    private class ProductAisleInfoDiffCallback : DiffUtil.ItemCallback<ProductAisleInfo>() {
-        override fun areItemsTheSame(oldItem: ProductAisleInfo, newItem: ProductAisleInfo): Boolean {
-            return oldItem.locationName == newItem.locationName
-        }
+        companion object {
+            private val DiffCallback = object : DiffUtil.ItemCallback<ProductAisleInfo>() {
+                override fun areItemsTheSame(
+                    oldItem: ProductAisleInfo, newItem: ProductAisleInfo
+                ): Boolean {
+                    return oldItem.locationId == newItem.locationId && oldItem.aisleId == newItem.aisleId
+                }
 
-        override fun areContentsTheSame(oldItem: ProductAisleInfo, newItem: ProductAisleInfo): Boolean {
-            return oldItem == newItem
+                override fun areContentsTheSame(
+                    oldItem: ProductAisleInfo, newItem: ProductAisleInfo
+                ): Boolean {
+                    return oldItem == newItem
+                }
+            }
         }
     }
 }
