@@ -95,22 +95,47 @@ class ProductViewModel(
                 inStock = product?.inStock ?: inStock,
                 noteText = product?.note?.noteText ?: ""
             )
-            product?.let { p ->
-                _productAisles.value = getProductMappingsUseCase(p.id).flatMap { location ->
-                    location.aisles.map { aisle ->
-                        ProductAisleInfo(
-                            locationId = location.id,
-                            locationName = location.name,
-                            aisleId = aisle.id,
-                            aisleName = aisle.name,
-                            initialAisleId = aisle.id
-                        )
-                    }
-                }
+
+            product?.let {
+                loadProductAisleList(it)
             }
 
-            // TODO: Load locations that don't have the product in them
             _productUiState.value = ProductUiState.Empty
+        }
+    }
+
+    private suspend fun loadProductAisleList(product: Product) {
+        val aisles = getProductMappingsUseCase(product.id).flatMap { location ->
+            location.aisles.map { aisle ->
+                ProductAisleInfo(
+                    locationId = location.id,
+                    locationName = location.name,
+                    aisleId = aisle.id,
+                    aisleName = aisle.name,
+                    initialAisleId = aisle.id
+                )
+            }
+        }
+
+        val currentAisles = _productAisles.value
+        _productAisles.value = aisles.map { newAisle ->
+            val existing = currentAisles.find {
+                it.locationId == newAisle.locationId && it.initialAisleId == newAisle.initialAisleId
+            }
+
+            if (existing != null && existing.locationName != newAisle.locationName) {
+                existing.copy(locationName = newAisle.locationName)
+            } else {
+                newAisle
+            }
+        }
+    }
+
+    fun requestProductAisles() {
+        product?.let {
+            coroutineScope.launch {
+                loadProductAisleList(it)
+            }
         }
     }
 

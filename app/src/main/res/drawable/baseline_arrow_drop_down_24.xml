@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ Copyright (C) 2025 aisleron.com
   ~
@@ -16,12 +15,14 @@
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/product_aisles_list"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.product.ProductAislesFragment"
-    tools:listitem="@layout/fragment_product_aisle_list_item"
-    android:paddingVertical="@dimen/text_margin"
-    android:clipToPadding="false" />
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:height="24dp"
+    android:viewportHeight="24"
+    android:viewportWidth="24"
+    android:width="24dp">
+
+    <path
+        android:fillColor="?attr/colorOnSurface"
+        android:pathData="M7,10l5,5 5,-5z" />
+
+</vector>

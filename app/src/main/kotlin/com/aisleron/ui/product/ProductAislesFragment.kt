@@ -31,7 +31,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.aisleron.databinding.FragmentProductAislesBinding
-import com.aisleron.databinding.ListItemProductAisleBinding
+import com.aisleron.databinding.FragmentProductAisleListItemBinding
 import com.aisleron.ui.AisleronFragment
 import com.aisleron.ui.aisle.AislePickerDialogFragment
 import com.aisleron.ui.bundles.AislePickerBundle
@@ -119,6 +119,7 @@ class ProductAislesFragment : Fragment(), AisleronFragment {
 
     override fun onResume() {
         super.onResume()
+        viewModel.requestProductAisles()
         binding.root.requestLayout()
     }
 
@@ -130,7 +131,7 @@ class ProductAislesFragment : Fragment(), AisleronFragment {
         ListAdapter<ProductAisleInfo, ProductAislesAdapter.ViewHolder>(DiffCallback) {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            val binding = ListItemProductAisleBinding.inflate(
+            val binding = FragmentProductAisleListItemBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false
@@ -142,7 +143,7 @@ class ProductAislesFragment : Fragment(), AisleronFragment {
             holder.bind(getItem(position), onItemClicked)
         }
 
-        class ViewHolder(private val binding: ListItemProductAisleBinding) :
+        class ViewHolder(private val binding: FragmentProductAisleListItemBinding) :
             RecyclerView.ViewHolder(binding.root) {
             fun bind(
                 productAisleInfo: ProductAisleInfo, onItemClicked: (ProductAisleInfo) -> Unit
@@ -160,7 +161,7 @@ class ProductAislesFragment : Fragment(), AisleronFragment {
                 override fun areItemsTheSame(
                     oldItem: ProductAisleInfo, newItem: ProductAisleInfo
                 ): Boolean {
-                    return oldItem.locationId == newItem.locationId && oldItem.aisleId == newItem.aisleId
+                    return oldItem.locationId == newItem.locationId && oldItem.initialAisleId == newItem.initialAisleId
                 }
 
                 override fun areContentsTheSame(

@@ -20,6 +20,7 @@ package com.aisleron.ui.product
 import android.os.Bundle
 import androidx.fragment.app.testing.FragmentScenario
 import androidx.fragment.app.testing.launchFragmentInContainer
+import androidx.lifecycle.Lifecycle
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -36,13 +37,18 @@ import com.aisleron.di.daoTestModule
 import com.aisleron.di.repositoryModule
 import com.aisleron.di.useCaseModule
 import com.aisleron.di.viewModelTestModule
+import com.aisleron.domain.FilterType
 import com.aisleron.domain.aisle.AisleRepository
+import com.aisleron.domain.location.Location
+import com.aisleron.domain.location.LocationType
+import com.aisleron.domain.location.usecase.AddLocationUseCase
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
 import com.aisleron.domain.product.usecase.GetProductMappingsUseCase
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import com.aisleron.ui.AddEditFragmentListenerTestImpl
 import com.aisleron.ui.ApplicationTitleUpdateListenerTestImpl
+import com.aisleron.ui.FabHandlerTestImpl
 import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.settings.ProductPreferencesTestImpl
 import kotlinx.coroutines.runBlocking
@@ -89,13 +95,14 @@ class ProductAislesFragmentTest : KoinTest {
                     productPreferences ?: ProductPreferencesTestImpl().also {
                         val context = InstrumentationRegistry.getInstrumentation().context
                         it.setShowExtraOptions(context, true)
-                    }
+                    },
+
+                    FabHandlerTestImpl()
                 )
             }
         )
 
-        onView(withText(R.string.product_tab_aisles))
-            .perform(click())
+        onView(withText(R.string.product_tab_aisles)).perform(click())
 
         return scenario
     }
@@ -121,7 +128,7 @@ class ProductAislesFragmentTest : KoinTest {
         val bundle = bundler.makeEditProductBundle(productId)
         getFragmentScenario(bundle)
 
-        onView(withId(R.id.product_aisles_list)).check(matches(hasChildCount(1)))
+        onView(withId(R.id.product_aisles_list)).check(matches(hasChildCount(0)))
     }
 
     @Test
@@ -154,6 +161,29 @@ class ProductAislesFragmentTest : KoinTest {
         onView(allOf(withText(aisleToSelect.name), hasSibling(withText(location.name)))).check(
             matches(isDisplayed())
         )
+    }
+
+    @Test
+    fun onResume_LocationAdded_ShowsNewLocation() = runTest {
+        val bundle = bundler.makeEditProductBundle(product.id)
+        val scenario = getFragmentScenario(bundle)
+        val newLocationName = "A New Location"
+        get<AddLocationUseCase>().invoke(
+            Location(
+                id = 0,
+                type = LocationType.SHOP,
+                defaultFilter = FilterType.NEEDED,
+                name = newLocationName,
+                pinned = false,
+                aisles = emptyList(),
+                showDefaultAisle = true
+            )
+        )
+
+        scenario.moveToState(Lifecycle.State.STARTED)
+        scenario.moveToState(Lifecycle.State.RESUMED)
+
+        onView(withText(newLocationName)).check(matches(isDisplayed()))
     }
 
     /*

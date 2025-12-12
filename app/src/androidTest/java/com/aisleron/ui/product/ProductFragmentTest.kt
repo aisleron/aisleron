@@ -23,8 +23,8 @@ import androidx.appcompat.view.menu.ActionMenuItem
 import androidx.fragment.app.testing.FragmentScenario
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.action.ViewActions.clearText
+import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers
@@ -45,6 +45,7 @@ import com.aisleron.domain.product.ProductRepository
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import com.aisleron.ui.AddEditFragmentListenerTestImpl
 import com.aisleron.ui.ApplicationTitleUpdateListenerTestImpl
+import com.aisleron.ui.FabHandler
 import com.aisleron.ui.FabHandlerTestImpl
 import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.settings.ProductPreferencesTestImpl
@@ -68,6 +69,7 @@ class ProductFragmentTest : KoinTest {
     private lateinit var addEditFragmentListener: AddEditFragmentListenerTestImpl
     private lateinit var applicationTitleUpdateListener: ApplicationTitleUpdateListenerTestImpl
     private lateinit var fabHandler: FabHandlerTestImpl
+    private lateinit var productRepository: ProductRepository
 
     @get:Rule
     val koinTestRule = KoinTestRule(
@@ -79,6 +81,7 @@ class ProductFragmentTest : KoinTest {
         bundler = Bundler()
         addEditFragmentListener = AddEditFragmentListenerTestImpl()
         applicationTitleUpdateListener = ApplicationTitleUpdateListenerTestImpl()
+        productRepository = get<ProductRepository>()
         fabHandler = FabHandlerTestImpl()
         runBlocking { get<CreateSampleDataUseCase>().invoke() }
     }
@@ -97,7 +100,7 @@ class ProductFragmentTest : KoinTest {
 
     @Test
     fun onCreateProductFragment_HasEditBundle_ScreenMatchesEditProduct() = runTest {
-        val existingProduct = get<ProductRepository>().getAll().first { it.inStock }
+        val existingProduct = productRepository.getAll().first { it.inStock }
         val bundle = bundler.makeEditProductBundle(existingProduct.id)
         getFragmentScenario(bundle)
 
@@ -129,7 +132,7 @@ class ProductFragmentTest : KoinTest {
             it.onMenuItemSelected(menuItem)
         }
 
-        val product = get<ProductRepository>().getByName(newProductName)
+        val product = productRepository.getByName(newProductName)
 
         onView(withId(R.id.edt_product_name)).check(matches(withText(newProductName)))
         Assert.assertTrue(addEditFragmentListener.addEditSuccess)
@@ -152,7 +155,6 @@ class ProductFragmentTest : KoinTest {
 
     @Test
     fun onSaveClick_ExistingProductHasUniqueName_ProductUpdated() = runTest {
-        val productRepository = get<ProductRepository>()
         val existingProduct = productRepository.getAll().first()
         val bundle = bundler.makeEditProductBundle(existingProduct.id)
         val newProductName = existingProduct.name + " Updated"
@@ -177,12 +179,11 @@ class ProductFragmentTest : KoinTest {
 
     @Test
     fun onSaveClick_InStockChanged_InStockUpdated() = runTest {
-        val productRepository = get<ProductRepository>()
         val existingProduct = productRepository.getAll().first { !it.inStock }
         val bundle = bundler.makeEditProductBundle(existingProduct.id)
         val scenario = getFragmentScenario(bundle)
 
-        onView(withId(R.id.chk_product_in_stock)).perform(ViewActions.click())
+        onView(withId(R.id.chk_product_in_stock)).perform(click())
         scenario.onFragment {
             val menuItem = getSaveMenuItem(it.requireContext())
             it.onMenuItemSelected(menuItem)
@@ -200,7 +201,7 @@ class ProductFragmentTest : KoinTest {
 
     @Test
     fun onSaveClick_IsDuplicateName_ShowErrorSnackBar() = runTest {
-        val existingProduct = get<ProductRepository>().getAll().first()
+        val existingProduct = productRepository.getAll().first()
         val bundle = bundler.makeAddProductBundle()
         val scenario = getFragmentScenario(bundle)
 
@@ -249,7 +250,8 @@ class ProductFragmentTest : KoinTest {
                 false,
                 addEditFragmentListener,
                 applicationTitleUpdateListener,
-                ProductPreferencesTestImpl()
+                ProductPreferencesTestImpl(),
+                fabHandler
             )
         Assert.assertNotNull(fragment)
     }
@@ -258,7 +260,7 @@ class ProductFragmentTest : KoinTest {
     fun onCreateView_PreferenceIsHideExtraOption_ExtraOptionsGone() = runTest {
         val preferences = ProductPreferencesTestImpl()
         preferences.setShowExtraOptions(getInstrumentation().targetContext, false)
-        val existingProduct = get<ProductRepository>().getAll().first()
+        val existingProduct = productRepository.getAll().first()
         val bundle = bundler.makeEditProductBundle(existingProduct.id)
 
         getFragmentScenario(bundle, preferences)
@@ -275,14 +277,14 @@ class ProductFragmentTest : KoinTest {
 
     private fun getShowExtraOptionsPreference(showExtraOptions: Boolean): ProductPreferencesTestImpl {
         val preferences = ProductPreferencesTestImpl()
-        preferences.setShowExtraOptions(getInstrumentation().targetContext,showExtraOptions)
+        preferences.setShowExtraOptions(getInstrumentation().targetContext, showExtraOptions)
         return preferences
     }
 
     @Test
     fun onCreateView_PreferenceIsShowExtraOption_ExtraOptionsVisible() = runTest {
         val preferences = getShowExtraOptionsPreference(true)
-        val existingProduct = get<ProductRepository>().getAll().first()
+        val existingProduct = productRepository.getAll().first()
         val bundle = bundler.makeEditProductBundle(existingProduct.id)
 
         getFragmentScenario(bundle, preferences)
@@ -297,12 +299,12 @@ class ProductFragmentTest : KoinTest {
     @Test
     fun onClickExtrasToggle_ExtraOptionsIsGone_ExtraOptionsVisible() = runTest {
         val preferences = getShowExtraOptionsPreference(false)
-        val existingProduct = get<ProductRepository>().getAll().first()
+        val existingProduct = productRepository.getAll().first()
         val bundle = bundler.makeEditProductBundle(existingProduct.id)
         getFragmentScenario(bundle, preferences)
 
         onView(withId(R.id.txt_toggle_extra_options))
-            .perform(ViewActions.click())
+            .perform(click())
 
         onView(withId(R.id.layout_extra_options)).check(
             matches(
@@ -317,12 +319,12 @@ class ProductFragmentTest : KoinTest {
     @Test
     fun onClickExtrasToggle_ExtraOptionsIsVisible_ExtraOptionsGone() = runTest {
         val preferences = getShowExtraOptionsPreference(true)
-        val existingProduct = get<ProductRepository>().getAll().first()
+        val existingProduct = productRepository.getAll().first()
         val bundle = bundler.makeEditProductBundle(existingProduct.id)
 
         getFragmentScenario(bundle, preferences)
         onView(withId(R.id.txt_toggle_extra_options))
-            .perform(ViewActions.click())
+            .perform(click())
 
         onView(withId(R.id.layout_extra_options)).check(
             matches(
@@ -337,7 +339,7 @@ class ProductFragmentTest : KoinTest {
     @Test
     fun onCreateView_ProductHasNoNote_NoteEmpty() = runTest {
         val preferences = getShowExtraOptionsPreference(true)
-        val existingProduct = get<ProductRepository>().getAll().first()
+        val existingProduct = productRepository.getAll().first()
         val bundle = bundler.makeEditProductBundle(existingProduct.id)
 
         getFragmentScenario(bundle, preferences)
@@ -346,7 +348,7 @@ class ProductFragmentTest : KoinTest {
                 isDescendantOfA(withId(R.id.tab_product_options)),
                 withText(R.string.tab_notes)
             )
-        ).perform(ViewActions.click())
+        ).perform(click())
 
         onView(withId(R.id.edt_notes)).check(
             matches(withText(emptyString()))
@@ -356,7 +358,6 @@ class ProductFragmentTest : KoinTest {
     @Test
     fun onCreateView_ProductHasNote_NoteDisplayed() = runTest {
         val preferences = getShowExtraOptionsPreference(true)
-        val productRepository = get<ProductRepository>()
         val existingProduct = productRepository.getAll().first()
         val noteText = "Test note displayed on product"
         val noteId = get<NoteRepository>().add(Note(0, noteText))
@@ -369,7 +370,7 @@ class ProductFragmentTest : KoinTest {
                 isDescendantOfA(withId(R.id.tab_product_options)),
                 withText(R.string.tab_notes)
             )
-        ).perform(ViewActions.click())
+        ).perform(click())
 
         onView(withId(R.id.edt_notes)).check(
             matches(withText(noteText))
@@ -379,7 +380,6 @@ class ProductFragmentTest : KoinTest {
     @Test
     fun onSaveClick_NoteEntered_NoteSaved() = runTest {
         val preferences = getShowExtraOptionsPreference(true)
-        val productRepository = get<ProductRepository>()
         val existingProduct = productRepository.getAll().first()
         val bundle = bundler.makeEditProductBundle(existingProduct.id)
         val scenario = getFragmentScenario(bundle, preferences)
@@ -389,7 +389,7 @@ class ProductFragmentTest : KoinTest {
                 isDescendantOfA(withId(R.id.tab_product_options)),
                 withText(R.string.tab_notes)
             )
-        ).perform(ViewActions.click())
+        ).perform(click())
 
         val noteText = "Note added to product"
         onView(withId(R.id.edt_notes))
@@ -408,6 +408,36 @@ class ProductFragmentTest : KoinTest {
         assertEquals(note.id, updatedProduct?.noteId)
     }
 
+    @Test
+    fun onExtraOptions_onTabSelection_AddShopFabShowsCorrectly() = runTest {
+        val preferences = getShowExtraOptionsPreference(true)
+        val existingProduct = productRepository.getAll().first()
+        val bundle = bundler.makeEditProductBundle(existingProduct.id)
+        getFragmentScenario(bundle, preferences)
+
+        // Fab is hidden on notes tab
+        onView(withText(R.string.tab_notes)).perform(click())
+        assertEquals(0, fabHandler.getFabItems().size)
+
+        // Fab is displayed when switching to the Aisle tab
+        onView(withText(R.string.product_tab_aisles)).perform(click())
+        assertEquals(1, fabHandler.getFabItems().size)
+        assertEquals(FabHandler.FabOption.ADD_SHOP, fabHandler.getFabItems().first())
+
+        // Fab is hidden when collapsing extra options
+        onView(withId(R.id.txt_toggle_extra_options)).perform(click())
+        assertEquals(0, fabHandler.getFabItems().size)
+
+        // Fab is shown again when expanding extra options and aisle is the active tab
+        onView(withId(R.id.txt_toggle_extra_options)).perform(click())
+        assertEquals(1, fabHandler.getFabItems().size)
+        assertEquals(FabHandler.FabOption.ADD_SHOP, fabHandler.getFabItems().first())
+
+        // Fab is hidden again when switching back to notes tab
+        onView(withText(R.string.tab_notes)).perform(click())
+        assertEquals(0, fabHandler.getFabItems().size)
+    }
+
     private fun getSaveMenuItem(context: Context): ActionMenuItem {
         val menuItem = ActionMenuItem(context, 0, R.id.mnu_btn_save, 0, 0, null)
         return menuItem
@@ -423,13 +453,12 @@ class ProductFragmentTest : KoinTest {
                 ProductFragment(
                     addEditFragmentListener,
                     applicationTitleUpdateListener,
-                    productPreferences ?: ProductPreferencesTestImpl()
+                    productPreferences ?: ProductPreferencesTestImpl(),
+                    fabHandler
                 )
             }
         )
 
         return scenario
     }
-
-
 }
