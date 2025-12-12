@@ -32,11 +32,12 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.aisleron.databinding.FragmentProductAislesBinding
 import com.aisleron.databinding.ListItemProductAisleBinding
+import com.aisleron.ui.AisleronFragment
 import com.aisleron.ui.aisle.AislePickerDialogFragment
 import com.aisleron.ui.bundles.AislePickerBundle
 import kotlinx.coroutines.launch
 
-class ProductAislesFragment : Fragment() {
+class ProductAislesFragment : Fragment(), AisleronFragment {
 
     private var _binding: FragmentProductAislesBinding? = null
     private val binding get() = _binding!!
@@ -70,6 +71,8 @@ class ProductAislesFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentProductAislesBinding.inflate(inflater, container, false)
+        setWindowInsetListeners(this, binding.root, true, null, applyMargins = false, applyBottomPadding = true)
+
         return binding.root
     }
 
@@ -112,6 +115,11 @@ class ProductAislesFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onResume() {
+        super.onResume()
+        binding.root.requestLayout()
     }
 
     companion object {

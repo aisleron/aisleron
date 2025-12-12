@@ -22,4 +22,5 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.product.ProductAislesFragment"
-    tools:listitem="@layout/list_item_product_aisle" />
+    tools:listitem="@layout/list_item_product_aisle"
+    android:clipToPadding="false"/>

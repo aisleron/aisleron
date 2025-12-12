@@ -21,13 +21,19 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 
 class ProductTabsAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
+    companion object {
+        const val PRODUCT_TAB_NOTES = 0
+        const val PRODUCT_TAB_AISLES = 1
+        const val PRODUCT_TAB_INVENTORY = 2
+        const val PRODUCT_TAB_BARCODES = 3
+    }
 
     override fun getItemCount(): Int = 2
 
     override fun createFragment(position: Int): Fragment {
         return when (position) {
-            0 -> ProductNoteFragment()
-            1 -> ProductAislesFragment()
+            PRODUCT_TAB_NOTES -> ProductNoteFragment()
+            PRODUCT_TAB_AISLES -> ProductAislesFragment()
             else -> throw IllegalArgumentException("Invalid tab index")
         }
     }

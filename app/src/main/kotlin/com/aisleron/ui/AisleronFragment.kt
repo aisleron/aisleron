@@ -31,7 +31,9 @@ interface AisleronFragment {
         fragment: Fragment,
         view: View,
         fabPadding: Boolean = true,
-        baseMarginId: Int?
+        baseMarginId: Int?,
+        applyMargins: Boolean = true,
+        applyBottomPadding: Boolean = true
     ) {
         ViewCompat.setOnApplyWindowInsetsListener(view) { v, windowInsets ->
             val insets = windowInsets.getInsets(
@@ -40,30 +42,34 @@ interface AisleronFragment {
                         or WindowInsetsCompat.Type.ime()
             )
 
-            var baseMargin = 0
-            baseMarginId?.let {
-                baseMargin += fragment.resources.getDimensionPixelSize(it)
+            if (applyMargins) {
+                var baseMargin = 0
+                baseMarginId?.let {
+                    baseMargin += fragment.resources.getDimensionPixelSize(it)
+                }
+
+                v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                    leftMargin = baseMargin + insets.left
+                    rightMargin = baseMargin + insets.right
+                    topMargin = baseMargin
+                    bottomMargin = baseMargin
+                }
             }
 
-            v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                leftMargin = baseMargin + insets.left
-                rightMargin = baseMargin + insets.right
-                topMargin = baseMargin
-                bottomMargin = baseMargin
+            if (applyBottomPadding) {
+                var bottomPadding = insets.bottom
+                if (fabPadding) {
+                    val fabMargins =
+                        fragment.resources.getDimensionPixelSize(R.dimen.fab_margin_bottom) * 2
+
+                    val fabSize =
+                        fragment.resources.getDimensionPixelSize(R.dimen.design_fab_size_normal)
+
+                    bottomPadding += fabSize + fabMargins
+                }
+
+                v.updatePadding(bottom = bottomPadding)
             }
-
-            var bottomPadding = insets.bottom
-            if (fabPadding) {
-                val fabMargins =
-                    fragment.resources.getDimensionPixelSize(R.dimen.fab_margin_bottom) * 2
-
-                val fabSize =
-                    fragment.resources.getDimensionPixelSize(R.dimen.design_fab_size_normal)
-
-                bottomPadding += fabSize + fabMargins
-            }
-
-            v.updatePadding(bottom = bottomPadding)
 
             windowInsets
         }

@@ -40,7 +40,8 @@ val fragmentModule = module {
         ProductFragment(
             addEditFragmentListener = get(),
             applicationTitleUpdateListener = get(),
-            productPreferences = get()
+            productPreferences = get(),
+            fabHandler = get()
         )
     }
 

@@ -106,13 +106,7 @@ class ProductViewModel(
                             initialAisleId = aisle.id
                         )
                     }
-                } + ProductAisleInfo(
-                    locationId = 0,
-                    locationName = "Add new shop",
-                    aisleId = 0,
-                    aisleName = "",
-                    initialAisleId = 0
-                )
+                }
             }
 
             // TODO: Load locations that don't have the product in them
