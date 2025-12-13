@@ -51,7 +51,8 @@ import com.aisleron.ui.AisleronFragment
 import com.aisleron.ui.ApplicationTitleUpdateListener
 import com.aisleron.ui.FabHandler
 import com.aisleron.ui.FabHandler.FabClickedCallBack
-import com.aisleron.ui.aisle.AisleDialog
+import com.aisleron.ui.aisle.AisleDialogFragment
+import com.aisleron.ui.bundles.AisleDialogBundle
 import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.copyentity.CopyEntityDialogFragment
 import com.aisleron.ui.copyentity.CopyEntityType
@@ -72,8 +73,7 @@ class ShoppingListFragment(
     private val applicationTitleUpdateListener: ApplicationTitleUpdateListener,
     private val fabHandler: FabHandler,
     private val shoppingListPreferences: ShoppingListPreferences,
-    private val loyaltyCardProvider: LoyaltyCardProvider,
-    private val aisleDialog: AisleDialog
+    private val loyaltyCardProvider: LoyaltyCardProvider
 ) : Fragment(), SearchView.OnQueryTextListener, ActionMode.Callback, FabClickedCallBack,
     MenuProvider, AisleronFragment {
 
@@ -267,6 +267,31 @@ class ShoppingListFragment(
         ).show()
     }
 
+    private fun showAisleDialog(aisleId: Int, action: AisleDialogFragment.AisleDialogAction) {
+        val requestKey = when (action) {
+            AisleDialogFragment.AisleDialogAction.ADD_SINGLE -> ADD_AISLE_REQUEST_KEY
+            AisleDialogFragment.AisleDialogAction.ADD_MULTIPLE -> ADD_AISLE_REQUEST_KEY
+            AisleDialogFragment.AisleDialogAction.EDIT -> EDIT_AISLE_REQUEST_KEY
+        }
+
+        val aisleDialogBundle = AisleDialogBundle(
+            aisleId = aisleId,
+            action = action,
+            locationId = shoppingListViewModel.locationId
+        )
+
+        AisleDialogFragment.newInstance(aisleDialogBundle, requestKey)
+            .show(childFragmentManager, AisleDialogFragment.TAG)
+    }
+
+    private fun showAddAisleDialog() {
+        showAisleDialog(-1, AisleDialogFragment.AisleDialogAction.ADD_MULTIPLE)
+    }
+
+    private fun showEditAisleDialog(aisleId: Int) {
+        showAisleDialog(aisleId, AisleDialogFragment.AisleDialogAction.EDIT)
+    }
+
     private fun initializeFab() {
         fabHandler.setFabOnClickedListener(this)
         fabHandler.setFabItems(
@@ -281,7 +306,7 @@ class ShoppingListFragment(
         }
 
         fabHandler.setFabOnClickListener(this.requireActivity(), FabHandler.FabOption.ADD_AISLE) {
-            aisleDialog.showAddDialog(requireContext(), shoppingListViewModel.locationId)
+            showAddAisleDialog()
         }
     }
 
@@ -323,7 +348,6 @@ class ShoppingListFragment(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        aisleDialog.observeLifecycle(viewLifecycleOwner)
         val menuHost = requireActivity()
         menuHost.addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
 
@@ -382,7 +406,7 @@ class ShoppingListFragment(
 
     private fun editShoppingListItem(item: ShoppingListItem) {
         when (item) {
-            is AisleShoppingListItem -> aisleDialog.showEditDialog(requireContext(), item)
+            is AisleShoppingListItem -> showEditAisleDialog(item.aisleId)
             is ProductShoppingListItem -> navigateToEditProduct(item.id)
         }
     }
@@ -559,6 +583,9 @@ class ShoppingListFragment(
         private const val ARG_LOCATION_ID = "locationId"
         private const val ARG_FILTER_TYPE = "filterType"
 
+        private const val ADD_AISLE_REQUEST_KEY = "addAisleRequest"
+        private const val EDIT_AISLE_REQUEST_KEY = "editAisleRequest"
+
         @JvmStatic
         fun newInstance(
             locationId: Long,
@@ -566,15 +593,13 @@ class ShoppingListFragment(
             applicationTitleUpdateListener: ApplicationTitleUpdateListener,
             fabHandler: FabHandler,
             shoppingListPreferences: ShoppingListPreferences,
-            loyaltyCardProvider: LoyaltyCardProvider,
-            aisleDialog: AisleDialog
+            loyaltyCardProvider: LoyaltyCardProvider
         ) =
             ShoppingListFragment(
                 applicationTitleUpdateListener,
                 fabHandler,
                 shoppingListPreferences,
-                loyaltyCardProvider,
-                aisleDialog
+                loyaltyCardProvider
             ).apply {
                 arguments = Bundle().apply {
                     putInt(ARG_LOCATION_ID, locationId.toInt())

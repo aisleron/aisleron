@@ -80,7 +80,6 @@ import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import com.aisleron.ui.ApplicationTitleUpdateListenerTestImpl
 import com.aisleron.ui.FabHandler
 import com.aisleron.ui.FabHandlerTestImpl
-import com.aisleron.ui.aisle.AisleDialog
 import com.aisleron.ui.bundles.AddEditLocationBundle
 import com.aisleron.ui.bundles.AddEditProductBundle
 import com.aisleron.ui.bundles.Bundler
@@ -153,8 +152,7 @@ class ShoppingListFragmentTest : KoinTest {
                 applicationTitleUpdateListener,
                 fabHandler,
                 shoppingListPreferencesTestImpl ?: ShoppingListPreferencesTestImpl(),
-                loyaltyCardProvider ?: get<LoyaltyCardProvider>(),
-                get<AisleDialog>()
+                loyaltyCardProvider ?: get<LoyaltyCardProvider>()
             ).apply {
                 arguments = fragmentArgs
             }
@@ -182,8 +180,7 @@ class ShoppingListFragmentTest : KoinTest {
                     applicationTitleUpdateListener,
                     fabHandler,
                     shoppingListPreferencesTestImpl ?: ShoppingListPreferencesTestImpl(),
-                    loyaltyCardProvider ?: get<LoyaltyCardProvider>(),
-                    get<AisleDialog>()
+                    loyaltyCardProvider ?: get<LoyaltyCardProvider>()
                 )
             }
         )
@@ -216,8 +213,7 @@ class ShoppingListFragmentTest : KoinTest {
                 applicationTitleUpdateListener,
                 fabHandler,
                 ShoppingListPreferencesTestImpl(),
-                LoyaltyCardProviderTestImpl(),
-                get<AisleDialog>()
+                LoyaltyCardProviderTestImpl()
             )
         Assert.assertNotNull(fragment)
     }
