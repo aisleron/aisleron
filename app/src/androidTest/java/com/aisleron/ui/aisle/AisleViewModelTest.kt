@@ -25,6 +25,7 @@ import org.junit.Test
 import org.koin.test.KoinTest
 import org.koin.test.get
 import org.koin.test.mock.declare
+import kotlin.test.assertEquals
 
 class AisleViewModelTest : KoinTest {
     private lateinit var aisleViewModel: AisleViewModel
@@ -227,5 +228,108 @@ class AisleViewModelTest : KoinTest {
 
         Assert.assertNotEquals(stateBefore, stateAfter)
         Assert.assertTrue(aisleViewModel.uiState.value is AisleViewModel.AisleUiState.Empty)
+    }
+
+    @Test
+    fun constructor_NoCoroutineScopeProvided_aisleViewModelReturned() {
+        val vm = AisleViewModel(
+            get<AddAisleUseCase>(),
+            get<UpdateAisleUseCase>(),
+            get<GetAisleUseCase>(),
+        )
+
+        Assert.assertNotNull(vm)
+    }
+
+    @Test
+    fun hydrate_isValidAisle_AisleNamePopulated() = runTest {
+        val aisle = get<AisleRepository>().getAll().first { !it.isDefault }
+
+        aisleViewModel.hydrate(aisle.id, aisle.locationId)
+
+        assertEquals(aisle.name, aisleViewModel.aisleName.value)
+    }
+
+    @Test
+    fun hydrate_isInvalidAisle_AisleNameIsBlank() = runTest {
+        aisleViewModel.hydrate(-1, -1)
+
+        assertEquals("", aisleViewModel.aisleName.value)
+    }
+
+    @Test
+    fun hydrate_isSameAisleId_DoNotRehydrate() = runTest {
+        val aisle = get<AisleRepository>().getAll().first { !it.isDefault }
+        aisleViewModel.hydrate(aisle.id, aisle.locationId)
+        val newAisleName = "My New Aisle Name"
+        aisleViewModel.setAisleName(newAisleName)
+
+        aisleViewModel.hydrate(aisle.id, aisle.locationId)
+
+        assertEquals(newAisleName, aisleViewModel.aisleName.value)
+    }
+
+    @Test
+    fun updateAisleName_ExceptionRaised_UiStateIsError() = runTest {
+        val exceptionMessage = "Error on update Aisle"
+
+        declare<UpdateAisleUseCase> {
+            object : UpdateAisleUseCase {
+                override suspend fun invoke(aisle: Aisle) {
+                    throw Exception(exceptionMessage)
+                }
+            }
+        }
+
+        val aisle = get<AisleRepository>().getAll().first { !it.isDefault }
+        val vm = get<AisleViewModel>()
+        vm.hydrate(aisle.id, aisle.locationId)
+        vm.setAisleName("Dummy Dummy")
+
+        vm.updateAisleName()
+
+        val uiState = vm.uiState.value
+        Assert.assertTrue(uiState is AisleViewModel.AisleUiState.Error)
+        with(uiState as AisleViewModel.AisleUiState.Error) {
+            Assert.assertEquals(AisleronException.ExceptionCode.GENERIC_EXCEPTION, this.errorCode)
+            Assert.assertEquals(exceptionMessage, this.errorMessage)
+        }
+    }
+
+    @Test
+    fun updateAisleName_IsValidAisle_AisleUpdated() = runTest {
+        val aisleRepository = get<AisleRepository>()
+        val existingAisle = aisleRepository.getAll().first { !it.isDefault }
+        aisleViewModel.hydrate(existingAisle.id, existingAisle.locationId)
+
+        val updatedAisleName = "Update Aisle Test"
+        aisleViewModel.setAisleName(updatedAisleName)
+        aisleViewModel.updateAisleName()
+
+        val updatedAisle = aisleRepository.get(existingAisle.id)
+        Assert.assertNotNull(updatedAisle)
+        Assert.assertEquals(existingAisle.copy(name = updatedAisleName), updatedAisle)
+
+        Assert.assertTrue(aisleViewModel.uiState.value is AisleViewModel.AisleUiState.Success)
+    }
+
+    @Test
+    fun updateAisleName_AisleNameIsBlank_AisleNotUpdated() = runTest {
+        val updatedAisleName = ""
+        val aisleRepository = get<AisleRepository>()
+        val existingAisle = aisleRepository.getAll().first { !it.isDefault }
+        val aisleCountBefore = aisleRepository.getAll().count()
+        aisleViewModel.hydrate(existingAisle.id, existingAisle.locationId)
+
+        aisleViewModel.setAisleName(updatedAisleName)
+        aisleViewModel.updateAisleName()
+
+        val aisleCountAfter = aisleRepository.getAll().count()
+        Assert.assertEquals(aisleCountBefore, aisleCountAfter)
+
+        val updatedAisle = aisleRepository.get(existingAisle.id)
+        Assert.assertEquals(existingAisle.name, updatedAisle?.name)
+
+        Assert.assertTrue(aisleViewModel.uiState.value is AisleViewModel.AisleUiState.Success)
     }
 }

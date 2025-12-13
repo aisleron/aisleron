@@ -106,7 +106,8 @@ val viewModelModule = module {
     viewModel {
         AisleViewModel(
             addAisleUseCase = get(),
-            updateAisleUseCase = get()
+            updateAisleUseCase = get(),
+            getAisleUseCase = get()
         )
     }
 

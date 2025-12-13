@@ -18,11 +18,14 @@
 package com.aisleron.ui.product
 
 import android.os.Bundle
+import android.widget.EditText
 import androidx.fragment.app.testing.FragmentScenario
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.lifecycle.Lifecycle
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.action.ViewActions.typeText
+import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.RootMatchers.isDialog
 import androidx.test.espresso.matcher.ViewMatchers.hasChildCount
@@ -54,6 +57,7 @@ import com.aisleron.ui.settings.ProductPreferencesTestImpl
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.allOf
+import org.hamcrest.CoreMatchers.instanceOf
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -186,20 +190,46 @@ class ProductAislesFragmentTest : KoinTest {
         onView(withText(newLocationName)).check(matches(isDisplayed()))
     }
 
-    /*
-        @Test
-        fun onAislePickerResult_addNewAisle_doesNothing() {
-            val pickerData = AislePickerBundle("Test Dialog", emptyList(), -1)
-            launchFragment()
+    @Test
+    fun onAislePickerResult_addNewAisle_showAisleDialog() = runTest {
+        val location = get<GetProductMappingsUseCase>().invoke(product.id).first()
+        val bundle = bundler.makeEditProductBundle(product.id)
+        getFragmentScenario(bundle)
 
-            activityScenarioRule.scenario.onActivity {
-                viewModel.aislesForLocationFlow.postValue(pickerData)
-            }
+        onView(withText(location.name)).perform(click())
+        onView(withText(R.string.add_aisle)).inRoot(isDialog())
+            .perform(click())
 
-            onView(withText(R.string.add_aisle)).inRoot(isDialog()).perform(click())
+        onView(withText(R.string.add_aisle))
+            .inRoot(isDialog())
+            .check(matches(isDisplayed()))
 
-            assertNull(viewModel.updatedAisleId)
+        onView(withText(R.string.add_another))
+            .inRoot(isDialog())
+            .check(doesNotExist())
+    }
 
-        }*/
+    @Test
+    fun onAddNewAisleResult_isValidAisle_updatesProductAisle() = runTest {
+        val location = get<GetProductMappingsUseCase>().invoke(product.id).first()
+        val bundle = bundler.makeEditProductBundle(product.id)
+        getFragmentScenario(bundle)
 
+        onView(withText(location.name)).perform(click())
+        onView(withText(R.string.add_aisle)).inRoot(isDialog())
+            .perform(click())
+
+        val newAisleName = "New Aisle"
+        onView(allOf(withId(R.id.edt_aisle_name), instanceOf(EditText::class.java)))
+            .inRoot(isDialog())
+            .perform(typeText(newAisleName))
+
+        onView(withText(R.string.done))
+            .inRoot(isDialog())
+            .perform(click())
+
+        onView(allOf(withText(newAisleName), hasSibling(withText(location.name)))).check(
+            matches(isDisplayed())
+        )
+    }
 }

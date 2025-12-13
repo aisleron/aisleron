@@ -22,6 +22,7 @@ import android.os.Bundle
 import android.os.Parcelable
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.LocationType
+import com.aisleron.ui.aisle.AisleDialogFragment
 import com.aisleron.ui.copyentity.CopyEntityType
 import com.aisleron.ui.note.NoteParentRef
 
@@ -177,6 +178,25 @@ class Bundler {
         return result ?: AislePickerBundle()
     }
 
+    fun makeAisleDialogBundle(
+        aisleId: Int,
+        action: AisleDialogFragment.AisleDialogAction,
+        locationId: Int
+    ): Bundle {
+        val aisleDialogBundle = AisleDialogBundle(
+            aisleId = aisleId,
+            action = action,
+            locationId = locationId
+        )
+        return makeParcelableBundle(AISLE_DIALOG, aisleDialogBundle)
+    }
+
+    fun getAisleDialogBundle(bundle: Bundle?): AisleDialogBundle {
+        val result =
+            getParcelableBundle(bundle, AISLE_DIALOG, AisleDialogBundle::class.java)
+        return result ?: AisleDialogBundle()
+    }
+
     private companion object BundleType {
         const val ADD_EDIT_PRODUCT = "addEditProduct"
         const val ADD_EDIT_LOCATION = "addEditLocation"
@@ -184,6 +204,7 @@ class Bundler {
         const val COPY_ENTITY = "copyEntity"
         const val NOTE_DIALOG = "noteDialog"
         const val AISLE_PICKER = "aislePicker"
+        const val AISLE_DIALOG = "aisleDialog"
 
 
         const val ARG_LOCATION_ID = "locationId"

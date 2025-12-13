@@ -30,15 +30,16 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.aisleron.databinding.FragmentProductAislesBinding
 import com.aisleron.databinding.FragmentProductAisleListItemBinding
+import com.aisleron.databinding.FragmentProductAislesBinding
 import com.aisleron.ui.AisleronFragment
+import com.aisleron.ui.aisle.AisleDialogFragment
 import com.aisleron.ui.aisle.AislePickerDialogFragment
+import com.aisleron.ui.bundles.AisleDialogBundle
 import com.aisleron.ui.bundles.AislePickerBundle
 import kotlinx.coroutines.launch
 
 class ProductAislesFragment : Fragment(), AisleronFragment {
-
     private var _binding: FragmentProductAislesBinding? = null
     private val binding get() = _binding!!
 
@@ -59,8 +60,26 @@ class ProductAislesFragment : Fragment(), AisleronFragment {
             if (selectedAisleId != -1) {
                 viewModel.updateProductAisle(selectedAisleId)
             }
+
             if (addNewAisle) {
-                // TODO: Handle add new aisle
+                val aisleDialogBundle = AisleDialogBundle(
+                    aisleId = -1,
+                    action = AisleDialogFragment.AisleDialogAction.ADD_SINGLE,
+                    locationId = viewModel.editingAisleInfo?.locationId ?: -1
+                )
+
+                AisleDialogFragment.newInstance(aisleDialogBundle, ADD_AISLE_REQUEST_KEY)
+                    .show(childFragmentManager, AisleDialogFragment.TAG)
+            }
+        }
+
+        childFragmentManager.setFragmentResultListener(
+            ADD_AISLE_REQUEST_KEY,
+            this
+        ) { _, bundle ->
+            val newAisleId = bundle.getInt(AisleDialogFragment.KEY_AISLE_ID, -1)
+            if (newAisleId != -1) {
+                viewModel.updateProductAisle(newAisleId)
             }
         }
     }
@@ -71,7 +90,9 @@ class ProductAislesFragment : Fragment(), AisleronFragment {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentProductAislesBinding.inflate(inflater, container, false)
-        setWindowInsetListeners(this, binding.root, true, null, applyMargins = false, applyBottomPadding = true)
+        setWindowInsetListeners(
+            this, binding.root, true, null, applyMargins = false, applyBottomPadding = true
+        )
 
         return binding.root
     }
@@ -125,6 +146,7 @@ class ProductAislesFragment : Fragment(), AisleronFragment {
 
     companion object {
         private const val AISLE_PICKER_REQUEST_KEY = "aislePickerRequest"
+        private const val ADD_AISLE_REQUEST_KEY = "addAisleRequest"
     }
 
     private class ProductAislesAdapter(private val onItemClicked: (ProductAisleInfo) -> Unit) :

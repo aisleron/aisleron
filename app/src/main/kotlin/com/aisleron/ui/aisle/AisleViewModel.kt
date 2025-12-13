@@ -21,29 +21,65 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.aisle.usecase.AddAisleUseCase
+import com.aisleron.domain.aisle.usecase.GetAisleUseCase
 import com.aisleron.domain.aisle.usecase.UpdateAisleUseCase
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.ui.shoppinglist.AisleShoppingListItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class AisleViewModel(
     private val addAisleUseCase: AddAisleUseCase,
     private val updateAisleUseCase: UpdateAisleUseCase,
+    private val getAisleUseCase: GetAisleUseCase,
     coroutineScopeProvider: CoroutineScope? = null
 ) : ViewModel() {
     private val coroutineScope = coroutineScopeProvider ?: this.viewModelScope
 
+    private var _aisleName = MutableStateFlow("")
+    val aisleName: StateFlow<String> = _aisleName
+
+    private var _aisleId: Int? = null
+    val aisleId: Int get() = _aisleId!!
+
+    private var _locationId: Int = -1
+
     private val _uiState = MutableStateFlow<AisleUiState>(AisleUiState.Empty)
     val uiState = _uiState.asStateFlow()
+
+    fun hydrate(aisleId: Int, locationId: Int) {
+        if (aisleId == _aisleId) return
+
+        coroutineScope.launch {
+            _aisleId = aisleId
+            val aisle = getAisleUseCase(aisleId)
+            aisle?.let {
+                _aisleName.value = it.name
+                _locationId = it.locationId
+            } ?: run {
+                _aisleName.value = ""
+                _locationId = locationId
+            }
+        }
+    }
+
+    fun setAisleName(name: String) {
+        _aisleName.value = name
+    }
+
+    fun addAisle() {
+        addAisle(aisleName.value, _locationId)
+    }
+
 
     fun addAisle(aisleName: String, locationId: Int) {
         coroutineScope.launch {
             try {
                 if (aisleName.isNotBlank()) {
-                    addAisleUseCase(
+                    _aisleId = addAisleUseCase(
                         Aisle(
                             name = aisleName,
                             products = emptyList(),
@@ -55,7 +91,8 @@ class AisleViewModel(
                         )
                     )
                 }
-                _uiState.value = AisleUiState.Success
+
+                _uiState.value = AisleUiState.Success(_aisleId ?: -1)
             } catch (e: AisleronException) {
                 _uiState.value = AisleUiState.Error(e.exceptionCode, e.message)
             } catch (e: Exception) {
@@ -83,7 +120,29 @@ class AisleViewModel(
                     )
                 }
 
-                _uiState.value = AisleUiState.Success
+                _uiState.value = AisleUiState.Success(aisle.id)
+            } catch (e: AisleronException) {
+                _uiState.value = AisleUiState.Error(e.exceptionCode, e.message)
+            } catch (e: Exception) {
+                _uiState.value = AisleUiState.Error(
+                    AisleronException.ExceptionCode.GENERIC_EXCEPTION, e.message
+                )
+            }
+        }
+    }
+
+    fun updateAisleName() {
+        coroutineScope.launch {
+            try {
+                val newName = aisleName.value
+                if (newName.isNotBlank()) {
+                    val aisle = getAisleUseCase(aisleId)
+                    aisle?.let {
+                        updateAisleUseCase(it.copy(name = newName))
+                    }
+                }
+
+                _uiState.value = AisleUiState.Success(aisleId)
             } catch (e: AisleronException) {
                 _uiState.value = AisleUiState.Error(e.exceptionCode, e.message)
             } catch (e: Exception) {
@@ -100,7 +159,7 @@ class AisleViewModel(
 
     sealed class AisleUiState {
         data object Empty : AisleUiState()
-        data object Success : AisleUiState()
+        data class Success(val aisleId: Int) : AisleUiState()
         data class Error(
             val errorCode: AisleronException.ExceptionCode,
             val errorMessage: String?

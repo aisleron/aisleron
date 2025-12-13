@@ -110,6 +110,7 @@ val viewModelTestModule = module {
         AisleViewModel(
             addAisleUseCase = get(),
             updateAisleUseCase = get(),
+            getAisleUseCase = get(),
             TestScope(UnconfinedTestDispatcher())
         )
     }

@@ -55,6 +55,7 @@ class ProductViewModel(
 ) : ViewModel(), NoteViewModel {
     private var _aisleId: Int? = null
     private var _locationId: Int? = null
+
     private var product: Product? = null
     private val coroutineScope = coroutineScopeProvider ?: this.viewModelScope
 
@@ -70,7 +71,9 @@ class ProductViewModel(
     private val _aislesForLocation = MutableStateFlow<AislePickerBundle?>(null)
     val aislesForLocation: StateFlow<AislePickerBundle?> = _aislesForLocation
 
-    private var editingAisleInfo: ProductAisleInfo? = null
+    private var _editingAisleInfo: ProductAisleInfo? = null
+    val editingAisleInfo: ProductAisleInfo? get() = _editingAisleInfo
+
 
     override val noteFlow: StateFlow<String>
         get() = _uiData.map { it.noteText }.stateIn(
@@ -140,7 +143,7 @@ class ProductViewModel(
     }
 
     fun requestLocationAisles(item: ProductAisleInfo) {
-        editingAisleInfo = item
+        _editingAisleInfo = item
         coroutineScope.launch {
             val aisles = getAislesForLocationUseCase(item.locationId)
                 .sortedBy { it.rank }
@@ -225,7 +228,7 @@ class ProductViewModel(
     }
 
     fun updateProductAisle(selectedAisleId: Int) {
-        val selectedAisleInfo = editingAisleInfo ?: return
+        val selectedAisleInfo = _editingAisleInfo ?: return
 
         coroutineScope.launch {
             getAisleUseCase(selectedAisleId)?.let { a ->
