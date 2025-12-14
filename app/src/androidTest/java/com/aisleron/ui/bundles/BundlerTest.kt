@@ -54,8 +54,7 @@ class BundlerTest {
     @Test
     fun testMakeEditProductBundle_ProductIdProvided_EditObjectBundled() {
         val productId = 1
-        val locationId = 24
-        val bundle = bundler.makeEditProductBundle(productId = productId, locationId = locationId)
+        val bundle = bundler.makeEditProductBundle(productId = productId)
 
         val editProductBundle =
             getParcelableBundle(bundle, "addEditProduct", AddEditProductBundle::class.java)
@@ -77,7 +76,6 @@ class BundlerTest {
         assertFalse(addProductBundle?.inStock!!)
         assertEquals(AddEditProductBundle.ProductAction.ADD, addProductBundle.actionType)
         assertNull(addProductBundle.aisleId)
-        assertNull(addProductBundle.locationId)
     }
 
     @Test
@@ -253,17 +251,6 @@ class BundlerTest {
             getParcelableBundle(bundle, "addEditProduct", AddEditProductBundle::class.java)
 
         assertEquals(aisleId, addProductBundle!!.aisleId)
-    }
-
-    @Test
-    fun makeAddProductBundle_LocationIdProvided_BundleHasLocationId() {
-        val locationId = 24
-        val bundle = bundler.makeAddProductBundle(locationId = locationId)
-
-        val addProductBundle =
-            getParcelableBundle(bundle, "addEditProduct", AddEditProductBundle::class.java)
-
-        assertEquals(locationId, addProductBundle!!.locationId)
     }
 
     @Test

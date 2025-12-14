@@ -18,6 +18,7 @@
 package com.aisleron.domain.product.usecase
 
 import com.aisleron.domain.aisle.usecase.GetAisleUseCase
+import com.aisleron.domain.aisle.usecase.GetDefaultAislesUseCase
 import com.aisleron.domain.aisleproduct.AisleProductRepository
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.usecase.GetLocationUseCase
@@ -29,16 +30,25 @@ interface GetProductMappingsUseCase {
 class GetProductMappingsUseCaseImpl(
     private val aisleProductRepository: AisleProductRepository,
     private val getAisleUseCase: GetAisleUseCase,
-    private val getLocationUseCase: GetLocationUseCase
+    private val getLocationUseCase: GetLocationUseCase,
+    private val getDefaultAislesUseCase: GetDefaultAislesUseCase
 ) : GetProductMappingsUseCase {
     override suspend fun invoke(productId: Int): List<Location> {
-        val aisleProducts = aisleProductRepository.getProductAisles(productId)
-        val aisles = aisleProducts.mapNotNull { getAisleUseCase(it.aisleId) }
-        val aislesByLocation = aisles.groupBy { it.locationId }
-        return aislesByLocation.mapNotNull { (locationId, aislesInLocation) ->
-            getLocationUseCase(locationId)?.copy(aisles = aislesInLocation)
-        }
+        val mappedAislesByLocation = aisleProductRepository.getProductAisles(productId)
+            .mapNotNull { getAisleUseCase(it.aisleId) }
+            .groupBy { it.locationId }
 
-        // TODO: Add locations where product is not mapped in a location aisle
+        val defaultAislesByLocation = getDefaultAislesUseCase().groupBy { it.locationId }
+
+        // 1. Start with a map of default Location ID -> Aisle List
+        val finalAisles = defaultAislesByLocation.toMutableMap()
+
+        // 2. Overwrite defaults with mapped aisles (prioritization)
+        finalAisles.putAll(mappedAislesByLocation)
+
+        // 3. Convert the map into the final list of Location objects
+        return finalAisles.mapNotNull { (locationId, aisles) ->
+            getLocationUseCase(locationId)?.copy(aisles = aisles)
+        }
     }
 }

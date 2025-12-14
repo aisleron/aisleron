@@ -27,6 +27,7 @@ import com.aisleron.domain.product.ProductRepository
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -34,7 +35,6 @@ import org.junit.jupiter.api.Test
 class GetProductMappingsUseCaseImplTest {
     private lateinit var dm: TestDependencyManager
     private lateinit var getProductMappingsUseCase: GetProductMappingsUseCase
-    private lateinit var productRepository: ProductRepository
     private lateinit var aisleProductRepository: AisleProductRepository
     private lateinit var locationRepository: LocationRepository
     private lateinit var aisleRepository: AisleRepository
@@ -44,10 +44,11 @@ class GetProductMappingsUseCaseImplTest {
     fun setUp() {
         dm = TestDependencyManager()
         getProductMappingsUseCase = dm.getUseCase()
-        productRepository = dm.getRepository()
         aisleProductRepository = dm.getRepository()
         locationRepository = dm.getRepository()
         aisleRepository = dm.getRepository()
+
+        val productRepository = dm.getRepository<ProductRepository>()
         runBlocking {
             val newProductId = productRepository.add(Product(0, "New Product", false, 0))
             product = productRepository.get(newProductId)!!
@@ -55,26 +56,30 @@ class GetProductMappingsUseCaseImplTest {
     }
 
     @Test
-    fun getProductMappings_productNotMapped_returnsEmptyList() = runTest {
+    fun getProductMappings_productNotMapped_returnsLocationsWithDefaultAisles() = runTest {
         val result = getProductMappingsUseCase(product.id)
 
-        assertTrue(result.isEmpty())
+        val locationCount = locationRepository.getAll().size
+        assertEquals(locationCount, result.size)
+
+        result.forEach {
+            assertTrue(it.aisles.single().isDefault)
+        }
     }
 
     @Test
     fun getProductMappings_productMappedToOneAisle_returnsLocationWithAisle() = runTest {
-        val location = locationRepository.getAll().first()
-        val aisle = aisleRepository.getForLocation(location.id).first()
+        val aisle = aisleRepository.getAll().first { !it.isDefault }
         aisleProductRepository.add(
             AisleProduct(1, aisle.id, product, 0)
         )
 
         val result = getProductMappingsUseCase(product.id)
 
-        assertEquals(1, result.size)
-        assertEquals(location.id, result.first().id)
-        assertEquals(1, result.first().aisles.size)
-        assertEquals(aisle.id, result.first().aisles.single().id)
+        val locationCount = locationRepository.getAll().size
+        assertEquals(locationCount, result.size)
+
+        assertNotNull(result.singleOrNull { it.aisles.single().id == aisle.id })
     }
 
     @Test
@@ -110,6 +115,7 @@ class GetProductMappingsUseCaseImplTest {
 
         val result = getProductMappingsUseCase(product.id)
 
-        assertTrue(result.isEmpty())
+        val locationCount = locationRepository.getAll().size
+        assertEquals(locationCount - 1, result.size)
     }
 }

@@ -125,8 +125,7 @@ class CreateSampleDataUseCaseTest {
                     inStock = false,
                     qtyNeeded = 0,
                     noteId = null
-                ),
-                null
+                )
             )
 
             assertThrows<AisleronException.SampleDataCreationException> {

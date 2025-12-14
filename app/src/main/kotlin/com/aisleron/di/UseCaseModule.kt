@@ -304,7 +304,8 @@ val useCaseModule = module {
         GetProductMappingsUseCaseImpl(
             aisleProductRepository = get(),
             getAisleUseCase = get(),
-            getLocationUseCase = get()
+            getLocationUseCase = get(),
+            getDefaultAislesUseCase = get()
         )
     }
 

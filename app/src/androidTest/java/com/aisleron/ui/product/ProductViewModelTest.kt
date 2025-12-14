@@ -23,7 +23,6 @@ import com.aisleron.di.repositoryModule
 import com.aisleron.di.useCaseModule
 import com.aisleron.di.viewModelTestModule
 import com.aisleron.domain.FilterType
-import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.aisle.AisleRepository
 import com.aisleron.domain.aisle.usecase.GetAisleUseCase
 import com.aisleron.domain.aisle.usecase.GetAislesForLocationUseCase
@@ -181,12 +180,8 @@ class ProductViewModelTest() : KoinTest {
 
         declare<AddProductUseCase> {
             object : AddProductUseCase {
-                override suspend fun invoke(product: Product, targetAisle: Aisle?): Int {
-                    throw Exception(exceptionMessage)
-                }
-
                 override suspend fun invoke(item: Product): Int {
-                    return invoke(item, null)
+                    throw Exception(exceptionMessage)
                 }
             }
         }
@@ -251,7 +246,7 @@ class ProductViewModelTest() : KoinTest {
         val aisle = get<AisleRepository>().getAll().first { !it.isDefault }
         val inStock = true
 
-        productViewModel.hydrate(0, inStock, aisle.locationId, aisle.id)
+        productViewModel.hydrate(0, inStock, aisle.id)
         val countBefore = aisleProductRepository.getAll().count { it.aisleId == aisle.id }
         productViewModel.updateProductName(newProductName)
         productViewModel.updateInStock(inStock)
@@ -465,5 +460,17 @@ class ProductViewModelTest() : KoinTest {
 
         val updatedAisleInfo = updatedAisles.single { it.locationId == initialAisleInfo.locationId }
         assertEquals(initialAisleInfo.copy(locationName = updatedStoreName), updatedAisleInfo)
+    }
+
+    @Test
+    fun hydrate_targetAisleIdProvided_productAislesFlowIsUpdated() = runTest {
+        val aisle = get<AisleRepository>().getAll().first { !it.isDefault }
+
+        productViewModel.hydrate(0, false, aisle.id)
+
+        val productAisles = productViewModel.productAisles.value
+        val targetAisleInfo = productAisles.first { it.locationId == aisle.locationId }
+        assertEquals(aisle.id, targetAisleInfo.aisleId)
+        assertNotEquals(aisle.id, targetAisleInfo.initialAisleId)
     }
 }

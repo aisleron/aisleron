@@ -28,7 +28,6 @@ import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.RootMatchers.isDialog
-import androidx.test.espresso.matcher.ViewMatchers.hasChildCount
 import androidx.test.espresso.matcher.ViewMatchers.hasSibling
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
@@ -118,21 +117,30 @@ class ProductAislesFragmentTest : KoinTest {
         getFragmentScenario(bundle)
 
         mappings.forEach {
-            onView(withText(it.name)).check(matches(isDisplayed()))
-            onView(withText(it.aisles.first().name)).check(matches(isDisplayed()))
+            onView(
+                allOf(
+                    withText(it.aisles.first().name),
+                    hasSibling(withText(it.name))
+                )
+            ).check(matches(isDisplayed()))
         }
     }
 
     @Test
-    fun onCreateView_withNoProductAisles_showsEmptyList() = runTest {
-        val productId = get<ProductRepository>().add(
-            Product(0, "Not Mapped Product", true, 0)
-        )
+    fun onCreateView_onAddProduct_showsDefaultAisles() = runTest {
+        val mappings = get<GetProductMappingsUseCase>().invoke(-1)
 
-        val bundle = bundler.makeEditProductBundle(productId)
+        val bundle = bundler.makeAddProductBundle("Not Mapped Product")
         getFragmentScenario(bundle)
 
-        onView(withId(R.id.product_aisles_list)).check(matches(hasChildCount(0)))
+        mappings.forEach {
+            onView(
+                allOf(
+                    withText(it.aisles.first().name),
+                    hasSibling(withText(it.name))
+                )
+            ).check(matches(isDisplayed()))
+        }
     }
 
     @Test

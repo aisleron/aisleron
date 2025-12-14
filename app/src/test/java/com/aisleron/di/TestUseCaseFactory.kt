@@ -52,6 +52,8 @@ import com.aisleron.domain.location.usecase.GetShopsUseCase
 import com.aisleron.domain.location.usecase.IsLocationNameUniqueUseCase
 import com.aisleron.domain.location.usecase.RemoveLocationUseCase
 import com.aisleron.domain.location.usecase.RemoveLocationUseCaseImpl
+import com.aisleron.domain.location.usecase.SortLocationByNameUseCase
+import com.aisleron.domain.location.usecase.SortLocationByNameUseCaseImpl
 import com.aisleron.domain.location.usecase.UpdateLocationUseCase
 import com.aisleron.domain.loyaltycard.usecase.AddLoyaltyCardToLocationUseCase
 import com.aisleron.domain.loyaltycard.usecase.AddLoyaltyCardToLocationUseCaseImpl
@@ -244,6 +246,14 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
         )
     }
 
+    val sortLocationByNameUseCase: SortLocationByNameUseCase by lazy {
+        SortLocationByNameUseCaseImpl(
+            repositoryFactory.locationRepository,
+            updateAisleUseCase = updateAisleUseCase,
+            updateAisleProductUseCase = updateAisleProductsUseCase
+        )
+    }
+
     val updateLocationUseCase: UpdateLocationUseCase by lazy {
         UpdateLocationUseCase(
             repositoryFactory.locationRepository,
@@ -374,7 +384,8 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
         GetProductMappingsUseCaseImpl(
             aisleProductRepository = repositoryFactory.aisleProductRepository,
             getAisleUseCase = getAisleUseCase,
-            getLocationUseCase = getLocationUseCase
+            getLocationUseCase = getLocationUseCase,
+            getDefaultAislesUseCase = getDefaultAislesUseCase
         )
     }
 
@@ -464,6 +475,7 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
             GetPinnedShopsUseCase::class -> getPinnedShopsUseCase as T
             GetShopsUseCase::class -> getShopsUseCase as T
             RemoveLocationUseCase::class -> removeLocationUseCase as T
+            SortLocationByNameUseCase::class -> sortLocationByNameUseCase as T
             UpdateLocationUseCase::class -> updateLocationUseCase as T
 
             //Loyalty Card Use Cases

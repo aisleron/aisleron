@@ -136,7 +136,7 @@
     <string name="product_tab_inventory">Inhalt</string>
     <string name="notes_hint">Notizen hier…</string>
     <string name="show_note">Notiz anzeigen</string>
-    <string name="note_dialog_title">Notiz für %$1s</string>
+    <string name="note_dialog_title">Notiz für %1$s</string>
     <string name="loading">Lade…</string>
     <string name="dismiss">Verwerfen</string>
     <string name="view_changes">Änderungen anzeigen</string>
@@ -158,4 +158,5 @@
     <string name="tracking_mode">Tracking-Modus</string>
     <string name="new_entity_name">Neuer Entitätsname</string>
     <string name="pure_black_style">Stil Reines Schwarz</string>
+    <string name="aisle_picker_dropdown">Gangauswahl-Dropdown</string>
 </resources>

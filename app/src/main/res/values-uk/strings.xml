@@ -158,4 +158,5 @@
     <string name="pure_black_business_class">Бізнес-клас</string>
     <string name="pure_black_first_class">Перший клас</string>
     <string name="pure_black_style">Чистий чорний стиль</string>
+    <string name="aisle_picker_dropdown">Розкривний список вибору проходу</string>
 </resources>

@@ -158,4 +158,5 @@
     <string name="view_changes">Visa ändringar</string>
     <string name="updated_notification">Aisleron uppdaterades från %1$s till %2$s.</string>
     <string name="pure_black_style">Ren svart stil</string>
+    <string name="aisle_picker_dropdown">Rullgardinsmeny för gångväljare</string>
 </resources>

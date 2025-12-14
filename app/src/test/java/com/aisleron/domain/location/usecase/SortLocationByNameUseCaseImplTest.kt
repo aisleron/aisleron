@@ -5,9 +5,6 @@ import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.aisle.AisleRepository
 import com.aisleron.domain.aisle.usecase.AddAisleUseCaseImpl
 import com.aisleron.domain.aisle.usecase.IsAisleNameUniqueUseCase
-import com.aisleron.domain.aisle.usecase.UpdateAisleUseCaseImpl
-import com.aisleron.domain.aisleproduct.AisleProductRepository
-import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductsUseCase
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.usecase.AddProductUseCase
@@ -24,16 +21,7 @@ class SortLocationByNameUseCaseImplTest {
     @BeforeEach
     fun setUp() {
         dm = TestDependencyManager()
-        val aisleRepository = dm.getRepository<AisleRepository>()
-        sortLocationByNameUseCase = SortLocationByNameUseCaseImpl(
-            locationRepository = dm.getRepository<LocationRepository>(),
-            updateAisleUseCase = UpdateAisleUseCaseImpl(
-                aisleRepository = aisleRepository,
-                getLocationUseCase = GetLocationUseCase(dm.getRepository<LocationRepository>()),
-                isAisleNameUniqueUseCase = IsAisleNameUniqueUseCase(aisleRepository)
-            ),
-            updateAisleProductUseCase = UpdateAisleProductsUseCase(dm.getRepository<AisleProductRepository>())
-        )
+        sortLocationByNameUseCase = dm.getUseCase()
     }
 
     @Test
@@ -84,15 +72,14 @@ class SortLocationByNameUseCaseImplTest {
             noteId = null
         )
 
-        val aisle = locationRepository.getLocationWithAisles(locationId).aisles.first()
-        addProductUseCase(product, aisle)
-        addProductUseCase(product.copy(name = "AAA"), aisle)
+        addProductUseCase(product)
+        addProductUseCase(product.copy(name = "AAA"))
 
         sortLocationByNameUseCase(locationId)
 
         val sortedProducts =
             locationRepository.getLocationWithAislesWithProducts(locationId)
-                .first()!!.aisles.first { it.id == aisle.id }.products
+                .first()!!.aisles.first { it.isDefault }.products
 
         assertEquals(1, sortedProducts.first { it.product.name == "AAA" }.rank)
         assertEquals(

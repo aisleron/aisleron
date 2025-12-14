@@ -53,8 +53,7 @@ class ProductViewModel(
     private val changeProductAisleUseCase: ChangeProductAisleUseCase,
     coroutineScopeProvider: CoroutineScope? = null
 ) : ViewModel(), NoteViewModel {
-    private var _aisleId: Int? = null
-    private var _locationId: Int? = null
+    private var _targetAisleId: Int? = null
 
     private var product: Product? = null
     private val coroutineScope = coroutineScopeProvider ?: this.viewModelScope
@@ -84,13 +83,11 @@ class ProductViewModel(
 
     private var hydrated = false
 
-    fun hydrate(productId: Int, inStock: Boolean, locationId: Int? = null, aisleId: Int? = null) {
+    fun hydrate(productId: Int, inStock: Boolean, targetAisleId: Int? = null) {
         if (hydrated) return
-        hydrated = true
 
         coroutineScope.launch {
-            _locationId = locationId
-            _aisleId = aisleId
+            _targetAisleId = targetAisleId
             _productUiState.value = ProductUiState.Loading
             product = getProduct(productId)
             _uiData.value = ProductUiData(
@@ -99,16 +96,15 @@ class ProductViewModel(
                 noteText = product?.note?.noteText ?: ""
             )
 
-            product?.let {
-                loadProductAisleList(it)
-            }
+            loadProductAisleList(product?.id ?: -1)
 
             _productUiState.value = ProductUiState.Empty
+            hydrated = true
         }
     }
 
-    private suspend fun loadProductAisleList(product: Product) {
-        val aisles = getProductMappingsUseCase(product.id).flatMap { location ->
+    private suspend fun loadProductAisleList(productId: Int) {
+        val aisles = getProductMappingsUseCase(productId).flatMap { location ->
             location.aisles.map { aisle ->
                 ProductAisleInfo(
                     locationId = location.id,
@@ -120,25 +116,27 @@ class ProductViewModel(
             }
         }
 
+        val targetAisle = _targetAisleId?.let { getAisleUseCase(it) }
         val currentAisles = _productAisles.value
         _productAisles.value = aisles.map { newAisle ->
             val existing = currentAisles.find {
                 it.locationId == newAisle.locationId && it.initialAisleId == newAisle.initialAisleId
             }
 
-            if (existing != null && existing.locationName != newAisle.locationName) {
-                existing.copy(locationName = newAisle.locationName)
+            val aisleInfo = existing?.copy(locationName = newAisle.locationName) ?: newAisle
+            if (aisleInfo.locationId == targetAisle?.locationId) {
+                aisleInfo.copy(aisleId = targetAisle.id, aisleName = targetAisle.name)
             } else {
-                newAisle
+                aisleInfo
             }
         }
     }
 
     fun requestProductAisles() {
-        product?.let {
-            coroutineScope.launch {
-                loadProductAisleList(it)
-            }
+        if (!hydrated) return
+
+        coroutineScope.launch {
+            loadProductAisleList(product?.id ?: -1)
         }
     }
 
@@ -186,7 +184,6 @@ class ProductViewModel(
 
             _productUiState.value = ProductUiState.Loading
             try {
-                val aisle = _aisleId?.let { getAisleUseCase(it) }
                 product?.let {
                     val updated = it.copy(name = name, inStock = inStock)
                     updateProductUseCase(updated)
@@ -198,8 +195,7 @@ class ProductViewModel(
                             inStock = inStock,
                             id = 0,
                             qtyNeeded = 0
-                        ),
-                        aisle
+                        )
                     )
 
                     product = getProduct(id)

@@ -158,4 +158,5 @@
     <string name="view_changes">Voir les modifications</string>
     <string name="updated_notification">Aisleron a été mis à jour de %1$s à %2$s.</string>
     <string name="pure_black_style">Style noir pur</string>
+    <string name="aisle_picker_dropdown">Sélecteur de rayon</string>
 </resources>

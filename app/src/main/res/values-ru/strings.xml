@@ -158,4 +158,5 @@
     <string name="view_changes">Просмотреть изменения</string>
     <string name="updated_notification">Aisleron был обновлен с %1$s до %2$s.</string>
     <string name="pure_black_style">Стиль «чистый черный»</string>
+    <string name="aisle_picker_dropdown">Выпадающий список выбора отдела</string>
 </resources>

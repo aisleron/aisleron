@@ -742,7 +742,6 @@ class ShoppingListFragmentTest : KoinTest {
         val bundle = navController.backStack.last().arguments
         val addEditProductBundle = bundler.getAddEditProductBundle(bundle)
         assertEquals(aisle.id, addEditProductBundle.aisleId)
-        assertEquals(shoppingList.id, addEditProductBundle.locationId)
         assertEquals(AddEditProductBundle.ProductAction.ADD, addEditProductBundle.actionType)
     }
 

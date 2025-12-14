@@ -24,7 +24,6 @@ import com.aisleron.domain.aisle.usecase.AddAisleUseCase
 import com.aisleron.domain.aisle.usecase.GetAisleUseCase
 import com.aisleron.domain.aisle.usecase.UpdateAisleUseCase
 import com.aisleron.domain.base.AisleronException
-import com.aisleron.ui.shoppinglist.AisleShoppingListItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -71,11 +70,7 @@ class AisleViewModel(
     }
 
     fun addAisle() {
-        addAisle(aisleName.value, _locationId)
-    }
-
-
-    fun addAisle(aisleName: String, locationId: Int) {
+        val aisleName = aisleName.value
         coroutineScope.launch {
             try {
                 if (aisleName.isNotBlank()) {
@@ -83,7 +78,7 @@ class AisleViewModel(
                         Aisle(
                             name = aisleName,
                             products = emptyList(),
-                            locationId = locationId,
+                            locationId = _locationId,
                             isDefault = false,
                             rank = 0,
                             id = 0,
@@ -93,34 +88,6 @@ class AisleViewModel(
                 }
 
                 _uiState.value = AisleUiState.Success(_aisleId ?: -1)
-            } catch (e: AisleronException) {
-                _uiState.value = AisleUiState.Error(e.exceptionCode, e.message)
-            } catch (e: Exception) {
-                _uiState.value = AisleUiState.Error(
-                    AisleronException.ExceptionCode.GENERIC_EXCEPTION, e.message
-                )
-            }
-        }
-    }
-
-    fun updateAisleName(aisle: AisleShoppingListItem, newName: String) {
-        coroutineScope.launch {
-            try {
-                if (newName.isNotBlank()) {
-                    updateAisleUseCase(
-                        Aisle(
-                            name = newName,
-                            products = emptyList(),
-                            locationId = aisle.locationId,
-                            isDefault = aisle.isDefault,
-                            rank = aisle.rank,
-                            id = aisle.id,
-                            expanded = aisle.expanded
-                        )
-                    )
-                }
-
-                _uiState.value = AisleUiState.Success(aisle.id)
             } catch (e: AisleronException) {
                 _uiState.value = AisleUiState.Error(e.exceptionCode, e.message)
             } catch (e: Exception) {
