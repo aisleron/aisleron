@@ -52,7 +52,9 @@ import com.aisleron.ui.ApplicationTitleUpdateListener
 import com.aisleron.ui.FabHandler
 import com.aisleron.ui.FabHandler.FabClickedCallBack
 import com.aisleron.ui.aisle.AisleDialogFragment
+import com.aisleron.ui.aisle.AislePickerDialogFragment
 import com.aisleron.ui.bundles.AisleDialogBundle
+import com.aisleron.ui.bundles.AislePickerBundle
 import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.copyentity.CopyEntityDialogFragment
 import com.aisleron.ui.copyentity.CopyEntityType
@@ -78,7 +80,6 @@ class ShoppingListFragment(
     MenuProvider, AisleronFragment {
 
     private var actionMode: ActionMode? = null
-    private var actionModeItem: ShoppingListItem? = null
     private var actionModeItemView: View? = null
     private var editShopMenuItem: MenuItem? = null
     private var loyaltyCardMenuItem: MenuItem? = null
@@ -101,6 +102,32 @@ class ShoppingListFragment(
             shoppingListBundle.filterType,
             shoppingListPreferences.showEmptyAisles(requireContext())
         )
+
+        childFragmentManager.setFragmentResultListener(
+            AISLE_PICKER_REQUEST_KEY, this
+        ) { _, bundle ->
+            val selectedAisleId = bundle.getInt(AislePickerDialogFragment.KEY_SELECTED_AISLE_ID, -1)
+            val addNewAisle = bundle.getBoolean(AislePickerDialogFragment.KEY_ADD_NEW_AISLE, false)
+
+            if (selectedAisleId != -1) {
+                shoppingListViewModel.updateSelectedProductAisle(selectedAisleId)
+                endActionMode()
+            }
+
+            if (addNewAisle) {
+                showAddSingleAisleDialog()
+            }
+        }
+
+        childFragmentManager.setFragmentResultListener(
+            ADD_AISLE_REQUEST_KEY, this
+        ) { _, bundle ->
+            val newAisleId = bundle.getInt(AisleDialogFragment.KEY_AISLE_ID, -1)
+            shoppingListViewModel.selectedItem?.let {
+                shoppingListViewModel.updateSelectedProductAisle(newAisleId)
+                endActionMode()
+            }
+        }
     }
 
     override fun onCreateView(
@@ -116,28 +143,39 @@ class ShoppingListFragment(
             setWindowInsetListeners(this, view, true, null)
             viewLifecycleOwner.lifecycleScope.launch {
                 viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    shoppingListViewModel.shoppingListUiState.collect {
-                        when (it) {
-                            is ShoppingListViewModel.ShoppingListUiState.Error -> {
-                                displayErrorSnackBar(
-                                    it.errorCode,
-                                    it.errorMessage,
-                                    fabHandler.getFabView(requireActivity())
-                                )
+                    launch {
+                        shoppingListViewModel.shoppingListUiState.collect {
+                            when (it) {
+                                is ShoppingListViewModel.ShoppingListUiState.Error -> {
+                                    displayErrorSnackBar(
+                                        it.errorCode,
+                                        it.errorMessage,
+                                        fabHandler.getFabView(requireActivity())
+                                    )
 
-                                shoppingListViewModel.clearState()
+                                    shoppingListViewModel.clearState()
+                                }
+
+                                is ShoppingListViewModel.ShoppingListUiState.Updated -> {
+                                    updateTitle()
+                                    setMenuItemVisibility()
+
+                                    (view.adapter as ShoppingListItemRecyclerViewAdapter).submitList(
+                                        it.shoppingList
+                                    )
+                                }
+
+                                else -> Unit
                             }
+                        }
+                    }
 
-                            is ShoppingListViewModel.ShoppingListUiState.Updated -> {
-                                updateTitle()
-                                setMenuItemVisibility()
-
-                                (view.adapter as ShoppingListItemRecyclerViewAdapter).submitList(
-                                    it.shoppingList
-                                )
+                    launch {
+                        shoppingListViewModel.aislesForLocation.collect { data ->
+                            if (data != null) {
+                                showAislePickerDialog(data)
+                                shoppingListViewModel.onAislesDialogShown()
                             }
-
-                            else -> Unit
                         }
                     }
                 }
@@ -151,14 +189,14 @@ class ShoppingListFragment(
                     object :
                         ShoppingListItemRecyclerViewAdapter.ShoppingListItemListener {
                         override fun onClick(item: ShoppingListItem) {
-                            actionMode?.finish()
+                            endActionMode()
                         }
 
                         override fun onProductStatusChange(
                             item: ProductShoppingListItem,
                             inStock: Boolean
                         ) {
-                            actionMode?.finish()
+                            endActionMode()
                             shoppingListViewModel.updateProductStatus(item, inStock)
                             displayStatusChangeSnackBar(item, inStock)
                         }
@@ -172,18 +210,19 @@ class ShoppingListFragment(
                         override fun onListPositionChanged(
                             item: ShoppingListItem, precedingItem: ShoppingListItem?
                         ) {
-                            actionMode?.finish()
+                            endActionMode()
                             shoppingListViewModel.updateItemRank(item, precedingItem)
                         }
 
                         override fun onLongClick(item: ShoppingListItem, view: View): Boolean {
                             // Finish the previous action mode and start a new one
-                            actionMode?.finish()
+                            endActionMode()
                             if (item.itemType == ShoppingListItem.ItemType.EMPTY_LIST) {
                                 return false
                             }
 
-                            actionModeItem = item
+                            shoppingListViewModel.setSelectedItem(item)
+
                             actionModeItemView = view
                             actionModeItemView?.isSelected = true
                             return when (actionMode) {
@@ -207,7 +246,7 @@ class ShoppingListFragment(
                         override fun onAisleExpandToggle(
                             item: AisleShoppingListItem, expanded: Boolean
                         ) {
-                            actionMode?.finish()
+                            endActionMode()
                             shoppingListViewModel.updateAisleExpanded(item, expanded)
                         }
 
@@ -230,6 +269,11 @@ class ShoppingListFragment(
             }
         }
         return view
+    }
+
+    private fun showAislePickerDialog(data: AislePickerBundle) {
+        AislePickerDialogFragment.newInstance(data, AISLE_PICKER_REQUEST_KEY)
+            .show(childFragmentManager, AislePickerDialogFragment.TAG)
     }
 
     private fun setMenuItemVisibility() {
@@ -284,7 +328,11 @@ class ShoppingListFragment(
             .show(childFragmentManager, AisleDialogFragment.TAG)
     }
 
-    private fun showAddAisleDialog() {
+    private fun showAddSingleAisleDialog() {
+        showAisleDialog(-1, AisleDialogFragment.AisleDialogAction.ADD_SINGLE)
+    }
+
+    private fun showAddMultiAisleDialog() {
         showAisleDialog(-1, AisleDialogFragment.AisleDialogAction.ADD_MULTIPLE)
     }
 
@@ -306,7 +354,7 @@ class ShoppingListFragment(
         }
 
         fabHandler.setFabOnClickListener(this.requireActivity(), FabHandler.FabOption.ADD_AISLE) {
-            showAddAisleDialog()
+            showAddMultiAisleDialog()
         }
     }
 
@@ -427,6 +475,8 @@ class ShoppingListFragment(
     }
 
     override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
+        val actionModeItem = shoppingListViewModel.selectedItem
+
         mode.title = actionModeItem?.name
         menu.findItem(R.id.mnu_delete_shopping_list_item)
             .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
@@ -440,10 +490,15 @@ class ShoppingListFragment(
         menu.findItem(R.id.mnu_product_note).isVisible =
             actionModeItem?.itemType == ShoppingListItem.ItemType.PRODUCT
 
+        menu.findItem(R.id.mnu_select_aisle).isVisible =
+            actionModeItem?.itemType == ShoppingListItem.ItemType.PRODUCT
+
         return false // Return false if nothing is done
     }
 
     override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
+        val actionModeItem = shoppingListViewModel.selectedItem
+
         var result = true
         when (item.itemId) {
             R.id.mnu_edit_shopping_list_item ->
@@ -465,6 +520,12 @@ class ShoppingListFragment(
             R.id.mnu_product_note ->
                 actionModeItem?.let { showNoteDialog(it) }
 
+            R.id.mnu_select_aisle ->
+                actionModeItem?.let {
+                    if (it is ProductShoppingListItem)
+                        shoppingListViewModel.requestLocationAisles(it)
+                }
+
             else -> result = false // No action picked, so don't close the CAB.
         }
 
@@ -475,9 +536,8 @@ class ShoppingListFragment(
 
     override fun onDestroyActionMode(mode: ActionMode) {
         actionModeItemView?.isSelected = false
-        actionMode = null
-        actionModeItem = null
         actionModeItemView = null
+        actionMode = null
     }
 
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
@@ -577,13 +637,20 @@ class ShoppingListFragment(
         dialog.show()
     }
 
+    private fun endActionMode() {
+        shoppingListViewModel.clearSelectedItem()
+        actionMode?.finish()
+    }
+
     companion object {
 
         private const val ARG_LOCATION_ID = "locationId"
         private const val ARG_FILTER_TYPE = "filterType"
 
-        private const val ADD_AISLE_REQUEST_KEY = "addAisleRequest"
-        private const val EDIT_AISLE_REQUEST_KEY = "editAisleRequest"
+        const val ADD_AISLE_REQUEST_KEY = "shoppingListAddAisleRequest"
+        const val EDIT_AISLE_REQUEST_KEY = "shoppingListEditAisleRequest"
+
+        const val AISLE_PICKER_REQUEST_KEY = "shoppingListAislePickerRequest"
 
         @JvmStatic
         fun newInstance(
@@ -608,6 +675,6 @@ class ShoppingListFragment(
     }
 
     override fun fabClicked(fabOption: FabHandler.FabOption) {
-        actionMode?.finish()
+        endActionMode()
     }
 }

@@ -333,7 +333,6 @@ class AisleDialogFragmentTest : KoinTest {
         assertEquals(aisle.name, updatedAisle?.name)
     }
 
-
     private suspend fun showAddSingleDialog(requestKey: String = "addAisle") {
         val location = get<LocationRepository>().getAll().first { it.type == LocationType.SHOP }
         showAddSingleDialog(location.id, requestKey)
@@ -396,5 +395,35 @@ class AisleDialogFragmentTest : KoinTest {
         val addedAisle = get<AisleRepository>().getAll().firstOrNull { it.name == newAisleName }
         assertNotNull(addedAisle)
         assertEquals(addedAisle.id, aisleId)
+    }
+
+    @Test
+    fun addAisle_AfterError_ErrorClearedWhenTyping() = runTest {
+        // Get an existing aisle to create a duplicate
+        val existingAisle = get<AisleRepository>().getAll().first { !it.isDefault }
+
+        // Show dialog and trigger error by entering a duplicate name
+        showAddSingleDialog(existingAisle.locationId)
+        onView(allOf(withId(R.id.edt_aisle_name), instanceOf(EditText::class.java)))
+            .inRoot(isDialog())
+            .perform(typeText(existingAisle.name))
+
+        onView(withText(R.string.done))
+            .inRoot(isDialog())
+            .perform(click())
+
+        // Verify error is shown
+        onView(withText(R.string.duplicate_aisle_name_exception))
+            .inRoot(isDialog())
+            .check(matches(isDisplayed()))
+
+        // Type in the edit box to clear the error
+        onView(allOf(withId(R.id.edt_aisle_name), instanceOf(EditText::class.java)))
+            .inRoot(isDialog())
+            .perform(clearText(), typeText("New Aisle Name"))
+
+        // Verify error message is cleared
+        onView(withText(R.string.duplicate_aisle_name_exception))
+            .check(doesNotExist())
     }
 }

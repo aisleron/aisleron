@@ -49,6 +49,8 @@ val viewModelTestModule = module {
             getLoyaltyCardForLocationUseCase = get(),
             updateProductQtyNeededUseCase = get(),
             expandCollapseAislesForLocationUseCase = get(),
+            getAislesForLocationUseCase = get(),
+            changeProductAisleUseCase = get(),
             debounceTime = 0,
             TestScope(UnconfinedTestDispatcher())
         )

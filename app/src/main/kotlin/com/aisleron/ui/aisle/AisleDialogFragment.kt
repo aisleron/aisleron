@@ -50,7 +50,7 @@ class AisleDialogFragment : DialogFragment() {
     private val binding get() = _binding!!
     private var addMoreAisles = false
     private var positiveButtonClickListener: ((view: View) -> Unit)? = null
-    private var negativeButtonClickListener: ((view: View) -> Unit)? = null
+    private var neutralButtonClickListener: ((view: View) -> Unit)? = null
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         _binding = DialogAisleBinding.inflate(layoutInflater)
@@ -65,7 +65,7 @@ class AisleDialogFragment : DialogFragment() {
         }
 
         val dialog = builder
-            .setNeutralButton(android.R.string.cancel, null)
+            .setNegativeButton(android.R.string.cancel, null)
             .setView(binding.root)
             .create()
 
@@ -74,8 +74,8 @@ class AisleDialogFragment : DialogFragment() {
             val positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
             positiveButton?.setOnClickListener(positiveButtonClickListener)
 
-            val negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
-            negativeButton?.setOnClickListener(negativeButtonClickListener)
+            val neutralButton = dialog.getButton(AlertDialog.BUTTON_NEUTRAL)
+            neutralButton?.setOnClickListener(neutralButtonClickListener)
         }
 
         binding.edtAisleName.post {
@@ -85,7 +85,7 @@ class AisleDialogFragment : DialogFragment() {
         }
 
         binding.edtAisleName.doAfterTextChanged {
-            binding.edtAisleName.error = null
+            binding.edtAisleNameLayout.error = null
             viewModel.setAisleName(binding.edtAisleName.text.toString())
         }
 
@@ -95,7 +95,7 @@ class AisleDialogFragment : DialogFragment() {
                     viewModel.uiState.collect { state ->
                         dialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled =
                             state != CopyEntityViewModel.CopyUiState.Loading
-                        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).isEnabled =
+                        dialog.getButton(AlertDialog.BUTTON_NEUTRAL).isEnabled =
                             state != CopyEntityViewModel.CopyUiState.Loading
                         when (state) {
                             is AisleViewModel.AisleUiState.Error -> showError(state.errorCode)
@@ -124,7 +124,7 @@ class AisleDialogFragment : DialogFragment() {
     private fun showError(code: AisleronException.ExceptionCode) {
         val layout = binding.edtAisleNameLayout
         layout.error = getString(AisleronExceptionMap().getErrorResourceId(code))
-        // viewModel.clearState()
+        viewModel.clearState()
     }
 
     private fun closeDialog(aisleId: Int, requestKey: String) {
@@ -139,13 +139,13 @@ class AisleDialogFragment : DialogFragment() {
     }
 
     private fun getAddMultipleDialogBuilder(): MaterialAlertDialogBuilder {
-        negativeButtonClickListener = {
+        neutralButtonClickListener = {
             addMoreAisles = true
             viewModel.addAisle()
         }
 
         return getAddSingleDialogBuilder()
-            .setNegativeButton(R.string.add_another, null)
+            .setNeutralButton(R.string.add_another, null)
     }
 
     private fun getAddSingleDialogBuilder(): MaterialAlertDialogBuilder {
@@ -157,7 +157,6 @@ class AisleDialogFragment : DialogFragment() {
         return MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.add_aisle)
             .setPositiveButton(R.string.done, null)
-
     }
 
     private fun getEditDialogBuilder(): MaterialAlertDialogBuilder {

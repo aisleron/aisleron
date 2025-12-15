@@ -29,7 +29,13 @@
         android:id="@+id/mnu_product_note"
         android:title="@string/show_note"
         android:icon="@drawable/baseline_sticky_note_2_24"
-        app:showAsAction="ifRoom"
+        app:showAsAction="always"
+        android:menuCategory="container" />
+    <item
+        android:id="@+id/mnu_select_aisle"
+        android:title="@string/select_aisle"
+        android:icon="@drawable/baseline_aisle_24"
+        app:showAsAction="always"
         android:menuCategory="container" />
     <item
         android:id="@+id/mnu_edit_shopping_list_item"

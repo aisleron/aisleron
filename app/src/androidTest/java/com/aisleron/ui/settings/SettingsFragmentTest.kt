@@ -160,7 +160,7 @@ class SettingsFragmentTest : KoinTest {
         testUri: String, intentAction: String, viewTextResourceId: Int
     ) {
         val intent = Intent()
-        intent.setData(Uri.parse(testUri))
+        intent.data = Uri.parse(testUri)
         val result: Instrumentation.ActivityResult =
             Instrumentation.ActivityResult(Activity.RESULT_OK, intent)
 
