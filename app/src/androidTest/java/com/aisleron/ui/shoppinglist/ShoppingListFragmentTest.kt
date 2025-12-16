@@ -1409,7 +1409,7 @@ class ShoppingListFragmentTest : KoinTest {
         getActivityScenario(bundle)
 
         onView(withText(product.name)).perform(longClick())
-        onView(withId(R.id.mnu_select_aisle)).perform(click())
+        onView(withId(R.id.mnu_aisle_picker)).perform(click())
 
         onView(withText(product.name))
             .inRoot(isDialog())

@@ -32,8 +32,8 @@
         app:showAsAction="always"
         android:menuCategory="container" />
     <item
-        android:id="@+id/mnu_select_aisle"
-        android:title="@string/select_aisle"
+        android:id="@+id/mnu_aisle_picker"
+        android:title="@string/aisle_picker"
         android:icon="@drawable/baseline_aisle_24"
         app:showAsAction="always"
         android:menuCategory="container" />

@@ -158,5 +158,5 @@
     <string name="tracking_mode">Tracking-Modus</string>
     <string name="new_entity_name">Neuer Entitätsname</string>
     <string name="pure_black_style">Stil Reines Schwarz</string>
-    <string name="aisle_picker_dropdown">Gangauswahl-Dropdown</string>
+    <string name="aisle_picker">Gangauswahl</string>
 </resources>

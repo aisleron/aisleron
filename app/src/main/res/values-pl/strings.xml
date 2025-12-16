@@ -158,5 +158,5 @@
     <string name="view_changes">Wyświetl zmiany</string>
     <string name="updated_notification">Aisleron został zaktualizowany z %1$s do %2$s.</string>
     <string name="pure_black_style">Styl czystej czerni</string>
-    <string name="aisle_picker_dropdown">Rozwijana lista wyboru alejek</string>
+    <string name="aisle_picker">Wybór alejki</string>
 </resources>

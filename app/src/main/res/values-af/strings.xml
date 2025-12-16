@@ -166,5 +166,5 @@
     <string name="view_changes">Bekyk Veranderinge</string>
     <string name="updated_notification">Aisleron is opgedateer van %1$s na %2$s.</string>
     <string name="pure_black_style">Suiwer Swart styl</string>
-    <string name="aisle_picker_dropdown">Gangkieser-aftreklys</string>
+    <string name="aisle_picker">Gangkieser</string>
 </resources>

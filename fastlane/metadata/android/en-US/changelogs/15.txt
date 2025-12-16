@@ -1,10 +1,2 @@
 Enhancements:
-* New: Copy a shop or product
-* Option to show or hide empty aisles
-* Return to Welcome screen during first run
-* Aisle names are now unique per list
-
-Bug Fixes:
-* Product/shop details no longer clear when switching apps
-* Fixed missing pinned shops after database restore
-* Fixed scrolling when dragging products
+* Added the ability to manage aisles when adding or editing a product (#48)

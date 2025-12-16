@@ -490,7 +490,7 @@ class ShoppingListFragment(
         menu.findItem(R.id.mnu_product_note).isVisible =
             actionModeItem?.itemType == ShoppingListItem.ItemType.PRODUCT
 
-        menu.findItem(R.id.mnu_select_aisle).isVisible =
+        menu.findItem(R.id.mnu_aisle_picker).isVisible =
             actionModeItem?.itemType == ShoppingListItem.ItemType.PRODUCT
 
         return false // Return false if nothing is done
@@ -520,7 +520,7 @@ class ShoppingListFragment(
             R.id.mnu_product_note ->
                 actionModeItem?.let { showNoteDialog(it) }
 
-            R.id.mnu_select_aisle ->
+            R.id.mnu_aisle_picker ->
                 actionModeItem?.let {
                     if (it is ProductShoppingListItem)
                         shoppingListViewModel.requestLocationAisles(it)

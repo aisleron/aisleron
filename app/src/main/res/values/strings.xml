@@ -210,5 +210,5 @@
     <string name="dismiss">Dismiss</string>
     <string name="view_changes">View Changes</string>
     <string name="updated_notification">Aisleron was updated from %1$s to %2$s. </string>
-    <string name="aisle_picker_dropdown">Aisle Picker Dropdown</string>
+    <string name="aisle_picker">Aisle Picker</string>
 </resources>

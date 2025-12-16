@@ -36,7 +36,7 @@
             android:id="@+id/dropdown_arrow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:contentDescription="@string/aisle_picker_dropdown"
+            android:contentDescription="@string/aisle_picker"
             android:src="@drawable/baseline_arrow_drop_down_24"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true" />
