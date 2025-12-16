@@ -161,7 +161,7 @@ class NoteDialogFragmentTest : KoinTest {
         val exceptionMessage = "Apply Note Changes Error"
         declare<ApplyNoteChangesUseCase> {
             object : ApplyNoteChangesUseCase {
-                override suspend fun invoke(item: NoteParent, note: Note?): Int? {
+                override suspend fun invoke(item: NoteParent, note: Note?): Int {
                     throw Exception(exceptionMessage)
                 }
             }

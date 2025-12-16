@@ -50,6 +50,7 @@
     <string name="duplicate_location_exception">ERRORE: Non è possibile aggiungere un duplicato di una posizione esistente</string>
     <string name="sample_data_creation_exception">ERRORE: Non è possibile caricare i dati campione in un database esistente</string>
     <string name="loyalty_card_provider_missing_exception">ERRORE: Fornitore di carte fedeltà non installato o attività non trovata</string>
+    <string name="aisle_move_exception">ERRORE: Lo spostamento del reparto deve avvenire all\'interno della stessa Posizione.</string>
     <string name="about_support_header">Supporto</string>
     <string name="about_legal_header">Licenze e Policies</string>
     <string name="about_support_version_title">Storia della versione</string>
@@ -157,4 +158,5 @@
     <string name="pure_black_business_class">Business Class</string>
     <string name="pure_black_first_class">Prima classe</string>
     <string name="pure_black_style">Stile nero puro</string>
+    <string name="aisle_picker">Seleziona corsia</string>
 </resources>

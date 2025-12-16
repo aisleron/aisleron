@@ -27,9 +27,15 @@ replay_pid*
 # Specific Files #
 keystore.properties
 
-# .idea files
-/.idea/androidTestResultsUserPreferences.xml
-/.idea/deploymentTargetSelector.xml
+# fastlane files
 /fastlane/README.md
 /fastlane/report.xml
 /fastlane/screenshots/
+
+# Android Studio IDE files
+.idea/
+.gradle/
+
+# Build outputs
+/build
+/bin

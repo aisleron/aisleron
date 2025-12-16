@@ -15,14 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.ui.aisle
+package com.aisleron.ui.product
 
-import android.content.Context
-import androidx.lifecycle.LifecycleOwner
-import com.aisleron.ui.shoppinglist.AisleShoppingListItem
-
-interface AisleDialog {
-    fun observeLifecycle(owner: LifecycleOwner)
-    fun showAddDialog(context: Context, locationId: Int)
-    fun showEditDialog(context: Context, aisle: AisleShoppingListItem)
-}
+data class ProductAisleInfo(
+    val locationId: Int,
+    val locationName: String,
+    val aisleId: Int,
+    val aisleName: String,
+    val initialAisleId: Int
+)

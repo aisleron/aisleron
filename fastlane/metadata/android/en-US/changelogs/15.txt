@@ -1,0 +1,2 @@
+Enhancements:
+* Added the ability to manage aisles when adding or editing a product (#48)

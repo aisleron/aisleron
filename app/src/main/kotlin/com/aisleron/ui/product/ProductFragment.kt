@@ -34,6 +34,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.viewpager2.widget.ViewPager2
 import com.aisleron.R
 import com.aisleron.databinding.FragmentProductBinding
 import com.aisleron.domain.base.AisleronException
@@ -41,6 +42,7 @@ import com.aisleron.ui.AddEditFragmentListener
 import com.aisleron.ui.AisleronExceptionMap
 import com.aisleron.ui.AisleronFragment
 import com.aisleron.ui.ApplicationTitleUpdateListener
+import com.aisleron.ui.FabHandler
 import com.aisleron.ui.bundles.AddEditProductBundle
 import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.settings.ProductPreferences
@@ -53,7 +55,8 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class ProductFragment(
     private val addEditFragmentListener: AddEditFragmentListener,
     private val applicationTitleUpdateListener: ApplicationTitleUpdateListener,
-    private val productPreferences: ProductPreferences
+    private val productPreferences: ProductPreferences,
+    private val fabHandler: FabHandler,
 ) : Fragment(), MenuProvider, AisleronFragment {
 
     private val productViewModel: ProductViewModel by viewModel()
@@ -78,7 +81,6 @@ class ProductFragment(
             productViewModel.hydrate(
                 addEditProductBundle.productId,
                 addEditProductBundle.inStock ?: false,
-                addEditProductBundle.locationId,
                 addEditProductBundle.aisleId
             )
         }
@@ -89,9 +91,19 @@ class ProductFragment(
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentProductBinding.inflate(inflater, container, false)
-        setWindowInsetListeners(this, binding.root, false, R.dimen.text_margin)
+        setWindowInsetListeners(this, binding.root, false, R.dimen.text_margin,
+            applyMargins = true,
+            applyBottomPadding = false
+        )
 
         initialiseTabs()
+        showHideExtraOptions()
+        // Expand / collapse extra options
+        binding.txtToggleExtraOptions.setOnClickListener {
+            val visible = binding.layoutExtraOptions.isVisible
+            productPreferences.setShowExtraOptions(requireContext(), !visible)
+            showHideExtraOptions()
+        }
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -159,34 +171,50 @@ class ProductFragment(
         }
 
         toggle.setCompoundDrawablesRelativeWithIntrinsicBounds(expandDrawable, 0, 0, 0)
+        setShowAddShopFab()
 
+        binding.pgrProductOptions.post {
+            val lastSelectedTab = productPreferences.getLastSelectedTab(requireContext())
+            binding.pgrProductOptions.setCurrentItem(lastSelectedTab, false)
+        }
     }
 
     private fun initialiseTabs() {
-        showHideExtraOptions()
-
-        // Expand / collapse extra options
-        binding.txtToggleExtraOptions.setOnClickListener {
-            val visible = binding.layoutExtraOptions.isVisible
-            productPreferences.setShowExtraOptions(requireContext(), !visible)
-            showHideExtraOptions()
-        }
-
         // Setup tabs & pager
         tabsAdapter = ProductTabsAdapter(this)
         val viewPager = binding.pgrProductOptions
         viewPager.adapter = tabsAdapter
-
+        val lastSelectedTab = productPreferences.getLastSelectedTab(requireContext())
+        viewPager.setCurrentItem(lastSelectedTab, false)
 
         TabLayoutMediator(binding.tabProductOptions, viewPager) { tab, position ->
             tab.text = when (position) {
-                0 -> getString(R.string.tab_notes)
-                1 -> getString(R.string.product_tab_aisles)
-                2 -> getString(R.string.product_tab_barcodes)
-                3 -> getString(R.string.product_tab_inventory)
+                ProductTabsAdapter.PRODUCT_TAB_NOTES -> getString(R.string.tab_notes)
+                ProductTabsAdapter.PRODUCT_TAB_AISLES -> getString(R.string.product_tab_aisles)
+                ProductTabsAdapter.PRODUCT_TAB_BARCODES -> getString(R.string.product_tab_barcodes)
+                ProductTabsAdapter.PRODUCT_TAB_INVENTORY -> getString(R.string.product_tab_inventory)
                 else -> ""
             }
         }.attach()
+
+        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                productPreferences.setLastSelectedTab(requireContext(), position)
+                setShowAddShopFab()
+            }
+        })
+    }
+
+    private fun setShowAddShopFab() {
+        val showAddShopFab = productPreferences.showExtraOptions(requireContext())
+                && binding.pgrProductOptions.currentItem == ProductTabsAdapter.PRODUCT_TAB_AISLES
+
+        if (showAddShopFab) {
+            fabHandler.setFabItems(requireActivity(), FabHandler.FabOption.ADD_SHOP)
+        } else {
+            fabHandler.setFabItems(requireActivity())
+        }
     }
 
     private fun displayErrorSnackBar(
@@ -212,6 +240,9 @@ class ProductFragment(
         super.onResume()
         applicationTitleUpdateListener.applicationTitleUpdated(requireActivity(), appTitle)
 
+        // Don't show the keyboard by default if extra options are visible.
+        if (productPreferences.showExtraOptions(requireContext())) return
+
         val edtProductName = binding.edtProductName
         edtProductName.doOnLayout {
             edtProductName.requestFocus()
@@ -228,12 +259,14 @@ class ProductFragment(
             inStock: Boolean,
             addEditFragmentListener: AddEditFragmentListener,
             applicationTitleUpdateListener: ApplicationTitleUpdateListener,
-            productPreferences: ProductPreferences
+            productPreferences: ProductPreferences,
+            fabHandler: FabHandler
         ) =
             ProductFragment(
                 addEditFragmentListener,
                 applicationTitleUpdateListener,
-                productPreferences
+                productPreferences,
+                fabHandler
             ).apply {
                 arguments = Bundler().makeAddProductBundle(name, inStock)
             }

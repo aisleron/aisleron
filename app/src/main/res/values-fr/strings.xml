@@ -99,6 +99,7 @@
     <string name="duplicate_aisle_name_exception">ERREUR : le nom de l’allée doit être unique par liste</string>
     <string name="invalid_product_exception">ERREUR : identifiant de produit non valide fourni</string>
     <string name="loyalty_card_provider_missing_exception">ERREUR : fournisseur de carte de fidélité non installé ou activité introuvable</string>
+    <string name="aisle_move_exception">ERREUR : Le déplacement du rayon doit se faire à l\'intérieur du même emplacement.</string>
     <string name="empty_list_title">Cette liste est actuellement vide</string>
     <string name="empty_list_description">Cela pourrait être parce que :</string>
     <string name="empty_list_reasons">- Aucun article n’est nécessaire pour le moment \n- Aucun produit ou rayon n’a encore été ajouté \n- Les éléments existent mais ne sont pas assignés à une allée visible</string>
@@ -157,4 +158,5 @@
     <string name="view_changes">Voir les modifications</string>
     <string name="updated_notification">Aisleron a été mis à jour de %1$s à %2$s.</string>
     <string name="pure_black_style">Style noir pur</string>
+    <string name="aisle_picker">Sélecteur d\'allée</string>
 </resources>

@@ -21,6 +21,7 @@ import android.os.Build
 import android.os.Bundle
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.LocationType
+import com.aisleron.ui.aisle.AisleDialogFragment
 import com.aisleron.ui.copyentity.CopyEntityType
 import com.aisleron.ui.note.NoteParentRef
 import junit.framework.TestCase.assertEquals
@@ -53,8 +54,7 @@ class BundlerTest {
     @Test
     fun testMakeEditProductBundle_ProductIdProvided_EditObjectBundled() {
         val productId = 1
-        val locationId = 24
-        val bundle = bundler.makeEditProductBundle(productId = productId, locationId = locationId)
+        val bundle = bundler.makeEditProductBundle(productId = productId)
 
         val editProductBundle =
             getParcelableBundle(bundle, "addEditProduct", AddEditProductBundle::class.java)
@@ -76,7 +76,6 @@ class BundlerTest {
         assertFalse(addProductBundle?.inStock!!)
         assertEquals(AddEditProductBundle.ProductAction.ADD, addProductBundle.actionType)
         assertNull(addProductBundle.aisleId)
-        assertNull(addProductBundle.locationId)
     }
 
     @Test
@@ -255,17 +254,6 @@ class BundlerTest {
     }
 
     @Test
-    fun makeAddProductBundle_LocationIdProvided_BundleHasLocationId() {
-        val locationId = 24
-        val bundle = bundler.makeAddProductBundle(locationId = locationId)
-
-        val addProductBundle =
-            getParcelableBundle(bundle, "addEditProduct", AddEditProductBundle::class.java)
-
-        assertEquals(locationId, addProductBundle!!.locationId)
-    }
-
-    @Test
     fun makeCopyEntityBundle_LocationEntityTypeProvided_BundleHasLocationEntityType() {
         val locationId = 2
         val title = "Test Location Bundle"
@@ -361,5 +349,81 @@ class BundlerTest {
         val bundledNoteDialog = bundler.getNoteDialogBundle(null)
 
         assertEquals(NoteParentRef.Product(-1), bundledNoteDialog.noteParentRef)
+    }
+
+    @Test
+    fun makeAislePickerBundle_validData_bundleHasAislePickerData() {
+        val title = "My Location"
+        val aisles = arrayListOf(AisleListEntry(1, "Aisle 1"), AisleListEntry(2, "Aisle 2"))
+        val currentAisleId = 1
+
+        val bundle = bundler.makeAislePickerBundle(title, aisles, currentAisleId)
+
+        val aislePickerBundle =
+            getParcelableBundle(bundle, "aislePicker", AislePickerBundle::class.java)
+
+        assertNotNull(aislePickerBundle)
+        assertEquals(title, aislePickerBundle?.title)
+        assertEquals(aisles, aislePickerBundle?.aisles)
+        assertEquals(currentAisleId, aislePickerBundle?.currentAisleId)
+    }
+
+    @Test
+    fun getAislePickerBundle_validBundle_returnsAislePickerBundle() {
+        val title = "My Location"
+        val aisles = arrayListOf(AisleListEntry(1, "Aisle 1"))
+        val currentAisleId = 1
+        val aislePickerBundle = AislePickerBundle(title, aisles, currentAisleId)
+        val bundle = Bundle()
+        bundle.putParcelable("aislePicker", aislePickerBundle)
+
+        val result = bundler.getAislePickerBundle(bundle)
+
+        assertEquals(aislePickerBundle, result)
+    }
+
+    @Test
+    fun getAislePickerBundle_nullBundle_returnsDefaultAislePickerBundle() {
+        val result = bundler.getAislePickerBundle(null)
+        val defaultBundle = AislePickerBundle()
+        assertEquals(defaultBundle, result)
+    }
+
+    @Test
+    fun makeAisleDialogBundle_validData_bundleHasAisleDialogData() {
+        val aisleId = 10
+        val action = AisleDialogFragment.AisleDialogAction.EDIT
+        val locationId = 1
+
+        val bundle = bundler.makeAisleDialogBundle(aisleId, action, locationId)
+
+        val aisleDialogBundle =
+            getParcelableBundle(bundle, "aisleDialog", AisleDialogBundle::class.java)
+
+        assertNotNull(aisleDialogBundle)
+        assertEquals(aisleId, aisleDialogBundle?.aisleId)
+        assertEquals(action, aisleDialogBundle?.action)
+        assertEquals(locationId, aisleDialogBundle?.locationId)
+    }
+
+    @Test
+    fun getAisleDialogBundle_validBundle_returnsAisleDialogBundle() {
+        val aisleId = 10
+        val action = AisleDialogFragment.AisleDialogAction.EDIT
+        val locationId = 1
+        val aisleDialogBundle = AisleDialogBundle(aisleId, action, locationId)
+        val bundle = Bundle()
+        bundle.putParcelable("aisleDialog", aisleDialogBundle)
+
+        val result = bundler.getAisleDialogBundle(bundle)
+
+        assertEquals(aisleDialogBundle, result)
+    }
+
+    @Test
+    fun getAisleDialogBundle_nullBundle_returnsDefaultAislePickerBundle() {
+        val result = bundler.getAisleDialogBundle(null)
+        val defaultBundle = AisleDialogBundle()
+        assertEquals(defaultBundle, result)
     }
 }

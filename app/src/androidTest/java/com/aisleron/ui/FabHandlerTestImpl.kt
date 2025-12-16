@@ -22,6 +22,7 @@ import android.view.View
 import com.aisleron.ui.FabHandler.FabClickedCallBack
 
 class FabHandlerTestImpl : FabHandler {
+    private var fabItems = mutableListOf<FabHandler.FabOption>()
     private val fabOnClick = mutableMapOf<FabHandler.FabOption, View.OnClickListener>()
     override fun getFabView(activity: Activity): View? = null
 
@@ -42,7 +43,8 @@ class FabHandlerTestImpl : FabHandler {
     }
 
     override fun setFabItems(activity: Activity, vararg fabOptions: FabHandler.FabOption) {
-        fabOnClick.clear()
+        fabItems.clear()
+        fabItems.addAll(fabOptions)
     }
 
     override fun reset() {
@@ -52,4 +54,6 @@ class FabHandlerTestImpl : FabHandler {
     fun clickFab(fabOption: FabHandler.FabOption, view: View) {
         fabOnClick[fabOption]?.onClick(view)
     }
+
+    fun getFabItems(): List<FabHandler.FabOption> = fabItems
 }

@@ -64,6 +64,7 @@
     <string name="duplicate_location_exception">BŁĄD: Nie można dodać duplikatu istniejącej lokalizacji</string>
     <string name="sample_data_creation_exception">BŁĄD: Nie można załadować danych przykładowych do istniejącej bazy danych</string>
     <string name="loyalty_card_provider_missing_exception">BŁĄD: Dostawca karty lojalnościowej nie jest zainstalowany lub nie znaleziono aktywności</string>
+    <string name="aisle_move_exception">BŁĄD: Przeniesienie alejki musi odbywać się w obrębie tej samej lokalizacji.</string>
     <string name="about_legal_header">Licencje i zasady</string>
     <string name="about_support_version_title">Historia wersji</string>
     <string name="about_support_report_issue_title">Zgłoś problem</string>
@@ -157,4 +158,5 @@
     <string name="view_changes">Wyświetl zmiany</string>
     <string name="updated_notification">Aisleron został zaktualizowany z %1$s do %2$s.</string>
     <string name="pure_black_style">Styl czystej czerni</string>
+    <string name="aisle_picker">Wybór alejki</string>
 </resources>

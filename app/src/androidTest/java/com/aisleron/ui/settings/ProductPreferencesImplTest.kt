@@ -22,6 +22,7 @@ import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.aisleron.SharedPreferencesInitializer
 import org.junit.Before
 import org.junit.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -71,6 +72,27 @@ class ProductPreferencesImplTest {
                 .getBoolean("show_product_extra_options", true)
 
         assertFalse(showExtraOptions)
+    }
+
+    @Test
+    fun getLastSelectedTab_PositionSet_PositionReturned() {
+        SharedPreferencesInitializer().setProductLastSelectedTab(1)
+
+        val position = ProductPreferencesImpl().getLastSelectedTab(getInstrumentation().targetContext)
+
+        assertEquals(1, position)
+    }
+
+    @Test
+    fun setLastSelectedTab_SetToValue_ValueSavedAsPosition() {
+        SharedPreferencesInitializer().setProductLastSelectedTab(0)
+
+        ProductPreferencesImpl().setLastSelectedTab(getInstrumentation().targetContext, 2)
+        val lastSelectedTabPosition =
+            PreferenceManager.getDefaultSharedPreferences(getInstrumentation().targetContext)
+                .getInt("product_last_selected_tab", 0)
+
+        assertEquals(2, lastSelectedTabPosition)
     }
 
 }

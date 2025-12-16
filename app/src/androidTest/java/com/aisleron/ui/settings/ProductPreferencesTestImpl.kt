@@ -21,10 +21,17 @@ import android.content.Context
 
 class ProductPreferencesTestImpl : ProductPreferences {
     private var _showExtraOptions = false
+    private var _lastSelectedTab = 0
 
     override fun showExtraOptions(context: Context): Boolean = _showExtraOptions
 
     override fun setShowExtraOptions(context: Context, value: Boolean) {
         _showExtraOptions = value
+    }
+
+    override fun getLastSelectedTab(context: Context): Int = _lastSelectedTab
+
+    override fun setLastSelectedTab(context: Context, position: Int) {
+        _lastSelectedTab = position
     }
 }

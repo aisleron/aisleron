@@ -28,9 +28,13 @@ import com.aisleron.domain.aisle.AisleRepository
 import com.aisleron.domain.aisle.usecase.AddAisleUseCase
 import com.aisleron.domain.aisle.usecase.ExpandCollapseAislesForLocationUseCase
 import com.aisleron.domain.aisle.usecase.GetAisleUseCase
+import com.aisleron.domain.aisle.usecase.GetAislesForLocationUseCase
 import com.aisleron.domain.aisle.usecase.RemoveAisleUseCase
 import com.aisleron.domain.aisle.usecase.UpdateAisleExpandedUseCase
 import com.aisleron.domain.aisle.usecase.UpdateAisleRankUseCase
+import com.aisleron.domain.aisleproduct.AisleProduct
+import com.aisleron.domain.aisleproduct.AisleProductRepository
+import com.aisleron.domain.aisleproduct.usecase.ChangeProductAisleUseCase
 import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductRankUseCase
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.location.Location
@@ -60,6 +64,7 @@ import org.koin.test.KoinTest
 import org.koin.test.get
 import org.koin.test.mock.declare
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -138,18 +143,7 @@ class ShoppingListViewModelTest : KoinTest {
         val existingAisle = get<AisleRepository>().getAll()
             .first { it.locationId == existingLocation.id && it.isDefault }
 
-        val shoppingListItem = AisleShoppingListItemViewModel(
-            rank = existingAisle.rank,
-            id = existingAisle.id,
-            name = existingAisle.name,
-            isDefault = existingAisle.isDefault,
-            childCount = 0,
-            locationId = existingLocation.id,
-            expanded = existingAisle.expanded,
-            updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
-            getAisleUseCase = get<GetAisleUseCase>(),
-            removeAisleUseCase = get<RemoveAisleUseCase>()
-        )
+        val shoppingListItem = getAisleShoppingListItemViewModel(existingAisle)
 
         shoppingListViewModel.hydrate(existingLocation.id, existingLocation.defaultFilter)
         shoppingListViewModel.removeItem(shoppingListItem)
@@ -165,19 +159,8 @@ class ShoppingListViewModelTest : KoinTest {
         val aisleProduct = existingAisle.products.first { it.product.inStock == !inStock }
         val productRepository = get<ProductRepository>()
         val existingProduct = productRepository.get(aisleProduct.product.id)!!
-        val shoppingListItem = ProductShoppingListItemViewModel(
-            aisleRank = existingAisle.rank,
-            rank = aisleProduct.rank,
-            id = existingProduct.id,
-            name = existingProduct.name,
-            inStock = existingProduct.inStock,
-            qtyNeeded = existingProduct.qtyNeeded,
-            noteId = null,
-            aisleId = existingAisle.id,
-            aisleProductId = aisleProduct.id,
-            updateAisleProductRankUseCase = get<UpdateAisleProductRankUseCase>(),
-            removeProductUseCase = get<RemoveProductUseCase>()
-        )
+        val shoppingListItem =
+            getProductShoppingListItemViewModel(existingAisle, aisleProduct, existingProduct)
 
         shoppingListViewModel.hydrate(shoppingList.id, shoppingList.defaultFilter)
         shoppingListViewModel.updateProductStatus(shoppingListItem, inStock)
@@ -409,7 +392,9 @@ class ShoppingListViewModelTest : KoinTest {
             get<SortLocationByNameUseCase>(),
             get<GetLoyaltyCardForLocationUseCase>(),
             get<UpdateProductQtyNeededUseCase>(),
-            get<ExpandCollapseAislesForLocationUseCase>()
+            get<ExpandCollapseAislesForLocationUseCase>(),
+            get<GetAislesForLocationUseCase>(),
+            get<ChangeProductAisleUseCase>(),
         )
 
         Assert.assertNotNull(vm)
@@ -421,7 +406,7 @@ class ShoppingListViewModelTest : KoinTest {
 
         declare<GetAisleUseCase> {
             object : GetAisleUseCase {
-                override suspend operator fun invoke(id: Int): Aisle? {
+                override suspend operator fun invoke(id: Int): Aisle {
                     throw Exception(exceptionMessage)
                 }
             }
@@ -459,34 +444,12 @@ class ShoppingListViewModelTest : KoinTest {
         val movedAisle = aisleRepository.getAll()
             .last { it.locationId == existingLocation.id && !it.isDefault }
 
-        val shoppingListItem = AisleShoppingListItemViewModel(
-            rank = movedAisle.rank,
-            id = movedAisle.id,
-            name = movedAisle.name,
-            isDefault = movedAisle.isDefault,
-            childCount = 0,
-            locationId = movedAisle.locationId,
-            expanded = movedAisle.expanded,
-            updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
-            getAisleUseCase = get<GetAisleUseCase>(),
-            removeAisleUseCase = get<RemoveAisleUseCase>()
-        )
+        val shoppingListItem = getAisleShoppingListItemViewModel(movedAisle)
 
         val precedingAisle = aisleRepository.getAll()
             .first { it.locationId == movedAisle.locationId && !it.isDefault && it.id != movedAisle.id }
 
-        val precedingItem = AisleShoppingListItemViewModel(
-            rank = precedingAisle.rank,
-            id = precedingAisle.id,
-            name = precedingAisle.name,
-            isDefault = precedingAisle.isDefault,
-            childCount = 0,
-            locationId = precedingAisle.locationId,
-            expanded = precedingAisle.expanded,
-            updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
-            getAisleUseCase = get<GetAisleUseCase>(),
-            removeAisleUseCase = get<RemoveAisleUseCase>()
-        )
+        val precedingItem = getAisleShoppingListItemViewModel(precedingAisle)
 
         shoppingListViewModel.hydrate(existingLocation.id, existingLocation.defaultFilter)
         shoppingListViewModel.updateItemRank(shoppingListItem, precedingItem)
@@ -502,18 +465,7 @@ class ShoppingListViewModelTest : KoinTest {
         val existingAisle = aisleRepository.getAll()
             .last { it.locationId == existingLocation.id && !it.isDefault }
 
-        val shoppingListItem = AisleShoppingListItemViewModel(
-            rank = existingAisle.rank,
-            id = existingAisle.id,
-            name = existingAisle.name,
-            isDefault = existingAisle.isDefault,
-            childCount = 0,
-            locationId = existingAisle.locationId,
-            expanded = existingAisle.expanded,
-            updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
-            getAisleUseCase = get<GetAisleUseCase>(),
-            removeAisleUseCase = get<RemoveAisleUseCase>()
-        )
+        val shoppingListItem = getAisleShoppingListItemViewModel(existingAisle)
 
         shoppingListViewModel.hydrate(existingLocation.id, existingLocation.defaultFilter)
         shoppingListViewModel.removeItem(shoppingListItem)
@@ -717,19 +669,8 @@ class ShoppingListViewModelTest : KoinTest {
         val productRepository = get<ProductRepository>()
         productRepository.update(aisleProduct.product.copy(qtyNeeded = qtyInitial))
         val existingProduct = productRepository.get(aisleProduct.product.id)!!
-        val shoppingListItem = ProductShoppingListItemViewModel(
-            aisleRank = existingAisle.rank,
-            rank = aisleProduct.rank,
-            id = existingProduct.id,
-            name = existingProduct.name,
-            inStock = existingProduct.inStock,
-            qtyNeeded = existingProduct.qtyNeeded,
-            noteId = null,
-            aisleId = existingAisle.id,
-            aisleProductId = aisleProduct.id,
-            updateAisleProductRankUseCase = get<UpdateAisleProductRankUseCase>(),
-            removeProductUseCase = get<RemoveProductUseCase>()
-        )
+        val shoppingListItem =
+            getProductShoppingListItemViewModel(existingAisle, aisleProduct, existingProduct)
 
         shoppingListViewModel.hydrate(shoppingList.id, shoppingList.defaultFilter)
         shoppingListViewModel.updateProductNeededQuantity(shoppingListItem, qtyNew)
@@ -764,7 +705,9 @@ class ShoppingListViewModelTest : KoinTest {
 
     @Test
     fun expandCollapseAisles_HasAisles_ExpandedCountChanges() = runTest {
-        val locationId = get<LocationRepository>().getAll().first { it.type == LocationType.SHOP }.id
+        val locationId =
+            get<LocationRepository>().getAll().first { it.type == LocationType.SHOP }.id
+
         val aisleRepository = get<AisleRepository>()
         val expandedBefore = aisleRepository.getAll().count { it.expanded }
         shoppingListViewModel.hydrate(locationId, FilterType.ALL)
@@ -773,5 +716,154 @@ class ShoppingListViewModelTest : KoinTest {
         val expandedAfter = aisleRepository.getAll().count { it.expanded }
 
         assertTrue(expandedBefore > expandedAfter)
+    }
+
+    @Test
+    fun selectedItem_SetAndClear_HandledCorrectly() = runTest {
+        val aisle = get<AisleRepository>().getAll().first { !it.isDefault }
+        shoppingListViewModel.hydrate(aisle.locationId, FilterType.ALL)
+        val shoppingListItem = getAisleShoppingListItemViewModel(aisle)
+
+        shoppingListViewModel.setSelectedItem(shoppingListItem)
+
+        assertEquals(shoppingListItem, shoppingListViewModel.selectedItem)
+
+        shoppingListViewModel.clearSelectedItem()
+
+        assertNull(shoppingListViewModel.selectedItem)
+    }
+
+    @Test
+    fun updateSelectedProductAisle_ItemIsProduct_ProductAisleUpdated() = runTest {
+        val shoppingList = getShoppingList()
+        val existingAisle =
+            shoppingList.aisles.first { it.products.count { p -> !p.product.inStock } > 0 }
+
+        val aisleProduct = existingAisle.products.first()
+        val existingProduct = aisleProduct.product
+        val shoppingListItem =
+            getProductShoppingListItemViewModel(existingAisle, aisleProduct, existingProduct)
+
+        shoppingListViewModel.hydrate(shoppingList.id, shoppingList.defaultFilter)
+        shoppingListViewModel.setSelectedItem(shoppingListItem)
+
+        val newAisle = shoppingList.aisles.first { it.id != existingAisle.id }
+        shoppingListViewModel.updateSelectedProductAisle(newAisle.id)
+
+        val updatedAisleProduct = get<AisleProductRepository>().get(aisleProduct.id)
+        assertEquals(newAisle.id, updatedAisleProduct?.aisleId)
+    }
+
+    private fun getProductShoppingListItemViewModel(
+        aisle: Aisle,
+        aisleProduct: AisleProduct,
+        product: Product
+    ): ProductShoppingListItemViewModel = ProductShoppingListItemViewModel(
+        aisleRank = aisle.rank,
+        rank = aisleProduct.rank,
+        id = product.id,
+        name = product.name,
+        inStock = product.inStock,
+        qtyNeeded = product.qtyNeeded,
+        noteId = null,
+        aisleId = aisle.id,
+        aisleProductId = aisleProduct.id,
+        updateAisleProductRankUseCase = get<UpdateAisleProductRankUseCase>(),
+        removeProductUseCase = get<RemoveProductUseCase>()
+    )
+
+    private fun getAisleShoppingListItemViewModel(aisle: Aisle): AisleShoppingListItemViewModel =
+        AisleShoppingListItemViewModel(
+            rank = aisle.rank,
+            id = aisle.id,
+            name = aisle.name,
+            isDefault = aisle.isDefault,
+            childCount = 0,
+            locationId = aisle.locationId,
+            expanded = aisle.expanded,
+            updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
+            getAisleUseCase = get<GetAisleUseCase>(),
+            removeAisleUseCase = get<RemoveAisleUseCase>()
+        )
+
+    @Test
+    fun updateSelectedProductAisle_ItemIsAisle_NoActionTaken() = runTest {
+        var changeAisleCalled = false
+        declare<ChangeProductAisleUseCase> {
+            object : ChangeProductAisleUseCase {
+                override suspend fun invoke(
+                    productId: Int, currentAisleId: Int, newAisleId: Int
+                ) {
+                    changeAisleCalled = true
+                }
+            }
+        }
+
+        val aisle = get<AisleRepository>().getAll().first { !it.isDefault }
+        shoppingListViewModel.hydrate(aisle.locationId, FilterType.ALL)
+        val shoppingListItem = getAisleShoppingListItemViewModel(aisle)
+
+        shoppingListViewModel.hydrate(aisle.id, FilterType.ALL)
+        shoppingListViewModel.setSelectedItem(shoppingListItem)
+
+        shoppingListViewModel.updateSelectedProductAisle(aisle.id)
+
+        assertFalse(changeAisleCalled)
+    }
+
+    @Test
+    fun requestLocationAisles_ValidProduct_EmitsAislePickerBundle() = runTest {
+        // Arrange
+        val shoppingList = getShoppingList()
+        val existingAisle = shoppingList.aisles.first()
+        val aisleProduct = existingAisle.products.first()
+        val product = get<ProductRepository>().get(aisleProduct.product.id)!!
+        val shoppingListItem =
+            getProductShoppingListItemViewModel(existingAisle, aisleProduct, product)
+
+        shoppingListViewModel.hydrate(shoppingList.id, shoppingList.defaultFilter)
+
+        // Act
+        shoppingListViewModel.requestLocationAisles(shoppingListItem)
+
+        // Assert
+        val aislesForLocation = shoppingListViewModel.aislesForLocation.first { it != null }
+        assertNotNull(aislesForLocation)
+        assertEquals(product.name, aislesForLocation.title)
+        assertEquals(aisleProduct.aisleId, aislesForLocation.currentAisleId)
+        assertTrue(aislesForLocation.aisles.isNotEmpty())
+
+        // Verify aisles are sorted by rank
+        val sortedAisles = shoppingList.aisles.sortedBy { it.rank }
+        assertEquals(sortedAisles.size, aislesForLocation.aisles.size)
+        sortedAisles.forEachIndexed { index, aisle ->
+            assertEquals(aisle.id, aislesForLocation.aisles[index].id)
+            assertEquals(aisle.name, aislesForLocation.aisles[index].name)
+        }
+    }
+
+    @Test
+    fun updateSelectedProductAisle_AisleIsFromDifferentLocation_UiStateIsAisleronError() = runTest {
+        val shoppingList = getShoppingList()
+        val existingAisle = shoppingList.aisles.first()
+        val aisleProduct = existingAisle.products.first()
+        val product = aisleProduct.product
+        shoppingListViewModel.hydrate(shoppingList.id, shoppingList.defaultFilter)
+
+        val shoppingListItem =
+            getProductShoppingListItemViewModel(existingAisle, aisleProduct, product)
+
+        shoppingListViewModel.setSelectedItem(shoppingListItem)
+
+        val changeToAisle =
+            get<AisleRepository>().getAll().first { it.locationId != existingAisle.locationId }
+
+        shoppingListViewModel.hydrate(shoppingList.id, shoppingList.defaultFilter)
+        shoppingListViewModel.updateSelectedProductAisle(changeToAisle.id)
+
+        val result =
+            shoppingListViewModel.shoppingListUiState.value as? ShoppingListViewModel.ShoppingListUiState.Error
+
+        Assert.assertEquals(AisleronException.ExceptionCode.AISLE_MOVE_EXCEPTION, result?.errorCode)
     }
 }

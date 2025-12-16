@@ -68,6 +68,7 @@
     <string name="duplicate_location_exception">FEHLER: Es ist nicht möglich, ein Duplikat eines bereits vorhandenen Standorts hinzuzufügen</string>
     <string name="sample_data_creation_exception">FEHLER: Es ist nicht möglich, Beispieldaten in eine vorhandene Datenbank zu laden</string>
     <string name="loyalty_card_provider_missing_exception">FEHLER: Anbieter von Kundenkarten nicht installiert oder nicht gefunden</string>
+    <string name="aisle_move_exception">FEHLER: Das Verschieben des Ganges muss innerhalb desselben Standorts erfolgen.</string>
     <string name="about_support_header">Support</string>
     <string name="about_legal_header">Lizenzen &amp; Richtlinien</string>
     <string name="about_support_version_title">Versionsverlauf</string>
@@ -135,7 +136,7 @@
     <string name="product_tab_inventory">Inhalt</string>
     <string name="notes_hint">Notizen hier…</string>
     <string name="show_note">Notiz anzeigen</string>
-    <string name="note_dialog_title">Notiz für %$1s</string>
+    <string name="note_dialog_title">Notiz für %1$s</string>
     <string name="loading">Lade…</string>
     <string name="dismiss">Verwerfen</string>
     <string name="view_changes">Änderungen anzeigen</string>
@@ -157,4 +158,5 @@
     <string name="tracking_mode">Tracking-Modus</string>
     <string name="new_entity_name">Neuer Entitätsname</string>
     <string name="pure_black_style">Stil Reines Schwarz</string>
+    <string name="aisle_picker">Gangauswahl</string>
 </resources>

@@ -49,6 +49,8 @@ val viewModelTestModule = module {
             getLoyaltyCardForLocationUseCase = get(),
             updateProductQtyNeededUseCase = get(),
             expandCollapseAislesForLocationUseCase = get(),
+            getAislesForLocationUseCase = get(),
+            changeProductAisleUseCase = get(),
             debounceTime = 0,
             TestScope(UnconfinedTestDispatcher())
         )
@@ -85,6 +87,9 @@ val viewModelTestModule = module {
             getAisleUseCase = get(),
             getNoteParentUseCase = get(),
             applyNoteChangesUseCase = get(),
+            getProductMappingsUseCase = get(),
+            getAislesForLocationUseCase = get(),
+            changeProductAisleUseCase = get(),
             TestScope(UnconfinedTestDispatcher())
         )
     }
@@ -107,6 +112,7 @@ val viewModelTestModule = module {
         AisleViewModel(
             addAisleUseCase = get(),
             updateAisleUseCase = get(),
+            getAisleUseCase = get(),
             TestScope(UnconfinedTestDispatcher())
         )
     }

@@ -23,6 +23,7 @@ import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import androidx.annotation.IdRes
+import androidx.annotation.StringRes
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso
@@ -263,14 +264,17 @@ class CaptureScreenshots : KoinTest {
         }
     }
 
+    private fun clickProductExtraOptions() {
+        onView(withId(R.id.txt_toggle_extra_options))
+            .perform(click())
+    }
+
     @Test
     fun screenshot_ProductExtraOptions() {
         getActivityScenario().use {
             clickFab(FabHandler.FabOption.ADD_PRODUCT)
             Espresso.closeSoftKeyboard()
-            onView(withId(R.id.txt_toggle_extra_options))
-                .perform(click())
-
+            clickProductExtraOptions()
             Screengrab.screenshot("alr-065-product-extra-options")
         }
     }
@@ -299,6 +303,33 @@ class CaptureScreenshots : KoinTest {
             selectShoppingListItem("Apples")
             clickEditShoppingListItem()
             Screengrab.screenshot("alr-080-edit-product")
+        }
+    }
+
+    private fun selectProductExtrasTab(@StringRes tabName: Int) {
+        onView(withText(tabName))
+            .perform(click())
+    }
+
+    private fun selectProductAislesEntry(locationName: String) {
+        onView(allOf(withId(R.id.location_name), withText(locationName)))
+            .perform(click())
+
+    }
+
+    @Test
+    fun screenshot_ProductSelectAisle() {
+        getActivityScenario().use {
+            selectShoppingListItem("Apples")
+            clickEditShoppingListItem()
+            Espresso.closeSoftKeyboard()
+            clickProductExtraOptions()
+
+            selectProductExtrasTab(R.string.product_tab_aisles)
+            Screengrab.screenshot("alr-085-010-product-aisles")
+
+            selectProductAislesEntry(saveBigSuper)
+            Screengrab.screenshot("alr-085-020-product-aisle-picker")
         }
     }
 
@@ -348,6 +379,20 @@ class CaptureScreenshots : KoinTest {
             clickCopyProduct()
             sleep(300)
             Screengrab.screenshot("alr-105-copy-product")
+        }
+    }
+
+    private fun clickShoppingListAislePicker() {
+        onView(withId(R.id.mnu_aisle_picker))
+            .perform(click())
+    }
+
+    @Test
+    fun screenshot_ShoppingListAislePicker() {
+        getActivityScenario().use {
+            selectShoppingListItem("Apples")
+            clickShoppingListAislePicker()
+            Screengrab.screenshot("alr-107-010-shopping-list-aisle-picker")
         }
     }
 

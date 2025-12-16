@@ -24,10 +24,12 @@ import com.aisleron.domain.FilterType
 import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.aisle.usecase.ExpandCollapseAislesForLocationUseCase
 import com.aisleron.domain.aisle.usecase.GetAisleUseCase
+import com.aisleron.domain.aisle.usecase.GetAislesForLocationUseCase
 import com.aisleron.domain.aisle.usecase.RemoveAisleUseCase
 import com.aisleron.domain.aisle.usecase.UpdateAisleExpandedUseCase
 import com.aisleron.domain.aisle.usecase.UpdateAisleRankUseCase
 import com.aisleron.domain.aisleproduct.AisleProduct
+import com.aisleron.domain.aisleproduct.usecase.ChangeProductAisleUseCase
 import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductRankUseCase
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.location.Location
@@ -39,10 +41,13 @@ import com.aisleron.domain.product.usecase.RemoveProductUseCase
 import com.aisleron.domain.product.usecase.UpdateProductQtyNeededUseCase
 import com.aisleron.domain.product.usecase.UpdateProductStatusUseCase
 import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
+import com.aisleron.ui.bundles.AisleListEntry
+import com.aisleron.ui.bundles.AislePickerBundle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlin.coroutines.cancellation.CancellationException
@@ -60,6 +65,8 @@ class ShoppingListViewModel(
     private val getLoyaltyCardForLocationUseCase: GetLoyaltyCardForLocationUseCase,
     private val updateProductQtyNeededUseCase: UpdateProductQtyNeededUseCase,
     private val expandCollapseAislesForLocationUseCase: ExpandCollapseAislesForLocationUseCase,
+    private val getAislesForLocationUseCase: GetAislesForLocationUseCase,
+    private val changeProductAisleUseCase: ChangeProductAisleUseCase,
     private val debounceTime: Long = 300,
     coroutineScopeProvider: CoroutineScope? = null
 ) : ViewModel() {
@@ -90,6 +97,27 @@ class ShoppingListViewModel(
     )
 
     val shoppingListUiState = _shoppingListUiState.asStateFlow()
+
+    private var _listItems = listOf<ShoppingListItem>()
+
+    private val _aislesForLocation = MutableStateFlow<AislePickerBundle?>(null)
+    val aislesForLocation: StateFlow<AislePickerBundle?> = _aislesForLocation
+
+    private var _selectedItem: ShoppingListItem? = null
+    val selectedItem: ShoppingListItem? get() = _selectedItem
+
+    fun setSelectedItem(item: ShoppingListItem) {
+        _selectedItem = item
+    }
+
+    fun clearSelectedItem() {
+        _selectedItem = null
+    }
+
+    private fun submitUpdatedList(list: List<ShoppingListItem>) {
+        _listItems = list
+        _shoppingListUiState.value = ShoppingListUiState.Updated(_listItems)
+    }
 
     private fun isValidAisle(aisle: Aisle, parameters: ShoppingListFilterParameters): Boolean {
         return (parameters.showDefaultAisle || !aisle.isDefault) &&
@@ -193,10 +221,7 @@ class ShoppingListViewModel(
                     _loyaltyCard = getLoyaltyCardForLocationUseCase(it.id)
                 }
 
-                _shoppingListUiState.value =
-                    ShoppingListUiState.Updated(
-                        getShoppingList(_location, shoppingListFilterParameters)
-                    )
+                submitUpdatedList(getShoppingList(_location, shoppingListFilterParameters))
             }
         }
     }
@@ -233,6 +258,15 @@ class ShoppingListViewModel(
         }
     }
 
+    fun updateSelectedProductAisle(selectedAisleId: Int) {
+        val item = selectedItem
+        coroutineScope.launchHandling {
+            (item as? ProductShoppingListItem)?.let {
+                changeProductAisleUseCase(it.id, it.aisleId, selectedAisleId)
+            }
+        }
+    }
+
     fun submitProductSearch(productNameQuery: String) {
         searchJob?.cancel()
 
@@ -247,7 +281,7 @@ class ShoppingListViewModel(
 
             _shoppingListUiState.value = ShoppingListUiState.Loading
             val searchResults = getShoppingList(_location, shoppingListFilterParameters)
-            _shoppingListUiState.value = ShoppingListUiState.Updated(searchResults)
+            submitUpdatedList(searchResults)
         }
     }
 
@@ -264,7 +298,7 @@ class ShoppingListViewModel(
         coroutineScope.launch {
             _shoppingListUiState.value = ShoppingListUiState.Loading
             val searchResults = getShoppingList(_location, shoppingListFilterParameters)
-            _shoppingListUiState.value = ShoppingListUiState.Updated(searchResults)
+            submitUpdatedList(searchResults)
         }
     }
 
@@ -275,7 +309,7 @@ class ShoppingListViewModel(
         coroutineScope.launch {
             _shoppingListUiState.value = ShoppingListUiState.Loading
             val searchResults = getShoppingList(_location, shoppingListFilterParameters)
-            _shoppingListUiState.value = ShoppingListUiState.Updated(searchResults)
+            submitUpdatedList(searchResults)
         }
     }
 
@@ -309,6 +343,24 @@ class ShoppingListViewModel(
 
     fun clearState() {
         _shoppingListUiState.value = ShoppingListUiState.Empty
+    }
+
+    fun requestLocationAisles(item: ProductShoppingListItem) {
+        coroutineScope.launch {
+            val aisles = getAislesForLocationUseCase(locationId)
+                .sortedBy { it.rank }
+                .map { AisleListEntry(it.id, it.name) }
+
+            _aislesForLocation.value = AislePickerBundle(
+                title = item.name,
+                aisles = aisles,
+                currentAisleId = item.aisleId
+            )
+        }
+    }
+
+    fun onAislesDialogShown() {
+        _aislesForLocation.value = null
     }
 
     private fun CoroutineScope.launchHandling(

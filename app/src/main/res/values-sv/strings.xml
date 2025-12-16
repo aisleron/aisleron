@@ -79,6 +79,7 @@
     <string name="duplicate_location_exception">FEL: Det går inte att lägga till en dubblett av en befintlig plats</string>
     <string name="sample_data_creation_exception">FEL: Det går inte att läsa in exempeldata i en befintlig databas</string>
     <string name="loyalty_card_provider_missing_exception">FEL: Lojalitetskortsleverantör inte installerad eller aktivitet hittades inte</string>
+    <string name="aisle_move_exception">FEL: Gångflytt måste ske inom samma plats.</string>
     <string name="about_legal_header">Licenser och policyer</string>
     <string name="about_legal_license_title">Aisleron-licens</string>
     <string name="about_legal_privacy_title">Aisleron sekretesspolicy</string>
@@ -157,4 +158,5 @@
     <string name="view_changes">Visa ändringar</string>
     <string name="updated_notification">Aisleron uppdaterades från %1$s till %2$s.</string>
     <string name="pure_black_style">Ren svart stil</string>
+    <string name="aisle_picker">Välj gång</string>
 </resources>

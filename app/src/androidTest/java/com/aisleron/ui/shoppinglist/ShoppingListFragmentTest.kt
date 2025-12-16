@@ -68,6 +68,7 @@ import com.aisleron.di.viewModelTestModule
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.aisle.AisleRepository
+import com.aisleron.domain.aisleproduct.AisleProductRepository
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.location.LocationType
@@ -80,7 +81,8 @@ import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import com.aisleron.ui.ApplicationTitleUpdateListenerTestImpl
 import com.aisleron.ui.FabHandler
 import com.aisleron.ui.FabHandlerTestImpl
-import com.aisleron.ui.aisle.AisleDialog
+import com.aisleron.ui.aisle.AisleDialogFragment
+import com.aisleron.ui.aisle.AislePickerDialogFragment
 import com.aisleron.ui.bundles.AddEditLocationBundle
 import com.aisleron.ui.bundles.AddEditProductBundle
 import com.aisleron.ui.bundles.Bundler
@@ -153,8 +155,7 @@ class ShoppingListFragmentTest : KoinTest {
                 applicationTitleUpdateListener,
                 fabHandler,
                 shoppingListPreferencesTestImpl ?: ShoppingListPreferencesTestImpl(),
-                loyaltyCardProvider ?: get<LoyaltyCardProvider>(),
-                get<AisleDialog>()
+                loyaltyCardProvider ?: get<LoyaltyCardProvider>()
             ).apply {
                 arguments = fragmentArgs
             }
@@ -182,8 +183,7 @@ class ShoppingListFragmentTest : KoinTest {
                     applicationTitleUpdateListener,
                     fabHandler,
                     shoppingListPreferencesTestImpl ?: ShoppingListPreferencesTestImpl(),
-                    loyaltyCardProvider ?: get<LoyaltyCardProvider>(),
-                    get<AisleDialog>()
+                    loyaltyCardProvider ?: get<LoyaltyCardProvider>()
                 )
             }
         )
@@ -216,8 +216,7 @@ class ShoppingListFragmentTest : KoinTest {
                 applicationTitleUpdateListener,
                 fabHandler,
                 ShoppingListPreferencesTestImpl(),
-                LoyaltyCardProviderTestImpl(),
-                get<AisleDialog>()
+                LoyaltyCardProviderTestImpl()
             )
         Assert.assertNotNull(fragment)
     }
@@ -652,6 +651,10 @@ class ShoppingListFragmentTest : KoinTest {
             .inRoot(isDialog())
             .check(matches(isDisplayed()))
 
+        onView(withText(R.string.add_another))
+            .inRoot(isDialog())
+            .check(matches(isDisplayed()))
+
         onView(allOf(instanceOf(EditText::class.java)))
             .inRoot(isDialog())
             .check(matches(withText("")))
@@ -746,7 +749,6 @@ class ShoppingListFragmentTest : KoinTest {
         val bundle = navController.backStack.last().arguments
         val addEditProductBundle = bundler.getAddEditProductBundle(bundle)
         assertEquals(aisle.id, addEditProductBundle.aisleId)
-        assertEquals(shoppingList.id, addEditProductBundle.locationId)
         assertEquals(AddEditProductBundle.ProductAction.ADD, addEditProductBundle.actionType)
     }
 
@@ -1396,5 +1398,138 @@ class ShoppingListFragmentTest : KoinTest {
     @Test
     fun onActionItemClicked_ShowNoteCompleted_DialogClosed() = runTest {
         testShowNoteClosed(android.R.string.ok)
+    }
+
+    @Test
+    fun onActionItemClicked_ActionItemIsSelectAisle_ShowNoteDialogShown() = runTest {
+        val shoppingList = getShoppingList()
+        val product = getProduct(shoppingList, false)
+
+        val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
+        getActivityScenario(bundle)
+
+        onView(withText(product.name)).perform(longClick())
+        onView(withId(R.id.mnu_aisle_picker)).perform(click())
+
+        onView(withText(product.name))
+            .inRoot(isDialog())
+            .check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun onAislePickerResult_AisleSelected_ProductAisleUpdated() = runTest {
+        val shoppingList = getShoppingList()
+        val product = getProduct(shoppingList, false)
+        val aisleProduct = shoppingList.aisles
+            .first { it.products.any { p -> p.product.id == product.id } }
+            .products.first { it.product.id == product.id }
+
+        val newAisle = shoppingList.aisles.first { aisle ->
+            aisle.products.none { it.product.id == product.id }
+        }
+
+        val scenario = getActivityScenario(
+            bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
+        )
+
+        onView(withText(product.name)).perform(longClick())
+
+        // Simulate the fragment result with the new aisle ID
+        val result = Bundle().apply {
+            putInt(AislePickerDialogFragment.KEY_SELECTED_AISLE_ID, newAisle.id)
+        }
+
+        scenario.onActivity { a ->
+            val fragment = a.supportFragmentManager.fragments
+                .first { it is ShoppingListFragment } as ShoppingListFragment
+
+            fragment.childFragmentManager.setFragmentResult(
+                ShoppingListFragment.AISLE_PICKER_REQUEST_KEY, result
+            )
+        }
+
+        val updatedAisleProduct = get<AisleProductRepository>().get(aisleProduct.id)
+        assertEquals(newAisle.id, updatedAisleProduct?.aisleId)
+    }
+
+    @Test
+    fun onAislePickerResult_AddNewAisle_AddSingleAisleDialogDisplayed() = runTest {
+        val shoppingList = getShoppingList()
+        val product = getProduct(shoppingList, false)
+        val scenario = getActivityScenario(
+            bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
+        )
+
+        onView(withText(product.name)).perform(longClick())
+
+        // Simulate the fragment result with the new aisle ID
+        val result = Bundle().apply {
+            putBoolean(AislePickerDialogFragment.KEY_ADD_NEW_AISLE, true)
+        }
+
+        scenario.onActivity { a ->
+            val fragment = a.supportFragmentManager.fragments
+                .first { it is ShoppingListFragment } as ShoppingListFragment
+
+            fragment.childFragmentManager.setFragmentResult(
+                ShoppingListFragment.AISLE_PICKER_REQUEST_KEY, result
+            )
+        }
+
+        onView(withText(R.string.add_aisle))
+            .inRoot(isDialog())
+            .check(matches(isDisplayed()))
+
+        onView(withText(R.string.add_another))
+            .inRoot(isDialog())
+            .check(doesNotExist())
+
+        onView(allOf(instanceOf(EditText::class.java)))
+            .inRoot(isDialog())
+            .check(matches(withText("")))
+    }
+
+    @Test
+    fun onAisleDialogResult_AisleAdded_SelectedProductAisleUpdated() = runTest {
+        val shoppingList = getShoppingList()
+        val product = getProduct(shoppingList, false)
+        val aisleProduct = shoppingList.aisles
+            .first { it.products.any { p -> p.product.id == product.id } }
+            .products.first { it.product.id == product.id }
+
+        val newAisleId = get<AisleRepository>().add(
+            Aisle(
+                name = "New Aisle",
+                products = emptyList(),
+                locationId = shoppingList.id,
+                rank = 1000,
+                id = 0,
+                isDefault = false,
+                expanded = true
+            )
+        )
+
+        val scenario = getActivityScenario(
+            bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
+        )
+
+        onView(withText(product.name)).perform(longClick())
+
+        // Simulate the fragment result with the new aisle ID
+        val result = Bundle().apply {
+            putInt(AisleDialogFragment.KEY_AISLE_ID, newAisleId)
+        }
+
+        scenario.onActivity { a ->
+            val fragment = a.supportFragmentManager.fragments
+                .first { it is ShoppingListFragment } as ShoppingListFragment
+
+            fragment.childFragmentManager.setFragmentResult(
+                ShoppingListFragment.ADD_AISLE_REQUEST_KEY, result
+            )
+        }
+
+        val updatedAisleProduct = get<AisleProductRepository>().get(aisleProduct.id)
+        assertEquals(newAisleId, updatedAisleProduct?.aisleId)
     }
 }

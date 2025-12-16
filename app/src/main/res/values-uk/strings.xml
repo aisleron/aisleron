@@ -49,6 +49,7 @@
     <string name="duplicate_location_exception">ПОМИЛКА: Неможливо додати дублікат існуючого місцезнаходження</string>
     <string name="sample_data_creation_exception">ПОМИЛКА: Не вдається завантажити зразок даних у існуючу базу даних</string>
     <string name="loyalty_card_provider_missing_exception">ПОМИЛКА: Постачальник картки лояльності не встановлено або активність не знайдено</string>
+    <string name="aisle_move_exception">ПОМИЛКА: Переміщення проходу повинно відбуватися в межах одного Місцезнаходження.</string>
     <string name="about_support_header">Підтримка</string>
     <string name="about_legal_header">Ліцензії та політики</string>
     <string name="about_support_version_title">Історія версій</string>
@@ -157,4 +158,5 @@
     <string name="pure_black_business_class">Бізнес-клас</string>
     <string name="pure_black_first_class">Перший клас</string>
     <string name="pure_black_style">Чистий чорний стиль</string>
+    <string name="aisle_picker">Вибір проходу</string>
 </resources>

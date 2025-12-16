@@ -18,7 +18,6 @@
 package com.aisleron.domain.product.usecase
 
 import com.aisleron.domain.TransactionRunner
-import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.aisle.usecase.GetDefaultAislesUseCase
 import com.aisleron.domain.aisleproduct.AisleProduct
 import com.aisleron.domain.aisleproduct.usecase.AddAisleProductsUseCase
@@ -29,7 +28,7 @@ import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
 
 interface AddProductUseCase : AddUseCase<Product> {
-    suspend operator fun invoke(product: Product, targetAisle: Aisle?): Int
+    override suspend operator fun invoke(item: Product): Int
 }
 
 class AddProductUseCaseImpl(
@@ -41,27 +40,23 @@ class AddProductUseCaseImpl(
     private val transactionRunner: TransactionRunner
 
 ) : AddProductUseCase {
-    override suspend operator fun invoke(product: Product, targetAisle: Aisle?): Int {
+    override suspend operator fun invoke(item: Product): Int {
 
-        if (!isProductNameUniqueUseCase(product)) {
+        if (!isProductNameUniqueUseCase(item)) {
             throw AisleronException.DuplicateProductNameException("Product Name must be unique")
         }
 
-        if (productRepository.get(product.id) != null) {
+        if (productRepository.get(item.id) != null) {
             throw AisleronException.DuplicateProductException("Cannot add a duplicate of an existing Product")
         }
 
         return transactionRunner.run {
-            val newProduct = product.copy(
-                id = productRepository.add(product)
+            val newProduct = item.copy(
+                id = productRepository.add(item)
             )
 
+            // TODO: Remove aisle allocation when getting rid of default aisle concept
             val defaultAisles = getDefaultAislesUseCase().toMutableList()
-            targetAisle?.let { target ->
-                defaultAisles.removeIf { it.locationId == target.locationId }
-                defaultAisles.add(target)
-            }
-
             addAisleProductsUseCase(defaultAisles.map {
                 AisleProduct(
                     aisleId = it.id,
@@ -73,9 +68,5 @@ class AddProductUseCaseImpl(
 
             newProduct.id
         }
-    }
-
-    override suspend fun invoke(item: Product): Int {
-        return invoke(item, null)
     }
 }

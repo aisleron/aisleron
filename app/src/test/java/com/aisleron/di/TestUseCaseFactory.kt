@@ -22,6 +22,8 @@ import com.aisleron.domain.aisle.usecase.AddAisleUseCase
 import com.aisleron.domain.aisle.usecase.AddAisleUseCaseImpl
 import com.aisleron.domain.aisle.usecase.GetAisleUseCase
 import com.aisleron.domain.aisle.usecase.GetAisleUseCaseImpl
+import com.aisleron.domain.aisle.usecase.GetAislesForLocationUseCase
+import com.aisleron.domain.aisle.usecase.GetAislesForLocationUseCaseImpl
 import com.aisleron.domain.aisle.usecase.GetDefaultAislesUseCase
 import com.aisleron.domain.aisle.usecase.IsAisleNameUniqueUseCase
 import com.aisleron.domain.aisle.usecase.RemoveAisleUseCase
@@ -33,6 +35,8 @@ import com.aisleron.domain.aisle.usecase.UpdateAisleRankUseCase
 import com.aisleron.domain.aisle.usecase.UpdateAisleUseCase
 import com.aisleron.domain.aisle.usecase.UpdateAisleUseCaseImpl
 import com.aisleron.domain.aisleproduct.usecase.AddAisleProductsUseCase
+import com.aisleron.domain.aisleproduct.usecase.ChangeProductAisleUseCase
+import com.aisleron.domain.aisleproduct.usecase.ChangeProductAisleUseCaseImpl
 import com.aisleron.domain.aisleproduct.usecase.GetAisleMaxRankUseCase
 import com.aisleron.domain.aisleproduct.usecase.RemoveProductsFromAisleUseCase
 import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductRankUseCase
@@ -48,6 +52,8 @@ import com.aisleron.domain.location.usecase.GetShopsUseCase
 import com.aisleron.domain.location.usecase.IsLocationNameUniqueUseCase
 import com.aisleron.domain.location.usecase.RemoveLocationUseCase
 import com.aisleron.domain.location.usecase.RemoveLocationUseCaseImpl
+import com.aisleron.domain.location.usecase.SortLocationByNameUseCase
+import com.aisleron.domain.location.usecase.SortLocationByNameUseCaseImpl
 import com.aisleron.domain.location.usecase.UpdateLocationUseCase
 import com.aisleron.domain.loyaltycard.usecase.AddLoyaltyCardToLocationUseCase
 import com.aisleron.domain.loyaltycard.usecase.AddLoyaltyCardToLocationUseCaseImpl
@@ -80,6 +86,8 @@ import com.aisleron.domain.product.usecase.AddProductUseCaseImpl
 import com.aisleron.domain.product.usecase.CopyProductUseCase
 import com.aisleron.domain.product.usecase.CopyProductUseCaseImpl
 import com.aisleron.domain.product.usecase.GetAllProductsUseCase
+import com.aisleron.domain.product.usecase.GetProductMappingsUseCase
+import com.aisleron.domain.product.usecase.GetProductMappingsUseCaseImpl
 import com.aisleron.domain.product.usecase.GetProductUseCase
 import com.aisleron.domain.product.usecase.GetProductUseCaseImpl
 import com.aisleron.domain.product.usecase.IsProductNameUniqueUseCase
@@ -108,6 +116,10 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
 
     val getAisleUseCase: GetAisleUseCase by lazy {
         GetAisleUseCaseImpl(repositoryFactory.aisleRepository)
+    }
+
+    val getAislesForLocationUseCase: GetAislesForLocationUseCase by lazy {
+        GetAislesForLocationUseCaseImpl(repositoryFactory.aisleRepository)
     }
 
     val getDefaultAislesUseCase: GetDefaultAislesUseCase by lazy {
@@ -175,6 +187,15 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
         UpdateAisleProductsUseCase(repositoryFactory.aisleProductRepository)
     }
 
+    val changeProductAisleUseCase: ChangeProductAisleUseCase by lazy {
+        ChangeProductAisleUseCaseImpl(
+            aisleProductRepository = repositoryFactory.aisleProductRepository,
+            getAisleUseCase = getAisleUseCase,
+            getAisleMaxRankUseCase = getAisleMaxRankUseCase,
+            updateAisleProductUseCase = updateAisleProductsUseCase
+        )
+    }
+
     /**
      * Location Use Cases
      */
@@ -222,6 +243,14 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
             repositoryFactory.locationRepository,
             removeAisleUseCase = removeAisleUseCase,
             removeDefaultAisleUseCase = removeDefaultAisleUseCase
+        )
+    }
+
+    val sortLocationByNameUseCase: SortLocationByNameUseCase by lazy {
+        SortLocationByNameUseCaseImpl(
+            repositoryFactory.locationRepository,
+            updateAisleUseCase = updateAisleUseCase,
+            updateAisleProductUseCase = updateAisleProductsUseCase
         )
     }
 
@@ -351,6 +380,15 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
         )
     }
 
+    val getProductMappingsUseCase: GetProductMappingsUseCase by lazy {
+        GetProductMappingsUseCaseImpl(
+            aisleProductRepository = repositoryFactory.aisleProductRepository,
+            getAisleUseCase = getAisleUseCase,
+            getLocationUseCase = getLocationUseCase,
+            getDefaultAislesUseCase = getDefaultAislesUseCase
+        )
+    }
+
     val isProductNameUniqueUseCase: IsProductNameUniqueUseCase by lazy {
         IsProductNameUniqueUseCase(repositoryFactory.productRepository)
     }
@@ -413,6 +451,7 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
             AddAisleUseCase::class -> addAisleUseCase as T
             GetAisleMaxRankUseCase::class -> getAisleMaxRankUseCase as T
             GetAisleUseCase::class -> getAisleUseCase as T
+            GetAislesForLocationUseCase::class -> getAislesForLocationUseCase as T
             GetDefaultAislesUseCase::class -> getDefaultAislesUseCase as T
             IsAisleNameUniqueUseCase::class -> isAisleNameUniqueUseCase as T
             RemoveAisleUseCase::class -> removeAisleUseCase as T
@@ -425,6 +464,7 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
             RemoveProductsFromAisleUseCase::class -> removeProductsFromAisleUseCase as T
             UpdateAisleProductsUseCase::class -> updateAisleProductsUseCase as T
             UpdateAisleProductRankUseCase::class -> updateAisleProductRankUseCase as T
+            ChangeProductAisleUseCase::class -> changeProductAisleUseCase as T
 
             // Location Use Cases
             AddLocationUseCase::class -> addLocationUseCase as T
@@ -435,6 +475,7 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
             GetPinnedShopsUseCase::class -> getPinnedShopsUseCase as T
             GetShopsUseCase::class -> getShopsUseCase as T
             RemoveLocationUseCase::class -> removeLocationUseCase as T
+            SortLocationByNameUseCase::class -> sortLocationByNameUseCase as T
             UpdateLocationUseCase::class -> updateLocationUseCase as T
 
             //Loyalty Card Use Cases
@@ -459,6 +500,7 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
             CopyProductUseCase::class -> copyProductUseCase as T
             GetAllProductsUseCase::class -> getAllProductsUseCase as T
             GetProductUseCase::class -> getProductUseCase as T
+            GetProductMappingsUseCase::class -> getProductMappingsUseCase as T
             IsProductNameUniqueUseCase::class -> isProductNameUniqueUseCase as T
             RemoveProductUseCase::class -> removeProductUseCase as T
             UpdateProductStatusUseCase::class -> updateProductStatusUseCase as T

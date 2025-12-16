@@ -22,6 +22,7 @@ import android.os.Bundle
 import android.os.Parcelable
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.LocationType
+import com.aisleron.ui.aisle.AisleDialogFragment
 import com.aisleron.ui.copyentity.CopyEntityType
 import com.aisleron.ui.note.NoteParentRef
 
@@ -43,28 +44,23 @@ class Bundler {
         return bundle
     }
 
-    fun makeEditProductBundle(productId: Int, locationId: Int? = null): Bundle {
+    fun makeEditProductBundle(productId: Int): Bundle {
         val editProductBundle = AddEditProductBundle(
             productId = productId,
             actionType = AddEditProductBundle.ProductAction.EDIT,
-            aisleId = null,
-            locationId = locationId
+            aisleId = null
         )
         return makeParcelableBundle(ADD_EDIT_PRODUCT, editProductBundle)
     }
 
     fun makeAddProductBundle(
-        name: String? = null,
-        inStock: Boolean = false,
-        aisleId: Int? = null,
-        locationId: Int? = null
+        name: String? = null, inStock: Boolean = false, aisleId: Int? = null
     ): Bundle {
         val addProductBundle = AddEditProductBundle(
             name = name,
             inStock = inStock,
             actionType = AddEditProductBundle.ProductAction.ADD,
-            aisleId = aisleId,
-            locationId = locationId
+            aisleId = aisleId
 
         )
         return makeParcelableBundle(ADD_EDIT_PRODUCT, addProductBundle)
@@ -160,12 +156,51 @@ class Bundler {
         return result ?: NoteDialogBundle(NoteParentRef.Product(-1))
     }
 
+    fun makeAislePickerBundle(
+        title: String, aisles: List<AisleListEntry>, currentAisleId: Int
+    ): Bundle {
+        val aislePickerBundle = AislePickerBundle(
+            title = title,
+            aisles = aisles,
+            currentAisleId = currentAisleId
+        )
+        return makeParcelableBundle(AISLE_PICKER, aislePickerBundle)
+    }
+
+    fun getAislePickerBundle(bundle: Bundle?): AislePickerBundle {
+        val result =
+            getParcelableBundle(bundle, AISLE_PICKER, AislePickerBundle::class.java)
+        return result ?: AislePickerBundle()
+    }
+
+    fun makeAisleDialogBundle(
+        aisleId: Int,
+        action: AisleDialogFragment.AisleDialogAction,
+        locationId: Int
+    ): Bundle {
+        val aisleDialogBundle = AisleDialogBundle(
+            aisleId = aisleId,
+            action = action,
+            locationId = locationId
+        )
+        return makeParcelableBundle(AISLE_DIALOG, aisleDialogBundle)
+    }
+
+    fun getAisleDialogBundle(bundle: Bundle?): AisleDialogBundle {
+        val result =
+            getParcelableBundle(bundle, AISLE_DIALOG, AisleDialogBundle::class.java)
+        return result ?: AisleDialogBundle()
+    }
+
     private companion object BundleType {
         const val ADD_EDIT_PRODUCT = "addEditProduct"
         const val ADD_EDIT_LOCATION = "addEditLocation"
         const val SHOPPING_LIST_BUNDLE = "shoppingList"
         const val COPY_ENTITY = "copyEntity"
         const val NOTE_DIALOG = "noteDialog"
+        const val AISLE_PICKER = "aislePicker"
+        const val AISLE_DIALOG = "aisleDialog"
+
 
         const val ARG_LOCATION_ID = "locationId"
         const val ARG_FILTER_TYPE = "filterType"
