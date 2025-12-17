@@ -66,7 +66,8 @@ class ChangeProductAisleUseCaseImplTest {
     @Test
     fun changeProductAisle_differentLocations_throwsException() = runTest {
         val currentAisle = aisleRepository.get(aisleProduct.aisleId)!!
-        val anotherLocationAisle = aisleRepository.getAll().first { it.locationId != currentAisle.locationId }
+        val anotherLocationAisle =
+            aisleRepository.getAll().first { it.locationId != currentAisle.locationId }
 
         assertThrows<AisleronException.AisleMoveException> {
             changeProductAisleUseCase(product.id, currentAisle.id, anotherLocationAisle.id)
@@ -117,14 +118,14 @@ class ChangeProductAisleUseCaseImplTest {
         val aisleForProduct = aisleRepository.get(aisleProduct.aisleId)!!
         val newAisle = aisleRepository.getAll()
             .first { it.locationId == aisleForProduct.locationId && it.id != aisleForProduct.id }
-        val getAisleMaxRankUseCase = dm.getUseCase<GetAisleMaxRankUseCase>()
-        val newAisleMaxRank = getAisleMaxRankUseCase(newAisle)
+        val getAisleProductMaxRankUseCase = dm.getUseCase<GetAisleProductMaxRankUseCase>()
+        val newAisleProductMaxRank = getAisleProductMaxRankUseCase(newAisle)
 
         changeProductAisleUseCase(product.id, aisleProduct.aisleId, newAisle.id)
 
         val updatedAisleProduct =
             aisleProductRepository.getProductAisles(product.id).first { it.aisleId == newAisle.id }
         assertEquals(newAisle.id, updatedAisleProduct.aisleId)
-        assertEquals(newAisleMaxRank + 1, updatedAisleProduct.rank)
+        assertEquals(newAisleProductMaxRank + 1, updatedAisleProduct.rank)
     }
 }

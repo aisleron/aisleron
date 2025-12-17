@@ -37,7 +37,7 @@ import com.aisleron.domain.aisle.usecase.UpdateAisleUseCaseImpl
 import com.aisleron.domain.aisleproduct.usecase.AddAisleProductsUseCase
 import com.aisleron.domain.aisleproduct.usecase.ChangeProductAisleUseCase
 import com.aisleron.domain.aisleproduct.usecase.ChangeProductAisleUseCaseImpl
-import com.aisleron.domain.aisleproduct.usecase.GetAisleMaxRankUseCase
+import com.aisleron.domain.aisleproduct.usecase.GetAisleProductMaxRankUseCase
 import com.aisleron.domain.aisleproduct.usecase.RemoveProductsFromAisleUseCase
 import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductRankUseCase
 import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductsUseCase
@@ -171,8 +171,8 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
         AddAisleProductsUseCase(repositoryFactory.aisleProductRepository)
     }
 
-    val getAisleMaxRankUseCase: GetAisleMaxRankUseCase by lazy {
-        GetAisleMaxRankUseCase(repositoryFactory.aisleProductRepository)
+    val getAisleProductMaxRankUseCase: GetAisleProductMaxRankUseCase by lazy {
+        GetAisleProductMaxRankUseCase(repositoryFactory.aisleProductRepository)
     }
 
     val removeProductsFromAisleUseCase: RemoveProductsFromAisleUseCase by lazy {
@@ -191,7 +191,7 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
         ChangeProductAisleUseCaseImpl(
             aisleProductRepository = repositoryFactory.aisleProductRepository,
             getAisleUseCase = getAisleUseCase,
-            getAisleMaxRankUseCase = getAisleMaxRankUseCase,
+            getAisleProductMaxRankUseCase = getAisleProductMaxRankUseCase,
             updateAisleProductUseCase = updateAisleProductsUseCase
         )
     }
@@ -354,7 +354,7 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
             getDefaultAislesUseCase = getDefaultAislesUseCase,
             addAisleProductsUseCase = addAisleProductUseCase,
             isProductNameUniqueUseCase = isProductNameUniqueUseCase,
-            getAisleMaxRankUseCase = getAisleMaxRankUseCase,
+            getAisleProductMaxRankUseCase = getAisleProductMaxRankUseCase,
             transactionRunner = transactionRunner
         )
     }
@@ -449,7 +449,7 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
             // Aisle Use Cases
             UpdateAisleExpandedUseCase::class -> updateAisleExpandedUseCase as T
             AddAisleUseCase::class -> addAisleUseCase as T
-            GetAisleMaxRankUseCase::class -> getAisleMaxRankUseCase as T
+            GetAisleProductMaxRankUseCase::class -> getAisleProductMaxRankUseCase as T
             GetAisleUseCase::class -> getAisleUseCase as T
             GetAislesForLocationUseCase::class -> getAislesForLocationUseCase as T
             GetDefaultAislesUseCase::class -> getDefaultAislesUseCase as T
