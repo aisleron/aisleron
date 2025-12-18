@@ -15,14 +15,14 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class GetAisleMaxRankUseCaseTest {
+class GetAisleProductMaxRankUseCaseTest {
     private lateinit var dm: TestDependencyManager
-    private lateinit var getAisleMaxRankUseCase: GetAisleMaxRankUseCase
+    private lateinit var getAisleProductMaxRankUseCase: GetAisleProductMaxRankUseCase
 
     @BeforeEach
     fun setUp() {
         dm = TestDependencyManager()
-        getAisleMaxRankUseCase = dm.getUseCase()
+        getAisleProductMaxRankUseCase = dm.getUseCase()
     }
 
     private suspend fun getAisle(): Aisle {
@@ -55,7 +55,7 @@ class GetAisleMaxRankUseCaseTest {
     }
 
     @Test
-    fun getAisleMaxRank_AisleHasProducts_RankIsMax() = runTest {
+    fun getAisleProductMaxRank_AisleHasProducts_RankIsMax() = runTest {
         val aisle = getAisle()
         val productRepository = dm.getRepository<ProductRepository>()
         dm.getRepository<AisleProductRepository>().add(
@@ -66,16 +66,16 @@ class GetAisleMaxRankUseCaseTest {
             )
         )
 
-        val maxRankResult = getAisleMaxRankUseCase(aisle)
+        val maxRankResult = getAisleProductMaxRankUseCase(aisle)
 
         Assertions.assertEquals(300, maxRankResult)
     }
 
     @Test
-    fun getAisleMaxRank_AisleHasNoProducts_RankIsZero() = runTest {
+    fun getAisleProductMaxRank_AisleHasNoProducts_RankIsZero() = runTest {
         val aisle = getAisle()
 
-        val maxRankResult = getAisleMaxRankUseCase(aisle)
+        val maxRankResult = getAisleProductMaxRankUseCase(aisle)
 
         Assertions.assertEquals(0, maxRankResult)
     }

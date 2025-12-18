@@ -20,8 +20,8 @@ package com.aisleron.domain.aisleproduct.usecase
 import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.aisleproduct.AisleProductRepository
 
-class GetAisleMaxRankUseCase(private val aisleProductRepository: AisleProductRepository) {
+class GetAisleProductMaxRankUseCase(private val aisleProductRepository: AisleProductRepository) {
     suspend operator fun invoke(aisle: Aisle): Int {
-        return aisleProductRepository.getAisleMaxRank(aisle.id)
+        return aisleProductRepository.getAisleProductMaxRank(aisle.id)
     }
 }

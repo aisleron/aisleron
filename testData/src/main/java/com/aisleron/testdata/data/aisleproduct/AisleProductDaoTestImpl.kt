@@ -69,7 +69,7 @@ class AisleProductDaoTestImpl(private val productDao: ProductDaoTestImpl) : Aisl
         aisleProductList.removeIf { it.aisleId == aisleId }
     }
 
-    override suspend fun getAisleMaxRank(aisleId: Int): Int {
+    override suspend fun getAisleProductMaxRank(aisleId: Int): Int {
         return aisleProductList.filter { it.aisleId == aisleId }.maxOfOrNull { it.rank } ?: 0
     }
 
@@ -79,7 +79,7 @@ class AisleProductDaoTestImpl(private val productDao: ProductDaoTestImpl) : Aisl
             val id: Int
             val existingEntity = aisleProductList.find { ap -> ap.id == it.id }
             if (existingEntity == null) {
-                id = (aisleProductList.maxOfOrNull { ap -> ap.id }?.toInt() ?: 0) + 1
+                id = (aisleProductList.maxOfOrNull { ap -> ap.id } ?: 0) + 1
             } else {
                 id = existingEntity.id
                 delete(existingEntity)

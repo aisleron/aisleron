@@ -15,17 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.domain.aisle
+package com.aisleron.domain.aisle.usecase
 
-import com.aisleron.domain.aisleproduct.AisleProduct
-import com.aisleron.domain.base.AisleronItem
+import com.aisleron.domain.aisle.AisleRepository
 
-data class Aisle(
-    val name: String,
-    val products: List<AisleProduct>,
-    val locationId: Int,
-    val rank: Int,
-    override val id: Int,
-    val isDefault: Boolean,
-    val expanded: Boolean
-) : AisleronItem
+interface GetAisleMaxRankUseCase {
+    suspend operator fun invoke(locationId: Int): Int
+}
+
+class GetAisleMaxRankUseCaseImpl(val aisleRepository: AisleRepository) : GetAisleMaxRankUseCase{
+    override suspend fun invoke(locationId: Int): Int {
+        return aisleRepository.getAisleMaxRank(locationId)
+    }
+
+}

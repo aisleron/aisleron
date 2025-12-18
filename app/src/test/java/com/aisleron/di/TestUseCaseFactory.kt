@@ -20,6 +20,8 @@ package com.aisleron.di
 import com.aisleron.domain.TransactionRunner
 import com.aisleron.domain.aisle.usecase.AddAisleUseCase
 import com.aisleron.domain.aisle.usecase.AddAisleUseCaseImpl
+import com.aisleron.domain.aisle.usecase.GetAisleMaxRankUseCase
+import com.aisleron.domain.aisle.usecase.GetAisleMaxRankUseCaseImpl
 import com.aisleron.domain.aisle.usecase.GetAisleUseCase
 import com.aisleron.domain.aisle.usecase.GetAisleUseCaseImpl
 import com.aisleron.domain.aisle.usecase.GetAislesForLocationUseCase
@@ -37,7 +39,7 @@ import com.aisleron.domain.aisle.usecase.UpdateAisleUseCaseImpl
 import com.aisleron.domain.aisleproduct.usecase.AddAisleProductsUseCase
 import com.aisleron.domain.aisleproduct.usecase.ChangeProductAisleUseCase
 import com.aisleron.domain.aisleproduct.usecase.ChangeProductAisleUseCaseImpl
-import com.aisleron.domain.aisleproduct.usecase.GetAisleMaxRankUseCase
+import com.aisleron.domain.aisleproduct.usecase.GetAisleProductMaxRankUseCase
 import com.aisleron.domain.aisleproduct.usecase.RemoveProductsFromAisleUseCase
 import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductRankUseCase
 import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductsUseCase
@@ -122,6 +124,10 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
         GetAislesForLocationUseCaseImpl(repositoryFactory.aisleRepository)
     }
 
+    val getAisleMaxRankUseCase: GetAisleMaxRankUseCase by lazy {
+        GetAisleMaxRankUseCaseImpl(repositoryFactory.aisleRepository)
+    }
+
     val getDefaultAislesUseCase: GetDefaultAislesUseCase by lazy {
         GetDefaultAislesUseCase(repositoryFactory.aisleRepository)
     }
@@ -171,8 +177,8 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
         AddAisleProductsUseCase(repositoryFactory.aisleProductRepository)
     }
 
-    val getAisleMaxRankUseCase: GetAisleMaxRankUseCase by lazy {
-        GetAisleMaxRankUseCase(repositoryFactory.aisleProductRepository)
+    val getAisleProductMaxRankUseCase: GetAisleProductMaxRankUseCase by lazy {
+        GetAisleProductMaxRankUseCase(repositoryFactory.aisleProductRepository)
     }
 
     val removeProductsFromAisleUseCase: RemoveProductsFromAisleUseCase by lazy {
@@ -191,7 +197,7 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
         ChangeProductAisleUseCaseImpl(
             aisleProductRepository = repositoryFactory.aisleProductRepository,
             getAisleUseCase = getAisleUseCase,
-            getAisleMaxRankUseCase = getAisleMaxRankUseCase,
+            getAisleProductMaxRankUseCase = getAisleProductMaxRankUseCase,
             updateAisleProductUseCase = updateAisleProductsUseCase
         )
     }
@@ -354,7 +360,7 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
             getDefaultAislesUseCase = getDefaultAislesUseCase,
             addAisleProductsUseCase = addAisleProductUseCase,
             isProductNameUniqueUseCase = isProductNameUniqueUseCase,
-            getAisleMaxRankUseCase = getAisleMaxRankUseCase,
+            getAisleProductMaxRankUseCase = getAisleProductMaxRankUseCase,
             transactionRunner = transactionRunner
         )
     }
@@ -449,9 +455,10 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
             // Aisle Use Cases
             UpdateAisleExpandedUseCase::class -> updateAisleExpandedUseCase as T
             AddAisleUseCase::class -> addAisleUseCase as T
-            GetAisleMaxRankUseCase::class -> getAisleMaxRankUseCase as T
+            GetAisleProductMaxRankUseCase::class -> getAisleProductMaxRankUseCase as T
             GetAisleUseCase::class -> getAisleUseCase as T
             GetAislesForLocationUseCase::class -> getAislesForLocationUseCase as T
+            GetAisleMaxRankUseCase::class -> getAisleMaxRankUseCase as T
             GetDefaultAislesUseCase::class -> getDefaultAislesUseCase as T
             IsAisleNameUniqueUseCase::class -> isAisleNameUniqueUseCase as T
             RemoveAisleUseCase::class -> removeAisleUseCase as T

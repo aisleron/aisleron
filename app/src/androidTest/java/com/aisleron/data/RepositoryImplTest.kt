@@ -24,17 +24,28 @@ import com.aisleron.di.daoModule
 import com.aisleron.di.inMemoryDatabaseTestModule
 import com.aisleron.di.repositoryModule
 import com.aisleron.di.useCaseModule
+import com.aisleron.domain.base.AisleronItem
+import com.aisleron.domain.base.BaseRepository
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
+import org.junit.Before
 import org.junit.Rule
+import org.junit.Test
 import org.koin.core.module.Module
 import org.koin.test.KoinTest
 import org.koin.test.get
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
-abstract class RepositoryImplTest : KoinTest {
+abstract class RepositoryImplTest<T : AisleronItem> : KoinTest {
+    protected lateinit var repository: BaseRepository<T>
+
     @get:Rule
     val koinTestRule = KoinTestRule(
         modules = getKoinModules()
@@ -45,7 +56,8 @@ abstract class RepositoryImplTest : KoinTest {
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    fun setup() {
+    @Before
+    open fun setUp() {
         DbInitializer(
             get<LocationDao>(), get<AisleDao>(), TestScope(UnconfinedTestDispatcher())
         ).invoke()
@@ -53,27 +65,144 @@ abstract class RepositoryImplTest : KoinTest {
         runBlocking {
             get<CreateSampleDataUseCase>().invoke()
         }
+
+        repository = initRepository()
     }
 
-    protected abstract suspend fun addSingleItem(): Int
+    protected abstract fun initRepository(): BaseRepository<T>
 
-    protected abstract suspend fun addMultipleItems(): List<Int>
+    protected abstract suspend fun getSingleNewItem(): T
 
-    abstract fun add_SingleItemProvided_AddItem()
+    protected suspend fun addSingleItem(): Int {
+        val item = getSingleNewItem()
+        return repository.add(item)
+    }
 
-    abstract fun add_MultipleItemsProvided_AddItems()
+    protected abstract suspend fun getMultipleNewItems(): List<T>
 
-    abstract fun get_ValidIdProvided_ReturnItem()
+    protected suspend fun addMultipleItems(): List<Int> {
+        val items = getMultipleNewItems()
+        return repository.add(items)
+    }
 
-    abstract fun get_InvalidIdProvided_ReturnNull()
+    protected abstract suspend fun getInvalidItem(): T
 
-    abstract fun getAll_MultipleItemsExist_ReturnAll()
+    @Test
+    open fun add_SingleItemProvided_AddItem() = runTest {
+        val countBefore = repository.getAll().count()
 
-    abstract fun update_SingleItemProvided_UpdatedItem()
+        val newId = addSingleItem()
 
-    abstract fun update_MultipleItemsProvided_UpdateItems()
+        val newItem = repository.get(newId)
+        assertNotNull(newItem)
 
-    abstract fun remove_ValidItemProvided_RemoveItem()
+        val countAfter = repository.getAll().count()
+        assertEquals(countBefore + 1, countAfter)
+    }
 
-    abstract fun remove_InvalidItemProvided_NoItemsRemoved()
+    @Test
+    fun add_MultipleItemsProvided_AddItems() = runTest {
+        val countBefore = repository.getAll().count()
+
+        val newIds = addMultipleItems()
+
+        assertTrue(newIds.count() > 1)
+
+        val countAfter = repository.getAll().count()
+        assertEquals(countBefore + newIds.count(), countAfter)
+
+        val newItemOne = repository.get(newIds.first())
+        assertNotNull(newItemOne)
+
+        val newItemTwo = repository.get(newIds.last())
+        assertNotNull(newItemTwo)
+    }
+
+    @Test
+    fun get_ValidIdProvided_ReturnItem() = runTest {
+        val itemIds = addMultipleItems()
+
+        val item = repository.get(itemIds.first())
+
+        assertNotNull(item)
+    }
+
+    @Test
+    fun get_InvalidIdProvided_ReturnNull() = runTest {
+        addMultipleItems()
+
+        val item = repository.get(-1)
+
+        assertNull(item)
+    }
+
+    @Test
+    fun getAll_MultipleItemsExist_ReturnAll() = runTest {
+        val countBefore = repository.getAll().count()
+        val itemIds = addMultipleItems()
+
+        val items = repository.getAll()
+
+        assertEquals(countBefore + itemIds.count(), items.count())
+    }
+
+    protected abstract fun getUpdatedItem(item: T): T
+
+    @Test
+    fun update_SingleItemProvided_UpdatedItem() = runTest {
+        val itemIds = repository.add(getMultipleNewItems())
+        val item = getUpdatedItem(repository.get(itemIds.first())!!)
+
+        repository.update(item)
+
+        val updatedItem = repository.get(item.id)
+        assertEquals(item, updatedItem)
+    }
+
+    @Test
+    fun update_MultipleItemsProvided_UpdateItems() = runTest {
+        val itemIds = addMultipleItems()
+        val countBefore = repository.getAll().count()
+        val itemOneBefore = getUpdatedItem(repository.get(itemIds.first())!!)
+        val itemTwoBefore = getUpdatedItem(repository.get(itemIds.last())!!)
+        val updateItems = listOf(itemOneBefore, itemTwoBefore)
+
+        repository.update(updateItems)
+
+        val itemOneAfter = repository.get(itemOneBefore.id)
+        assertEquals(itemOneBefore, itemOneAfter)
+
+        val itemTwoAfter = repository.get(itemTwoBefore.id)
+        assertEquals(itemTwoBefore, itemTwoAfter)
+
+        val countAfter = repository.getAll().count()
+        assertEquals(countBefore, countAfter)
+    }
+
+    @Test
+    fun remove_ValidItemProvided_RemoveItem() = runTest {
+        val itemId = addMultipleItems().first()
+        val itemBefore = repository.get(itemId)!!
+        val countBefore = repository.getAll().count()
+
+        repository.remove(itemBefore)
+
+        val itemAfter = repository.get(itemId)
+        assertNull(itemAfter)
+
+        val countAfter = repository.getAll().count()
+        assertEquals(countBefore.dec(), countAfter)
+    }
+
+    @Test
+    fun remove_InvalidItemProvided_NoItemsRemoved() = runTest {
+        addMultipleItems()
+        val countBefore = repository.getAll().count()
+        val item = getInvalidItem()
+
+        repository.remove(item)
+
+        val countAfter = repository.getAll().count()
+        assertEquals(countBefore, countAfter)
+    }
 }

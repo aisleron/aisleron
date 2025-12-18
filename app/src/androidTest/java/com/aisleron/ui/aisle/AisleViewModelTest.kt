@@ -8,6 +8,7 @@ import com.aisleron.di.viewModelTestModule
 import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.aisle.AisleRepository
 import com.aisleron.domain.aisle.usecase.AddAisleUseCase
+import com.aisleron.domain.aisle.usecase.GetAisleMaxRankUseCase
 import com.aisleron.domain.aisle.usecase.GetAisleUseCase
 import com.aisleron.domain.aisle.usecase.UpdateAisleUseCase
 import com.aisleron.domain.base.AisleronException
@@ -23,6 +24,8 @@ import org.koin.test.KoinTest
 import org.koin.test.get
 import org.koin.test.mock.declare
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
 
 class AisleViewModelTest : KoinTest {
     private lateinit var aisleViewModel: AisleViewModel
@@ -80,15 +83,18 @@ class AisleViewModelTest : KoinTest {
         val newAisleName = "Add New Aisle Test"
         aisleViewModel.hydrate(-1, existingLocation.id)
         aisleViewModel.setAisleName(newAisleName)
+        val aisleMaxRank = get<AisleRepository>().getAisleMaxRank(existingLocation.id)
 
         aisleViewModel.addAisle()
 
         val addedAisle = get<AisleRepository>().getAll().firstOrNull { it.name == newAisleName }
 
-        Assert.assertNotNull(addedAisle)
-        Assert.assertEquals(newAisleName, addedAisle?.name)
-        Assert.assertEquals(existingLocation.id, addedAisle?.locationId)
-        Assert.assertFalse(addedAisle!!.isDefault)
+        assertNotNull(addedAisle)
+        assertEquals(newAisleName, addedAisle.name)
+        assertEquals(existingLocation.id, addedAisle.locationId)
+        assertFalse(addedAisle.isDefault)
+        assertEquals(aisleMaxRank + 1, addedAisle.rank)
+
         Assert.assertTrue(aisleViewModel.uiState.value is AisleViewModel.AisleUiState.Success)
     }
 
@@ -169,6 +175,7 @@ class AisleViewModelTest : KoinTest {
             get<AddAisleUseCase>(),
             get<UpdateAisleUseCase>(),
             get<GetAisleUseCase>(),
+            get<GetAisleMaxRankUseCase>(),
         )
 
         Assert.assertNotNull(vm)

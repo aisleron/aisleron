@@ -21,7 +21,7 @@ import com.aisleron.domain.TransactionRunner
 import com.aisleron.domain.aisle.usecase.GetDefaultAislesUseCase
 import com.aisleron.domain.aisleproduct.AisleProduct
 import com.aisleron.domain.aisleproduct.usecase.AddAisleProductsUseCase
-import com.aisleron.domain.aisleproduct.usecase.GetAisleMaxRankUseCase
+import com.aisleron.domain.aisleproduct.usecase.GetAisleProductMaxRankUseCase
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.base.usecase.AddUseCase
 import com.aisleron.domain.product.Product
@@ -36,7 +36,7 @@ class AddProductUseCaseImpl(
     private val getDefaultAislesUseCase: GetDefaultAislesUseCase,
     private val addAisleProductsUseCase: AddAisleProductsUseCase,
     private val isProductNameUniqueUseCase: IsProductNameUniqueUseCase,
-    private val getAisleMaxRankUseCase: GetAisleMaxRankUseCase,
+    private val getAisleProductMaxRankUseCase: GetAisleProductMaxRankUseCase,
     private val transactionRunner: TransactionRunner
 
 ) : AddProductUseCase {
@@ -61,7 +61,7 @@ class AddProductUseCaseImpl(
                 AisleProduct(
                     aisleId = it.id,
                     product = newProduct,
-                    rank = getAisleMaxRankUseCase(it) + 1,
+                    rank = getAisleProductMaxRankUseCase(it) + 1,
                     id = 0
                 )
             })

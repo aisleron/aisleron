@@ -28,7 +28,7 @@ interface ChangeProductAisleUseCase {
 class ChangeProductAisleUseCaseImpl(
     private val aisleProductRepository: AisleProductRepository,
     private val getAisleUseCase: GetAisleUseCase,
-    private val getAisleMaxRankUseCase: GetAisleMaxRankUseCase,
+    private val getAisleProductMaxRankUseCase: GetAisleProductMaxRankUseCase,
     private val updateAisleProductUseCase: UpdateAisleProductsUseCase
 ) : ChangeProductAisleUseCase {
     override suspend fun invoke(
@@ -47,9 +47,9 @@ class ChangeProductAisleUseCaseImpl(
         }
 
         aisleProductToMove?.let {
-            val aisleMaxRank = getAisleMaxRankUseCase(newAisle)
+            val aisleProductMaxRank = getAisleProductMaxRankUseCase(newAisle)
             val updatedAisleProduct = it.copy(
-                rank = aisleMaxRank.inc(),
+                rank = aisleProductMaxRank.inc(),
                 aisleId = newAisle.id
             )
             updateAisleProductUseCase(listOf(updatedAisleProduct))
