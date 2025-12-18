@@ -127,7 +127,7 @@ class ProductRepositoryImplTest : KoinTest {
             id = 0,
             name = "Product Repository Add Product Test",
             inStock = true,
-            qtyNeeded = 0,
+            qtyNeeded = 0.0,
             noteId = null
         )
 
@@ -150,14 +150,14 @@ class ProductRepositoryImplTest : KoinTest {
                 id = 0,
                 name = "Product Repository Multi Add Test Product One",
                 inStock = true,
-                qtyNeeded = 0,
+                qtyNeeded = 0.0,
                 noteId = null
             ),
             Product(
                 id = 0,
                 name = "Product Repository Multi Add Test Product Two",
                 inStock = false,
-                qtyNeeded = 0,
+                qtyNeeded = 0.0,
                 noteId = null
             )
         )
@@ -259,7 +259,7 @@ class ProductRepositoryImplTest : KoinTest {
             id = -10001,
             name = "Test remove_InvalidProductProvided_NoProductsRemoved",
             inStock = false,
-            qtyNeeded = 0,
+            qtyNeeded = 0.0,
             noteId = null
         )
 

@@ -68,7 +68,7 @@ class SortLocationByNameUseCaseImplTest {
             id = 0,
             name = "ZZZ",
             inStock = false,
-            qtyNeeded = 0,
+            qtyNeeded = 0.0,
             noteId = null
         )
 

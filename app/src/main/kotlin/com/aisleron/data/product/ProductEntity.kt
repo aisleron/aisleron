@@ -38,6 +38,6 @@ data class ProductEntity(
     @PrimaryKey(autoGenerate = true) val id: Int,
     val name: String,
     val inStock: Boolean,
-    @ColumnInfo(defaultValue = "0") val qtyNeeded: Int,
+    @ColumnInfo(defaultValue = "0") val qtyNeeded: Double,
     @ColumnInfo(index = true) val noteId: Int?
 )

@@ -19,6 +19,7 @@ package com.aisleron.data.loyaltycard
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import com.aisleron.data.location.LocationEntity
 
 @Entity(
@@ -38,11 +39,9 @@ import com.aisleron.data.location.LocationEntity
             onDelete = ForeignKey.CASCADE
         )
     ],
-    /* TODO: Re-enable this index in a future db migration
     indices = [
         Index(value = ["loyaltyCardId"])
     ]
-    */
 )
 data class LocationLoyaltyCardEntity(
     val locationId: Int,

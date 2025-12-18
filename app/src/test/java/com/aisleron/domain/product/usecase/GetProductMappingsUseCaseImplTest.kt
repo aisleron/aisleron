@@ -50,7 +50,7 @@ class GetProductMappingsUseCaseImplTest {
 
         val productRepository = dm.getRepository<ProductRepository>()
         runBlocking {
-            val newProductId = productRepository.add(Product(0, "New Product", false, 0))
+            val newProductId = productRepository.add(Product(0, "New Product", false, 0.0))
             product = productRepository.get(newProductId)!!
         }
     }

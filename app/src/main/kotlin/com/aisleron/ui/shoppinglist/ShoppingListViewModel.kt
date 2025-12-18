@@ -232,7 +232,7 @@ class ShoppingListViewModel(
         }
     }
 
-    fun updateProductNeededQuantity(item: ProductShoppingListItem, quantity: Int?) {
+    fun updateProductNeededQuantity(item: ProductShoppingListItem, quantity: Double?) {
         updateQtyJob?.cancel()
         updateQtyJob = coroutineScope.launchHandling {
             delay(debounceTime)

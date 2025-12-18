@@ -46,6 +46,7 @@ import com.aisleron.databinding.FragmentEmptyListItemBinding
 import com.aisleron.databinding.FragmentProductListItemBinding
 import com.aisleron.domain.FilterType
 import com.aisleron.ui.settings.ShoppingListPreferences
+import java.text.DecimalFormat
 import java.util.Collections
 
 /**
@@ -246,12 +247,12 @@ class ShoppingListItemRecyclerViewAdapter(
                 qtyWatcher = null
             }
 
-            qtyEdit.setText(item.qtyNeeded.toString())
+            qtyEdit.setText(formatQty(item.qtyNeeded))
             qtyEdit.setSelection(qtyEdit.text?.length ?: 0)
 
             // Add a new watcher and keep reference
             qtyWatcher = qtyEdit.doAfterTextChanged { editable ->
-                val newQty = editable?.toString()?.toIntOrNull()
+                val newQty = editable?.toString()?.toDoubleOrNull()
                 listener.onProductQuantityChange(item, newQty)
             }
 
@@ -261,9 +262,9 @@ class ShoppingListItemRecyclerViewAdapter(
             )
 
             decQtyButton.setOnClickListener {
-                val newQty = (qtyEdit.text.toString().toIntOrNull() ?: 0).dec()
+                val newQty = (qtyEdit.text.toString().toDoubleOrNull() ?: 0.0) - 1
                 if (newQty >= 0) {
-                    qtyEdit.setText(newQty.toString())
+                    qtyEdit.setText(formatQty(newQty))
                 }
             }
 
@@ -273,23 +274,24 @@ class ShoppingListItemRecyclerViewAdapter(
                     .firstOrNull()
                     ?.max ?: Int.MAX_VALUE
 
-                val newQty = ((qtyEdit.text.toString().toIntOrNull() ?: 0).inc())
+                val newQty = (qtyEdit.text.toString().toDoubleOrNull() ?: 0.0) + 1
                 if (newQty.toString().length <= maxLength) {
-                    qtyEdit.setText(newQty.toString())
+                    qtyEdit.setText(formatQty(newQty))
                 }
             }
         }
+
+        private fun formatQty(qty: Double): String =
+            DecimalFormat("0.###").format(qty)
     }
 
-    inner class EmptyListItemViewHolder(binding: FragmentEmptyListItemBinding) :
-        ViewHolder(binding.root) {
-
-    }
+    class EmptyListItemViewHolder(binding: FragmentEmptyListItemBinding) :
+        ViewHolder(binding.root)
 
     interface ShoppingListItemListener {
         fun onClick(item: ShoppingListItem)
         fun onProductStatusChange(item: ProductShoppingListItem, inStock: Boolean)
-        fun onProductQuantityChange(item: ProductShoppingListItem, quantity: Int?)
+        fun onProductQuantityChange(item: ProductShoppingListItem, quantity: Double?)
         fun onListPositionChanged(item: ShoppingListItem, precedingItem: ShoppingListItem?)
         fun onLongClick(item: ShoppingListItem, view: View): Boolean
         fun onMoved(item: ShoppingListItem)

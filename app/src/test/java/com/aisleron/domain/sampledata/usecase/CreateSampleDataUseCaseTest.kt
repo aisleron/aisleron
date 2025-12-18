@@ -123,7 +123,7 @@ class CreateSampleDataUseCaseTest {
                     id = 0,
                     name = "CreateSampleDataProductExistsTest",
                     inStock = false,
-                    qtyNeeded = 0,
+                    qtyNeeded = 0.0,
                     noteId = null
                 )
             )

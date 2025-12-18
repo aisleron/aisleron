@@ -87,17 +87,19 @@ class CreateSampleDataUseCaseImpl(
     }
 
     private suspend fun addSampleProducts() {
+        val qty = 0.0
+
         val productList = listOf(
-            Product(0, PRD_FROZEN_VEGES, true, 0, null),
-            Product(0, PRD_APPLES, true, 0, null),
-            Product(0, PRD_MILK, false, 0, null),
-            Product(0, PRD_BUTTER, false, 0, null),
-            Product(0, PRD_CEREAL, true, 0, null),
-            Product(0, PRD_BREAD, true, 0, null),
-            Product(0, PRD_SOAP, true, 0, null),
-            Product(0, PRD_TOOTHPASTE, false, 0, null),
-            Product(0, PRD_PET_FOOD, true, 0, null),
-            Product(0, PRD_SALT, true, 0, null)
+            Product(0, PRD_FROZEN_VEGES, true, qty, null),
+            Product(0, PRD_APPLES, true, qty, null),
+            Product(0, PRD_MILK, false, qty, null),
+            Product(0, PRD_BUTTER, false, qty, null),
+            Product(0, PRD_CEREAL, true, qty, null),
+            Product(0, PRD_BREAD, true, qty, null),
+            Product(0, PRD_SOAP, true, qty, null),
+            Product(0, PRD_TOOTHPASTE, false, qty, null),
+            Product(0, PRD_PET_FOOD, true, qty, null),
+            Product(0, PRD_SALT, true, qty, null)
         )
 
         productList.forEach { addProductUseCase(it) }

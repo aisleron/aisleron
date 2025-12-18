@@ -102,7 +102,7 @@ class ProductShoppingListItemViewModelTest : KoinTest {
             id = -1,
             name = "Dummy",
             inStock = false,
-            qtyNeeded = 0,
+            qtyNeeded = 0.0,
             noteId = null,
             aisleId = 1,
             aisleProductId = 1,

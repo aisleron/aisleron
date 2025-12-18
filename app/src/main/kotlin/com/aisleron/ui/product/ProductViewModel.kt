@@ -194,7 +194,7 @@ class ProductViewModel(
                             name = name,
                             inStock = inStock,
                             id = 0,
-                            qtyNeeded = 0
+                            qtyNeeded = 0.0
                         )
                     )
 

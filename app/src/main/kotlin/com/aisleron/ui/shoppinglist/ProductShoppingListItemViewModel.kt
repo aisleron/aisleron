@@ -29,7 +29,7 @@ data class ProductShoppingListItemViewModel(
     override val name: String,
     override val aisleId: Int,
     override val inStock: Boolean,
-    override val qtyNeeded: Int,
+    override val qtyNeeded: Double,
     override val noteId: Int?,
     private val aisleProductId: Int,
     private val updateAisleProductRankUseCase: UpdateAisleProductRankUseCase,

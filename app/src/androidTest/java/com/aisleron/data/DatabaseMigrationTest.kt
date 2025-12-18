@@ -192,7 +192,7 @@ class DatabaseMigrationTest {
         val product = runBlocking { db.productDao().getProducts().first() }
 
         // Product.qtyNeeded introduced in V4
-        assertEquals(0, product.qtyNeeded)
+        assertEquals(0.0, product.qtyNeeded)
 
         // Product.noteId introduced in V5
         assertNull(product.noteId)

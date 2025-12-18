@@ -47,7 +47,7 @@ class UpdateProductQtyNeededUseCaseImplTest {
         )
     }
 
-    private suspend fun getProduct(initialQty: Int): Product {
+    private suspend fun getProduct(initialQty: Double): Product {
         val product = Product(
             id = 0,
             name = "qtyNeeded Test Product",
@@ -62,7 +62,7 @@ class UpdateProductQtyNeededUseCaseImplTest {
 
     @Test
     fun updateProductQtyNeeded_QtyIncremented_QtyNeededUpdated() = runTest {
-        val productBefore = getProduct(5)
+        val productBefore = getProduct(5.0)
         val newQty = productBefore.qtyNeeded + 3
 
         updateProductQtyNeededUseCase(productBefore.id, newQty)
@@ -74,7 +74,7 @@ class UpdateProductQtyNeededUseCaseImplTest {
 
     @Test
     fun updateProductQtyNeeded_QtyDecremented_QtyNeededUpdated() = runTest {
-        val productBefore = getProduct(5)
+        val productBefore = getProduct(5.0)
         val newQty = productBefore.qtyNeeded - 3
 
         val productAfter = updateProductQtyNeededUseCase(productBefore.id, newQty)
@@ -85,17 +85,28 @@ class UpdateProductQtyNeededUseCaseImplTest {
 
     @Test
     fun updateProductQtyNeeded_ProductDoesNotExist_ReturnNull() = runTest {
-        val updatedProduct = updateProductQtyNeededUseCase(1001, 5)
+        val updatedProduct = updateProductQtyNeededUseCase(1001, 5.0)
         assertNull(updatedProduct)
     }
 
     @Test
     fun updateProductQtyNeeded_IsNegativeNumber_ThrowsException() = runTest {
-        val productBefore = getProduct(0)
-        val newQty = -1
+        val productBefore = getProduct(0.0)
+        val newQty = -1.0
 
         assertThrows<IllegalArgumentException> {
             updateProductQtyNeededUseCase(productBefore.id, newQty)
         }
+    }
+
+    @Test
+    fun updateProductQtyNeeded_QtyIsDecimal_QtyNeededUpdatedToDecimal() = runTest {
+        val productBefore = getProduct(1.0)
+        val newQty = 2.333
+
+        val productAfter = updateProductQtyNeededUseCase(productBefore.id, newQty)
+
+        assertNotNull(productAfter)
+        assertEquals(newQty, productAfter?.qtyNeeded)
     }
 }

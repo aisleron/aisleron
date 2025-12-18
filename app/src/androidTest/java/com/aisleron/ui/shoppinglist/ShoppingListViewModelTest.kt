@@ -660,7 +660,9 @@ class ShoppingListViewModelTest : KoinTest {
         assertEquals(uiStateBefore, uiStateAfter)
     }
 
-    private suspend fun updateProductNeededQuantityArrangeAct(qtyInitial: Int, qtyNew: Int?): Int {
+    private suspend fun updateProductNeededQuantityArrangeAct(
+        qtyInitial: Double, qtyNew: Double?
+    ): Int {
         val shoppingList = getShoppingList()
         val existingAisle =
             shoppingList.aisles.first { it.products.count { p -> !p.product.inStock } > 0 }
@@ -679,8 +681,8 @@ class ShoppingListViewModelTest : KoinTest {
 
     @Test
     fun updateProductNeededQuantity_ValidQty_ProductQtyNeededUpdated() = runTest {
-        val qtyInitial = 5
-        val qtyNew = 10
+        val qtyInitial = 5.0
+        val qtyNew = 10.0
         val productId = updateProductNeededQuantityArrangeAct(qtyInitial, qtyNew)
         val updatedProduct = get<ProductRepository>().get(productId)
         Assert.assertEquals(qtyNew, updatedProduct?.qtyNeeded)
@@ -688,15 +690,15 @@ class ShoppingListViewModelTest : KoinTest {
 
     @Test
     fun updateProductNeededQuantity_NegativeQty_UiStateIsError() = runTest {
-        val qtyInitial = 5
-        val qtyNew = -1
+        val qtyInitial = 5.0
+        val qtyNew = -1.0
         updateProductNeededQuantityArrangeAct(qtyInitial, qtyNew)
         Assert.assertTrue(shoppingListViewModel.shoppingListUiState.value is ShoppingListViewModel.ShoppingListUiState.Error)
     }
 
     @Test
     fun updateProductNeededQuantity_QtyIsNull_QtyNotUpdated() = runTest {
-        val qtyInitial = 5
+        val qtyInitial = 5.0
         val qtyNew = null
         val productId = updateProductNeededQuantityArrangeAct(qtyInitial, qtyNew)
         val updatedProduct = get<ProductRepository>().get(productId)

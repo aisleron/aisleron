@@ -105,6 +105,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.koin.test.KoinTest
 import org.koin.test.get
+import java.text.DecimalFormat
 import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
 import kotlin.test.assertNull
@@ -1253,7 +1254,7 @@ class ShoppingListFragmentTest : KoinTest {
             )
         )
 
-    private suspend fun onProductQuantityChange_Arrange(initialQty: Int): Product {
+    private suspend fun onProductQuantityChange_Arrange(initialQty: Double): Product {
         val shoppingListPrefs = ShoppingListPreferencesTestImpl()
         shoppingListPrefs.setTrackingMode(ShoppingListPreferences.TrackingMode.QUANTITY)
         val shoppingList = getShoppingList()
@@ -1271,57 +1272,66 @@ class ShoppingListFragmentTest : KoinTest {
         return product
     }
 
+    private fun formatQty(qty: Double): String =
+        DecimalFormat("0.###").format(qty)
+
     @Test
     fun onProductQuantityChange_decQtyButtonClicked_qtyDecreased() = runTest {
-        val initialQty = 5
+        val initialQty = 5.0
         val product = onProductQuantityChange_Arrange(initialQty)
 
         val btnDecQty = getQtyStepperComponentForProduct(product, R.id.btn_qty_dec)
         btnDecQty.perform(click())
 
         val edtQty = getQtyStepperComponentForProduct(product, R.id.edt_qty)
-        edtQty.check(matches(withText(initialQty.dec().toString())))
+        val expected = formatQty(initialQty.dec())
+        edtQty.check(matches(withText(expected)))
     }
 
     @Test
     fun onProductQuantityChange_incQtyButtonClicked_qtyIncreased() = runTest {
-        val initialQty = 5
+        val initialQty = 5.0
         val product = onProductQuantityChange_Arrange(initialQty)
 
         val btnIncQty = getQtyStepperComponentForProduct(product, R.id.btn_qty_inc)
         btnIncQty.perform(click())
 
         val edtQty = getQtyStepperComponentForProduct(product, R.id.edt_qty)
-        edtQty.check(matches(withText(initialQty.inc().toString())))
+        val expected = formatQty(initialQty.inc())
+        edtQty.check(matches(withText(expected)))
     }
 
     @Test
     fun onProductQuantityChange_decQtyButtonClickedWithZeroQty_qtyRemainsZero() = runTest {
-        val initialQty = 0
+        val initialQty = 1.0
         val product = onProductQuantityChange_Arrange(initialQty)
 
         val btnDecQty = getQtyStepperComponentForProduct(product, R.id.btn_qty_dec)
         btnDecQty.perform(click())
+        btnDecQty.perform(click())
+        btnDecQty.perform(click())
 
         val edtQty = getQtyStepperComponentForProduct(product, R.id.edt_qty)
-        edtQty.check(matches(withText(initialQty.toString())))
+        val expected = formatQty(0.0)
+        edtQty.check(matches(withText(expected)))
     }
 
     @Test
-    fun onProductQuantityChange_incQtyButtonClickedWithMaxLength_qtyRemainsMAxLength() = runTest {
-        val initialQty = 9999
+    fun onProductQuantityChange_incQtyButtonClickedWithMaxLength_qtyRemainsMaxLength() = runTest {
+        val initialQty = 99999.0
         val product = onProductQuantityChange_Arrange(initialQty)
 
         val btnIncQty = getQtyStepperComponentForProduct(product, R.id.btn_qty_inc)
         btnIncQty.perform(click())
 
         val edtQty = getQtyStepperComponentForProduct(product, R.id.edt_qty)
-        edtQty.check(matches(withText(initialQty.toString())))
+        val expected = formatQty(initialQty)
+        edtQty.check(matches(withText(expected)))
     }
 
     @Test
     fun onProductQuantityChange_qtyEditChanged_ProductQuantityUpdated() = runTest {
-        val initialQty = 5
+        val initialQty = 5.0
         val product = onProductQuantityChange_Arrange(initialQty)
 
         val edtQty = getQtyStepperComponentForProduct(product, R.id.edt_qty)
@@ -1334,7 +1344,7 @@ class ShoppingListFragmentTest : KoinTest {
 
     @Test
     fun onProductQuantityChange_qtyEditCleared_ProductQuantityNotUpdated() = runTest {
-        val initialQty = 5
+        val initialQty = 5.0
         val product = onProductQuantityChange_Arrange(initialQty)
 
         val edtQty = getQtyStepperComponentForProduct(product, R.id.edt_qty)
@@ -1342,6 +1352,20 @@ class ShoppingListFragmentTest : KoinTest {
 
         val updatedProduct = get<ProductRepository>().get(product.id)
         assertEquals(initialQty, updatedProduct?.qtyNeeded)
+    }
+
+    @Test
+    fun onProductQuantityChange_qtyEditIsDecimal_ProductQuantityUpdated() = runTest {
+        val initialQty = 5.0
+        val product = onProductQuantityChange_Arrange(initialQty)
+        val newQty = 6.78
+
+        val edtQty = getQtyStepperComponentForProduct(product, R.id.edt_qty)
+        edtQty.perform(clearText())
+        edtQty.perform(typeText(newQty.toString()))
+
+        val updatedProduct = get<ProductRepository>().get(product.id)
+        assertEquals(newQty, updatedProduct?.qtyNeeded)
     }
 
     @Test
