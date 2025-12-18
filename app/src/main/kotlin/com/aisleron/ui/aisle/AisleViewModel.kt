@@ -21,6 +21,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.aisle.usecase.AddAisleUseCase
+import com.aisleron.domain.aisle.usecase.GetAisleMaxRankUseCase
 import com.aisleron.domain.aisle.usecase.GetAisleUseCase
 import com.aisleron.domain.aisle.usecase.UpdateAisleUseCase
 import com.aisleron.domain.base.AisleronException
@@ -34,6 +35,7 @@ class AisleViewModel(
     private val addAisleUseCase: AddAisleUseCase,
     private val updateAisleUseCase: UpdateAisleUseCase,
     private val getAisleUseCase: GetAisleUseCase,
+    private val getAisleMaxRankUseCase: GetAisleMaxRankUseCase,
     coroutineScopeProvider: CoroutineScope? = null
 ) : ViewModel() {
     private val coroutineScope = coroutineScopeProvider ?: this.viewModelScope
@@ -80,7 +82,7 @@ class AisleViewModel(
                             products = emptyList(),
                             locationId = _locationId,
                             isDefault = false,
-                            rank = 0,
+                            rank = getAisleMaxRankUseCase(_locationId) + 1,
                             id = 0,
                             expanded = true
                         )

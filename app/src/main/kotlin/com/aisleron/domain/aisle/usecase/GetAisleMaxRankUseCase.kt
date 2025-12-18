@@ -18,15 +18,14 @@
 package com.aisleron.domain.aisle.usecase
 
 import com.aisleron.domain.aisle.AisleRepository
-import com.aisleron.domain.location.Location
 
 interface GetAisleMaxRankUseCase {
-    suspend operator fun invoke(location: Location): Int
+    suspend operator fun invoke(locationId: Int): Int
 }
 
 class GetAisleMaxRankUseCaseImpl(val aisleRepository: AisleRepository) : GetAisleMaxRankUseCase{
-    override suspend fun invoke(location: Location): Int {
-        return aisleRepository.getAisleMaxRank(location.id)
+    override suspend fun invoke(locationId: Int): Int {
+        return aisleRepository.getAisleMaxRank(locationId)
     }
 
 }

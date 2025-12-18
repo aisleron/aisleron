@@ -78,7 +78,7 @@ class GetAisleMaxRankUseCaseImplTest {
             )
         )
 
-        val maxRankResult = getAisleMaxRankUseCase(location)
+        val maxRankResult = getAisleMaxRankUseCase(location.id)
 
         Assertions.assertEquals(300, maxRankResult)
     }
@@ -87,7 +87,14 @@ class GetAisleMaxRankUseCaseImplTest {
     fun getAisleMaxRank_LocationHasNoAisles_RankIsZero() = runTest {
         val location = getLocation()
 
-        val maxRankResult = getAisleMaxRankUseCase(location)
+        val maxRankResult = getAisleMaxRankUseCase(location.id)
+
+        Assertions.assertEquals(0, maxRankResult)
+    }
+
+    @Test
+    fun getAisleMaxRank_InvalidLocationProvided_RankIsZero() = runTest {
+        val maxRankResult = getAisleMaxRankUseCase(-1)
 
         Assertions.assertEquals(0, maxRankResult)
     }
