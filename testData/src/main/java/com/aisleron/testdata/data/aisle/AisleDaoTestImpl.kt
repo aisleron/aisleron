@@ -73,13 +73,18 @@ class AisleDaoTestImpl(private val aisleProductDao: AisleProductDaoTestImpl) : A
         }
     }
 
+    override suspend fun getAisleMaxRank(locationId: Int): Int {
+        return aisleList.filter { it.locationId == locationId && !it.isDefault }
+            .maxOfOrNull { it.rank } ?: 0
+    }
+
     override suspend fun upsert(vararg entity: AisleEntity): List<Long> {
         val result = mutableListOf<Long>()
         entity.forEach {
             val id: Int
             val existingEntity = getAisle(it.id)
             if (existingEntity == null) {
-                id = (aisleList.maxOfOrNull { a -> a.id }?.toInt() ?: 0) + 1
+                id = (aisleList.maxOfOrNull { a -> a.id } ?: 0) + 1
             } else {
                 id = existingEntity.id
                 delete(existingEntity)

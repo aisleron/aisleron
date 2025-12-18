@@ -20,6 +20,8 @@ package com.aisleron.di
 import com.aisleron.domain.TransactionRunner
 import com.aisleron.domain.aisle.usecase.AddAisleUseCase
 import com.aisleron.domain.aisle.usecase.AddAisleUseCaseImpl
+import com.aisleron.domain.aisle.usecase.GetAisleMaxRankUseCase
+import com.aisleron.domain.aisle.usecase.GetAisleMaxRankUseCaseImpl
 import com.aisleron.domain.aisle.usecase.GetAisleUseCase
 import com.aisleron.domain.aisle.usecase.GetAisleUseCaseImpl
 import com.aisleron.domain.aisle.usecase.GetAislesForLocationUseCase
@@ -120,6 +122,10 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
 
     val getAislesForLocationUseCase: GetAislesForLocationUseCase by lazy {
         GetAislesForLocationUseCaseImpl(repositoryFactory.aisleRepository)
+    }
+
+    val getAisleMaxRankUseCase: GetAisleMaxRankUseCase by lazy {
+        GetAisleMaxRankUseCaseImpl(repositoryFactory.aisleRepository)
     }
 
     val getDefaultAislesUseCase: GetDefaultAislesUseCase by lazy {
@@ -452,6 +458,7 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
             GetAisleProductMaxRankUseCase::class -> getAisleProductMaxRankUseCase as T
             GetAisleUseCase::class -> getAisleUseCase as T
             GetAislesForLocationUseCase::class -> getAislesForLocationUseCase as T
+            GetAisleMaxRankUseCase::class -> getAisleMaxRankUseCase as T
             GetDefaultAislesUseCase::class -> getDefaultAislesUseCase as T
             IsAisleNameUniqueUseCase::class -> isAisleNameUniqueUseCase as T
             RemoveAisleUseCase::class -> removeAisleUseCase as T

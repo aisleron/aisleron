@@ -44,6 +44,10 @@ class AisleRepositoryImpl(
         return AisleWithProductsMapper().toModel(aisleDao.getAisleWithProducts(aisleId))
     }
 
+    override suspend fun getAisleMaxRank(locationId: Int): Int {
+        return aisleDao.getAisleMaxRank(locationId)
+    }
+
     override suspend fun get(id: Int): Aisle? {
         return aisleDao.getAisle(id)?.let { aisleMapper.toModel(it) }
     }

@@ -25,4 +25,5 @@ interface AisleRepository : BaseRepository<Aisle> {
     suspend fun getDefaultAisleFor(locationId: Int): Aisle?
     suspend fun updateAisleRank(aisle: Aisle)
     suspend fun getWithProducts(aisleId: Int): Aisle
+    suspend fun getAisleMaxRank(locationId: Int): Int
 }
