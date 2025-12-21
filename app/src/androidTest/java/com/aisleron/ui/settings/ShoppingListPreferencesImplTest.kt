@@ -20,6 +20,7 @@ package com.aisleron.ui.settings
 import androidx.preference.PreferenceManager
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.aisleron.SharedPreferencesInitializer
+import com.aisleron.domain.product.TrackingMode
 import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -95,7 +96,7 @@ class ShoppingListPreferencesImplTest {
         assertFalse(showEmptyAisles)
     }
 
-    private fun getTrackingMode_ArrangeAct(trackingMode: SharedPreferencesInitializer.TrackingMode): ShoppingListPreferences.TrackingMode {
+    private fun getTrackingMode_ArrangeAct(trackingMode: SharedPreferencesInitializer.TrackingMode): TrackingMode {
         SharedPreferencesInitializer().setTrackingMode(trackingMode)
         return ShoppingListPreferencesImpl().trackingMode(getInstrumentation().targetContext)
     }
@@ -105,7 +106,7 @@ class ShoppingListPreferencesImplTest {
         val trackingMode =
             getTrackingMode_ArrangeAct(SharedPreferencesInitializer.TrackingMode.CHECKBOX)
 
-        assertEquals(ShoppingListPreferences.TrackingMode.CHECKBOX, trackingMode)
+        assertEquals(TrackingMode.CHECKBOX, trackingMode)
     }
 
     @Test
@@ -113,7 +114,7 @@ class ShoppingListPreferencesImplTest {
         val trackingMode =
             getTrackingMode_ArrangeAct(SharedPreferencesInitializer.TrackingMode.QUANTITY)
 
-        assertEquals(ShoppingListPreferences.TrackingMode.QUANTITY, trackingMode)
+        assertEquals(TrackingMode.QUANTITY, trackingMode)
     }
 
     @Test
@@ -121,13 +122,13 @@ class ShoppingListPreferencesImplTest {
         val trackingMode =
             getTrackingMode_ArrangeAct(SharedPreferencesInitializer.TrackingMode.CHECKBOX_QUANTITY)
 
-        assertEquals(ShoppingListPreferences.TrackingMode.CHECKBOX_QUANTITY, trackingMode)
+        assertEquals(TrackingMode.CHECKBOX_QUANTITY, trackingMode)
     }
 
     @Test
     fun getTrackingMode_isNone_ReturnNone() {
         val trackingMode = getTrackingMode_ArrangeAct(SharedPreferencesInitializer.TrackingMode.NONE)
-        assertEquals(ShoppingListPreferences.TrackingMode.NONE, trackingMode)
+        assertEquals(TrackingMode.NONE, trackingMode)
     }
 
     @Test
