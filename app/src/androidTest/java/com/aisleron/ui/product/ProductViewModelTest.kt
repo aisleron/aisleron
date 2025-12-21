@@ -40,12 +40,16 @@ import com.aisleron.domain.note.usecase.ApplyNoteChangesUseCase
 import com.aisleron.domain.note.usecase.GetNoteParentUseCase
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
+import com.aisleron.domain.product.TrackingMode
 import com.aisleron.domain.product.usecase.AddProductUseCase
 import com.aisleron.domain.product.usecase.GetProductMappingsUseCase
 import com.aisleron.domain.product.usecase.UpdateProductUseCase
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import com.aisleron.ui.bundles.AisleListEntry
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
@@ -59,6 +63,7 @@ import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class ProductViewModelTest() : KoinTest {
     private lateinit var productViewModel: ProductViewModel
     private lateinit var productRepository: ProductRepository
@@ -83,12 +88,19 @@ class ProductViewModelTest() : KoinTest {
         productViewModel.hydrate(existingProduct.id, existingProduct.inStock)
         productViewModel.updateProductName(updatedProductName)
         productViewModel.updateInStock(inStock)
+        productViewModel.updateQtyIncrement(1.25)
+        productViewModel.updateTrackingMode(TrackingMode.CHECKBOX_QUANTITY)
+        productViewModel.updateUnitOfMeasure("testUoM")
+
         productViewModel.saveProduct()
 
         val updatedProduct = productRepository.get(existingProduct.id)
         Assert.assertNotNull(updatedProduct)
         Assert.assertEquals(updatedProductName, updatedProduct?.name)
         Assert.assertEquals(inStock, updatedProduct?.inStock)
+        Assert.assertEquals(1.25, updatedProduct?.qtyIncrement)
+        Assert.assertEquals(TrackingMode.CHECKBOX_QUANTITY, updatedProduct?.trackingMode)
+        Assert.assertEquals("testUoM", updatedProduct?.unitOfMeasure)
 
         val countAfter: Int = productRepository.getAll().count()
         Assert.assertEquals(countBefore, countAfter)
@@ -111,12 +123,19 @@ class ProductViewModelTest() : KoinTest {
         productViewModel.hydrate(0, inStock)
         productViewModel.updateProductName(newProductName)
         productViewModel.updateInStock(inStock)
+        productViewModel.updateQtyIncrement(1.25)
+        productViewModel.updateTrackingMode(TrackingMode.CHECKBOX_QUANTITY)
+        productViewModel.updateUnitOfMeasure("testUoM")
+
         productViewModel.saveProduct()
 
         val newProduct = productRepository.getByName(newProductName)
         Assert.assertNotNull(newProduct)
         Assert.assertEquals(newProductName, newProduct?.name)
         Assert.assertEquals(inStock, newProduct?.inStock)
+        Assert.assertEquals(1.25, newProduct?.qtyIncrement)
+        Assert.assertEquals(TrackingMode.CHECKBOX_QUANTITY, newProduct?.trackingMode)
+        Assert.assertEquals("testUoM", newProduct?.unitOfMeasure)
         Assert.assertEquals(newProductName, productViewModel.uiData.value.productName)
         Assert.assertEquals(inStock, productViewModel.uiData.value.inStock)
 
@@ -351,10 +370,13 @@ class ProductViewModelTest() : KoinTest {
         assertNotNull(aislesForLocation)
         assertEquals(productAisleInfo.locationName, aislesForLocation.title)
         assertEquals(productAisleInfo.aisleId, aislesForLocation.currentAisleId)
+
         val locationAisles = get<AisleRepository>().getForLocation(productAisleInfo.locationId)
             .sortedBy { it.rank }
             .map { AisleListEntry(it.id, it.name) }
         assertEquals(locationAisles, aislesForLocation.aisles)
+
+        assertEquals(productAisleInfo, productViewModel.editingAisleInfo)
     }
 
     @Test
@@ -472,5 +494,131 @@ class ProductViewModelTest() : KoinTest {
         val targetAisleInfo = productAisles.first { it.locationId == aisle.locationId }
         assertEquals(aisle.id, targetAisleInfo.aisleId)
         assertNotEquals(aisle.id, targetAisleInfo.initialAisleId)
+    }
+
+    @Test
+    fun updateUnitOfMeasure_IsNewUoM_UiDataUpdated() = runTest {
+        val product = productRepository.getAll().first()
+        productViewModel.hydrate(product.id, product.inStock)
+
+        // Start collecting in a background job
+        val results = mutableListOf<ProductUiData>()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            productViewModel.uiData.collect { results.add(it) }
+        }
+
+        // Act
+        val newUoM = "New UoM"
+        productViewModel.updateUnitOfMeasure(newUoM)
+
+        // Assert
+        assertEquals(newUoM, results.last().unitOfMeasure)
+        assertNotEquals(newUoM, product.unitOfMeasure)
+    }
+
+    @Test
+    fun updateUnitOfMeasure_IsSameUoN_UiDataNotUpdated() = runTest {
+        val uoM = "Current UoM"
+        val product = productRepository.getAll().first().copy(unitOfMeasure = uoM)
+        get<UpdateProductUseCase>().invoke(product)
+        productViewModel.hydrate(product.id, product.inStock)
+
+        // Start collecting in a background job
+        val results = mutableListOf<ProductUiData>()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            productViewModel.uiData.collect { results.add(it) }
+        }
+
+        // Act
+        productViewModel.updateUnitOfMeasure(uoM)
+
+        // Assert
+        assertEquals(1, results.size)
+        assertEquals(uoM, results.last().unitOfMeasure)
+        assertEquals(uoM, product.unitOfMeasure)
+    }
+
+    @Test
+    fun updateQtyIncrement_IsNewIncrement_UiDataUpdated() = runTest {
+        val product = productRepository.getAll().first()
+        productViewModel.hydrate(product.id, product.inStock)
+
+        // Start collecting in a background job
+        val results = mutableListOf<ProductUiData>()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            productViewModel.uiData.collect { results.add(it) }
+        }
+
+        // Act
+        val newQtyIncrement = 1.234
+        productViewModel.updateQtyIncrement(newQtyIncrement)
+
+        // Assert
+        assertEquals(newQtyIncrement, results.last().qtyIncrement)
+        assertNotEquals(newQtyIncrement, product.qtyIncrement)
+    }
+
+    @Test
+    fun updateQtyIncrement_IsSameIncrement_UiDataNotUpdated() = runTest {
+        val increment = 1.234
+        val product = productRepository.getAll().first().copy(qtyIncrement = increment)
+        get<UpdateProductUseCase>().invoke(product)
+        productViewModel.hydrate(product.id, product.inStock)
+
+        // Start collecting in a background job
+        val results = mutableListOf<ProductUiData>()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            productViewModel.uiData.collect { results.add(it) }
+        }
+
+        // Act
+        productViewModel.updateQtyIncrement(increment)
+
+        // Assert
+        assertEquals(1, results.size)
+        assertEquals(increment, results.last().qtyIncrement)
+        assertEquals(increment, product.qtyIncrement)
+    }
+
+    @Test
+    fun updateTrackingMode_IsNewTrackingMode_UiDataUpdated() = runTest {
+        val product = productRepository.getAll().first()
+        productViewModel.hydrate(product.id, product.inStock)
+
+        // Start collecting in a background job
+        val results = mutableListOf<ProductUiData>()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            productViewModel.uiData.collect { results.add(it) }
+        }
+
+        // Act
+        val newTrackingMode = TrackingMode.CHECKBOX_QUANTITY
+        productViewModel.updateTrackingMode(newTrackingMode)
+
+        // Assert
+        assertEquals(newTrackingMode, results.last().trackingMode)
+        assertNotEquals(newTrackingMode, product.trackingMode)
+    }
+
+    @Test
+    fun updateTrackingMode_IsSameTrackingMode_UiDataNotUpdated() = runTest {
+        val trackingMode = TrackingMode.QUANTITY
+        val product = productRepository.getAll().first().copy(trackingMode = trackingMode)
+        get<UpdateProductUseCase>().invoke(product)
+        productViewModel.hydrate(product.id, product.inStock)
+
+        // Start collecting in a background job
+        val results = mutableListOf<ProductUiData>()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            productViewModel.uiData.collect { results.add(it) }
+        }
+
+        // Act
+        productViewModel.updateTrackingMode(trackingMode)
+
+        // Assert
+        assertEquals(1, results.size)
+        assertEquals(trackingMode, results.last().trackingMode)
+        assertEquals(trackingMode, product.trackingMode)
     }
 }

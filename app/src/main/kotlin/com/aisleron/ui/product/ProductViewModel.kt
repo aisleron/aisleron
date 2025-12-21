@@ -27,6 +27,7 @@ import com.aisleron.domain.note.Note
 import com.aisleron.domain.note.usecase.ApplyNoteChangesUseCase
 import com.aisleron.domain.note.usecase.GetNoteParentUseCase
 import com.aisleron.domain.product.Product
+import com.aisleron.domain.product.TrackingMode
 import com.aisleron.domain.product.usecase.AddProductUseCase
 import com.aisleron.domain.product.usecase.GetProductMappingsUseCase
 import com.aisleron.domain.product.usecase.UpdateProductUseCase
@@ -93,7 +94,10 @@ class ProductViewModel(
             _uiData.value = ProductUiData(
                 productName = product?.name.orEmpty(),
                 inStock = product?.inStock ?: inStock,
-                noteText = product?.note?.noteText ?: ""
+                noteText = product?.note?.noteText ?: "",
+                qtyIncrement = product?.qtyIncrement ?: 1.0,
+                unitOfMeasure = product?.unitOfMeasure ?: "",
+                trackingMode = product?.trackingMode ?: TrackingMode.DEFAULT
             )
 
             loadProductAisleList(product?.id ?: -1)
@@ -160,11 +164,15 @@ class ProductViewModel(
     }
 
     fun updateProductName(name: String) {
-        _uiData.value = _uiData.value.copy(productName = name)
+        if (uiData.value.productName != name) {
+            _uiData.value = _uiData.value.copy(productName = name)
+        }
     }
 
     fun updateInStock(inStock: Boolean) {
-        _uiData.value = _uiData.value.copy(inStock = inStock)
+        if (uiData.value.inStock != inStock) {
+            _uiData.value = _uiData.value.copy(inStock = inStock)
+        }
     }
 
     override fun updateNote(noteText: String) {
@@ -180,12 +188,22 @@ class ProductViewModel(
             val name = _uiData.value.productName
             val inStock = _uiData.value.inStock
             val noteText = _uiData.value.noteText
+            val qtyIncrement = _uiData.value.qtyIncrement
+            val unitOfMeasure = _uiData.value.unitOfMeasure
+            val trackingMode = _uiData.value.trackingMode
             if (name.isBlank()) return@launch
 
             _productUiState.value = ProductUiState.Loading
             try {
                 product?.let {
-                    val updated = it.copy(name = name, inStock = inStock)
+                    val updated = it.copy(
+                        name = name,
+                        inStock = inStock,
+                        qtyIncrement = qtyIncrement,
+                        unitOfMeasure = unitOfMeasure,
+                        trackingMode = trackingMode
+                    )
+
                     updateProductUseCase(updated)
                     product = updated
                 } ?: run {
@@ -194,7 +212,10 @@ class ProductViewModel(
                             name = name,
                             inStock = inStock,
                             id = 0,
-                            qtyNeeded = 0.0
+                            qtyNeeded = 0.0,
+                            qtyIncrement = qtyIncrement,
+                            unitOfMeasure = unitOfMeasure,
+                            trackingMode = trackingMode
                         )
                     )
 
@@ -237,6 +258,24 @@ class ProductViewModel(
                     }
                 }
             }
+        }
+    }
+
+    fun updateUnitOfMeasure(newUom: String) {
+        if (uiData.value.unitOfMeasure != newUom) {
+            _uiData.value = _uiData.value.copy(unitOfMeasure = newUom)
+        }
+    }
+
+    fun updateQtyIncrement(newIncrement: Double) {
+        if (uiData.value.qtyIncrement != newIncrement) {
+            _uiData.value = _uiData.value.copy(qtyIncrement = newIncrement)
+        }
+    }
+
+    fun updateTrackingMode(selectedMode: TrackingMode) {
+        if (uiData.value.trackingMode != selectedMode) {
+            _uiData.value = _uiData.value.copy(trackingMode = selectedMode)
         }
     }
 
