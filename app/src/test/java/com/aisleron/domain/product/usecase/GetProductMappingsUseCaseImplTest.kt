@@ -24,6 +24,7 @@ import com.aisleron.domain.aisleproduct.AisleProductRepository
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
+import com.aisleron.domain.product.TrackingMode
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -50,7 +51,14 @@ class GetProductMappingsUseCaseImplTest {
 
         val productRepository = dm.getRepository<ProductRepository>()
         runBlocking {
-            val newProductId = productRepository.add(Product(0, "New Product", false, 0.0))
+            val newProductId = productRepository.add(
+                Product(
+                    0, "New Product", false, 0.0,
+                    qtyIncrement = 1.0,
+                    trackingMode = TrackingMode.DEFAULT,
+                    unitOfMeasure = "Qty"
+                )
+            )
             product = productRepository.get(newProductId)!!
         }
     }

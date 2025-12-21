@@ -36,4 +36,18 @@
 
     <!-- Aisleron dimensions.   -->
     <dimen name="card_elevation">4dp</dimen>
+
+    <!-- Standard padding dimensions.   -->
+    <dimen name="padding_32">32dp</dimen>
+    <dimen name="padding_16">16dp</dimen>
+    <dimen name="padding_8">8dp</dimen>
+    <dimen name="padding_4">4dp</dimen>
+    <dimen name="padding_2">2dp</dimen>
+
+    <!-- Standard margin dimensions.   -->
+    <dimen name="margin_32">32dp</dimen>
+    <dimen name="margin_16">16dp</dimen>
+    <dimen name="margin_8">8dp</dimen>
+    <dimen name="margin_4">4dp</dimen>
+    <dimen name="margin_2">2dp</dimen>
 </resources>

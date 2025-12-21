@@ -28,6 +28,7 @@ import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.location.usecase.AddLocationUseCase
 import com.aisleron.domain.location.usecase.GetHomeLocationUseCase
 import com.aisleron.domain.product.Product
+import com.aisleron.domain.product.TrackingMode
 import com.aisleron.domain.product.usecase.AddProductUseCase
 import com.aisleron.domain.product.usecase.GetAllProductsUseCase
 import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
@@ -86,20 +87,30 @@ class CreateSampleDataUseCaseImpl(
         addShop()
     }
 
-    private suspend fun addSampleProducts() {
-        val qty = 0.0
+    private fun createSampleProduct(name: String, inStock: Boolean): Product =
+        Product(
+            id = 0,
+            name = name,
+            inStock = inStock,
+            qtyNeeded = 0.0,
+            noteId = null,
+            qtyIncrement = 1.0,
+            unitOfMeasure = "",
+            trackingMode = TrackingMode.DEFAULT
+        )
 
+    private suspend fun addSampleProducts() {
         val productList = listOf(
-            Product(0, PRD_FROZEN_VEGES, true, qty, null),
-            Product(0, PRD_APPLES, true, qty, null),
-            Product(0, PRD_MILK, false, qty, null),
-            Product(0, PRD_BUTTER, false, qty, null),
-            Product(0, PRD_CEREAL, true, qty, null),
-            Product(0, PRD_BREAD, true, qty, null),
-            Product(0, PRD_SOAP, true, qty, null),
-            Product(0, PRD_TOOTHPASTE, false, qty, null),
-            Product(0, PRD_PET_FOOD, true, qty, null),
-            Product(0, PRD_SALT, true, qty, null)
+            createSampleProduct(PRD_FROZEN_VEGES, true),
+            createSampleProduct(PRD_APPLES, true),
+            createSampleProduct(PRD_MILK, false),
+            createSampleProduct(PRD_BUTTER, false),
+            createSampleProduct(PRD_CEREAL, true),
+            createSampleProduct(PRD_BREAD, true),
+            createSampleProduct(PRD_SOAP, true),
+            createSampleProduct(PRD_TOOTHPASTE, false),
+            createSampleProduct(PRD_PET_FOOD, true),
+            createSampleProduct(PRD_SALT, true)
         )
 
         productList.forEach { addProductUseCase(it) }

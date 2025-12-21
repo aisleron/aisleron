@@ -21,6 +21,7 @@ import com.aisleron.di.TestDependencyManager
 import com.aisleron.domain.note.usecase.GetNoteUseCaseImpl
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
+import com.aisleron.domain.product.TrackingMode
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -53,7 +54,10 @@ class UpdateProductQtyNeededUseCaseImplTest {
             name = "qtyNeeded Test Product",
             inStock = false,
             qtyNeeded = initialQty,
-            noteId = null
+            noteId = null,
+            qtyIncrement = 1.0,
+            trackingMode = TrackingMode.DEFAULT,
+            unitOfMeasure = "Qty"
         )
 
         val id = dm.getRepository<ProductRepository>().add(product)

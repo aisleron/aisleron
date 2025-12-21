@@ -33,6 +33,7 @@ import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductRankUseCase
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.product.ProductRepository
+import com.aisleron.domain.product.TrackingMode
 import com.aisleron.domain.product.usecase.RemoveProductUseCase
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import kotlinx.coroutines.flow.first
@@ -71,7 +72,10 @@ class ProductShoppingListItemViewModelTest : KoinTest {
         aisleId = aisleProduct.aisleId,
         aisleProductId = aisleProduct.id,
         updateAisleProductRankUseCase = get<UpdateAisleProductRankUseCase>(),
-        removeProductUseCase = get<RemoveProductUseCase>()
+        removeProductUseCase = get<RemoveProductUseCase>(),
+        qtyIncrement = 1.0,
+        trackingMode = TrackingMode.DEFAULT,
+        unitOfMeasure = "Qty"
     )
 
     private fun getShoppingList(): Location {
@@ -107,7 +111,10 @@ class ProductShoppingListItemViewModelTest : KoinTest {
             aisleId = 1,
             aisleProductId = 1,
             updateAisleProductRankUseCase = get<UpdateAisleProductRankUseCase>(),
-            removeProductUseCase = get<RemoveProductUseCase>()
+            removeProductUseCase = get<RemoveProductUseCase>(),
+            qtyIncrement = 1.0,
+            trackingMode = TrackingMode.DEFAULT,
+            unitOfMeasure = "Qty"
         )
 
         val productRepository = get<ProductRepository>()

@@ -41,7 +41,10 @@ class ProductDaoTestImpl : ProductDao {
                 name = it.name,
                 inStock = it.inStock,
                 qtyNeeded = it.qtyNeeded,
-                noteId = it.noteId
+                noteId = it.noteId,
+                qtyIncrement = it.qtyIncrement,
+                trackingMode = it.trackingMode,
+                unitOfMeasure = it.unitOfMeasure
             )
 
             productList.add(newEntity)
@@ -63,6 +66,6 @@ class ProductDaoTestImpl : ProductDao {
     }
 
     override suspend fun getProductByName(name: String): ProductEntity? {
-        return productList.find { it.name.uppercase() == name.uppercase() }
+        return productList.find { it.name.equals(name, ignoreCase = true) }
     }
 }

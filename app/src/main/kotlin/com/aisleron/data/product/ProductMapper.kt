@@ -19,6 +19,7 @@ package com.aisleron.data.product
 
 import com.aisleron.data.base.MapperBaseImpl
 import com.aisleron.domain.product.Product
+import com.aisleron.domain.product.TrackingMode
 
 class ProductMapper : MapperBaseImpl<ProductEntity, Product>() {
     override fun toModel(value: ProductEntity) = Product(
@@ -26,7 +27,10 @@ class ProductMapper : MapperBaseImpl<ProductEntity, Product>() {
         name = value.name.trim(),
         inStock = value.inStock,
         qtyNeeded = value.qtyNeeded,
-        noteId = value.noteId
+        noteId = value.noteId,
+        qtyIncrement = value.qtyIncrement,
+        unitOfMeasure = value.unitOfMeasure,
+        trackingMode = value.trackingMode ?: TrackingMode.DEFAULT
     )
 
     override fun fromModel(value: Product) = ProductEntity(
@@ -34,6 +38,9 @@ class ProductMapper : MapperBaseImpl<ProductEntity, Product>() {
         name = value.name.trim(),
         inStock = value.inStock,
         qtyNeeded = value.qtyNeeded,
-        noteId = value.noteId
+        noteId = value.noteId,
+        qtyIncrement = value.qtyIncrement,
+        unitOfMeasure = value.unitOfMeasure,
+        trackingMode = value.trackingMode
     )
 }

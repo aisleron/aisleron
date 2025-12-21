@@ -22,8 +22,10 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import com.aisleron.data.note.NoteEntity
+import com.aisleron.domain.product.TrackingMode
 
-@Entity(tableName = "Product",
+@Entity(
+    tableName = "Product",
     foreignKeys = [
         ForeignKey(
             entity = NoteEntity::class,
@@ -39,5 +41,8 @@ data class ProductEntity(
     val name: String,
     val inStock: Boolean,
     @ColumnInfo(defaultValue = "0") val qtyNeeded: Double,
-    @ColumnInfo(index = true) val noteId: Int?
+    @ColumnInfo(index = true) val noteId: Int?,
+    @ColumnInfo(defaultValue = "1") val qtyIncrement: Double,
+    @ColumnInfo(defaultValue = "") val unitOfMeasure: String,
+    val trackingMode: TrackingMode?
 )
