@@ -17,9 +17,11 @@
 
 package com.aisleron.domain.loyaltycard
 
+import com.aisleron.domain.base.AisleronItem
+
 data class LoyaltyCard(
-    val id: Int,
+    override val id: Int,
     val name: String,
     val provider: LoyaltyCardProviderType,
     val intent: String
-)
+) : AisleronItem
