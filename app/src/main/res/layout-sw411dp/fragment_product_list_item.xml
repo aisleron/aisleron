@@ -41,23 +41,24 @@
             android:gravity="center_vertical"
             android:maxLines="2"
             android:padding="@dimen/text_margin"
-            android:text="@string/product"
+            tools:text="@string/product"
             android:textAppearance="?attr/textAppearanceBodyLarge" />
 
         <LinearLayout
             android:id="@+id/stp_qty_selector"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
             <ImageButton
                 android:id="@+id/btn_qty_dec"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/decrement"
-                android:paddingVertical="12dp"
+
                 android:paddingStart="@dimen/text_margin"
                 android:paddingEnd="0dp"
                 android:src="@drawable/baseline_remove_circle_outline_24" />
@@ -79,10 +80,9 @@
             <ImageButton
                 android:id="@+id/btn_qty_inc"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/increment"
-                android:paddingVertical="12dp"
                 android:paddingStart="0dp"
                 android:paddingEnd="@dimen/text_margin"
                 android:src="@drawable/baseline_add_circle_outline_24" />

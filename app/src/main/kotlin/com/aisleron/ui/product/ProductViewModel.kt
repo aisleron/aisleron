@@ -53,14 +53,14 @@ class ProductViewModel(
     private val getAislesForLocationUseCase: GetAislesForLocationUseCase,
     private val changeProductAisleUseCase: ChangeProductAisleUseCase,
     coroutineScopeProvider: CoroutineScope? = null
-) : ViewModel(), NoteViewModel {
+) : ViewModel(), NoteViewModel, ProductInventoryViewModel {
     private var _targetAisleId: Int? = null
 
     private var product: Product? = null
     private val coroutineScope = coroutineScopeProvider ?: this.viewModelScope
 
     private val _uiData = MutableStateFlow(ProductUiData())
-    val uiData: StateFlow<ProductUiData> = _uiData
+    override val uiData: StateFlow<ProductUiData> = _uiData
 
     private val _productAisles = MutableStateFlow<List<ProductAisleInfo>>(emptyList())
     val productAisles: StateFlow<List<ProductAisleInfo>> = _productAisles
@@ -261,19 +261,19 @@ class ProductViewModel(
         }
     }
 
-    fun updateUnitOfMeasure(newUom: String) {
+    override fun updateUnitOfMeasure(newUom: String) {
         if (uiData.value.unitOfMeasure != newUom) {
             _uiData.value = _uiData.value.copy(unitOfMeasure = newUom)
         }
     }
 
-    fun updateQtyIncrement(newIncrement: Double) {
+    override fun updateQtyIncrement(newIncrement: Double) {
         if (uiData.value.qtyIncrement != newIncrement) {
             _uiData.value = _uiData.value.copy(qtyIncrement = newIncrement)
         }
     }
 
-    fun updateTrackingMode(selectedMode: TrackingMode) {
+    override fun updateTrackingMode(selectedMode: TrackingMode) {
         if (uiData.value.trackingMode != selectedMode) {
             _uiData.value = _uiData.value.copy(trackingMode = selectedMode)
         }

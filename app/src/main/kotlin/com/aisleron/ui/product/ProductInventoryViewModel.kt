@@ -18,12 +18,18 @@
 package com.aisleron.ui.product
 
 import com.aisleron.domain.product.TrackingMode
+import kotlinx.coroutines.flow.StateFlow
 
-data class ProductUiData(
-    val productName: String = "",
-    val inStock: Boolean = false,
-    val noteText: String = "",
-    override val qtyIncrement: Double = 1.0,
-    override val unitOfMeasure: String = "",
-    override val trackingMode: TrackingMode = TrackingMode.DEFAULT
-) : ProductInventoryUiData
+interface ProductInventoryViewModel {
+    fun updateQtyIncrement(newIncrement: Double)
+    fun updateUnitOfMeasure(newUom: String)
+    fun updateTrackingMode(selectedMode: TrackingMode)
+
+    val uiData: StateFlow<ProductInventoryUiData>
+}
+
+interface ProductInventoryUiData {
+    val qtyIncrement: Double
+    val unitOfMeasure: String
+    val trackingMode: TrackingMode
+}
