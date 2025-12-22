@@ -202,7 +202,7 @@ class ShoppingListFragment(
                         }
 
                         override fun onProductQuantityChange(
-                            item: ProductShoppingListItem, quantity: Int?
+                            item: ProductShoppingListItem, quantity: Double?
                         ) {
                             shoppingListViewModel.updateProductNeededQuantity(item, quantity)
                         }
@@ -258,6 +258,7 @@ class ShoppingListFragment(
                     },
 
                     shoppingListPreferences.trackingMode(requireContext()),
+                    getString(R.string.qty),
                     shoppingListViewModel.defaultFilter
                 )
 

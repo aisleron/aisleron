@@ -21,6 +21,7 @@ import com.aisleron.di.TestDependencyManager
 import com.aisleron.domain.note.usecase.GetNoteUseCaseImpl
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
+import com.aisleron.domain.product.TrackingMode
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -47,13 +48,16 @@ class UpdateProductQtyNeededUseCaseImplTest {
         )
     }
 
-    private suspend fun getProduct(initialQty: Int): Product {
+    private suspend fun getProduct(initialQty: Double): Product {
         val product = Product(
             id = 0,
             name = "qtyNeeded Test Product",
             inStock = false,
             qtyNeeded = initialQty,
-            noteId = null
+            noteId = null,
+            qtyIncrement = 1.0,
+            trackingMode = TrackingMode.DEFAULT,
+            unitOfMeasure = "Qty"
         )
 
         val id = dm.getRepository<ProductRepository>().add(product)
@@ -62,7 +66,7 @@ class UpdateProductQtyNeededUseCaseImplTest {
 
     @Test
     fun updateProductQtyNeeded_QtyIncremented_QtyNeededUpdated() = runTest {
-        val productBefore = getProduct(5)
+        val productBefore = getProduct(5.0)
         val newQty = productBefore.qtyNeeded + 3
 
         updateProductQtyNeededUseCase(productBefore.id, newQty)
@@ -74,7 +78,7 @@ class UpdateProductQtyNeededUseCaseImplTest {
 
     @Test
     fun updateProductQtyNeeded_QtyDecremented_QtyNeededUpdated() = runTest {
-        val productBefore = getProduct(5)
+        val productBefore = getProduct(5.0)
         val newQty = productBefore.qtyNeeded - 3
 
         val productAfter = updateProductQtyNeededUseCase(productBefore.id, newQty)
@@ -85,17 +89,28 @@ class UpdateProductQtyNeededUseCaseImplTest {
 
     @Test
     fun updateProductQtyNeeded_ProductDoesNotExist_ReturnNull() = runTest {
-        val updatedProduct = updateProductQtyNeededUseCase(1001, 5)
+        val updatedProduct = updateProductQtyNeededUseCase(1001, 5.0)
         assertNull(updatedProduct)
     }
 
     @Test
     fun updateProductQtyNeeded_IsNegativeNumber_ThrowsException() = runTest {
-        val productBefore = getProduct(0)
-        val newQty = -1
+        val productBefore = getProduct(0.0)
+        val newQty = -1.0
 
         assertThrows<IllegalArgumentException> {
             updateProductQtyNeededUseCase(productBefore.id, newQty)
         }
+    }
+
+    @Test
+    fun updateProductQtyNeeded_QtyIsDecimal_QtyNeededUpdatedToDecimal() = runTest {
+        val productBefore = getProduct(1.0)
+        val newQty = 2.333
+
+        val productAfter = updateProductQtyNeededUseCase(productBefore.id, newQty)
+
+        assertNotNull(productAfter)
+        assertEquals(newQty, productAfter?.qtyNeeded)
     }
 }

@@ -142,17 +142,13 @@ class ProductFragment(
 
         binding.edtProductName.doAfterTextChanged {
             val newText = it?.toString() ?: ""
-            if (productViewModel.uiData.value.productName != newText) {
-                productViewModel.updateProductName(newText)
-            }
+            productViewModel.updateProductName(newText)
         }
 
         binding.chkProductInStock.setOnClickListener {
             val chk = binding.chkProductInStock
             chk.isChecked = !chk.isChecked
-            if (productViewModel.uiData.value.inStock != chk.isChecked) {
-                productViewModel.updateInStock(chk.isChecked)
-            }
+            productViewModel.updateInStock(chk.isChecked)
         }
 
         return binding.root
@@ -189,10 +185,10 @@ class ProductFragment(
 
         TabLayoutMediator(binding.tabProductOptions, viewPager) { tab, position ->
             tab.text = when (position) {
-                ProductTabsAdapter.PRODUCT_TAB_NOTES -> getString(R.string.tab_notes)
-                ProductTabsAdapter.PRODUCT_TAB_AISLES -> getString(R.string.product_tab_aisles)
-                ProductTabsAdapter.PRODUCT_TAB_BARCODES -> getString(R.string.product_tab_barcodes)
-                ProductTabsAdapter.PRODUCT_TAB_INVENTORY -> getString(R.string.product_tab_inventory)
+                ProductTabsAdapter.ProductTab.TAB_NOTES.ordinal -> getString(R.string.tab_notes)
+                ProductTabsAdapter.ProductTab.TAB_AISLES.ordinal -> getString(R.string.product_tab_aisles)
+                ProductTabsAdapter.ProductTab.TAB_INVENTORY.ordinal -> getString(R.string.product_tab_inventory)
+                //ProductTabsAdapter.ProductTab.TAB_BARCODES.ordinal -> getString(R.string.product_tab_barcodes)
                 else -> ""
             }
         }.attach()
@@ -208,7 +204,7 @@ class ProductFragment(
 
     private fun setShowAddShopFab() {
         val showAddShopFab = productPreferences.showExtraOptions(requireContext())
-                && binding.pgrProductOptions.currentItem == ProductTabsAdapter.PRODUCT_TAB_AISLES
+                && binding.pgrProductOptions.currentItem == ProductTabsAdapter.ProductTab.TAB_AISLES.ordinal
 
         if (showAddShopFab) {
             fabHandler.setFabItems(requireActivity(), FabHandler.FabOption.ADD_SHOP)

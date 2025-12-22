@@ -159,4 +159,7 @@
     <string name="new_entity_name">Neuer Entitätsname</string>
     <string name="pure_black_style">Stil Reines Schwarz</string>
     <string name="aisle_picker">Gangauswahl</string>
+    <string name="tracking_default">Standard</string>
+    <string name="qty_increments">Mengenschritte</string>
+    <string name="unit_of_measure">Maßeinheit</string>
 </resources>

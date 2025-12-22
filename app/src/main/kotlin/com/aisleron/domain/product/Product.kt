@@ -25,7 +25,10 @@ data class Product(
     override val id: Int,
     override val name: String,
     val inStock: Boolean,
-    val qtyNeeded: Int,
+    val qtyNeeded: Double,
     override val noteId: Int? = null,
-    override val note: Note? = null
+    override val note: Note? = null,
+    val qtyIncrement: Double,
+    val unitOfMeasure: String,
+    val trackingMode: TrackingMode
 ) : AisleronItem, NoteParent

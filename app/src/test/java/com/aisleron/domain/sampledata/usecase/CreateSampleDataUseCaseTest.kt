@@ -23,6 +23,7 @@ import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
+import com.aisleron.domain.product.TrackingMode
 import com.aisleron.domain.product.usecase.AddProductUseCase
 import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
 import kotlinx.coroutines.flow.first
@@ -123,8 +124,11 @@ class CreateSampleDataUseCaseTest {
                     id = 0,
                     name = "CreateSampleDataProductExistsTest",
                     inStock = false,
-                    qtyNeeded = 0,
-                    noteId = null
+                    qtyNeeded = 0.0,
+                    noteId = null,
+                    qtyIncrement = 1.0,
+                    trackingMode = TrackingMode.DEFAULT,
+                    unitOfMeasure = "Qty"
                 )
             )
 

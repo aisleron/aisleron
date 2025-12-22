@@ -20,6 +20,7 @@ package com.aisleron.ui.settings
 import android.content.Context
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
+import com.aisleron.domain.product.TrackingMode
 
 class ShoppingListPreferencesImpl : ShoppingListPreferences {
     override fun isStatusChangeSnackBarHidden(context: Context): Boolean =
@@ -39,16 +40,12 @@ class ShoppingListPreferencesImpl : ShoppingListPreferences {
             }
     }
 
-    override fun trackingMode(context: Context): ShoppingListPreferences.TrackingMode {
+    override fun trackingMode(context: Context): TrackingMode {
         val method = PreferenceManager.getDefaultSharedPreferences(context)
-            .getString(PREF_TRACKING_MODE, CHECKBOX)
+            .getString(PREF_TRACKING_MODE, TrackingMode.CHECKBOX.value)
+            ?.ifEmpty { "" }
 
-        return when (method) {
-            QUANTITY -> ShoppingListPreferences.TrackingMode.QUANTITY
-            CHECKBOX_QUANTITY -> ShoppingListPreferences.TrackingMode.CHECKBOX_QUANTITY
-            NONE -> ShoppingListPreferences.TrackingMode.NONE
-            else -> ShoppingListPreferences.TrackingMode.CHECKBOX
-        }
+        return TrackingMode.fromValue(method)
     }
 
     override fun keepScreenOn(context: Context): Boolean =
@@ -61,10 +58,5 @@ class ShoppingListPreferencesImpl : ShoppingListPreferences {
         const val PREF_SHOW_EMPTY_AISLES = "show_empty_aisles"
         const val PREF_TRACKING_MODE = "tracking_mode"
         const val PREF_KEEP_SCREEN_ON = "keep_screen_on"
-
-        const val CHECKBOX = "checkbox"
-        const val QUANTITY = "quantity"
-        const val CHECKBOX_QUANTITY = "checkbox_quantity"
-        const val NONE = "none"
     }
 }

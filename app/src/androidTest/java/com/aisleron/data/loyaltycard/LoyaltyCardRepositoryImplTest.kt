@@ -17,145 +17,97 @@
 
 package com.aisleron.data.loyaltycard
 
-import com.aisleron.data.DbInitializer
-import com.aisleron.data.aisle.AisleDao
-import com.aisleron.data.location.LocationDao
-import com.aisleron.di.KoinTestRule
-import com.aisleron.di.daoModule
-import com.aisleron.di.inMemoryDatabaseTestModule
-import com.aisleron.di.repositoryModule
-import com.aisleron.di.useCaseModule
+import com.aisleron.data.RepositoryImplTest
+import com.aisleron.domain.base.BaseRepository
+import com.aisleron.domain.location.Location
+import com.aisleron.domain.location.LocationRepository
+import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.loyaltycard.LoyaltyCard
 import com.aisleron.domain.loyaltycard.LoyaltyCardProviderType
-import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import com.aisleron.domain.loyaltycard.LoyaltyCardRepository
 import kotlinx.coroutines.test.runTest
-import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
-import org.koin.core.module.Module
-import org.koin.test.KoinTest
 import org.koin.test.get
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
-class LoyaltyCardRepositoryImplTest : KoinTest {
-    private lateinit var repository: LoyaltyCardRepositoryImpl
+class LoyaltyCardRepositoryImplTest : RepositoryImplTest<LoyaltyCard>() {
+    private val loyaltyCardRepository: LoyaltyCardRepository get() = repository as LoyaltyCardRepository
 
-    @get:Rule
-    val koinTestRule = KoinTestRule(
-        modules = getKoinModules()
-    )
-
-    private fun getKoinModules(): List<Module> = listOf(
-        daoModule, inMemoryDatabaseTestModule, repositoryModule, useCaseModule
-    )
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Before
-    fun setUp() {
-        DbInitializer(
-            get<LocationDao>(), get<AisleDao>(), TestScope(UnconfinedTestDispatcher())
-        ).invoke()
-
-        runBlocking {
-            get<CreateSampleDataUseCase>().invoke()
-        }
-
-        repository = LoyaltyCardRepositoryImpl(
+    override fun initRepository(): BaseRepository<LoyaltyCard> =
+        LoyaltyCardRepositoryImpl(
             loyaltyCardDao = get<LoyaltyCardDao>(),
             locationLoyaltyCardDao = get<LocationLoyaltyCardDao>(),
             loyaltyCardMapper = LoyaltyCardMapper()
         )
-    }
 
-    private suspend fun addItems(): List<Int> {
-        val newItems = listOf(
-            LoyaltyCard(
-                id = 0,
-                name = "Card 1",
-                provider = LoyaltyCardProviderType.CATIMA,
-                intent = "Dummy Intent"
-            ),
-            LoyaltyCard(
-                id = 0,
-                name = "Card 2",
-                provider = LoyaltyCardProviderType.CATIMA,
-                intent = "Dummy Intent"
-            )
-        )
-
-        return repository.add(newItems)
-    }
-
-    @Test
-    fun add_MultipleCardsProvided_CardsAdded() = runTest {
-        val countBefore = repository.getAll().count()
-
-        val newIds = addItems()
-        val countAfter = repository.getAll().count()
-        val newItemOne = repository.get(newIds.first())
-        val newItemTwo = repository.get(newIds.last())
-
-        assertEquals(countBefore + 2, countAfter)
-        assertEquals(2, newIds.count())
-        assertNotNull(newItemOne)
-        assertNotNull(newItemTwo)
-    }
-
-    @Test
-    fun update_MultipleCardsProvided_CardsUpdated() = runTest {
-        val newIds = addItems()
-        val countBefore = repository.getAll().count()
-        val itemOneBefore = repository.get(newIds.first())!!
-        val itemTwoBefore = repository.get(newIds.last())!!
-        val updateItems = listOf(
-            itemOneBefore.copy(name = "${itemOneBefore.name} Updated"),
-            itemTwoBefore.copy(name = "${itemTwoBefore.name} Updated")
-        )
-
-        repository.update(updateItems)
-        val countAfter = repository.getAll().count()
-        val itemOneAfter = repository.get(itemOneBefore.id)
-        val itemTwoAfter = repository.get(itemTwoBefore.id)
-
-        assertEquals(countBefore, countAfter)
-        assertEquals(itemOneBefore.copy(name = "${itemOneBefore.name} Updated"), itemOneAfter)
-        assertEquals(itemTwoBefore.copy(name = "${itemTwoBefore.name} Updated"), itemTwoAfter)
-    }
-
-    @Test
-    fun remove_ValidCardProvided_CardRemoved() = runTest {
-        val itemId = addItems().first()
-        val itemBefore = repository.get(itemId)!!
-        val countBefore = repository.getAll().count()
-
-        repository.remove(itemBefore)
-        val countAfter = repository.getAll().count()
-        val itemAfter = repository.get(itemId)
-
-        assertEquals(countBefore - 1, countAfter)
-        assertNull(itemAfter)
-    }
-
-    @Test
-    fun remove_InvalidCardProvided_NoCardsRemoved() = runTest {
-        addItems()
-        val countBefore = repository.getAll().count()
-        val item = LoyaltyCard(
-            id = 99,
-            name = "Card 99",
+    override suspend fun getSingleNewItem(): LoyaltyCard =
+        LoyaltyCard(
+            id = 0,
+            name = "Card 1",
             provider = LoyaltyCardProviderType.CATIMA,
             intent = "Dummy Intent"
         )
 
-        repository.remove(item)
-        val countAfter = repository.getAll().count()
+    override suspend fun getMultipleNewItems(): List<LoyaltyCard> {
+        return listOf(
+            getSingleNewItem(),
+            getSingleNewItem().copy(name = "Card 2")
+        )
+    }
 
-        assertEquals(countBefore, countAfter)
+    override suspend fun getInvalidItem(): LoyaltyCard =
+        getSingleNewItem().copy(id = -1)
+
+    override fun getUpdatedItem(item: LoyaltyCard): LoyaltyCard =
+        item.copy(name = "${item.name} Updated")
+
+    @Test
+    override fun add_SingleItemProvided_AddItem() {
+        super.add_SingleItemProvided_AddItem()
+    }
+
+    @Test
+    fun getProviderCard_ValidProviderProvided_ReturnCard() = runTest {
+        val card = repository.get(addSingleItem())!!
+
+        val result = loyaltyCardRepository.getProviderCard(card.provider, card.intent)
+
+        assertEquals(card, result)
+    }
+
+    @Test
+    fun getProviderCard_InvalidProviderProvided_ReturnNull() = runTest {
+        val result = loyaltyCardRepository.getProviderCard(LoyaltyCardProviderType.CATIMA, "")
+
+        assertNull(result)
+    }
+
+    private suspend fun getLocation(): Location =
+        get<LocationRepository>().getAll().first { it.type == LocationType.SHOP }
+
+    @Test
+    fun addToLocation_ValidLocationAndCard_CardAddedToLocation() = runTest {
+        val cardId = addSingleItem()
+        val location = getLocation()
+
+        loyaltyCardRepository.addToLocation(location.id, cardId)
+
+        val result = loyaltyCardRepository.getForLocation(location.id)
+        assertNotNull(result)
+        assertEquals(cardId, result.id)
+    }
+
+    @Test
+    fun removeFromLocation_ValidLocationAndCard_CardRemovedFromLocation() = runTest {
+        val cardId = addSingleItem()
+        val location = getLocation()
+        loyaltyCardRepository.addToLocation(location.id, cardId)
+
+        loyaltyCardRepository.removeFromLocation(location.id, cardId)
+
+        val result = loyaltyCardRepository.getForLocation(location.id)
+        assertNull(result)
     }
 }

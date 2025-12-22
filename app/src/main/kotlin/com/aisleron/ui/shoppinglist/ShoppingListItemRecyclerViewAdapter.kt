@@ -45,7 +45,8 @@ import com.aisleron.databinding.FragmentAisleListItemBinding
 import com.aisleron.databinding.FragmentEmptyListItemBinding
 import com.aisleron.databinding.FragmentProductListItemBinding
 import com.aisleron.domain.FilterType
-import com.aisleron.ui.settings.ShoppingListPreferences
+import com.aisleron.domain.product.TrackingMode
+import java.text.DecimalFormat
 import java.util.Collections
 
 /**
@@ -54,7 +55,8 @@ import java.util.Collections
  */
 class ShoppingListItemRecyclerViewAdapter(
     private val listener: ShoppingListItemListener,
-    private val trackingMode: ShoppingListPreferences.TrackingMode,
+    private val defaultTrackingMode: TrackingMode,
+    private val defaultUnitOfMeasure: String,
     private val listFilter: FilterType
 ) : ListAdapter<ShoppingListItem, ViewHolder>(ShoppingListItemDiffCallback()),
     ShoppingListItemMoveCallbackListener.Listener {
@@ -227,11 +229,16 @@ class ShoppingListItemRecyclerViewAdapter(
         private var qtyWatcher: TextWatcher? = null
 
         fun bind(item: ProductShoppingListItem) {
+            val trackingMode = when (item.trackingMode) {
+                TrackingMode.DEFAULT -> defaultTrackingMode
+                else -> item.trackingMode
+            }
+
             contentView.text = item.name
             inStockView.isChecked = item.inStock
             inStockView.isVisible = trackingMode in setOf(
-                ShoppingListPreferences.TrackingMode.CHECKBOX,
-                ShoppingListPreferences.TrackingMode.CHECKBOX_QUANTITY
+                TrackingMode.CHECKBOX,
+                TrackingMode.CHECKBOX_QUANTITY
             ) || (listFilter == FilterType.ALL)
 
             inStockView.setOnClickListener { _ ->
@@ -246,25 +253,27 @@ class ShoppingListItemRecyclerViewAdapter(
                 qtyWatcher = null
             }
 
-            qtyEdit.setText(item.qtyNeeded.toString())
+            qtyEdit.setText(formatQty(item.qtyNeeded))
             qtyEdit.setSelection(qtyEdit.text?.length ?: 0)
+            qtyEdit.hint = item.unitOfMeasure.ifEmpty { defaultUnitOfMeasure }
+
+            val qtyIncrement = if (item.qtyIncrement > 0) item.qtyIncrement else 1.0
 
             // Add a new watcher and keep reference
             qtyWatcher = qtyEdit.doAfterTextChanged { editable ->
-                val newQty = editable?.toString()?.toIntOrNull()
+                val newQty = editable?.toString()?.toDoubleOrNull() ?: 0.0
                 listener.onProductQuantityChange(item, newQty)
             }
 
             qtySelector.isVisible = trackingMode in setOf(
-                ShoppingListPreferences.TrackingMode.QUANTITY,
-                ShoppingListPreferences.TrackingMode.CHECKBOX_QUANTITY
+                TrackingMode.QUANTITY,
+                TrackingMode.CHECKBOX_QUANTITY
             )
 
             decQtyButton.setOnClickListener {
-                val newQty = (qtyEdit.text.toString().toIntOrNull() ?: 0).dec()
-                if (newQty >= 0) {
-                    qtyEdit.setText(newQty.toString())
-                }
+                val currentQty = (qtyEdit.text.toString().toDoubleOrNull() ?: 0.0)
+                val newQty = maxOf(currentQty - qtyIncrement, 0.0)
+                qtyEdit.setText(formatQty(newQty))
             }
 
             incQtyButton.setOnClickListener {
@@ -273,23 +282,30 @@ class ShoppingListItemRecyclerViewAdapter(
                     .firstOrNull()
                     ?.max ?: Int.MAX_VALUE
 
-                val newQty = ((qtyEdit.text.toString().toIntOrNull() ?: 0).inc())
-                if (newQty.toString().length <= maxLength) {
-                    qtyEdit.setText(newQty.toString())
+                val currentQty = (qtyEdit.text.toString().toDoubleOrNull() ?: 0.0)
+                val newQty = currentQty + qtyIncrement
+                val formattedQty = formatQty(newQty)
+
+                if (formattedQty.length <= maxLength) {
+                    qtyEdit.setText(formattedQty)
                 }
             }
         }
+
+        private fun formatQty(qty: Double): String =
+            if (qty > 0.0)
+                DecimalFormat("0.###").format(qty)
+            else
+                ""
     }
 
-    inner class EmptyListItemViewHolder(binding: FragmentEmptyListItemBinding) :
-        ViewHolder(binding.root) {
-
-    }
+    class EmptyListItemViewHolder(binding: FragmentEmptyListItemBinding) :
+        ViewHolder(binding.root)
 
     interface ShoppingListItemListener {
         fun onClick(item: ShoppingListItem)
         fun onProductStatusChange(item: ProductShoppingListItem, inStock: Boolean)
-        fun onProductQuantityChange(item: ProductShoppingListItem, quantity: Int?)
+        fun onProductQuantityChange(item: ProductShoppingListItem, quantity: Double?)
         fun onListPositionChanged(item: ShoppingListItem, precedingItem: ShoppingListItem?)
         fun onLongClick(item: ShoppingListItem, view: View): Boolean
         fun onMoved(item: ShoppingListItem)

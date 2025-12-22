@@ -23,6 +23,7 @@ import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
+import com.aisleron.domain.product.TrackingMode
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions
@@ -71,8 +72,11 @@ class AddProductUseCaseTest {
             id = 0,
             name = "New Product 1",
             inStock = false,
-            qtyNeeded = 0,
-            noteId = null
+            qtyNeeded = 0.0,
+            noteId = null,
+            qtyIncrement = 1.0,
+            trackingMode = TrackingMode.DEFAULT,
+            unitOfMeasure = "Qty"
         )
     }
 

@@ -48,6 +48,7 @@ import com.aisleron.domain.loyaltycard.LoyaltyCardRepository
 import com.aisleron.domain.loyaltycard.usecase.GetLoyaltyCardForLocationUseCase
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
+import com.aisleron.domain.product.TrackingMode
 import com.aisleron.domain.product.usecase.RemoveProductUseCase
 import com.aisleron.domain.product.usecase.UpdateProductQtyNeededUseCase
 import com.aisleron.domain.product.usecase.UpdateProductStatusUseCase
@@ -660,7 +661,9 @@ class ShoppingListViewModelTest : KoinTest {
         assertEquals(uiStateBefore, uiStateAfter)
     }
 
-    private suspend fun updateProductNeededQuantityArrangeAct(qtyInitial: Int, qtyNew: Int?): Int {
+    private suspend fun updateProductNeededQuantityArrangeAct(
+        qtyInitial: Double, qtyNew: Double?
+    ): Int {
         val shoppingList = getShoppingList()
         val existingAisle =
             shoppingList.aisles.first { it.products.count { p -> !p.product.inStock } > 0 }
@@ -679,8 +682,8 @@ class ShoppingListViewModelTest : KoinTest {
 
     @Test
     fun updateProductNeededQuantity_ValidQty_ProductQtyNeededUpdated() = runTest {
-        val qtyInitial = 5
-        val qtyNew = 10
+        val qtyInitial = 5.0
+        val qtyNew = 10.0
         val productId = updateProductNeededQuantityArrangeAct(qtyInitial, qtyNew)
         val updatedProduct = get<ProductRepository>().get(productId)
         Assert.assertEquals(qtyNew, updatedProduct?.qtyNeeded)
@@ -688,15 +691,15 @@ class ShoppingListViewModelTest : KoinTest {
 
     @Test
     fun updateProductNeededQuantity_NegativeQty_UiStateIsError() = runTest {
-        val qtyInitial = 5
-        val qtyNew = -1
+        val qtyInitial = 5.0
+        val qtyNew = -1.0
         updateProductNeededQuantityArrangeAct(qtyInitial, qtyNew)
         Assert.assertTrue(shoppingListViewModel.shoppingListUiState.value is ShoppingListViewModel.ShoppingListUiState.Error)
     }
 
     @Test
     fun updateProductNeededQuantity_QtyIsNull_QtyNotUpdated() = runTest {
-        val qtyInitial = 5
+        val qtyInitial = 5.0
         val qtyNew = null
         val productId = updateProductNeededQuantityArrangeAct(qtyInitial, qtyNew)
         val updatedProduct = get<ProductRepository>().get(productId)
@@ -769,7 +772,10 @@ class ShoppingListViewModelTest : KoinTest {
         aisleId = aisle.id,
         aisleProductId = aisleProduct.id,
         updateAisleProductRankUseCase = get<UpdateAisleProductRankUseCase>(),
-        removeProductUseCase = get<RemoveProductUseCase>()
+        removeProductUseCase = get<RemoveProductUseCase>(),
+        qtyIncrement = 1.0,
+        trackingMode = TrackingMode.DEFAULT,
+        unitOfMeasure = "Qty"
     )
 
     private fun getAisleShoppingListItemViewModel(aisle: Aisle): AisleShoppingListItemViewModel =

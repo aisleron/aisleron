@@ -159,4 +159,7 @@
     <string name="updated_notification">Aisleron был обновлен с %1$s до %2$s.</string>
     <string name="pure_black_style">Стиль «чистый черный»</string>
     <string name="aisle_picker">Выбор отдела</string>
+    <string name="tracking_default">По умолчанию</string>
+    <string name="qty_increments">Шаги количества</string>
+    <string name="unit_of_measure">Единица измерения</string>
 </resources>

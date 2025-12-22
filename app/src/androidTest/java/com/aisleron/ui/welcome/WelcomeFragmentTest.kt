@@ -57,6 +57,7 @@ import com.aisleron.domain.aisle.AisleRepository
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
+import com.aisleron.domain.product.TrackingMode
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import com.aisleron.ui.FabHandlerTestImpl
 import com.aisleron.ui.settings.WelcomePreferencesTestImpl
@@ -248,8 +249,11 @@ class WelcomeFragmentTest : KoinTest {
                     id = 0,
                     name = "Welcome Page Sample Items Error Test",
                     inStock = false,
-                    qtyNeeded = 0,
-                    noteId = null
+                    qtyNeeded = 0.0,
+                    noteId = null,
+                    qtyIncrement = 1.0,
+                    trackingMode = TrackingMode.DEFAULT,
+                    unitOfMeasure = "Qty"
                 )
             )
         }

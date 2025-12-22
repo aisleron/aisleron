@@ -19,6 +19,7 @@ package com.aisleron.ui.product
 
 import android.content.Context
 import android.os.Bundle
+import androidx.annotation.StringRes
 import androidx.appcompat.view.menu.ActionMenuItem
 import androidx.fragment.app.testing.FragmentScenario
 import androidx.fragment.app.testing.launchFragmentInContainer
@@ -408,6 +409,10 @@ class ProductFragmentTest : KoinTest {
         assertEquals(note.id, updatedProduct?.noteId)
     }
 
+    private fun switchToExtrasTab(@StringRes tabNameResId: Int) {
+        onView(withText(tabNameResId)).perform(click())
+    }
+
     @Test
     fun onExtraOptions_onTabSelection_AddShopFabShowsCorrectly() = runTest {
         val preferences = getShowExtraOptionsPreference(true)
@@ -416,11 +421,11 @@ class ProductFragmentTest : KoinTest {
         getFragmentScenario(bundle, preferences)
 
         // Fab is hidden on notes tab
-        onView(withText(R.string.tab_notes)).perform(click())
+        switchToExtrasTab(R.string.tab_notes)
         assertEquals(0, fabHandler.getFabItems().size)
 
         // Fab is displayed when switching to the Aisle tab
-        onView(withText(R.string.product_tab_aisles)).perform(click())
+        switchToExtrasTab(R.string.product_tab_aisles)
         assertEquals(1, fabHandler.getFabItems().size)
         assertEquals(FabHandler.FabOption.ADD_SHOP, fabHandler.getFabItems().first())
 
@@ -434,7 +439,14 @@ class ProductFragmentTest : KoinTest {
         assertEquals(FabHandler.FabOption.ADD_SHOP, fabHandler.getFabItems().first())
 
         // Fab is hidden again when switching back to notes tab
-        onView(withText(R.string.tab_notes)).perform(click())
+        switchToExtrasTab(R.string.tab_notes)
+        assertEquals(0, fabHandler.getFabItems().size)
+
+        //Fab is hidden when switching to the inventory tab
+        switchToExtrasTab(R.string.product_tab_aisles)
+        assertEquals(1, fabHandler.getFabItems().size)
+
+        switchToExtrasTab(R.string.product_tab_inventory)
         assertEquals(0, fabHandler.getFabItems().size)
     }
 

@@ -20,6 +20,7 @@ package com.aisleron.ui.shoppinglist
 import com.aisleron.domain.aisleproduct.AisleProduct
 import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductRankUseCase
 import com.aisleron.domain.product.Product
+import com.aisleron.domain.product.TrackingMode
 import com.aisleron.domain.product.usecase.RemoveProductUseCase
 
 data class ProductShoppingListItemViewModel(
@@ -29,9 +30,12 @@ data class ProductShoppingListItemViewModel(
     override val name: String,
     override val aisleId: Int,
     override val inStock: Boolean,
-    override val qtyNeeded: Int,
+    override val qtyNeeded: Double,
     override val noteId: Int?,
     private val aisleProductId: Int,
+    override val qtyIncrement: Double,
+    override val unitOfMeasure: String,
+    override val trackingMode: TrackingMode,
     private val updateAisleProductRankUseCase: UpdateAisleProductRankUseCase,
     private val removeProductUseCase: RemoveProductUseCase,
 ) : ProductShoppingListItem, ShoppingListItemViewModel {
@@ -51,7 +55,10 @@ data class ProductShoppingListItemViewModel(
                     name = name,
                     inStock = inStock,
                     qtyNeeded = qtyNeeded,
-                    noteId = noteId
+                    noteId = noteId,
+                    qtyIncrement = qtyIncrement,
+                    unitOfMeasure = unitOfMeasure,
+                    trackingMode = trackingMode
                 )
             )
         )

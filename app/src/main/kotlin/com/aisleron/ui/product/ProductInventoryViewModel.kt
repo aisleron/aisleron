@@ -15,16 +15,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.ui.shoppinglist
+package com.aisleron.ui.product
 
-interface ProductShoppingListItem : ShoppingListItem {
-    val inStock: Boolean
-    val qtyNeeded: Double
-    val noteId: Int?
+import com.aisleron.domain.product.TrackingMode
+import kotlinx.coroutines.flow.StateFlow
+
+interface ProductInventoryViewModel {
+    fun updateQtyIncrement(newIncrement: Double)
+    fun updateUnitOfMeasure(newUom: String)
+    fun updateTrackingMode(selectedMode: TrackingMode)
+
+    val uiData: StateFlow<ProductInventoryUiData>
+}
+
+interface ProductInventoryUiData {
     val qtyIncrement: Double
     val unitOfMeasure: String
-    val trackingMode: Any
-
-    override val itemType: ShoppingListItem.ItemType
-        get() = ShoppingListItem.ItemType.PRODUCT
+    val trackingMode: TrackingMode
 }

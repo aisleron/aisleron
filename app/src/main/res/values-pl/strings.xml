@@ -159,4 +159,7 @@
     <string name="updated_notification">Aisleron został zaktualizowany z %1$s do %2$s.</string>
     <string name="pure_black_style">Styl czystej czerni</string>
     <string name="aisle_picker">Wybór alejki</string>
+    <string name="tracking_default">Domyślny</string>
+    <string name="qty_increments">Przyrosty ilości</string>
+    <string name="unit_of_measure">Jednostka miary</string>
 </resources>

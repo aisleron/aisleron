@@ -15,16 +15,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.ui.shoppinglist
+package com.aisleron.domain.product
 
-interface ProductShoppingListItem : ShoppingListItem {
-    val inStock: Boolean
-    val qtyNeeded: Double
-    val noteId: Int?
-    val qtyIncrement: Double
-    val unitOfMeasure: String
-    val trackingMode: Any
+enum class TrackingMode(val value: String) {
+    CHECKBOX("checkbox"),
+    QUANTITY("quantity"),
+    CHECKBOX_QUANTITY("checkbox_quantity"),
+    NONE("none"),
+    DEFAULT("default");
 
-    override val itemType: ShoppingListItem.ItemType
-        get() = ShoppingListItem.ItemType.PRODUCT
+    // TrackingMode needs to be aligned with the tracking_method_values array
+    companion object {
+        fun fromValue(value: String?): TrackingMode {
+            return entries.find { it.value == value } ?: DEFAULT
+        }
+    }
 }

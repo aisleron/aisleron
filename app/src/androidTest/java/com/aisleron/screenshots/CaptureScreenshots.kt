@@ -742,7 +742,7 @@ class CaptureScreenshots : KoinTest {
         }
     }
 
-    private suspend fun setProductQuantity(productName: String, qty: Int) {
+    private suspend fun setProductQuantity(productName: String, qty: Double) {
         get<ProductRepository>().getByName(productName)?.let {
             get<UpdateProductQtyNeededUseCase>().invoke(it.id, qty)
         }
@@ -751,7 +751,7 @@ class CaptureScreenshots : KoinTest {
     @Test
     fun screenshot_QtyProduct() = runTest {
         SharedPreferencesInitializer().setTrackingMode(SharedPreferencesInitializer.TrackingMode.QUANTITY)
-        setProductQuantity("Bread", 2)
+        setProductQuantity("Bread", 2.0)
         getActivityScenario().use {
             Screengrab.screenshot("alr-340-qty-product")
         }
@@ -760,7 +760,7 @@ class CaptureScreenshots : KoinTest {
     @Test
     fun screenshot_QtyChkProduct() = runTest {
         SharedPreferencesInitializer().setTrackingMode(SharedPreferencesInitializer.TrackingMode.CHECKBOX_QUANTITY)
-        setProductQuantity("Butter", 4)
+        setProductQuantity("Butter", 4.0)
         getActivityScenario().use {
             navigateToPinnedShop(saveBigSuper)
             Screengrab.screenshot("alr-350-qty-chk-product")

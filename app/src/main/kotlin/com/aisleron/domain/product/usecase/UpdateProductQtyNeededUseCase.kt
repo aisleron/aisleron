@@ -20,14 +20,14 @@ package com.aisleron.domain.product.usecase
 import com.aisleron.domain.product.Product
 
 interface UpdateProductQtyNeededUseCase {
-    suspend operator fun invoke(id: Int, quantity: Int): Product?
+    suspend operator fun invoke(id: Int, quantity: Double): Product?
 }
 
 class UpdateProductQtyNeededUseCaseImpl(
     private val getProductUseCase: GetProductUseCase,
     private val updateProductUseCase: UpdateProductUseCase
 ) : UpdateProductQtyNeededUseCase {
-    override suspend operator fun invoke(id: Int, quantity: Int): Product? {
+    override suspend operator fun invoke(id: Int, quantity: Double): Product? {
         require(quantity >= 0)
 
         val product = getProductUseCase(id)?.copy(qtyNeeded = quantity)

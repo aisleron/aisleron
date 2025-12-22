@@ -17,8 +17,13 @@
 
 package com.aisleron.ui.product
 
+import com.aisleron.domain.product.TrackingMode
+
 data class ProductUiData(
     val productName: String = "",
     val inStock: Boolean = false,
-    val noteText: String = ""
-)
+    val noteText: String = "",
+    override val qtyIncrement: Double = 1.0,
+    override val unitOfMeasure: String = "",
+    override val trackingMode: TrackingMode = TrackingMode.DEFAULT
+) : ProductInventoryUiData

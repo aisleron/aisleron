@@ -7,6 +7,7 @@ import com.aisleron.domain.aisle.usecase.AddAisleUseCaseImpl
 import com.aisleron.domain.aisle.usecase.IsAisleNameUniqueUseCase
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.product.Product
+import com.aisleron.domain.product.TrackingMode
 import com.aisleron.domain.product.usecase.AddProductUseCase
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -68,8 +69,11 @@ class SortLocationByNameUseCaseImplTest {
             id = 0,
             name = "ZZZ",
             inStock = false,
-            qtyNeeded = 0,
-            noteId = null
+            qtyNeeded = 0.0,
+            noteId = null,
+            qtyIncrement = 1.0,
+            trackingMode = TrackingMode.DEFAULT,
+            unitOfMeasure = "Qty"
         )
 
         addProductUseCase(product)

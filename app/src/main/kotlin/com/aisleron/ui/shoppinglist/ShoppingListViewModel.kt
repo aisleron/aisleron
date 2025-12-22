@@ -169,7 +169,10 @@ class ShoppingListViewModel(
                                     aisleId = ap.aisleId,
                                     aisleProductId = ap.id,
                                     removeProductUseCase = removeProductUseCase,
-                                    updateAisleProductRankUseCase = updateAisleProductRankUseCase
+                                    updateAisleProductRankUseCase = updateAisleProductRankUseCase,
+                                    qtyIncrement = ap.product.qtyIncrement,
+                                    unitOfMeasure = ap.product.unitOfMeasure,
+                                    trackingMode = ap.product.trackingMode
                                 )
                             }
             }
@@ -232,7 +235,7 @@ class ShoppingListViewModel(
         }
     }
 
-    fun updateProductNeededQuantity(item: ProductShoppingListItem, quantity: Int?) {
+    fun updateProductNeededQuantity(item: ProductShoppingListItem, quantity: Double?) {
         updateQtyJob?.cancel()
         updateQtyJob = coroutineScope.launchHandling {
             delay(debounceTime)

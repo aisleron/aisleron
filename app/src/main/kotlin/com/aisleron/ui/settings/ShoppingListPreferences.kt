@@ -18,6 +18,7 @@
 package com.aisleron.ui.settings
 
 import android.content.Context
+import com.aisleron.domain.product.TrackingMode
 
 interface ShoppingListPreferences {
     fun isStatusChangeSnackBarHidden(context: Context): Boolean
@@ -26,10 +27,4 @@ interface ShoppingListPreferences {
     fun trackingMode(context: Context): TrackingMode
     fun keepScreenOn(context: Context): Boolean
 
-    enum class TrackingMode {
-        CHECKBOX,
-        QUANTITY,
-        CHECKBOX_QUANTITY,
-        NONE
-    }
 }

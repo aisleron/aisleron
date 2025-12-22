@@ -71,7 +71,6 @@ class DatabaseMigrationTest {
         productValues.put("inStock", true)
 
         db.insert("Product", android.database.sqlite.SQLiteDatabase.CONFLICT_FAIL, productValues)
-
     }
 
     @Test
@@ -171,6 +170,56 @@ class DatabaseMigrationTest {
         }
     }
 
+    private fun populateV5Database(db: SupportSQLiteDatabase) {
+        populateV1Database(db)
+
+        val productValues = ContentValues().apply {
+            put("qtyNeeded", 10)
+        }
+
+        db.update(
+            "Product",
+            android.database.sqlite.SQLiteDatabase.CONFLICT_FAIL,
+            productValues,
+            "name = ?",
+            arrayOf("Migration Test Product")
+        )
+    }
+
+    @Test
+    @Throws(IOException::class)
+    fun migrate5to6() {
+        helper.createDatabase(testDb, 5).apply {
+            populateV5Database(this)
+            close()
+        }
+
+        val db = helper.runMigrationsAndValidate(testDb, 6, true)
+
+        db.apply {
+            // Check noteId exists on Product
+            val queryProduct = SupportSQLiteQueryBuilder.builder("Product")
+            val cursorProduct: Cursor = query(queryProduct.create())
+            cursorProduct.moveToFirst()
+
+            val qtyNeeded = cursorProduct.getDouble(cursorProduct.getColumnIndex("qtyNeeded"))
+            assertNotNull(qtyNeeded)
+
+            val qtyIncrement = cursorProduct.getDouble(cursorProduct.getColumnIndex("qtyIncrement"))
+            assertEquals(1.0, qtyIncrement)
+
+            val unitOfMeasure = cursorProduct.getString(cursorProduct.getColumnIndex("unitOfMeasure"))
+            assertEquals("", unitOfMeasure)
+
+            val trackingMode = cursorProduct.getString(cursorProduct.getColumnIndex("trackingMode"))
+            assertNull(trackingMode)
+
+            cursorProduct.close()
+
+            close()
+        }
+    }
+
     @Test
     @Throws(IOException::class)
     fun migrateAll() {
@@ -191,8 +240,8 @@ class DatabaseMigrationTest {
 
         val product = runBlocking { db.productDao().getProducts().first() }
 
-        // Product.qtyNeeded introduced in V4
-        assertEquals(0, product.qtyNeeded)
+        // Product.qtyNeeded introduced in V4, updated to Double in V6
+        assertEquals(0.0, product.qtyNeeded)
 
         // Product.noteId introduced in V5
         assertNull(product.noteId)
@@ -200,6 +249,9 @@ class DatabaseMigrationTest {
         // Note introduced in V5
         val notes = runBlocking { db.noteDao().getNotes() }
         assertNotNull(notes)
+
+        // Product.qtyIncrement introduced in V6
+        assertEquals(1.0, product.qtyIncrement)
 
         db.close()
     }
