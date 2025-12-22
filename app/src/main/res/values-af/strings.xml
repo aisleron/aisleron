@@ -167,4 +167,7 @@
     <string name="updated_notification">Aisleron is opgedateer van %1$s na %2$s.</string>
     <string name="pure_black_style">Suiwer Swart styl</string>
     <string name="aisle_picker">Gangkieser</string>
+    <string name="tracking_default">Verstek</string>
+    <string name="qty_increments">Hoeveelheidsverhogings</string>
+    <string name="unit_of_measure">Maatstafeenheid</string>
 </resources>

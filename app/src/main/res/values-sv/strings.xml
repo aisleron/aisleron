@@ -159,4 +159,7 @@
     <string name="updated_notification">Aisleron uppdaterades från %1$s till %2$s.</string>
     <string name="pure_black_style">Ren svart stil</string>
     <string name="aisle_picker">Välj gång</string>
+    <string name="tracking_default">Standard</string>
+    <string name="qty_increments">Kvantitetssteg</string>
+    <string name="unit_of_measure">Måttenhet</string>
 </resources>

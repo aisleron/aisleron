@@ -159,4 +159,7 @@
     <string name="pure_black_first_class">Prima classe</string>
     <string name="pure_black_style">Stile nero puro</string>
     <string name="aisle_picker">Seleziona corsia</string>
+    <string name="tracking_default">Predefinito</string>
+    <string name="qty_increments">Incrementi quantità</string>
+    <string name="unit_of_measure">Unità di misura</string>
 </resources>

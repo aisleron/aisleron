@@ -144,6 +144,9 @@
     <string name="decrement">Decrementar</string>
     <string name="increment">Incrementar</string>
     <string name="qty">Cant.</string>
+    <string name="tracking_default">Predeterminado</string>
+    <string name="qty_increments">Incrementos de cantidad</string>
+    <string name="unit_of_measure">Unidad de medida</string>
     <string name="expand_collapse_aisles">Expandir/contraer pasillos</string>
     <string name="extra_options">Opciones adicionales</string>
     <string name="tab_notes">Notas</string>

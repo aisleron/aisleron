@@ -159,4 +159,7 @@
     <string name="updated_notification">Aisleron a été mis à jour de %1$s à %2$s.</string>
     <string name="pure_black_style">Style noir pur</string>
     <string name="aisle_picker">Sélecteur d\'allée</string>
+    <string name="tracking_default">Par défaut</string>
+    <string name="qty_increments">Incréments de quantité</string>
+    <string name="unit_of_measure">Unité de mesure</string>
 </resources>
