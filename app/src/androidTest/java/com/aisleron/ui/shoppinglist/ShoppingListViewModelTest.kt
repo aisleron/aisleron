@@ -48,6 +48,7 @@ import com.aisleron.domain.loyaltycard.LoyaltyCardRepository
 import com.aisleron.domain.loyaltycard.usecase.GetLoyaltyCardForLocationUseCase
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
+import com.aisleron.domain.product.TrackingMode
 import com.aisleron.domain.product.usecase.RemoveProductUseCase
 import com.aisleron.domain.product.usecase.UpdateProductQtyNeededUseCase
 import com.aisleron.domain.product.usecase.UpdateProductStatusUseCase
@@ -771,7 +772,10 @@ class ShoppingListViewModelTest : KoinTest {
         aisleId = aisle.id,
         aisleProductId = aisleProduct.id,
         updateAisleProductRankUseCase = get<UpdateAisleProductRankUseCase>(),
-        removeProductUseCase = get<RemoveProductUseCase>()
+        removeProductUseCase = get<RemoveProductUseCase>(),
+        qtyIncrement = 1.0,
+        trackingMode = TrackingMode.DEFAULT,
+        unitOfMeasure = "Qty"
     )
 
     private fun getAisleShoppingListItemViewModel(aisle: Aisle): AisleShoppingListItemViewModel =

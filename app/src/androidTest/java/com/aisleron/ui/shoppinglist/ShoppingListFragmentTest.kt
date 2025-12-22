@@ -54,6 +54,7 @@ import androidx.test.espresso.matcher.ViewMatchers.isDescendantOfA
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.isSelected
 import androidx.test.espresso.matcher.ViewMatchers.withClassName
+import androidx.test.espresso.matcher.ViewMatchers.withHint
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
@@ -77,6 +78,7 @@ import com.aisleron.domain.loyaltycard.LoyaltyCardProviderType
 import com.aisleron.domain.loyaltycard.LoyaltyCardRepository
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
+import com.aisleron.domain.product.TrackingMode
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import com.aisleron.ui.ApplicationTitleUpdateListenerTestImpl
 import com.aisleron.ui.FabHandler
@@ -88,7 +90,6 @@ import com.aisleron.ui.bundles.AddEditProductBundle
 import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.loyaltycard.LoyaltyCardProvider
 import com.aisleron.ui.loyaltycard.LoyaltyCardProviderTestImpl
-import com.aisleron.ui.settings.ShoppingListPreferences
 import com.aisleron.ui.settings.ShoppingListPreferencesTestImpl
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -1175,7 +1176,7 @@ class ShoppingListFragmentTest : KoinTest {
             .check(doesNotExist())
     }
 
-    private suspend fun onCreateView_TrackingMode_ArrangeAct(trackingMode: ShoppingListPreferences.TrackingMode): Product {
+    private suspend fun onCreateView_TrackingMode_ArrangeAct(trackingMode: TrackingMode): Product {
         val shoppingListPrefs = ShoppingListPreferencesTestImpl()
         shoppingListPrefs.setTrackingMode(trackingMode)
         val shoppingList = getShoppingList()
@@ -1190,7 +1191,7 @@ class ShoppingListFragmentTest : KoinTest {
     @Test
     fun onCreateView_TrackingModeIsCheckbox_OnlyCheckBoxShown() = runTest {
         val product =
-            onCreateView_TrackingMode_ArrangeAct(ShoppingListPreferences.TrackingMode.CHECKBOX)
+            onCreateView_TrackingMode_ArrangeAct(TrackingMode.CHECKBOX)
 
         getCheckboxForProduct(product).check(matches(isDisplayed()))
         getQtyStepperForProduct(product).check(matches(not(isDisplayed())))
@@ -1199,7 +1200,7 @@ class ShoppingListFragmentTest : KoinTest {
     @Test
     fun onCreateView_TrackingModeIsNone_NothingShown() = runTest {
         val product =
-            onCreateView_TrackingMode_ArrangeAct(ShoppingListPreferences.TrackingMode.NONE)
+            onCreateView_TrackingMode_ArrangeAct(TrackingMode.NONE)
 
         getCheckboxForProduct(product).check(matches(not(isDisplayed())))
         getQtyStepperForProduct(product).check(matches(not(isDisplayed())))
@@ -1208,7 +1209,7 @@ class ShoppingListFragmentTest : KoinTest {
     @Test
     fun onCreateView_TrackingModeIsQuantity_QuantityShown() = runTest {
         val product =
-            onCreateView_TrackingMode_ArrangeAct(ShoppingListPreferences.TrackingMode.QUANTITY)
+            onCreateView_TrackingMode_ArrangeAct(TrackingMode.QUANTITY)
 
         getCheckboxForProduct(product).check(matches(not(isDisplayed())))
         getQtyStepperForProduct(product).check(matches(isDisplayed()))
@@ -1217,7 +1218,7 @@ class ShoppingListFragmentTest : KoinTest {
     @Test
     fun onCreateView_TrackingModeIsCheckboxQuantity_CheckboxAndQuantityShown() = runTest {
         val product =
-            onCreateView_TrackingMode_ArrangeAct(ShoppingListPreferences.TrackingMode.CHECKBOX_QUANTITY)
+            onCreateView_TrackingMode_ArrangeAct(TrackingMode.CHECKBOX_QUANTITY)
 
         getCheckboxForProduct(product).check(matches(isDisplayed()))
         getQtyStepperForProduct(product).check(matches(isDisplayed()))
@@ -1254,16 +1255,21 @@ class ShoppingListFragmentTest : KoinTest {
             )
         )
 
-    private suspend fun onProductQuantityChange_Arrange(initialQty: Double): Product {
+    private suspend fun onProductQuantityChange_Arrange(
+        initialQty: Double, increment: Double = 1.0
+    ): Product {
         val shoppingListPrefs = ShoppingListPreferencesTestImpl()
-        shoppingListPrefs.setTrackingMode(ShoppingListPreferences.TrackingMode.QUANTITY)
+        shoppingListPrefs.setTrackingMode(TrackingMode.QUANTITY)
         val shoppingList = getShoppingList()
+
+        val product = getProduct(shoppingList, false).copy(qtyIncrement = increment)
+        get<ProductRepository>().update(product)
+
         val shoppingListBundle =
             bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
 
         getFragmentScenario(shoppingListBundle, shoppingListPrefs)
 
-        val product = getProduct(shoppingList, false)
 
         val edtQty = getQtyStepperComponentForProduct(product, R.id.edt_qty)
         edtQty.perform(clearText())
@@ -1312,7 +1318,37 @@ class ShoppingListFragmentTest : KoinTest {
         btnDecQty.perform(click())
 
         val edtQty = getQtyStepperComponentForProduct(product, R.id.edt_qty)
-        val expected = formatQty(0.0)
+        edtQty.check(matches(withText("")))
+
+        val updatedProduct = get<ProductRepository>().get(product.id)
+        assertEquals(0.0, updatedProduct?.qtyNeeded)
+    }
+
+    @Test
+    fun onProductQuantityChange_decQtyButtonClickedAndProductHasQtyInc_qtyDecreased() = runTest {
+        val initialQty = 5.0
+        val qtyIncrement = 0.75
+        val product = onProductQuantityChange_Arrange(initialQty, qtyIncrement)
+
+        val btnDecQty = getQtyStepperComponentForProduct(product, R.id.btn_qty_dec)
+        btnDecQty.perform(click())
+
+        val edtQty = getQtyStepperComponentForProduct(product, R.id.edt_qty)
+        val expected = formatQty(initialQty - qtyIncrement)
+        edtQty.check(matches(withText(expected)))
+    }
+
+    @Test
+    fun onProductQuantityChange_incQtyButtonClickedAndProductHasQtyInc_qtyIncreased() = runTest {
+        val initialQty = 5.0
+        val qtyIncrement = 0.75
+        val product = onProductQuantityChange_Arrange(initialQty, qtyIncrement)
+
+        val btnIncQty = getQtyStepperComponentForProduct(product, R.id.btn_qty_inc)
+        btnIncQty.perform(click())
+
+        val edtQty = getQtyStepperComponentForProduct(product, R.id.edt_qty)
+        val expected = formatQty(initialQty + qtyIncrement)
         edtQty.check(matches(withText(expected)))
     }
 
@@ -1343,7 +1379,7 @@ class ShoppingListFragmentTest : KoinTest {
     }
 
     @Test
-    fun onProductQuantityChange_qtyEditCleared_ProductQuantityNotUpdated() = runTest {
+    fun onProductQuantityChange_qtyEditCleared_ProductQuantitySetToZero() = runTest {
         val initialQty = 5.0
         val product = onProductQuantityChange_Arrange(initialQty)
 
@@ -1351,7 +1387,7 @@ class ShoppingListFragmentTest : KoinTest {
         edtQty.perform(clearText())
 
         val updatedProduct = get<ProductRepository>().get(product.id)
-        assertEquals(initialQty, updatedProduct?.qtyNeeded)
+        assertEquals(0.0, updatedProduct?.qtyNeeded)
     }
 
     @Test
@@ -1555,5 +1591,87 @@ class ShoppingListFragmentTest : KoinTest {
 
         val updatedAisleProduct = get<AisleProductRepository>().get(aisleProduct.id)
         assertEquals(newAisleId, updatedAisleProduct?.aisleId)
+    }
+
+
+    private suspend fun onCreateView_TrackingModeProduct_ArrangeAct(trackingMode: TrackingMode): Product {
+        val shoppingList = getShoppingList()
+        val product = getProduct(shoppingList, false).copy(trackingMode = trackingMode)
+        get<ProductRepository>().update(product)
+
+        val shoppingListBundle =
+            bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
+
+        getFragmentScenario(shoppingListBundle)
+
+        return product
+    }
+
+    @Test
+    fun onCreateView_TrackingModeIsCheckboxProduct_OnlyCheckBoxShown() = runTest {
+        val product =
+            onCreateView_TrackingModeProduct_ArrangeAct(TrackingMode.CHECKBOX)
+
+        getCheckboxForProduct(product).check(matches(isDisplayed()))
+        getQtyStepperForProduct(product).check(matches(not(isDisplayed())))
+    }
+
+    @Test
+    fun onCreateView_TrackingModeIsNoneProduct_NothingShown() = runTest {
+        val product =
+            onCreateView_TrackingModeProduct_ArrangeAct(TrackingMode.NONE)
+
+        getCheckboxForProduct(product).check(matches(not(isDisplayed())))
+        getQtyStepperForProduct(product).check(matches(not(isDisplayed())))
+    }
+
+    @Test
+    fun onCreateView_TrackingModeIsQuantityProduct_QuantityShown() = runTest {
+        val product =
+            onCreateView_TrackingModeProduct_ArrangeAct(TrackingMode.QUANTITY)
+
+        getCheckboxForProduct(product).check(matches(not(isDisplayed())))
+        getQtyStepperForProduct(product).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun onCreateView_TrackingModeIsCheckboxQuantityProduct_CheckboxAndQuantityShown() = runTest {
+        val product =
+            onCreateView_TrackingModeProduct_ArrangeAct(TrackingMode.CHECKBOX_QUANTITY)
+
+        getCheckboxForProduct(product).check(matches(isDisplayed()))
+        getQtyStepperForProduct(product).check(matches(isDisplayed()))
+    }
+
+    private suspend fun qtySetToZero_ArrangeActAssert(unitOfMeasure: String, expectedHint: String) {
+        val shoppingList = getShoppingList()
+        val product = getProduct(shoppingList, false).copy(
+            unitOfMeasure = unitOfMeasure,
+            trackingMode = TrackingMode.QUANTITY
+        )
+
+        get<ProductRepository>().update(product)
+
+        val shoppingListBundle =
+            bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
+
+        getFragmentScenario(shoppingListBundle)
+
+        val edtQty = getQtyStepperComponentForProduct(product, R.id.edt_qty)
+        edtQty.perform(clearText())
+
+        edtQty.check(matches(withHint(expectedHint)))
+    }
+
+    @Test
+    fun onProductQuantityChange_qtySetToZeroAndNoUom_showQtyHint() = runTest {
+        val expectedHint = getInstrumentation().targetContext.getString(R.string.qty)
+        qtySetToZero_ArrangeActAssert("", expectedHint)
+    }
+
+    @Test
+    fun onProductQuantityChange_qtySetToZeroAndUomSet_showUomHint() = runTest {
+        val unitOfMeasure = "kg"
+        qtySetToZero_ArrangeActAssert(unitOfMeasure, unitOfMeasure)
     }
 }

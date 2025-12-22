@@ -169,7 +169,10 @@ class ShoppingListViewModel(
                                     aisleId = ap.aisleId,
                                     aisleProductId = ap.id,
                                     removeProductUseCase = removeProductUseCase,
-                                    updateAisleProductRankUseCase = updateAisleProductRankUseCase
+                                    updateAisleProductRankUseCase = updateAisleProductRankUseCase,
+                                    qtyIncrement = ap.product.qtyIncrement,
+                                    unitOfMeasure = ap.product.unitOfMeasure,
+                                    trackingMode = ap.product.trackingMode
                                 )
                             }
             }

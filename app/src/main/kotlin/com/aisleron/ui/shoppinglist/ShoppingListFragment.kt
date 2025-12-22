@@ -258,6 +258,7 @@ class ShoppingListFragment(
                     },
 
                     shoppingListPreferences.trackingMode(requireContext()),
+                    getString(R.string.qty),
                     shoppingListViewModel.defaultFilter
                 )
 
