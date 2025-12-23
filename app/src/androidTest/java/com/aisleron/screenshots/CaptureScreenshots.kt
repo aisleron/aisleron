@@ -75,6 +75,7 @@ import com.aisleron.domain.loyaltycard.LoyaltyCardProviderType
 import com.aisleron.domain.loyaltycard.usecase.AddLoyaltyCardToLocationUseCase
 import com.aisleron.domain.loyaltycard.usecase.AddLoyaltyCardUseCase
 import com.aisleron.domain.product.ProductRepository
+import com.aisleron.domain.product.TrackingMode
 import com.aisleron.domain.product.usecase.UpdateProductQtyNeededUseCase
 import com.aisleron.domain.product.usecase.UpdateProductStatusUseCase
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
@@ -332,6 +333,30 @@ class CaptureScreenshots : KoinTest {
             Screengrab.screenshot("alr-085-020-product-aisle-picker")
         }
     }
+
+    @Test
+    fun screenshot_ProductInventory() = runTest {
+        val productRepository = get<ProductRepository>()
+        val product = productRepository.getByName("Apples")!!.copy(
+            unitOfMeasure = "kg",
+            trackingMode = TrackingMode.CHECKBOX_QUANTITY,
+            qtyIncrement = 0.5
+        )
+
+        productRepository.update(product)
+
+        getActivityScenario().use {
+            selectShoppingListItem(product.name)
+            clickEditShoppingListItem()
+            Espresso.closeSoftKeyboard()
+            clickProductExtraOptions()
+
+            selectProductExtrasTab(R.string.product_tab_aisles)
+            selectProductExtrasTab(R.string.product_tab_inventory)
+            Screengrab.screenshot("alr-086-010-product-inventory")
+        }
+    }
+
 
     private fun openCabOverflowMenu() {
         onView(
