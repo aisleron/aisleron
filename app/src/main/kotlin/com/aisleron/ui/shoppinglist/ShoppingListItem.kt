@@ -25,6 +25,8 @@ interface ShoppingListItem {
     val aisleId: Int
     val itemType: ItemType
 
+    val selected: Boolean
+
     override fun equals(other: Any?): Boolean
 
     enum class ItemType {

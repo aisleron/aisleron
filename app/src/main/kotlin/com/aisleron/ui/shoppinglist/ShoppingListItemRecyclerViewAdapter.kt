@@ -60,13 +60,6 @@ class ShoppingListItemRecyclerViewAdapter(
     private val listFilter: FilterType
 ) : ListAdapter<ShoppingListItem, ViewHolder>(ShoppingListItemDiffCallback()),
     ShoppingListItemMoveCallbackListener.Listener {
-
-    companion object {
-        const val AISLE_VIEW = 1
-        const val PRODUCT_VIEW = 2
-        const val EMPTY_LIST_VIEW = 3
-    }
-
     private val longClickHandler: Handler = Handler(Looper.getMainLooper())
 
     private var longClicked = false
@@ -86,30 +79,34 @@ class ShoppingListItemRecyclerViewAdapter(
             return oldItem == newItem
         }
 
-        /*        override fun getChangePayload(oldItem: ShoppingListItem, newItem: ShoppingListItem): Any? {
-                    if (oldItem is AisleShoppingListItem && newItem is AisleShoppingListItem) {
-                        return if (oldItem.childCount != newItem.childCount) newItem.childCount else null
-                    }
+        override fun getChangePayload(oldItem: ShoppingListItem, newItem: ShoppingListItem): Any? {
+            val payload = mutableSetOf<String>()
 
-                    return super.getChangePayload(oldItem, newItem)
-                }*/
+            if (oldItem.selected != newItem.selected) {
+                payload.add("SELECTION")
+            }
+
+            return payload.ifEmpty { super.getChangePayload(oldItem, newItem) }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val newViewHolder = when (viewType) {
-            AISLE_VIEW -> AisleViewHolder(
+        val viewItemType = ShoppingListItem.ItemType.entries[viewType]
+
+        val newViewHolder = when (viewItemType) {
+            ShoppingListItem.ItemType.AISLE -> AisleViewHolder(
                 FragmentAisleListItemBinding.inflate(
                     LayoutInflater.from(parent.context), parent, false
                 )
             )
 
-            PRODUCT_VIEW -> ProductListItemViewHolder(
+            ShoppingListItem.ItemType.PRODUCT -> ProductListItemViewHolder(
                 FragmentProductListItemBinding.inflate(
                     LayoutInflater.from(parent.context), parent, false
                 )
             )
 
-            else -> EmptyListItemViewHolder(
+            ShoppingListItem.ItemType.EMPTY_LIST -> EmptyListItemViewHolder(
                 FragmentEmptyListItemBinding.inflate(
                     LayoutInflater.from(parent.context), parent, false
                 )
@@ -118,11 +115,13 @@ class ShoppingListItemRecyclerViewAdapter(
 
         newViewHolder.itemView.setOnLongClickListener { view ->
             listener.onLongClick(getItem(newViewHolder.absoluteAdapterPosition), view)
+
+            // TODO: Investigate the return value here.
             true
         }
 
-        newViewHolder.itemView.setOnClickListener {
-            listener.onClick(getItem(newViewHolder.absoluteAdapterPosition))
+        newViewHolder.itemView.setOnClickListener { view ->
+            listener.onClick(getItem(newViewHolder.absoluteAdapterPosition), view)
         }
         newViewHolder.itemView.setOnTouchListener(shoppingListOnTouchListener(newViewHolder))
 
@@ -167,6 +166,25 @@ class ShoppingListItemRecyclerViewAdapter(
         }
     }
 
+    override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: MutableList<Any>) {
+        if (payloads.isNotEmpty()) {
+            val item = getItem(position)
+
+            // Handle each payload
+            for (payload in payloads) {
+                when (payload) {
+                    is Set<*> -> {
+                        if (payload.contains("SELECTION")) {
+                            holder.itemView.isSelected = item.selected
+                        }
+                    }
+                }
+            }
+        } else {
+            onBindViewHolder(holder, position)
+        }
+    }
+
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         when (val item = getItem(position)) {
             is AisleShoppingListItem -> (holder as AisleViewHolder).bind(item)
@@ -175,19 +193,17 @@ class ShoppingListItemRecyclerViewAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return when (getItem(position).itemType) {
-            ShoppingListItem.ItemType.AISLE -> AISLE_VIEW
-            ShoppingListItem.ItemType.PRODUCT -> PRODUCT_VIEW
-            ShoppingListItem.ItemType.EMPTY_LIST -> EMPTY_LIST_VIEW
-        }
+        return getItem(position).itemType.ordinal
     }
 
     inner class AisleViewHolder(binding: FragmentAisleListItemBinding) : ViewHolder(binding.root) {
         private val contentView: TextView = binding.txtAisleName
         private val productCountView: TextView = binding.txtProductCnt
+        private val rootView = binding.root
 
         @SuppressLint("ClickableViewAccessibility")
         fun bind(item: AisleShoppingListItem) {
+            rootView.isSelected = item.selected
             contentView.text = item.name
             if (item.isDefault) {
                 contentView.setTypeface(null, Typeface.ITALIC)
@@ -196,12 +212,14 @@ class ShoppingListItemRecyclerViewAdapter(
             }
 
             contentView.setOnClickListener { _ ->
-                setExpandedIcon(contentView, !item.expanded)
-                listener.onAisleExpandToggle(item, !item.expanded)
+                if (!listener.hasSelectedItems()) {
+                    listener.onAisleExpandToggle(item, !item.expanded)
+                } else {
+                    itemView.performClick()
+                }
             }
 
             contentView.setOnLongClickListener { _ -> itemView.performLongClick() }
-            contentView.setOnTouchListener(shoppingListOnTouchListener(this))
             setExpandedIcon(contentView, item.expanded)
 
             productCountView.text = if (item.childCount > 0) item.childCount.toString() else ""
@@ -225,6 +243,7 @@ class ShoppingListItemRecyclerViewAdapter(
         private val decQtyButton: ImageButton = binding.btnQtyDec
         private val incQtyButton: ImageButton = binding.btnQtyInc
         private val qtyEdit: EditText = binding.edtQty
+        private val rootView = binding.root
 
         private var qtyWatcher: TextWatcher? = null
 
@@ -233,6 +252,8 @@ class ShoppingListItemRecyclerViewAdapter(
                 TrackingMode.DEFAULT -> defaultTrackingMode
                 else -> item.trackingMode
             }
+
+            rootView.isSelected = item.selected
 
             contentView.text = item.name
             inStockView.isChecked = item.inStock
@@ -303,7 +324,7 @@ class ShoppingListItemRecyclerViewAdapter(
         ViewHolder(binding.root)
 
     interface ShoppingListItemListener {
-        fun onClick(item: ShoppingListItem)
+        fun onClick(item: ShoppingListItem, view: View)
         fun onProductStatusChange(item: ProductShoppingListItem, inStock: Boolean)
         fun onProductQuantityChange(item: ProductShoppingListItem, quantity: Double?)
         fun onListPositionChanged(item: ShoppingListItem, precedingItem: ShoppingListItem?)
@@ -312,6 +333,7 @@ class ShoppingListItemRecyclerViewAdapter(
         fun onAisleExpandToggle(item: AisleShoppingListItem, expanded: Boolean)
         fun onDragStart(viewHolder: ViewHolder)
         fun onMove(item: ShoppingListItem)
+        fun hasSelectedItems(): Boolean
     }
 
     override fun onRowMove(viewHolder: ViewHolder, target: ViewHolder) {

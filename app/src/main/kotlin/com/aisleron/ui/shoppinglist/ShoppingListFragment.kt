@@ -54,6 +54,7 @@ import com.aisleron.ui.FabHandler.FabClickedCallBack
 import com.aisleron.ui.aisle.AisleDialogFragment
 import com.aisleron.ui.aisle.AislePickerDialogFragment
 import com.aisleron.ui.bundles.AisleDialogBundle
+import com.aisleron.ui.bundles.AisleListEntry
 import com.aisleron.ui.bundles.AislePickerBundle
 import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.copyentity.CopyEntityDialogFragment
@@ -80,8 +81,6 @@ class ShoppingListFragment(
     MenuProvider, AisleronFragment {
 
     private var actionMode: ActionMode? = null
-    private var actionModeItemView: View? = null
-    private var editShopMenuItem: MenuItem? = null
     private var loyaltyCardMenuItem: MenuItem? = null
 
     private val showEmptyAisles: Boolean
@@ -111,7 +110,6 @@ class ShoppingListFragment(
 
             if (selectedAisleId != -1) {
                 shoppingListViewModel.updateSelectedProductAisle(selectedAisleId)
-                endActionMode()
             }
 
             if (addNewAisle) {
@@ -123,16 +121,12 @@ class ShoppingListFragment(
             ADD_AISLE_REQUEST_KEY, this
         ) { _, bundle ->
             val newAisleId = bundle.getInt(AisleDialogFragment.KEY_AISLE_ID, -1)
-            shoppingListViewModel.selectedItem?.let {
-                shoppingListViewModel.updateSelectedProductAisle(newAisleId)
-                endActionMode()
-            }
+            shoppingListViewModel.updateSelectedProductAisle(newAisleId)
         }
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
         initializeFab()
 
@@ -163,6 +157,8 @@ class ShoppingListFragment(
                                     (view.adapter as ShoppingListItemRecyclerViewAdapter).submitList(
                                         it.shoppingList
                                     )
+
+                                    initializeActionMode()
                                 }
 
                                 else -> Unit
@@ -172,7 +168,7 @@ class ShoppingListFragment(
 
                     launch {
                         shoppingListViewModel.aislesForLocation.collect { data ->
-                            if (data != null) {
+                            if (data.isNotEmpty()) {
                                 showAislePickerDialog(data)
                                 shoppingListViewModel.onAislesDialogShown()
                             }
@@ -188,15 +184,16 @@ class ShoppingListFragment(
                 adapter = ShoppingListItemRecyclerViewAdapter(
                     object :
                         ShoppingListItemRecyclerViewAdapter.ShoppingListItemListener {
-                        override fun onClick(item: ShoppingListItem) {
-                            endActionMode()
+                        override fun onClick(item: ShoppingListItem, view: View) {
+                            // If no items are selected, do nothing
+                            if (!shoppingListViewModel.hasSelectedItems()) return
+                            shoppingListViewModel.toggleItemSelection(item)
                         }
 
                         override fun onProductStatusChange(
-                            item: ProductShoppingListItem,
-                            inStock: Boolean
+                            item: ProductShoppingListItem, inStock: Boolean
                         ) {
-                            endActionMode()
+                            tryEndActionMode(forceEnd = true)
                             shoppingListViewModel.updateProductStatus(item, inStock)
                             displayStatusChangeSnackBar(item, inStock)
                         }
@@ -210,33 +207,17 @@ class ShoppingListFragment(
                         override fun onListPositionChanged(
                             item: ShoppingListItem, precedingItem: ShoppingListItem?
                         ) {
-                            endActionMode()
                             shoppingListViewModel.updateItemRank(item, precedingItem)
                         }
 
                         override fun onLongClick(item: ShoppingListItem, view: View): Boolean {
+                            if (item.itemType == ShoppingListItem.ItemType.EMPTY_LIST) return false
+
                             // Finish the previous action mode and start a new one
-                            endActionMode()
-                            if (item.itemType == ShoppingListItem.ItemType.EMPTY_LIST) {
-                                return false
-                            }
+                            tryEndActionMode(forceEnd = true)
 
-                            shoppingListViewModel.setSelectedItem(item)
-
-                            actionModeItemView = view
-                            actionModeItemView?.isSelected = true
-                            return when (actionMode) {
-                                null -> {
-                                    // Start the CAB using the ActionMode.Callback defined earlier.
-                                    actionMode =
-                                        (requireActivity() as AppCompatActivity).startSupportActionMode(
-                                            this@ShoppingListFragment
-                                        )
-                                    true
-                                }
-
-                                else -> false
-                            }
+                            shoppingListViewModel.toggleItemSelection(item)
+                            return true
                         }
 
                         override fun onMoved(item: ShoppingListItem) {
@@ -246,7 +227,8 @@ class ShoppingListFragment(
                         override fun onAisleExpandToggle(
                             item: AisleShoppingListItem, expanded: Boolean
                         ) {
-                            endActionMode()
+                            if (shoppingListViewModel.hasSelectedItems()) return
+
                             shoppingListViewModel.updateAisleExpanded(item, expanded)
                         }
 
@@ -255,6 +237,10 @@ class ShoppingListFragment(
                         }
 
                         override fun onMove(item: ShoppingListItem) {}
+
+                        override fun hasSelectedItems(): Boolean {
+                            return shoppingListViewModel.hasSelectedItems()
+                        }
                     },
 
                     shoppingListPreferences.trackingMode(requireContext()),
@@ -272,13 +258,32 @@ class ShoppingListFragment(
         return view
     }
 
-    private fun showAislePickerDialog(data: AislePickerBundle) {
-        AislePickerDialogFragment.newInstance(data, AISLE_PICKER_REQUEST_KEY)
+    private fun initializeActionMode() {
+        tryEndActionMode(forceEnd = false)
+        if (!shoppingListViewModel.hasSelectedItems()) return
+
+        actionMode?.let {
+            setActionModeOptions(it)
+        } ?: run {
+            actionMode = (requireActivity() as AppCompatActivity).startSupportActionMode(
+                this@ShoppingListFragment
+            )
+        }
+    }
+
+    private fun showAislePickerDialog(aisleList: List<AisleListEntry>) {
+        val currentAisle = shoppingListViewModel.getSelectedItemsAisleId()
+        val aislePickerBundle = AislePickerBundle(
+            aisles = aisleList,
+            currentAisleId = currentAisle,
+            title = getSelectedItemsDescription()
+        )
+
+        AislePickerDialogFragment.newInstance(aislePickerBundle, AISLE_PICKER_REQUEST_KEY)
             .show(childFragmentManager, AislePickerDialogFragment.TAG)
     }
 
     private fun setMenuItemVisibility() {
-        editShopMenuItem?.isVisible = shoppingListViewModel.locationType == LocationType.SHOP
         loyaltyCardMenuItem?.isVisible = shoppingListViewModel.loyaltyCard != null
     }
 
@@ -297,9 +302,7 @@ class ShoppingListFragment(
     }
 
     private fun displayErrorSnackBar(
-        errorCode: AisleronException.ExceptionCode,
-        errorMessage: String?,
-        anchorView: View?
+        errorCode: AisleronException.ExceptionCode, errorMessage: String?, anchorView: View?
     ) {
         val snackBarMessage =
             getString(AisleronExceptionMap().getErrorResourceId(errorCode), errorMessage)
@@ -407,13 +410,15 @@ class ShoppingListFragment(
         this.findNavController().navigate(R.id.nav_add_shop, bundle)
     }
 
-    private fun confirmDelete(context: Context, item: ShoppingListItem) {
+    private fun confirmDelete(context: Context) {
         val builder = MaterialAlertDialogBuilder(context)
+        val selectedItemsDescription = getSelectedItemsDescription()
+
         builder
-            .setTitle(getString(R.string.delete_confirmation, item.name))
+            .setTitle(getString(R.string.delete_confirmation, selectedItemsDescription))
             .setNegativeButton(android.R.string.cancel, null)
             .setPositiveButton(android.R.string.ok) { _, _ ->
-                shoppingListViewModel.removeItem(item)
+                shoppingListViewModel.removeSelectedItems()
             }
 
         val dialog: AlertDialog = builder.create()
@@ -475,69 +480,71 @@ class ShoppingListFragment(
         return true
     }
 
+    private fun getSelectedItemsDescription(): String {
+        val actionModeItems = shoppingListViewModel.selectedViewItems
+        val size = actionModeItems.size
+        val productsOnly = actionModeItems.all { it is ProductShoppingListItem } && size > 0
+        val aislesOnly = actionModeItems.all { it is AisleShoppingListItem } && size > 0
+        val singleItem = size == 1
+
+        return when {
+            singleItem -> actionModeItems.first().name
+            aislesOnly -> getString(R.string.aisles_selected, actionModeItems.size)
+            productsOnly -> getString(R.string.products_selected, actionModeItems.size)
+            else -> getString(R.string.items_selected, actionModeItems.size)
+        }
+    }
+
+    private fun setActionModeOptions(mode: ActionMode?) {
+        mode?.title = getSelectedItemsDescription()
+
+        val actionModeItems = shoppingListViewModel.selectedViewItems
+        val productsOnly = actionModeItems.all { it is ProductShoppingListItem }
+        val aislesOnly = actionModeItems.all { it is AisleShoppingListItem }
+        val singleItem = actionModeItems.size == 1
+
+        mode?.menu?.let {
+            it.findItem(R.id.mnu_add_product_to_aisle).isVisible = singleItem && aislesOnly
+            it.findItem(R.id.mnu_copy_shopping_list_item).isVisible = singleItem && productsOnly
+            it.findItem(R.id.mnu_product_note).isVisible = singleItem && productsOnly
+            it.findItem(R.id.mnu_aisle_picker).isVisible = productsOnly
+            it.findItem(R.id.mnu_edit_shopping_list_item).isVisible = singleItem
+            it.findItem(R.id.mnu_delete_shopping_list_item)
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
+        }
+    }
+
     override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
-        val actionModeItem = shoppingListViewModel.selectedItem
-
-        mode.title = actionModeItem?.name
-        menu.findItem(R.id.mnu_delete_shopping_list_item)
-            .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
-
-        menu.findItem(R.id.mnu_add_product_to_aisle).isVisible =
-            actionModeItem?.itemType == ShoppingListItem.ItemType.AISLE
-
-        menu.findItem(R.id.mnu_copy_shopping_list_item).isVisible =
-            actionModeItem?.itemType == ShoppingListItem.ItemType.PRODUCT
-
-        menu.findItem(R.id.mnu_product_note).isVisible =
-            actionModeItem?.itemType == ShoppingListItem.ItemType.PRODUCT
-
-        menu.findItem(R.id.mnu_aisle_picker).isVisible =
-            actionModeItem?.itemType == ShoppingListItem.ItemType.PRODUCT
-
+        setActionModeOptions(mode)
         return false // Return false if nothing is done
     }
 
     override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
-        val actionModeItem = shoppingListViewModel.selectedItem
+        val actionModeItems = shoppingListViewModel.selectedViewItems
 
         var result = true
         when (item.itemId) {
-            R.id.mnu_edit_shopping_list_item ->
-                actionModeItem?.let { editShoppingListItem(it) }
+            R.id.mnu_edit_shopping_list_item -> editShoppingListItem(actionModeItems.first())
+            R.id.mnu_delete_shopping_list_item -> confirmDelete(requireContext())
+            R.id.mnu_add_product_to_aisle -> navigateToAddProduct(
+                shoppingListViewModel.defaultFilter, actionModeItems.first().aisleId
+            )
 
-            R.id.mnu_delete_shopping_list_item ->
-                actionModeItem?.let { confirmDelete(requireContext(), it) }
-
-            R.id.mnu_add_product_to_aisle ->
-                actionModeItem?.let {
-                    navigateToAddProduct(
-                        shoppingListViewModel.defaultFilter, it.aisleId
-                    )
-                }
-
-            R.id.mnu_copy_shopping_list_item ->
-                actionModeItem?.let { showCopyProductDialog(it) }
-
-            R.id.mnu_product_note ->
-                actionModeItem?.let { showNoteDialog(it) }
-
-            R.id.mnu_aisle_picker ->
-                actionModeItem?.let {
-                    if (it is ProductShoppingListItem)
-                        shoppingListViewModel.requestLocationAisles(it)
-                }
-
+            R.id.mnu_copy_shopping_list_item -> showCopyProductDialog(actionModeItems.first())
+            R.id.mnu_product_note -> showNoteDialog(actionModeItems.first())
+            R.id.mnu_aisle_picker -> shoppingListViewModel.requestLocationAisles()
             else -> result = false // No action picked, so don't close the CAB.
         }
 
+        // TODO: investigte the implications of removing this line.
+        // e.g., navigating to Edit Shop still shows the action mode
         if (result) mode.finish()  // Action picked, so close the CAB.
 
         return result
     }
 
     override fun onDestroyActionMode(mode: ActionMode) {
-        actionModeItemView?.isSelected = false
-        actionModeItemView = null
+        shoppingListViewModel.clearSelectedViewItems()
         actionMode = null
     }
 
@@ -568,14 +575,16 @@ class ShoppingListFragment(
         })
 
         menu.findItem(R.id.mnu_show_empty_aisles).apply { isChecked = showEmptyAisles }
+        menu.findItem(R.id.mnu_edit_shop).apply {
+            isVisible = shoppingListViewModel.locationType == LocationType.SHOP
+        }
 
-        editShopMenuItem = menu.findItem(R.id.mnu_edit_shop)
         loyaltyCardMenuItem = menu.findItem(R.id.mnu_show_loyalty_card)
         setMenuItemVisibility()
     }
 
-    //NOTE: If you override onMenuItemSelected, OnSupportNavigateUp will only be called when returning false
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+        //NOTE: If you override onMenuItemSelected, OnSupportNavigateUp will only be called when returning false
         return when (menuItem.itemId) {
             R.id.mnu_edit_shop -> {
                 navigateToEditShop(locationId = shoppingListViewModel.locationId)
@@ -615,7 +624,6 @@ class ShoppingListFragment(
             loyaltyCardProvider.showNotInstalledDialog(requireContext())
         } catch (e: Exception) {
             displayErrorSnackBar(
-
                 AisleronException.ExceptionCode.GENERIC_EXCEPTION,
                 e.message,
                 fabHandler.getFabView(this.requireActivity())
@@ -638,9 +646,9 @@ class ShoppingListFragment(
         dialog.show()
     }
 
-    private fun endActionMode() {
-        shoppingListViewModel.clearSelectedItem()
-        actionMode?.finish()
+    private fun tryEndActionMode(forceEnd: Boolean) {
+        if (forceEnd || !shoppingListViewModel.hasSelectedItems())
+            actionMode?.finish()
     }
 
     companion object {
@@ -676,6 +684,6 @@ class ShoppingListFragment(
     }
 
     override fun fabClicked(fabOption: FabHandler.FabOption) {
-        endActionMode()
+        tryEndActionMode(forceEnd = true)
     }
 }

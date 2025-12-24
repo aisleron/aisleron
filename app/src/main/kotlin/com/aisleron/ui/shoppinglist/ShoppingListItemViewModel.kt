@@ -18,6 +18,7 @@
 package com.aisleron.ui.shoppinglist
 
 interface ShoppingListItemViewModel {
+    val selected: Boolean
     suspend fun remove()
     suspend fun updateRank(precedingItem: ShoppingListItem?)
 }

@@ -29,6 +29,7 @@ data class ProductShoppingListItemViewModel(
     override val id: Int,
     override val name: String,
     override val aisleId: Int,
+    override val selected: Boolean,
     override val inStock: Boolean,
     override val qtyNeeded: Double,
     override val noteId: Int?,
