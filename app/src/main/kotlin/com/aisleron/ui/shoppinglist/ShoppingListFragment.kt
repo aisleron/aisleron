@@ -69,9 +69,6 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-/**
- * A fragment representing a list of [ShoppingListItem].
- */
 class ShoppingListFragment(
     private val applicationTitleUpdateListener: ApplicationTitleUpdateListener,
     private val fabHandler: FabHandler,
@@ -79,6 +76,15 @@ class ShoppingListFragment(
     private val loyaltyCardProvider: LoyaltyCardProvider
 ) : Fragment(), SearchView.OnQueryTextListener, ActionMode.Callback, FabClickedCallBack,
     MenuProvider, AisleronFragment {
+
+
+    private var searchView: SearchView? = null
+    private val searchViewListener = object : OnAttachStateChangeListener {
+        override fun onViewAttachedToWindow(v: View) {}
+        override fun onViewDetachedFromWindow(v: View) {
+            shoppingListViewModel.requestDefaultList()
+        }
+    }
 
     private var actionMode: ActionMode? = null
     private var loyaltyCardMenuItem: MenuItem? = null
@@ -170,7 +176,7 @@ class ShoppingListFragment(
                         shoppingListViewModel.aislesForLocation.collect { data ->
                             if (data.isNotEmpty()) {
                                 showAislePickerDialog(data)
-                                shoppingListViewModel.onAislesDialogShown()
+                                shoppingListViewModel.clearLocationAisles()
                             }
                         }
                     }
@@ -186,14 +192,13 @@ class ShoppingListFragment(
                         ShoppingListItemRecyclerViewAdapter.ShoppingListItemListener {
                         override fun onClick(item: ShoppingListItem, view: View) {
                             // If no items are selected, do nothing
-                            if (!shoppingListViewModel.hasSelectedItems()) return
+                            if (!hasSelectedItems()) return
                             shoppingListViewModel.toggleItemSelection(item)
                         }
 
                         override fun onProductStatusChange(
                             item: ProductShoppingListItem, inStock: Boolean
                         ) {
-                            tryEndActionMode(forceEnd = true)
                             shoppingListViewModel.updateProductStatus(item, inStock)
                             displayStatusChangeSnackBar(item, inStock)
                         }
@@ -214,7 +219,7 @@ class ShoppingListFragment(
                             if (item.itemType == ShoppingListItem.ItemType.EMPTY_LIST) return false
 
                             // Finish the previous action mode and start a new one
-                            tryEndActionMode(forceEnd = true)
+                            shoppingListViewModel.clearSelectedListItems()
 
                             shoppingListViewModel.toggleItemSelection(item)
                             return true
@@ -227,7 +232,7 @@ class ShoppingListFragment(
                         override fun onAisleExpandToggle(
                             item: AisleShoppingListItem, expanded: Boolean
                         ) {
-                            if (shoppingListViewModel.hasSelectedItems()) return
+                            if (hasSelectedItems()) return
 
                             shoppingListViewModel.updateAisleExpanded(item, expanded)
                         }
@@ -239,7 +244,7 @@ class ShoppingListFragment(
                         override fun onMove(item: ShoppingListItem) {}
 
                         override fun hasSelectedItems(): Boolean {
-                            return shoppingListViewModel.hasSelectedItems()
+                            return this@ShoppingListFragment.hasSelectedItems()
                         }
                     },
 
@@ -258,21 +263,28 @@ class ShoppingListFragment(
         return view
     }
 
-    private fun initializeActionMode() {
-        tryEndActionMode(forceEnd = false)
-        if (!shoppingListViewModel.hasSelectedItems()) return
+    override fun onDestroyView() {
+        searchView?.removeOnAttachStateChangeListener(searchViewListener)
+        searchView = null
+        super.onDestroyView()
+    }
 
-        actionMode?.let {
-            setActionModeOptions(it)
-        } ?: run {
-            actionMode = (requireActivity() as AppCompatActivity).startSupportActionMode(
-                this@ShoppingListFragment
-            )
+    private fun initializeActionMode() {
+        if (!hasSelectedItems()) {
+            actionMode?.finish()
+            return
         }
+
+        actionMode = actionMode ?: (requireActivity() as AppCompatActivity).startSupportActionMode(
+            this@ShoppingListFragment
+        )
+
+        setActionModeOptions(actionMode)
     }
 
     private fun showAislePickerDialog(aisleList: List<AisleListEntry>) {
-        val currentAisle = shoppingListViewModel.getSelectedItemsAisleId()
+        // TODO : Replace Bundler with NavigationArgs
+        val currentAisle = shoppingListViewModel.getSelectedItemAisleId()
         val aislePickerBundle = AislePickerBundle(
             aisles = aisleList,
             currentAisleId = currentAisle,
@@ -316,6 +328,7 @@ class ShoppingListFragment(
     }
 
     private fun showAisleDialog(aisleId: Int, action: AisleDialogFragment.AisleDialogAction) {
+        // TODO : Replace Bundler with NavigationArgs
         val requestKey = when (action) {
             AisleDialogFragment.AisleDialogAction.ADD_SINGLE -> ADD_AISLE_REQUEST_KEY
             AisleDialogFragment.AisleDialogAction.ADD_MULTIPLE -> ADD_AISLE_REQUEST_KEY
@@ -379,17 +392,20 @@ class ShoppingListFragment(
     }
 
     private fun navigateToAddProduct(filterType: FilterType, aisleId: Int? = null) {
+        shoppingListViewModel.clearSelectedListItems()
+
+        // TODO : Replace Bundler with NavigationArgs
         val bundle =
             Bundler().makeAddProductBundle(
                 name = null,
                 inStock = filterType == FilterType.IN_STOCK,
                 aisleId = aisleId
             )
-
         this.findNavController().navigate(R.id.nav_add_product, bundle)
     }
 
     private fun navigateToEditProduct(productId: Int) {
+        // TODO : Replace Bundler with NavigationArgs
         val bundle = Bundler().makeEditProductBundle(
             productId = productId
         )
@@ -406,6 +422,7 @@ class ShoppingListFragment(
     }
 
     private fun navigateToEditShop(locationId: Int) {
+        // TODO : Replace Bundler with NavigationArgs
         val bundle = Bundler().makeEditLocationBundle(locationId)
         this.findNavController().navigate(R.id.nav_add_shop, bundle)
     }
@@ -427,6 +444,7 @@ class ShoppingListFragment(
     }
 
     private fun showCopyProductDialog(item: ShoppingListItem) {
+        // TODO : Replace Bundler with NavigationArgs
         val dialog = CopyEntityDialogFragment.newInstance(
             type = CopyEntityType.Product(item.id),
             title = getString(R.string.copy_entity_title, item.name),
@@ -435,6 +453,7 @@ class ShoppingListFragment(
         )
 
         dialog.onCopySuccess = {
+            shoppingListViewModel.clearSelectedListItems()
             requireView().postDelayed({
                 Snackbar.make(
                     requireView(),
@@ -450,14 +469,17 @@ class ShoppingListFragment(
     }
 
     private fun showNoteDialog(item: ShoppingListItem) {
+        // TODO : Replace Bundler with NavigationArgs
         val dialog = NoteDialogFragment.newInstance(
             noteParentRef = NoteParentRef.Product(item.id)
         )
 
         dialog.show(childFragmentManager, "noteDialog")
+        shoppingListViewModel.clearSelectedListItems()
     }
 
     private fun editShoppingListItem(item: ShoppingListItem) {
+        shoppingListViewModel.clearSelectedListItems()
         when (item) {
             is AisleShoppingListItem -> showEditAisleDialog(item.aisleId)
             is ProductShoppingListItem -> navigateToEditProduct(item.id)
@@ -481,7 +503,7 @@ class ShoppingListFragment(
     }
 
     private fun getSelectedItemsDescription(): String {
-        val actionModeItems = shoppingListViewModel.selectedViewItems
+        val actionModeItems = shoppingListViewModel.selectedListItems
         val size = actionModeItems.size
         val productsOnly = actionModeItems.all { it is ProductShoppingListItem } && size > 0
         val aislesOnly = actionModeItems.all { it is AisleShoppingListItem } && size > 0
@@ -498,7 +520,7 @@ class ShoppingListFragment(
     private fun setActionModeOptions(mode: ActionMode?) {
         mode?.title = getSelectedItemsDescription()
 
-        val actionModeItems = shoppingListViewModel.selectedViewItems
+        val actionModeItems = shoppingListViewModel.selectedListItems
         val productsOnly = actionModeItems.all { it is ProductShoppingListItem }
         val aislesOnly = actionModeItems.all { it is AisleShoppingListItem }
         val singleItem = actionModeItems.size == 1
@@ -515,12 +537,11 @@ class ShoppingListFragment(
     }
 
     override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
-        setActionModeOptions(mode)
         return false // Return false if nothing is done
     }
 
     override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
-        val actionModeItems = shoppingListViewModel.selectedViewItems
+        val actionModeItems = shoppingListViewModel.selectedListItems
 
         var result = true
         when (item.itemId) {
@@ -533,18 +554,14 @@ class ShoppingListFragment(
             R.id.mnu_copy_shopping_list_item -> showCopyProductDialog(actionModeItems.first())
             R.id.mnu_product_note -> showNoteDialog(actionModeItems.first())
             R.id.mnu_aisle_picker -> shoppingListViewModel.requestLocationAisles()
-            else -> result = false // No action picked, so don't close the CAB.
+            else -> result = false // No action picked
         }
-
-        // TODO: investigte the implications of removing this line.
-        // e.g., navigating to Edit Shop still shows the action mode
-        if (result) mode.finish()  // Action picked, so close the CAB.
 
         return result
     }
 
     override fun onDestroyActionMode(mode: ActionMode) {
-        shoppingListViewModel.clearSelectedViewItems()
+        shoppingListViewModel.clearSelectedListItems()
         actionMode = null
     }
 
@@ -556,17 +573,17 @@ class ShoppingListFragment(
         val searchableInfo =
             searchManager.getSearchableInfo(requireActivity().componentName)
 
-        val searchView = menu.findItem(R.id.action_search).actionView as SearchView
-        searchView.setMaxWidth(Integer.MAX_VALUE)
-        searchView.setSearchableInfo(searchableInfo)
-        searchView.setOnQueryTextListener(this@ShoppingListFragment)
-        searchView.setOnCloseListener {
+        searchView = menu.findItem(R.id.action_search).actionView as SearchView
+        searchView?.setMaxWidth(Integer.MAX_VALUE)
+        searchView?.setSearchableInfo(searchableInfo)
+        searchView?.setOnQueryTextListener(this@ShoppingListFragment)
+        searchView?.setOnCloseListener {
             shoppingListViewModel.requestDefaultList()
             false
         }
 
         //OnAttachStateChange is here as a workaround because OnCloseListener doesn't fire
-        searchView.addOnAttachStateChangeListener(object : OnAttachStateChangeListener {
+        searchView?.addOnAttachStateChangeListener(object : OnAttachStateChangeListener {
             override fun onViewAttachedToWindow(v: View) {}
 
             override fun onViewDetachedFromWindow(v: View) {
@@ -646,10 +663,11 @@ class ShoppingListFragment(
         dialog.show()
     }
 
-    private fun tryEndActionMode(forceEnd: Boolean) {
-        if (forceEnd || !shoppingListViewModel.hasSelectedItems())
-            actionMode?.finish()
+    override fun fabClicked(fabOption: FabHandler.FabOption) {
+        shoppingListViewModel.clearSelectedListItems()
     }
+
+    fun hasSelectedItems(): Boolean = shoppingListViewModel.hasSelectedItems()
 
     companion object {
 
@@ -681,9 +699,5 @@ class ShoppingListFragment(
                     putSerializable(ARG_FILTER_TYPE, filterType)
                 }
             }
-    }
-
-    override fun fabClicked(fabOption: FabHandler.FabOption) {
-        tryEndActionMode(forceEnd = true)
     }
 }

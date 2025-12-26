@@ -121,6 +121,10 @@
     <string name="main_fab">Główny FAB</string>
     <string name="add_shop_fab">Dodaj sklep FAB</string>
     <string name="add_aisle_fab">Dodaj alejkę FAB</string>
+    <string name="new_aisle">Nowa alejka</string>
+    <string name="aisles_selected">%1$d Alejki</string>
+    <string name="products_selected">%1$d Produkty</string>
+    <string name="items_selected">%1$d Pozycje</string>
     <string name="add_product_fab">Dodaj produkt FAB</string>
     <string name="title_activity_about">O Aisleron</string>
     <string name="shopping_list_options_header">Opcje listy zakupów</string>

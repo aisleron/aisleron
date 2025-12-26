@@ -205,7 +205,7 @@ class ProductAislesFragmentTest : KoinTest {
         getFragmentScenario(bundle)
 
         onView(withText(location.name)).perform(click())
-        onView(withText(R.string.add_aisle)).inRoot(isDialog())
+        onView(withText(R.string.new_aisle)).inRoot(isDialog())
             .perform(click())
 
         onView(withText(R.string.add_aisle))
@@ -224,7 +224,7 @@ class ProductAislesFragmentTest : KoinTest {
         getFragmentScenario(bundle)
 
         onView(withText(location.name)).perform(click())
-        onView(withText(R.string.add_aisle)).inRoot(isDialog())
+        onView(withText(R.string.new_aisle)).inRoot(isDialog())
             .perform(click())
 
         val newAisleName = "New Aisle"

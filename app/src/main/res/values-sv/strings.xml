@@ -124,6 +124,10 @@
     <string name="main_fab">Huvud-FAB</string>
     <string name="add_shop_fab">Lägg till butik FAB</string>
     <string name="add_aisle_fab">Lägg till gång FAB</string>
+    <string name="new_aisle">Ny gång</string>
+    <string name="aisles_selected">%1$d Gångar</string>
+    <string name="products_selected">%1$d Produkter</string>
+    <string name="items_selected">%1$d Föremål</string>
     <string name="add_product_fab">Lägg till produkt FAB</string>
     <string name="shopping_list_options_header">Alternativ för inköpslista</string>
     <string name="hide_status_change_snack_bar">Dölj meddelande om statusändring</string>

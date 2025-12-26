@@ -154,7 +154,7 @@ class AislePickerDialogFragmentTest : KoinTest {
             dialog.show(activity.supportFragmentManager, AislePickerDialogFragment.TAG)
         }
 
-        onView(withText(R.string.add_aisle))
+        onView(withText(R.string.new_aisle))
             .inRoot(isDialog())
             .perform(click())
 

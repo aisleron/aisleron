@@ -69,6 +69,10 @@
     <string name="sample_data_creation_exception">FEHLER: Es ist nicht möglich, Beispieldaten in eine vorhandene Datenbank zu laden</string>
     <string name="loyalty_card_provider_missing_exception">FEHLER: Anbieter von Kundenkarten nicht installiert oder nicht gefunden</string>
     <string name="aisle_move_exception">FEHLER: Das Verschieben des Ganges muss innerhalb desselben Standorts erfolgen.</string>
+    <string name="new_aisle">Neuer Gang</string>
+    <string name="aisles_selected">%1$d Gänge</string>
+    <string name="products_selected">%1$d Produkte</string>
+    <string name="items_selected">%1$d Artikel</string>
     <string name="about_support_header">Support</string>
     <string name="about_legal_header">Lizenzen &amp; Richtlinien</string>
     <string name="about_support_version_title">Versionsverlauf</string>

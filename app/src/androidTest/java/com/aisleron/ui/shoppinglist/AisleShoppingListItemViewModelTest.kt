@@ -59,18 +59,17 @@ class AisleShoppingListItemViewModelTest : KoinTest {
             childCount = 0,
             locationId = existingAisle.locationId,
             expanded = existingAisle.expanded,
+            selected = false,
             updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
             getAisleUseCase = get<GetAisleUseCase>(),
             removeAisleUseCase = get<RemoveAisleUseCase>()
         )
     }
 
-    private fun getAisle(): Aisle {
-        return runBlocking {
-            val existingLocationId = get<LocationRepository>().getAll().first().id
-            get<AisleRepository>().getAll()
-                .last { it.locationId == existingLocationId && !it.isDefault }
-        }
+    private suspend fun getAisle(): Aisle {
+        val existingLocationId = get<LocationRepository>().getAll().first().id
+        return get<AisleRepository>().getAll()
+            .last { it.locationId == existingLocationId && !it.isDefault }
     }
 
     @Test
@@ -78,7 +77,7 @@ class AisleShoppingListItemViewModelTest : KoinTest {
         val existingAisle = getAisle()
         val shoppingListItem = getAisleShoppingListItemViewModel(existingAisle)
 
-        runBlocking { shoppingListItem.remove() }
+        shoppingListItem.remove()
 
         val removedAisle = get<AisleRepository>().get(existingAisle.id)
         Assert.assertNull(removedAisle)
@@ -94,6 +93,7 @@ class AisleShoppingListItemViewModelTest : KoinTest {
             childCount = 0,
             locationId = -1,
             expanded = true,
+            selected = false,
             updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
             getAisleUseCase = get<GetAisleUseCase>(),
             removeAisleUseCase = get<RemoveAisleUseCase>()
@@ -101,9 +101,10 @@ class AisleShoppingListItemViewModelTest : KoinTest {
 
         val aisleRepository = get<AisleRepository>()
         val aisleCountBefore = aisleRepository.getAll().count()
-        shoppingListItem.remove()
-        val aisleCountAfter = aisleRepository.getAll().count()
 
+        shoppingListItem.remove()
+
+        val aisleCountAfter = aisleRepository.getAll().count()
         Assert.assertEquals(aisleCountBefore, aisleCountAfter)
     }
 
@@ -115,10 +116,9 @@ class AisleShoppingListItemViewModelTest : KoinTest {
         val precedingAisle = aisleRepository.getAll()
             .first { it.locationId == movedAisle.locationId && !it.isDefault && it.id != movedAisle.id }
 
-
         val precedingItem = getAisleShoppingListItemViewModel(precedingAisle)
 
-        runBlocking { shoppingListItem.updateRank(precedingItem) }
+        shoppingListItem.updateRank(precedingItem)
 
         val updatedAisle = aisleRepository.get(movedAisle.id)
         Assert.assertEquals(precedingItem.rank + 1, updatedAisle?.rank)
@@ -132,7 +132,16 @@ class AisleShoppingListItemViewModelTest : KoinTest {
         shoppingListItem.updateRank(null)
 
         val updatedAisle = get<AisleRepository>().get(movedAisle.id)
-
         Assert.assertEquals(1, updatedAisle?.rank)
+    }
+
+    @Test
+    fun copyWith_SelectedValue_SelectedUpdated() = runTest {
+        val shoppingListItem = getAisleShoppingListItemViewModel(getAisle())
+        val selectedBefore = shoppingListItem.selected
+
+        val updatedShoppingListItem = shoppingListItem.copyWith(selected = !selectedBefore)
+
+        Assert.assertTrue(updatedShoppingListItem.selected != selectedBefore)
     }
 }

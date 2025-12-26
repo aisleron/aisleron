@@ -54,4 +54,7 @@ data class AisleShoppingListItemViewModel(
             )
         )
     }
+
+    override fun copyWith(selected: Boolean): AisleShoppingListItemViewModel =
+        this.copy(selected = selected)
 }

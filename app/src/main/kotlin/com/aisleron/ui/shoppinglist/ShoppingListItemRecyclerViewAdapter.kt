@@ -220,6 +220,7 @@ class ShoppingListItemRecyclerViewAdapter(
             }
 
             contentView.setOnLongClickListener { _ -> itemView.performLongClick() }
+            contentView.setOnTouchListener(shoppingListOnTouchListener(this))
             setExpandedIcon(contentView, item.expanded)
 
             productCountView.text = if (item.childCount > 0) item.childCount.toString() else ""

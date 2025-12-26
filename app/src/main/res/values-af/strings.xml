@@ -138,6 +138,10 @@
     <string name="in_stock_at_home">In voorraad by die huis?</string>
     <string name="shop_logo">Winkellogo</string>
     <string name="aisle_expand">Gang uitbrei</string>
+    <string name="new_aisle">Nuwe gang</string>
+    <string name="aisles_selected">%1$d Gange</string>
+    <string name="products_selected">%1$d Produkte</string>
+    <string name="items_selected">%1$d Items</string>
     <string name="show_empty_aisles">Wys leë gange</string>
     <string name="mnu_edit_location">Wysig winkel</string>
     <string name="mnu_sort_list_by_name">Sorteer volgens naam</string>

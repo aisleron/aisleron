@@ -29,6 +29,8 @@ interface ShoppingListItem {
 
     override fun equals(other: Any?): Boolean
 
+    fun copyWith(selected: Boolean): ShoppingListItem
+
     enum class ItemType {
         AISLE, PRODUCT, EMPTY_LIST
     }
