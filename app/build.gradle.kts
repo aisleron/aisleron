@@ -24,6 +24,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("com.google.devtools.ksp")
     id("org.jetbrains.kotlin.plugin.parcelize")
+    // id("androidx.navigation.safeargs.kotlin")
 
     id("com.autonomousapps.dependency-analysis")
 }

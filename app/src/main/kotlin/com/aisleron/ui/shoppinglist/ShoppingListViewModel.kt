@@ -42,7 +42,6 @@ import com.aisleron.domain.product.usecase.UpdateProductQtyNeededUseCase
 import com.aisleron.domain.product.usecase.UpdateProductStatusUseCase
 import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
 import com.aisleron.ui.bundles.AisleListEntry
-import com.aisleron.ui.bundles.AislePickerBundle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -50,6 +49,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlin.collections.listOf
 import kotlin.coroutines.cancellation.CancellationException
 
 class ShoppingListViewModel(
@@ -74,9 +74,12 @@ class ShoppingListViewModel(
     private var searchJob: Job? = null
     private var updateQtyJob: Job? = null
 
-    private var _location: Location? = null
+    private var hydrated = false
+
     private var _showDefaultAisle: Boolean = true
     private val showDefaultAisle: Boolean get() = _showDefaultAisle
+
+    private var _location: Location? = null
     val locationName: String get() = _location?.name ?: ""
     val locationType: LocationType get() = _location?.type ?: LocationType.HOME
     val locationId: Int get() = _location?.id ?: 0
@@ -98,21 +101,49 @@ class ShoppingListViewModel(
 
     val shoppingListUiState = _shoppingListUiState.asStateFlow()
 
+    private val _aislesForLocation = MutableStateFlow<List<AisleListEntry>>(emptyList())
+    val aislesForLocation: StateFlow<List<AisleListEntry>> = _aislesForLocation
+
     private var _listItems = listOf<ShoppingListItem>()
 
-    private val _aislesForLocation = MutableStateFlow<AislePickerBundle?>(null)
-    val aislesForLocation: StateFlow<AislePickerBundle?> = _aislesForLocation
+    val selectedListItems: List<ShoppingListItem> get() = _listItems.filter { it.selected }
 
-    private var _selectedItem: ShoppingListItem? = null
-    val selectedItem: ShoppingListItem? get() = _selectedItem
+    private fun getListWithItemSelectionToggled(
+        sourceListUiState: List<ShoppingListItem>, item: ShoppingListItem
+    ): List<ShoppingListItem> {
+        val updatedList = sourceListUiState.map { listItem ->
+            if (listItem == item) {
+                listItem.copyWith(selected = !listItem.selected)
+            } else {
+                listItem
+            }
+        }
 
-    fun setSelectedItem(item: ShoppingListItem) {
-        _selectedItem = item
+        return updatedList
     }
 
-    fun clearSelectedItem() {
-        _selectedItem = null
+    fun toggleItemSelection(item: ShoppingListItem) {
+        coroutineScope.launchHandling {
+            val updatedList = getListWithItemSelectionToggled(_listItems, item)
+            submitUpdatedList(updatedList)
+        }
     }
+
+    private fun clearSelectedListItemsInternal() {
+        if (!hasSelectedItems()) return
+
+        val deselectedList = _listItems.map { listItem ->
+            listItem.copyWith(selected = false)
+        }
+
+        submitUpdatedList(deselectedList)
+    }
+
+    fun clearSelectedListItems() {
+        coroutineScope.launchHandling { clearSelectedListItemsInternal() }
+    }
+
+    fun hasSelectedItems(): Boolean = selectedListItems.isNotEmpty()
 
     private fun submitUpdatedList(list: List<ShoppingListItem>) {
         _listItems = list
@@ -151,6 +182,7 @@ class ShoppingListViewModel(
                         isDefault = a.isDefault,
                         locationId = a.locationId,
                         expanded = a.expanded,
+                        selected = false,
                         updateAisleRankUseCase = updateAisleRankUseCase,
                         getAisleUseCase = getAisleUseCase,
                         removeAisleUseCase = removeAisleUseCase,
@@ -167,6 +199,7 @@ class ShoppingListViewModel(
                                     qtyNeeded = ap.product.qtyNeeded,
                                     noteId = ap.product.noteId,
                                     aisleId = ap.aisleId,
+                                    selected = false,
                                     aisleProductId = ap.id,
                                     removeProductUseCase = removeProductUseCase,
                                     updateAisleProductRankUseCase = updateAisleProductRankUseCase,
@@ -203,9 +236,13 @@ class ShoppingListViewModel(
     }
 
     fun hydrate(locationId: Int, filterType: FilterType, showEmptyAisles: Boolean = false) {
+        if (hydrated) return
+
+        hydrated = true
+
         _defaultFilter = filterType
         _showEmptyAisles = showEmptyAisles
-        coroutineScope.launch {
+        coroutineScope.launchHandling {
             getShoppingListUseCase(locationId).collect { collectedLocation ->
                 _shoppingListUiState.value = ShoppingListUiState.Loading
                 _location = collectedLocation
@@ -230,7 +267,7 @@ class ShoppingListViewModel(
     }
 
     fun updateProductStatus(item: ProductShoppingListItem, inStock: Boolean) {
-        coroutineScope.launch {
+        coroutineScope.launchHandling {
             updateProductStatusUseCase(item.id, inStock)
         }
     }
@@ -244,28 +281,29 @@ class ShoppingListViewModel(
     }
 
     fun updateAisleExpanded(item: AisleShoppingListItem, expanded: Boolean) {
-        coroutineScope.launch {
+        coroutineScope.launchHandling {
             updateAisleExpandedUseCase(item.id, expanded)
         }
     }
 
     fun updateItemRank(item: ShoppingListItem, precedingItem: ShoppingListItem?) {
-        coroutineScope.launch {
+        coroutineScope.launchHandling {
             (item as ShoppingListItemViewModel).updateRank(precedingItem)
         }
     }
 
     fun expandCollapseAisles() {
-        coroutineScope.launch {
+        coroutineScope.launchHandling {
             expandCollapseAislesForLocationUseCase(locationId)
         }
     }
 
     fun updateSelectedProductAisle(selectedAisleId: Int) {
-        val item = selectedItem
+        val items = selectedListItems.filterIsInstance<ProductShoppingListItem>()
         coroutineScope.launchHandling {
-            (item as? ProductShoppingListItem)?.let {
+            items.forEach {
                 changeProductAisleUseCase(it.id, it.aisleId, selectedAisleId)
+                clearSelectedListItemsInternal()
             }
         }
     }
@@ -273,7 +311,7 @@ class ShoppingListViewModel(
     fun submitProductSearch(productNameQuery: String) {
         searchJob?.cancel()
 
-        searchJob = coroutineScope.launch {
+        searchJob = coroutineScope.launchHandling {
             delay(debounceTime) //Add debounce to the search so it doesn't execute every keypress
 
             shoppingListFilterParameters.filterType = FilterType.ALL
@@ -298,7 +336,7 @@ class ShoppingListViewModel(
     fun requestDefaultList() {
         searchJob?.cancel()
         shoppingListFilterParameters = getDefaultFilterParameters()
-        coroutineScope.launch {
+        coroutineScope.launchHandling {
             _shoppingListUiState.value = ShoppingListUiState.Loading
             val searchResults = getShoppingList(_location, shoppingListFilterParameters)
             submitUpdatedList(searchResults)
@@ -309,38 +347,29 @@ class ShoppingListViewModel(
         //TODO: Do some smarts to only expand the list if I'm dragging an aisle, dragging a product across an aisle, or reached the end of the list
         //TODO: When dragging an aisle, hide all products
         shoppingListFilterParameters.showAllAisles = true
-        coroutineScope.launch {
+        coroutineScope.launchHandling {
             _shoppingListUiState.value = ShoppingListUiState.Loading
-            val searchResults = getShoppingList(_location, shoppingListFilterParameters)
-            submitUpdatedList(searchResults)
+            val shoppingList = getShoppingList(_location, shoppingListFilterParameters)
+            val updatedList =
+                getListWithItemSelectionToggled(shoppingList, item.copyWith(selected = false))
+
+            submitUpdatedList(updatedList)
         }
     }
 
-    fun removeItem(item: ShoppingListItem) {
-        coroutineScope.launch {
-            try {
-                (item as ShoppingListItemViewModel).remove()
-            } catch (e: AisleronException) {
-                _shoppingListUiState.value = ShoppingListUiState.Error(e.exceptionCode, e.message)
-            } catch (e: Exception) {
-                _shoppingListUiState.value =
-                    ShoppingListUiState.Error(
-                        AisleronException.ExceptionCode.GENERIC_EXCEPTION, e.message
-                    )
-            }
+    fun removeSelectedItems() {
+        val aisleItems = selectedListItems.filterIsInstance<AisleShoppingListItemViewModel>()
+        val productItems = selectedListItems.filterIsInstance<ProductShoppingListItemViewModel>()
+        coroutineScope.launchHandling {
+            productItems.forEach { it.remove() }
+            aisleItems.forEach { it.remove() }
+            clearSelectedListItemsInternal()
         }
     }
 
     fun sortListByName() {
-        coroutineScope.launch {
-            try {
-                sortLocationByNameUseCase(locationId)
-            } catch (e: Exception) {
-                _shoppingListUiState.value =
-                    ShoppingListUiState.Error(
-                        AisleronException.ExceptionCode.GENERIC_EXCEPTION, e.message
-                    )
-            }
+        coroutineScope.launchHandling {
+            sortLocationByNameUseCase(locationId)
         }
     }
 
@@ -348,22 +377,18 @@ class ShoppingListViewModel(
         _shoppingListUiState.value = ShoppingListUiState.Empty
     }
 
-    fun requestLocationAisles(item: ProductShoppingListItem) {
-        coroutineScope.launch {
+    fun requestLocationAisles() {
+        coroutineScope.launchHandling {
             val aisles = getAislesForLocationUseCase(locationId)
                 .sortedBy { it.rank }
                 .map { AisleListEntry(it.id, it.name) }
 
-            _aislesForLocation.value = AislePickerBundle(
-                title = item.name,
-                aisles = aisles,
-                currentAisleId = item.aisleId
-            )
+            _aislesForLocation.value = aisles
         }
     }
 
-    fun onAislesDialogShown() {
-        _aislesForLocation.value = null
+    fun clearLocationAisles() {
+        _aislesForLocation.value = emptyList()
     }
 
     private fun CoroutineScope.launchHandling(
@@ -372,7 +397,7 @@ class ShoppingListViewModel(
         try {
             block()
         } catch (e: CancellationException) {
-            Log.e("SLVM", "Cancellation")
+            Log.e(TAG, "Cancellation")
             throw e // propagate cancellation
         } catch (e: AisleronException) {
             _shoppingListUiState.value =
@@ -384,6 +409,9 @@ class ShoppingListViewModel(
         }
     }
 
+    fun getSelectedItemAisleId(): Int =
+        selectedListItems.singleOrNull()?.aisleId ?: -1
+
     sealed class ShoppingListUiState {
         data object Empty : ShoppingListUiState()
         data object Loading : ShoppingListUiState()
@@ -392,5 +420,9 @@ class ShoppingListViewModel(
         ) : ShoppingListUiState()
 
         data class Updated(val shoppingList: List<ShoppingListItem>) : ShoppingListUiState()
+    }
+
+    companion object {
+        const val TAG = "ShoppingListViewModel"
     }
 }

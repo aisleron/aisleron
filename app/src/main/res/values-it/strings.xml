@@ -122,6 +122,10 @@
     <string name="undo">ANNULLA</string>
     <string name="aisleron_logo">Logo di Aisleron</string>
     <string name="in_stock_at_home">In dispensa a casa?</string>
+    <string name="new_aisle">Nuovo corridoio</string>
+    <string name="aisles_selected">%1$d Corridoi</string>
+    <string name="products_selected">%1$d Prodotti</string>
+    <string name="items_selected">%1$d Articoli</string>
     <string name="shop_logo">Logo negozio</string>
     <string name="aisle_expand">Apri reparto</string>
     <string name="show_empty_aisles">Mostra reparto vuoto</string>

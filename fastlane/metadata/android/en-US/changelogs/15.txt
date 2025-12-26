@@ -1,8 +1,9 @@
 Enhancements:
-* Added the ability to manage aisles when adding or editing a product (#48)
-* Allow quantities to be tracked in decimal values (#85)
-* Added Unit of Measure to product inventory (#92)
-* Added the option to set tracking mode per product
+* Added the ability to manage aisles when adding or editing a product.
+* Allow quantities to be tracked in decimal values.
+* Added Unit of Measure to product inventory.
+* Added multiple selection capability to the product list.
+* Added the option to set tracking mode per product.
 
 Bug Fixes:
-* Fixed unexpected aisle reorder behavior when there are a lot of unranked aisles (#71)
+* Fixed unexpected aisle reorder behavior when there are a lot of unranked aisles.

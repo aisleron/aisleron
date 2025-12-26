@@ -30,6 +30,7 @@ data class AisleShoppingListItemViewModel(
     override var childCount: Int = 0,
     override val locationId: Int,
     override val expanded: Boolean,
+    override val selected: Boolean,
     private val updateAisleRankUseCase: UpdateAisleRankUseCase,
     private val getAisleUseCase: GetAisleUseCase,
     private val removeAisleUseCase: RemoveAisleUseCase
@@ -53,4 +54,7 @@ data class AisleShoppingListItemViewModel(
             )
         )
     }
+
+    override fun copyWith(selected: Boolean): AisleShoppingListItemViewModel =
+        this.copy(selected = selected)
 }

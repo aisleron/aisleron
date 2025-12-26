@@ -160,6 +160,7 @@
     <string name="pin_shop">Pin Shop to Drawer</string>
     <string name="show_unmapped_products">Show Products in the \'No Aisle\' section</string>
     <string name="add_aisle">Add Aisle</string>
+    <string name="new_aisle">New Aisle</string>
     <string name="add_another">Add Another</string>
     <string name="aisle_name">Aisle Name</string>
     <string name="id_label" translatable="false">id</string>
@@ -214,4 +215,7 @@
     <string name="aisle_picker">Aisle Picker</string>
     <string name="qty_increments">Qty Increments</string>
     <string name="unit_of_measure">Unit of Measure</string>
+    <string name="aisles_selected">%1$d Aisles</string>
+    <string name="products_selected">%1$d Products</string>
+    <string name="items_selected">%1$d Items</string>
 </resources>

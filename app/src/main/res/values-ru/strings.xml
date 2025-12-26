@@ -94,6 +94,10 @@
     <string name="main_fab">Главный FAB</string>
     <string name="add_shop_fab">Добавить магазин FAB</string>
     <string name="add_aisle_fab">Добавить отдел FAB</string>
+    <string name="new_aisle">Новый проход</string>
+    <string name="aisles_selected">%1$d Проходы</string>
+    <string name="products_selected">%1$d Товары</string>
+    <string name="items_selected">%1$d Элементы</string>
     <string name="add_product_fab">Добавить продукт FAB</string>
     <string name="title_activity_about">Об Aisleron</string>
     <string name="shopping_list_options_header">Настройки списка покупок</string>

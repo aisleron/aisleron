@@ -118,6 +118,10 @@
     <string name="tracking_checkbox_quantity">Case à cocher et quantité</string>
     <string name="tracking_none">Aucun (balayage uniquement)</string>
     <string name="show_unmapped_products">Afficher les produits dans la section \'Pas d’allée\'</string>
+    <string name="new_aisle">Nouveau rayon</string>
+    <string name="aisles_selected">%1$d Rayons</string>
+    <string name="products_selected">%1$d Produits</string>
+    <string name="items_selected">%1$d Articles</string>
     <string name="main_fab">FAB principal</string>
     <string name="add_shop_fab">Ajouter boutique FAB</string>
     <string name="add_aisle_fab">Ajouter allée FAB</string>

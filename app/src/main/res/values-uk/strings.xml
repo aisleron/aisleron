@@ -50,6 +50,10 @@
     <string name="sample_data_creation_exception">ПОМИЛКА: Не вдається завантажити зразок даних у існуючу базу даних</string>
     <string name="loyalty_card_provider_missing_exception">ПОМИЛКА: Постачальник картки лояльності не встановлено або активність не знайдено</string>
     <string name="aisle_move_exception">ПОМИЛКА: Переміщення проходу повинно відбуватися в межах одного Місцезнаходження.</string>
+    <string name="new_aisle">Новий прохід</string>
+    <string name="aisles_selected">%1$d Проходи</string>
+    <string name="products_selected">%1$d Товари</string>
+    <string name="items_selected">%1$d Елементи</string>
     <string name="about_support_header">Підтримка</string>
     <string name="about_legal_header">Ліцензії та політики</string>
     <string name="about_support_version_title">Історія версій</string>

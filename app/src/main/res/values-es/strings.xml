@@ -115,6 +115,10 @@
     <string name="edit">Editar</string>
     <string name="delete">Eliminar</string>
     <string name="delete_confirmation">¿Eliminar %1$s?</string>
+    <string name="new_aisle">Nuevo pasillo</string>
+    <string name="aisles_selected">%1$d Pasillos</string>
+    <string name="products_selected">%1$d Productos</string>
+    <string name="items_selected">%1$d Artículos</string>
     <string name="edit_aisle">Editar pasillo</string>
     <string name="edit_location">Editar tienda</string>
     <string name="main_fab">FAB principal</string>

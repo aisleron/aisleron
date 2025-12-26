@@ -39,7 +39,7 @@ class AislePickerDialogFragment : DialogFragment() {
         return MaterialAlertDialogBuilder(requireContext())
             .setTitle(aislePickerBundle.title)
             .setNegativeButton(android.R.string.cancel, null)
-            .setNeutralButton(R.string.add_aisle) { _, _ ->
+            .setNeutralButton(R.string.new_aisle) { _, _ ->
                 setFragmentResult(requestKey, bundleOf(KEY_ADD_NEW_AISLE to true))
             }
             .setSingleChoiceItems(aisleNames, checkedItem) { dialog, which ->
