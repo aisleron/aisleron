@@ -108,6 +108,10 @@
     <string name="in_stock_at_home">В наличии дома?</string>
     <string name="shop_logo">Логотип магазина</string>
     <string name="aisle_expand">Раскрыть отдел</string>
+    <string name="discard">Отменить</string>
+    <string name="save_changes_title">Сохранить изменения?</string>
+    <string name="save_changes_message">У вас есть несохраненные изменения. Хотите сохранить их перед выходом?</string>
+    <string name="keep_editing">Продолжить редактирование</string>
     <string name="show_empty_aisles">Показывать пустые отделы</string>
     <string name="mnu_edit_location">Изменить магазин</string>
     <string name="mnu_sort_list_by_name">Сортировать по имени</string>

@@ -134,6 +134,10 @@
     <string name="in_stock_at_home">¿En casa?</string>
     <string name="shop_logo">Logotipo de la tienda</string>
     <string name="aisle_expand">Ampliar pasillo</string>
+    <string name="discard">Descartar</string>
+    <string name="save_changes_title">¿Guardar cambios?</string>
+    <string name="save_changes_message">Tienes cambios sin guardar. ¿Quieres guardarlos antes de salir?</string>
+    <string name="keep_editing">Seguir editando</string>
     <string name="show_empty_aisles">Mostrar pasillos vacíos</string>
     <string name="mnu_edit_location">Editar tienda</string>
     <string name="mnu_sort_list_by_name">Ordenar por nombre</string>

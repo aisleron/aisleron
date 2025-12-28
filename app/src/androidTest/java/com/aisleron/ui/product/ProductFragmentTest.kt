@@ -23,13 +23,16 @@ import androidx.annotation.StringRes
 import androidx.appcompat.view.menu.ActionMenuItem
 import androidx.fragment.app.testing.FragmentScenario
 import androidx.fragment.app.testing.launchFragmentInContainer
+import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.clearText
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.matcher.RootMatchers.isDialog
 import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.isDescendantOfA
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
@@ -42,6 +45,7 @@ import com.aisleron.di.useCaseModule
 import com.aisleron.di.viewModelTestModule
 import com.aisleron.domain.note.Note
 import com.aisleron.domain.note.NoteRepository
+import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import com.aisleron.ui.AddEditFragmentListenerTestImpl
@@ -50,9 +54,11 @@ import com.aisleron.ui.FabHandler
 import com.aisleron.ui.FabHandlerTestImpl
 import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.settings.ProductPreferencesTestImpl
+import com.aisleron.utils.SystemIds
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.allOf
+import org.hamcrest.CoreMatchers.startsWithIgnoringCase
 import org.hamcrest.Matchers.emptyString
 import org.junit.Assert
 import org.junit.Before
@@ -215,13 +221,7 @@ class ProductFragmentTest : KoinTest {
             it.onMenuItemSelected(menuItem)
         }
 
-        onView(withId(com.google.android.material.R.id.snackbar_text)).check(
-            matches(
-                ViewMatchers.withEffectiveVisibility(
-                    ViewMatchers.Visibility.VISIBLE
-                )
-            )
-        )
+        verifyErrorSnackbarShown()
     }
 
     @Test
@@ -241,20 +241,6 @@ class ProductFragmentTest : KoinTest {
         } finally {
             device.setOrientationPortrait()
         }
-    }
-
-    @Test
-    fun newInstance_CallNewInstance_ReturnsFragment() = runTest {
-        val fragment =
-            ProductFragment.newInstance(
-                null,
-                false,
-                addEditFragmentListener,
-                applicationTitleUpdateListener,
-                ProductPreferencesTestImpl(),
-                fabHandler
-            )
-        Assert.assertNotNull(fragment)
     }
 
     @Test
@@ -455,6 +441,11 @@ class ProductFragmentTest : KoinTest {
         return menuItem
     }
 
+    private fun getBackMenuItem(context: Context): ActionMenuItem {
+        val menuItem = ActionMenuItem(context, 0, android.R.id.home, 0, 0, null)
+        return menuItem
+    }
+
     private fun getFragmentScenario(
         bundle: Bundle, productPreferences: ProductPreferencesTestImpl? = null
     ): FragmentScenario<ProductFragment> {
@@ -472,5 +463,143 @@ class ProductFragmentTest : KoinTest {
         )
 
         return scenario
+    }
+
+    private fun verifySaveConfirmationDialogShown() {
+        onView(withText(R.string.save_changes_title))
+            .inRoot(isDialog())
+            .check(matches(isDisplayed()))
+
+        onView(withText(R.string.save_changes_title))
+            .inRoot(isDialog())
+            .check(matches(isDisplayed()))
+
+        onView(withText(R.string.save))
+            .inRoot(isDialog())
+            .check(matches(isDisplayed()))
+
+        onView(withText(R.string.discard))
+            .inRoot(isDialog())
+            .check(matches(isDisplayed()))
+
+        onView(withText(R.string.keep_editing))
+            .inRoot(isDialog())
+            .check(matches(isDisplayed()))
+    }
+
+    private fun showSaveConfirmationDialogArrange(
+        product: Product, newName: String? = null
+    ): FragmentScenario<ProductFragment> {
+        val bundle = bundler.makeEditProductBundle(product.id)
+        val scenario = getFragmentScenario(bundle)
+
+        onView(withId(R.id.edt_product_name)).perform(
+            clearText(),
+            typeText(newName ?: "Modified Product Name")
+        )
+
+        return scenario
+    }
+
+    @Test
+    fun backPressed_DirtyFlagTrue_ShowSaveConfirmationDialog() = runTest {
+        showSaveConfirmationDialogArrange(productRepository.getAll().first())
+
+        Espresso.pressBack()
+
+        verifySaveConfirmationDialogShown()
+    }
+
+    @Test
+    fun toolbarBackPressed_DirtyFlagTrue_ShowSaveConfirmationDialog() = runTest {
+        val scenario = showSaveConfirmationDialogArrange(productRepository.getAll().first())
+
+        scenario.onFragment {
+            val menuItem = getBackMenuItem(it.requireContext())
+            it.onMenuItemSelected(menuItem)
+        }
+
+        verifySaveConfirmationDialogShown()
+    }
+
+    @Test
+    fun showSaveConfirmationDialog_discardClicked_closesDialogAndReturns() = runTest {
+        val existingProduct = productRepository.getAll().first()
+        showSaveConfirmationDialogArrange(existingProduct)
+
+        Espresso.pressBack()
+        onView(withText(R.string.discard))
+            .inRoot(isDialog())
+            .perform(click())
+
+        assertFalse(addEditFragmentListener.addEditSuccess)
+
+        val updatedProduct = productRepository.get(existingProduct.id)
+        assertEquals(existingProduct.name, updatedProduct?.name)
+    }
+
+    @Test
+    fun showSaveConfirmationDialog_KeepEditingClicked_closesDialogAndReturnsToForm() = runTest {
+        val newName = "Modified Product Name"
+        val existingProduct = productRepository.getAll().first()
+        showSaveConfirmationDialogArrange(existingProduct)
+
+        Espresso.pressBack()
+        onView(withText(R.string.keep_editing))
+            .inRoot(isDialog())
+            .perform(click())
+
+        assertFalse(addEditFragmentListener.addEditSuccess)
+
+        onView(withId(R.id.edt_product_name))
+            .check(matches(isDisplayed()))
+            .check(matches(withText(newName)))
+
+        val updatedProduct = productRepository.get(existingProduct.id)
+        assertEquals(existingProduct.name, updatedProduct?.name)
+    }
+
+    @Test
+    fun showSaveConfirmationDialog_saveClicked_savesAndCloses() = runTest {
+        val newName = "Modified Product Name"
+        val existingProduct = productRepository.getAll().first()
+        showSaveConfirmationDialogArrange(existingProduct)
+
+        Espresso.pressBack()
+        onView(withText(R.string.save))
+            .inRoot(isDialog())
+            .perform(click())
+
+        assertTrue(addEditFragmentListener.addEditSuccess)
+
+        val savedProduct = productRepository.get(existingProduct.id)
+        assertEquals(newName, savedProduct?.name)
+    }
+
+    @Test
+    fun showSaveConfirmationDialog_ErrorOnSave_showsErrorSnackBar() = runTest {
+        val existingProduct = productRepository.getAll().first()
+        val duplicateMame =
+            productRepository.getAll().first { it.name != existingProduct.name }.name
+
+        showSaveConfirmationDialogArrange(existingProduct, duplicateMame)
+
+        // Show dialog and click save
+        Espresso.pressBack()
+        onView(withText(R.string.save))
+            .inRoot(isDialog())
+            .perform(click())
+
+        verifyErrorSnackbarShown()
+    }
+
+    private fun verifyErrorSnackbarShown() {
+        onView(withId(SystemIds.SNACKBAR_TEXT))
+            .check(
+                matches(
+                    ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)
+                )
+            )
+            .check(matches(withText(startsWithIgnoringCase("ERROR"))))
     }
 }

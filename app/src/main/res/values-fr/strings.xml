@@ -127,6 +127,10 @@
     <string name="add_aisle_fab">Ajouter allée FAB</string>
     <string name="add_product_fab">Ajouter produit FAB</string>
     <string name="aisle_expand">Étendre allée</string>
+    <string name="discard">Annuler</string>
+    <string name="save_changes_title">Enregistrer les modifications ?</string>
+    <string name="save_changes_message">Vous avez des modifications non enregistrées. Voulez-vous les enregistrer avant de quitter ?</string>
+    <string name="keep_editing">Continuer l\'édition</string>
     <string name="show_empty_aisles">Afficher allées vides</string>
     <string name="mnu_edit_location">Modifier boutique</string>
     <string name="mnu_sort_list_by_name">Trier par nom</string>

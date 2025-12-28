@@ -39,6 +39,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -59,9 +60,11 @@ class ProductViewModel(
     private var product: Product? = null
     private val coroutineScope = coroutineScopeProvider ?: this.viewModelScope
 
+    private val _originalData = MutableStateFlow(ProductUiData())
     private val _uiData = MutableStateFlow(ProductUiData())
     override val uiData: StateFlow<ProductUiData> = _uiData
 
+    private val _originalAisles = MutableStateFlow<List<ProductAisleInfo>>(emptyList())
     private val _productAisles = MutableStateFlow<List<ProductAisleInfo>>(emptyList())
     val productAisles: StateFlow<List<ProductAisleInfo>> = _productAisles
 
@@ -74,6 +77,18 @@ class ProductViewModel(
     private var _editingAisleInfo: ProductAisleInfo? = null
     val editingAisleInfo: ProductAisleInfo? get() = _editingAisleInfo
 
+    val isDirty: StateFlow<Boolean> = combine(
+        _originalData,
+        _uiData,
+        _originalAisles,
+        _productAisles
+    ) { originalData, currentData, originalAisles, currentAisles ->
+        (originalData != currentData) || (originalAisles != currentAisles)
+    }.stateIn(
+        scope = coroutineScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = false
+    )
 
     override val noteFlow: StateFlow<String>
         get() = _uiData.map { it.noteText }.stateIn(
@@ -100,7 +115,10 @@ class ProductViewModel(
                 trackingMode = product?.trackingMode ?: TrackingMode.DEFAULT
             )
 
+            _originalData.value = _uiData.value
+
             loadProductAisleList(product?.id ?: -1)
+            _originalAisles.value = _productAisles.value
 
             _productUiState.value = ProductUiState.Empty
             hydrated = true
@@ -232,6 +250,8 @@ class ProductViewModel(
                     }
                 }
 
+                _originalData.value = _uiData.value
+                _originalAisles.value = _productAisles.value
                 _productUiState.value = ProductUiState.Success
             } catch (e: AisleronException) {
                 _productUiState.value = ProductUiState.Error(e.exceptionCode, e.message)
@@ -277,6 +297,10 @@ class ProductViewModel(
         if (uiData.value.trackingMode != selectedMode) {
             _uiData.value = _uiData.value.copy(trackingMode = selectedMode)
         }
+    }
+
+    fun clearState() {
+        _productUiState.value = ProductUiState.Empty
     }
 
     sealed class ProductUiState {

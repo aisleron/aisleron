@@ -134,6 +134,10 @@
     <string name="in_stock_at_home">W domu?</string>
     <string name="shop_logo">Logo sklepu</string>
     <string name="aisle_expand">Rozwiń alejkę</string>
+    <string name="discard">Odrzuć</string>
+    <string name="save_changes_title">Zapisać zmiany?</string>
+    <string name="save_changes_message">Masz niezapisane zmiany. Czy chcesz je zapisać przed wyjściem?</string>
+    <string name="keep_editing">Kontynuuj edycję</string>
     <string name="show_empty_aisles">Pokaż puste alejki</string>
     <string name="mnu_edit_location">Edytuj sklep</string>
     <string name="mnu_sort_list_by_name">Sortuj według nazwy</string>

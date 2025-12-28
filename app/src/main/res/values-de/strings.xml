@@ -120,6 +120,10 @@
     <string name="empty_list_reasons">- Derzeit wird nichts benötigt \n- Es wurden noch keine Produkte oder Gänge hinzugefügt \n- Artikel existieren, wurden aber noch keinem sichtbaren Gang zugewiesen</string>
     <string name="empty_list_instructions">Du kannst Produkte und Gänge über die Schaltfläche „Hinzufügen“ unten rechts hinzufügen oder die Suchleiste oben auf dem Bildschirm verwenden, um Produkte zu suchen und ihren Status oder ihre Gangzuordnung zu aktualisieren.</string>
     <string name="aisle_expand">Gang erweitern</string>
+    <string name="discard">Verwerfen</string>
+    <string name="save_changes_title">Änderungen speichern?</string>
+    <string name="save_changes_message">Sie haben ungespeicherte Änderungen. Möchten Sie diese speichern, bevor Sie fortfahren?</string>
+    <string name="keep_editing">Weiter bearbeiten</string>
     <string name="add_shop_fab">Geschäft hinzufügen FAB</string>
     <string name="add_aisle_fab">Gang hinzufügen FAB</string>
     <string name="add_product_fab">Produkt hinzufügen FAB</string>

@@ -128,6 +128,10 @@
     <string name="items_selected">%1$d Articoli</string>
     <string name="shop_logo">Logo negozio</string>
     <string name="aisle_expand">Apri reparto</string>
+    <string name="discard">Annulla</string>
+    <string name="save_changes_title">Salvare le modifiche?</string>
+    <string name="save_changes_message">Hai delle modifiche non salvate. Vuoi salvarle prima di uscire?</string>
+    <string name="keep_editing">Continua a modificare</string>
     <string name="show_empty_aisles">Mostra reparto vuoto</string>
     <string name="mnu_edit_location">Modifica negozio</string>
     <string name="mnu_sort_list_by_name">Ordina per nome</string>
