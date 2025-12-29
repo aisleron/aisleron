@@ -4,6 +4,7 @@ Enhancements:
 * Added Unit of Measure to product inventory.
 * Added multiple selection capability to the product list.
 * Added the option to set tracking mode per product.
+* Added save prompt when leaving the product page if there are unsaved changes.
 
 Bug Fixes:
 * Fixed unexpected aisle reorder behavior when there are a lot of unranked aisles.

@@ -501,11 +501,16 @@ class ProductFragmentTest : KoinTest {
         return scenario
     }
 
+    private fun pressBack() {
+        Espresso.closeSoftKeyboard()
+        Espresso.pressBack()
+    }
+
     @Test
     fun backPressed_DirtyFlagTrue_ShowSaveConfirmationDialog() = runTest {
         showSaveConfirmationDialogArrange(productRepository.getAll().first())
 
-        Espresso.pressBack()
+        pressBack()
 
         verifySaveConfirmationDialogShown()
     }
@@ -527,10 +532,8 @@ class ProductFragmentTest : KoinTest {
         val existingProduct = productRepository.getAll().first()
         showSaveConfirmationDialogArrange(existingProduct)
 
-        Espresso.pressBack()
-        onView(withText(R.string.discard))
-            .inRoot(isDialog())
-            .perform(click())
+        pressBack()
+        clickSaveConfirmationDialogButton(R.string.discard)
 
         assertFalse(addEditFragmentListener.addEditSuccess)
 
@@ -544,10 +547,8 @@ class ProductFragmentTest : KoinTest {
         val existingProduct = productRepository.getAll().first()
         showSaveConfirmationDialogArrange(existingProduct)
 
-        Espresso.pressBack()
-        onView(withText(R.string.keep_editing))
-            .inRoot(isDialog())
-            .perform(click())
+        pressBack()
+        clickSaveConfirmationDialogButton(R.string.keep_editing)
 
         assertFalse(addEditFragmentListener.addEditSuccess)
 
@@ -559,16 +560,20 @@ class ProductFragmentTest : KoinTest {
         assertEquals(existingProduct.name, updatedProduct?.name)
     }
 
+    private fun clickSaveConfirmationDialogButton(@StringRes buttonId: Int) {
+        onView(withText(buttonId))
+            .inRoot(isDialog())
+            .perform(click())
+    }
+
     @Test
     fun showSaveConfirmationDialog_saveClicked_savesAndCloses() = runTest {
         val newName = "Modified Product Name"
         val existingProduct = productRepository.getAll().first()
         showSaveConfirmationDialogArrange(existingProduct)
 
-        Espresso.pressBack()
-        onView(withText(R.string.save))
-            .inRoot(isDialog())
-            .perform(click())
+        pressBack()
+        clickSaveConfirmationDialogButton(R.string.save)
 
         assertTrue(addEditFragmentListener.addEditSuccess)
 
@@ -584,11 +589,8 @@ class ProductFragmentTest : KoinTest {
 
         showSaveConfirmationDialogArrange(existingProduct, duplicateMame)
 
-        // Show dialog and click save
-        Espresso.pressBack()
-        onView(withText(R.string.save))
-            .inRoot(isDialog())
-            .perform(click())
+        pressBack()
+        clickSaveConfirmationDialogButton(R.string.save)
 
         verifyErrorSnackbarShown()
     }
