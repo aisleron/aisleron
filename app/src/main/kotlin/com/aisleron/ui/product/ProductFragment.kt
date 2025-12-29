@@ -17,6 +17,7 @@
 
 package com.aisleron.ui.product
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -25,6 +26,8 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuProvider
 import androidx.core.view.doOnLayout
@@ -47,6 +50,7 @@ import com.aisleron.ui.bundles.AddEditProductBundle
 import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.settings.ProductPreferences
 import com.aisleron.ui.widgets.ErrorSnackBar
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.launch
@@ -59,6 +63,7 @@ class ProductFragment(
     private val fabHandler: FabHandler,
 ) : Fragment(), MenuProvider, AisleronFragment {
 
+    private var showAddShopFab: Boolean = false
     private val productViewModel: ProductViewModel by viewModel()
     private var _binding: FragmentProductBinding? = null
 
@@ -67,6 +72,12 @@ class ProductFragment(
     private var appTitle: String = ""
 
     private var tabsAdapter: ProductTabsAdapter? = null
+
+    private val backCallback = object : OnBackPressedCallback(false) {
+        override fun handleOnBackPressed() {
+            showSaveConfirmationDialog(requireContext())
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -91,6 +102,12 @@ class ProductFragment(
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentProductBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         setWindowInsetListeners(this, binding.root, false, R.dimen.text_margin,
             applyMargins = true,
             applyBottomPadding = false
@@ -98,46 +115,11 @@ class ProductFragment(
 
         initialiseTabs()
         showHideExtraOptions()
-        // Expand / collapse extra options
+
         binding.txtToggleExtraOptions.setOnClickListener {
             val visible = binding.layoutExtraOptions.isVisible
             productPreferences.setShowExtraOptions(requireContext(), !visible)
             showHideExtraOptions()
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch {
-                    productViewModel.uiData.collect { data ->
-                        // Update EditText only if needed to avoid cursor jumping
-                        if (binding.edtProductName.text.toString() != data.productName) {
-                            binding.edtProductName.setText(data.productName)
-                        }
-
-                        // Update CheckedTextView
-                        if (binding.chkProductInStock.isChecked != data.inStock) {
-                            binding.chkProductInStock.isChecked = data.inStock
-                        }
-                    }
-                }
-
-                launch {
-                    productViewModel.productUiState.collect {
-                        when (it) {
-                            ProductViewModel.ProductUiState.Success -> {
-                                addEditFragmentListener.addEditActionCompleted(requireActivity())
-                            }
-
-                            is ProductViewModel.ProductUiState.Error -> {
-                                displayErrorSnackBar(it.errorCode, it.errorMessage)
-                            }
-
-                            ProductViewModel.ProductUiState.Loading,
-                            ProductViewModel.ProductUiState.Empty -> Unit
-                        }
-                    }
-                }
-            }
         }
 
         binding.edtProductName.doAfterTextChanged {
@@ -151,7 +133,56 @@ class ProductFragment(
             productViewModel.updateInStock(chk.isChecked)
         }
 
-        return binding.root
+        val menuHost = requireActivity()
+        menuHost.addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
+
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, backCallback)
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch { collectUiData() }
+                launch { collectUiState() }
+                launch { collectDirtyFlag() }
+            }
+        }
+    }
+
+    private suspend fun collectDirtyFlag() {
+        productViewModel.isDirty.collect { isDirty ->
+            backCallback.isEnabled = isDirty
+        }
+    }
+
+    private suspend fun collectUiState() {
+        productViewModel.productUiState.collect {
+            when (it) {
+                ProductViewModel.ProductUiState.Success -> {
+                    productViewModel.clearState()
+                    addEditFragmentListener.addEditActionCompleted(requireActivity())
+                }
+
+                is ProductViewModel.ProductUiState.Error -> {
+                    displayErrorSnackBar(it.errorCode, it.errorMessage)
+                }
+
+                ProductViewModel.ProductUiState.Loading,
+                ProductViewModel.ProductUiState.Empty -> Unit
+            }
+        }
+    }
+
+    private suspend fun collectUiData() {
+        productViewModel.uiData.collect { data ->
+            // Update EditText only if needed to avoid cursor jumping
+            if (binding.edtProductName.text.toString() != data.productName) {
+                binding.edtProductName.setText(data.productName)
+            }
+
+            // Update CheckedTextView
+            if (binding.chkProductInStock.isChecked != data.inStock) {
+                binding.chkProductInStock.isChecked = data.inStock
+            }
+        }
     }
 
     private fun showHideExtraOptions() {
@@ -203,7 +234,7 @@ class ProductFragment(
     }
 
     private fun setShowAddShopFab() {
-        val showAddShopFab = productPreferences.showExtraOptions(requireContext())
+        showAddShopFab = productPreferences.showExtraOptions(requireContext())
                 && binding.pgrProductOptions.currentItem == ProductTabsAdapter.ProductTab.TAB_AISLES.ordinal
 
         if (showAddShopFab) {
@@ -216,15 +247,14 @@ class ProductFragment(
     private fun displayErrorSnackBar(
         errorCode: AisleronException.ExceptionCode, errorMessage: String?
     ) {
+        val anchorView = if (showAddShopFab) fabHandler.getFabView(requireActivity()) else null
+
         val snackBarMessage =
             getString(AisleronExceptionMap().getErrorResourceId(errorCode), errorMessage)
-        ErrorSnackBar().make(requireView(), snackBarMessage, Snackbar.LENGTH_SHORT).show()
-    }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        val menuHost = requireActivity()
-        menuHost.addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
+        ErrorSnackBar().make(
+            requireView(), snackBarMessage, Snackbar.LENGTH_SHORT, anchorView
+        ).show()
     }
 
     override fun onDestroyView() {
@@ -248,26 +278,6 @@ class ProductFragment(
         }
     }
 
-    companion object {
-        @JvmStatic
-        fun newInstance(
-            name: String?,
-            inStock: Boolean,
-            addEditFragmentListener: AddEditFragmentListener,
-            applicationTitleUpdateListener: ApplicationTitleUpdateListener,
-            productPreferences: ProductPreferences,
-            fabHandler: FabHandler
-        ) =
-            ProductFragment(
-                addEditFragmentListener,
-                applicationTitleUpdateListener,
-                productPreferences,
-                fabHandler
-            ).apply {
-                arguments = Bundler().makeAddProductBundle(name, inStock)
-            }
-    }
-
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
         menuInflater.inflate(R.menu.add_edit_fragment_main, menu)
     }
@@ -279,7 +289,31 @@ class ProductFragment(
                 true
             }
 
+            android.R.id.home -> {
+                requireActivity().onBackPressedDispatcher.onBackPressed()
+                true
+            }
+
             else -> false
         }
+    }
+
+    private fun showSaveConfirmationDialog(context: Context) {
+        val builder = MaterialAlertDialogBuilder(context)
+        builder
+            .setTitle(getString(R.string.save_changes_title))
+            .setMessage(R.string.save_changes_message)
+            .setNegativeButton(R.string.discard) { _, _ ->
+                backCallback.isEnabled = false
+                requireActivity().onBackPressedDispatcher.onBackPressed()
+            }
+            .setPositiveButton(R.string.save) { _, _ ->
+                productViewModel.saveProduct()
+            }
+            .setNeutralButton(R.string.keep_editing, null)
+
+        val dialog: AlertDialog = builder.create()
+
+        dialog.show()
     }
 }

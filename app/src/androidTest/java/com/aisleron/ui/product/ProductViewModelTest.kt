@@ -49,9 +49,9 @@ import com.aisleron.ui.bundles.AisleListEntry
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -59,9 +59,11 @@ import org.koin.test.KoinTest
 import org.koin.test.get
 import org.koin.test.mock.declare
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ProductViewModelTest() : KoinTest {
@@ -95,15 +97,15 @@ class ProductViewModelTest() : KoinTest {
         productViewModel.saveProduct()
 
         val updatedProduct = productRepository.get(existingProduct.id)
-        Assert.assertNotNull(updatedProduct)
-        Assert.assertEquals(updatedProductName, updatedProduct?.name)
-        Assert.assertEquals(inStock, updatedProduct?.inStock)
-        Assert.assertEquals(1.25, updatedProduct?.qtyIncrement)
-        Assert.assertEquals(TrackingMode.CHECKBOX_QUANTITY, updatedProduct?.trackingMode)
-        Assert.assertEquals("testUoM", updatedProduct?.unitOfMeasure)
+        assertNotNull(updatedProduct)
+        assertEquals(updatedProductName, updatedProduct.name)
+        assertEquals(inStock, updatedProduct.inStock)
+        assertEquals(1.25, updatedProduct.qtyIncrement)
+        assertEquals(TrackingMode.CHECKBOX_QUANTITY, updatedProduct.trackingMode)
+        assertEquals("testUoM", updatedProduct.unitOfMeasure)
 
         val countAfter: Int = productRepository.getAll().count()
-        Assert.assertEquals(countBefore, countAfter)
+        assertEquals(countBefore, countAfter)
     }
 
     @Test
@@ -130,17 +132,17 @@ class ProductViewModelTest() : KoinTest {
         productViewModel.saveProduct()
 
         val newProduct = productRepository.getByName(newProductName)
-        Assert.assertNotNull(newProduct)
-        Assert.assertEquals(newProductName, newProduct?.name)
-        Assert.assertEquals(inStock, newProduct?.inStock)
-        Assert.assertEquals(1.25, newProduct?.qtyIncrement)
-        Assert.assertEquals(TrackingMode.CHECKBOX_QUANTITY, newProduct?.trackingMode)
-        Assert.assertEquals("testUoM", newProduct?.unitOfMeasure)
-        Assert.assertEquals(newProductName, productViewModel.uiData.value.productName)
-        Assert.assertEquals(inStock, productViewModel.uiData.value.inStock)
+        assertNotNull(newProduct)
+        assertEquals(newProductName, newProduct.name)
+        assertEquals(inStock, newProduct.inStock)
+        assertEquals(1.25, newProduct.qtyIncrement)
+        assertEquals(TrackingMode.CHECKBOX_QUANTITY, newProduct.trackingMode)
+        assertEquals("testUoM", newProduct.unitOfMeasure)
+        assertEquals(newProductName, productViewModel.uiData.value.productName)
+        assertEquals(inStock, productViewModel.uiData.value.inStock)
 
         val countAfter: Int = productRepository.getAll().count()
-        Assert.assertEquals(countBefore + 1, countAfter)
+        assertEquals(countBefore + 1, countAfter)
     }
 
     @Test
@@ -159,13 +161,16 @@ class ProductViewModelTest() : KoinTest {
         val existingProduct: Product = productRepository.getAll().first()
 
         productViewModel.hydrate(existingProduct.id, existingProduct.inStock)
+        observeFlows(productViewModel)
         productViewModel.updateProductName(updatedProductName)
         productViewModel.updateInStock(existingProduct.inStock)
         productViewModel.saveProduct()
 
-        Assert.assertEquals(
+        assertEquals(
             ProductViewModel.ProductUiState.Success, productViewModel.productUiState.value
         )
+
+        assertFalse(productViewModel.isDirty.value)
     }
 
     @Test
@@ -173,10 +178,11 @@ class ProductViewModelTest() : KoinTest {
         val updatedProductName = ""
 
         productViewModel.hydrate(0, true)
+        observeFlows(productViewModel)
         productViewModel.updateProductName(updatedProductName)
         productViewModel.saveProduct()
 
-        Assert.assertEquals(
+        assertEquals(
             ProductViewModel.ProductUiState.Empty, productViewModel.productUiState.value
         )
     }
@@ -186,11 +192,14 @@ class ProductViewModelTest() : KoinTest {
         val existingProduct: Product = productRepository.getAll().first()
 
         productViewModel.hydrate(0, existingProduct.inStock)
+        observeFlows(productViewModel)
         productViewModel.updateProductName(existingProduct.name)
         productViewModel.updateInStock(!existingProduct.inStock)
         productViewModel.saveProduct()
 
-        Assert.assertTrue(productViewModel.productUiState.value is ProductViewModel.ProductUiState.Error)
+        assertTrue(productViewModel.productUiState.value is ProductViewModel.ProductUiState.Error)
+
+        assertTrue(productViewModel.isDirty.value)
     }
 
     @Test
@@ -208,38 +217,41 @@ class ProductViewModelTest() : KoinTest {
         val pvm = get<ProductViewModel>()
 
         pvm.hydrate(0, false)
+        observeFlows(pvm)
         pvm.updateProductName("Bogus Product")
         pvm.updateInStock(true)
         pvm.saveProduct()
 
-        Assert.assertTrue(pvm.productUiState.value is ProductViewModel.ProductUiState.Error)
-        Assert.assertEquals(
+        assertTrue(pvm.productUiState.value is ProductViewModel.ProductUiState.Error)
+        assertEquals(
             AisleronException.ExceptionCode.GENERIC_EXCEPTION,
             (pvm.productUiState.value as ProductViewModel.ProductUiState.Error).errorCode
         )
-        Assert.assertEquals(
+        assertEquals(
             exceptionMessage,
             (pvm.productUiState.value as ProductViewModel.ProductUiState.Error).errorMessage
         )
+
+        assertTrue(pvm.isDirty.value)
     }
 
     @Test
     fun testGetProductName_ProductExists_ReturnsProductName() = runTest {
         val existingProduct: Product = productRepository.getAll().first()
         productViewModel.hydrate(existingProduct.id, existingProduct.inStock)
-        Assert.assertEquals(existingProduct.name, productViewModel.uiData.value.productName)
+        assertEquals(existingProduct.name, productViewModel.uiData.value.productName)
     }
 
     @Test
     fun testGetProductName_ProductDoesNotExists_ReturnsEmptyProductName() = runTest {
         productViewModel.hydrate(0, false)
-        Assert.assertEquals("", productViewModel.uiData.value.productName)
+        assertEquals("", productViewModel.uiData.value.productName)
     }
 
     @Test
     fun testHydrate_ProductDoesNotExists_UiStateIsEmpty() = runTest {
         productViewModel.hydrate(1, true)
-        Assert.assertTrue(productViewModel.productUiState.value is ProductViewModel.ProductUiState.Empty)
+        assertTrue(productViewModel.productUiState.value is ProductViewModel.ProductUiState.Empty)
     }
 
     @Test
@@ -255,7 +267,7 @@ class ProductViewModelTest() : KoinTest {
             get<ChangeProductAisleUseCase>()
         )
 
-        Assert.assertNotNull(pvm)
+        assertNotNull(pvm)
     }
 
     @Test
@@ -271,15 +283,15 @@ class ProductViewModelTest() : KoinTest {
         productViewModel.updateInStock(inStock)
         productViewModel.saveProduct()
 
-        Assert.assertEquals(newProductName, productViewModel.uiData.value.productName)
-        Assert.assertEquals(inStock, productViewModel.uiData.value.inStock)
+        assertEquals(newProductName, productViewModel.uiData.value.productName)
+        assertEquals(inStock, productViewModel.uiData.value.inStock)
 
         val newProduct = productRepository.getByName(newProductName)
-        Assert.assertEquals(newProductName, newProduct?.name)
-        Assert.assertEquals(inStock, newProduct?.inStock)
+        assertEquals(newProductName, newProduct?.name)
+        assertEquals(inStock, newProduct?.inStock)
 
         val countAfter = aisleProductRepository.getAll().count { it.aisleId == aisle.id }
-        Assert.assertEquals(countBefore + 1, countAfter)
+        assertEquals(countBefore + 1, countAfter)
     }
 
     @Test
@@ -291,7 +303,7 @@ class ProductViewModelTest() : KoinTest {
 
         productViewModel.hydrate(existingProduct.id, existingProduct.inStock)
 
-        Assert.assertEquals(noteText, productViewModel.noteFlow.value)
+        assertEquals(noteText, productViewModel.noteFlow.value)
     }
 
     @Test
@@ -301,11 +313,14 @@ class ProductViewModelTest() : KoinTest {
         val existingProduct: Product = productRepository.getAll().first()
         productRepository.update(existingProduct.copy(noteId = noteId))
         productViewModel.hydrate(existingProduct.id, existingProduct.inStock)
+        observeFlows(productViewModel)
 
         val updatedNote = "Updated note text"
         productViewModel.updateNote(updatedNote)
 
-        Assert.assertEquals(updatedNote, productViewModel.noteFlow.value)
+        assertEquals(updatedNote, productViewModel.noteFlow.value)
+
+        assertTrue(productViewModel.isDirty.value)
     }
 
     @Test
@@ -396,6 +411,7 @@ class ProductViewModelTest() : KoinTest {
     fun updateProductAisle_newAisleSelected_productAislesFlowIsUpdated() = runTest {
         val product = productRepository.getAll().first()
         productViewModel.hydrate(product.id, product.inStock)
+        observeFlows(productViewModel)
         val aisleInfoToUpdate = productViewModel.productAisles.value.first { it.aisleId != 0 }
         productViewModel.requestLocationAisles(aisleInfoToUpdate)
         val newAisle = get<AisleRepository>().getForLocation(aisleInfoToUpdate.locationId)
@@ -409,6 +425,8 @@ class ProductViewModelTest() : KoinTest {
         assertEquals(newAisle.id, updatedAisleInfo.aisleId)
         assertEquals(newAisle.name, updatedAisleInfo.aisleName)
         assertEquals(aisleInfoToUpdate.initialAisleId, updatedAisleInfo.initialAisleId)
+
+        assertTrue(productViewModel.isDirty.value)
     }
 
     @Test
@@ -500,20 +518,17 @@ class ProductViewModelTest() : KoinTest {
     fun updateUnitOfMeasure_IsNewUoM_UiDataUpdated() = runTest {
         val product = productRepository.getAll().first()
         productViewModel.hydrate(product.id, product.inStock)
-
-        // Start collecting in a background job
-        val results = mutableListOf<ProductUiData>()
-        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-            productViewModel.uiData.collect { results.add(it) }
-        }
+        observeFlows(productViewModel)
 
         // Act
         val newUoM = "New UoM"
         productViewModel.updateUnitOfMeasure(newUoM)
 
         // Assert
-        assertEquals(newUoM, results.last().unitOfMeasure)
+        assertEquals(newUoM, productViewModel.uiData.value.unitOfMeasure)
         assertNotEquals(newUoM, product.unitOfMeasure)
+
+        assertTrue(productViewModel.isDirty.value)
     }
 
     @Test
@@ -522,40 +537,40 @@ class ProductViewModelTest() : KoinTest {
         val product = productRepository.getAll().first().copy(unitOfMeasure = uoM)
         get<UpdateProductUseCase>().invoke(product)
         productViewModel.hydrate(product.id, product.inStock)
-
-        // Start collecting in a background job
-        val results = mutableListOf<ProductUiData>()
-        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-            productViewModel.uiData.collect { results.add(it) }
-        }
+        observeFlows(productViewModel)
 
         // Act
         productViewModel.updateUnitOfMeasure(uoM)
 
         // Assert
-        assertEquals(1, results.size)
-        assertEquals(uoM, results.last().unitOfMeasure)
+        assertEquals(uoM, productViewModel.uiData.value.unitOfMeasure)
         assertEquals(uoM, product.unitOfMeasure)
+
+        assertFalse(productViewModel.isDirty.value)
+    }
+
+    private fun TestScope.observeFlows(viewModel: ProductViewModel) {
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            launch { viewModel.isDirty.collect { } }
+            launch { viewModel.uiData.collect { } }
+        }
     }
 
     @Test
     fun updateQtyIncrement_IsNewIncrement_UiDataUpdated() = runTest {
         val product = productRepository.getAll().first()
         productViewModel.hydrate(product.id, product.inStock)
-
-        // Start collecting in a background job
-        val results = mutableListOf<ProductUiData>()
-        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-            productViewModel.uiData.collect { results.add(it) }
-        }
+        observeFlows(productViewModel)
 
         // Act
         val newQtyIncrement = 1.234
         productViewModel.updateQtyIncrement(newQtyIncrement)
 
         // Assert
-        assertEquals(newQtyIncrement, results.last().qtyIncrement)
+        assertEquals(newQtyIncrement, productViewModel.uiData.value.qtyIncrement)
         assertNotEquals(newQtyIncrement, product.qtyIncrement)
+
+        assertTrue(productViewModel.isDirty.value)
     }
 
     @Test
@@ -564,40 +579,33 @@ class ProductViewModelTest() : KoinTest {
         val product = productRepository.getAll().first().copy(qtyIncrement = increment)
         get<UpdateProductUseCase>().invoke(product)
         productViewModel.hydrate(product.id, product.inStock)
-
-        // Start collecting in a background job
-        val results = mutableListOf<ProductUiData>()
-        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-            productViewModel.uiData.collect { results.add(it) }
-        }
+        observeFlows(productViewModel)
 
         // Act
         productViewModel.updateQtyIncrement(increment)
 
         // Assert
-        assertEquals(1, results.size)
-        assertEquals(increment, results.last().qtyIncrement)
+        assertEquals(increment, productViewModel.uiData.value.qtyIncrement)
         assertEquals(increment, product.qtyIncrement)
+
+        assertFalse(productViewModel.isDirty.value)
     }
 
     @Test
     fun updateTrackingMode_IsNewTrackingMode_UiDataUpdated() = runTest {
         val product = productRepository.getAll().first()
         productViewModel.hydrate(product.id, product.inStock)
-
-        // Start collecting in a background job
-        val results = mutableListOf<ProductUiData>()
-        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-            productViewModel.uiData.collect { results.add(it) }
-        }
+        observeFlows(productViewModel)
 
         // Act
         val newTrackingMode = TrackingMode.CHECKBOX_QUANTITY
         productViewModel.updateTrackingMode(newTrackingMode)
 
         // Assert
-        assertEquals(newTrackingMode, results.last().trackingMode)
+        assertEquals(newTrackingMode, productViewModel.uiData.value.trackingMode)
         assertNotEquals(newTrackingMode, product.trackingMode)
+
+        assertTrue(productViewModel.isDirty.value)
     }
 
     @Test
@@ -606,19 +614,15 @@ class ProductViewModelTest() : KoinTest {
         val product = productRepository.getAll().first().copy(trackingMode = trackingMode)
         get<UpdateProductUseCase>().invoke(product)
         productViewModel.hydrate(product.id, product.inStock)
-
-        // Start collecting in a background job
-        val results = mutableListOf<ProductUiData>()
-        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-            productViewModel.uiData.collect { results.add(it) }
-        }
+        observeFlows(productViewModel)
 
         // Act
         productViewModel.updateTrackingMode(trackingMode)
 
         // Assert
-        assertEquals(1, results.size)
-        assertEquals(trackingMode, results.last().trackingMode)
+        assertEquals(trackingMode, productViewModel.uiData.value.trackingMode)
         assertEquals(trackingMode, product.trackingMode)
+
+        assertFalse(productViewModel.isDirty.value)
     }
 }

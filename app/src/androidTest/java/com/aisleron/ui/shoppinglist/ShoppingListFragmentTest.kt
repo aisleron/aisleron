@@ -92,6 +92,7 @@ import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.loyaltycard.LoyaltyCardProvider
 import com.aisleron.ui.loyaltycard.LoyaltyCardProviderTestImpl
 import com.aisleron.ui.settings.ShoppingListPreferencesTestImpl
+import com.aisleron.utils.SystemIds
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -114,11 +115,6 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class ShoppingListFragmentTest : KoinTest {
-    companion object {
-        private const val SNACKBAR_TEXT_RES_ID = com.google.android.material.R.id.snackbar_text
-        private const val SNACKBAR_ACTION_RES_ID = com.google.android.material.R.id.snackbar_action
-    }
-
     private lateinit var bundler: Bundler
     private lateinit var applicationTitleUpdateListener: ApplicationTitleUpdateListenerTestImpl
     private lateinit var fabHandler: FabHandlerTestImpl
@@ -577,7 +573,7 @@ class ShoppingListFragmentTest : KoinTest {
             .inRoot(isDialog())
             .perform(click())
 
-        onView(withId(SNACKBAR_TEXT_RES_ID)).check(
+        onView(withId(SystemIds.SNACKBAR_TEXT)).check(
             matches(
                 ViewMatchers.withEffectiveVisibility(
                     ViewMatchers.Visibility.VISIBLE
@@ -814,7 +810,7 @@ class ShoppingListFragmentTest : KoinTest {
 
         getCheckboxForProduct(product).perform(click())
 
-        onView(withId(SNACKBAR_TEXT_RES_ID)).check(
+        onView(withId(SystemIds.SNACKBAR_TEXT)).check(
             matches(
                 ViewMatchers.withEffectiveVisibility(
                     ViewMatchers.Visibility.VISIBLE
@@ -837,7 +833,7 @@ class ShoppingListFragmentTest : KoinTest {
 
         getCheckboxForProduct(product).perform(click())
 
-        onView(withId(SNACKBAR_TEXT_RES_ID)).check(doesNotExist())
+        onView(withId(SystemIds.SNACKBAR_TEXT)).check(doesNotExist())
     }
 
     @Test
@@ -859,7 +855,7 @@ class ShoppingListFragmentTest : KoinTest {
         val productRepository = get<ProductRepository>()
         val productStatusAfterChange = productRepository.get(product.id)?.inStock
 
-        onView(withId(SNACKBAR_ACTION_RES_ID)).perform(click())
+        onView(withId(SystemIds.SNACKBAR_ACTION)).perform(click())
 
         val productStatusAfterUndo = productRepository.get(product.id)?.inStock
 
@@ -1197,7 +1193,7 @@ class ShoppingListFragmentTest : KoinTest {
             fragment.onMenuItemSelected(menuItem)
         }
 
-        onView(withId(SNACKBAR_TEXT_RES_ID)).check(
+        onView(withId(SystemIds.SNACKBAR_TEXT)).check(
             matches(
                 ViewMatchers.withEffectiveVisibility(
                     ViewMatchers.Visibility.VISIBLE
@@ -1293,7 +1289,7 @@ class ShoppingListFragmentTest : KoinTest {
         onView(withText(copyDialogTitle))
             .check(doesNotExist())
 
-        val snackbar = onView(withId(SNACKBAR_TEXT_RES_ID))
+        val snackbar = onView(withId(SystemIds.SNACKBAR_TEXT))
         snackbar.checkVisibility(View.VISIBLE)
         snackbar.check(matches(withText(confirmCopy)))
 

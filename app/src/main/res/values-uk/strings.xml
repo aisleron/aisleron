@@ -127,6 +127,10 @@
     <string name="in_stock_at_home">В наявності вдома?</string>
     <string name="shop_logo">Логотип магазину</string>
     <string name="aisle_expand">Розширення проходу</string>
+    <string name="discard">Скасувати</string>
+    <string name="save_changes_title">Зберегти зміни?</string>
+    <string name="save_changes_message">У вас є незбережені зміни. Чи бажаєте ви зберегти їх перед виходом?</string>
+    <string name="keep_editing">Продовжити редагування</string>
     <string name="show_empty_aisles">Показати порожні проходи</string>
     <string name="mnu_edit_location">Редагувати магазин</string>
     <string name="mnu_sort_list_by_name">Сортувати за назвою</string>
