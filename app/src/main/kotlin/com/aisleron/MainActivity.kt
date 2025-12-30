@@ -38,6 +38,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.navigation.FloatingWindow
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
@@ -62,6 +63,8 @@ class MainActivity : AisleronActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
     private lateinit var prefsListener: SharedPreferences.OnSharedPreferenceChangeListener
+
+    private var actionMode: ActionMode? = null
 
     val fabHandler: FabHandler by inject()
 
@@ -120,10 +123,13 @@ class MainActivity : AisleronActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         binding.navView.setupWithNavController(navController)
 
-        navController.addOnDestinationChangedListener { _, _, _ ->
+        navController.addOnDestinationChangedListener { _, navDestination, _ ->
+            if (navDestination !is FloatingWindow) {
+                actionMode?.finish()
+            }
+
             val appBarLayout = binding.appBarMain.appBarLayout
             appBarLayout.setExpanded(true, true)
-
             drawerLayout.closeDrawers()
             fabHandler.setFabItems(this)
         }
@@ -308,6 +314,7 @@ class MainActivity : AisleronActivity() {
     }
 
     override fun onSupportActionModeStarted(mode: ActionMode) {
+        actionMode = mode
         binding.appBarMain.toolbar.removeCallbacks(enableToolbarRunnable)
         super.onSupportActionModeStarted(mode)
         supportActionBar?.setDisplayShowTitleEnabled(false)
@@ -317,6 +324,7 @@ class MainActivity : AisleronActivity() {
     }
 
     override fun onSupportActionModeFinished(mode: ActionMode) {
+        actionMode = null
         super.onSupportActionModeFinished(mode)
         binding.appBarMain.toolbar.post(enableToolbarRunnable)
     }

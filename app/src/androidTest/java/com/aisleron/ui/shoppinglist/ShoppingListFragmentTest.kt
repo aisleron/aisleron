@@ -652,10 +652,6 @@ class ShoppingListFragmentTest : KoinTest {
         assertEquals(product.id, addEditProductBundle.productId)
         assertEquals(AddEditProductBundle.ProductAction.EDIT, addEditProductBundle.actionType)
         assertEquals(R.id.nav_add_product, navController.currentDestination?.id)
-
-        scenario.onActivity {
-            assertFalse(activityFragment.hasSelectedItems())
-        }
     }
 
     @Test
@@ -728,7 +724,7 @@ class ShoppingListFragmentTest : KoinTest {
         val shoppingListBundle =
             bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
 
-        val scenario = getActivityScenario(shoppingListBundle)
+        getActivityScenario(shoppingListBundle)
 
         val aisleItem = onView(allOf(withText(aisle.name), withId(R.id.txt_aisle_name)))
         aisleItem.perform(longClick())
@@ -741,10 +737,6 @@ class ShoppingListFragmentTest : KoinTest {
         onView(allOf(withText(aisle.name), instanceOf(EditText::class.java)))
             .inRoot(isDialog())
             .check(matches(isDisplayed()))
-
-        scenario.onActivity {
-            assertFalse(activityFragment.hasSelectedItems())
-        }
     }
 
     @Test
@@ -887,10 +879,6 @@ class ShoppingListFragmentTest : KoinTest {
         val addEditProductBundle = bundler.getAddEditProductBundle(bundle)
         assertEquals(aisle.id, addEditProductBundle.aisleId)
         assertEquals(AddEditProductBundle.ProductAction.ADD, addEditProductBundle.actionType)
-
-        scenario.onActivity {
-            assertFalse(activityFragment.hasSelectedItems())
-        }
     }
 
     @Test

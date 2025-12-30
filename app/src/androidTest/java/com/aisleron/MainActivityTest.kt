@@ -29,6 +29,7 @@ import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.View
 import androidx.annotation.AttrRes
+import androidx.annotation.IdRes
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.net.toUri
@@ -41,6 +42,7 @@ import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.longClick
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.contrib.DrawerActions
 import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intended
@@ -542,7 +544,38 @@ class MainActivityTest : KoinTest {
         )
 
         // Assert toolbar state is still cleared
-        assertTrue((actionBar!!.displayOptions and ActionBar.DISPLAY_SHOW_TITLE) == 0)
+        assertEquals(0, (actionBar!!.displayOptions and ActionBar.DISPLAY_SHOW_TITLE))
         onView(withId(R.id.action_search)).check(doesNotExist())
+    }
+
+    @Test
+    fun onActionMode_NavigateToDifferentPAge_ActionModeEnded() = runTest {
+        var actionBar: ActionBar? = null
+        val scenario = launchWithShoppingList()
+        scenario.onActivity { actionBar = it.supportActionBar }
+        assertTrue((actionBar!!.displayOptions and ActionBar.DISPLAY_SHOW_TITLE) != 0)
+
+        // Long click to start action mode
+        onView(withId(R.id.frg_shopping_list)).perform(
+            RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(
+                0, longClick()
+            )
+        )
+
+        navigateToAllItemsList(R.id.nav_needed)
+
+        assertNotEquals(0, (actionBar!!.displayOptions and ActionBar.DISPLAY_SHOW_TITLE))
+        onView(withId(R.id.action_search)).check(matches(isDisplayed()))
+    }
+
+    private fun openNavigationDrawer() {
+        onView(withId(R.id.drawer_layout))
+            .perform(DrawerActions.open())
+    }
+
+    private fun navigateToAllItemsList(@IdRes homeListId: Int) {
+        openNavigationDrawer()
+        onView(withId(homeListId))
+            .perform(click())
     }
 }

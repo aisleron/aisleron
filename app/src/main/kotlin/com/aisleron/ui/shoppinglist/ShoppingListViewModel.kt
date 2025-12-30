@@ -172,8 +172,15 @@ class ShoppingListViewModel(
     private fun getShoppingList(
         location: Location?, parameters: ShoppingListFilterParameters
     ): List<ShoppingListItem> {
+        val selectedSignatures = selectedListItems
+            .filter { it.selected }
+            .map { Triple(it.itemType, it.id, it.aisleId) }
+            .toSet()
+
         val filteredList: MutableList<ShoppingListItem> = location?.let { l ->
             l.aisles.filter { a -> isValidAisle(a, parameters) }.flatMap { a ->
+                val aisleSignature = Triple(ShoppingListItem.ItemType.AISLE, a.id, a.id)
+
                 listOf(
                     AisleShoppingListItemViewModel(
                         rank = a.rank,
@@ -182,7 +189,7 @@ class ShoppingListViewModel(
                         isDefault = a.isDefault,
                         locationId = a.locationId,
                         expanded = a.expanded,
-                        selected = false,
+                        selected = selectedSignatures.contains(aisleSignature),
                         updateAisleRankUseCase = updateAisleRankUseCase,
                         getAisleUseCase = getAisleUseCase,
                         removeAisleUseCase = removeAisleUseCase,
@@ -190,6 +197,10 @@ class ShoppingListViewModel(
                     )) +
                         a.products.filter { ap -> isValidAisleProduct(ap, parameters, a.expanded) }
                             .map { ap ->
+                                val productSignature = Triple(
+                                    ShoppingListItem.ItemType.PRODUCT, ap.product.id, ap.aisleId
+                                )
+
                                 ProductShoppingListItemViewModel(
                                     aisleRank = a.rank,
                                     rank = ap.rank,
@@ -199,7 +210,7 @@ class ShoppingListViewModel(
                                     qtyNeeded = ap.product.qtyNeeded,
                                     noteId = ap.product.noteId,
                                     aisleId = ap.aisleId,
-                                    selected = false,
+                                    selected = selectedSignatures.contains(productSignature),
                                     aisleProductId = ap.id,
                                     removeProductUseCase = removeProductUseCase,
                                     updateAisleProductRankUseCase = updateAisleProductRankUseCase,
@@ -313,6 +324,12 @@ class ShoppingListViewModel(
 
         searchJob = coroutineScope.launchHandling {
             delay(debounceTime) //Add debounce to the search so it doesn't execute every keypress
+
+            if (productNameQuery.isBlank()
+                || shoppingListFilterParameters.copy(productNameQuery = productNameQuery) == shoppingListFilterParameters
+            ) {
+                return@launchHandling
+            }
 
             shoppingListFilterParameters.filterType = FilterType.ALL
             shoppingListFilterParameters.showDefaultAisle = true

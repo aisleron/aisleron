@@ -40,6 +40,7 @@ import com.aisleron.di.useCaseModule
 import com.aisleron.di.viewModelTestModule
 import com.aisleron.domain.product.ProductRepository
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
+import com.aisleron.utils.SystemIds
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.allOf
@@ -54,8 +55,6 @@ import org.koin.test.get
 class SearchBoxTest : KoinTest {
 
     private lateinit var scenario: ActivityScenario<MainActivity>
-    private val searchBoxResId = androidx.appcompat.R.id.search_src_text
-    private val searchCloseBtnResId = androidx.appcompat.R.id.search_close_btn
 
     @get:Rule
     val koinTestRule = KoinTestRule(
@@ -95,7 +94,7 @@ class SearchBoxTest : KoinTest {
 
     private fun getSearchTextBox(): ViewInteraction = onView(
         allOf(
-            withId(searchBoxResId),
+            withId(SystemIds.SEARCH_BOX),
             isDisplayed()
         )
     )
@@ -112,7 +111,7 @@ class SearchBoxTest : KoinTest {
     @Test
     fun onSearchClick_SearchBoxDisplayed() {
         activateSearchBox()
-        onView(withId(searchBoxResId)).check(matches(isDisplayed()))
+        onView(withId(SystemIds.SEARCH_BOX)).check(matches(isDisplayed()))
     }
 
     @Test
@@ -132,20 +131,20 @@ class SearchBoxTest : KoinTest {
     }
 
     @Test
-    fun onSearchBox_ClearSearchClicked_ShowProducts() = runTest {
+    fun onSearchBox_ClearSearchClicked_DonNotRunSearch() = runTest {
         val product = get<ProductRepository>().getAll().first()
         val searchString = "This is Not a Real Product Name"
 
         performSearch(searchString)
         val clearSearch = onView(
             Matchers.allOf(
-                withId(searchCloseBtnResId),
+                withId(SystemIds.SEARCH_CLOSE_BTN),
                 isDisplayed()
             )
         )
         clearSearch.perform(click())
 
-        getProductView(product.name).check(matches(isDisplayed()))
+        getProductView(product.name).check(doesNotExist())
     }
 
     @Test
