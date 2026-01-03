@@ -90,7 +90,7 @@
     <string name="loyalty_card">Карта за лоялност</string>
     <string name="delete_loyalty_card">Изтриване на карта за лоялност</string>
     <string name="get_loyalty_card">Търсене на карта за лоялност</string>
-    <string name="loyalty_card_provider_catima">Catima — Портфейл и Карта за лоялност</string>
+    <string name="loyalty_card_provider_catima">Catima — портфейл за карти</string>
     <string name="loyalty_card_provider_missing_title">Няма инсталиран доставчик на карти за лоялност</string>
     <string name="loyalty_card_provider_missing_message"><b><i>%1$s</i></b> е задължителен за показване на карти за лоялност. Искате ли да отворите уебсайта им, за да научите повече за него?</string>
     <string name="invalid_loyalty_card_exception">ГРЕШКА: Невалиден идентификационен номер на картата за лоялност</string>
