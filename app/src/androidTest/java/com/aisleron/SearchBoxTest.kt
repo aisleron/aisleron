@@ -19,6 +19,7 @@ package com.aisleron
 
 
 import androidx.test.core.app.ActivityScenario
+import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.ViewInteraction
 import androidx.test.espresso.action.ViewActions.click
@@ -40,6 +41,8 @@ import com.aisleron.di.useCaseModule
 import com.aisleron.di.viewModelTestModule
 import com.aisleron.domain.product.ProductRepository
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
+import com.aisleron.ui.FabHandler
+import com.aisleron.ui.FabHandlerImpl
 import com.aisleron.utils.SystemIds
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -51,6 +54,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.koin.test.KoinTest
 import org.koin.test.get
+import org.koin.test.mock.declare
 
 class SearchBoxTest : KoinTest {
 
@@ -71,8 +75,14 @@ class SearchBoxTest : KoinTest {
 
     @Before
     fun setUp() {
-        SharedPreferencesInitializer().clearPreferences()
-        SharedPreferencesInitializer().setIsInitialized(true)
+        declare<FabHandler> { FabHandlerImpl(get()) }
+        SharedPreferencesInitializer().apply {
+            clearPreferences()
+            setIsInitialized(true)
+            setLastUpdateCode(BuildConfig.VERSION_CODE)
+            setLastUpdateName(BuildConfig.VERSION_NAME)
+        }
+
         runBlocking { get<CreateSampleDataUseCase>().invoke() }
         scenario = ActivityScenario.launch(MainActivity::class.java)
     }
@@ -122,7 +132,7 @@ class SearchBoxTest : KoinTest {
     }
 
     @Test
-    fun onSearchBox_IsNonExistentProduct_ProductDisplayed() {
+    fun onSearchBox_IsNonExistentProduct_ProductNotDisplayed() {
         val searchString = "This is Not a Real Product Name"
 
         performSearch(searchString)
@@ -159,6 +169,24 @@ class SearchBoxTest : KoinTest {
         Thread.sleep(500)
 
         getSearchTextBox().check(doesNotExist())
+    }
+
+    @Test
+    fun onSearchBox_NavigateAwayAndBack_SearchDismissedAndDefaultListShown() {
+        val existingProduct = "Frozen Vegetables"
+        getProductView(existingProduct).check(matches(isDisplayed()))
+
+        val searchString = "Ap"
+        performSearch(searchString)
+        getProductView(existingProduct).check(doesNotExist())
+
+        onView(withId(R.id.fab)).perform(click())
+        onView(withId(R.id.fab_add_product)).perform(click())
+        Espresso.closeSoftKeyboard()
+        Espresso.pressBack()
+
+        getSearchTextBox().check(doesNotExist())
+        getProductView(existingProduct).check(matches(isDisplayed()))
     }
 }
 

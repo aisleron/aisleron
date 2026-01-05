@@ -82,7 +82,7 @@ class ShoppingListFragment(
     private val searchViewListener = object : OnAttachStateChangeListener {
         override fun onViewAttachedToWindow(v: View) {}
         override fun onViewDetachedFromWindow(v: View) {
-            if (!hasSelectedItems()) shoppingListViewModel.requestDefaultList()
+            shoppingListViewModel.requestListRefresh(!hasSelectedItems())
         }
     }
 
@@ -96,7 +96,7 @@ class ShoppingListFragment(
 
     override fun onResume() {
         super.onResume()
-        shoppingListViewModel.setShowEmptyAisles(showEmptyAisles)
+        shoppingListViewModel.requestListRefresh(!hasSelectedItems())
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -289,7 +289,6 @@ class ShoppingListFragment(
     }
 
     private fun showAislePickerDialog(aisleList: List<AisleListEntry>) {
-        // TODO : Replace Bundler with NavigationArgs
         val currentAisle = shoppingListViewModel.getSelectedItemAisleId()
         val aislePickerBundle = AislePickerBundle(
             aisles = aisleList,
@@ -334,7 +333,6 @@ class ShoppingListFragment(
     }
 
     private fun showAisleDialog(aisleId: Int, action: AisleDialogFragment.AisleDialogAction) {
-        // TODO : Replace Bundler with NavigationArgs
         val requestKey = when (action) {
             AisleDialogFragment.AisleDialogAction.ADD_SINGLE -> ADD_AISLE_REQUEST_KEY
             AisleDialogFragment.AisleDialogAction.ADD_MULTIPLE -> ADD_AISLE_REQUEST_KEY
@@ -398,18 +396,16 @@ class ShoppingListFragment(
     }
 
     private fun navigateToAddProduct(filterType: FilterType, aisleId: Int? = null) {
-        // TODO : Replace Bundler with NavigationArgs
-        val bundle =
-            Bundler().makeAddProductBundle(
-                name = null,
-                inStock = filterType == FilterType.IN_STOCK,
-                aisleId = aisleId
-            )
+        val bundle = Bundler().makeAddProductBundle(
+            name = null,
+            inStock = filterType == FilterType.IN_STOCK,
+            aisleId = aisleId
+        )
+
         this.findNavController().navigate(R.id.nav_add_product, bundle)
     }
 
     private fun navigateToEditProduct(productId: Int) {
-        // TODO : Replace Bundler with NavigationArgs
         val bundle = Bundler().makeEditProductBundle(
             productId = productId
         )
@@ -426,7 +422,6 @@ class ShoppingListFragment(
     }
 
     private fun navigateToEditShop(locationId: Int) {
-        // TODO : Replace Bundler with NavigationArgs
         val bundle = Bundler().makeEditLocationBundle(locationId)
         this.findNavController().navigate(R.id.nav_add_shop, bundle)
     }
@@ -448,7 +443,6 @@ class ShoppingListFragment(
     }
 
     private fun showCopyProductDialog(item: ShoppingListItem) {
-        // TODO : Replace Bundler with NavigationArgs
         val dialog = CopyEntityDialogFragment.newInstance(
             type = CopyEntityType.Product(item.id),
             title = getString(R.string.copy_entity_title, item.name),
@@ -473,7 +467,6 @@ class ShoppingListFragment(
     }
 
     private fun showNoteDialog(item: ShoppingListItem) {
-        // TODO : Replace Bundler with NavigationArgs
         val dialog = NoteDialogFragment.newInstance(
             noteParentRef = NoteParentRef.Product(item.id)
         )
@@ -567,7 +560,7 @@ class ShoppingListFragment(
     override fun onDestroyActionMode(mode: ActionMode) {
         actionMode = null
         shoppingListViewModel.clearSelectedListItems()
-        shoppingListViewModel.requestDefaultList()
+        shoppingListViewModel.requestListRefresh(true)
     }
 
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
@@ -583,10 +576,6 @@ class ShoppingListFragment(
         searchView?.setMaxWidth(Integer.MAX_VALUE)
         searchView?.setSearchableInfo(searchableInfo)
         searchView?.setOnQueryTextListener(this@ShoppingListFragment)
-        searchView?.setOnCloseListener {
-            shoppingListViewModel.requestDefaultList()
-            false
-        }
 
         //OnAttachStateChange is here as a workaround because OnCloseListener doesn't fire
         searchView?.addOnAttachStateChangeListener(searchViewListener)
@@ -670,34 +659,8 @@ class ShoppingListFragment(
     fun hasSelectedItems(): Boolean = shoppingListViewModel.hasSelectedItems()
 
     companion object {
-
-        private const val ARG_LOCATION_ID = "locationId"
-        private const val ARG_FILTER_TYPE = "filterType"
-
         const val ADD_AISLE_REQUEST_KEY = "shoppingListAddAisleRequest"
         const val EDIT_AISLE_REQUEST_KEY = "shoppingListEditAisleRequest"
-
         const val AISLE_PICKER_REQUEST_KEY = "shoppingListAislePickerRequest"
-
-        @JvmStatic
-        fun newInstance(
-            locationId: Long,
-            filterType: FilterType,
-            applicationTitleUpdateListener: ApplicationTitleUpdateListener,
-            fabHandler: FabHandler,
-            shoppingListPreferences: ShoppingListPreferences,
-            loyaltyCardProvider: LoyaltyCardProvider
-        ) =
-            ShoppingListFragment(
-                applicationTitleUpdateListener,
-                fabHandler,
-                shoppingListPreferences,
-                loyaltyCardProvider
-            ).apply {
-                arguments = Bundle().apply {
-                    putInt(ARG_LOCATION_ID, locationId.toInt())
-                    putSerializable(ARG_FILTER_TYPE, filterType)
-                }
-            }
     }
 }

@@ -266,91 +266,57 @@ class ShoppingListViewModelTest : KoinTest {
     }
 
     @Test
-    fun requestDefaultList_ShowEmptyAisles_UiStateHasAllAislesAndProducts() = runTest {
+    fun requestListRefresh_returnDefaultListIsFalse_DoNotUpdateFilters() = runTest {
         val locationRepo = get<LocationRepository>()
         val locationId = locationRepo.getAll().first { it.type == LocationType.SHOP }.id
-        val emptyAisleName = "Empty Aisle"
-        get<AisleRepository>().add(
-            Aisle(
-                name = emptyAisleName,
-                locationId = locationId,
-                rank = 1001,
-                products = emptyList(),
-                id = 0,
-                isDefault = false,
-                expanded = false
-            )
-        )
 
-        val location = locationRepo.getLocationWithAislesWithProducts(locationId).first()!!
-        val aisleCount = location.aisles.count()
-        var productCount = 0
-        location.aisles.forEach {
-            productCount += it.products.count()
-        }
+        shoppingListViewModel.hydrate(locationId, FilterType.ALL, false)
 
-        shoppingListViewModel.hydrate(location.id, FilterType.ALL, true)
-        shoppingListViewModel.requestDefaultList()
+        val aisleCount = getAisleListItems(shoppingListViewModel).count()
+        val productCount = getProductListItems(shoppingListViewModel).count()
 
-        val shoppingList = uiStateAsUpdated(shoppingListViewModel).shoppingList
+        shoppingListViewModel.submitProductSearch("Ap")
 
-        Assert.assertNotNull(
-            shoppingList.firstOrNull {
-                it.itemType == ShoppingListItem.ItemType.AISLE && it.name == emptyAisleName
-            }
-        )
+        val searchedAisleCount = getAisleListItems(shoppingListViewModel).count()
+        assertTrue(aisleCount > searchedAisleCount)
 
-        Assert.assertEquals(
-            aisleCount, shoppingList.count { it.itemType == ShoppingListItem.ItemType.AISLE }
-        )
+        val searchedProductCount = getProductListItems(shoppingListViewModel).count()
+        assertTrue(productCount > searchedProductCount)
 
-        Assert.assertEquals(
-            productCount, shoppingList.count { it.itemType == ShoppingListItem.ItemType.PRODUCT }
-        )
+        shoppingListViewModel.requestListRefresh(false)
+
+        val refreshedAisleCount = getAisleListItems(shoppingListViewModel).count()
+        assertEquals(searchedAisleCount, refreshedAisleCount)
+
+        val refreshedProductCount = getProductListItems(shoppingListViewModel).count()
+        assertEquals(searchedProductCount, refreshedProductCount)
     }
 
     @Test
-    fun requestDefaultList_HideEmptyAisles_UiStateHasPopulatedAislesAndAllProducts() = runTest {
+    fun requestListRefresh_returnDefaultListIsTrue_ReturnDefaultList() = runTest {
         val locationRepo = get<LocationRepository>()
         val locationId = locationRepo.getAll().first { it.type == LocationType.SHOP }.id
-        val emptyAisleName = "Empty Aisle"
-        get<AisleRepository>().add(
-            Aisle(
-                name = emptyAisleName,
-                locationId = locationId,
-                rank = 1001,
-                products = emptyList(),
-                id = 0,
-                isDefault = false,
-                expanded = false
-            )
-        )
 
-        val location = locationRepo.getLocationWithAislesWithProducts(locationId).first()!!
-        val aisleCount = location.aisles.count()
-        var productCount = 0
-        location.aisles.forEach {
-            productCount += it.products.count()
-        }
+        shoppingListViewModel.hydrate(locationId, FilterType.ALL, false)
 
-        shoppingListViewModel.hydrate(location.id, FilterType.ALL, false)
-        shoppingListViewModel.requestDefaultList()
+        val aisleCount = getAisleListItems(shoppingListViewModel).count()
+        val productCount = getProductListItems(shoppingListViewModel).count()
 
-        val shoppingList = uiStateAsUpdated(shoppingListViewModel).shoppingList
+        shoppingListViewModel.submitProductSearch("Ap")
 
-        Assert.assertNull(
-            shoppingList.firstOrNull {
-                it.itemType == ShoppingListItem.ItemType.AISLE && it.name == emptyAisleName
-            }
-        )
+        val searchedAisleCount = getAisleListItems(shoppingListViewModel).count()
+        assertTrue(aisleCount > searchedAisleCount)
 
-        Assert.assertTrue(
-            aisleCount > shoppingList.count { it.itemType == ShoppingListItem.ItemType.AISLE }
-        )
+        val searchedProductCount = getProductListItems(shoppingListViewModel).count()
+        assertTrue(productCount > searchedProductCount)
 
-        Assert.assertEquals(
-            productCount, shoppingList.count { it.itemType == ShoppingListItem.ItemType.PRODUCT }
-        )
+        shoppingListViewModel.requestListRefresh(true)
+
+        val refreshedAisleCount = getAisleListItems(shoppingListViewModel).count()
+        assertEquals(aisleCount, refreshedAisleCount)
+
+        val refreshedProductCount = getProductListItems(shoppingListViewModel).count()
+        assertEquals(productCount, refreshedProductCount)
     }
 
     @Test
@@ -581,14 +547,16 @@ class ShoppingListViewModelTest : KoinTest {
         val showEmptyAisles = false
 
         shoppingListViewModel.hydrate(locationId, FilterType.ALL, showEmptyAisles)
-        shoppingListViewModel.clearState()
+        val aisleCount = getAisleListItems(shoppingListViewModel).count()
         val uiStateBefore = shoppingListViewModel.shoppingListUiState.value
 
         shoppingListViewModel.setShowEmptyAisles(!showEmptyAisles)
 
         val uiStateAfter = shoppingListViewModel.shoppingListUiState.value
-
         assertNotEquals(uiStateBefore, uiStateAfter)
+
+        val aisleCountAfter = getAisleListItems(shoppingListViewModel).count()
+        assertTrue(aisleCount < aisleCountAfter)
     }
 
     @Test
@@ -598,13 +566,11 @@ class ShoppingListViewModelTest : KoinTest {
         val showEmptyAisles = false
 
         shoppingListViewModel.hydrate(locationId, FilterType.ALL, showEmptyAisles)
-        shoppingListViewModel.clearState()
         val uiStateBefore = shoppingListViewModel.shoppingListUiState.value
 
         shoppingListViewModel.setShowEmptyAisles(showEmptyAisles)
 
         val uiStateAfter = shoppingListViewModel.shoppingListUiState.value
-
         assertEquals(uiStateBefore, uiStateAfter)
     }
 

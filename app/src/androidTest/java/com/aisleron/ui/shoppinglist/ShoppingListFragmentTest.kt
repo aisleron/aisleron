@@ -210,20 +210,6 @@ class ShoppingListFragmentTest : KoinTest {
     }
 
     @Test
-    fun newInstance_CallNewInstance_ReturnsFragment() {
-        val fragment =
-            ShoppingListFragment.newInstance(
-                1,
-                FilterType.ALL,
-                applicationTitleUpdateListener,
-                fabHandler,
-                ShoppingListPreferencesTestImpl(),
-                LoyaltyCardProviderTestImpl()
-            )
-        Assert.assertNotNull(fragment)
-    }
-
-    @Test
     fun onCreateShoppingListFragment_HomeFilterIsInStock_AppTitleIsInStock() = runTest {
         val location = getLocation(LocationType.HOME)
         val bundle = bundler.makeShoppingListBundle(location.id, FilterType.IN_STOCK)
@@ -1849,10 +1835,4 @@ class ShoppingListFragmentTest : KoinTest {
 
         assertEquals(!aisleBefore.expanded, aisleRepository.get(aisle.id)!!.expanded)
     }
-
-    /**
-     * Aisle Expanded Toggle:
-     * - On no selection, aisle expands
-     * - on selected items, select aisle
-     */
 }

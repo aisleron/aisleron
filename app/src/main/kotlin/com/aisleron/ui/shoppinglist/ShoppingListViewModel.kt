@@ -88,7 +88,6 @@ class ShoppingListViewModel(
     val defaultFilter: FilterType get() = _defaultFilter
 
     private var _showEmptyAisles: Boolean = true
-    private val showEmptyAisles: Boolean get() = _showEmptyAisles
 
     private var _loyaltyCard: LoyaltyCard? = null
     val loyaltyCard: LoyaltyCard? get() = _loyaltyCard
@@ -242,14 +241,12 @@ class ShoppingListViewModel(
         return ShoppingListFilterParameters(
             filterType = _defaultFilter,
             showDefaultAisle = showDefaultAisle,
-            showAllAisles = showEmptyAisles
+            showAllAisles = _showEmptyAisles
         )
     }
 
     fun hydrate(locationId: Int, filterType: FilterType, showEmptyAisles: Boolean = false) {
         if (hydrated) return
-
-        hydrated = true
 
         _defaultFilter = filterType
         _showEmptyAisles = showEmptyAisles
@@ -258,8 +255,7 @@ class ShoppingListViewModel(
                 _shoppingListUiState.value = ShoppingListUiState.Loading
                 _location = collectedLocation
 
-                if (!::shoppingListFilterParameters.isInitialized)
-                    shoppingListFilterParameters = getDefaultFilterParameters()
+                shoppingListFilterParameters = getDefaultFilterParameters()
 
                 shoppingListFilterParameters.showAllAisles = _showEmptyAisles
                 _location?.let {
@@ -273,6 +269,7 @@ class ShoppingListViewModel(
                 }
 
                 submitUpdatedList(getShoppingList(_location, shoppingListFilterParameters))
+                hydrated = true
             }
         }
     }
@@ -335,7 +332,7 @@ class ShoppingListViewModel(
             shoppingListFilterParameters.showDefaultAisle = true
             shoppingListFilterParameters.productNameQuery = productNameQuery
             shoppingListFilterParameters.showAllProducts = true
-            shoppingListFilterParameters.showAllAisles = showEmptyAisles
+            shoppingListFilterParameters.showAllAisles = _showEmptyAisles
 
             _shoppingListUiState.value = ShoppingListUiState.Loading
             val searchResults = getShoppingList(_location, shoppingListFilterParameters)
@@ -344,15 +341,17 @@ class ShoppingListViewModel(
     }
 
     fun setShowEmptyAisles(showEmptyAisles: Boolean) {
-        if (_showEmptyAisles != showEmptyAisles) {
-            _showEmptyAisles = showEmptyAisles
-            requestDefaultList()
-        }
+        if (_showEmptyAisles == showEmptyAisles) return
+
+        _showEmptyAisles = showEmptyAisles
+        shoppingListFilterParameters.showAllAisles = _showEmptyAisles
+        requestListRefresh(false)
     }
 
-    fun requestDefaultList() {
+    fun requestListRefresh(returnDefaultList: Boolean) {
+        if (!hydrated) return
         searchJob?.cancel()
-        shoppingListFilterParameters = getDefaultFilterParameters()
+        if (returnDefaultList) shoppingListFilterParameters = getDefaultFilterParameters()
         coroutineScope.launchHandling {
             _shoppingListUiState.value = ShoppingListUiState.Loading
             val searchResults = getShoppingList(_location, shoppingListFilterParameters)

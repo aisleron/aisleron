@@ -19,6 +19,8 @@ package com.aisleron.di
 
 import com.aisleron.ui.settings.DisplayPreferences
 import com.aisleron.ui.settings.DisplayPreferencesImpl
+import com.aisleron.ui.settings.ProductPreferences
+import com.aisleron.ui.settings.ProductPreferencesTestImpl
 import com.aisleron.ui.settings.ShopPreferences
 import com.aisleron.ui.settings.ShopPreferencesTestImpl
 import com.aisleron.ui.settings.ShoppingListPreferences
@@ -32,4 +34,5 @@ val preferenceTestModule = module {
     factory<ShoppingListPreferences> { ShoppingListPreferencesTestImpl() }
     factory<WelcomePreferences> { WelcomePreferencesTestImpl() }
     factory<ShopPreferences> { ShopPreferencesTestImpl() }
+    factory<ProductPreferences> { ProductPreferencesTestImpl() }
 }
