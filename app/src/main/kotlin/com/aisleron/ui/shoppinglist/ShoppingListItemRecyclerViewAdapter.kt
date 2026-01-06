@@ -29,6 +29,7 @@ import android.view.View
 import android.view.View.OnTouchListener
 import android.view.ViewConfiguration
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.ImageButton
@@ -285,6 +286,14 @@ class ShoppingListItemRecyclerViewAdapter(
             qtyWatcher = qtyEdit.doAfterTextChanged { editable ->
                 val newQty = editable?.toString()?.toDoubleOrNull() ?: 0.0
                 listener.onProductQuantityChange(item, newQty)
+            }
+
+            qtyEdit.setOnEditorActionListener { v, actionId, _ ->
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    v.clearFocus()
+                }
+
+                false
             }
 
             qtySelector.isVisible = trackingMode in setOf(

@@ -36,12 +36,11 @@ platform :android do
     upload_to_play_store
   end
 
+  desc "Take application screenshots"
   lane :screenshots do
       # To run from terminal: fastlane screenshots
       # Build the debug and AndroidTest packages so they are available for screenshots
-      gradle(
-          task: "assembleDebug assembleDebugAndroidTest"
-      )
+      gradle(task: "assembleDebug assembleDebugAndroidTest")
 
       # Dynamically locate APKs
       app_apk = Dir.glob(File.expand_path("../app/build/outputs/apk/debug/com.aisleron-*-debug.apk")).first
@@ -75,5 +74,32 @@ platform :android do
           skip_open_summary: true,
           launch_arguments: ["uiMode dark"]
       )
+  end
+
+  desc "Build Release APK and AAB and move to custom folder"
+  lane :assemble_release_artifacts do
+    # Build the artifacts
+    gradle(task: "clean assembleRelease bundleRelease")
+
+    # Define the destination
+    output_dir = File.expand_path(ENV["RELEASE_ARTIFACT_PATH"])
+
+    # Find and copy the APK
+    apk_path = Dir.glob("../app/build/outputs/apk/release/com.aisleron-*-release.apk").first
+    if apk_path
+      FileUtils.cp(apk_path, output_dir)
+      UI.success("Copied APK: #{File.basename(apk_path)}")
+    else
+      UI.error("Could not find any APK in the release folder!")
+    end
+
+    # Find and copy the AAB
+    bundle_path = Dir.glob("../app/build/outputs/bundle/release/com.aisleron-*-release.aab").first
+    if bundle_path
+      FileUtils.cp(bundle_path, output_dir)
+      UI.success("Copied AAB: #{File.basename(bundle_path)}")
+    else
+      UI.error("Could not find any AAB in the release folder!")
+    end
   end
 end

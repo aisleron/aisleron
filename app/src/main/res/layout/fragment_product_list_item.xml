@@ -78,7 +78,8 @@
                 android:minWidth="40dp"
                 android:paddingVertical="12dp"
                 android:textAppearance="?attr/textAppearanceBodyMedium"
-                tools:ignore="LabelFor" />
+                tools:ignore="LabelFor"
+                android:imeOptions="actionDone" />
 
             <ImageButton
                 android:id="@+id/btn_qty_inc"

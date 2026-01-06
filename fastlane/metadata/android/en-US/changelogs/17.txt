@@ -1,0 +1,12 @@
+Enhancements:
+* Manage product aisles during add/edit.
+* Support for decimal quantities & Units of Measure.
+* Multi-select capability in product lists.
+* Per-product tracking mode options.
+* Save prompts when exiting product pages.
+* Added Bulgarian translations.
+
+Bug Fixes:
+* Improved aisle reordering logic.
+* Clear search filters when navigating lists.
+* Fixed potential crash when pressing Enter on quantity input.
