@@ -169,5 +169,7 @@
     <string name="view_changes">Ver cambios</string>
     <string name="updated_notification">Aisleron se ha actualizado de %1$s a %2$s.</string>
     <string name="pure_black_style">Estilo negro puro</string>
+    <string name="language">Idioma</string>
+    <string name="system_default">Predeterminado del sistema</string>
     <string name="aisle_picker">Selector de pasillo</string>
 </resources>

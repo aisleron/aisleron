@@ -166,6 +166,8 @@
     <string name="view_changes">Wyświetl zmiany</string>
     <string name="updated_notification">Aisleron został zaktualizowany z %1$s do %2$s.</string>
     <string name="pure_black_style">Styl czystej czerni</string>
+    <string name="language">Język</string>
+    <string name="system_default">Domyślne ustawienia systemu</string>
     <string name="aisle_picker">Wybór alejki</string>
     <string name="tracking_default">Domyślny</string>
     <string name="qty_increments">Przyrosty ilości</string>

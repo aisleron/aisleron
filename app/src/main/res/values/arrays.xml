@@ -55,4 +55,35 @@
         <item>pure_black_business_class</item>
         <item>pure_black_first_class</item>
     </array>
+
+    <string-array name="language_names">
+        <item>@string/system_default</item>
+        <item>@string/language_english_en</item>
+        <item>@string/language_afrikaans_af</item>
+        <item>@string/language_bulgarian_bg</item>
+        <item>@string/language_german_de</item>
+        <item>@string/language_spanish_es</item>
+        <item>@string/language_french_fr</item>
+        <item>@string/language_italian_it</item>
+        <item>@string/language_polish_pl</item>
+        <item>@string/language_russian_ru</item>
+        <item>@string/language_swedish_sv</item>
+        <item>@string/language_ukrainian_uk</item>
+    </string-array>
+
+    <!-- Keep this list aligned with the values in locale_config.xml   -->
+    <string-array name="language_codes">
+        <item />
+        <item>en</item>
+        <item>af</item>
+        <item>bg</item>
+        <item>de</item>
+        <item>es</item>
+        <item>fr</item>
+        <item>it</item>
+        <item>pl</item>
+        <item>ru</item>
+        <item>sv</item>
+        <item>uk</item>
+    </string-array>
 </resources>

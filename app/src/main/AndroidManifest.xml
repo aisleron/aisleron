@@ -29,7 +29,8 @@
         android:roundIcon="@mipmap/ic_aisleron_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Aisleron"
-        tools:targetApi="31">
+        tools:targetApi="33"
+        android:localeConfig="@xml/locale_config">
         <activity
             android:name=".AboutActivity"
             android:exported="false"
@@ -53,6 +54,15 @@
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
+
+        <service
+            android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"
+            android:enabled="false"
+            android:exported="false">
+            <meta-data
+                android:name="autoStoreLocales"
+                android:value="true" />
+        </service>
     </application>
 
     <queries>

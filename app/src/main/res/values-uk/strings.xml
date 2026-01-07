@@ -166,6 +166,8 @@
     <string name="pure_black_business_class">Бізнес-клас</string>
     <string name="pure_black_first_class">Перший клас</string>
     <string name="pure_black_style">Чистий чорний стиль</string>
+    <string name="language">Мова</string>
+    <string name="system_default">Типова система</string>
     <string name="aisle_picker">Вибір проходу</string>
     <string name="tracking_default">За замовчуванням</string>
     <string name="qty_increments">Кроки кількості</string>

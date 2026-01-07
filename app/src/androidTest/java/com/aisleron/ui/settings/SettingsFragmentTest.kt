@@ -20,7 +20,9 @@ package com.aisleron.ui.settings
 import android.app.Activity
 import android.app.Instrumentation
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.Uri
+import androidx.annotation.StringRes
 import androidx.fragment.app.testing.FragmentScenario
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.navigation.NavController
@@ -46,6 +48,8 @@ import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withContentDescription
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
+import androidx.test.platform.app.InstrumentationRegistry
+import com.aisleron.AppCompatActivityTestImpl
 import com.aisleron.MainActivity
 import com.aisleron.R
 import com.aisleron.di.KoinTestRule
@@ -58,6 +62,7 @@ import com.aisleron.di.useCaseModule
 import com.aisleron.di.viewModelTestModule
 import com.aisleron.domain.backup.DatabaseMaintenance
 import com.aisleron.testdata.data.maintenance.DatabaseMaintenanceDbNameTestImpl
+import com.aisleron.utils.SystemIds
 import org.hamcrest.CoreMatchers.allOf
 import org.hamcrest.CoreMatchers.startsWith
 import org.hamcrest.Matchers
@@ -67,11 +72,13 @@ import org.junit.Test
 import org.koin.test.KoinTest
 import org.koin.test.mock.declare
 import java.util.Calendar
+import java.util.Locale
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 
 class SettingsFragmentTest : KoinTest {
+    private val fragmentTag = "SETTINGS_FRAGMENT"
 
     @get:Rule
     val koinTestRule = KoinTestRule(
@@ -92,7 +99,7 @@ class SettingsFragmentTest : KoinTest {
     }
 
     private fun clickOption(viewTextResourceId: Int) {
-        onView(withId(androidx.preference.R.id.recycler_view))
+        onView(withId(SystemIds.PREFERENCE_RECYCLER_VIEW))
             .perform(
                 RecyclerViewActions.actionOnItem<RecyclerView.ViewHolder>(
                     hasDescendant(withText(viewTextResourceId)),
@@ -106,6 +113,17 @@ class SettingsFragmentTest : KoinTest {
             themeResId = R.style.Theme_Aisleron,
             instantiate = { SettingsFragment() }
         )
+
+    private fun getActivityScenario(): ActivityScenario<AppCompatActivityTestImpl> {
+        val scenario = ActivityScenario.launch(AppCompatActivityTestImpl::class.java)
+        scenario.onActivity { activity ->
+            activity.supportFragmentManager.beginTransaction()
+                .replace(android.R.id.content, SettingsFragment(), fragmentTag)
+                .commitNow()
+        }
+
+        return scenario
+    }
 
     @Test
     fun onBackPressed_OnSettingsFragment_ReturnToMain() {
@@ -291,7 +309,7 @@ class SettingsFragmentTest : KoinTest {
             .check(matches(isDisplayed()))
             .perform(click())
 
-        onView(withId(com.google.android.material.R.id.snackbar_text)).check(
+        onView(withId(SystemIds.SNACKBAR_TEXT)).check(
             matches(
                 allOf(
                     ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE),
@@ -344,7 +362,7 @@ class SettingsFragmentTest : KoinTest {
             fragment.preferenceScreen.addPreference(editTextPreference)
         }
 
-        onView(withId(androidx.preference.R.id.recycler_view))
+        onView(withId(SystemIds.PREFERENCE_RECYCLER_VIEW))
             .perform(
                 RecyclerViewActions.actionOnItem<RecyclerView.ViewHolder>(
                     hasDescendant(withText("Test Edit Text")),
@@ -355,5 +373,68 @@ class SettingsFragmentTest : KoinTest {
         onView(withId(android.R.id.edit))
             .inRoot(isDialog())
             .check(matches(isDisplayed()))
+    }
+
+    private fun getLocalizedString(resourceId: Int, localeTag: String): String {
+        val config =
+            Configuration(InstrumentationRegistry.getInstrumentation().targetContext.resources.configuration)
+
+        config.setLocale(Locale.forLanguageTag(localeTag))
+        val localizedContext =
+            InstrumentationRegistry.getInstrumentation().targetContext.createConfigurationContext(
+                config
+            )
+
+        return localizedContext.resources.getString(resourceId)
+    }
+
+    private fun languageChange_ArrangeActAssert(
+        scenario: ActivityScenario<AppCompatActivityTestImpl>,
+        @StringRes languageResId: Int,
+        localeTag: String
+    ) {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val languageName = context.getString(languageResId)
+
+        clickOption(R.string.language)
+        onView(withText(languageName)).inRoot(isDialog()).perform(click())
+
+        scenario.onActivity { activity ->
+            val activityFragment =
+                activity.supportFragmentManager.findFragmentByTag(fragmentTag) as SettingsFragment
+
+            val languagePreference = activityFragment.findPreference<ListPreference>("language")
+            assertEquals(languageName, languagePreference?.summary)
+        }
+
+        val expectedText = getLocalizedString(R.string.language, localeTag)
+        onView(withText(expectedText)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun onLanguageClick_SelectValue_PreferenceUpdated() {
+        val languages = listOf(
+            Pair(R.string.language_english_en, "en"),
+            Pair(R.string.language_afrikaans_af, "af"),
+            Pair(R.string.language_bulgarian_bg, "bg"),
+            Pair(R.string.language_german_de, "de"),
+            Pair(R.string.language_spanish_es, "es"),
+            Pair(R.string.language_french_fr, "fr"),
+            Pair(R.string.language_italian_it, "it"),
+            Pair(R.string.language_polish_pl, "pl"),
+            Pair(R.string.language_russian_ru, "ru"),
+            Pair(R.string.language_swedish_sv, "sv"),
+            Pair(R.string.language_ukrainian_uk, "uk")
+        )
+
+        getActivityScenario().use { scenario ->
+            languages.forEach { (languageResId, localeTag) ->
+                try {
+                    languageChange_ArrangeActAssert(scenario, languageResId, localeTag)
+                } catch (_: Exception) {
+                    throw AssertionError("Failed to change language to $localeTag")
+                }
+            }
+        }
     }
 }

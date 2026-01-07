@@ -43,6 +43,8 @@
     <string name="pure_black_business_class">Бизнес класа</string>
     <string name="pure_black_first_class">Първа класа</string>
     <string name="pure_black_style">Чисто черен стил</string>
+    <string name="language">Език</string>
+    <string name="system_default">Системно подразбиране</string>
     <string name="generic_error">ГРЕШКА: %1$s</string>
     <string name="delete_default_aisle_exception">ГРЕШКА: Стандартният коридор не може да бъде премахнат</string>
     <string name="duplicate_product_name_exception">ГРЕШКА: Името на продукта трябва да е уникално</string>

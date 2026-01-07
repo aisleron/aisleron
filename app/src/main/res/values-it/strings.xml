@@ -166,6 +166,8 @@
     <string name="pure_black_business_class">Business Class</string>
     <string name="pure_black_first_class">Prima classe</string>
     <string name="pure_black_style">Stile nero puro</string>
+    <string name="language">Lingua</string>
+    <string name="system_default">Predefinito del sistema</string>
     <string name="aisle_picker">Seleziona corsia</string>
     <string name="tracking_default">Predefinito</string>
     <string name="qty_increments">Incrementi quantità</string>
