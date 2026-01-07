@@ -30,7 +30,9 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.net.toUri
+import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -74,8 +76,38 @@ class SettingsFragment : PreferenceFragmentCompat(), AisleronFragment {
             PreferenceOption.RESTORE_DATABASE, this::selectBackupFile, this::restoreDatabase
         )
 
+        findPreference<ListPreference>("language")?.setOnPreferenceChangeListener { _, newValue ->
+            val languageTag = newValue as String
+            val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags(languageTag)
+            AppCompatDelegate.setApplicationLocales(appLocale)
+
+            true
+        }
+
         settingsViewModel.requestLocationDetails()
         hideNotSupportedSettings()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        syncLanguageSelection()
+    }
+
+    private fun syncLanguageSelection() {
+        val listPreference = findPreference<ListPreference>("language") ?: return
+        val currentLocaleTag = AppCompatDelegate.getApplicationLocales().toLanguageTags()
+
+        val bestMatch = when {
+            listPreference.entryValues.contains(currentLocaleTag) -> currentLocaleTag
+            currentLocaleTag.contains("-") -> {
+                val baseLanguage = currentLocaleTag.split("-")[0]
+                if (listPreference.entryValues.contains(baseLanguage)) baseLanguage else ""
+            }
+
+            else -> ""
+        }
+
+        listPreference.value = bestMatch
     }
 
     private fun hideNotSupportedSettings() {

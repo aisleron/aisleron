@@ -166,6 +166,8 @@
     <string name="tracking_mode">Tracking-Modus</string>
     <string name="new_entity_name">Neuer Entitätsname</string>
     <string name="pure_black_style">Stil Reines Schwarz</string>
+    <string name="language">Sprache</string>
+    <string name="system_default">Systemstandard</string>
     <string name="aisle_picker">Gangauswahl</string>
     <string name="tracking_default">Standard</string>
     <string name="qty_increments">Mengenschritte</string>

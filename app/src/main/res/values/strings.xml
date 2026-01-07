@@ -64,6 +64,21 @@
     <string name="pure_black_business_class">Business Class</string>
     <string name="pure_black_first_class">First Class</string>
     <string name="pure_black_style">Pure Black style</string>
+    <string name="language">Language</string>
+    <string name="system_default">System Default</string>
+
+    <!-- Language names (non-translatable) -->
+    <string name="language_afrikaans_af" translatable="false">Afrikaans</string>
+    <string name="language_bulgarian_bg" translatable="false">Български</string>
+    <string name="language_english_en" translatable="false">English</string>
+    <string name="language_french_fr" translatable="false">Français</string>
+    <string name="language_german_de" translatable="false">Deutsch</string>
+    <string name="language_italian_it" translatable="false">Italiano</string>
+    <string name="language_polish_pl" translatable="false">Polski</string>
+    <string name="language_russian_ru" translatable="false">Русский</string>
+    <string name="language_spanish_es" translatable="false">Español</string>
+    <string name="language_swedish_sv" translatable="false">Svenska</string>
+    <string name="language_ukrainian_uk" translatable="false">Українська</string>
 
     <!-- Exception Messages   -->
     <string name="generic_error">ERROR: %1$s</string>
@@ -179,7 +194,6 @@
     <string name="hide_status_change_snack_bar">Hide status change message</string>
     <string name="status_change_confirmation">%1$s moved to %2$s</string>
     <string name="undo">UNDO</string>
-
     <string name="aisleron_logo">Aisleron logo</string>
     <string name="in_stock_at_home">In stock at home?</string>
     <string name="shop_logo">Shop Logo</string>

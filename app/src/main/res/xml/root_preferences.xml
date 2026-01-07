@@ -40,7 +40,6 @@
             android:key="pure_black_style"
             android:title="@string/pure_black_style"
             app:useSimpleSummaryProvider="true" />
-
         <SwitchPreferenceCompat
             app:key="dynamic_color"
             app:title="@string/use_dynamic_color"
@@ -49,6 +48,13 @@
             app:key="starting_list"
             app:title="@string/starting_list"
             app:defaultValue="1|IN_STOCK" />
+        <ListPreference
+            android:entries="@array/language_names"
+            android:entryValues="@array/language_codes"
+            android:key="language"
+            android:title="@string/language"
+            android:summary="%s"
+            android:defaultValue="en"/>
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/shopping_list_options_header">
