@@ -16,5 +16,5 @@
   -->
 
 <resources>
-    <dimen name="fab_margin">200dp</dimen>
+    <style name="TextAppearance.Aisleron.ProductListItem" parent="TextAppearance.Material3.BodyMedium" />
 </resources>
