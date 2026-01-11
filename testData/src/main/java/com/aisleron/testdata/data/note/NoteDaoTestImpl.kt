@@ -19,6 +19,8 @@ package com.aisleron.testdata.data.note
 
 import com.aisleron.data.note.NoteDao
 import com.aisleron.data.note.NoteEntity
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 
 class NoteDaoTestImpl : NoteDao {
     private val noteList = mutableListOf<NoteEntity>()
@@ -29,6 +31,11 @@ class NoteDaoTestImpl : NoteDao {
 
     override suspend fun getNotes(): List<NoteEntity> {
         return noteList
+    }
+
+    override fun getNotes(ids: List<Int>): Flow<List<NoteEntity>> {
+        val result = noteList.filter { note -> ids.contains(note.id) }
+        return flowOf(result)
     }
 
     override suspend fun upsert(vararg entity: NoteEntity): List<Long> {

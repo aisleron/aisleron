@@ -77,6 +77,8 @@ import com.aisleron.domain.note.usecase.GetNoteParentUseCase
 import com.aisleron.domain.note.usecase.GetNoteParentUseCaseImpl
 import com.aisleron.domain.note.usecase.GetNoteUseCase
 import com.aisleron.domain.note.usecase.GetNoteUseCaseImpl
+import com.aisleron.domain.note.usecase.GetNotesUseCase
+import com.aisleron.domain.note.usecase.GetNotesUseCaseImpl
 import com.aisleron.domain.note.usecase.RemoveNoteFromParentUseCase
 import com.aisleron.domain.note.usecase.RemoveNoteFromParentUseCaseImpl
 import com.aisleron.domain.note.usecase.RemoveNoteUseCase
@@ -102,6 +104,7 @@ import com.aisleron.domain.product.usecase.UpdateProductUseCaseImpl
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCaseImpl
 import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
+import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCaseImpl
 import com.aisleron.testdata.data.TransactionRunnerTestImpl
 
 class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
@@ -324,6 +327,10 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
         GetNoteUseCaseImpl(repositoryFactory.noteRepository)
     }
 
+    val getNotesUseCase: GetNotesUseCase by lazy {
+        GetNotesUseCaseImpl(repositoryFactory.noteRepository)
+    }
+
     val addNoteToParentUseCase: AddNoteToParentUseCase by lazy {
         AddNoteToParentUseCaseImpl(
             removeNoteUseCase = removeNoteUseCase,
@@ -440,7 +447,10 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
      * Shopping List Use Cases
      */
     val getShoppingListUseCase: GetShoppingListUseCase by lazy {
-        GetShoppingListUseCase(repositoryFactory.locationRepository)
+        GetShoppingListUseCaseImpl(
+            repositoryFactory.locationRepository,
+            getNotesUseCase = getNotesUseCase
+        )
     }
 
     /**
@@ -497,6 +507,7 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
             CopyNoteUseCase::class -> copyNoteUseCase as T
             GetNoteParentUseCase::class -> getNoteParentUseCase as T
             GetNoteUseCase::class -> getNoteUseCase as T
+            GetNotesUseCase::class -> getNotesUseCase as T
             AddNoteToParentUseCase::class -> addNoteToParentUseCase as T
             UpdateNoteUseCase::class -> updateNoteUseCase as T
             RemoveNoteFromParentUseCase::class -> removeNoteFromParentUseCase as T

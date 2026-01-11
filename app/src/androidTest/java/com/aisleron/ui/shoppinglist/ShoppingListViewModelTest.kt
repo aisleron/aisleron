@@ -51,10 +51,21 @@ import com.aisleron.domain.product.usecase.RemoveProductUseCase
 import com.aisleron.domain.product.usecase.UpdateProductQtyNeededUseCase
 import com.aisleron.domain.product.usecase.UpdateProductStatusUseCase
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
+import com.aisleron.domain.shoppinglist.ShoppingListFilter
 import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withTimeout
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
@@ -69,6 +80,7 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class ShoppingListViewModelTest : KoinTest {
     private lateinit var shoppingListViewModel: ShoppingListViewModel
 
@@ -86,20 +98,27 @@ class ShoppingListViewModelTest : KoinTest {
     @Test
     fun hydrate_IsValidLocation_LocationMembersAreCorrect() = runTest {
         val existingLocation = get<LocationRepository>().getAll().first()
+
         shoppingListViewModel.hydrate(existingLocation.id, existingLocation.defaultFilter)
 
-        Assert.assertEquals(existingLocation.name, shoppingListViewModel.locationName)
-        Assert.assertEquals(existingLocation.defaultFilter, shoppingListViewModel.defaultFilter)
-        Assert.assertEquals(existingLocation.type, shoppingListViewModel.locationType)
+        val result = awaitUiStateUpdated(shoppingListViewModel)
+        assertEquals(existingLocation.name, result.locationName)
+        assertEquals(existingLocation.defaultFilter, result.productFilter)
+        assertEquals(existingLocation.type, result.locationType)
+
+        assertEquals(existingLocation.defaultFilter, shoppingListViewModel.productFilter)
+        assertEquals(existingLocation.id, shoppingListViewModel.locationId.value)
     }
 
     @Test
-    fun hydrate_IsInvalidLocation_LocationMembersAreDefault() {
+    fun hydrate_IsInvalidLocation_LocationMembersAreDefault() = runTest {
         shoppingListViewModel.hydrate(-1, FilterType.NEEDED)
 
-        Assert.assertEquals("", shoppingListViewModel.locationName)
-        Assert.assertEquals(FilterType.NEEDED, shoppingListViewModel.defaultFilter)
-        Assert.assertEquals(LocationType.HOME, shoppingListViewModel.locationType)
+        val result = awaitUiStateUpdated(shoppingListViewModel)
+
+        Assert.assertEquals("", result.locationName)
+        Assert.assertEquals(FilterType.NEEDED, result.productFilter)
+        Assert.assertEquals(LocationType.HOME, result.locationType)
     }
 
     @Test
@@ -117,7 +136,7 @@ class ShoppingListViewModelTest : KoinTest {
         val locationId = get<LocationRepository>().add(location)
         shoppingListViewModel.hydrate(locationId, location.defaultFilter)
 
-        val shoppingList = uiStateAsUpdated(shoppingListViewModel).shoppingList
+        val shoppingList = awaitUiStateUpdated(shoppingListViewModel).shoppingList
 
         assertEquals(1, shoppingList.count())
         assertEquals(1, shoppingList.count { it.itemType == ShoppingListItem.ItemType.EMPTY_LIST })
@@ -128,14 +147,23 @@ class ShoppingListViewModelTest : KoinTest {
         val location = getShoppingList()
         shoppingListViewModel.hydrate(location.id, location.defaultFilter)
 
-        val shoppingList = uiStateAsUpdated(shoppingListViewModel).shoppingList
+        val shoppingList = awaitUiStateUpdated(shoppingListViewModel).shoppingList
 
         assertTrue(shoppingList.isNotEmpty())
         assertEquals(0, shoppingList.count { it.itemType == ShoppingListItem.ItemType.EMPTY_LIST })
     }
 
-    private fun uiStateAsUpdated(viewModel: ShoppingListViewModel): ShoppingListViewModel.ShoppingListUiState.Updated {
-        return viewModel.shoppingListUiState.value as ShoppingListViewModel.ShoppingListUiState.Updated
+    private suspend fun awaitUiStateUpdated(
+        viewModel: ShoppingListViewModel
+    ): ShoppingListViewModel.ShoppingListUiState.Updated {
+        // We use first() to wait until the Flow emits a state that is Updated
+        return viewModel.shoppingListUiState
+            .first { it is ShoppingListViewModel.ShoppingListUiState.Updated }
+                as ShoppingListViewModel.ShoppingListUiState.Updated
+    }
+
+    private suspend fun awaitLoyaltyCard(viewModel: ShoppingListViewModel): LoyaltyCard? {
+        return viewModel.loyaltyCard.first()
     }
 
     @Test
@@ -146,9 +174,11 @@ class ShoppingListViewModelTest : KoinTest {
         val existingAisle = getAisleListItems(shoppingListViewModel).first { it.isDefault }
         shoppingListViewModel.toggleItemSelection(existingAisle)
 
-        shoppingListViewModel.removeSelectedItems()
+        val event = awaitEvent(shoppingListViewModel) {
+            shoppingListViewModel.removeSelectedItems()
+        }
 
-        assertNotNull(uiStateAsError(shoppingListViewModel))
+        assert(event is ShoppingListViewModel.ShoppingListEvent.ShowError)
     }
 
     private suspend fun updateProductStatusArrangeAct(newInStock: Boolean): Product? {
@@ -203,7 +233,7 @@ class ShoppingListViewModelTest : KoinTest {
     fun hydrate_AisleCollapsed_AisleItemsHidden() = runTest {
         val domainShoppingList = getShoppingList()
         shoppingListViewModel.hydrate(domainShoppingList.id, domainShoppingList.defaultFilter)
-        val shoppingListBefore = uiStateAsUpdated(shoppingListViewModel).shoppingList
+        val shoppingListBefore = awaitUiStateUpdated(shoppingListViewModel).shoppingList
 
         val aisleSummaryBefore =
             shoppingListBefore.groupingBy { it.aisleId }.eachCount().maxBy { it.value }
@@ -219,7 +249,7 @@ class ShoppingListViewModelTest : KoinTest {
         // Create a new instance of the viewmodel to verify results because hydrate won't run again.
         val vm = get<ShoppingListViewModel>()
         vm.hydrate(domainShoppingList.id, domainShoppingList.defaultFilter)
-        val shoppingListAfter = uiStateAsUpdated(vm).shoppingList
+        val shoppingListAfter = awaitUiStateUpdated(vm).shoppingList
         val aisleCountAfter = shoppingListAfter.count { it.aisleId == aisleSummaryBefore.key }
         assertEquals(1, aisleCountAfter)
     }
@@ -241,12 +271,11 @@ class ShoppingListViewModelTest : KoinTest {
         shoppingListViewModel.hydrate(existingLocation.id, existingLocation.defaultFilter)
         shoppingListViewModel.submitProductSearch(searchString)
 
-        val shoppingList = uiStateAsUpdated(shoppingListViewModel).shoppingList
+        val shoppingList = awaitUiStateUpdated(shoppingListViewModel).shoppingList
         Assert.assertEquals(
             productSearchCount,
             shoppingList.count { p -> p.name.contains(searchString) && p.itemType == ShoppingListItem.ItemType.PRODUCT }
         )
-
     }
 
     @Test
@@ -258,7 +287,7 @@ class ShoppingListViewModelTest : KoinTest {
         shoppingListViewModel.hydrate(existingLocation.id, existingLocation.defaultFilter)
         shoppingListViewModel.submitProductSearch(searchString)
 
-        val shoppingList = uiStateAsUpdated(shoppingListViewModel).shoppingList
+        val shoppingList = awaitUiStateUpdated(shoppingListViewModel).shoppingList
         Assert.assertEquals(
             productSearchCount,
             shoppingList.count { p -> p.name.contains(searchString) && p.itemType == ShoppingListItem.ItemType.PRODUCT }
@@ -341,8 +370,32 @@ class ShoppingListViewModelTest : KoinTest {
         Assert.assertNotNull(vm)
     }
 
+    private suspend fun TestScope.awaitEvent(
+        viewModel: ShoppingListViewModel,
+        trigger: suspend () -> Unit
+    ): ShoppingListViewModel.ShoppingListEvent {
+        // We create a "trap" for the event before we trigger the action
+        val events = viewModel.events
+
+        // Start collecting in the background
+        val deferred = CompletableDeferred<ShoppingListViewModel.ShoppingListEvent>()
+        val job = backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            events.collect { deferred.complete(it) }
+        }
+
+        // Trigger the action (e.g., removeSelectedItems)
+        trigger()
+
+        // Wait for the trap to snap shut
+        return withTimeout(2000) {
+            val result = deferred.await()
+            job.cancel()
+            result
+        }
+    }
+
     @Test
-    fun removeSelectedItems_ExceptionRaised_UiStateIsError() {
+    fun removeSelectedItems_ExceptionRaised_UiStateIsError() = runTest {
         val exceptionMessage = "Error on Remove Item"
 
         declare<GetAisleUseCase> {
@@ -358,12 +411,15 @@ class ShoppingListViewModelTest : KoinTest {
         val sli = getAisleListItems(vm).first()
         vm.toggleItemSelection(sli)
 
-        vm.removeSelectedItems()
+        val event = awaitEvent(vm) {
+            vm.removeSelectedItems()
+        }
 
-        val uiState = uiStateAsError(vm)
-        assertNotNull(uiState)
-        assertEquals(AisleronException.ExceptionCode.GENERIC_EXCEPTION, uiState.errorCode)
-        assertEquals(exceptionMessage, uiState.errorMessage)
+        assert(event is ShoppingListViewModel.ShoppingListEvent.ShowError)
+
+        val error = event as ShoppingListViewModel.ShoppingListEvent.ShowError
+        assertEquals(AisleronException.ExceptionCode.GENERIC_EXCEPTION, error.errorCode)
+        assertEquals(exceptionMessage, error.errorMessage)
     }
 
     @Test
@@ -449,9 +505,8 @@ class ShoppingListViewModelTest : KoinTest {
     }
 
     @Test
-    fun sortListByName_ExceptionRaised_UiStateIsError() {
+    fun sortListByName_ExceptionRaised_UiStateIsError() = runTest {
         val exceptionMessage = "Error on Sort by Name"
-
         declare<SortLocationByNameUseCase> {
             object : SortLocationByNameUseCase {
                 override suspend operator fun invoke(locationId: Int) {
@@ -461,14 +516,17 @@ class ShoppingListViewModelTest : KoinTest {
         }
 
         val vm = get<ShoppingListViewModel>()
-
         vm.hydrate(1, FilterType.NEEDED)
-        vm.sortListByName()
 
-        val uiState = uiStateAsError(vm)
-        assertNotNull(uiState)
-        Assert.assertEquals(AisleronException.ExceptionCode.GENERIC_EXCEPTION, uiState.errorCode)
-        Assert.assertEquals(exceptionMessage, uiState.errorMessage)
+        val event = awaitEvent(vm) {
+            vm.sortListByName()
+        }
+
+        assert(event is ShoppingListViewModel.ShoppingListEvent.ShowError)
+
+        val error = event as ShoppingListViewModel.ShoppingListEvent.ShowError
+        Assert.assertEquals(AisleronException.ExceptionCode.GENERIC_EXCEPTION, error.errorCode)
+        Assert.assertEquals(exceptionMessage, error.errorMessage)
     }
 
     @Test
@@ -489,7 +547,8 @@ class ShoppingListViewModelTest : KoinTest {
 
         shoppingListViewModel.hydrate(existingLocation.id, existingLocation.defaultFilter)
 
-        assertEquals(loyaltyCard.copy(id = loyaltyCardId), shoppingListViewModel.loyaltyCard)
+        val loyaltyCardResult = awaitLoyaltyCard(shoppingListViewModel)
+        assertEquals(loyaltyCard.copy(id = loyaltyCardId), loyaltyCardResult)
     }
 
     @Test
@@ -505,7 +564,8 @@ class ShoppingListViewModelTest : KoinTest {
 
         shoppingListViewModel.hydrate(existingLocation.id, existingLocation.defaultFilter)
 
-        assertNull(shoppingListViewModel.loyaltyCard)
+        val loyaltyCardResult = awaitLoyaltyCard(shoppingListViewModel)
+        assertNull(loyaltyCardResult)
     }
 
     @Test
@@ -527,13 +587,13 @@ class ShoppingListViewModelTest : KoinTest {
         )
 
         shoppingListViewModel.hydrate(existingLocation.id, existingLocation.defaultFilter)
-        val shoppingList = uiStateAsUpdated(shoppingListViewModel).shoppingList
+        val shoppingList = awaitUiStateUpdated(shoppingListViewModel).shoppingList
 
         val item = shoppingList.first { it.itemType == ShoppingListItem.ItemType.AISLE }
 
         shoppingListViewModel.movedItem(item)
 
-        val fullShoppingList = uiStateAsUpdated(shoppingListViewModel).shoppingList
+        val fullShoppingList = awaitUiStateUpdated(shoppingListViewModel).shoppingList
 
         assertTrue { shoppingList.count() < fullShoppingList.count() }
         assertNull(shoppingList.firstOrNull { it.itemType == ShoppingListItem.ItemType.AISLE && it.name == aisleName })
@@ -605,8 +665,12 @@ class ShoppingListViewModelTest : KoinTest {
     fun updateProductNeededQuantity_NegativeQty_UiStateIsError() = runTest {
         val qtyInitial = 5.0
         val qtyNew = -1.0
-        updateProductNeededQuantityArrangeAct(qtyInitial, qtyNew)
-        Assert.assertTrue(shoppingListViewModel.shoppingListUiState.value is ShoppingListViewModel.ShoppingListUiState.Error)
+
+        val event = awaitEvent(shoppingListViewModel) {
+            updateProductNeededQuantityArrangeAct(qtyInitial, qtyNew)
+        }
+
+        assert(event is ShoppingListViewModel.ShoppingListEvent.ShowError)
     }
 
     @Test
@@ -729,8 +793,14 @@ class ShoppingListViewModelTest : KoinTest {
         assertTrue(aislesForLocationAfterClear.isEmpty())
     }
 
-    private fun uiStateAsError(viewModel: ShoppingListViewModel): ShoppingListViewModel.ShoppingListUiState.Error? {
-        return viewModel.shoppingListUiState.value as? ShoppingListViewModel.ShoppingListUiState.Error
+
+    private suspend fun awaitUiStateError(
+        viewModel: ShoppingListViewModel
+    ): ShoppingListViewModel.ShoppingListUiState.Error {
+        // We use first() to wait until the Flow emits a state that is Updated
+        return viewModel.shoppingListUiState
+            .first { it is ShoppingListViewModel.ShoppingListUiState.Error }
+                as ShoppingListViewModel.ShoppingListUiState.Error
     }
 
     @Test
@@ -738,16 +808,19 @@ class ShoppingListViewModelTest : KoinTest {
         val shoppingList = getShoppingList()
         shoppingListViewModel.hydrate(shoppingList.id, shoppingList.defaultFilter)
         val shoppingListItem = getProductListItems(shoppingListViewModel).first()
-
         shoppingListViewModel.toggleItemSelection(shoppingListItem)
 
         val changeToAisle =
             get<AisleRepository>().getAll().first { it.locationId != shoppingList.id }
 
-        shoppingListViewModel.updateSelectedProductAisle(changeToAisle.id)
+        val event = awaitEvent(shoppingListViewModel) {
+            shoppingListViewModel.updateSelectedProductAisle(changeToAisle.id)
+        }
 
-        val result = uiStateAsError(shoppingListViewModel)
-        Assert.assertEquals(AisleronException.ExceptionCode.AISLE_MOVE_EXCEPTION, result?.errorCode)
+        assert(event is ShoppingListViewModel.ShoppingListEvent.ShowError)
+
+        val error = event as ShoppingListViewModel.ShoppingListEvent.ShowError
+        Assert.assertEquals(AisleronException.ExceptionCode.AISLE_MOVE_EXCEPTION, error.errorCode)
     }
 
     @Test
@@ -788,12 +861,12 @@ class ShoppingListViewModelTest : KoinTest {
         assertEquals(-1, aisleId)
     }
 
-    private fun getAisleListItems(viewModel: ShoppingListViewModel): List<AisleShoppingListItem> =
-        uiStateAsUpdated(viewModel).shoppingList.filterIsInstance<AisleShoppingListItem>()
+    private suspend fun getAisleListItems(viewModel: ShoppingListViewModel): List<AisleShoppingListItem> =
+        awaitUiStateUpdated(viewModel).shoppingList.filterIsInstance<AisleShoppingListItem>()
 
 
-    private fun getProductListItems(viewModel: ShoppingListViewModel): List<ProductShoppingListItem> =
-        uiStateAsUpdated(viewModel).shoppingList.filterIsInstance<ProductShoppingListItem>()
+    private suspend fun getProductListItems(viewModel: ShoppingListViewModel): List<ProductShoppingListItem> =
+        awaitUiStateUpdated(viewModel).shoppingList.filterIsInstance<ProductShoppingListItem>()
 
     @Test
     fun removeSelectedItems_MultipleItemsSelected_RemoveAllItems() = runTest {
@@ -850,5 +923,127 @@ class ShoppingListViewModelTest : KoinTest {
             .singleOrNull { it.aisleId == newAisle.id }
 
         assertNotNull(updatedProductTwo)
+    }
+
+    @Test
+    fun shoppingListUiState_ExceptionRaised_UiStateIsError() = runTest {
+        val exceptionMessage = "Error on Get Shopping List"
+
+        declare<GetShoppingListUseCase> {
+            object : GetShoppingListUseCase {
+                override fun invoke(locationId: Int, filter: ShoppingListFilter): Flow<Location?> =
+                    flow {
+                        throw Exception(exceptionMessage)
+                    }
+            }
+        }
+
+        val vm = get<ShoppingListViewModel>()
+        vm.hydrate(1, FilterType.NEEDED)
+        val uiState = awaitUiStateError(vm)
+        assertEquals(exceptionMessage, uiState.errorMessage)
+        assertEquals(AisleronException.ExceptionCode.GENERIC_EXCEPTION, uiState.errorCode)
+    }
+
+    @Test
+    fun hasSelectedItems_ItemsSelected_ReturnsTrue() = runTest {
+        val shoppingList = getShoppingList()
+        shoppingListViewModel.hydrate(shoppingList.id, shoppingList.defaultFilter)
+        val shoppingListItem = getProductListItems(shoppingListViewModel).first()
+
+        shoppingListViewModel.toggleItemSelection(shoppingListItem)
+
+        assertTrue(shoppingListViewModel.hasSelectedItems())
+    }
+
+    @Test
+    fun hasSelectedItems_NoItemsSelected_ReturnsFalse() = runTest {
+        val shoppingList = getShoppingList()
+        shoppingListViewModel.hydrate(shoppingList.id, shoppingList.defaultFilter)
+
+        assertFalse(shoppingListViewModel.hasSelectedItems())
+    }
+
+    @Test
+    fun navigateToLoyaltyCard_LocationHasLoyaltyCard_NavigateToLoyaltyCardEventEmitted() = runTest {
+        val shoppingList = getShoppingList()
+        val loyaltyCardRepository = get<LoyaltyCardRepository>()
+        val loyaltyCardId = loyaltyCardRepository.add(
+            LoyaltyCard(
+                id = 0,
+                name = "Test Loyalty Card",
+                provider = LoyaltyCardProviderType.CATIMA,
+                intent = "Dummy Intent"
+            )
+        )
+
+        loyaltyCardRepository.addToLocation(shoppingList.id, loyaltyCardId)
+        shoppingListViewModel.hydrate(shoppingList.id, shoppingList.defaultFilter)
+        val loyaltyCard = awaitLoyaltyCard(shoppingListViewModel)
+
+        val event = awaitEvent(shoppingListViewModel) {
+            shoppingListViewModel.navigateToLoyaltyCard()
+        }
+
+        assert(event is ShoppingListViewModel.ShoppingListEvent.NavigateToLoyaltyCard)
+
+        val navEvent = event as ShoppingListViewModel.ShoppingListEvent.NavigateToLoyaltyCard
+        assertEquals(loyaltyCard, navEvent.loyaltyCard)
+    }
+
+    @Test
+    fun navigateToLoyaltyCard_CardIsNull_NoEventEmitted() = runTest {
+        val shoppingList = getShoppingList()
+        shoppingListViewModel.hydrate(shoppingList.id, shoppingList.defaultFilter)
+
+        // Create a list to catch any events
+        val collectedEvents = mutableListOf<ShoppingListViewModel.ShoppingListEvent>()
+        val job = launch(UnconfinedTestDispatcher(testScheduler)) {
+            shoppingListViewModel.events.toList(collectedEvents)
+        }
+        try {
+            shoppingListViewModel.navigateToLoyaltyCard()
+
+            // Force the scheduler to run any pending coroutines
+            runCurrent()
+
+            assertTrue(collectedEvents.isEmpty())
+        } finally {
+            job.cancel()
+        }
+    }
+
+    @Test
+    fun navigateToEditShop_LocationIdIsPopulated_NavigateToEditShopEventEmitted() = runTest {
+        val shoppingList = getShoppingList()
+        shoppingListViewModel.hydrate(shoppingList.id, shoppingList.defaultFilter)
+
+        val event = awaitEvent(shoppingListViewModel) {
+            shoppingListViewModel.navigateToEditShop()
+        }
+
+        assert(event is ShoppingListViewModel.ShoppingListEvent.NavigateToEditShop)
+
+        val navEvent = event as ShoppingListViewModel.ShoppingListEvent.NavigateToEditShop
+        assertEquals(shoppingList.id, navEvent.id)
+    }
+
+    @Test
+    fun navigateToEditShop_LocationIdNull_NoEventEmitted() = runTest {
+        // Create a list to catch any events
+        val collectedEvents = mutableListOf<ShoppingListViewModel.ShoppingListEvent>()
+        val job = launch(UnconfinedTestDispatcher(testScheduler)) {
+            shoppingListViewModel.events.toList(collectedEvents)
+        }
+        try {
+            shoppingListViewModel.navigateToEditShop()
+
+            // Force the scheduler to run any pending coroutines
+            runCurrent()
+
+            assertTrue(collectedEvents.isEmpty())
+        } finally {
+            job.cancel()
+        }
     }
 }

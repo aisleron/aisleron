@@ -15,21 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.data.note
+package com.aisleron.domain.base.usecase
 
-import androidx.room.Dao
-import androidx.room.Query
-import com.aisleron.data.base.BaseDao
+import com.aisleron.domain.base.AisleronItem
 import kotlinx.coroutines.flow.Flow
 
-@Dao
-interface NoteDao : BaseDao<NoteEntity> {
-    @Query("SELECT * FROM Note WHERE id = :noteId")
-    suspend fun getNote(noteId: Int): NoteEntity?
-
-    @Query("SELECT * FROM Note")
-    suspend fun getNotes(): List<NoteEntity>
-
-    @Query("SELECT * FROM Note WHERE id IN (:ids)")
-    fun getNotes(ids: List<Int>): Flow<List<NoteEntity>>
+interface GetMultipleUseCase<T : AisleronItem> {
+    suspend operator fun invoke(ids: List<Int>): Flow<List<T>>
 }

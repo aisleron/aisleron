@@ -31,6 +31,7 @@ import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.TrackingMode
 import com.aisleron.domain.product.usecase.AddProductUseCase
 import com.aisleron.domain.product.usecase.GetAllProductsUseCase
+import com.aisleron.domain.shoppinglist.ShoppingListFilter
 import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
 import kotlinx.coroutines.flow.first
 
@@ -75,6 +76,11 @@ class CreateSampleDataUseCaseImpl(
         private const val SHOP_AISLE_4 = "Aisle 4"
         private const val SHOP_AISLE_FROZEN_FOODS = "Frozen Foods"
     }
+
+    private val shoppingListFilter = ShoppingListFilter(
+        productFilter = FilterType.ALL,
+        showEmptyAisles = true
+    )
 
     override suspend operator fun invoke() {
         val products = getAllProductsUseCase()
@@ -149,7 +155,7 @@ class CreateSampleDataUseCaseImpl(
 
         aisleList.forEach { addAisleUseCase(it) }
 
-        val homeList = getShoppingListUseCase(homeLocation.id).first()!!
+        val homeList = getShoppingListUseCase(homeLocation.id, shoppingListFilter).first()!!
 
         homeList.aisles.first { it.isDefault }.products.forEach {
             when (it.product.name) {
@@ -198,7 +204,7 @@ class CreateSampleDataUseCaseImpl(
 
         aisleList.forEach { addAisleUseCase(it) }
 
-        val shopList = getShoppingListUseCase(shopId).first()!!
+        val shopList = getShoppingListUseCase(shopId, shoppingListFilter).first()!!
 
         shopList.aisles.first { it.isDefault }.products.forEach {
             when (it.product.name) {

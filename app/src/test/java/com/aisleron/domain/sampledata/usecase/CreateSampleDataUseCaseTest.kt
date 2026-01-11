@@ -25,9 +25,10 @@ import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
 import com.aisleron.domain.product.TrackingMode
 import com.aisleron.domain.product.usecase.AddProductUseCase
+import com.aisleron.domain.shoppinglist.ShoppingListFilter
 import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -44,43 +45,40 @@ class CreateSampleDataUseCaseTest {
     }
 
     @Test
-    fun createSampleDataUseCase_NoRestrictionsViolated_ProductsCreated() {
+    fun createSampleDataUseCase_NoRestrictionsViolated_ProductsCreated() = runTest {
         val productRepository = dm.getRepository<ProductRepository>()
-        val productCountBefore = runBlocking { productRepository.getAll().count() }
+        val productCountBefore = productRepository.getAll().count()
 
-        runBlocking { createSampleDataUseCase() }
+        createSampleDataUseCase()
 
-        val productCountAfter = runBlocking { productRepository.getAll().count() }
+        val productCountAfter = productRepository.getAll().count()
 
         Assertions.assertEquals(productCountBefore, 0)
         Assertions.assertTrue(productCountBefore < productCountAfter)
     }
 
     @Test
-    fun createSampleDataUseCase_NoRestrictionsViolated_HomeAislesCreated() {
+    fun createSampleDataUseCase_NoRestrictionsViolated_HomeAislesCreated() = runTest {
         val aisleRepository = dm.getRepository<AisleRepository>()
-        val homeId = runBlocking { dm.getRepository<LocationRepository>().getHome().id }
-        val aisleCountBefore =
-            runBlocking { aisleRepository.getAll().count { it.locationId == homeId } }
+        val homeId = dm.getRepository<LocationRepository>().getHome().id
+        val aisleCountBefore = aisleRepository.getAll().count { it.locationId == homeId }
 
-        runBlocking { createSampleDataUseCase() }
+        createSampleDataUseCase()
 
-        val aisleCountAfter =
-            runBlocking { aisleRepository.getAll().count { it.locationId == homeId } }
+        val aisleCountAfter = aisleRepository.getAll().count { it.locationId == homeId }
 
         Assertions.assertEquals(aisleCountBefore, 1)
         Assertions.assertTrue(aisleCountBefore < aisleCountAfter)
     }
 
     @Test
-    fun createSampleDataUseCase_HomeAislesCreated_ProductsMappedInHomeAisles() {
-        runBlocking { createSampleDataUseCase() }
+    fun createSampleDataUseCase_HomeAislesCreated_ProductsMappedInHomeAisles() = runTest {
+        createSampleDataUseCase()
 
-        val homeList = runBlocking {
-            val locationRepository = dm.getRepository<LocationRepository>()
-            val homeId = locationRepository.getHome().id
-            GetShoppingListUseCase(locationRepository).invoke(homeId).first()!!
-        }
+        val locationRepository = dm.getRepository<LocationRepository>()
+        val homeId = locationRepository.getHome().id
+        val homeList =
+            dm.getUseCase<GetShoppingListUseCase>().invoke(homeId, ShoppingListFilter()).first()!!
 
         val aisleProductCountAfter = homeList.aisles.find { !it.isDefault }?.products?.count() ?: 0
 
@@ -88,27 +86,26 @@ class CreateSampleDataUseCaseTest {
     }
 
     @Test
-    fun createSampleDataUseCase_NoRestrictionsViolated_ShopCreated() {
+    fun createSampleDataUseCase_NoRestrictionsViolated_ShopCreated() = runTest {
         val locationRepository = dm.getRepository<LocationRepository>()
-        val shopCountBefore = runBlocking { locationRepository.getShops().first().count() }
+        val shopCountBefore = locationRepository.getShops().first().count()
 
-        runBlocking { createSampleDataUseCase() }
+        createSampleDataUseCase()
 
-        val shopCountAfter = runBlocking { locationRepository.getShops().first().count() }
+        val shopCountAfter = locationRepository.getShops().first().count()
 
         Assertions.assertEquals(shopCountBefore, 0)
         Assertions.assertTrue(shopCountBefore < shopCountAfter)
     }
 
     @Test
-    fun createSampleDataUseCase_ShopCreated_ProductsMappedInShopAisles() {
-        runBlocking { createSampleDataUseCase() }
+    fun createSampleDataUseCase_ShopCreated_ProductsMappedInShopAisles() = runTest {
+        createSampleDataUseCase()
 
-        val shopList = runBlocking {
-            val locationRepository = dm.getRepository<LocationRepository>()
-            val shopId = locationRepository.getShops().first().first().id
-            GetShoppingListUseCase(locationRepository).invoke(shopId).first()!!
-        }
+        val locationRepository = dm.getRepository<LocationRepository>()
+        val shopId = locationRepository.getShops().first().first().id
+        val shopList =
+            dm.getUseCase<GetShoppingListUseCase>().invoke(shopId, ShoppingListFilter()).first()!!
 
         val aisleProductCountAfter = shopList.aisles.find { !it.isDefault }?.products?.count() ?: 0
 
@@ -116,25 +113,23 @@ class CreateSampleDataUseCaseTest {
     }
 
     @Test
-    fun createSampleDataUseCase_ProductsExistInDatabase_ThrowsException() {
-        runBlocking {
-            val addProductUseCase = dm.getUseCase<AddProductUseCase>()
-            addProductUseCase(
-                Product(
-                    id = 0,
-                    name = "CreateSampleDataProductExistsTest",
-                    inStock = false,
-                    qtyNeeded = 0.0,
-                    noteId = null,
-                    qtyIncrement = 1.0,
-                    trackingMode = TrackingMode.DEFAULT,
-                    unitOfMeasure = "Qty"
-                )
+    fun createSampleDataUseCase_ProductsExistInDatabase_ThrowsException() = runTest {
+        val addProductUseCase = dm.getUseCase<AddProductUseCase>()
+        addProductUseCase(
+            Product(
+                id = 0,
+                name = "CreateSampleDataProductExistsTest",
+                inStock = false,
+                qtyNeeded = 0.0,
+                noteId = null,
+                qtyIncrement = 1.0,
+                trackingMode = TrackingMode.DEFAULT,
+                unitOfMeasure = "Qty"
             )
+        )
 
-            assertThrows<AisleronException.SampleDataCreationException> {
-                createSampleDataUseCase()
-            }
+        assertThrows<AisleronException.SampleDataCreationException> {
+            createSampleDataUseCase()
         }
     }
 
