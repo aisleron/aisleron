@@ -26,6 +26,9 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class ShopPreferencesImplTest {
+    val shopPreferences: ShopPreferencesImpl
+        get() = ShopPreferencesImpl(getInstrumentation().targetContext)
+
     @Before
     fun setUp() {
         SharedPreferencesInitializer().clearPreferences()
@@ -35,7 +38,7 @@ class ShopPreferencesImplTest {
     fun showExtraOptions_isExtraOptionsActive_ReturnTrue() {
         SharedPreferencesInitializer().setShowShopExtraOptions(true)
         val showExtraOptions =
-            ShopPreferencesImpl().showExtraOptions(getInstrumentation().targetContext)
+            shopPreferences.showExtraOptions()
 
         assertTrue(showExtraOptions)
     }
@@ -44,7 +47,7 @@ class ShopPreferencesImplTest {
     fun showExtraOptions_isExtraOptionsInactive_ReturnFalse() {
         SharedPreferencesInitializer().setShowShopExtraOptions(false)
         val showExtraOptions =
-            ShopPreferencesImpl().showExtraOptions(getInstrumentation().targetContext)
+            shopPreferences.showExtraOptions()
 
         assertFalse(showExtraOptions)
     }
@@ -53,7 +56,7 @@ class ShopPreferencesImplTest {
     fun setShowExtraOptions_SetToTrue_ShowExtraOptionsIsTrue() {
         SharedPreferencesInitializer().setShowShopExtraOptions(false)
 
-        ShopPreferencesImpl().setShowExtraOptions(getInstrumentation().targetContext, true)
+        shopPreferences.setShowExtraOptions(true)
         val showExtraOptions =
             PreferenceManager.getDefaultSharedPreferences(getInstrumentation().targetContext)
                 .getBoolean("show_shop_extra_options", false)
@@ -65,7 +68,7 @@ class ShopPreferencesImplTest {
     fun setShowExtraOptions_SetToFalse_ShowExtraOptionsIsFalse() {
         SharedPreferencesInitializer().setShowShopExtraOptions(true)
 
-        ShopPreferencesImpl().setShowExtraOptions(getInstrumentation().targetContext, false)
+        shopPreferences.setShowExtraOptions(false)
         val showExtraOptions =
             PreferenceManager.getDefaultSharedPreferences(getInstrumentation().targetContext)
                 .getBoolean("show_shop_extra_options", true)

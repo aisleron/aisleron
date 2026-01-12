@@ -105,7 +105,7 @@ class MainActivity : AisleronActivity() {
         val navGraph = navInflater.inflate(R.navigation.mobile_navigation)
 
         val shoppingListBundle =
-            Bundler().makeShoppingListBundle(DisplayPreferencesImpl().startingList(this))
+            Bundler().makeShoppingListBundle(DisplayPreferencesImpl(this).startingList())
 
         navController.setGraph(navGraph, shoppingListBundle)
 
@@ -134,21 +134,21 @@ class MainActivity : AisleronActivity() {
             fabHandler.setFabItems(this)
         }
 
-        val welcomePreferences = WelcomePreferencesImpl()
+        val welcomePreferences = WelcomePreferencesImpl(this)
 
         initialiseUpdateBanner(welcomePreferences)
 
-        if (!welcomePreferences.isInitialized(this)) {
+        if (!welcomePreferences.isInitialized()) {
             navController.navigate(R.id.nav_welcome)
         }
     }
 
     private fun setDisplayPreferences() {
-        val displayPreferences = DisplayPreferencesImpl()
+        val displayPreferences = DisplayPreferencesImpl(this)
 
-        setShowOnLockScreen(displayPreferences.showOnLockScreen(this))
+        setShowOnLockScreen(displayPreferences.showOnLockScreen())
 
-        val nightMode = when (displayPreferences.applicationTheme(this)) {
+        val nightMode = when (displayPreferences.applicationTheme()) {
             DisplayPreferences.ApplicationTheme.LIGHT_THEME -> AppCompatDelegate.MODE_NIGHT_NO
             DisplayPreferences.ApplicationTheme.DARK_THEME -> AppCompatDelegate.MODE_NIGHT_YES
             else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
@@ -273,7 +273,7 @@ class MainActivity : AisleronActivity() {
         binding.appBarMain.txtUpdateBanner.text =
             getString(
                 R.string.updated_notification,
-                welcomePreferences.getLastUpdateVersionName(this),
+                welcomePreferences.getLastUpdateVersionName(),
                 BuildConfig.VERSION_NAME
             )
 
@@ -289,8 +289,8 @@ class MainActivity : AisleronActivity() {
             dismissUpdateBanner()
         }
 
-        val isInitialized = welcomePreferences.isInitialized(this)
-        val lastUpdatedVersionCode = welcomePreferences.getLastUpdateVersionCode(this)
+        val isInitialized = welcomePreferences.isInitialized()
+        val lastUpdatedVersionCode = welcomePreferences.getLastUpdateVersionCode()
         binding.appBarMain.updateBanner.visibility =
             if (isInitialized && (lastUpdatedVersionCode < BuildConfig.VERSION_CODE)) {
                 View.VISIBLE
@@ -301,8 +301,8 @@ class MainActivity : AisleronActivity() {
 
     private fun dismissUpdateBanner() {
         val updateBanner = binding.appBarMain.updateBanner
-        val welcomePreferences = WelcomePreferencesImpl()
-        welcomePreferences.setLastUpdateValues(this)
+        val welcomePreferences = WelcomePreferencesImpl(this)
+        welcomePreferences.setLastUpdateValues()
         updateBanner.visibility = View.GONE
     }
 

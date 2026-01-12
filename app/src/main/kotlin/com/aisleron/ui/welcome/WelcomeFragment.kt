@@ -148,7 +148,7 @@ class WelcomeFragment(
     }
 
     private fun setInitialised() {
-        welcomePreferences.setInitialised(requireContext())
-        welcomePreferences.setLastUpdateValues(requireContext())
+        welcomePreferences.setInitialised()
+        welcomePreferences.setLastUpdateValues()
     }
 }

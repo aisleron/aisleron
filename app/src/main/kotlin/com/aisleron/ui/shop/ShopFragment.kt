@@ -164,7 +164,7 @@ class ShopFragment(
         val toggle = binding.txtToggleExtraOptions
         val extraOptions = binding.layoutExtraOptions
         var expandDrawable: Int
-        if (shopPreferences.showExtraOptions(requireContext())) {
+        if (shopPreferences.showExtraOptions()) {
             extraOptions.visibility = View.VISIBLE
             expandDrawable = R.drawable.baseline_expand_down_24
         } else {
@@ -182,7 +182,7 @@ class ShopFragment(
         // Expand / collapse extra options
         binding.txtToggleExtraOptions.setOnClickListener {
             val visible = binding.layoutExtraOptions.isVisible
-            shopPreferences.setShowExtraOptions(requireContext(), !visible)
+            shopPreferences.setShowExtraOptions(!visible)
             showHideExtraOptions()
         }
 

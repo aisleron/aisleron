@@ -22,32 +22,28 @@ import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import com.aisleron.BuildConfig
 
-class WelcomePreferencesImpl : WelcomePreferences {
-    override fun isInitialized(context: Context): Boolean =
-        PreferenceManager.getDefaultSharedPreferences(context).getBoolean(IS_INITIALIZED, false)
+class WelcomePreferencesImpl(context: Context) : WelcomePreferences {
+    private val prefs = PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
 
-    override fun setInitialised(context: Context) {
-        PreferenceManager.getDefaultSharedPreferences(context).edit(commit = true) {
-            putBoolean(IS_INITIALIZED, true)
-        }
+    override fun isInitialized(): Boolean =
+        prefs.getBoolean(IS_INITIALIZED, false)
+
+    override fun setInitialised() {
+        prefs.edit(commit = true) { putBoolean(IS_INITIALIZED, true) }
     }
 
-    override fun getLastUpdateVersionCode(context: Context): Int =
-        PreferenceManager.getDefaultSharedPreferences(context)
-            .getInt(LAST_UPDATE_CODE, 11)
+    override fun getLastUpdateVersionCode(): Int =
+        prefs.getInt(LAST_UPDATE_CODE, 11)
 
-    override fun getLastUpdateVersionName(context: Context): String =
-        PreferenceManager.getDefaultSharedPreferences(context)
-            .getString(LAST_UPDATE_NAME, "2025.8.0") ?: "2025.8.0"
+    override fun getLastUpdateVersionName(): String =
+        prefs.getString(LAST_UPDATE_NAME, "2025.8.0") ?: "2025.8.0"
 
-    override fun setLastUpdateValues(context: Context) {
-        setLastUpdateValues(context, BuildConfig.VERSION_CODE, BuildConfig.VERSION_NAME)
+    override fun setLastUpdateValues() {
+        setLastUpdateValues(BuildConfig.VERSION_CODE, BuildConfig.VERSION_NAME)
     }
 
-    override fun setLastUpdateValues(
-        context: Context, lastUpdateVersionCode: Int, lastUpdateVersionName: String
-    ) {
-        PreferenceManager.getDefaultSharedPreferences(context).edit(commit = true) {
+    override fun setLastUpdateValues(lastUpdateVersionCode: Int, lastUpdateVersionName: String) {
+        prefs.edit(commit = true) {
             putInt(LAST_UPDATE_CODE, lastUpdateVersionCode)
             putString(LAST_UPDATE_NAME, lastUpdateVersionName)
         }

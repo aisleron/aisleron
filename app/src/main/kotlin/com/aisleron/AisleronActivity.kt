@@ -27,7 +27,7 @@ import com.google.android.material.color.DynamicColors
 abstract class AisleronActivity : AppCompatActivity() {
 
     protected fun applyPureBlackStyle(displayPreferences: DisplayPreferences) {
-        val pureBlackStyleId = when (displayPreferences.pureBlackStyle(this)) {
+        val pureBlackStyleId = when (displayPreferences.pureBlackStyle()) {
             DisplayPreferences.PureBlackStyle.ECONOMY -> R.style.AisleronPureBlack_Economy
             DisplayPreferences.PureBlackStyle.BUSINESS_CLASS -> R.style.AisleronPureBlack_BusinessClass
             DisplayPreferences.PureBlackStyle.FIRST_CLASS -> R.style.AisleronPureBlack_FirstClass
@@ -38,13 +38,13 @@ abstract class AisleronActivity : AppCompatActivity() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             theme.applyStyle(pureBlackStyleId, true)
-        } else if (displayPreferences.applicationTheme(this) == DisplayPreferences.ApplicationTheme.DARK_THEME) {
+        } else if (displayPreferences.applicationTheme() == DisplayPreferences.ApplicationTheme.DARK_THEME) {
             findViewById<View>(android.R.id.content)?.setBackgroundColor(Color.BLACK)
         }
     }
 
     protected fun applyDynamicColors(displayPreferences: DisplayPreferences) {
-        if (displayPreferences.dynamicColor(this)) {
+        if (displayPreferences.dynamicColor()) {
             DynamicColors.applyToActivityIfAvailable(this)
         }
     }

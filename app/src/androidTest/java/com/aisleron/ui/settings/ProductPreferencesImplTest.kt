@@ -27,6 +27,9 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class ProductPreferencesImplTest {
+    val productPreferences: ProductPreferencesImpl
+        get() = ProductPreferencesImpl(getInstrumentation().targetContext)
+
     @Before
     fun setUp() {
         SharedPreferencesInitializer().clearPreferences()
@@ -36,7 +39,7 @@ class ProductPreferencesImplTest {
     fun showExtraOptions_isExtraOptionsActive_ReturnTrue() {
         SharedPreferencesInitializer().setShowProductExtraOptions(true)
         val showExtraOptions =
-            ProductPreferencesImpl().showExtraOptions(getInstrumentation().targetContext)
+            productPreferences.showExtraOptions()
 
         assertTrue(showExtraOptions)
     }
@@ -45,7 +48,7 @@ class ProductPreferencesImplTest {
     fun showExtraOptions_isExtraOptionsInactive_ReturnFalse() {
         SharedPreferencesInitializer().setShowProductExtraOptions(false)
         val showExtraOptions =
-            ProductPreferencesImpl().showExtraOptions(getInstrumentation().targetContext)
+            productPreferences.showExtraOptions()
 
         assertFalse(showExtraOptions)
     }
@@ -54,7 +57,7 @@ class ProductPreferencesImplTest {
     fun setShowExtraOptions_SetToTrue_ShowExtraOptionsIsTrue() {
         SharedPreferencesInitializer().setShowProductExtraOptions(false)
 
-        ProductPreferencesImpl().setShowExtraOptions(getInstrumentation().targetContext, true)
+        productPreferences.setShowExtraOptions(true)
         val showExtraOptions =
             PreferenceManager.getDefaultSharedPreferences(getInstrumentation().targetContext)
                 .getBoolean("show_product_extra_options", false)
@@ -66,7 +69,7 @@ class ProductPreferencesImplTest {
     fun setShowExtraOptions_SetToFalse_ShowExtraOptionsIsFalse() {
         SharedPreferencesInitializer().setShowProductExtraOptions(true)
 
-        ProductPreferencesImpl().setShowExtraOptions(getInstrumentation().targetContext, false)
+        productPreferences.setShowExtraOptions(false)
         val showExtraOptions =
             PreferenceManager.getDefaultSharedPreferences(getInstrumentation().targetContext)
                 .getBoolean("show_product_extra_options", true)
@@ -78,7 +81,7 @@ class ProductPreferencesImplTest {
     fun getLastSelectedTab_PositionSet_PositionReturned() {
         SharedPreferencesInitializer().setProductLastSelectedTab(1)
 
-        val position = ProductPreferencesImpl().getLastSelectedTab(getInstrumentation().targetContext)
+        val position = productPreferences.getLastSelectedTab()
 
         assertEquals(1, position)
     }
@@ -87,7 +90,7 @@ class ProductPreferencesImplTest {
     fun setLastSelectedTab_SetToValue_ValueSavedAsPosition() {
         SharedPreferencesInitializer().setProductLastSelectedTab(0)
 
-        ProductPreferencesImpl().setLastSelectedTab(getInstrumentation().targetContext, 2)
+        productPreferences.setLastSelectedTab(2)
         val lastSelectedTabPosition =
             PreferenceManager.getDefaultSharedPreferences(getInstrumentation().targetContext)
                 .getInt("product_last_selected_tab", 0)

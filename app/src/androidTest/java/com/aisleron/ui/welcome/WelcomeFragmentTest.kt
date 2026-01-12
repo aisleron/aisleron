@@ -39,7 +39,6 @@ import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.isEnabled
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
-import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.aisleron.BuildConfig
 import com.aisleron.MainActivity
 import com.aisleron.R
@@ -180,7 +179,7 @@ class WelcomeFragmentTest : KoinTest {
     @Test
     fun welcomePage_SelectAddOwnProducts_InitializeOptionSet() {
         val welcomePreferences = WelcomePreferencesTestImpl()
-        val initialisedBefore = welcomePreferences.isInitialized(getInstrumentation().targetContext)
+        val initialisedBefore = welcomePreferences.isInitialized()
 
         val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
         getFragmentScenario(welcomePreferences).onFragment { fragment ->
@@ -193,7 +192,7 @@ class WelcomeFragmentTest : KoinTest {
         welcomeOption.perform(click())
 
         Assert.assertFalse(initialisedBefore)
-        Assert.assertTrue(welcomePreferences.isInitialized(getInstrumentation().targetContext))
+        Assert.assertTrue(welcomePreferences.isInitialized())
     }
 
     @Test
@@ -225,7 +224,7 @@ class WelcomeFragmentTest : KoinTest {
     @Test
     fun welcomePage_SelectLoadSampleItems_InitializeOptionSet() {
         val welcomePreferences = WelcomePreferencesTestImpl()
-        val initialisedBefore = welcomePreferences.isInitialized(getInstrumentation().targetContext)
+        val initialisedBefore = welcomePreferences.isInitialized()
 
         val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
         getFragmentScenario(welcomePreferences).onFragment { fragment ->
@@ -238,7 +237,7 @@ class WelcomeFragmentTest : KoinTest {
         welcomeOption.perform(click())
 
         Assert.assertFalse(initialisedBefore)
-        Assert.assertTrue(welcomePreferences.isInitialized(getInstrumentation().targetContext))
+        Assert.assertTrue(welcomePreferences.isInitialized())
     }
 
     @Test
@@ -274,7 +273,7 @@ class WelcomeFragmentTest : KoinTest {
     @Test
     fun welcomePage_SelectRestoreDatabase_InitializeOptionSet() {
         val welcomePreferences = WelcomePreferencesTestImpl()
-        val initialisedBefore = welcomePreferences.isInitialized(getInstrumentation().targetContext)
+        val initialisedBefore = welcomePreferences.isInitialized()
 
         val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
         getFragmentScenario(welcomePreferences).onFragment { fragment ->
@@ -287,7 +286,7 @@ class WelcomeFragmentTest : KoinTest {
         welcomeOption.perform(click())
 
         Assert.assertFalse(initialisedBefore)
-        Assert.assertTrue(welcomePreferences.isInitialized(getInstrumentation().targetContext))
+        Assert.assertTrue(welcomePreferences.isInitialized())
     }
 
     @Test
@@ -395,12 +394,12 @@ class WelcomeFragmentTest : KoinTest {
         welcomeOption.perform(click())
 
         assertEquals(
-            welcomePreferences.getLastUpdateVersionCode(getInstrumentation().targetContext),
+            welcomePreferences.getLastUpdateVersionCode(),
             BuildConfig.VERSION_CODE
         )
 
         assertEquals(
-            welcomePreferences.getLastUpdateVersionName(getInstrumentation().targetContext),
+            welcomePreferences.getLastUpdateVersionName(),
             BuildConfig.VERSION_NAME
         )
     }

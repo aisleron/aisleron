@@ -21,23 +21,21 @@ import android.content.Context
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 
-class ProductPreferencesImpl : ProductPreferences {
-    override fun showExtraOptions(context: Context): Boolean =
-        PreferenceManager.getDefaultSharedPreferences(context).getBoolean(
-            SHOW_PRODUCT_EXTRA_OPTIONS, false
-        )
+class ProductPreferencesImpl(context: Context) : ProductPreferences {
+    private val prefs = PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
 
-    override fun setShowExtraOptions(context: Context, value: Boolean) {
-        PreferenceManager.getDefaultSharedPreferences(context).edit {
-            putBoolean(SHOW_PRODUCT_EXTRA_OPTIONS, value)
-        }
+    override fun showExtraOptions(): Boolean =
+        prefs.getBoolean(SHOW_PRODUCT_EXTRA_OPTIONS, false)
+
+    override fun setShowExtraOptions(value: Boolean) {
+        prefs.edit { putBoolean(SHOW_PRODUCT_EXTRA_OPTIONS, value) }
     }
 
-    override fun getLastSelectedTab(context: Context): Int =
-        PreferenceManager.getDefaultSharedPreferences(context).getInt(PRODUCT_LAST_SELECTED_TAB, 0)
+    override fun getLastSelectedTab(): Int =
+        prefs.getInt(PRODUCT_LAST_SELECTED_TAB, 0)
 
-    override fun setLastSelectedTab(context: Context, position: Int) {
-        PreferenceManager.getDefaultSharedPreferences(context).edit {
+    override fun setLastSelectedTab(position: Int) {
+        prefs.edit {
             putInt(PRODUCT_LAST_SELECTED_TAB, position)
         }
     }

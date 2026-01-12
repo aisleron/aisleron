@@ -17,15 +17,13 @@
 
 package com.aisleron.ui.settings
 
-import android.content.Context
-
 interface ProductPreferences {
 
-    fun showExtraOptions(context: Context): Boolean
+    fun showExtraOptions(): Boolean
 
-    fun setShowExtraOptions(context: Context, value: Boolean)
+    fun setShowExtraOptions(value: Boolean)
 
-    fun getLastSelectedTab(context: Context): Int
+    fun getLastSelectedTab(): Int
 
-    fun setLastSelectedTab(context: Context, position: Int)
+    fun setLastSelectedTab(position: Int)
 }

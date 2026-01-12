@@ -47,7 +47,7 @@ class AboutActivity : AisleronActivity() {
     }
 
     private fun setDisplayPreferences() {
-        val displayPreferences = DisplayPreferencesImpl()
+        val displayPreferences = DisplayPreferencesImpl(this)
         applyDynamicColors(displayPreferences)
         applyPureBlackStyle(displayPreferences)
     }

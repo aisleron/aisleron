@@ -208,8 +208,7 @@ class ProductInventoryFragmentTest : KoinTest {
                         AddEditFragmentListenerTestImpl(),
                         ApplicationTitleUpdateListenerTestImpl(),
                         ProductPreferencesTestImpl().also {
-                            val context = InstrumentationRegistry.getInstrumentation().context
-                            it.setShowExtraOptions(context, true)
+                            it.setShowExtraOptions(true)
                         },
                         FabHandlerTestImpl()
                     )

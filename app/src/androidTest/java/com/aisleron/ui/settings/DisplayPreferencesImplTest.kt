@@ -17,7 +17,6 @@
 
 package com.aisleron.ui.settings
 
-import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.aisleron.SharedPreferencesInitializer
 import com.aisleron.domain.FilterType
@@ -26,16 +25,13 @@ import org.junit.Test
 import kotlin.test.assertEquals
 
 class DisplayPreferencesImplTest {
-
     private lateinit var displayPreferences: DisplayPreferences
     private lateinit var sharedPreferencesInitializer: SharedPreferencesInitializer
-    private lateinit var context: Context
 
     @Before
     fun setUp() {
-        context = getInstrumentation().targetContext
         sharedPreferencesInitializer = SharedPreferencesInitializer()
-        displayPreferences = DisplayPreferencesImpl()
+        displayPreferences = DisplayPreferencesImpl(getInstrumentation().targetContext)
         sharedPreferencesInitializer.clearPreferences()
     }
 
@@ -49,7 +45,7 @@ class DisplayPreferencesImplTest {
 
         testCases.forEach { (inputValue, expectedValue) ->
             sharedPreferencesInitializer.setApplicationTheme(inputValue)
-            val actual = displayPreferences.applicationTheme(context)
+            val actual = displayPreferences.applicationTheme()
             assertEquals(expectedValue, actual, "Failed for theme: ${inputValue.name}")
         }
     }
@@ -58,7 +54,7 @@ class DisplayPreferencesImplTest {
     fun showOnLockScreen_returnsCorrectBoolean_forGivenSetting() {
         listOf(true, false).forEach { showOnLockScreen ->
             sharedPreferencesInitializer.setShowOnLockScreen(showOnLockScreen)
-            val actual = displayPreferences.showOnLockScreen(context)
+            val actual = displayPreferences.showOnLockScreen()
             assertEquals(showOnLockScreen, actual, "Failed for showOnLockScreen: $showOnLockScreen")
         }
     }
@@ -115,10 +111,19 @@ class DisplayPreferencesImplTest {
             sharedPreferencesInitializer.clearPreferences() // Reset for each case
             case.setup()
 
-            val shoppingListBundle = displayPreferences.startingList(context)
+            val shoppingListBundle = displayPreferences.startingList()
 
-            assertEquals(case.expectedLocationId, shoppingListBundle.locationId, "Failed id for: ${case.description}")
-            assertEquals(case.expectedFilterType, shoppingListBundle.filterType, "Failed filter for: ${case.description}")
+            assertEquals(
+                case.expectedLocationId,
+                shoppingListBundle.locationId,
+                "Failed id for: ${case.description}"
+            )
+
+            assertEquals(
+                case.expectedFilterType,
+                shoppingListBundle.filterType,
+                "Failed filter for: ${case.description}"
+            )
         }
     }
 
@@ -126,7 +131,7 @@ class DisplayPreferencesImplTest {
     fun dynamicColor_returnsCorrectBoolean_forGivenSetting() {
         listOf(true, false).forEach { dynamicColor ->
             sharedPreferencesInitializer.setDynamicColor(dynamicColor)
-            val actual = displayPreferences.dynamicColor(context)
+            val actual = displayPreferences.dynamicColor()
             assertEquals(dynamicColor, actual, "Failed for dynamicColor: $dynamicColor")
         }
     }
@@ -142,7 +147,7 @@ class DisplayPreferencesImplTest {
 
         testCases.forEach { (inputValue, expectedValue) ->
             sharedPreferencesInitializer.setPureBlackStyle(inputValue)
-            val actual = displayPreferences.pureBlackStyle(context)
+            val actual = displayPreferences.pureBlackStyle()
             assertEquals(expectedValue, actual, "Failed for style: ${inputValue.name}")
         }
     }

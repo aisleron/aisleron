@@ -30,9 +30,9 @@ import com.aisleron.ui.settings.WelcomePreferencesImpl
 import org.koin.dsl.module
 
 val preferenceModule = module {
-    factory<ShoppingListPreferences> { ShoppingListPreferencesImpl() }
-    factory<WelcomePreferences> { WelcomePreferencesImpl() }
-    factory<DisplayPreferences> { DisplayPreferencesImpl() }
-    factory<ProductPreferences> { ProductPreferencesImpl() }
-    factory<ShopPreferences> { ShopPreferencesImpl() }
+    factory<ShoppingListPreferences> { ShoppingListPreferencesImpl(get()) }
+    factory<WelcomePreferences> { WelcomePreferencesImpl(get()) }
+    factory<DisplayPreferences> { DisplayPreferencesImpl(get()) }
+    factory<ProductPreferences> { ProductPreferencesImpl(get()) }
+    factory<ShopPreferences> { ShopPreferencesImpl(get()) }
 }

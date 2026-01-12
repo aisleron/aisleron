@@ -118,7 +118,7 @@ class ProductFragment(
 
         binding.txtToggleExtraOptions.setOnClickListener {
             val visible = binding.layoutExtraOptions.isVisible
-            productPreferences.setShowExtraOptions(requireContext(), !visible)
+            productPreferences.setShowExtraOptions(!visible)
             showHideExtraOptions()
         }
 
@@ -189,7 +189,7 @@ class ProductFragment(
         val toggle = binding.txtToggleExtraOptions
         val extraOptions = binding.layoutExtraOptions
         var expandDrawable: Int
-        if (productPreferences.showExtraOptions(requireContext())) {
+        if (productPreferences.showExtraOptions()) {
             extraOptions.visibility = View.VISIBLE
             expandDrawable = R.drawable.baseline_expand_down_24
         } else {
@@ -201,7 +201,7 @@ class ProductFragment(
         setShowAddShopFab()
 
         binding.pgrProductOptions.post {
-            val lastSelectedTab = productPreferences.getLastSelectedTab(requireContext())
+            val lastSelectedTab = productPreferences.getLastSelectedTab()
             binding.pgrProductOptions.setCurrentItem(lastSelectedTab, false)
         }
     }
@@ -211,7 +211,7 @@ class ProductFragment(
         tabsAdapter = ProductTabsAdapter(this)
         val viewPager = binding.pgrProductOptions
         viewPager.adapter = tabsAdapter
-        val lastSelectedTab = productPreferences.getLastSelectedTab(requireContext())
+        val lastSelectedTab = productPreferences.getLastSelectedTab()
         viewPager.setCurrentItem(lastSelectedTab, false)
 
         TabLayoutMediator(binding.tabProductOptions, viewPager) { tab, position ->
@@ -227,14 +227,14 @@ class ProductFragment(
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
-                productPreferences.setLastSelectedTab(requireContext(), position)
+                productPreferences.setLastSelectedTab(position)
                 setShowAddShopFab()
             }
         })
     }
 
     private fun setShowAddShopFab() {
-        showAddShopFab = productPreferences.showExtraOptions(requireContext())
+        showAddShopFab = productPreferences.showExtraOptions()
                 && binding.pgrProductOptions.currentItem == ProductTabsAdapter.ProductTab.TAB_AISLES.ordinal
 
         if (showAddShopFab) {
@@ -267,7 +267,7 @@ class ProductFragment(
         applicationTitleUpdateListener.applicationTitleUpdated(requireActivity(), appTitle)
 
         // Don't show the keyboard by default if extra options are visible.
-        if (productPreferences.showExtraOptions(requireContext())) return
+        if (productPreferences.showExtraOptions()) return
 
         val edtProductName = binding.edtProductName
         edtProductName.doOnLayout {

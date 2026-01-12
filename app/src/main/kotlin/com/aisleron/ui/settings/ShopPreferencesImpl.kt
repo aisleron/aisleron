@@ -21,16 +21,15 @@ import android.content.Context
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 
-class ShopPreferencesImpl : ShopPreferences {
-    override fun showExtraOptions(context: Context): Boolean =
-        PreferenceManager.getDefaultSharedPreferences(context).getBoolean(
-            SHOW_SHOP_EXTRA_OPTIONS, false
-        )
+class ShopPreferencesImpl(context: Context) : ShopPreferences {
+    private val prefs = PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
 
-    override fun setShowExtraOptions(context: Context, value: Boolean) {
-        PreferenceManager.getDefaultSharedPreferences(context).edit {
-            putBoolean(SHOW_SHOP_EXTRA_OPTIONS, value)
-        }
+
+    override fun showExtraOptions(): Boolean =
+        prefs.getBoolean(SHOW_SHOP_EXTRA_OPTIONS, false)
+
+    override fun setShowExtraOptions(value: Boolean) {
+        prefs.edit { putBoolean(SHOW_SHOP_EXTRA_OPTIONS, value) }
     }
 
     companion object {
