@@ -16,5 +16,7 @@
   -->
 
 <resources>
-    <dimen name="fab_margin">200dp</dimen>
+    <!-- Product list item margins.   -->
+    <dimen name="pli_padding_default">@dimen/padding_16</dimen>
+    <dimen name="pli_margin_start">@dimen/margin_32</dimen>
 </resources>

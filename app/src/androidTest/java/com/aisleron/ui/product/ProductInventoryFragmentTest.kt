@@ -38,7 +38,7 @@ import com.aisleron.di.repositoryModule
 import com.aisleron.di.useCaseModule
 import com.aisleron.di.viewModelTestModule
 import com.aisleron.domain.product.ProductRepository
-import com.aisleron.domain.product.TrackingMode
+import com.aisleron.domain.preferences.TrackingMode
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import com.aisleron.ui.AddEditFragmentListenerTestImpl
 import com.aisleron.ui.ApplicationTitleUpdateListenerTestImpl
@@ -208,8 +208,7 @@ class ProductInventoryFragmentTest : KoinTest {
                         AddEditFragmentListenerTestImpl(),
                         ApplicationTitleUpdateListenerTestImpl(),
                         ProductPreferencesTestImpl().also {
-                            val context = InstrumentationRegistry.getInstrumentation().context
-                            it.setShowExtraOptions(context, true)
+                            it.setShowExtraOptions(true)
                         },
                         FabHandlerTestImpl()
                     )

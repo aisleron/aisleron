@@ -20,43 +20,47 @@ package com.aisleron.ui.settings
 import android.content.Context
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
-import com.aisleron.domain.product.TrackingMode
+import com.aisleron.domain.preferences.NoteHint
+import com.aisleron.domain.preferences.TrackingMode
 
-class ShoppingListPreferencesImpl : ShoppingListPreferences {
-    override fun isStatusChangeSnackBarHidden(context: Context): Boolean =
-        PreferenceManager.getDefaultSharedPreferences(context).getBoolean(
-            PREF_HIDE_STATUS_CHANGE_SNACK_BAR, false
-        )
+class ShoppingListPreferencesImpl(context: Context) : ShoppingListPreferences {
+    private val prefs = PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
 
-    override fun showEmptyAisles(context: Context): Boolean =
-        PreferenceManager.getDefaultSharedPreferences(context).getBoolean(
-            PREF_SHOW_EMPTY_AISLES, false
-        )
+    override fun isStatusChangeSnackBarHidden(): Boolean =
+        prefs.getBoolean(PREF_HIDE_STATUS_CHANGE_SNACK_BAR, false)
 
-    override fun setShowEmptyAisles(context: Context, value: Boolean) {
-        PreferenceManager.getDefaultSharedPreferences(context)
-            .edit {
-                putBoolean(PREF_SHOW_EMPTY_AISLES, value)
-            }
+    override fun showEmptyAisles(): Boolean =
+        prefs.getBoolean(PREF_SHOW_EMPTY_AISLES, false)
+
+    override fun setShowEmptyAisles(value: Boolean) {
+        prefs.edit {
+            putBoolean(PREF_SHOW_EMPTY_AISLES, value)
+        }
     }
 
-    override fun trackingMode(context: Context): TrackingMode {
-        val method = PreferenceManager.getDefaultSharedPreferences(context)
+    override fun trackingMode(): TrackingMode {
+        val method = prefs
             .getString(PREF_TRACKING_MODE, TrackingMode.CHECKBOX.value)
-            ?.ifEmpty { "" }
 
         return TrackingMode.fromValue(method)
     }
 
-    override fun keepScreenOn(context: Context): Boolean =
-        PreferenceManager.getDefaultSharedPreferences(context).getBoolean(
-            PREF_KEEP_SCREEN_ON, false
+    override fun keepScreenOn(): Boolean =
+        prefs.getBoolean(PREF_KEEP_SCREEN_ON, false)
+
+    override fun noteHint(): NoteHint {
+        val noteHint = prefs.getString(
+            PREF_NOTE_HINT, NoteHint.NONE.value
         )
+
+        return NoteHint.fromValue(noteHint)
+    }
 
     companion object {
         const val PREF_HIDE_STATUS_CHANGE_SNACK_BAR = "hide_status_change_snack_bar"
         const val PREF_SHOW_EMPTY_AISLES = "show_empty_aisles"
         const val PREF_TRACKING_MODE = "tracking_mode"
         const val PREF_KEEP_SCREEN_ON = "keep_screen_on"
+        const val PREF_NOTE_HINT = "note_hint"
     }
 }

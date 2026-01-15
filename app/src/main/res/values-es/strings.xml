@@ -172,4 +172,9 @@
     <string name="language">Idioma</string>
     <string name="system_default">Predeterminado del sistema</string>
     <string name="aisle_picker">Selector de pasillo</string>
+    <string name="note_hint">Sugerencia de nota</string>
+    <string name="note_hint_button">Botón</string>
+    <string name="note_hint_summary">Resumen</string>
+    <string name="note_hint_indicator">Indicador (*)</string>
+    <string name="preference_none">Ninguno</string>
 </resources>

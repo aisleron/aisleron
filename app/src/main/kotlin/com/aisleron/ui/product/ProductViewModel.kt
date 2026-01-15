@@ -27,7 +27,7 @@ import com.aisleron.domain.note.Note
 import com.aisleron.domain.note.usecase.ApplyNoteChangesUseCase
 import com.aisleron.domain.note.usecase.GetNoteParentUseCase
 import com.aisleron.domain.product.Product
-import com.aisleron.domain.product.TrackingMode
+import com.aisleron.domain.preferences.TrackingMode
 import com.aisleron.domain.product.usecase.AddProductUseCase
 import com.aisleron.domain.product.usecase.GetProductMappingsUseCase
 import com.aisleron.domain.product.usecase.UpdateProductUseCase

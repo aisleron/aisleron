@@ -17,14 +17,12 @@
 
 package com.aisleron.ui.settings
 
-import android.content.Context
-
 class ShopPreferencesTestImpl : ShopPreferences {
     private var _showExtraOptions = false
 
-    override fun showExtraOptions(context: Context): Boolean = _showExtraOptions
+    override fun showExtraOptions(): Boolean = _showExtraOptions
 
-    override fun setShowExtraOptions(context: Context, value: Boolean) {
+    override fun setShowExtraOptions(value: Boolean) {
         _showExtraOptions = value
     }
 }

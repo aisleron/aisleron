@@ -44,6 +44,15 @@ class SharedPreferencesInitializer {
         NONE("none")
     }
 
+    enum class NoteHint(val value: String?) {
+        BUTTON("note_hint_button"),
+        SUMMARY("note_hint_summary"),
+        INDICATOR("note_hint_indicator"),
+        NONE("preference_none"),
+        DUMMY("note_hint_dummy"),
+        NULL(null)
+    }
+
     private fun getPreferencesEditor(): SharedPreferences.Editor {
         val targetContext = getInstrumentation().targetContext
         return PreferenceManager.getDefaultSharedPreferences(targetContext).edit()
@@ -81,6 +90,10 @@ class SharedPreferencesInitializer {
 
     fun setTrackingMode(trackingMode: TrackingMode) {
         setPreferenceValue(PREF_TRACKING_MODE, trackingMode.value)
+    }
+
+    fun setNoteHint(noteHint: NoteHint) {
+        setPreferenceValue(PREF_NOTE_HINT, noteHint.value)
     }
 
     fun setKeepScreenOn(keepScreenOn: Boolean) {
@@ -136,6 +149,7 @@ class SharedPreferencesInitializer {
         private const val PREF_SHOW_EMPTY_AISLES = "show_empty_aisles"
         private const val PREF_TRACKING_MODE = "tracking_mode"
         private const val PREF_KEEP_SCREEN_ON = "keep_screen_on"
+        const val PREF_NOTE_HINT = "note_hint"
         private const val PREF_STARTING_LIST = "starting_list"
         private const val PREF_DISPLAY_LOCKSCREEN = "display_lockscreen"
         private const val DYNAMIC_COLOR = "dynamic_color"

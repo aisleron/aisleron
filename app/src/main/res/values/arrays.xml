@@ -86,4 +86,18 @@
         <item>sv</item>
         <item>uk</item>
     </string-array>
+d
+    <array name="note_hint_names">
+        <item>@string/note_hint_button</item>
+        <item>@string/note_hint_summary</item>
+        <item>@string/note_hint_indicator</item>
+        <item>@string/preference_none</item>
+    </array>
+
+    <array name="note_hint_values">
+        <item>note_hint_button</item>
+        <item>note_hint_summary</item>
+        <item>note_hint_indicator</item>
+        <item>preference_none</item>
+    </array>
 </resources>

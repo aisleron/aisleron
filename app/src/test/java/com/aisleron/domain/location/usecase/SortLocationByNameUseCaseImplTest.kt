@@ -7,7 +7,7 @@ import com.aisleron.domain.aisle.usecase.AddAisleUseCaseImpl
 import com.aisleron.domain.aisle.usecase.IsAisleNameUniqueUseCase
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.product.Product
-import com.aisleron.domain.product.TrackingMode
+import com.aisleron.domain.preferences.TrackingMode
 import com.aisleron.domain.product.usecase.AddProductUseCase
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest

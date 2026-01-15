@@ -77,9 +77,12 @@ import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.loyaltycard.LoyaltyCard
 import com.aisleron.domain.loyaltycard.LoyaltyCardProviderType
 import com.aisleron.domain.loyaltycard.LoyaltyCardRepository
+import com.aisleron.domain.note.Note
+import com.aisleron.domain.note.NoteRepository
+import com.aisleron.domain.preferences.NoteHint
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
-import com.aisleron.domain.product.TrackingMode
+import com.aisleron.domain.preferences.TrackingMode
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import com.aisleron.ui.ApplicationTitleUpdateListenerTestImpl
 import com.aisleron.ui.FabHandler
@@ -97,6 +100,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.allOf
+import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.CoreMatchers.endsWith
 import org.hamcrest.CoreMatchers.instanceOf
 import org.hamcrest.CoreMatchers.not
@@ -1212,9 +1216,7 @@ class ShoppingListFragmentTest : KoinTest {
             fragment.onMenuItemSelected(menuItem)
         }
 
-        val valueAfter =
-            shoppingListPreferencesTestImpl.showEmptyAisles(getInstrumentation().targetContext)
-
+        val valueAfter = shoppingListPreferencesTestImpl.showEmptyAisles()
         assertNotEquals(valueBefore, valueAfter)
     }
 
@@ -1834,5 +1836,155 @@ class ShoppingListFragmentTest : KoinTest {
         onView(withText(aisle.name)).perform(click())
 
         assertEquals(!aisleBefore.expanded, aisleRepository.get(aisle.id)!!.expanded)
+    }
+
+    private fun getNoteHintButtonForProduct(product: Product): ViewInteraction =
+        onView(
+            allOf(
+                withId(R.id.btn_note),
+                hasSibling(
+                    allOf(
+                        withText(containsString(product.name)),
+                        withId(R.id.txt_product_name)
+                    )
+                )
+            )
+        )
+
+    private fun getNoteHintSummaryForProduct(product: Product): ViewInteraction =
+        onView(
+            allOf(
+                withId(R.id.ll_product_note_preview),
+                isDescendantOfA(
+                    allOf(
+                        withId(R.id.frg_product_list_item),
+                        hasDescendant(withText(containsString(product.name)))
+                    )
+                )
+            )
+        )
+
+    private fun getNoteHintIndicatorForProduct(product: Product): ViewInteraction {
+        return onView(
+            allOf(
+                withText(containsString(product.name)), withId(R.id.txt_product_name)
+            )
+        )
+    }
+
+    private suspend fun noteHint_ArrangeAct(noteHint: NoteHint): Product {
+        val noteId = get<NoteRepository>().add(Note(id = 0, noteText = "Test Note Hints"))
+        val shoppingList = getShoppingList()
+        val product = getProduct(shoppingList, false).copy(noteId = noteId)
+        get<ProductRepository>().update(product)
+        val shoppingListBundle =
+            bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
+
+        val shoppingListPreferencesTestImpl = ShoppingListPreferencesTestImpl()
+        shoppingListPreferencesTestImpl.setNoteHint(noteHint)
+
+        getFragmentScenario(shoppingListBundle, shoppingListPreferencesTestImpl)
+
+        return product
+    }
+
+    @Test
+    fun uiStateUpdated_NoteHintIsNone_ShowNoNoteHints() = runTest {
+        val product = noteHint_ArrangeAct(NoteHint.NONE)
+
+        getNoteHintButtonForProduct(product).check(
+            matches(
+                ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE)
+            )
+        )
+
+        getNoteHintSummaryForProduct(product).check(
+            matches(
+                ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE)
+            )
+        )
+
+        getNoteHintIndicatorForProduct(product).check(matches(withText(product.name)))
+    }
+
+    @Test
+    fun uiStateUpdated_NoteHintIsButton_ShowNoteHintButton() = runTest {
+        val product = noteHint_ArrangeAct(NoteHint.BUTTON)
+
+        getNoteHintButtonForProduct(product).check(
+            matches(
+                ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)
+            )
+        )
+
+        getNoteHintSummaryForProduct(product).check(
+            matches(
+                ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE)
+            )
+        )
+
+        getNoteHintIndicatorForProduct(product).check(matches(withText(product.name)))
+    }
+
+    @Test
+    fun uiStateUpdated_NoteHintIsSummary_ShowNoteHintSummary() = runTest {
+        val product = noteHint_ArrangeAct(NoteHint.SUMMARY)
+
+        getNoteHintButtonForProduct(product).check(
+            matches(
+                ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE)
+            )
+        )
+
+        getNoteHintSummaryForProduct(product).check(
+            matches(
+                ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)
+            )
+        )
+
+        getNoteHintIndicatorForProduct(product).check(matches(withText(product.name)))
+    }
+
+    @Test
+    fun uiStateUpdated_NoteHintIsIndicator_ShowNoteHintIndicator() = runTest {
+        val product = noteHint_ArrangeAct(NoteHint.INDICATOR)
+
+        getNoteHintButtonForProduct(product).check(
+            matches(
+                ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE)
+            )
+        )
+
+        getNoteHintSummaryForProduct(product).check(
+            matches(
+                ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE)
+            )
+        )
+
+        getNoteHintIndicatorForProduct(product).check(matches(withText("${product.name} *")))
+    }
+
+    @Test
+    fun onNoteHintButtonClick_NoteDialogShown() = runTest {
+        val product = noteHint_ArrangeAct(NoteHint.BUTTON)
+
+        val noteHintButton = getNoteHintButtonForProduct(product)
+        noteHintButton.perform(click())
+
+        onView(withText(containsString(product.name)))
+            .inRoot(isDialog())
+            .check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun onNoteSummaryClick_NoteDialogShown() = runTest {
+        val product = noteHint_ArrangeAct(NoteHint.SUMMARY)
+
+        val noteSummary = getNoteHintSummaryForProduct(product)
+        noteSummary.perform(click())
+
+        onView(withText(containsString(product.name)))
+            .inRoot(isDialog())
+            .check(matches(isDisplayed()))
     }
 }

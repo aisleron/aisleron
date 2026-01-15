@@ -172,4 +172,9 @@
     <string name="tracking_default">За замовчуванням</string>
     <string name="qty_increments">Кроки кількості</string>
     <string name="unit_of_measure">Одиниця виміру</string>
+    <string name="note_hint">Підказка для нотатки</string>
+    <string name="note_hint_button">Кнопка</string>
+    <string name="note_hint_summary">Резюме</string>
+    <string name="note_hint_indicator">Індикатор (*)</string>
+    <string name="preference_none">Немає</string>
 </resources>

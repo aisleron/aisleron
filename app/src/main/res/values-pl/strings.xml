@@ -172,4 +172,9 @@
     <string name="tracking_default">Domyślny</string>
     <string name="qty_increments">Przyrosty ilości</string>
     <string name="unit_of_measure">Jednostka miary</string>
+    <string name="note_hint">Podpowiedź notatki</string>
+    <string name="note_hint_button">Przycisk</string>
+    <string name="note_hint_summary">Podsumowanie</string>
+    <string name="note_hint_indicator">Wskaźnik (*)</string>
+    <string name="preference_none">Brak</string>
 </resources>

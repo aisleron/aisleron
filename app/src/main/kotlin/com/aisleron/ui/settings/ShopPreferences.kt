@@ -17,10 +17,8 @@
 
 package com.aisleron.ui.settings
 
-import android.content.Context
-
 interface ShopPreferences {
-    fun showExtraOptions(context: Context): Boolean
+    fun showExtraOptions(): Boolean
 
-    fun setShowExtraOptions(context: Context, value: Boolean)
+    fun setShowExtraOptions(value: Boolean)
 }

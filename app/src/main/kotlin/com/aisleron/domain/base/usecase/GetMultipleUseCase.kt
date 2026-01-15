@@ -15,14 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.ui.shoppinglist
+package com.aisleron.domain.base.usecase
 
-import com.aisleron.domain.FilterType
+import com.aisleron.domain.base.AisleronItem
+import kotlinx.coroutines.flow.Flow
 
-data class ShoppingListFilterParameters(
-    var filterType: FilterType = FilterType.NEEDED,
-    var showDefaultAisle: Boolean = true,
-    var productNameQuery: String = "",
-    var showAllProducts: Boolean = false,
-    var showAllAisles: Boolean = false
-)
+interface GetMultipleUseCase<T : AisleronItem> {
+    suspend operator fun invoke(ids: List<Int>): Flow<List<T>>
+}

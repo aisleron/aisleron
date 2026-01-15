@@ -48,9 +48,9 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.preference.PreferenceManager
 import com.aisleron.databinding.ActivityMainBinding
+import com.aisleron.domain.preferences.ApplicationTheme
 import com.aisleron.ui.FabHandler
 import com.aisleron.ui.bundles.Bundler
-import com.aisleron.ui.settings.DisplayPreferences
 import com.aisleron.ui.settings.DisplayPreferencesImpl
 import com.aisleron.ui.settings.WelcomePreferences
 import com.aisleron.ui.settings.WelcomePreferencesImpl
@@ -105,7 +105,7 @@ class MainActivity : AisleronActivity() {
         val navGraph = navInflater.inflate(R.navigation.mobile_navigation)
 
         val shoppingListBundle =
-            Bundler().makeShoppingListBundle(DisplayPreferencesImpl().startingList(this))
+            Bundler().makeShoppingListBundle(DisplayPreferencesImpl(this).startingList())
 
         navController.setGraph(navGraph, shoppingListBundle)
 
@@ -134,23 +134,23 @@ class MainActivity : AisleronActivity() {
             fabHandler.setFabItems(this)
         }
 
-        val welcomePreferences = WelcomePreferencesImpl()
+        val welcomePreferences = WelcomePreferencesImpl(this)
 
         initialiseUpdateBanner(welcomePreferences)
 
-        if (!welcomePreferences.isInitialized(this)) {
+        if (!welcomePreferences.isInitialized()) {
             navController.navigate(R.id.nav_welcome)
         }
     }
 
     private fun setDisplayPreferences() {
-        val displayPreferences = DisplayPreferencesImpl()
+        val displayPreferences = DisplayPreferencesImpl(this)
 
-        setShowOnLockScreen(displayPreferences.showOnLockScreen(this))
+        setShowOnLockScreen(displayPreferences.showOnLockScreen())
 
-        val nightMode = when (displayPreferences.applicationTheme(this)) {
-            DisplayPreferences.ApplicationTheme.LIGHT_THEME -> AppCompatDelegate.MODE_NIGHT_NO
-            DisplayPreferences.ApplicationTheme.DARK_THEME -> AppCompatDelegate.MODE_NIGHT_YES
+        val nightMode = when (displayPreferences.applicationTheme()) {
+            ApplicationTheme.LIGHT_THEME -> AppCompatDelegate.MODE_NIGHT_NO
+            ApplicationTheme.DARK_THEME -> AppCompatDelegate.MODE_NIGHT_YES
             else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
         }
 
@@ -172,13 +172,17 @@ class MainActivity : AisleronActivity() {
         val fab = binding.appBarMain.fab
         ViewCompat.setOnApplyWindowInsetsListener(fab) { view, windowInsets ->
             val insets = windowInsets.getInsets(
-                WindowInsetsCompat.Type.navigationBars()
+                WindowInsetsCompat.Type.statusBars()
+                        or WindowInsetsCompat.Type.navigationBars()
                         or WindowInsetsCompat.Type.ime()
+                        or WindowInsetsCompat.Type.displayCutout()
             )
 
             view.updateLayoutParams<MarginLayoutParams> {
                 val fabMargins = resources.getDimensionPixelSize(R.dimen.fab_margin_bottom)
                 bottomMargin = fabMargins + insets.bottom
+                rightMargin = fabMargins + insets.right
+                leftMargin = fabMargins + insets.left
             }
 
             windowInsets
@@ -194,20 +198,6 @@ class MainActivity : AisleronActivity() {
             )
 
             view.updatePadding(top = insets.top, right = insets.right, left = insets.left)
-
-            /*view.updateLayoutParams<MarginLayoutParams> {
-                topMargin = insets.top
-                leftMargin = insets.left
-                rightMargin = insets.right
-            }
-*/
-            /*val actionBarHeight = resources.getDimensionPixelSize(R.dimen.toolbar_height)
-
-            val params = view.layoutParams
-            params.height = actionBarHeight + insets.top
-            view.layoutParams = params
-
-            view.updatePadding(top = insets.top, right = insets.right, left = insets.left)*/
 
             windowInsets
         }
@@ -273,7 +263,7 @@ class MainActivity : AisleronActivity() {
         binding.appBarMain.txtUpdateBanner.text =
             getString(
                 R.string.updated_notification,
-                welcomePreferences.getLastUpdateVersionName(this),
+                welcomePreferences.getLastUpdateVersionName(),
                 BuildConfig.VERSION_NAME
             )
 
@@ -289,8 +279,8 @@ class MainActivity : AisleronActivity() {
             dismissUpdateBanner()
         }
 
-        val isInitialized = welcomePreferences.isInitialized(this)
-        val lastUpdatedVersionCode = welcomePreferences.getLastUpdateVersionCode(this)
+        val isInitialized = welcomePreferences.isInitialized()
+        val lastUpdatedVersionCode = welcomePreferences.getLastUpdateVersionCode()
         binding.appBarMain.updateBanner.visibility =
             if (isInitialized && (lastUpdatedVersionCode < BuildConfig.VERSION_CODE)) {
                 View.VISIBLE
@@ -301,8 +291,8 @@ class MainActivity : AisleronActivity() {
 
     private fun dismissUpdateBanner() {
         val updateBanner = binding.appBarMain.updateBanner
-        val welcomePreferences = WelcomePreferencesImpl()
-        welcomePreferences.setLastUpdateValues(this)
+        val welcomePreferences = WelcomePreferencesImpl(this)
+        welcomePreferences.setLastUpdateValues()
         updateBanner.visibility = View.GONE
     }
 

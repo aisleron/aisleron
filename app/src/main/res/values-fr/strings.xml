@@ -172,4 +172,9 @@
     <string name="tracking_default">Par défaut</string>
     <string name="qty_increments">Incréments de quantité</string>
     <string name="unit_of_measure">Unité de mesure</string>
+    <string name="note_hint">Indice de note</string>
+    <string name="note_hint_button">Bouton</string>
+    <string name="note_hint_summary">Résumé</string>
+    <string name="note_hint_indicator">Indicateur (*)</string>
+    <string name="preference_none">Aucun</string>
 </resources>

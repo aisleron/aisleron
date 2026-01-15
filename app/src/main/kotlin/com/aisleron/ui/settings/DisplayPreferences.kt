@@ -17,31 +17,18 @@
 
 package com.aisleron.ui.settings
 
-import android.content.Context
+import com.aisleron.domain.preferences.ApplicationTheme
+import com.aisleron.domain.preferences.PureBlackStyle
 import com.aisleron.ui.bundles.ShoppingListBundle
 
 interface DisplayPreferences {
+    fun showOnLockScreen(): Boolean
 
-    enum class ApplicationTheme {
-        SYSTEM_THEME,
-        LIGHT_THEME,
-        DARK_THEME
-    }
+    fun applicationTheme(): ApplicationTheme
 
-    enum class PureBlackStyle {
-        DEFAULT,
-        ECONOMY,
-        BUSINESS_CLASS,
-        FIRST_CLASS
-    }
+    fun startingList(): ShoppingListBundle
 
-    fun showOnLockScreen(context: Context): Boolean
+    fun dynamicColor(): Boolean
 
-    fun applicationTheme(context: Context): ApplicationTheme
-
-    fun startingList(context: Context): ShoppingListBundle
-
-    fun dynamicColor(context: Context): Boolean
-
-    fun pureBlackStyle(context: Context): PureBlackStyle
+    fun pureBlackStyle(): PureBlackStyle
 }

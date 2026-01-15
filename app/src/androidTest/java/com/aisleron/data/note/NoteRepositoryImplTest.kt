@@ -20,11 +20,16 @@ package com.aisleron.data.note
 import com.aisleron.data.RepositoryImplTest
 import com.aisleron.domain.base.BaseRepository
 import com.aisleron.domain.note.Note
+import com.aisleron.domain.note.NoteRepository
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.koin.test.KoinTest
 import org.koin.test.get
+import kotlin.test.assertEquals
 
 class NoteRepositoryImplTest : KoinTest, RepositoryImplTest<Note>() {
+    val noteRepository: NoteRepository get() = repository as NoteRepository
 
     override fun initRepository(): BaseRepository<Note> = NoteRepositoryImpl(
         noteDao = get<NoteDao>(), noteMapper = NoteMapper()
@@ -36,7 +41,8 @@ class NoteRepositoryImplTest : KoinTest, RepositoryImplTest<Note>() {
     override suspend fun getMultipleNewItems(): List<Note> =
         listOf(
             Note(id = 0, noteText = "Add note 1"),
-            Note(id = 0, noteText = "Add note 2")
+            Note(id = 0, noteText = "Add note 2"),
+            Note(id = 0, noteText = "Add note 3")
         )
 
     override suspend fun getInvalidItem(): Note =
@@ -48,5 +54,26 @@ class NoteRepositoryImplTest : KoinTest, RepositoryImplTest<Note>() {
     @Test
     override fun add_SingleItemProvided_AddItem() {
         super.add_SingleItemProvided_AddItem()
+    }
+
+    @Test
+    fun getMultiple_ValidItemIdsProvided_ReturnItems() = runTest {
+        val itemIds = addMultipleItems()
+
+        val items = noteRepository.getMultiple(itemIds).first()
+
+        val resultIds = items.map { it.id }
+        assertEquals(itemIds.sorted(), resultIds.sorted())
+    }
+
+    @Test
+    fun getMultiple_singleItemIdProvided_ReturnSingleItem() = runTest {
+        val itemIds = addMultipleItems().filter { it == 1 }
+
+        val items = noteRepository.getMultiple(itemIds).first()
+
+        val resultIds = items.map { it.id }
+        assertEquals(1, resultIds.size)
+        assertEquals(itemIds.sorted(), resultIds.sorted())
     }
 }

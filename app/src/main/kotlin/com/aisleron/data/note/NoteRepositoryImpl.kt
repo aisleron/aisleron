@@ -19,6 +19,8 @@ package com.aisleron.data.note
 
 import com.aisleron.domain.note.Note
 import com.aisleron.domain.note.NoteRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class NoteRepositoryImpl(
     private val noteDao: NoteDao,
@@ -57,5 +59,10 @@ class NoteRepositoryImpl(
         return noteDao
             .upsert(*noteMapper.fromModelList(notes).map { it }.toTypedArray())
             .map { it.toInt() }
+    }
+
+    override fun getMultiple(ids: List<Int>): Flow<List<Note>> {
+        val noteEntities = noteDao.getNotes(ids)
+        return noteEntities.map { noteMapper.toModelList(it) }
     }
 }

@@ -27,9 +27,12 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.aisleron.databinding.FragmentNoteBinding
+import com.aisleron.ui.AisleronFragment
 import kotlinx.coroutines.launch
 
-abstract class NoteFragment<VM : NoteViewModel> : Fragment() {
+abstract class NoteFragment<VM : NoteViewModel> : Fragment(), AisleronFragment {
+    private var _binding: FragmentNoteBinding? = null
+    private val binding get() = _binding!!
     protected abstract val viewModel: VM
 
     override fun onCreateView(
@@ -37,7 +40,10 @@ abstract class NoteFragment<VM : NoteViewModel> : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val binding = FragmentNoteBinding.inflate(inflater, container, false)
+        _binding = FragmentNoteBinding.inflate(inflater, container, false)
+        setWindowInsetListeners(
+            this, binding.root, false, null, applyMargins = false, applyBottomPadding = true
+        )
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -49,5 +55,15 @@ abstract class NoteFragment<VM : NoteViewModel> : Fragment() {
 
         binding.edtNotes.doAfterTextChanged { viewModel.updateNote(it.toString()) }
         return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    override fun onResume() {
+        super.onResume()
+        binding.root.requestLayout()
     }
 }

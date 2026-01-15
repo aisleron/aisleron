@@ -172,4 +172,9 @@
     <string name="tracking_default">Standard</string>
     <string name="qty_increments">Mengenschritte</string>
     <string name="unit_of_measure">Maßeinheit</string>
+    <string name="note_hint">Notiz-Hinweis</string>
+    <string name="note_hint_button">Schaltfläche</string>
+    <string name="note_hint_summary">Zusammenfassung</string>
+    <string name="note_hint_indicator">Indikator (*)</string>
+    <string name="preference_none">Keine</string>
 </resources>

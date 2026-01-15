@@ -46,7 +46,8 @@ import com.aisleron.databinding.FragmentAisleListItemBinding
 import com.aisleron.databinding.FragmentEmptyListItemBinding
 import com.aisleron.databinding.FragmentProductListItemBinding
 import com.aisleron.domain.FilterType
-import com.aisleron.domain.product.TrackingMode
+import com.aisleron.domain.preferences.NoteHint
+import com.aisleron.domain.preferences.TrackingMode
 import java.text.DecimalFormat
 import java.util.Collections
 
@@ -58,7 +59,8 @@ class ShoppingListItemRecyclerViewAdapter(
     private val listener: ShoppingListItemListener,
     private val defaultTrackingMode: TrackingMode,
     private val defaultUnitOfMeasure: String,
-    private val listFilter: FilterType
+    private val listFilter: FilterType,
+    private val noteHint: NoteHint
 ) : ListAdapter<ShoppingListItem, ViewHolder>(ShoppingListItemDiffCallback()),
     ShoppingListItemMoveCallbackListener.Listener {
     private val longClickHandler: Handler = Handler(Looper.getMainLooper())
@@ -245,6 +247,9 @@ class ShoppingListItemRecyclerViewAdapter(
         private val decQtyButton: ImageButton = binding.btnQtyDec
         private val incQtyButton: ImageButton = binding.btnQtyInc
         private val qtyEdit: EditText = binding.edtQty
+        private val noteButton: ImageButton = binding.btnNote
+        private val noteLayout: LinearLayout = binding.llProductNotePreview
+        private val noteTextView: TextView = binding.txtProductNotePreview
         private val rootView = binding.root
 
         private var qtyWatcher: TextWatcher? = null
@@ -257,7 +262,6 @@ class ShoppingListItemRecyclerViewAdapter(
 
             rootView.isSelected = item.selected
 
-            contentView.text = item.name
             inStockView.isChecked = item.inStock
             inStockView.isVisible = trackingMode in setOf(
                 TrackingMode.CHECKBOX,
@@ -321,6 +325,30 @@ class ShoppingListItemRecyclerViewAdapter(
                     qtyEdit.setText(formattedQty)
                 }
             }
+
+            val hasNote = item.noteId != null && (item.noteText ?: "").isNotBlank()
+            noteLayout.isVisible =
+                hasNote && noteHint == NoteHint.SUMMARY
+
+            val itemName = item.name +
+                    if (noteHint == NoteHint.INDICATOR && hasNote)
+                        " *"
+                    else
+                        ""
+
+            contentView.text = itemName
+
+            noteTextView.text = item.noteText
+            noteTextView.setOnClickListener {
+                listener.onShowNoteClick(item)
+            }
+
+            noteButton.isVisible =
+                hasNote && noteHint == NoteHint.BUTTON
+
+            noteButton.setOnClickListener {
+                listener.onShowNoteClick(item)
+            }
         }
 
         private fun formatQty(qty: Double): String =
@@ -344,6 +372,7 @@ class ShoppingListItemRecyclerViewAdapter(
         fun onDragStart(viewHolder: ViewHolder)
         fun onMove(item: ShoppingListItem)
         fun hasSelectedItems(): Boolean
+        fun onShowNoteClick(item: ShoppingListItem)
     }
 
     override fun onRowMove(viewHolder: ViewHolder, target: ViewHolder) {

@@ -172,4 +172,9 @@
     <string name="tracking_default">По умолчанию</string>
     <string name="qty_increments">Шаги количества</string>
     <string name="unit_of_measure">Единица измерения</string>
+    <string name="note_hint">Подсказка для заметки</string>
+    <string name="note_hint_button">Кнопка</string>
+    <string name="note_hint_summary">Сводка</string>
+    <string name="note_hint_indicator">Индикатор (*)</string>
+    <string name="preference_none">Нет</string>
 </resources>

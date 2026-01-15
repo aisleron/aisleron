@@ -21,7 +21,7 @@ import com.aisleron.di.TestDependencyManager
 import com.aisleron.domain.note.usecase.GetNoteUseCaseImpl
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
-import com.aisleron.domain.product.TrackingMode
+import com.aisleron.domain.preferences.TrackingMode
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull

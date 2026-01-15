@@ -20,6 +20,7 @@ package com.aisleron.domain.product
 import com.aisleron.domain.base.AisleronItem
 import com.aisleron.domain.note.Note
 import com.aisleron.domain.note.NoteParent
+import com.aisleron.domain.preferences.TrackingMode
 
 data class Product(
     override val id: Int,

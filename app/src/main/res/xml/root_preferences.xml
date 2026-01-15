@@ -71,6 +71,13 @@
             android:key="tracking_mode"
             android:title="@string/tracking_mode"
             app:useSimpleSummaryProvider="true" />
+        <ListPreference
+            android:defaultValue="preference_none"
+            android:entries="@array/note_hint_names"
+            android:entryValues="@array/note_hint_values"
+            android:key="note_hint"
+            android:title="@string/note_hint"
+            app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/backup_restore_title">

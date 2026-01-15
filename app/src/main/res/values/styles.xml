@@ -16,6 +16,8 @@
   -->
 
 <resources>
-    <dimen name="fab_margin">48dp</dimen>
-    <dimen name="mini_fab_margin">52dp</dimen>
+    <style name="TextAppearance.Aisleron.ProductListItem" parent="TextAppearance.Material3.BodyMedium" />
+    <style name="TextAppearance.Aisleron.ProductNote" parent="TextAppearance.Material3.BodySmall">
+        <item name="android:textStyle">italic</item>
+    </style>
 </resources>

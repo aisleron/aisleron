@@ -17,21 +17,19 @@
 
 package com.aisleron.ui.settings
 
-import android.content.Context
-
 class ProductPreferencesTestImpl : ProductPreferences {
     private var _showExtraOptions = false
     private var _lastSelectedTab = 0
 
-    override fun showExtraOptions(context: Context): Boolean = _showExtraOptions
+    override fun showExtraOptions(): Boolean = _showExtraOptions
 
-    override fun setShowExtraOptions(context: Context, value: Boolean) {
+    override fun setShowExtraOptions(value: Boolean) {
         _showExtraOptions = value
     }
 
-    override fun getLastSelectedTab(context: Context): Int = _lastSelectedTab
+    override fun getLastSelectedTab(): Int = _lastSelectedTab
 
-    override fun setLastSelectedTab(context: Context, position: Int) {
+    override fun setLastSelectedTab(position: Int) {
         _lastSelectedTab = position
     }
 }

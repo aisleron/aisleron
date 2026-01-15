@@ -39,7 +39,6 @@ import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.isEnabled
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
-import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.aisleron.BuildConfig
 import com.aisleron.MainActivity
 import com.aisleron.R
@@ -57,10 +56,11 @@ import com.aisleron.domain.aisle.AisleRepository
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
-import com.aisleron.domain.product.TrackingMode
+import com.aisleron.domain.preferences.TrackingMode
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import com.aisleron.ui.FabHandlerTestImpl
 import com.aisleron.ui.settings.WelcomePreferencesTestImpl
+import com.aisleron.utils.SystemIds
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.allOf
@@ -180,7 +180,7 @@ class WelcomeFragmentTest : KoinTest {
     @Test
     fun welcomePage_SelectAddOwnProducts_InitializeOptionSet() {
         val welcomePreferences = WelcomePreferencesTestImpl()
-        val initialisedBefore = welcomePreferences.isInitialized(getInstrumentation().targetContext)
+        val initialisedBefore = welcomePreferences.isInitialized()
 
         val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
         getFragmentScenario(welcomePreferences).onFragment { fragment ->
@@ -193,7 +193,7 @@ class WelcomeFragmentTest : KoinTest {
         welcomeOption.perform(click())
 
         Assert.assertFalse(initialisedBefore)
-        Assert.assertTrue(welcomePreferences.isInitialized(getInstrumentation().targetContext))
+        Assert.assertTrue(welcomePreferences.isInitialized())
     }
 
     @Test
@@ -225,7 +225,7 @@ class WelcomeFragmentTest : KoinTest {
     @Test
     fun welcomePage_SelectLoadSampleItems_InitializeOptionSet() {
         val welcomePreferences = WelcomePreferencesTestImpl()
-        val initialisedBefore = welcomePreferences.isInitialized(getInstrumentation().targetContext)
+        val initialisedBefore = welcomePreferences.isInitialized()
 
         val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
         getFragmentScenario(welcomePreferences).onFragment { fragment ->
@@ -238,7 +238,7 @@ class WelcomeFragmentTest : KoinTest {
         welcomeOption.perform(click())
 
         Assert.assertFalse(initialisedBefore)
-        Assert.assertTrue(welcomePreferences.isInitialized(getInstrumentation().targetContext))
+        Assert.assertTrue(welcomePreferences.isInitialized())
     }
 
     @Test
@@ -274,7 +274,7 @@ class WelcomeFragmentTest : KoinTest {
     @Test
     fun welcomePage_SelectRestoreDatabase_InitializeOptionSet() {
         val welcomePreferences = WelcomePreferencesTestImpl()
-        val initialisedBefore = welcomePreferences.isInitialized(getInstrumentation().targetContext)
+        val initialisedBefore = welcomePreferences.isInitialized()
 
         val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
         getFragmentScenario(welcomePreferences).onFragment { fragment ->
@@ -287,7 +287,7 @@ class WelcomeFragmentTest : KoinTest {
         welcomeOption.perform(click())
 
         Assert.assertFalse(initialisedBefore)
-        Assert.assertTrue(welcomePreferences.isInitialized(getInstrumentation().targetContext))
+        Assert.assertTrue(welcomePreferences.isInitialized())
     }
 
     @Test
@@ -371,7 +371,7 @@ class WelcomeFragmentTest : KoinTest {
         val welcomeOption = onView(withId(R.id.txt_welcome_load_sample_items))
         welcomeOption.perform(click())
 
-        onView(withId(com.google.android.material.R.id.snackbar_text)).check(
+        onView(withId(SystemIds.SNACKBAR_TEXT)).check(
             matches(
                 allOf(
                     ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE),
@@ -395,12 +395,12 @@ class WelcomeFragmentTest : KoinTest {
         welcomeOption.perform(click())
 
         assertEquals(
-            welcomePreferences.getLastUpdateVersionCode(getInstrumentation().targetContext),
+            welcomePreferences.getLastUpdateVersionCode(),
             BuildConfig.VERSION_CODE
         )
 
         assertEquals(
-            welcomePreferences.getLastUpdateVersionName(getInstrumentation().targetContext),
+            welcomePreferences.getLastUpdateVersionName(),
             BuildConfig.VERSION_NAME
         )
     }

@@ -17,12 +17,13 @@
 
 package com.aisleron.ui.shoppinglist
 
-import com.aisleron.domain.product.TrackingMode
+import com.aisleron.domain.preferences.TrackingMode
 
 interface ProductShoppingListItem : ShoppingListItem {
     val inStock: Boolean
     val qtyNeeded: Double
     val noteId: Int?
+    val noteText: String?
     val qtyIncrement: Double
     val unitOfMeasure: String
     val trackingMode: TrackingMode

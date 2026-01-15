@@ -371,7 +371,7 @@ class ShopFragmentTest : KoinTest {
 
     private fun getShowExtraOptionsPreference(showExtraOptions: Boolean): ShopPreferencesTestImpl {
         val preferences = ShopPreferencesTestImpl()
-        preferences.setShowExtraOptions(getInstrumentation().targetContext, showExtraOptions)
+        preferences.setShowExtraOptions(showExtraOptions)
         return preferences
     }
 
@@ -428,7 +428,7 @@ class ShopFragmentTest : KoinTest {
             )
         )
 
-        val endPreference = preferences.showExtraOptions(getInstrumentation().targetContext)
+        val endPreference = preferences.showExtraOptions()
         assertTrue(endPreference)
     }
 
@@ -448,7 +448,7 @@ class ShopFragmentTest : KoinTest {
             )
         )
 
-        val endPreference = preferences.showExtraOptions(getInstrumentation().targetContext)
+        val endPreference = preferences.showExtraOptions()
         assertFalse(endPreference)
     }
 

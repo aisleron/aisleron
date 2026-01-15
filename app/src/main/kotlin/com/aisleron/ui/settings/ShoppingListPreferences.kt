@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 aisleron.com
+ * Copyright (C) 2025-2026 aisleron.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -17,14 +17,15 @@
 
 package com.aisleron.ui.settings
 
-import android.content.Context
-import com.aisleron.domain.product.TrackingMode
+import com.aisleron.domain.preferences.NoteHint
+import com.aisleron.domain.preferences.TrackingMode
 
 interface ShoppingListPreferences {
-    fun isStatusChangeSnackBarHidden(context: Context): Boolean
-    fun showEmptyAisles(context: Context): Boolean
-    fun setShowEmptyAisles(context: Context, value: Boolean)
-    fun trackingMode(context: Context): TrackingMode
-    fun keepScreenOn(context: Context): Boolean
+    fun isStatusChangeSnackBarHidden(): Boolean
+    fun showEmptyAisles(): Boolean
+    fun setShowEmptyAisles(value: Boolean)
+    fun trackingMode(): TrackingMode
+    fun keepScreenOn(): Boolean
+    fun noteHint(): NoteHint
 
 }

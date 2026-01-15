@@ -172,4 +172,9 @@
     <string name="tracking_default">Standard</string>
     <string name="qty_increments">Kvantitetssteg</string>
     <string name="unit_of_measure">Måttenhet</string>
+    <string name="note_hint">Anteckningsledtråd</string>
+    <string name="note_hint_button">Knapp</string>
+    <string name="note_hint_summary">Sammanfattning</string>
+    <string name="note_hint_indicator">Indikator (*)</string>
+    <string name="preference_none">Ingen</string>
 </resources>

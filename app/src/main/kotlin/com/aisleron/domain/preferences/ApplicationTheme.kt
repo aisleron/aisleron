@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 aisleron.com
+ * Copyright (C) 2026 aisleron.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,24 +15,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.ui.settings
+package com.aisleron.domain.preferences
 
-import android.content.Context
-import androidx.core.content.edit
-import androidx.preference.PreferenceManager
+enum class ApplicationTheme(override val value: String) : PreferenceEnum {
+    SYSTEM_THEME("system_theme"),
+    LIGHT_THEME("light_theme"),
+    DARK_THEME("dark_theme");
 
-class ShopPreferencesImpl(context: Context) : ShopPreferences {
-    private val prefs = PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
-
-
-    override fun showExtraOptions(): Boolean =
-        prefs.getBoolean(SHOW_SHOP_EXTRA_OPTIONS, false)
-
-    override fun setShowExtraOptions(value: Boolean) {
-        prefs.edit { putBoolean(SHOW_SHOP_EXTRA_OPTIONS, value) }
-    }
-
-    companion object {
-        private const val SHOW_SHOP_EXTRA_OPTIONS = "show_shop_extra_options"
+    // ApplicationTheme needs to be aligned with the theme_values array
+    companion object : PreferenceEnum.Factory<ApplicationTheme> {
+        override val defaultValue = SYSTEM_THEME
     }
 }

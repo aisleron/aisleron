@@ -20,26 +20,25 @@ package com.aisleron.ui.settings
 import android.content.Context
 import androidx.preference.PreferenceManager
 import com.aisleron.domain.FilterType
+import com.aisleron.domain.preferences.ApplicationTheme
+import com.aisleron.domain.preferences.PureBlackStyle
 import com.aisleron.ui.bundles.ShoppingListBundle
 
-class DisplayPreferencesImpl : DisplayPreferences {
+class DisplayPreferencesImpl(context: Context) : DisplayPreferences {
+    private val prefs = PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
 
-    override fun showOnLockScreen(context: Context): Boolean =
-        PreferenceManager.getDefaultSharedPreferences(context).getBoolean(DISPLAY_LOCKSCREEN, false)
+    override fun showOnLockScreen(): Boolean =
+        prefs.getBoolean(DISPLAY_LOCKSCREEN, false)
 
-    override fun applicationTheme(context: Context): DisplayPreferences.ApplicationTheme {
-        val appTheme = PreferenceManager.getDefaultSharedPreferences(context)
-            .getString(APPLICATION_THEME, SYSTEM_THEME)
+    override fun applicationTheme(): ApplicationTheme {
+        val appTheme = prefs.getString(
+            APPLICATION_THEME, ApplicationTheme.SYSTEM_THEME.value
+        )
 
-        return when (appTheme) {
-            LIGHT_THEME -> DisplayPreferences.ApplicationTheme.LIGHT_THEME
-            DARK_THEME -> DisplayPreferences.ApplicationTheme.DARK_THEME
-            else -> DisplayPreferences.ApplicationTheme.SYSTEM_THEME
-        }
+        return ApplicationTheme.fromValue(appTheme)
     }
 
-    override fun startingList(context: Context): ShoppingListBundle {
-        val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+    override fun startingList(): ShoppingListBundle {
         val startList = prefs.getString(STARTING_LIST, null) ?: "1|IN_STOCK"
         val (locationIdStr, filterTypeStr) = startList.split("|")
         val locationId = locationIdStr.toIntOrNull() ?: 1
@@ -52,36 +51,21 @@ class DisplayPreferencesImpl : DisplayPreferences {
         return ShoppingListBundle(locationId, filterType)
     }
 
-    override fun dynamicColor(context: Context): Boolean =
-        PreferenceManager.getDefaultSharedPreferences(context).getBoolean(DYNAMIC_COLOR, false)
+    override fun dynamicColor(): Boolean =
+        prefs.getBoolean(DYNAMIC_COLOR, false)
 
-    override fun pureBlackStyle(context: Context): DisplayPreferences.PureBlackStyle {
-        val pureBlackStyle = PreferenceManager.getDefaultSharedPreferences(context)
-            .getString(PURE_BLACK_STYLE, PURE_BLACK_DEFAULT)
+    override fun pureBlackStyle(): PureBlackStyle {
+        val pureBlackStyle = prefs
+            .getString(PURE_BLACK_STYLE, PureBlackStyle.DEFAULT.value)
 
-        return when (pureBlackStyle) {
-            PURE_BLACK_ECONOMY -> DisplayPreferences.PureBlackStyle.ECONOMY
-            PURE_BLACK_BUSINESS_CLASS -> DisplayPreferences.PureBlackStyle.BUSINESS_CLASS
-            PURE_BLACK_FIRST_CLASS -> DisplayPreferences.PureBlackStyle.FIRST_CLASS
-            else -> DisplayPreferences.PureBlackStyle.DEFAULT
-        }
+        return PureBlackStyle.fromValue(pureBlackStyle)
     }
 
     companion object {
-        private const val SYSTEM_THEME = "system_theme"
-        private const val LIGHT_THEME = "light_theme"
-        private const val DARK_THEME = "dark_theme"
-
         private const val DISPLAY_LOCKSCREEN = "display_lockscreen"
         private const val APPLICATION_THEME = "application_theme"
         private const val DYNAMIC_COLOR = "dynamic_color"
         private const val PURE_BLACK_STYLE = "pure_black_style"
-
         private const val STARTING_LIST = "starting_list"
-
-        private const val PURE_BLACK_DEFAULT = "pure_black_default"
-        private const val PURE_BLACK_ECONOMY = "pure_black_economy"
-        private const val PURE_BLACK_BUSINESS_CLASS = "pure_black_business_class"
-        private const val PURE_BLACK_FIRST_CLASS = "pure_black_first_class"
     }
 }

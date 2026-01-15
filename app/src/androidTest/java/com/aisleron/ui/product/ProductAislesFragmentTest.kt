@@ -32,7 +32,6 @@ import androidx.test.espresso.matcher.ViewMatchers.hasSibling
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
-import androidx.test.platform.app.InstrumentationRegistry
 import com.aisleron.R
 import com.aisleron.di.KoinTestRule
 import com.aisleron.di.daoTestModule
@@ -96,8 +95,7 @@ class ProductAislesFragmentTest : KoinTest {
                     addEditFragmentListener,
                     applicationTitleUpdateListener,
                     productPreferences ?: ProductPreferencesTestImpl().also {
-                        val context = InstrumentationRegistry.getInstrumentation().context
-                        it.setShowExtraOptions(context, true)
+                        it.setShowExtraOptions(true)
                     },
 
                     FabHandlerTestImpl()

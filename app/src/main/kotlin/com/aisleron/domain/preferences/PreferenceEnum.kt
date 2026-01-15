@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 aisleron.com
+ * Copyright (C) 2026 aisleron.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,24 +15,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.ui.settings
+package com.aisleron.domain.preferences
 
-import android.content.Context
-import androidx.core.content.edit
-import androidx.preference.PreferenceManager
+interface PreferenceEnum {
+    val value: String
 
-class ShopPreferencesImpl(context: Context) : ShopPreferences {
-    private val prefs = PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
+    interface Factory<T> where T : Enum<T>, T : PreferenceEnum {
+        val defaultValue: T
 
+        /**
+         * Safely parses a string into the Enum type.
+         * Returns [defaultValue] if the input is null or doesn't match.
+         */
+        fun fromValue(value: String?): T {
+            if (value == null) return defaultValue
 
-    override fun showExtraOptions(): Boolean =
-        prefs.getBoolean(SHOW_SHOP_EXTRA_OPTIONS, false)
-
-    override fun setShowExtraOptions(value: Boolean) {
-        prefs.edit { putBoolean(SHOW_SHOP_EXTRA_OPTIONS, value) }
-    }
-
-    companion object {
-        private const val SHOW_SHOP_EXTRA_OPTIONS = "show_shop_extra_options"
+            return defaultValue::class.java.enumConstants?.find {
+                it.value == value
+            } ?: defaultValue
+        }
     }
 }

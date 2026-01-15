@@ -85,6 +85,8 @@ import com.aisleron.domain.note.usecase.GetNoteParentUseCase
 import com.aisleron.domain.note.usecase.GetNoteParentUseCaseImpl
 import com.aisleron.domain.note.usecase.GetNoteUseCase
 import com.aisleron.domain.note.usecase.GetNoteUseCaseImpl
+import com.aisleron.domain.note.usecase.GetNotesUseCase
+import com.aisleron.domain.note.usecase.GetNotesUseCaseImpl
 import com.aisleron.domain.note.usecase.RemoveNoteFromParentUseCase
 import com.aisleron.domain.note.usecase.RemoveNoteFromParentUseCaseImpl
 import com.aisleron.domain.note.usecase.RemoveNoteUseCase
@@ -112,6 +114,7 @@ import com.aisleron.domain.product.usecase.UpdateProductUseCaseImpl
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCaseImpl
 import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
+import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCaseImpl
 import org.koin.android.ext.koin.androidApplication
 import org.koin.dsl.module
 
@@ -315,7 +318,12 @@ val useCaseModule = module {
     /**
      * Shopping List Use Cases
      */
-    factory<GetShoppingListUseCase> { GetShoppingListUseCase(locationRepository = get()) }
+    factory<GetShoppingListUseCase> {
+        GetShoppingListUseCaseImpl(
+            locationRepository = get(),
+            getNotesUseCase = get()
+        )
+    }
 
     /**
      * Backup Use Cases
@@ -392,6 +400,7 @@ val useCaseModule = module {
     }
 
     factory<GetNoteUseCase> { GetNoteUseCaseImpl(noteRepository = get()) }
+    factory<GetNotesUseCase> { GetNotesUseCaseImpl(noteRepository = get()) }
     factory<RemoveNoteUseCase> {
         RemoveNoteUseCaseImpl(
             noteRepository = get(),

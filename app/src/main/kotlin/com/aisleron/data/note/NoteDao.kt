@@ -20,6 +20,7 @@ package com.aisleron.data.note
 import androidx.room.Dao
 import androidx.room.Query
 import com.aisleron.data.base.BaseDao
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface NoteDao : BaseDao<NoteEntity> {
@@ -28,4 +29,7 @@ interface NoteDao : BaseDao<NoteEntity> {
 
     @Query("SELECT * FROM Note")
     suspend fun getNotes(): List<NoteEntity>
+
+    @Query("SELECT * FROM Note WHERE id IN (:ids)")
+    fun getNotes(ids: List<Int>): Flow<List<NoteEntity>>
 }

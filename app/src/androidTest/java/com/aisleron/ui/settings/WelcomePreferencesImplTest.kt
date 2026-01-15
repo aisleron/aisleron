@@ -28,6 +28,8 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class WelcomePreferencesImplTest {
+    val welcomePreferences: WelcomePreferencesImpl
+        get() = WelcomePreferencesImpl(getInstrumentation().targetContext)
 
     @Before
     fun setUp() {
@@ -38,7 +40,7 @@ class WelcomePreferencesImplTest {
     fun getInitializedStatus_isInitialized_ReturnTrue() {
         SharedPreferencesInitializer().setIsInitialized(true)
         val isInitialized =
-            WelcomePreferencesImpl().isInitialized(getInstrumentation().targetContext)
+            welcomePreferences.isInitialized()
 
         assertTrue(isInitialized)
     }
@@ -47,7 +49,7 @@ class WelcomePreferencesImplTest {
     fun getInitializedStatus_isNotInitialized_ReturnFalse() {
         SharedPreferencesInitializer().setIsInitialized(false)
         val isInitialized =
-            WelcomePreferencesImpl().isInitialized(getInstrumentation().targetContext)
+            welcomePreferences.isInitialized()
 
         assertFalse(isInitialized)
     }
@@ -56,7 +58,7 @@ class WelcomePreferencesImplTest {
     fun setInitialised_MethodCalled_InitializedIsTrue() {
         SharedPreferencesInitializer().setIsInitialized(false)
 
-        WelcomePreferencesImpl().setInitialised(getInstrumentation().targetContext)
+        welcomePreferences.setInitialised()
         val isInitialized =
             PreferenceManager.getDefaultSharedPreferences(getInstrumentation().targetContext)
                 .getBoolean("is_initialised", false)
@@ -69,7 +71,7 @@ class WelcomePreferencesImplTest {
         val defaultValue = 11
 
         val lastUpdateVersionCode =
-            WelcomePreferencesImpl().getLastUpdateVersionCode(getInstrumentation().targetContext)
+            welcomePreferences.getLastUpdateVersionCode()
 
         assertEquals(defaultValue, lastUpdateVersionCode)
     }
@@ -80,7 +82,7 @@ class WelcomePreferencesImplTest {
         SharedPreferencesInitializer().setLastUpdateCode(versionCode)
 
         val lastUpdateVersionCode =
-            WelcomePreferencesImpl().getLastUpdateVersionCode(getInstrumentation().targetContext)
+            welcomePreferences.getLastUpdateVersionCode()
 
         assertEquals(versionCode, lastUpdateVersionCode)
     }
@@ -90,7 +92,7 @@ class WelcomePreferencesImplTest {
         val defaultValue = "2025.8.0"
 
         val lastUpdateVersionCode =
-            WelcomePreferencesImpl().getLastUpdateVersionName(getInstrumentation().targetContext)
+            welcomePreferences.getLastUpdateVersionName()
 
         assertEquals(defaultValue, lastUpdateVersionCode)
     }
@@ -101,7 +103,7 @@ class WelcomePreferencesImplTest {
         SharedPreferencesInitializer().setLastUpdateName(versionName)
 
         val lastUpdateVersionName =
-            WelcomePreferencesImpl().getLastUpdateVersionName(getInstrumentation().targetContext)
+            welcomePreferences.getLastUpdateVersionName()
 
         assertEquals(versionName, lastUpdateVersionName)
     }
@@ -111,7 +113,7 @@ class WelcomePreferencesImplTest {
         val versionCode = BuildConfig.VERSION_CODE
         val versionName = BuildConfig.VERSION_NAME
 
-        WelcomePreferencesImpl().setLastUpdateValues(getInstrumentation().targetContext)
+        welcomePreferences.setLastUpdateValues()
 
         val prefs =
             PreferenceManager.getDefaultSharedPreferences(getInstrumentation().targetContext)
@@ -128,9 +130,7 @@ class WelcomePreferencesImplTest {
         val versionCode = -3
         val versionName = "2025.100.0"
 
-        WelcomePreferencesImpl().setLastUpdateValues(
-            getInstrumentation().targetContext, versionCode, versionName
-        )
+        welcomePreferences.setLastUpdateValues(versionCode, versionName)
 
         val prefs =
             PreferenceManager.getDefaultSharedPreferences(getInstrumentation().targetContext)

@@ -66,6 +66,11 @@
     <string name="pure_black_style">Pure Black style</string>
     <string name="language">Language</string>
     <string name="system_default">System Default</string>
+    <string name="note_hint">Note hint</string>
+    <string name="note_hint_button">Button</string>
+    <string name="note_hint_summary">Summary</string>
+    <string name="note_hint_indicator">Indicator (*)</string>
+    <string name="preference_none">None</string>
 
     <!-- Language names (non-translatable) -->
     <string name="language_afrikaans_af" translatable="false">Afrikaans</string>

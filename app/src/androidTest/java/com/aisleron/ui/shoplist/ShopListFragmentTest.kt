@@ -60,6 +60,7 @@ import com.aisleron.ui.FabHandler
 import com.aisleron.ui.FabHandlerTestImpl
 import com.aisleron.ui.bundles.AddEditLocationBundle
 import com.aisleron.ui.bundles.Bundler
+import com.aisleron.utils.SystemIds
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.allOf
@@ -263,7 +264,7 @@ class ShopListFragmentTest : KoinTest {
             .inRoot(isDialog())
             .perform(click())
 
-        onView(withId(com.google.android.material.R.id.snackbar_text)).check(
+        onView(withId(SystemIds.SNACKBAR_TEXT)).check(
             matches(
                 allOf(
                     ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE),
@@ -352,7 +353,7 @@ class ShopListFragmentTest : KoinTest {
         onView(withText(copyDialogTitle))
             .check(doesNotExist())
 
-        val snackbar = onView(withId(com.google.android.material.R.id.snackbar_text))
+        val snackbar = onView(withId(SystemIds.SNACKBAR_TEXT))
         snackbar.checkVisibility(View.VISIBLE)
         snackbar.check(matches(withText(confirmCopy)))
     }

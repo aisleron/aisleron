@@ -17,21 +17,17 @@
 
 package com.aisleron.ui.settings
 
-import android.content.Context
-
 interface WelcomePreferences {
 
-    fun isInitialized(context: Context): Boolean
+    fun isInitialized(): Boolean
 
-    fun setInitialised(context: Context)
+    fun setInitialised()
 
-    fun getLastUpdateVersionCode(context: Context): Int
+    fun getLastUpdateVersionCode(): Int
 
-    fun getLastUpdateVersionName(context: Context): String
+    fun getLastUpdateVersionName(): String
 
-    fun setLastUpdateValues(context: Context)
+    fun setLastUpdateValues()
 
-    fun setLastUpdateValues(
-        context: Context, lastUpdateVersionCode: Int, lastUpdateVersionName: String
-    )
+    fun setLastUpdateValues(lastUpdateVersionCode: Int, lastUpdateVersionName: String)
 }

@@ -246,7 +246,7 @@ class ProductFragmentTest : KoinTest {
     @Test
     fun onCreateView_PreferenceIsHideExtraOption_ExtraOptionsGone() = runTest {
         val preferences = ProductPreferencesTestImpl()
-        preferences.setShowExtraOptions(getInstrumentation().targetContext, false)
+        preferences.setShowExtraOptions(false)
         val existingProduct = productRepository.getAll().first()
         val bundle = bundler.makeEditProductBundle(existingProduct.id)
 
@@ -264,7 +264,7 @@ class ProductFragmentTest : KoinTest {
 
     private fun getShowExtraOptionsPreference(showExtraOptions: Boolean): ProductPreferencesTestImpl {
         val preferences = ProductPreferencesTestImpl()
-        preferences.setShowExtraOptions(getInstrumentation().targetContext, showExtraOptions)
+        preferences.setShowExtraOptions(showExtraOptions)
         return preferences
     }
 
@@ -299,7 +299,7 @@ class ProductFragmentTest : KoinTest {
             )
         )
 
-        val endPreference = preferences.showExtraOptions(getInstrumentation().targetContext)
+        val endPreference = preferences.showExtraOptions()
         assertTrue(endPreference)
     }
 
@@ -319,7 +319,7 @@ class ProductFragmentTest : KoinTest {
             )
         )
 
-        val endPreference = preferences.showExtraOptions(getInstrumentation().targetContext)
+        val endPreference = preferences.showExtraOptions()
         assertFalse(endPreference)
     }
 

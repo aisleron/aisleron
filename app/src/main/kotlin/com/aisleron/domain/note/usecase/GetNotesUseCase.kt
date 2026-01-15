@@ -15,19 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.domain.product
+package com.aisleron.domain.note.usecase
 
-enum class TrackingMode(val value: String) {
-    CHECKBOX("checkbox"),
-    QUANTITY("quantity"),
-    CHECKBOX_QUANTITY("checkbox_quantity"),
-    NONE("none"),
-    DEFAULT("default");
+import com.aisleron.domain.base.usecase.GetMultipleUseCase
+import com.aisleron.domain.note.Note
+import com.aisleron.domain.note.NoteRepository
+import kotlinx.coroutines.flow.Flow
 
-    // TrackingMode needs to be aligned with the tracking_method_values array
-    companion object {
-        fun fromValue(value: String?): TrackingMode {
-            return entries.find { it.value == value } ?: DEFAULT
-        }
+interface GetNotesUseCase : GetMultipleUseCase<Note>
+
+class GetNotesUseCaseImpl(private val noteRepository: NoteRepository) : GetNotesUseCase {
+    override suspend fun invoke(ids: List<Int>): Flow<List<Note>> {
+        return noteRepository.getMultiple(ids)
     }
 }

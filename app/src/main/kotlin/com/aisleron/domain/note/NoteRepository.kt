@@ -18,6 +18,8 @@
 package com.aisleron.domain.note
 
 import com.aisleron.domain.base.BaseRepository
+import kotlinx.coroutines.flow.Flow
 
 interface NoteRepository : BaseRepository<Note> {
+    fun getMultiple(ids: List<Int>): Flow<List<Note>>
 }
