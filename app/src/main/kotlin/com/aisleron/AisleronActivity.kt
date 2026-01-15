@@ -21,6 +21,8 @@ import android.graphics.Color
 import android.os.Build
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import com.aisleron.domain.preferences.ApplicationTheme
+import com.aisleron.domain.preferences.PureBlackStyle
 import com.aisleron.ui.settings.DisplayPreferences
 import com.google.android.material.color.DynamicColors
 
@@ -28,9 +30,9 @@ abstract class AisleronActivity : AppCompatActivity() {
 
     protected fun applyPureBlackStyle(displayPreferences: DisplayPreferences) {
         val pureBlackStyleId = when (displayPreferences.pureBlackStyle()) {
-            DisplayPreferences.PureBlackStyle.ECONOMY -> R.style.AisleronPureBlack_Economy
-            DisplayPreferences.PureBlackStyle.BUSINESS_CLASS -> R.style.AisleronPureBlack_BusinessClass
-            DisplayPreferences.PureBlackStyle.FIRST_CLASS -> R.style.AisleronPureBlack_FirstClass
+            PureBlackStyle.ECONOMY -> R.style.AisleronPureBlack_Economy
+            PureBlackStyle.BUSINESS_CLASS -> R.style.AisleronPureBlack_BusinessClass
+            PureBlackStyle.FIRST_CLASS -> R.style.AisleronPureBlack_FirstClass
             else -> 0
         }
 
@@ -38,7 +40,7 @@ abstract class AisleronActivity : AppCompatActivity() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             theme.applyStyle(pureBlackStyleId, true)
-        } else if (displayPreferences.applicationTheme() == DisplayPreferences.ApplicationTheme.DARK_THEME) {
+        } else if (displayPreferences.applicationTheme() == ApplicationTheme.DARK_THEME) {
             findViewById<View>(android.R.id.content)?.setBackgroundColor(Color.BLACK)
         }
     }

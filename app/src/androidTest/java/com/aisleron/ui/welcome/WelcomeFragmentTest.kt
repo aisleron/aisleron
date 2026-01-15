@@ -56,10 +56,11 @@ import com.aisleron.domain.aisle.AisleRepository
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
-import com.aisleron.domain.product.TrackingMode
+import com.aisleron.domain.preferences.TrackingMode
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import com.aisleron.ui.FabHandlerTestImpl
 import com.aisleron.ui.settings.WelcomePreferencesTestImpl
+import com.aisleron.utils.SystemIds
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.allOf
@@ -370,7 +371,7 @@ class WelcomeFragmentTest : KoinTest {
         val welcomeOption = onView(withId(R.id.txt_welcome_load_sample_items))
         welcomeOption.perform(click())
 
-        onView(withId(com.google.android.material.R.id.snackbar_text)).check(
+        onView(withId(SystemIds.SNACKBAR_TEXT)).check(
             matches(
                 allOf(
                     ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE),

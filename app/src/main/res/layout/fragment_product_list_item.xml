@@ -19,6 +19,7 @@
 
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/frg_product_list_item"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -30,74 +31,118 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/product_list_item_selector"
-        android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/txt_product_name"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:ellipsize="end"
-            android:gravity="center_vertical"
-            android:layout_gravity="center_vertical"
-            android:maxLines="2"
-            android:paddingVertical="@dimen/pli_padding_default"
-            android:paddingStart="@dimen/pli_padding_default"
-            android:paddingEnd="0dp"
-            tools:text="@string/product"
-            android:textAppearance="@style/TextAppearance.Aisleron.ProductListItem" />
+        android:orientation="vertical">
 
         <LinearLayout
-            android:id="@+id/stp_qty_selector"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <ImageButton
-                android:id="@+id/btn_qty_dec"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/decrement"
+            <TextView
+                android:id="@+id/txt_product_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:paddingVertical="@dimen/pli_padding_default"
                 android:paddingStart="@dimen/pli_padding_default"
                 android:paddingEnd="0dp"
-                android:src="@drawable/baseline_remove_circle_outline_24" />
-
-            <EditText
-                android:id="@+id/edt_qty"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:hint="@string/qty"
-                android:importantForAutofill="no"
-                android:inputType="numberDecimal"
-                android:maxLength="5"
-                android:minWidth="40dp"
-                android:paddingVertical="@dimen/pli_padding_default"
-                android:textAppearance="@style/TextAppearance.Aisleron.ProductListItem"
-                tools:ignore="LabelFor"
-                android:imeOptions="actionDone" />
+                tools:text="@string/product"
+                android:textAppearance="@style/TextAppearance.Aisleron.ProductListItem" />
 
             <ImageButton
-                android:id="@+id/btn_qty_inc"
+                android:id="@+id/btn_note"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/increment"
-                android:paddingStart="0dp"
-                android:paddingEnd="@dimen/pli_padding_default"
-                android:src="@drawable/baseline_add_circle_outline_24" />
+                android:contentDescription="@string/show_note"
+                android:padding="@dimen/pli_padding_button"
+                android:src="@drawable/baseline_sticky_note_2_24"
+                app:tint="?attr/colorSecondary"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+            <LinearLayout
+                android:id="@+id/stp_qty_selector"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:visibility="gone"
+                tools:visibility="visible"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/btn_qty_dec"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/decrement"
+                    android:paddingVertical="@dimen/pli_padding_button"
+                    android:paddingStart="@dimen/pli_padding_button"
+                    android:paddingEnd="0dp"
+                    android:src="@drawable/baseline_remove_circle_outline_24" />
+
+                <EditText
+                    android:id="@+id/edt_qty"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:hint="@string/qty"
+                    android:importantForAutofill="no"
+                    android:inputType="numberDecimal"
+                    android:maxLength="5"
+                    android:minWidth="40dp"
+                    android:paddingVertical="@dimen/pli_padding_default"
+                    android:textAppearance="@style/TextAppearance.Aisleron.ProductListItem"
+                    tools:ignore="LabelFor"
+                    android:imeOptions="actionDone" />
+
+                <ImageButton
+                    android:id="@+id/btn_qty_inc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/increment"
+                    android:paddingStart="0dp"
+                    android:paddingVertical="@dimen/pli_padding_button"
+                    android:paddingEnd="@dimen/pli_padding_button"
+                    android:src="@drawable/baseline_add_circle_outline_24" />
+            </LinearLayout>
+
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/chk_in_stock"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checkMark="?android:attr/listChoiceIndicatorMultiple"
+                android:checked="false" />
         </LinearLayout>
 
-
-        <com.google.android.material.checkbox.MaterialCheckBox
-            android:id="@+id/chk_in_stock"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/ll_product_note_preview"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:checkMark="?android:attr/listChoiceIndicatorMultiple"
-            android:checked="false" />
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/pli_padding_default"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <View
+                android:id="@+id/divider"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?attr/colorOutlineVariant" />
+
+            <TextView
+                android:id="@+id/txt_product_note_preview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingVertical="@dimen/padding_8"
+                android:textAppearance="@style/TextAppearance.Aisleron.ProductNote"
+                android:maxLines="1"
+                android:ellipsize="end"
+                tools:text="This is where the product note text will appear if it exists." />
+        </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

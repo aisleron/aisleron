@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 aisleron.com
+ * Copyright (C) 2026 aisleron.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,19 +15,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.ui.shoppinglist
+package com.aisleron.domain.preferences
 
-import com.aisleron.domain.preferences.TrackingMode
+enum class NoteHint(override val value: String) : PreferenceEnum {
+    BUTTON("note_hint_button"),
+    SUMMARY("note_hint_summary"),
+    INDICATOR("note_hint_indicator"),
+    NONE("preference_none");
 
-interface ProductShoppingListItem : ShoppingListItem {
-    val inStock: Boolean
-    val qtyNeeded: Double
-    val noteId: Int?
-    val noteText: String?
-    val qtyIncrement: Double
-    val unitOfMeasure: String
-    val trackingMode: TrackingMode
-
-    override val itemType: ShoppingListItem.ItemType
-        get() = ShoppingListItem.ItemType.PRODUCT
+    // NoteHint needs to be aligned with the note_hint array
+    companion object : PreferenceEnum.Factory<NoteHint> {
+        override val defaultValue = NONE
+    }
 }

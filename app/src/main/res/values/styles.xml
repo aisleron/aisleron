@@ -17,4 +17,7 @@
 
 <resources>
     <style name="TextAppearance.Aisleron.ProductListItem" parent="TextAppearance.Material3.BodyMedium" />
+    <style name="TextAppearance.Aisleron.ProductNote" parent="TextAppearance.Material3.BodySmall">
+        <item name="android:textStyle">italic</item>
+    </style>
 </resources>

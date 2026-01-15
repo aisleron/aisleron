@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 aisleron.com
+ * Copyright (C) 2026 aisleron.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,19 +15,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.ui.shoppinglist
+package com.aisleron.domain.preferences
 
-import com.aisleron.domain.preferences.TrackingMode
+interface PreferenceEnum {
+    val value: String
 
-interface ProductShoppingListItem : ShoppingListItem {
-    val inStock: Boolean
-    val qtyNeeded: Double
-    val noteId: Int?
-    val noteText: String?
-    val qtyIncrement: Double
-    val unitOfMeasure: String
-    val trackingMode: TrackingMode
+    interface Factory<T> where T : Enum<T>, T : PreferenceEnum {
+        val defaultValue: T
 
-    override val itemType: ShoppingListItem.ItemType
-        get() = ShoppingListItem.ItemType.PRODUCT
+        /**
+         * Safely parses a string into the Enum type.
+         * Returns [defaultValue] if the input is null or doesn't match.
+         */
+        fun fromValue(value: String?): T {
+            if (value == null) return defaultValue
+
+            return defaultValue::class.java.enumConstants?.find {
+                it.value == value
+            } ?: defaultValue
+        }
+    }
 }

@@ -90,7 +90,7 @@ class ShoppingListFragment(
     private var editShopMenuItem: MenuItem? = null
 
     private val showEmptyAisles: Boolean
-        get() = shoppingListPreferences.showEmptyAisles(requireContext())
+        get() = shoppingListPreferences.showEmptyAisles()
 
     private val shoppingListViewModel: ShoppingListViewModel by viewModel()
 
@@ -105,7 +105,7 @@ class ShoppingListFragment(
         shoppingListViewModel.hydrate(
             shoppingListBundle.locationId,
             shoppingListBundle.filterType,
-            shoppingListPreferences.showEmptyAisles(requireContext())
+            shoppingListPreferences.showEmptyAisles()
         )
 
         childFragmentManager.setFragmentResultListener(
@@ -253,11 +253,16 @@ class ShoppingListFragment(
                         override fun hasSelectedItems(): Boolean {
                             return this@ShoppingListFragment.hasSelectedItems()
                         }
+
+                        override fun onShowNoteClick(item: ShoppingListItem) {
+                            showNoteDialog(item)
+                        }
                     },
 
-                    shoppingListPreferences.trackingMode(requireContext()),
+                    shoppingListPreferences.trackingMode(),
                     getString(R.string.qty),
-                    shoppingListViewModel.productFilter
+                    shoppingListViewModel.productFilter,
+                    shoppingListPreferences.noteHint()
                 )
 
                 val callback: ItemTouchHelper.Callback = ShoppingListItemMoveCallbackListener(
@@ -343,7 +348,7 @@ class ShoppingListFragment(
     }
 
     private fun displayStatusChangeSnackBar(item: ProductShoppingListItem, inStock: Boolean) {
-        if (shoppingListPreferences.isStatusChangeSnackBarHidden(requireContext())) return
+        if (shoppingListPreferences.isStatusChangeSnackBarHidden()) return
 
         val newStatus = getString(if (inStock) R.string.menu_in_stock else R.string.menu_needed)
 
@@ -457,7 +462,7 @@ class ShoppingListFragment(
         val menuHost = requireActivity()
         menuHost.addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
 
-        view.keepScreenOn = shoppingListPreferences.keepScreenOn(requireContext())
+        view.keepScreenOn = shoppingListPreferences.keepScreenOn()
     }
 
     private fun navigateToEditShop(locationId: Int) {
@@ -643,7 +648,7 @@ class ShoppingListFragment(
 
             R.id.mnu_show_empty_aisles -> {
                 val newValue = !showEmptyAisles
-                shoppingListPreferences.setShowEmptyAisles(requireContext(), newValue)
+                shoppingListPreferences.setShowEmptyAisles(newValue)
                 menuItem.isChecked = newValue
                 shoppingListViewModel.setShowEmptyAisles(newValue)
                 true

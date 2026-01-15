@@ -90,7 +90,7 @@ class GetShoppingListUseCaseImpl(
 
     private fun resolveProductFilter(
         productNameQuery: String, productFilter: FilterType?, location: Location
-    ): FilterType = if (productNameQuery.isNotEmpty())
+    ): FilterType = if (productNameQuery.isNotBlank())
         FilterType.ALL
     else
         productFilter ?: location.defaultFilter
@@ -100,7 +100,7 @@ class GetShoppingListUseCaseImpl(
     ): Boolean {
         val hasValidProducts = aisle.products.isNotEmpty()
 
-        val showDefault = showDefaultAisle || productNameQuery.isNotEmpty()
+        val showDefault = showDefaultAisle || productNameQuery.isNotBlank()
 
         return (showDefault || !aisle.isDefault) && (hasValidProducts || showEmptyAisles)
     }

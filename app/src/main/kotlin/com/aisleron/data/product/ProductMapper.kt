@@ -19,7 +19,7 @@ package com.aisleron.data.product
 
 import com.aisleron.data.base.MapperBaseImpl
 import com.aisleron.domain.product.Product
-import com.aisleron.domain.product.TrackingMode
+import com.aisleron.domain.preferences.TrackingMode
 
 class ProductMapper : MapperBaseImpl<ProductEntity, Product>() {
     override fun toModel(value: ProductEntity) = Product(

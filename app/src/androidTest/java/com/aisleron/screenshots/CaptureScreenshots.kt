@@ -75,12 +75,13 @@ import com.aisleron.domain.loyaltycard.LoyaltyCardProviderType
 import com.aisleron.domain.loyaltycard.usecase.AddLoyaltyCardToLocationUseCase
 import com.aisleron.domain.loyaltycard.usecase.AddLoyaltyCardUseCase
 import com.aisleron.domain.product.ProductRepository
-import com.aisleron.domain.product.TrackingMode
+import com.aisleron.domain.preferences.TrackingMode
 import com.aisleron.domain.product.usecase.UpdateProductQtyNeededUseCase
 import com.aisleron.domain.product.usecase.UpdateProductStatusUseCase
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import com.aisleron.testdata.data.maintenance.DatabaseMaintenanceTestImpl
 import com.aisleron.ui.FabHandler
+import com.aisleron.utils.SystemIds
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.allOf
@@ -98,7 +99,7 @@ import java.time.format.DateTimeFormatter
 
 @RunWith(AndroidJUnit4::class)
 class CaptureScreenshots : KoinTest {
-    private val searchBoxResId = androidx.appcompat.R.id.search_src_text
+    private val searchBoxResId = SystemIds.SEARCH_BOX
     private val saveBigSuper = "Save Big Super"
 
 
@@ -628,7 +629,7 @@ class CaptureScreenshots : KoinTest {
         Intents.init()
         intending(hasAction(Intent.ACTION_OPEN_DOCUMENT)).respondWith(result)
 
-        onView(withId(androidx.preference.R.id.recycler_view))
+        onView(withId(SystemIds.PREFERENCE_RECYCLER_VIEW))
             .perform(
                 RecyclerViewActions.actionOnItem<RecyclerView.ViewHolder>(
                     hasDescendant(withText(R.string.restore_database)),

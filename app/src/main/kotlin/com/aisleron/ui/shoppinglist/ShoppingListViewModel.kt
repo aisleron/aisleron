@@ -131,24 +131,19 @@ class ShoppingListViewModel(
         if (id == null || filters == null) {
             flowOf(ShoppingListUiState.Empty)
         } else {
-            // Build the filter object on the fly
-            val finalFilter = filters.copy(
-                productNameQuery = query,
-                productFilter = if (query.isNotBlank()) FilterType.ALL else filters.productFilter
-            )
+            val combinedFilter = filters.copy(productNameQuery = query.trim())
 
-            // Collect the UseCase (which is a Flow)
-            getShoppingListUseCase(id, finalFilter)
+            getShoppingListUseCase(id, combinedFilter)
                 .map { collectedLocation ->
                     val listItems = mapShoppingList(
-                        collectedLocation, finalFilter.productNameQuery.isNotEmpty(), selections
+                        collectedLocation, combinedFilter.productNameQuery.isNotBlank(), selections
                     )
 
                     val state: ShoppingListUiState = ShoppingListUiState.Updated(
                         shoppingList = listItems,
                         locationName = collectedLocation?.name ?: "",
                         locationType = collectedLocation?.type ?: LocationType.HOME,
-                        productFilter = finalFilter.productFilter ?: FilterType.NEEDED
+                        productFilter = combinedFilter.productFilter ?: FilterType.NEEDED
                     )
 
                     state
@@ -216,7 +211,10 @@ class ShoppingListViewModel(
     ): List<ShoppingListItem> {
         val filteredList: MutableList<ShoppingListItem> = location?.let { l ->
             l.aisles.flatMap { a ->
-                val aisleSignature = SelectedSignature(ShoppingListItem.ItemType.AISLE, a.id, a.id)
+                val aisleSignature = SelectedSignature(
+                    ShoppingListItem.ItemType.AISLE, a.id, a.id
+                )
+
                 listOf(
                     AisleShoppingListItemViewModel(
                         rank = a.rank,
@@ -252,7 +250,8 @@ class ShoppingListViewModel(
                             updateAisleProductRankUseCase = updateAisleProductRankUseCase,
                             qtyIncrement = ap.product.qtyIncrement,
                             unitOfMeasure = ap.product.unitOfMeasure,
-                            trackingMode = ap.product.trackingMode
+                            trackingMode = ap.product.trackingMode,
+                            noteText = ap.product.note?.noteText
                         )
                     }
             }
@@ -331,7 +330,7 @@ class ShoppingListViewModel(
     fun submitProductSearch(productNameQuery: String) {
         if (productNameQuery.isBlank()) return
 
-        _searchQuery.value = productNameQuery
+        _searchQuery.value = productNameQuery.trim()
     }
 
     fun setShowEmptyAisles(showEmptyAisles: Boolean) {
@@ -355,7 +354,8 @@ class ShoppingListViewModel(
     }
 
     fun movedItem(item: ShoppingListItem) {
-        //TODO: Do some smarts to only expand the list if I'm dragging an aisle, dragging a product across an aisle, or reached the end of the list
+        //TODO: Do some smarts to only expand the list if I'm dragging an aisle,
+        //      dragging a product across an aisle, or reached the end of the list
         //TODO: When dragging an aisle, hide all products
         if (_shoppingListFilters.value?.showEmptyAisles ?: _showEmptyAisles) return
 

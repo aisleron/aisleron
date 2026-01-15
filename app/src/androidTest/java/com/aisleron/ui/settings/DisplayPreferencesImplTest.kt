@@ -20,6 +20,8 @@ package com.aisleron.ui.settings
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.aisleron.SharedPreferencesInitializer
 import com.aisleron.domain.FilterType
+import com.aisleron.domain.preferences.ApplicationTheme
+import com.aisleron.domain.preferences.PureBlackStyle
 import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -38,9 +40,9 @@ class DisplayPreferencesImplTest {
     @Test
     fun getApplicationTheme_returnsCorrectEnum_forGivenSetting() {
         val testCases = mapOf(
-            SharedPreferencesInitializer.ApplicationTheme.LIGHT_THEME to DisplayPreferences.ApplicationTheme.LIGHT_THEME,
-            SharedPreferencesInitializer.ApplicationTheme.DARK_THEME to DisplayPreferences.ApplicationTheme.DARK_THEME,
-            SharedPreferencesInitializer.ApplicationTheme.SYSTEM_THEME to DisplayPreferences.ApplicationTheme.SYSTEM_THEME
+            SharedPreferencesInitializer.ApplicationTheme.LIGHT_THEME to ApplicationTheme.LIGHT_THEME,
+            SharedPreferencesInitializer.ApplicationTheme.DARK_THEME to ApplicationTheme.DARK_THEME,
+            SharedPreferencesInitializer.ApplicationTheme.SYSTEM_THEME to ApplicationTheme.SYSTEM_THEME
         )
 
         testCases.forEach { (inputValue, expectedValue) ->
@@ -139,10 +141,10 @@ class DisplayPreferencesImplTest {
     @Test
     fun pureBlackStyle_returnsCorrectEnum_forGivenSetting() {
         val testCases = mapOf(
-            SharedPreferencesInitializer.PureBlackStyle.DEFAULT to DisplayPreferences.PureBlackStyle.DEFAULT,
-            SharedPreferencesInitializer.PureBlackStyle.ECONOMY to DisplayPreferences.PureBlackStyle.ECONOMY,
-            SharedPreferencesInitializer.PureBlackStyle.BUSINESS_CLASS to DisplayPreferences.PureBlackStyle.BUSINESS_CLASS,
-            SharedPreferencesInitializer.PureBlackStyle.FIRST_CLASS to DisplayPreferences.PureBlackStyle.FIRST_CLASS
+            SharedPreferencesInitializer.PureBlackStyle.DEFAULT to PureBlackStyle.DEFAULT,
+            SharedPreferencesInitializer.PureBlackStyle.ECONOMY to PureBlackStyle.ECONOMY,
+            SharedPreferencesInitializer.PureBlackStyle.BUSINESS_CLASS to PureBlackStyle.BUSINESS_CLASS,
+            SharedPreferencesInitializer.PureBlackStyle.FIRST_CLASS to PureBlackStyle.FIRST_CLASS
         )
 
         testCases.forEach { (inputValue, expectedValue) ->

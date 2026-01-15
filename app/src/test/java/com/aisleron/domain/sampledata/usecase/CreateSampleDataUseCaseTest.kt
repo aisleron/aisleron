@@ -23,7 +23,7 @@ import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
-import com.aisleron.domain.product.TrackingMode
+import com.aisleron.domain.preferences.TrackingMode
 import com.aisleron.domain.product.usecase.AddProductUseCase
 import com.aisleron.domain.shoppinglist.ShoppingListFilter
 import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase

@@ -29,7 +29,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.aisleron.R
 import com.aisleron.databinding.FragmentProductInventoryBinding
-import com.aisleron.domain.product.TrackingMode
+import com.aisleron.domain.preferences.TrackingMode
 import com.aisleron.ui.AisleronFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch

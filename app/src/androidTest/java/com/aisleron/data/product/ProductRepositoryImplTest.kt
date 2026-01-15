@@ -22,7 +22,7 @@ import com.aisleron.data.aisleproduct.AisleProductDao
 import com.aisleron.domain.base.BaseRepository
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
-import com.aisleron.domain.product.TrackingMode
+import com.aisleron.domain.preferences.TrackingMode
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.koin.test.get

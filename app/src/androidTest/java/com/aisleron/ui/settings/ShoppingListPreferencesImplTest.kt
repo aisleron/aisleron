@@ -20,7 +20,8 @@ package com.aisleron.ui.settings
 import androidx.preference.PreferenceManager
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.aisleron.SharedPreferencesInitializer
-import com.aisleron.domain.product.TrackingMode
+import com.aisleron.domain.preferences.NoteHint
+import com.aisleron.domain.preferences.TrackingMode
 import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -28,6 +29,8 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class ShoppingListPreferencesImplTest {
+    val shoppingListPreferences: ShoppingListPreferencesImpl
+        get() = ShoppingListPreferencesImpl(getInstrumentation().targetContext)
 
     @Before
     fun setUp() {
@@ -38,7 +41,7 @@ class ShoppingListPreferencesImplTest {
     fun getSnackBarHidden_isHidden_ReturnTrue() {
         SharedPreferencesInitializer().setHideStatusChangeSnackBar(true)
         val isStatusChangeSnackBarHidden =
-            ShoppingListPreferencesImpl().isStatusChangeSnackBarHidden(getInstrumentation().targetContext)
+            shoppingListPreferences.isStatusChangeSnackBarHidden()
 
         assertTrue(isStatusChangeSnackBarHidden)
     }
@@ -47,7 +50,7 @@ class ShoppingListPreferencesImplTest {
     fun getSnackBarHidden_isNotHidden_ReturnFalse() {
         SharedPreferencesInitializer().setHideStatusChangeSnackBar(false)
         val isStatusChangeSnackBarHidden =
-            ShoppingListPreferencesImpl().isStatusChangeSnackBarHidden(getInstrumentation().targetContext)
+            shoppingListPreferences.isStatusChangeSnackBarHidden()
 
         assertFalse(isStatusChangeSnackBarHidden)
     }
@@ -55,8 +58,7 @@ class ShoppingListPreferencesImplTest {
     @Test
     fun getShowEmptyAisles_isShown_ReturnTrue() {
         SharedPreferencesInitializer().setShowEmptyAisles(true)
-        val showEmptyAisles =
-            ShoppingListPreferencesImpl().showEmptyAisles(getInstrumentation().targetContext)
+        val showEmptyAisles = shoppingListPreferences.showEmptyAisles()
 
         assertTrue(showEmptyAisles)
     }
@@ -64,8 +66,7 @@ class ShoppingListPreferencesImplTest {
     @Test
     fun getShowEmptyAisles_isNotShown_ReturnFalse() {
         SharedPreferencesInitializer().setShowEmptyAisles(false)
-        val showEmptyAisles =
-            ShoppingListPreferencesImpl().showEmptyAisles(getInstrumentation().targetContext)
+        val showEmptyAisles = shoppingListPreferences.showEmptyAisles()
 
         assertFalse(showEmptyAisles)
     }
@@ -74,9 +75,7 @@ class ShoppingListPreferencesImplTest {
         SharedPreferencesInitializer().setShowEmptyAisles(!showEmptyAisles)
         val context = getInstrumentation().targetContext
 
-        ShoppingListPreferencesImpl().setShowEmptyAisles(
-            getInstrumentation().targetContext, showEmptyAisles
-        )
+        shoppingListPreferences.setShowEmptyAisles(showEmptyAisles)
 
         val preference = PreferenceManager.getDefaultSharedPreferences(context)
         return preference.getBoolean("show_empty_aisles", !showEmptyAisles)
@@ -98,7 +97,7 @@ class ShoppingListPreferencesImplTest {
 
     private fun getTrackingMode_ArrangeAct(trackingMode: SharedPreferencesInitializer.TrackingMode): TrackingMode {
         SharedPreferencesInitializer().setTrackingMode(trackingMode)
-        return ShoppingListPreferencesImpl().trackingMode(getInstrumentation().targetContext)
+        return shoppingListPreferences.trackingMode()
     }
 
     @Test
@@ -127,15 +126,16 @@ class ShoppingListPreferencesImplTest {
 
     @Test
     fun getTrackingMode_isNone_ReturnNone() {
-        val trackingMode = getTrackingMode_ArrangeAct(SharedPreferencesInitializer.TrackingMode.NONE)
+        val trackingMode =
+            getTrackingMode_ArrangeAct(SharedPreferencesInitializer.TrackingMode.NONE)
+
         assertEquals(TrackingMode.NONE, trackingMode)
     }
 
     @Test
     fun getKeepScreenOn_isSet_ReturnTrue() {
         SharedPreferencesInitializer().setKeepScreenOn(true)
-        val showEmptyAisles =
-            ShoppingListPreferencesImpl().keepScreenOn(getInstrumentation().targetContext)
+        val showEmptyAisles = shoppingListPreferences.keepScreenOn()
 
         assertTrue(showEmptyAisles)
     }
@@ -143,9 +143,67 @@ class ShoppingListPreferencesImplTest {
     @Test
     fun getKeepScreenOn_isNotShown_ReturnFalse() {
         SharedPreferencesInitializer().setKeepScreenOn(false)
-        val showEmptyAisles =
-            ShoppingListPreferencesImpl().keepScreenOn(getInstrumentation().targetContext)
+        val showEmptyAisles = shoppingListPreferences.keepScreenOn()
 
         assertFalse(showEmptyAisles)
+    }
+
+    private fun getNoteHint_ArrangeActAssert(
+        input: SharedPreferencesInitializer.NoteHint,
+        expected: NoteHint
+    ) {
+        SharedPreferencesInitializer().setNoteHint(input)
+
+        val noteHint = shoppingListPreferences.noteHint()
+
+        assertEquals(expected, noteHint)
+    }
+
+    @Test
+    fun getNoteHint_isButton_ReturnButton() {
+        getNoteHint_ArrangeActAssert(
+            SharedPreferencesInitializer.NoteHint.BUTTON,
+            NoteHint.BUTTON
+        )
+    }
+
+    @Test
+    fun getNoteHint_isSummary_ReturnSummary() {
+        getNoteHint_ArrangeActAssert(
+            SharedPreferencesInitializer.NoteHint.SUMMARY,
+            NoteHint.SUMMARY
+        )
+    }
+
+    @Test
+    fun getNoteHint_isIndicator_ReturnIndicator() {
+        getNoteHint_ArrangeActAssert(
+            SharedPreferencesInitializer.NoteHint.INDICATOR,
+            NoteHint.INDICATOR
+        )
+    }
+
+    @Test
+    fun getNoteHint_isNone_ReturnNone() {
+        getNoteHint_ArrangeActAssert(
+            SharedPreferencesInitializer.NoteHint.NONE,
+            NoteHint.NONE
+        )
+    }
+
+    @Test
+    fun getNoteHint_ReturnNone() {
+        getNoteHint_ArrangeActAssert(
+            SharedPreferencesInitializer.NoteHint.DUMMY,
+            NoteHint.NONE
+        )
+    }
+
+    @Test
+    fun getNoteHint_isNullValue_ReturnNone() {
+        getNoteHint_ArrangeActAssert(
+            SharedPreferencesInitializer.NoteHint.NULL,
+            NoteHint.NONE
+        )
     }
 }

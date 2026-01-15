@@ -28,7 +28,7 @@ import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.location.usecase.AddLocationUseCase
 import com.aisleron.domain.location.usecase.GetHomeLocationUseCase
 import com.aisleron.domain.product.Product
-import com.aisleron.domain.product.TrackingMode
+import com.aisleron.domain.preferences.TrackingMode
 import com.aisleron.domain.product.usecase.AddProductUseCase
 import com.aisleron.domain.product.usecase.GetAllProductsUseCase
 import com.aisleron.domain.shoppinglist.ShoppingListFilter

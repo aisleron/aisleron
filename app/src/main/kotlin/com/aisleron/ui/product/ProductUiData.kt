@@ -17,7 +17,7 @@
 
 package com.aisleron.ui.product
 
-import com.aisleron.domain.product.TrackingMode
+import com.aisleron.domain.preferences.TrackingMode
 
 data class ProductUiData(
     val productName: String = "",

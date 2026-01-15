@@ -17,8 +17,8 @@
 
 package com.aisleron.ui.settings
 
-import android.content.Context
-import com.aisleron.domain.product.TrackingMode
+import com.aisleron.domain.preferences.NoteHint
+import com.aisleron.domain.preferences.TrackingMode
 
 class ShoppingListPreferencesTestImpl : ShoppingListPreferences {
 
@@ -26,13 +26,15 @@ class ShoppingListPreferencesTestImpl : ShoppingListPreferences {
     private var _showEmptyAisles: Boolean = false
     private var _keepScreenOn: Boolean = false
     private var _trackingMode: TrackingMode = TrackingMode.CHECKBOX
+    private var _noteHint: NoteHint = NoteHint.NONE
 
-    override fun isStatusChangeSnackBarHidden(context: Context): Boolean = _hideStatusChangeSnackBar
-    override fun showEmptyAisles(context: Context): Boolean = _showEmptyAisles
-    override fun keepScreenOn(context: Context): Boolean = _keepScreenOn
-    override fun trackingMode(context: Context): TrackingMode = _trackingMode
+    override fun isStatusChangeSnackBarHidden(): Boolean = _hideStatusChangeSnackBar
+    override fun showEmptyAisles(): Boolean = _showEmptyAisles
+    override fun keepScreenOn(): Boolean = _keepScreenOn
+    override fun noteHint(): NoteHint = _noteHint
+    override fun trackingMode(): TrackingMode = _trackingMode
 
-    override fun setShowEmptyAisles(context: Context, value: Boolean) {
+    override fun setShowEmptyAisles(value: Boolean) {
         _showEmptyAisles = value
     }
 
@@ -40,11 +42,11 @@ class ShoppingListPreferencesTestImpl : ShoppingListPreferences {
         _hideStatusChangeSnackBar = hideSnackBar
     }
 
-    fun setShowEmptyAisles(showEmptyAisles: Boolean) {
-        _showEmptyAisles = showEmptyAisles
-    }
-
     fun setTrackingMode(trackingMode: TrackingMode) {
         _trackingMode = trackingMode
+    }
+
+    fun setNoteHint(noteHint: NoteHint) {
+        _noteHint = noteHint
     }
 }

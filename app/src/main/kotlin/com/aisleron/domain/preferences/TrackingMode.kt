@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 aisleron.com
+ * Copyright (C) 2026 aisleron.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,9 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.domain.product
+package com.aisleron.domain.preferences
 
-enum class TrackingMode(val value: String) {
+enum class TrackingMode(override val value: String) : PreferenceEnum {
     CHECKBOX("checkbox"),
     QUANTITY("quantity"),
     CHECKBOX_QUANTITY("checkbox_quantity"),
@@ -25,9 +25,7 @@ enum class TrackingMode(val value: String) {
     DEFAULT("default");
 
     // TrackingMode needs to be aligned with the tracking_method_values array
-    companion object {
-        fun fromValue(value: String?): TrackingMode {
-            return entries.find { it.value == value } ?: DEFAULT
-        }
+    companion object: PreferenceEnum.Factory<TrackingMode> {
+        override val defaultValue: TrackingMode = DEFAULT
     }
 }

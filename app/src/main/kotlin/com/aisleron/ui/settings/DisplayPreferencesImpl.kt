@@ -20,6 +20,8 @@ package com.aisleron.ui.settings
 import android.content.Context
 import androidx.preference.PreferenceManager
 import com.aisleron.domain.FilterType
+import com.aisleron.domain.preferences.ApplicationTheme
+import com.aisleron.domain.preferences.PureBlackStyle
 import com.aisleron.ui.bundles.ShoppingListBundle
 
 class DisplayPreferencesImpl(context: Context) : DisplayPreferences {
@@ -28,12 +30,12 @@ class DisplayPreferencesImpl(context: Context) : DisplayPreferences {
     override fun showOnLockScreen(): Boolean =
         prefs.getBoolean(DISPLAY_LOCKSCREEN, false)
 
-    override fun applicationTheme(): DisplayPreferences.ApplicationTheme {
+    override fun applicationTheme(): ApplicationTheme {
         val appTheme = prefs.getString(
-            APPLICATION_THEME, DisplayPreferences.ApplicationTheme.SYSTEM_THEME.value
+            APPLICATION_THEME, ApplicationTheme.SYSTEM_THEME.value
         )
 
-        return DisplayPreferences.ApplicationTheme.fromValue(appTheme)
+        return ApplicationTheme.fromValue(appTheme)
     }
 
     override fun startingList(): ShoppingListBundle {
@@ -52,11 +54,11 @@ class DisplayPreferencesImpl(context: Context) : DisplayPreferences {
     override fun dynamicColor(): Boolean =
         prefs.getBoolean(DYNAMIC_COLOR, false)
 
-    override fun pureBlackStyle(): DisplayPreferences.PureBlackStyle {
+    override fun pureBlackStyle(): PureBlackStyle {
         val pureBlackStyle = prefs
-            .getString(PURE_BLACK_STYLE, DisplayPreferences.PureBlackStyle.DEFAULT.value)
+            .getString(PURE_BLACK_STYLE, PureBlackStyle.DEFAULT.value)
 
-        return DisplayPreferences.PureBlackStyle.fromValue(pureBlackStyle)
+        return PureBlackStyle.fromValue(pureBlackStyle)
     }
 
     companion object {

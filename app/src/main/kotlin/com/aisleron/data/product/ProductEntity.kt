@@ -22,7 +22,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import com.aisleron.data.note.NoteEntity
-import com.aisleron.domain.product.TrackingMode
+import com.aisleron.domain.preferences.TrackingMode
 
 @Entity(
     tableName = "Product",

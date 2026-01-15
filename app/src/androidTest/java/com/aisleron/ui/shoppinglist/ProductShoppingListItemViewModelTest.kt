@@ -33,7 +33,7 @@ import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductRankUseCase
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.product.ProductRepository
-import com.aisleron.domain.product.TrackingMode
+import com.aisleron.domain.preferences.TrackingMode
 import com.aisleron.domain.product.usecase.RemoveProductUseCase
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import kotlinx.coroutines.flow.first
@@ -69,6 +69,7 @@ class ProductShoppingListItemViewModelTest : KoinTest {
         inStock = aisleProduct.product.inStock,
         qtyNeeded = aisleProduct.product.qtyNeeded,
         noteId = null,
+        noteText = null,
         aisleId = aisleProduct.aisleId,
         aisleProductId = aisleProduct.id,
         updateAisleProductRankUseCase = get<UpdateAisleProductRankUseCase>(),
@@ -107,6 +108,7 @@ class ProductShoppingListItemViewModelTest : KoinTest {
             inStock = false,
             qtyNeeded = 0.0,
             noteId = null,
+            noteText = null,
             aisleId = 1,
             aisleProductId = 1,
             updateAisleProductRankUseCase = get<UpdateAisleProductRankUseCase>(),
