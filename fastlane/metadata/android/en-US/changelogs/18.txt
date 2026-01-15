@@ -3,4 +3,4 @@ Enhancements:
 * Added a product note hint on shopping list entries.
 
 Bug Fixes:
-*
+* Fixed note tab scrolling issue on the Edit Product page.
