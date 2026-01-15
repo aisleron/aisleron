@@ -172,4 +172,9 @@
     <string name="save_changes_title">Запазване на промените?</string>
     <string name="save_changes_message">Имате незапазени промени. Искате ли да ги запазите, преди да излезете?</string>
     <string name="keep_editing">Продължете да редактирате</string>
+    <string name="note_hint">Подсказка за бележка</string>
+    <string name="note_hint_button">Бутон</string>
+    <string name="note_hint_summary">Резюме</string>
+    <string name="note_hint_indicator">Индикатор (*)</string>
+    <string name="preference_none">Няма</string>
 </resources>

@@ -180,4 +180,9 @@
     <string name="tracking_default">Verstek</string>
     <string name="qty_increments">Hoeveelheidsverhogings</string>
     <string name="unit_of_measure">Maatstafeenheid</string>
+    <string name="note_hint">Nota-wenk</string>
+    <string name="note_hint_button">Knoppie</string>
+    <string name="note_hint_summary">Opsomming</string>
+    <string name="note_hint_indicator">Aanwyser (*)</string>
+    <string name="preference_none">Geen</string>
 </resources>
