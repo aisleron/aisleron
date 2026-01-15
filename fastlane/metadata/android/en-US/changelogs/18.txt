@@ -1,5 +1,6 @@
 Enhancements:
 * Added a language switcher in Preferences.
+* Added a product note hint on shopping list entries.
 
 Bug Fixes:
 *
