@@ -69,14 +69,14 @@ android {
         }
     }
     namespace = "com.aisleron"
-    compileSdk = 35
+    compileSdk = 358
 
     defaultConfig {
         applicationId = "com.aisleron"
         minSdk = 24
         targetSdk = 35
-        versionCode = 17
-        versionName = "2025.11.2"
+        versionCode = 18
+        versionName = "2026.1.0"
         base.archivesName = "$applicationId-$versionName"
 
         testInstrumentationRunner = "com.aisleron.di.KoinInstrumentationTestRunner"

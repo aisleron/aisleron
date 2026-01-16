@@ -18,6 +18,7 @@
 package com.aisleron
 
 
+import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
@@ -27,6 +28,8 @@ import androidx.test.espresso.action.ViewActions.closeSoftKeyboard
 import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.contrib.RecyclerViewActions
+import androidx.test.espresso.matcher.ViewMatchers.hasDescendant
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withContentDescription
 import androidx.test.espresso.matcher.ViewMatchers.withId
@@ -186,7 +189,22 @@ class SearchBoxTest : KoinTest {
         Espresso.pressBack()
 
         getSearchTextBox().check(doesNotExist())
+
+        scrollToRecyclerViewProduct(existingProduct)
         getProductView(existingProduct).check(matches(isDisplayed()))
+    }
+
+    private fun scrollToRecyclerViewProduct(productName: String) {
+        onView(withId(R.id.frg_shopping_list))
+            .perform(
+                RecyclerViewActions.scrollTo<RecyclerView.ViewHolder>(
+                    hasDescendant(
+                        allOf(
+                            withText(productName),
+                            withId(R.id.txt_product_name))
+                    )
+                )
+            )
     }
 }
 
