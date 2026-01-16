@@ -69,7 +69,7 @@ android {
         }
     }
     namespace = "com.aisleron"
-    compileSdk = 358
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.aisleron"
