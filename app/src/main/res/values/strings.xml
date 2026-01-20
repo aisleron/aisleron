@@ -119,6 +119,11 @@
     <string name="about_support_documentation_summary">View documentation online</string>
     <string name="about_legal_3rdparty_title">3rd Party Licenses</string>
     <string name="about_legal_3rdparty_summary">View 3rd party licenses online</string>
+    <string name="about_contribute_header">Contribute</string>
+    <string name="about_contribute_translate_title">Translate</string>
+    <string name="about_contribute_translate_summary">Help to make Aisleron available in more languages</string>
+    <string name="about_contribute_donate_title">Donate</string>
+    <string name="about_contribute_donate_summary">Contribute to Aisleron financially</string>
 
     <!-- Welcome Page -->
     <string name="welcome_app_title">Getting Started</string>
@@ -148,6 +153,8 @@
     <!-- URLs -->
     <string name="aisleron_documentation_url" translatable="false">https://aisleron.com/docs/documentation/</string>
     <string name="aisleron_version_history_url" translatable="false">https://aisleron.com/docs/version-history</string>
+    <string name="aisleron_translate_url" translatable="false">https://aisleron.com/docs/contribute/translate</string>
+    <string name="aisleron_donate_url" translatable="false">https://aisleron.com/docs/contribute/donate</string>
 
     <!-- Loyalty cards -->
     <string name="shop_loyalty_card_name">Loyalty Card</string>

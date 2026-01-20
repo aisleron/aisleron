@@ -194,4 +194,9 @@
     <string name="note_hint_summary">Sammanfattning</string>
     <string name="note_hint_indicator">Indikator (*)</string>
     <string name="preference_none">Ingen</string>
+    <string name="about_contribute_header">Bidra</string>
+    <string name="about_contribute_translate_title">Översätt</string>
+    <string name="about_contribute_translate_summary">Hjälp till att göra Aisleron tillgänglig på fler språk</string>
+    <string name="about_contribute_donate_title">Donera</string>
+    <string name="about_contribute_donate_summary">Bidra ekonomiskt till Aisleron</string>
 </resources>

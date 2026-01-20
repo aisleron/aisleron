@@ -54,6 +54,25 @@
         </Preference>
     </PreferenceCategory>
 
+    <PreferenceCategory app:title="@string/about_contribute_header">
+        <Preference
+            android:key="about_contribute_translate"
+            android:title="@string/about_contribute_translate_title"
+            android:summary="@string/about_contribute_translate_summary">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="@string/aisleron_translate_url" />
+        </Preference>
+        <Preference
+            android:key="about_contribute_donate"
+            android:title="@string/about_contribute_donate_title"
+            android:summary="@string/about_contribute_donate_summary">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="@string/aisleron_donate_url" />
+        </Preference>
+    </PreferenceCategory>
+
     <PreferenceCategory app:title="@string/about_legal_header">
         <Preference
             android:key="about_legal_license"

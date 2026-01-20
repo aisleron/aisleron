@@ -194,4 +194,9 @@
     <string name="note_hint_summary">Сводка</string>
     <string name="note_hint_indicator">Индикатор (*)</string>
     <string name="preference_none">Нет</string>
+    <string name="about_contribute_header">Внести вклад</string>
+    <string name="about_contribute_translate_title">Перевод</string>
+    <string name="about_contribute_translate_summary">Помогите сделать Aisleron доступным на большем количестве языков</string>
+    <string name="about_contribute_donate_title">Пожертвовать</string>
+    <string name="about_contribute_donate_summary">Поддержать проект Aisleron финансово</string>
 </resources>

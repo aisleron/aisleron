@@ -202,4 +202,9 @@
     <string name="note_hint_summary">Opsomming</string>
     <string name="note_hint_indicator">Aanwyser (*)</string>
     <string name="preference_none">Geen</string>
+    <string name="about_contribute_header">Dra by</string>
+    <string name="about_contribute_translate_title">Vertaal</string>
+    <string name="about_contribute_translate_summary">Help om Aisleron in meer tale beskikbaar te stel</string>
+    <string name="about_contribute_donate_title">Skenk</string>
+    <string name="about_contribute_donate_summary">Dra finansieel by tot Aisleron</string>
 </resources>

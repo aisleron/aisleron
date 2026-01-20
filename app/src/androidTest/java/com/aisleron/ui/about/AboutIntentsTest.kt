@@ -77,6 +77,14 @@ class AboutIntentsTest(private val resourceId: Int, private val expectedUri: Str
                 arrayOf(
                     R.string.about_legal_3rdparty_title,
                     "https://aisleron.com/docs/licenses-policies/3rd-party-licenses"
+                ),
+                arrayOf(
+                    R.string.about_contribute_translate_title,
+                    "https://aisleron.com/docs/contribute/translate"
+                ),
+                arrayOf(
+                    R.string.about_contribute_donate_title,
+                    "https://aisleron.com/docs/contribute/donate"
                 )
             )
         }

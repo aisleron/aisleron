@@ -194,4 +194,9 @@
     <string name="note_hint_summary">Resumen</string>
     <string name="note_hint_indicator">Indicador (*)</string>
     <string name="preference_none">Ninguno</string>
+    <string name="about_contribute_header">Contribuir</string>
+    <string name="about_contribute_translate_title">Traducir</string>
+    <string name="about_contribute_translate_summary">Ayuda a que Aisleron esté disponible en más idiomas</string>
+    <string name="about_contribute_donate_title">Donar</string>
+    <string name="about_contribute_donate_summary">Contribuye financieramente a Aisleron</string>
 </resources>
