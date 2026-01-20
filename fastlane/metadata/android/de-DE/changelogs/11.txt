@@ -1,0 +1,13 @@
+2025.8.0:
+* Mengenüberwachung für benötigte Produkte
+* Neue Option, die Bildschirmsperre beim Einkauf zu deaktivieren
+* Neue Übersetzung Französisch und Deutsch
+
+2025.7.0:
+* Neu: Kopiere ein Geschäft oder Produkt
+* Ein-/Ausblenden leerer Regale
+* Rückkehr zum Start bei Erststart
+* Eindeutige Regalnamen
+* Produkt- und Geschäftsdetails werden nicht beim Appwechsel gelöscht
+* Verlust von markierten Geschäften bei Datenbankwiederherstellung behoben
+* Scrollen beim Verschieben von Produkten behoben
