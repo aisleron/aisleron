@@ -1,0 +1,7 @@
+İyileştirmeler:
+* Ürünlere ve dükkânlara notlar eklendi
+* Uygulama açılışında gösterilecek başlangıç listesi seçeneği eklendi
+* Bütün reyonların dökümlerinin topluca açılıp kapatılabilmesi seçeneği eklendi
+* Yeni sürümlere dikkat çekmek için bir güncelleme bildirimi eklendi
+* Fransızca ve İsveççe çeviriler güncellendi
+* Ukraynaca çeviri eklendi

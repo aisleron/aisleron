@@ -1,0 +1,10 @@
+İyileştirmeler:
+* Yeni: Bir dükkân ya da ürün kopyala
+* Boş reyonların gösterme ya da saklama seçeneği
+* İlk çalışma sırasında Hoşgeldiniz sayfasına dönüş
+* Reyon isimleri artık liste içerisinde tek
+
+Hata düzeltmeleri:
+* Uygulama geçişlerinde ürün/dükkân isimleri artık temizlenmiyor
+* Veri tabanından geri yükleme sonrasında sabitlenmiş dükkânların kaybolması düzeltildi
+* Ürünleri sürüklerken ekran kaydırma düzeltildi
