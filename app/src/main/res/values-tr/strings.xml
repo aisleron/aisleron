@@ -19,7 +19,7 @@
     <string name="theme">Tema</string>
     <string name="backup_folder">Yedekleme klasörü</string>
     <string name="last_backup">Son yedekleme:</string>
-    <string name="never">Asla</string>
+    <string name="never">Hiçbir zaman</string>
     <string name="db_backup_processing">Yedekleniyor…</string>
     <string name="db_backup_success">Yedekleme tamamlandı</string>
     <string name="about_support_header">Destek</string>
@@ -138,7 +138,7 @@
     <string name="loyalty_card_provider_catima">Catima — Müşteri kartı cüzdanı</string>
     <string name="loyalty_card_provider_missing_title">Hiçbir müşteri kartı sağlayıcı kurulu değil</string>
     <string name="invalid_loyalty_card_exception">HATA: Verilen müşteki kartı kimliği geçersiz</string>
-    <string name="tracking_mode">İzleme yöntemi</string>
+    <string name="tracking_mode">Takip yöntemi</string>
     <string name="tracking_checkbox">Onay kutucuğu</string>
     <string name="tracking_quantity">Miktar</string>
     <string name="tracking_checkbox_quantity">Onay kutucuğu ve miktar</string>
