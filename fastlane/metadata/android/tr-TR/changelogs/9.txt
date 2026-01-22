@@ -1,0 +1,2 @@
+İyileştirmeler
+* Google Play test derlemesi için güncelle

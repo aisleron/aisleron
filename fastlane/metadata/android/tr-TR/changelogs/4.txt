@@ -1,0 +1,2 @@
+* Navigasyon menüsü başlığını yeri daha etkin kullanacak şekilde ayarla
+* Listelerde maddelerin seçiminde bazı tutarsızlıkları düzelt
