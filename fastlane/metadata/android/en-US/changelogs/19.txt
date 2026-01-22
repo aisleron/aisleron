@@ -1,4 +1,6 @@
 Enhancements:
 * Added a Contribute section to the About page.
+* Added Turkish translations.
 
 Bug Fixes:
+* Fixed language resources being stripped from the Play Store bundle.

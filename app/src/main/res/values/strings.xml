@@ -83,6 +83,7 @@
     <string name="language_russian_ru" translatable="false">Русский</string>
     <string name="language_spanish_es" translatable="false">Español</string>
     <string name="language_swedish_sv" translatable="false">Svenska</string>
+    <string name="language_turkish_tr" translatable="false">Türkçe</string>
     <string name="language_ukrainian_uk" translatable="false">Українська</string>
 
     <!-- Exception Messages   -->

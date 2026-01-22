@@ -68,10 +68,11 @@
         <item>@string/language_polish_pl</item>
         <item>@string/language_russian_ru</item>
         <item>@string/language_swedish_sv</item>
+        <item>@string/language_turkish_tr</item>
         <item>@string/language_ukrainian_uk</item>
     </string-array>
 
-    <!-- Keep this list aligned with the values in locale_config.xml   -->
+    <!-- Keep this list aligned with the values in locale_config.xml and build.gradle.kts (:app) supportedLocales   -->
     <string-array name="language_codes">
         <item />
         <item>en</item>
@@ -84,6 +85,7 @@
         <item>pl</item>
         <item>ru</item>
         <item>sv</item>
+        <item>tr</item>
         <item>uk</item>
     </string-array>
 d

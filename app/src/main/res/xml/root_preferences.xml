@@ -54,7 +54,7 @@
             android:key="language"
             android:title="@string/language"
             android:summary="%s"
-            android:defaultValue="en"/>
+            android:defaultValue="en" />
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/shopping_list_options_header">

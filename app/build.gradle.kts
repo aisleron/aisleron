@@ -42,6 +42,10 @@ object Versions {
     const val NAVIGATION = "2.9.6"
 }
 
+// Keep this list aligned with the values in the language_codes array in arrays.xml and with locale_config.xml
+val supportedLocales =
+    listOf("en", "af", "bg", "de", "es", "fr", "it", "pl", "ru", "sv", "tr", "uk")
+
 android {
     dependenciesInfo {
         // Disables dependency metadata when building APKs.
@@ -143,9 +147,11 @@ android {
         getByName("androidTest").assets.srcDir("$projectDir/schemas")
     }
 
-    //testOptions {
-    //    animationsDisabled = true
-    //}
+    androidResources {
+        // This ensures that languages are bundled and not stripped by the Play Store
+        @Suppress("UnstableApiUsage")
+        localeFilters += supportedLocales
+    }
 }
 
 dependencies {
