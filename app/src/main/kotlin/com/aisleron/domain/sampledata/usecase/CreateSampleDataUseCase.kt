@@ -31,8 +31,8 @@ import com.aisleron.domain.product.Product
 import com.aisleron.domain.preferences.TrackingMode
 import com.aisleron.domain.product.usecase.AddProductUseCase
 import com.aisleron.domain.product.usecase.GetAllProductsUseCase
-import com.aisleron.domain.shoppinglist.ShoppingListFilter
-import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
+import com.aisleron.domain.productlist.ProductListFilter
+import com.aisleron.domain.productlist.usecase.GetAisleProductListUseCase
 import kotlinx.coroutines.flow.first
 
 interface CreateSampleDataUseCase {
@@ -42,7 +42,7 @@ interface CreateSampleDataUseCase {
 class CreateSampleDataUseCaseImpl(
     private val addProductUseCase: AddProductUseCase,
     private val addAisleUseCase: AddAisleUseCase,
-    private val getShoppingListUseCase: GetShoppingListUseCase,
+    private val getAisleProductListUseCase: GetAisleProductListUseCase,
     private val updateAisleProductRankUseCase: UpdateAisleProductRankUseCase,
     private val addLocationUseCase: AddLocationUseCase,
     private val getAllProductsUseCase: GetAllProductsUseCase,
@@ -77,7 +77,7 @@ class CreateSampleDataUseCaseImpl(
         private const val SHOP_AISLE_FROZEN_FOODS = "Frozen Foods"
     }
 
-    private val shoppingListFilter = ShoppingListFilter(
+    private val productListFilter = ProductListFilter(
         productFilter = FilterType.ALL,
         showEmptyAisles = true
     )
@@ -155,7 +155,7 @@ class CreateSampleDataUseCaseImpl(
 
         aisleList.forEach { addAisleUseCase(it) }
 
-        val homeList = getShoppingListUseCase(homeLocation.id, shoppingListFilter).first()!!
+        val homeList = getAisleProductListUseCase(homeLocation.id, productListFilter).first()!!
 
         homeList.aisles.first { it.isDefault }.products.forEach {
             when (it.product.name) {
@@ -204,7 +204,7 @@ class CreateSampleDataUseCaseImpl(
 
         aisleList.forEach { addAisleUseCase(it) }
 
-        val shopList = getShoppingListUseCase(shopId, shoppingListFilter).first()!!
+        val shopList = getAisleProductListUseCase(shopId, productListFilter).first()!!
 
         shopList.aisles.first { it.isDefault }.products.forEach {
             when (it.product.name) {

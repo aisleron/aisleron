@@ -38,8 +38,8 @@ import com.aisleron.domain.loyaltycard.usecase.GetLoyaltyCardForLocationUseCase
 import com.aisleron.domain.product.usecase.RemoveProductUseCase
 import com.aisleron.domain.product.usecase.UpdateProductQtyNeededUseCase
 import com.aisleron.domain.product.usecase.UpdateProductStatusUseCase
-import com.aisleron.domain.shoppinglist.ShoppingListFilter
-import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
+import com.aisleron.domain.productlist.ProductListFilter
+import com.aisleron.domain.productlist.usecase.GetAisleProductListUseCase
 import com.aisleron.ui.bundles.AisleListEntry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -68,7 +68,7 @@ import kotlin.coroutines.cancellation.CancellationException
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 class ShoppingListViewModel(
-    private val getShoppingListUseCase: GetShoppingListUseCase,
+    private val getAisleProductListUseCase: GetAisleProductListUseCase,
     private val updateProductStatusUseCase: UpdateProductStatusUseCase,
     private val updateAisleProductRankUseCase: UpdateAisleProductRankUseCase,
     private val updateAisleRankUseCase: UpdateAisleRankUseCase,
@@ -89,7 +89,7 @@ class ShoppingListViewModel(
     private var hydrated = false
     private var _showEmptyAisles: Boolean = true
     val productFilter: FilterType
-        get() = _shoppingListFilters.value?.productFilter ?: FilterType.NEEDED
+        get() = _productListFilters.value?.productFilter ?: FilterType.NEEDED
 
     private val _aislesForLocation = MutableStateFlow<List<AisleListEntry>>(emptyList())
     val aislesForLocation: StateFlow<List<AisleListEntry>> = _aislesForLocation
@@ -101,7 +101,7 @@ class ShoppingListViewModel(
     val locationId: StateFlow<Int?> get() = _locationId
 
     private val _searchQuery = MutableStateFlow("")
-    private val _shoppingListFilters = MutableStateFlow<ShoppingListFilter?>(null)
+    private val _productListFilters = MutableStateFlow<ProductListFilter?>(null)
 
     private data class SelectedSignature(
         val itemType: ShoppingListItem.ItemType,
@@ -114,14 +114,14 @@ class ShoppingListViewModel(
     private data class ShoppingListStateParams(
         val id: Int?,
         val query: String,
-        val filters: ShoppingListFilter?,
+        val filters: ProductListFilter?,
         val selections: Set<SelectedSignature>
     )
 
     val shoppingListUiState: StateFlow<ShoppingListUiState> = combine(
         _locationId,
         _searchQuery.debounce(debounceTime).distinctUntilChanged(),
-        _shoppingListFilters,
+        _productListFilters,
         _selectedSignatures
     ) { id, query, filters, selections ->
         ShoppingListStateParams(id, query, filters, selections)
@@ -133,7 +133,7 @@ class ShoppingListViewModel(
         } else {
             val combinedFilter = filters.copy(productNameQuery = query.trim())
 
-            getShoppingListUseCase(id, combinedFilter)
+            getAisleProductListUseCase(id, combinedFilter)
                 .map { collectedLocation ->
                     val listItems = mapShoppingList(
                         collectedLocation, combinedFilter.productNameQuery.isNotBlank(), selections
@@ -279,7 +279,7 @@ class ShoppingListViewModel(
         _showEmptyAisles = showEmptyAisles
 
         _locationId.value = locationId
-        _shoppingListFilters.value = ShoppingListFilter(
+        _productListFilters.value = ProductListFilter(
             productFilter = productFilter,
             showEmptyAisles = _showEmptyAisles
         )
@@ -337,7 +337,7 @@ class ShoppingListViewModel(
         if (_showEmptyAisles == showEmptyAisles) return
 
         _showEmptyAisles = showEmptyAisles
-        _shoppingListFilters.update { it?.copy(showEmptyAisles = _showEmptyAisles) }
+        _productListFilters.update { it?.copy(showEmptyAisles = _showEmptyAisles) }
     }
 
     fun requestListRefresh(returnDefaultList: Boolean) {
@@ -345,7 +345,7 @@ class ShoppingListViewModel(
 
         clearSelectedListItems()
         _searchQuery.value = ""
-        _shoppingListFilters.update {
+        _productListFilters.update {
             it?.copy(
                 productNameQuery = "",
                 showEmptyAisles = _showEmptyAisles
@@ -357,9 +357,9 @@ class ShoppingListViewModel(
         //TODO: Do some smarts to only expand the list if I'm dragging an aisle,
         //      dragging a product across an aisle, or reached the end of the list
         //TODO: When dragging an aisle, hide all products
-        if (_shoppingListFilters.value?.showEmptyAisles ?: _showEmptyAisles) return
+        if (_productListFilters.value?.showEmptyAisles ?: _showEmptyAisles) return
 
-        _shoppingListFilters.update { it?.copy(showEmptyAisles = true) }
+        _productListFilters.update { it?.copy(showEmptyAisles = true) }
     }
 
     fun removeSelectedItems() {

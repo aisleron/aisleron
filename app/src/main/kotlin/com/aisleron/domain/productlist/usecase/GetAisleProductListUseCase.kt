@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.domain.shoppinglist.usecase
+package com.aisleron.domain.productlist.usecase
 
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.aisle.Aisle
@@ -23,23 +23,23 @@ import com.aisleron.domain.aisleproduct.AisleProduct
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.note.usecase.GetNotesUseCase
-import com.aisleron.domain.shoppinglist.ShoppingListFilter
+import com.aisleron.domain.productlist.ProductListFilter
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 
-interface GetShoppingListUseCase {
-    operator fun invoke(locationId: Int, filter: ShoppingListFilter): Flow<Location?>
+interface GetAisleProductListUseCase {
+    operator fun invoke(locationId: Int, filter: ProductListFilter): Flow<Location?>
 }
 
-class GetShoppingListUseCaseImpl(
+class GetAisleProductListUseCaseImpl(
     private val locationRepository: LocationRepository,
     private val getNotesUseCase: GetNotesUseCase
-) : GetShoppingListUseCase {
+) : GetAisleProductListUseCase {
     @OptIn(ExperimentalCoroutinesApi::class)
-    override operator fun invoke(locationId: Int, filter: ShoppingListFilter): Flow<Location?> {
+    override operator fun invoke(locationId: Int, filter: ProductListFilter): Flow<Location?> {
         return locationRepository.getLocationWithAislesWithProducts(locationId)
             .flatMapLatest { location ->
                 if (location == null) return@flatMapLatest flowOf(null)

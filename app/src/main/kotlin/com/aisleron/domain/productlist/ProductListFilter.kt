@@ -15,11 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.domain.shoppinglist
+package com.aisleron.domain.productlist
 
 import com.aisleron.domain.FilterType
 
-data class ShoppingListFilter(
+data class ProductListFilter(
     val productFilter: FilterType? = null,
     val productNameQuery: String = "",
     val showEmptyAisles: Boolean = false

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.domain.shoppinglist.usecase
+package com.aisleron.domain.productlist.usecase
 
 import com.aisleron.di.TestDependencyManager
 import com.aisleron.domain.FilterType
@@ -26,7 +26,7 @@ import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.note.Note
 import com.aisleron.domain.note.NoteRepository
 import com.aisleron.domain.product.ProductRepository
-import com.aisleron.domain.shoppinglist.ShoppingListFilter
+import com.aisleron.domain.productlist.ProductListFilter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -40,22 +40,22 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import java.util.stream.Stream
 
-class GetShoppingListUseCaseImplTest {
+class GetAisleProductListUseCaseImplTest {
     private lateinit var dm: TestDependencyManager
-    private lateinit var getShoppingListUseCase: GetShoppingListUseCase
+    private lateinit var getAisleProductListUseCase: GetAisleProductListUseCase
     private lateinit var locationRepository: LocationRepository
 
     @BeforeEach
     fun setUp() {
         dm = TestDependencyManager()
-        getShoppingListUseCase = dm.getUseCase()
+        getAisleProductListUseCase = dm.getUseCase()
         locationRepository = dm.getRepository()
     }
 
     @Test
-    fun getShoppingList_NonExistentId_ReturnNull() = runTest {
-        val shoppingList: Location? = getShoppingListUseCase(2001, ShoppingListFilter()).first()
-        assertNull(shoppingList)
+    fun getAisleProductList_NonExistentId_ReturnNull() = runTest {
+        val aisleProductList: Location? = getAisleProductListUseCase(2001, ProductListFilter()).first()
+        assertNull(aisleProductList)
     }
 
     private suspend fun getShop(): Location {
@@ -64,27 +64,27 @@ class GetShoppingListUseCaseImplTest {
     }
 
     @Test
-    fun getShoppingList_ExistingId_ReturnLocation() = runTest {
+    fun getAisleProductList_ExistingId_ReturnLocation() = runTest {
         val locationId = getShop().id
 
-        val shoppingList = getShoppingListUseCase(locationId, ShoppingListFilter()).first()
+        val aisleProductList = getAisleProductListUseCase(locationId, ProductListFilter()).first()
 
-        assertNotNull(shoppingList)
-        assertTrue(shoppingList!!.aisles.isNotEmpty())
-        assertTrue(shoppingList.aisles.count { it.products.isNotEmpty() } > 0)
+        assertNotNull(aisleProductList)
+        assertTrue(aisleProductList!!.aisles.isNotEmpty())
+        assertTrue(aisleProductList.aisles.count { it.products.isNotEmpty() } > 0)
     }
 
     @ParameterizedTest(name = "Test returned products when Product Filter is {0}")
     @MethodSource("showFilteredProducts")
-    fun getShoppingList_LocationFilterTypeSet_OnlyShowStatusProducts(
+    fun getAisleProductList_LocationFilterTypeSet_OnlyShowStatusProducts(
         filterType: FilterType, haveInStockProducts: Boolean, haveNeededProducts: Boolean
     ) = runTest {
         val location = getShop().copy(defaultFilter = filterType)
         locationRepository.update(location)
 
-        val shoppingList = getShoppingListUseCase(location.id, ShoppingListFilter()).first()!!
+        val aisleProductList = getAisleProductListUseCase(location.id, ProductListFilter()).first()!!
 
-        val allReturnedProducts = shoppingList.aisles.flatMap { it.products }
+        val allReturnedProducts = aisleProductList.aisles.flatMap { it.products }
         assertTrue(allReturnedProducts.isNotEmpty())
         assertEquals(haveNeededProducts, allReturnedProducts.any { !it.product.inStock })
         assertEquals(haveInStockProducts, allReturnedProducts.any { it.product.inStock })
@@ -92,41 +92,41 @@ class GetShoppingListUseCaseImplTest {
 
     @ParameterizedTest(name = "Test default aisle returned if showDefaultAisle is {0}")
     @MethodSource("showDefaultAisle")
-    fun getShoppingList_LocationDefaultAisleSet_ShowDefaultAisleAccordingly(
+    fun getAisleProductList_LocationDefaultAisleSet_ShowDefaultAisleAccordingly(
         showDefaultAisle: Boolean
     ) = runTest {
         val location = getShop().copy(showDefaultAisle = showDefaultAisle)
         locationRepository.update(location)
-        val shoppingListFilter = ShoppingListFilter(
+        val productListFilter = ProductListFilter(
             showEmptyAisles = true
         )
 
-        val shoppingList = getShoppingListUseCase(location.id, shoppingListFilter).first()!!
+        val aisleProductList = getAisleProductListUseCase(location.id, productListFilter).first()!!
 
-        assertEquals(showDefaultAisle, shoppingList.aisles.any { it.isDefault })
+        assertEquals(showDefaultAisle, aisleProductList.aisles.any { it.isDefault })
     }
 
-    @ParameterizedTest(name = "Test returned products when ShoppingListFilter Product Filter is {0}")
+    @ParameterizedTest(name = "Test returned products when ListFilter Product Filter is {0}")
     @MethodSource("showFilteredProducts")
-    fun getShoppingList_ShoppingListFilterFilterTypeSet_OnlyShowStatusProducts(
+    fun getAisleProductList_ListFilterFilterTypeSet_OnlyShowStatusProducts(
         filterType: FilterType, haveInStockProducts: Boolean, haveNeededProducts: Boolean
     ) = runTest {
         val location = getShop()
-        val shoppingListFilter = ShoppingListFilter(
+        val productListFilter = ProductListFilter(
             productFilter = filterType,
             showEmptyAisles = true
         )
 
-        val shoppingList = getShoppingListUseCase(location.id, shoppingListFilter).first()!!
+        val aisleProductList = getAisleProductListUseCase(location.id, productListFilter).first()!!
 
-        val allReturnedProducts = shoppingList.aisles.flatMap { it.products }
+        val allReturnedProducts = aisleProductList.aisles.flatMap { it.products }
         assertTrue(allReturnedProducts.isNotEmpty())
         assertEquals(haveNeededProducts, allReturnedProducts.any { !it.product.inStock })
         assertEquals(haveInStockProducts, allReturnedProducts.any { it.product.inStock })
     }
 
     @Test
-    fun getShoppingList_ShoppingListFilterShowEmptyAislesSet_ShowEmptyAisles() = runTest {
+    fun getAisleProductList_ListFilterShowEmptyAislesSet_ShowEmptyAisles() = runTest {
         val location = getShop()
         val productRepository = dm.getRepository<ProductRepository>()
         location.aisles.flatMap { it.products }.forEach {
@@ -134,18 +134,18 @@ class GetShoppingListUseCaseImplTest {
             productRepository.update(it.product.copy(inStock = true))
         }
 
-        val shoppingListFilter = ShoppingListFilter(
+        val productListFilter = ProductListFilter(
             showEmptyAisles = true
         )
 
-        val shoppingList = getShoppingListUseCase(location.id, shoppingListFilter).first()!!
+        val aisleProductList = getAisleProductListUseCase(location.id, productListFilter).first()!!
 
         val aisleCount = dm.getRepository<AisleRepository>().getForLocation(location.id).count()
-        assertEquals(aisleCount, shoppingList.aisles.count())
+        assertEquals(aisleCount, aisleProductList.aisles.count())
     }
 
     @Test
-    fun getShoppingList_ShoppingListFilterProductNameQuerySet_MatchingProductsReturned() = runTest {
+    fun getAisleProductList_ListFilterProductNameQuerySet_MatchingProductsReturned() = runTest {
         val location = getShop().copy(showDefaultAisle = false)
         locationRepository.update(location)
 
@@ -156,22 +156,22 @@ class GetShoppingListUseCaseImplTest {
         }
 
         val query = location.aisles.first().products.first().product.name
-        val shoppingListFilter = ShoppingListFilter(
+        val productListFilter = ProductListFilter(
             productNameQuery = query,
             showEmptyAisles = true
         )
 
-        val shoppingList = getShoppingListUseCase(location.id, shoppingListFilter).first()!!
+        val aisleProductList = getAisleProductListUseCase(location.id, productListFilter).first()!!
 
-        val allReturnedProducts = shoppingList.aisles.flatMap { it.products }
+        val allReturnedProducts = aisleProductList.aisles.flatMap { it.products }
         assertTrue(allReturnedProducts.isNotEmpty())
         assertTrue(allReturnedProducts.all { it.product.name.contains(query, ignoreCase = true) })
 
-        assertTrue(shoppingList.aisles.any { it.isDefault })
+        assertTrue(aisleProductList.aisles.any { it.isDefault })
     }
 
     @Test
-    fun getShoppingList_ProductHasNote_noteIncluded() = runTest {
+    fun getAisleProductList_ProductHasNote_noteIncluded() = runTest {
         val location = getShop()
 
         val noteText = "This is a test note."
@@ -185,9 +185,9 @@ class GetShoppingListUseCaseImplTest {
 
         dm.getRepository<ProductRepository>().update(productBefore)
 
-        val shoppingList = getShoppingListUseCase(location.id, ShoppingListFilter()).first()!!
+        val aisleProductList = getAisleProductListUseCase(location.id, ProductListFilter()).first()!!
 
-        val productAfter = shoppingList.aisles.flatMap { it.products }
+        val productAfter = aisleProductList.aisles.flatMap { it.products }
             .first { it.product.id == productBefore.id }.product
 
         assertEquals(noteBefore, productAfter.note)

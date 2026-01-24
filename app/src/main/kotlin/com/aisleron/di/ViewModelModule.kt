@@ -33,7 +33,7 @@ import org.koin.dsl.module
 val viewModelModule = module {
     viewModel {
         ShoppingListViewModel(
-            getShoppingListUseCase = get(),
+            getAisleProductListUseCase = get(),
             updateProductStatusUseCase = get(),
             updateAisleProductRankUseCase = get(),
             updateAisleRankUseCase = get(),

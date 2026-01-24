@@ -103,8 +103,8 @@ import com.aisleron.domain.product.usecase.UpdateProductUseCase
 import com.aisleron.domain.product.usecase.UpdateProductUseCaseImpl
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCaseImpl
-import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
-import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCaseImpl
+import com.aisleron.domain.productlist.usecase.GetAisleProductListUseCase
+import com.aisleron.domain.productlist.usecase.GetAisleProductListUseCaseImpl
 import com.aisleron.testdata.data.TransactionRunnerTestImpl
 
 class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
@@ -435,7 +435,7 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
         CreateSampleDataUseCaseImpl(
             addProductUseCase = addProductUseCase,
             addAisleUseCase = addAisleUseCase,
-            getShoppingListUseCase = getShoppingListUseCase,
+            getAisleProductListUseCase = getAisleProductListUseCase,
             updateAisleProductRankUseCase = updateAisleProductRankUseCase,
             addLocationUseCase = addLocationUseCase,
             getAllProductsUseCase = getAllProductsUseCase,
@@ -446,8 +446,8 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
     /**
      * Shopping List Use Cases
      */
-    val getShoppingListUseCase: GetShoppingListUseCase by lazy {
-        GetShoppingListUseCaseImpl(
+    val getAisleProductListUseCase: GetAisleProductListUseCase by lazy {
+        GetAisleProductListUseCaseImpl(
             repositoryFactory.locationRepository,
             getNotesUseCase = getNotesUseCase
         )
@@ -528,7 +528,7 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
             CreateSampleDataUseCase::class -> createSampleDataUseCase as T
 
             // Shopping List Use Cases
-            GetShoppingListUseCase::class -> getShoppingListUseCase as T
+            GetAisleProductListUseCase::class -> getAisleProductListUseCase as T
 
             else -> throw IllegalArgumentException("Unknown use case ${T::class}")
         }

@@ -25,8 +25,8 @@ import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
 import com.aisleron.domain.preferences.TrackingMode
 import com.aisleron.domain.product.usecase.AddProductUseCase
-import com.aisleron.domain.shoppinglist.ShoppingListFilter
-import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
+import com.aisleron.domain.productlist.ProductListFilter
+import com.aisleron.domain.productlist.usecase.GetAisleProductListUseCase
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions
@@ -78,7 +78,7 @@ class CreateSampleDataUseCaseTest {
         val locationRepository = dm.getRepository<LocationRepository>()
         val homeId = locationRepository.getHome().id
         val homeList =
-            dm.getUseCase<GetShoppingListUseCase>().invoke(homeId, ShoppingListFilter()).first()!!
+            dm.getUseCase<GetAisleProductListUseCase>().invoke(homeId, ProductListFilter()).first()!!
 
         val aisleProductCountAfter = homeList.aisles.find { !it.isDefault }?.products?.count() ?: 0
 
@@ -105,7 +105,7 @@ class CreateSampleDataUseCaseTest {
         val locationRepository = dm.getRepository<LocationRepository>()
         val shopId = locationRepository.getShops().first().first().id
         val shopList =
-            dm.getUseCase<GetShoppingListUseCase>().invoke(shopId, ShoppingListFilter()).first()!!
+            dm.getUseCase<GetAisleProductListUseCase>().invoke(shopId, ProductListFilter()).first()!!
 
         val aisleProductCountAfter = shopList.aisles.find { !it.isDefault }?.products?.count() ?: 0
 

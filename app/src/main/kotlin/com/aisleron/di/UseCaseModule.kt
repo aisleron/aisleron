@@ -113,8 +113,8 @@ import com.aisleron.domain.product.usecase.UpdateProductUseCase
 import com.aisleron.domain.product.usecase.UpdateProductUseCaseImpl
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCaseImpl
-import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
-import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCaseImpl
+import com.aisleron.domain.productlist.usecase.GetAisleProductListUseCase
+import com.aisleron.domain.productlist.usecase.GetAisleProductListUseCaseImpl
 import org.koin.android.ext.koin.androidApplication
 import org.koin.dsl.module
 
@@ -318,8 +318,8 @@ val useCaseModule = module {
     /**
      * Shopping List Use Cases
      */
-    factory<GetShoppingListUseCase> {
-        GetShoppingListUseCaseImpl(
+    factory<GetAisleProductListUseCase> {
+        GetAisleProductListUseCaseImpl(
             locationRepository = get(),
             getNotesUseCase = get()
         )
@@ -342,7 +342,7 @@ val useCaseModule = module {
         CreateSampleDataUseCaseImpl(
             addProductUseCase = get(),
             addAisleUseCase = get(),
-            getShoppingListUseCase = get(),
+            getAisleProductListUseCase = get(),
             updateAisleProductRankUseCase = get(),
             addLocationUseCase = get(),
             getAllProductsUseCase = get(),

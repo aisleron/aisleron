@@ -51,8 +51,8 @@ import com.aisleron.domain.product.usecase.RemoveProductUseCase
 import com.aisleron.domain.product.usecase.UpdateProductQtyNeededUseCase
 import com.aisleron.domain.product.usecase.UpdateProductStatusUseCase
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
-import com.aisleron.domain.shoppinglist.ShoppingListFilter
-import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
+import com.aisleron.domain.productlist.ProductListFilter
+import com.aisleron.domain.productlist.usecase.GetAisleProductListUseCase
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -351,7 +351,7 @@ class ShoppingListViewModelTest : KoinTest {
     @Test
     fun constructor_NoCoroutineScopeProvided_ShoppingListViewModelReturned() {
         val vm = ShoppingListViewModel(
-            get<GetShoppingListUseCase>(),
+            get<GetAisleProductListUseCase>(),
             get<UpdateProductStatusUseCase>(),
             get<UpdateAisleProductRankUseCase>(),
             get<UpdateAisleRankUseCase>(),
@@ -929,9 +929,9 @@ class ShoppingListViewModelTest : KoinTest {
     fun shoppingListUiState_ExceptionRaised_UiStateIsError() = runTest {
         val exceptionMessage = "Error on Get Shopping List"
 
-        declare<GetShoppingListUseCase> {
-            object : GetShoppingListUseCase {
-                override fun invoke(locationId: Int, filter: ShoppingListFilter): Flow<Location?> =
+        declare<GetAisleProductListUseCase> {
+            object : GetAisleProductListUseCase {
+                override fun invoke(locationId: Int, filter: ProductListFilter): Flow<Location?> =
                     flow {
                         throw Exception(exceptionMessage)
                     }
