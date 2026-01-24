@@ -55,7 +55,7 @@ class LoyaltyCardDaoTestImpl(private val locationLoyaltyCardDao: LocationLoyalty
             val id = existingEntity?.let {
                 loyaltyCardList.removeAt(loyaltyCardList.indexOf(existingEntity))
                 existingEntity.id
-            } ?: ((loyaltyCardList.maxOfOrNull { e -> e.id }?.toInt() ?: 0) + 1)
+            } ?: ((loyaltyCardList.maxOfOrNull { e -> e.id } ?: 0) + 1)
 
             val newEntity = LoyaltyCardEntity(
                 id = id,

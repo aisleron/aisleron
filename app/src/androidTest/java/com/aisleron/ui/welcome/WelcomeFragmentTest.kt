@@ -39,6 +39,7 @@ import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.isEnabled
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
+import androidx.test.platform.app.InstrumentationRegistry
 import com.aisleron.BuildConfig
 import com.aisleron.MainActivity
 import com.aisleron.R
@@ -65,7 +66,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.allOf
 import org.hamcrest.CoreMatchers.not
-import org.hamcrest.CoreMatchers.startsWith
 import org.hamcrest.Matchers
 import org.junit.Assert
 import org.junit.Before
@@ -359,6 +359,7 @@ class WelcomeFragmentTest : KoinTest {
     @Test
     fun onViewModelStateChange_IsError_ShowErrorSnackBar() = runTest {
         val exceptionMessage = "Error on load sample products"
+
         declare<CreateSampleDataUseCase> {
             object : CreateSampleDataUseCase {
                 override suspend fun invoke() {
@@ -366,6 +367,9 @@ class WelcomeFragmentTest : KoinTest {
                 }
             }
         }
+
+        val expectedError = InstrumentationRegistry.getInstrumentation().targetContext
+            .getString(R.string.generic_error, exceptionMessage)
 
         getFragmentScenario()
         val welcomeOption = onView(withId(R.id.txt_welcome_load_sample_items))
@@ -375,7 +379,7 @@ class WelcomeFragmentTest : KoinTest {
             matches(
                 allOf(
                     ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE),
-                    withText(startsWith("ERROR:"))
+                    withText(expectedError)
                 )
             )
         )

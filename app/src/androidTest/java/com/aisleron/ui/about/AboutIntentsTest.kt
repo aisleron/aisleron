@@ -21,17 +21,22 @@ import android.app.Instrumentation
 import android.content.Intent
 import androidx.fragment.app.testing.FragmentScenario
 import androidx.fragment.app.testing.launchFragmentInContainer
+import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.Intents.intending
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasData
+import androidx.test.espresso.matcher.ViewMatchers.hasDescendant
+import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import com.aisleron.R
 import com.aisleron.di.KoinTestRule
 import com.aisleron.di.viewModelTestModule
+import com.aisleron.utils.SystemIds
 import org.hamcrest.Matchers
 import org.junit.After
 import org.junit.Before
@@ -47,7 +52,7 @@ class AboutIntentsTest(private val resourceId: Int, private val expectedUri: Str
 
     companion object {
         @JvmStatic
-        @Parameterized.Parameters
+        @Parameterized.Parameters(name = "{index}: URL={1}")
         fun data(): Collection<Array<Any>> {
             return listOf(
                 arrayOf(
@@ -117,6 +122,14 @@ class AboutIntentsTest(private val resourceId: Int, private val expectedUri: Str
 
         val expectedIntent = Matchers.allOf(hasAction(Intent.ACTION_VIEW), hasData(expectedUri))
         intending(expectedIntent).respondWith(Instrumentation.ActivityResult(0, null))
+
+        onView(withId(SystemIds.PREFERENCE_RECYCLER_VIEW))
+            .perform(
+                RecyclerViewActions.scrollTo<RecyclerView.ViewHolder>(
+                    hasDescendant(withText(resourceId))
+                )
+            )
+
         onView(withText(resourceId)).perform(click())
         intended(expectedIntent)
     }

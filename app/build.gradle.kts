@@ -33,7 +33,7 @@ apply("../gradle/jacoco.gradle")
 
 object Versions {
     const val COROUTINES = "1.10.2"
-    const val JUNIT = "6.0.1"
+    const val JUNIT = "6.0.2"
     const val ESPRESSO = "3.7.0"
     const val FRAGMENT = "1.8.9"
     const val LIFECYCLE = "2.10.0"
@@ -73,12 +73,12 @@ android {
         }
     }
     namespace = "com.aisleron"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.aisleron"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 18
         versionName = "2026.1.0"
         base.archivesName = "$applicationId-$versionName"
@@ -114,13 +114,13 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 
     kotlin {
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_17)
+            jvmTarget.set(JvmTarget.JVM_21)
         }
     }
 
@@ -152,12 +152,28 @@ android {
         @Suppress("UnstableApiUsage")
         localeFilters += supportedLocales
     }
+
+    configurations.all {
+        // Targets only the Android Test configurations
+        resolutionStrategy {
+            // 1. Force 3.0 to break the "strictly 2.2" consistent resolution constraint
+            force("org.hamcrest:hamcrest:3.0")
+
+            // 2. Redirect requests for old module names to the new 3.0 single-jar module
+            dependencySubstitution {
+                substitute(module("org.hamcrest:hamcrest-core"))
+                    .using(module("org.hamcrest:hamcrest:3.0"))
+                substitute(module("org.hamcrest:hamcrest-library"))
+                    .using(module("org.hamcrest:hamcrest:3.0"))
+            }
+        }
+    }
 }
 
 dependencies {
     // Implementation
-    implementation("androidx.core:core-ktx:1.16.0") // 1.17.0 requires API 36
-    implementation("androidx.activity:activity-ktx:1.10.1") // 1.11.0 requires API 36
+    implementation("androidx.core:core-ktx:1.17.0")
+    implementation("androidx.activity:activity-ktx:1.12.2")
     implementation("androidx.appcompat:appcompat:1.7.1")
     implementation("com.google.android.material:material:1.13.0")
     implementation("androidx.recyclerview:recyclerview:1.4.0")
@@ -171,7 +187,7 @@ dependencies {
     implementation("androidx.documentfile:documentfile:1.1.0")
     implementation("androidx.preference:preference-ktx:1.2.1")
     implementation("androidx.viewpager2:viewpager2:1.1.0")
-    implementation("org.jetbrains.kotlin:kotlin-parcelize-runtime:2.2.21")
+    implementation("org.jetbrains.kotlin:kotlin-parcelize-runtime:2.3.0")
     implementation("androidx.fragment:fragment-ktx:${Versions.FRAGMENT}")
 
     // Lifecycle
@@ -181,7 +197,7 @@ dependencies {
 
     // Navigation
     implementation("androidx.navigation:navigation-ui-ktx:${Versions.NAVIGATION}")
-    implementation("androidx.navigation:navigation-common:${Versions.NAVIGATION}")
+    implementation("androidx.navigation:navigation-common-ktx:${Versions.NAVIGATION}")
     implementation("androidx.navigation:navigation-runtime-ktx:${Versions.NAVIGATION}")
     implementation("androidx.navigation:navigation-fragment-ktx:${Versions.NAVIGATION}")
 
@@ -203,7 +219,8 @@ dependencies {
     // Testing
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation(project(":testData"))
-    testImplementation("org.junit.jupiter:junit-jupiter:${Versions.JUNIT}")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:${Versions.JUNIT}")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:${Versions.JUNIT}")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.COROUTINES}")
 
     // Android Testing
@@ -215,7 +232,6 @@ dependencies {
 
     debugImplementation("androidx.room:room-testing-android:${Versions.ROOM}")
     debugImplementation("androidx.fragment:fragment-testing:${Versions.FRAGMENT}")
-    // implementation("androidx.room:room-testing:${Versions.ROOM}")
     androidTestImplementation("io.insert-koin:koin-test:${Versions.KOIN}")
     androidTestImplementation("androidx.navigation:navigation-testing:${Versions.NAVIGATION}")
     androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.COROUTINES}")
@@ -223,13 +239,12 @@ dependencies {
     debugImplementation("androidx.test.espresso:espresso-contrib:${Versions.ESPRESSO}")
     androidTestImplementation("androidx.test.espresso:espresso-core:${Versions.ESPRESSO}")
     androidTestImplementation("androidx.test.espresso:espresso-intents:${Versions.ESPRESSO}")
-    // Can't upgrade org.hamcrest:hamcrest to 3.0; 2.2 is a dependency of
-    // androidx.test.espresso:espresso-intents:3.7.0
-    androidTestImplementation("org.hamcrest:hamcrest:2.2")
+
+    androidTestImplementation("org.hamcrest:hamcrest:3.0")
 }
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }

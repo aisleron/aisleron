@@ -66,7 +66,6 @@ import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.allOf
 import org.hamcrest.CoreMatchers.endsWith
 import org.hamcrest.CoreMatchers.not
-import org.hamcrest.CoreMatchers.startsWith
 import org.hamcrest.Matcher
 import org.junit.Assert
 import org.junit.Assert.assertEquals
@@ -253,6 +252,9 @@ class ShopListFragmentTest : KoinTest {
             }
         }
 
+        val expectedError = getInstrumentation().targetContext
+            .getString(R.string.generic_error, exceptionMessage)
+
         val locationRepository = get<LocationRepository>()
         val deleteLocation = locationRepository.getAll().first { it.id != 1 }
 
@@ -268,7 +270,7 @@ class ShopListFragmentTest : KoinTest {
             matches(
                 allOf(
                     ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE),
-                    withText(startsWith("ERROR:"))
+                    withText(expectedError)
                 )
             )
         )

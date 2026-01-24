@@ -23,6 +23,8 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
 import androidx.annotation.StringRes
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import androidx.fragment.app.testing.FragmentScenario
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.navigation.NavController
@@ -48,10 +50,11 @@ import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withContentDescription
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
-import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.aisleron.AppCompatActivityTestImpl
 import com.aisleron.MainActivity
 import com.aisleron.R
+import com.aisleron.SharedPreferencesInitializer
 import com.aisleron.di.KoinTestRule
 import com.aisleron.di.daoTestModule
 import com.aisleron.di.fragmentModule
@@ -66,6 +69,7 @@ import com.aisleron.utils.SystemIds
 import org.hamcrest.CoreMatchers.allOf
 import org.hamcrest.CoreMatchers.startsWith
 import org.hamcrest.Matchers
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -96,6 +100,11 @@ class SettingsFragmentTest : KoinTest {
     @Before
     fun setUp() {
         declare<DatabaseMaintenance> { DatabaseMaintenanceDbNameTestImpl("Dummy") }
+    }
+
+    @After
+    fun tearDown() {
+        SharedPreferencesInitializer().clearPreferences()
     }
 
     private fun clickOption(viewTextResourceId: Int) {
@@ -377,11 +386,11 @@ class SettingsFragmentTest : KoinTest {
 
     private fun getLocalizedString(resourceId: Int, localeTag: String): String {
         val config =
-            Configuration(InstrumentationRegistry.getInstrumentation().targetContext.resources.configuration)
+            Configuration(getInstrumentation().targetContext.resources.configuration)
 
         config.setLocale(Locale.forLanguageTag(localeTag))
         val localizedContext =
-            InstrumentationRegistry.getInstrumentation().targetContext.createConfigurationContext(
+            getInstrumentation().targetContext.createConfigurationContext(
                 config
             )
 
@@ -393,7 +402,7 @@ class SettingsFragmentTest : KoinTest {
         @StringRes languageResId: Int,
         localeTag: String
     ) {
-        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val context = getInstrumentation().targetContext
         val languageName = context.getString(languageResId)
 
         clickOption(R.string.language)
@@ -428,14 +437,22 @@ class SettingsFragmentTest : KoinTest {
             Pair(R.string.language_ukrainian_uk, "uk")
         )
 
-        getActivityScenario().use { scenario ->
+        val scenario = getActivityScenario()
+        try {
             languages.forEach { (languageResId, localeTag) ->
                 try {
                     languageChange_ArrangeActAssert(scenario, languageResId, localeTag)
-                } catch (_: Exception) {
-                    throw AssertionError("Failed to change language to $localeTag")
+                } catch (e: Exception) {
+                    throw AssertionError("Failed to change language to $localeTag", e)
                 }
             }
+        } finally {
+            // Reset the system-level locale while activity is still active
+            getInstrumentation().runOnMainSync {
+                AppCompatDelegate.setApplicationLocales(LocaleListCompat.getEmptyLocaleList())
+            }
+
+            scenario.close()
         }
     }
 }

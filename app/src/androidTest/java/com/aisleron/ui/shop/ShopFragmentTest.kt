@@ -57,6 +57,7 @@ import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.loyaltycard.LoyaltyCardProvider
 import com.aisleron.ui.loyaltycard.LoyaltyCardProviderTestImpl
 import com.aisleron.ui.settings.ShopPreferencesTestImpl
+import com.aisleron.utils.SystemIds
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.allOf
@@ -216,7 +217,7 @@ class ShopFragmentTest : KoinTest {
             it.onMenuItemSelected(menuItem)
         }
 
-        onView(withId(com.google.android.material.R.id.snackbar_text)).check(
+        onView(withId(SystemIds.SNACKBAR_TEXT)).check(
             matches(
                 ViewMatchers.withEffectiveVisibility(
                     ViewMatchers.Visibility.VISIBLE
@@ -341,7 +342,7 @@ class ShopFragmentTest : KoinTest {
 
         onView(withId(R.id.btn_lookup_loyalty_card)).perform(ViewActions.click())
 
-        onView(withId(com.google.android.material.R.id.snackbar_text)).check(
+        onView(withId(SystemIds.SNACKBAR_TEXT)).check(
             matches(
                 ViewMatchers.withEffectiveVisibility(
                     ViewMatchers.Visibility.VISIBLE
