@@ -1,0 +1,6 @@
+İyileştirmeler:
+* Tercihlere dil seçimi için ayar eklendi.
+* Alışveriş listesi maddelerine ürün notu ipucu eklendi.
+
+Hata düzeltmeleri:
+* Ürün düzenleme sayfasında not sekmesinde ekran kaydırma sorunu giderildi.
