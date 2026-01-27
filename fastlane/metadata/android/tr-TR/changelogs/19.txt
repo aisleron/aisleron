@@ -1,4 +1,6 @@
 İyileştirmeler:
-* Hakkında sayfasına bir Katkı bölümü eklendi..
+* Hakkında sayfasına bir Katkı bölümü eklendi.
+* Türkçe çeviriler eklendi.
 
 Hata düzeltmeleri:
+* Play Store paketinden dil kaynaklarının çıkartılması sorunu giderildi.
