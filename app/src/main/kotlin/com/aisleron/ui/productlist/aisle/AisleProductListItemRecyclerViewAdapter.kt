@@ -15,31 +15,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.ui.shoppinglist
+package com.aisleron.ui.productlist.aisle
 
 import android.annotation.SuppressLint
 import android.graphics.Typeface
 import android.os.Handler
 import android.os.Looper
-import android.text.InputFilter
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.MotionEvent
-import android.view.View
 import android.view.View.OnTouchListener
 import android.view.ViewConfiguration
 import android.view.ViewGroup
-import android.view.inputmethod.EditorInfo
-import android.widget.CheckBox
-import android.widget.EditText
-import android.widget.ImageButton
-import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.view.isVisible
-import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.aisleron.R
 import com.aisleron.databinding.FragmentAisleListItemBinding
@@ -48,15 +37,16 @@ import com.aisleron.databinding.FragmentProductListItemBinding
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.preferences.NoteHint
 import com.aisleron.domain.preferences.TrackingMode
-import java.text.DecimalFormat
+import com.aisleron.ui.productlist.EmptyListItemViewHolder
+import com.aisleron.ui.productlist.ProductListItemListener
+import com.aisleron.ui.productlist.ProductListItemViewHolder
+import com.aisleron.ui.productlist.ProductShoppingListItem
+import com.aisleron.ui.productlist.ShoppingListItem
+import com.aisleron.ui.productlist.ShoppingListItemMoveCallbackListener
 import java.util.Collections
 
-/**
- * [RecyclerView.Adapter] that can display a [ShoppingListItem].
- *
- */
-class ShoppingListItemRecyclerViewAdapter(
-    private val listener: ShoppingListItemListener,
+class AisleProductListItemRecyclerViewAdapter(
+    private val listener: AisleProductListItemListener,
     private val defaultTrackingMode: TrackingMode,
     private val defaultUnitOfMeasure: String,
     private val listFilter: FilterType,
@@ -106,7 +96,9 @@ class ShoppingListItemRecyclerViewAdapter(
             ShoppingListItem.ItemType.PRODUCT -> ProductListItemViewHolder(
                 FragmentProductListItemBinding.inflate(
                     LayoutInflater.from(parent.context), parent, false
-                )
+                ),
+
+                listener, defaultTrackingMode, defaultUnitOfMeasure, noteHint, listFilter
             )
 
             ShoppingListItem.ItemType.EMPTY_LIST -> EmptyListItemViewHolder(
@@ -239,140 +231,8 @@ class ShoppingListItemRecyclerViewAdapter(
         }
     }
 
-    inner class ProductListItemViewHolder(binding: FragmentProductListItemBinding) :
-        ViewHolder(binding.root) {
-        private val contentView: TextView = binding.txtProductName
-        private val inStockView: CheckBox = binding.chkInStock
-        private val qtySelector: LinearLayout = binding.stpQtySelector
-        private val decQtyButton: ImageButton = binding.btnQtyDec
-        private val incQtyButton: ImageButton = binding.btnQtyInc
-        private val qtyEdit: EditText = binding.edtQty
-        private val noteButton: ImageButton = binding.btnNote
-        private val noteLayout: LinearLayout = binding.llProductNotePreview
-        private val noteTextView: TextView = binding.txtProductNotePreview
-        private val rootView = binding.root
-
-        private var qtyWatcher: TextWatcher? = null
-
-        fun bind(item: ProductShoppingListItem) {
-            val trackingMode = when (item.trackingMode) {
-                TrackingMode.DEFAULT -> defaultTrackingMode
-                else -> item.trackingMode
-            }
-
-            rootView.isSelected = item.selected
-
-            inStockView.isChecked = item.inStock
-            inStockView.isVisible = trackingMode in setOf(
-                TrackingMode.CHECKBOX,
-                TrackingMode.CHECKBOX_QUANTITY
-            ) || (listFilter == FilterType.ALL)
-
-            inStockView.setOnClickListener { _ ->
-                listener.onProductStatusChange(item, inStockView.isChecked)
-            }
-
-            inStockView.setOnLongClickListener { _ -> itemView.performLongClick() }
-
-            // Remove any old watcher
-            qtyWatcher?.let {
-                qtyEdit.removeTextChangedListener(it)
-                qtyWatcher = null
-            }
-
-            qtyEdit.setText(formatQty(item.qtyNeeded))
-            qtyEdit.setSelection(qtyEdit.text?.length ?: 0)
-            qtyEdit.hint = item.unitOfMeasure.ifEmpty { defaultUnitOfMeasure }
-
-            val qtyIncrement = if (item.qtyIncrement > 0) item.qtyIncrement else 1.0
-
-            // Add a new watcher and keep reference
-            qtyWatcher = qtyEdit.doAfterTextChanged { editable ->
-                val newQty = editable?.toString()?.toDoubleOrNull() ?: 0.0
-                listener.onProductQuantityChange(item, newQty)
-            }
-
-            qtyEdit.setOnEditorActionListener { v, actionId, _ ->
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    v.clearFocus()
-                }
-
-                false
-            }
-
-            qtySelector.isVisible = trackingMode in setOf(
-                TrackingMode.QUANTITY,
-                TrackingMode.CHECKBOX_QUANTITY
-            )
-
-            decQtyButton.setOnClickListener {
-                val currentQty = (qtyEdit.text.toString().toDoubleOrNull() ?: 0.0)
-                val newQty = maxOf(currentQty - qtyIncrement, 0.0)
-                qtyEdit.setText(formatQty(newQty))
-            }
-
-            incQtyButton.setOnClickListener {
-                val maxLength = qtyEdit.filters
-                    .filterIsInstance<InputFilter.LengthFilter>()
-                    .firstOrNull()
-                    ?.max ?: Int.MAX_VALUE
-
-                val currentQty = (qtyEdit.text.toString().toDoubleOrNull() ?: 0.0)
-                val newQty = currentQty + qtyIncrement
-                val formattedQty = formatQty(newQty)
-
-                if (formattedQty.length <= maxLength) {
-                    qtyEdit.setText(formattedQty)
-                }
-            }
-
-            val hasNote = item.noteId != null && (item.noteText ?: "").isNotBlank()
-            noteLayout.isVisible =
-                hasNote && noteHint == NoteHint.SUMMARY
-
-            val itemName = item.name +
-                    if (noteHint == NoteHint.INDICATOR && hasNote)
-                        " *"
-                    else
-                        ""
-
-            contentView.text = itemName
-
-            noteTextView.text = item.noteText
-            noteTextView.setOnClickListener {
-                listener.onShowNoteClick(item)
-            }
-
-            noteButton.isVisible =
-                hasNote && noteHint == NoteHint.BUTTON
-
-            noteButton.setOnClickListener {
-                listener.onShowNoteClick(item)
-            }
-        }
-
-        private fun formatQty(qty: Double): String =
-            if (qty > 0.0)
-                DecimalFormat("0.###").format(qty)
-            else
-                ""
-    }
-
-    class EmptyListItemViewHolder(binding: FragmentEmptyListItemBinding) :
-        ViewHolder(binding.root)
-
-    interface ShoppingListItemListener {
-        fun onClick(item: ShoppingListItem, view: View)
-        fun onProductStatusChange(item: ProductShoppingListItem, inStock: Boolean)
-        fun onProductQuantityChange(item: ProductShoppingListItem, quantity: Double?)
-        fun onListPositionChanged(item: ShoppingListItem, precedingItem: ShoppingListItem?)
-        fun onLongClick(item: ShoppingListItem, view: View): Boolean
-        fun onMoved(item: ShoppingListItem)
+    interface AisleProductListItemListener : ProductListItemListener {
         fun onAisleExpandToggle(item: AisleShoppingListItem, expanded: Boolean)
-        fun onDragStart(viewHolder: ViewHolder)
-        fun onMove(item: ShoppingListItem)
-        fun hasSelectedItems(): Boolean
-        fun onShowNoteClick(item: ShoppingListItem)
     }
 
     override fun onRowMove(viewHolder: ViewHolder, target: ViewHolder) {

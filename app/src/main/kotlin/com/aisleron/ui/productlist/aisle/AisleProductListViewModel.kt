@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.ui.shoppinglist
+package com.aisleron.ui.productlist.aisle
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -41,6 +41,11 @@ import com.aisleron.domain.product.usecase.UpdateProductStatusUseCase
 import com.aisleron.domain.productlist.ProductListFilter
 import com.aisleron.domain.productlist.usecase.GetAisleProductListUseCase
 import com.aisleron.ui.bundles.AisleListEntry
+import com.aisleron.ui.productlist.EmptyShoppingListItem
+import com.aisleron.ui.productlist.ProductShoppingListItem
+import com.aisleron.ui.productlist.ProductShoppingListItemViewModel
+import com.aisleron.ui.productlist.ShoppingListItem
+import com.aisleron.ui.productlist.ShoppingListItemViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -67,7 +72,7 @@ import kotlin.collections.listOf
 import kotlin.coroutines.cancellation.CancellationException
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-class ShoppingListViewModel(
+class AisleProductListViewModel(
     private val getAisleProductListUseCase: GetAisleProductListUseCase,
     private val updateProductStatusUseCase: UpdateProductStatusUseCase,
     private val updateAisleProductRankUseCase: UpdateAisleProductRankUseCase,
@@ -94,7 +99,7 @@ class ShoppingListViewModel(
     private val _aislesForLocation = MutableStateFlow<List<AisleListEntry>>(emptyList())
     val aislesForLocation: StateFlow<List<AisleListEntry>> = _aislesForLocation
 
-    private val _events = MutableSharedFlow<ShoppingListEvent>()
+    private val _events = MutableSharedFlow<UiEvent>()
     val events = _events.asSharedFlow()
 
     private val _locationId = MutableStateFlow<Int?>(null)
@@ -111,36 +116,36 @@ class ShoppingListViewModel(
 
     private val _selectedSignatures = MutableStateFlow<Set<SelectedSignature>>(emptySet())
 
-    private data class ShoppingListStateParams(
+    private data class UiStateParams(
         val id: Int?,
         val query: String,
         val filters: ProductListFilter?,
         val selections: Set<SelectedSignature>
     )
 
-    val shoppingListUiState: StateFlow<ShoppingListUiState> = combine(
+    val uiState: StateFlow<UiState> = combine(
         _locationId,
         _searchQuery.debounce(debounceTime).distinctUntilChanged(),
         _productListFilters,
         _selectedSignatures
     ) { id, query, filters, selections ->
-        ShoppingListStateParams(id, query, filters, selections)
+        UiStateParams(id, query, filters, selections)
     }.flatMapLatest { pkg ->
         val (id, query, filters, selections) = pkg
 
         if (id == null || filters == null) {
-            flowOf(ShoppingListUiState.Empty)
+            flowOf(UiState.Empty)
         } else {
             val combinedFilter = filters.copy(productNameQuery = query.trim())
 
             getAisleProductListUseCase(id, combinedFilter)
                 .map { collectedLocation ->
-                    val listItems = mapShoppingList(
+                    val listItems = mapProductList(
                         collectedLocation, combinedFilter.productNameQuery.isNotBlank(), selections
                     )
 
-                    val state: ShoppingListUiState = ShoppingListUiState.Updated(
-                        shoppingList = listItems,
+                    val state: UiState = UiState.Updated(
+                        productList = listItems,
                         locationName = collectedLocation?.name ?: "",
                         locationType = collectedLocation?.type ?: LocationType.HOME,
                         productFilter = combinedFilter.productFilter ?: FilterType.NEEDED
@@ -148,7 +153,7 @@ class ShoppingListViewModel(
 
                     state
                 }
-                .onStart { emit(ShoppingListUiState.Loading) }
+                .onStart { emit(UiState.Loading) }
                 .catch { e ->
                     emit(mapToErrorState(e))
                 }
@@ -156,7 +161,7 @@ class ShoppingListViewModel(
     }.stateIn(
         scope = coroutineScope,
         started = SharingStarted.WhileSubscribed(5000),
-        initialValue = ShoppingListUiState.Loading
+        initialValue = UiState.Loading
     )
 
     val loyaltyCard: StateFlow<LoyaltyCard?> = _locationId
@@ -175,8 +180,8 @@ class ShoppingListViewModel(
         )
 
     val selectedListItems: List<ShoppingListItem>
-        get() = (shoppingListUiState.value as? ShoppingListUiState.Updated)
-            ?.shoppingList?.filter { it.selected } ?: emptyList()
+        get() = (uiState.value as? UiState.Updated)
+            ?.productList?.filter { it.selected } ?: emptyList()
 
     private data class QtyUpdate(val itemId: Int, val quantity: Double)
 
@@ -204,7 +209,7 @@ class ShoppingListViewModel(
 
     fun hasSelectedItems(): Boolean = selectedListItems.isNotEmpty()
 
-    private fun mapShoppingList(
+    private fun mapProductList(
         location: Location?,
         showAllProducts: Boolean,
         selections: Set<SelectedSignature>
@@ -256,15 +261,6 @@ class ShoppingListViewModel(
                     }
             }
         }?.toMutableList() ?: mutableListOf()
-
-        filteredList.sortWith(
-            compareBy(
-                { it.aisleRank },
-                { it.aisleId },
-                { it.itemType },
-                { it.rank },
-                { it.name })
-        )
 
         if (filteredList.isEmpty()) {
             filteredList.add(EmptyShoppingListItem())
@@ -398,7 +394,7 @@ class ShoppingListViewModel(
         try {
             block()
         } catch (e: CancellationException) {
-            Log.e(TAG, "Cancellation")
+            Log.d(this::class.java.simpleName, "Cancellation")
             throw e // propagate cancellation
         } catch (e: Exception) {
             val event = mapToErrorEvent(e)
@@ -414,14 +410,14 @@ class ShoppingListViewModel(
         }
     }
 
-    private fun mapToErrorState(e: Throwable): ShoppingListUiState.Error {
+    private fun mapToErrorState(e: Throwable): UiState.Error {
         val (code, message) = getErrorInfo(e)
-        return ShoppingListUiState.Error(code, message)
+        return UiState.Error(code, message)
     }
 
-    private fun mapToErrorEvent(e: Throwable): ShoppingListEvent.ShowError {
+    private fun mapToErrorEvent(e: Throwable): UiEvent.ShowError {
         val (code, message) = getErrorInfo(e)
-        return ShoppingListEvent.ShowError(code, message)
+        return UiEvent.ShowError(code, message)
     }
 
     fun getSelectedItemAisleId(): Int =
@@ -431,7 +427,7 @@ class ShoppingListViewModel(
         loyaltyCard.value ?: return
 
         coroutineScope.launchHandling {
-            _events.emit(ShoppingListEvent.NavigateToLoyaltyCard(loyaltyCard.value))
+            _events.emit(UiEvent.NavigateToLoyaltyCard(loyaltyCard.value))
         }
     }
 
@@ -439,35 +435,31 @@ class ShoppingListViewModel(
         _locationId.value ?: return
 
         coroutineScope.launchHandling {
-            _events.emit(ShoppingListEvent.NavigateToEditShop(_locationId.value))
+            _events.emit(UiEvent.NavigateToEditShop(_locationId.value))
         }
     }
 
-    sealed class ShoppingListUiState {
-        data object Empty : ShoppingListUiState()
-        data object Loading : ShoppingListUiState()
+    sealed class UiState {
+        data object Empty : UiState()
+        data object Loading : UiState()
         data class Error(
             val errorCode: AisleronException.ExceptionCode, val errorMessage: String?
-        ) : ShoppingListUiState()
+        ) : UiState()
 
         data class Updated(
-            val shoppingList: List<ShoppingListItem>,
+            val productList: List<ShoppingListItem>,
             val locationName: String,
             val locationType: LocationType,
             val productFilter: FilterType
-        ) : ShoppingListUiState()
+        ) : UiState()
     }
 
-    sealed class ShoppingListEvent {
+    sealed class UiEvent {
         data class ShowError(
             val errorCode: AisleronException.ExceptionCode, val errorMessage: String?
-        ) : ShoppingListEvent()
+        ) : UiEvent()
 
-        data class NavigateToLoyaltyCard(val loyaltyCard: LoyaltyCard?) : ShoppingListEvent()
-        data class NavigateToEditShop(val id: Int?) : ShoppingListEvent()
-    }
-
-    companion object {
-        const val TAG = "ShoppingListViewModel"
+        data class NavigateToLoyaltyCard(val loyaltyCard: LoyaltyCard?) : UiEvent()
+        data class NavigateToEditShop(val id: Int?) : UiEvent()
     }
 }

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.ui.shoppinglist
+package com.aisleron.ui.productlist
 
 import com.aisleron.di.KoinTestRule
 import com.aisleron.di.daoTestModule
@@ -36,6 +36,7 @@ import com.aisleron.domain.product.ProductRepository
 import com.aisleron.domain.preferences.TrackingMode
 import com.aisleron.domain.product.usecase.RemoveProductUseCase
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
+import com.aisleron.ui.productlist.aisle.AisleShoppingListItemViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest

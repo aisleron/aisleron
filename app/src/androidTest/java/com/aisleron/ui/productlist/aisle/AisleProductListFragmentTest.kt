@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.ui.shoppinglist
+package com.aisleron.ui.productlist.aisle
 
 import android.content.Context
 import android.content.Intent
@@ -118,11 +118,11 @@ import kotlin.test.assertNotEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-class ShoppingListFragmentTest : KoinTest {
+class AisleProductListFragmentTest : KoinTest {
     private lateinit var bundler: Bundler
     private lateinit var applicationTitleUpdateListener: ApplicationTitleUpdateListenerTestImpl
     private lateinit var fabHandler: FabHandlerTestImpl
-    private lateinit var activityFragment: ShoppingListFragment
+    private lateinit var activityFragment: AisleProductListFragment
 
     @get:Rule
     val koinTestRule = KoinTestRule(
@@ -158,7 +158,7 @@ class ShoppingListFragmentTest : KoinTest {
 
             val fragmentArgs = activity.intent.getBundleExtra("fragment_args") ?: Bundle()
 
-            activityFragment = ShoppingListFragment(
+            activityFragment = AisleProductListFragment(
                 applicationTitleUpdateListener,
                 fabHandler,
                 shoppingListPreferencesTestImpl ?: ShoppingListPreferencesTestImpl(),
@@ -181,12 +181,12 @@ class ShoppingListFragmentTest : KoinTest {
         bundle: Bundle,
         shoppingListPreferencesTestImpl: ShoppingListPreferencesTestImpl? = null,
         loyaltyCardProvider: LoyaltyCardProvider? = null
-    ): FragmentScenario<ShoppingListFragment> {
-        val fragmentScenario = launchFragmentInContainer<ShoppingListFragment>(
+    ): FragmentScenario<AisleProductListFragment> {
+        val fragmentScenario = launchFragmentInContainer<AisleProductListFragment>(
             fragmentArgs = bundle,
             themeResId = R.style.Theme_Aisleron,
             instantiate = {
-                ShoppingListFragment(
+                AisleProductListFragment(
                     applicationTitleUpdateListener,
                     fabHandler,
                     shoppingListPreferencesTestImpl ?: ShoppingListPreferencesTestImpl(),
@@ -214,7 +214,7 @@ class ShoppingListFragmentTest : KoinTest {
     }
 
     @Test
-    fun onCreateShoppingListFragment_HomeFilterIsInStock_AppTitleIsInStock() = runTest {
+    fun onCreate_HomeFilterIsInStock_AppTitleIsInStock() = runTest {
         val location = getLocation(LocationType.HOME)
         val bundle = bundler.makeShoppingListBundle(location.id, FilterType.IN_STOCK)
         val scenario = getFragmentScenario(bundle)
@@ -227,7 +227,7 @@ class ShoppingListFragmentTest : KoinTest {
     }
 
     @Test
-    fun onCreateShoppingListFragment_HomeFilterIsNeeded_AppTitleIsNeeded() = runTest {
+    fun onCreate_HomeFilterIsNeeded_AppTitleIsNeeded() = runTest {
         val location = getLocation(LocationType.HOME)
         val bundle = bundler.makeShoppingListBundle(location.id, FilterType.NEEDED)
         val scenario = getFragmentScenario(bundle)
@@ -240,7 +240,7 @@ class ShoppingListFragmentTest : KoinTest {
     }
 
     @Test
-    fun onCreateShoppingListFragment_HomeFilterIsAll_AppTitleIsShoppingList() = runTest {
+    fun onCreate_HomeFilterIsAll_AppTitleIsShoppingList() = runTest {
         val location = getLocation(LocationType.HOME)
         val bundle = bundler.makeShoppingListBundle(location.id, FilterType.ALL)
         val scenario = getFragmentScenario(bundle)
@@ -253,7 +253,7 @@ class ShoppingListFragmentTest : KoinTest {
     }
 
     @Test
-    fun onCreateShoppingListFragment_LocationTypeIsShop_AppTitleIsShopName() = runTest {
+    fun onCreate_LocationTypeIsShop_AppTitleIsShopName() = runTest {
         val location = getLocation(LocationType.SHOP)
         val bundle = bundler.makeShoppingListBundle(location.id, location.defaultFilter)
         val scenario = getFragmentScenario(bundle)
@@ -266,7 +266,7 @@ class ShoppingListFragmentTest : KoinTest {
     }
 
     @Test
-    fun onCreateShoppingListFragment_BundleIsAttributes_FragmentCreated() = runTest {
+    fun onCreate_BundleIsAttributes_FragmentCreated() = runTest {
         val location = getLocation(LocationType.HOME)
         val bundle = bundler.makeShoppingListBundle(location.id, location.defaultFilter)
         val scenario = getFragmentScenario(bundle)
@@ -279,7 +279,7 @@ class ShoppingListFragmentTest : KoinTest {
     }
 
     @Test
-    fun onCreateShoppingListFragment_ListIsEmpty_ShowEmptyListItem() = runTest {
+    fun onCreate_ListIsEmpty_ShowEmptyListItem() = runTest {
         val location = Location(
             id = 0,
             type = LocationType.SHOP,
@@ -1640,10 +1640,10 @@ class ShoppingListFragmentTest : KoinTest {
 
         scenario.onActivity { a ->
             val fragment = a.supportFragmentManager.fragments
-                .first { it is ShoppingListFragment } as ShoppingListFragment
+                .first { it is AisleProductListFragment } as AisleProductListFragment
 
             fragment.childFragmentManager.setFragmentResult(
-                ShoppingListFragment.AISLE_PICKER_REQUEST_KEY, result
+                AisleProductListFragment.AISLE_PICKER_REQUEST_KEY, result
             )
         }
 
@@ -1672,10 +1672,10 @@ class ShoppingListFragmentTest : KoinTest {
 
         scenario.onActivity { a ->
             val fragment = a.supportFragmentManager.fragments
-                .first { it is ShoppingListFragment } as ShoppingListFragment
+                .first { it is AisleProductListFragment } as AisleProductListFragment
 
             fragment.childFragmentManager.setFragmentResult(
-                ShoppingListFragment.AISLE_PICKER_REQUEST_KEY, result
+                AisleProductListFragment.AISLE_PICKER_REQUEST_KEY, result
             )
         }
 
@@ -1725,10 +1725,10 @@ class ShoppingListFragmentTest : KoinTest {
 
         scenario.onActivity { a ->
             val fragment = a.supportFragmentManager.fragments
-                .first { it is ShoppingListFragment } as ShoppingListFragment
+                .first { it is AisleProductListFragment } as AisleProductListFragment
 
             fragment.childFragmentManager.setFragmentResult(
-                ShoppingListFragment.ADD_AISLE_REQUEST_KEY, result
+                AisleProductListFragment.ADD_AISLE_REQUEST_KEY, result
             )
         }
 

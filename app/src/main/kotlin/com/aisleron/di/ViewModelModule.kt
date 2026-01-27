@@ -25,14 +25,14 @@ import com.aisleron.ui.product.ProductViewModel
 import com.aisleron.ui.settings.SettingsViewModel
 import com.aisleron.ui.shop.ShopViewModel
 import com.aisleron.ui.shoplist.ShopListViewModel
-import com.aisleron.ui.shoppinglist.ShoppingListViewModel
+import com.aisleron.ui.productlist.aisle.AisleProductListViewModel
 import com.aisleron.ui.welcome.WelcomeViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val viewModelModule = module {
     viewModel {
-        ShoppingListViewModel(
+        AisleProductListViewModel(
             getAisleProductListUseCase = get(),
             updateProductStatusUseCase = get(),
             updateAisleProductRankUseCase = get(),

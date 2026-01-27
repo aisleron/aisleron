@@ -25,7 +25,7 @@ import com.aisleron.ui.product.ProductViewModel
 import com.aisleron.ui.settings.SettingsViewModel
 import com.aisleron.ui.shop.ShopViewModel
 import com.aisleron.ui.shoplist.ShopListViewModel
-import com.aisleron.ui.shoppinglist.ShoppingListViewModel
+import com.aisleron.ui.productlist.aisle.AisleProductListViewModel
 import com.aisleron.ui.welcome.WelcomeViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
@@ -36,7 +36,7 @@ import org.koin.dsl.module
 @OptIn(ExperimentalCoroutinesApi::class)
 val viewModelTestModule = module {
     viewModel {
-        ShoppingListViewModel(
+        AisleProductListViewModel(
             getAisleProductListUseCase = get(),
             updateProductStatusUseCase = get(),
             updateAisleProductRankUseCase = get(),

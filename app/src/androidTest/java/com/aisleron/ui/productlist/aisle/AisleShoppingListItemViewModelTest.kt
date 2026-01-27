@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.ui.shoppinglist
+package com.aisleron.ui.productlist.aisle
 
 import com.aisleron.di.KoinTestRule
 import com.aisleron.di.daoTestModule

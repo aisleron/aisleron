@@ -15,9 +15,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.ui.shoppinglist
+package com.aisleron.ui.productlist
 
-interface ShoppingListItemViewModel {
-    suspend fun remove()
-    suspend fun updateRank(precedingItem: ShoppingListItem?)
+import com.aisleron.domain.preferences.TrackingMode
+
+interface ProductShoppingListItem : ShoppingListItem {
+    val inStock: Boolean
+    val qtyNeeded: Double
+    val noteId: Int?
+    val noteText: String?
+    val qtyIncrement: Double
+    val unitOfMeasure: String
+    val trackingMode: TrackingMode
+
+    override val itemType: ShoppingListItem.ItemType
+        get() = ShoppingListItem.ItemType.PRODUCT
 }

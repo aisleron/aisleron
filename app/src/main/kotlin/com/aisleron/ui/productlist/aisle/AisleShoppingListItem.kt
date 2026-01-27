@@ -15,19 +15,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.ui.shoppinglist
+package com.aisleron.ui.productlist.aisle
 
-import com.aisleron.domain.preferences.TrackingMode
+import com.aisleron.ui.productlist.ShoppingListItem
 
-interface ProductShoppingListItem : ShoppingListItem {
-    val inStock: Boolean
-    val qtyNeeded: Double
-    val noteId: Int?
-    val noteText: String?
-    val qtyIncrement: Double
-    val unitOfMeasure: String
-    val trackingMode: TrackingMode
-
+interface AisleShoppingListItem : ShoppingListItem {
+    var childCount: Int
+    val locationId: Int
+    val isDefault: Boolean
+    val expanded: Boolean
+    override val aisleId: Int
+        get() = id
     override val itemType: ShoppingListItem.ItemType
-        get() = ShoppingListItem.ItemType.PRODUCT
+        get() = ShoppingListItem.ItemType.AISLE
+    override val aisleRank: Int
+        get() = rank
 }

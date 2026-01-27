@@ -24,8 +24,8 @@
 
     <fragment
         android:id="@+id/nav_in_stock"
-        android:name="com.aisleron.ui.shoppinglist.ShoppingListFragment"
-        tools:layout="@layout/fragment_shopping_list">
+        android:name="com.aisleron.ui.productlist.aisle.AisleProductListFragment"
+        tools:layout="@layout/fragment_aisle_product_list">
         <argument
             android:name="locationId"
             app:argType="integer"
@@ -38,8 +38,8 @@
 
     <fragment
         android:id="@+id/nav_needed"
-        android:name="com.aisleron.ui.shoppinglist.ShoppingListFragment"
-        tools:layout="@layout/fragment_shopping_list">
+        android:name="com.aisleron.ui.productlist.aisle.AisleProductListFragment"
+        tools:layout="@layout/fragment_aisle_product_list">
         <argument
             android:name="locationId"
             app:argType="integer"
@@ -52,8 +52,8 @@
 
     <fragment
         android:id="@+id/nav_all_items"
-        android:name="com.aisleron.ui.shoppinglist.ShoppingListFragment"
-        tools:layout="@layout/fragment_shopping_list">
+        android:name="com.aisleron.ui.productlist.aisle.AisleProductListFragment"
+        tools:layout="@layout/fragment_aisle_product_list">
         <argument
             android:name="locationId"
             app:argType="integer"
@@ -66,8 +66,8 @@
 
     <fragment
         android:id="@+id/nav_shopping_list"
-        android:name="com.aisleron.ui.shoppinglist.ShoppingListFragment"
-        tools:layout="@layout/fragment_shopping_list">
+        android:name="com.aisleron.ui.productlist.aisle.AisleProductListFragment"
+        tools:layout="@layout/fragment_aisle_product_list">
         <argument
             android:name="locationId"
             app:argType="integer"

@@ -15,21 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.ui.shoppinglist
+package com.aisleron.ui.productlist
 
-
-
-data class EmptyShoppingListItem(
-    override val rank: Int = 1,
-    override val name: String = ""
-) : ShoppingListItem {
-    override val aisleRank: Int get() = rank
-    override val id: Int get() = 0
-    override val aisleId: Int get() = id
-    override val selected: Boolean get() = false
-    override fun copyWith(selected: Boolean): EmptyShoppingListItem =
-        this.copyWith(selected = selected)
-
-    override val itemType: ShoppingListItem.ItemType
-        get() = ShoppingListItem.ItemType.EMPTY_LIST
+interface ShoppingListItemViewModel {
+    suspend fun remove()
+    suspend fun updateRank(precedingItem: ShoppingListItem?)
 }

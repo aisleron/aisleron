@@ -15,17 +15,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.ui.shoppinglist
+package com.aisleron.ui.productlist
 
-interface AisleShoppingListItem : ShoppingListItem {
-    var childCount: Int
-    val locationId: Int
-    val isDefault: Boolean
-    val expanded: Boolean
-    override val aisleId: Int
-        get() = id
-    override val itemType: ShoppingListItem.ItemType
-        get() = ShoppingListItem.ItemType.AISLE
-    override val aisleRank: Int
-        get() = rank
+interface ShoppingListItem {
+    val aisleRank: Int
+    val rank: Int
+    val id: Int
+    val name: String
+    val aisleId: Int
+    val itemType: ItemType
+
+    val selected: Boolean
+
+    override fun equals(other: Any?): Boolean
+
+    fun copyWith(selected: Boolean): ShoppingListItem
+
+    enum class ItemType {
+        AISLE, PRODUCT, EMPTY_LIST
+    }
 }
+

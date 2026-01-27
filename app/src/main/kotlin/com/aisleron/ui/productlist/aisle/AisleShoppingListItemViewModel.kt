@@ -15,12 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.ui.shoppinglist
+package com.aisleron.ui.productlist.aisle
 
 import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.aisle.usecase.GetAisleUseCase
 import com.aisleron.domain.aisle.usecase.RemoveAisleUseCase
 import com.aisleron.domain.aisle.usecase.UpdateAisleRankUseCase
+import com.aisleron.ui.productlist.ShoppingListItem
+import com.aisleron.ui.productlist.ShoppingListItemViewModel
 
 data class AisleShoppingListItemViewModel(
     override val rank: Int,
