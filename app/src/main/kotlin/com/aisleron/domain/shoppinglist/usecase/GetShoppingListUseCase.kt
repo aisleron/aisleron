@@ -52,7 +52,9 @@ class GetShoppingListUseCaseImpl(
                     aisle.copy(
                         products = aisle.products.filter { ap ->
                             isValidAisleProduct(ap, productFilter, productNameQuery)
-                        }
+                        }.sortedWith(compareBy<AisleProduct> { it.rank }
+                            .thenBy(String.CASE_INSENSITIVE_ORDER) { it.product.name }
+                        )
                     )
                 }
 
@@ -60,7 +62,9 @@ class GetShoppingListUseCaseImpl(
                     isValidAisle(
                         aisle, location.showDefaultAisle, productNameQuery, filter.showEmptyAisles
                     )
-                }
+                }.sortedWith(compareBy<Aisle> { it.rank }
+                    .thenBy(String.CASE_INSENSITIVE_ORDER) { it.name }
+                )
 
                 val noteIds = filteredAisles
                     .flatMap { it.products }

@@ -26,6 +26,7 @@ import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.aisle.AisleRepository
 import com.aisleron.domain.aisle.usecase.GetAisleUseCase
 import com.aisleron.domain.aisle.usecase.RemoveAisleUseCase
+import com.aisleron.domain.aisle.usecase.UpdateAisleExpandedUseCase
 import com.aisleron.domain.aisle.usecase.UpdateAisleRankUseCase
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
@@ -52,17 +53,12 @@ class AisleShoppingListItemViewModelTest : KoinTest {
 
     private fun getAisleShoppingListItemViewModel(existingAisle: Aisle): AisleShoppingListItemViewModel {
         return AisleShoppingListItemViewModel(
-            rank = existingAisle.rank,
-            id = existingAisle.id,
-            name = existingAisle.name,
-            isDefault = existingAisle.isDefault,
-            childCount = 0,
-            locationId = existingAisle.locationId,
-            expanded = existingAisle.expanded,
+            aisle = existingAisle,
             selected = false,
             updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
             getAisleUseCase = get<GetAisleUseCase>(),
-            removeAisleUseCase = get<RemoveAisleUseCase>()
+            removeAisleUseCase = get<RemoveAisleUseCase>(),
+            updateAisleExpandedUseCase = get<UpdateAisleExpandedUseCase>()
         )
     }
 
@@ -85,20 +81,17 @@ class AisleShoppingListItemViewModelTest : KoinTest {
 
     @Test
     fun removeItem_ItemIsInvalidAisle_NoAisleRemoved() = runTest {
-        val shoppingListItem = AisleShoppingListItemViewModel(
+        val aisle = Aisle(
             rank = 1000,
             id = -1,
             name = "Dummy",
             isDefault = false,
-            childCount = 0,
             locationId = -1,
             expanded = true,
-            selected = false,
-            updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
-            getAisleUseCase = get<GetAisleUseCase>(),
-            removeAisleUseCase = get<RemoveAisleUseCase>()
+            products = emptyList()
         )
 
+        val shoppingListItem = getAisleShoppingListItemViewModel(aisle)
         val aisleRepository = get<AisleRepository>()
         val aisleCountBefore = aisleRepository.getAll().count()
 
@@ -135,13 +128,41 @@ class AisleShoppingListItemViewModelTest : KoinTest {
         Assert.assertEquals(1, updatedAisle?.rank)
     }
 
+    private suspend fun updateExpandedArrangeActAssert(expanded: Boolean) {
+        val aisle = getAisle().copy(expanded = !expanded)
+        val aisleRepo = get<AisleRepository>()
+        aisleRepo.update(aisle)
+
+        val shoppingListItem = getAisleShoppingListItemViewModel(aisle)
+
+        shoppingListItem.updateExpanded(expanded)
+
+        val updatedAisle = aisleRepo.get(aisle.id)
+        Assert.assertEquals(expanded, updatedAisle?.expanded)
+    }
+
     @Test
-    fun copyWith_SelectedValue_SelectedUpdated() = runTest {
-        val shoppingListItem = getAisleShoppingListItemViewModel(getAisle())
-        val selectedBefore = shoppingListItem.selected
+    fun updateAisleExpanded_ExpandedTrue_AisleUpdatedToExpanded() = runTest {
+        updateExpandedArrangeActAssert(true)
+    }
 
-        val updatedShoppingListItem = shoppingListItem.copyWith(selected = !selectedBefore)
+    @Test
+    fun updateAisleExpanded_ExpandedFalse_AisleUpdatedToNotExpanded() = runTest {
+        updateExpandedArrangeActAssert(false)
+    }
 
-        Assert.assertTrue(updatedShoppingListItem.selected != selectedBefore)
+    @Test
+    fun onCreate_PropertiesInitializedCorrectly() = runTest {
+        val existingAisle = getAisle()
+
+        val shoppingListItem = getAisleShoppingListItemViewModel(existingAisle)
+
+        Assert.assertEquals(existingAisle.id, shoppingListItem.id)
+        Assert.assertEquals(existingAisle.name, shoppingListItem.name)
+        Assert.assertEquals(existingAisle.rank, shoppingListItem.rank)
+        Assert.assertEquals(existingAisle.locationId, shoppingListItem.locationId)
+        Assert.assertEquals(existingAisle.isDefault, shoppingListItem.isDefault)
+        Assert.assertEquals(existingAisle.expanded, shoppingListItem.expanded)
+        Assert.assertEquals(existingAisle.products.count(), shoppingListItem.childCount)
     }
 }

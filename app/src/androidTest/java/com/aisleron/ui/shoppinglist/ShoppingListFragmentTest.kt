@@ -63,6 +63,7 @@ import com.aisleron.AppCompatActivityTestImpl
 import com.aisleron.R
 import com.aisleron.di.KoinTestRule
 import com.aisleron.di.daoTestModule
+import com.aisleron.di.factoryModule
 import com.aisleron.di.generalTestModule
 import com.aisleron.di.repositoryModule
 import com.aisleron.di.useCaseModule
@@ -131,7 +132,8 @@ class ShoppingListFragmentTest : KoinTest {
             viewModelTestModule,
             repositoryModule,
             useCaseModule,
-            generalTestModule
+            generalTestModule,
+            factoryModule
         )
     )
 

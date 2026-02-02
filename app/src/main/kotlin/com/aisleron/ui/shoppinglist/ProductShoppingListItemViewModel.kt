@@ -18,29 +18,34 @@
 package com.aisleron.ui.shoppinglist
 
 import com.aisleron.domain.aisleproduct.AisleProduct
+import com.aisleron.domain.aisleproduct.usecase.ChangeProductAisleUseCase
 import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductRankUseCase
-import com.aisleron.domain.product.Product
 import com.aisleron.domain.preferences.TrackingMode
 import com.aisleron.domain.product.usecase.RemoveProductUseCase
+import com.aisleron.domain.product.usecase.UpdateProductQtyNeededUseCase
+import com.aisleron.domain.product.usecase.UpdateProductStatusUseCase
 
-data class ProductShoppingListItemViewModel(
+class ProductShoppingListItemViewModel(
+    private val aisleProduct: AisleProduct,
     override val aisleRank: Int,
-    override val rank: Int,
-    override val id: Int,
-    override val name: String,
-    override val aisleId: Int,
     override val selected: Boolean,
-    override val inStock: Boolean,
-    override val qtyNeeded: Double,
-    override val noteId: Int?,
-    override val noteText: String?,
-    private val aisleProductId: Int,
-    override val qtyIncrement: Double,
-    override val unitOfMeasure: String,
-    override val trackingMode: TrackingMode,
     private val updateAisleProductRankUseCase: UpdateAisleProductRankUseCase,
-    private val removeProductUseCase: RemoveProductUseCase
+    private val removeProductUseCase: RemoveProductUseCase,
+    private val updateProductStatusUseCase: UpdateProductStatusUseCase,
+    private val updateProductQtyNeededUseCase: UpdateProductQtyNeededUseCase,
+    private val changeProductAisleUseCase: ChangeProductAisleUseCase
 ) : ProductShoppingListItem, ShoppingListItemViewModel {
+    override val inStock: Boolean get() = aisleProduct.product.inStock
+    override val qtyNeeded: Double get() = aisleProduct.product.qtyNeeded
+    override val noteId: Int? get() = aisleProduct.product.noteId
+    override val noteText: String? get() = aisleProduct.product.note?.noteText
+    override val qtyIncrement: Double get() = aisleProduct.product.qtyIncrement
+    override val unitOfMeasure: String get() = aisleProduct.product.unitOfMeasure
+    override val trackingMode: TrackingMode get() = aisleProduct.product.trackingMode
+    override val rank: Int get() = aisleProduct.rank
+    override val id: Int get() = aisleProduct.product.id
+    override val name: String get() = aisleProduct.product.name
+    override val aisleId: Int get() = aisleProduct.aisleId
 
     override suspend fun remove() {
         removeProductUseCase(id)
@@ -48,24 +53,40 @@ data class ProductShoppingListItemViewModel(
 
     override suspend fun updateRank(precedingItem: ShoppingListItem?) {
         updateAisleProductRankUseCase(
-            AisleProduct(
+            aisleProduct.copy(
                 rank = if (precedingItem?.itemType == itemType) precedingItem.rank + 1 else 1,
-                aisleId = precedingItem?.aisleId ?: aisleId,
-                id = aisleProductId,
-                product = Product(
-                    id = id,
-                    name = name,
-                    inStock = inStock,
-                    qtyNeeded = qtyNeeded,
-                    noteId = noteId,
-                    qtyIncrement = qtyIncrement,
-                    unitOfMeasure = unitOfMeasure,
-                    trackingMode = trackingMode
-                )
+                aisleId = precedingItem?.aisleId ?: aisleId
             )
         )
     }
 
-    override fun copyWith(selected: Boolean): ProductShoppingListItemViewModel =
-        this.copy(selected = selected)
+    suspend fun updateStatus(inStock: Boolean) {
+        updateProductStatusUseCase(id, inStock)
+    }
+
+    suspend fun updateQtyNeeded(qtyNeeded: Double?) {
+        qtyNeeded?.let { updateProductQtyNeededUseCase(id, it) }
+    }
+
+    suspend fun updateAisle(newAisleId: Int) {
+        changeProductAisleUseCase(id, aisleId, newAisleId)
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is ProductShoppingListItemViewModel) return false
+
+        if (aisleProduct != other.aisleProduct) return false
+        if (aisleRank != other.aisleRank) return false
+        if (selected != other.selected) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = aisleProduct.hashCode()
+        result = 31 * result + aisleRank
+        result = 31 * result + selected.hashCode()
+        return result
+    }
 }

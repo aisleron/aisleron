@@ -34,19 +34,11 @@ val viewModelModule = module {
     viewModel {
         ShoppingListViewModel(
             getShoppingListUseCase = get(),
-            updateProductStatusUseCase = get(),
-            updateAisleProductRankUseCase = get(),
-            updateAisleRankUseCase = get(),
-            removeAisleUseCase = get(),
-            removeProductUseCase = get(),
-            getAisleUseCase = get(),
-            updateAisleExpandedUseCase = get(),
             sortLocationByNameUseCase = get(),
             getLoyaltyCardForLocationUseCase = get(),
-            updateProductQtyNeededUseCase = get(),
             expandCollapseAislesForLocationUseCase = get(),
             getAislesForLocationUseCase = get(),
-            changeProductAisleUseCase = get()
+            shoppingListItemViewModelFactory = get()
         )
     }
 

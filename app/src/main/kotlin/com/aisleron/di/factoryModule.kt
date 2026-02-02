@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025-2026 aisleron.com
+ * Copyright (C) 2026 aisleron.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -17,18 +17,21 @@
 
 package com.aisleron.di
 
+import com.aisleron.ui.shoppinglist.ShoppingListItemViewModelFactory
 import org.koin.dsl.module
 
-val appModules = module {
-    includes(
-        daoModule,
-        databaseModule,
-        fragmentModule,
-        generalModule,
-        preferenceModule,
-        repositoryModule,
-        useCaseModule,
-        viewModelModule,
-        factoryModule
-    )
+val factoryModule = module {
+    factory<ShoppingListItemViewModelFactory> {
+        ShoppingListItemViewModelFactory(
+            updateAisleRankUseCase = get(),
+            getAisleUseCase = get(),
+            removeAisleUseCase = get(),
+            updateAisleProductRankUseCase = get(),
+            updateAisleExpandedUseCase = get(),
+            removeProductUseCase = get(),
+            updateProductStatusUseCase = get(),
+            updateProductQtyNeededUseCase = get(),
+            changeProductAisleUseCase = get()
+        )
+    }
 }

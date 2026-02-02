@@ -22,29 +22,35 @@ import com.aisleron.di.daoTestModule
 import com.aisleron.di.repositoryModule
 import com.aisleron.di.useCaseModule
 import com.aisleron.di.viewModelTestModule
-import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.aisle.AisleRepository
 import com.aisleron.domain.aisle.usecase.GetAisleUseCase
 import com.aisleron.domain.aisle.usecase.RemoveAisleUseCase
+import com.aisleron.domain.aisle.usecase.UpdateAisleExpandedUseCase
 import com.aisleron.domain.aisle.usecase.UpdateAisleRankUseCase
 import com.aisleron.domain.aisleproduct.AisleProduct
 import com.aisleron.domain.aisleproduct.AisleProductRepository
+import com.aisleron.domain.aisleproduct.usecase.ChangeProductAisleUseCase
 import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductRankUseCase
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.product.ProductRepository
 import com.aisleron.domain.preferences.TrackingMode
+import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.usecase.RemoveProductUseCase
+import com.aisleron.domain.product.usecase.UpdateProductQtyNeededUseCase
+import com.aisleron.domain.product.usecase.UpdateProductStatusUseCase
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.koin.test.KoinTest
 import org.koin.test.get
+import kotlin.collections.first
+import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 class ProductShoppingListItemViewModelTest : KoinTest {
 
@@ -59,25 +65,17 @@ class ProductShoppingListItemViewModelTest : KoinTest {
     }
 
     private fun getProductShoppingListItemViewModel(
-        aisle: Aisle,
+        aisleRank: Int,
         aisleProduct: AisleProduct
     ) = ProductShoppingListItemViewModel(
-        aisleRank = aisle.rank,
-        rank = aisleProduct.rank,
-        id = aisleProduct.product.id,
-        name = aisleProduct.product.name,
-        inStock = aisleProduct.product.inStock,
-        qtyNeeded = aisleProduct.product.qtyNeeded,
-        noteId = null,
-        noteText = null,
-        aisleId = aisleProduct.aisleId,
-        aisleProductId = aisleProduct.id,
+        aisleProduct = aisleProduct,
+        aisleRank = aisleRank,
+        selected = false,
         updateAisleProductRankUseCase = get<UpdateAisleProductRankUseCase>(),
         removeProductUseCase = get<RemoveProductUseCase>(),
-        qtyIncrement = 1.0,
-        trackingMode = TrackingMode.DEFAULT,
-        unitOfMeasure = "Qty",
-        selected = false
+        updateProductStatusUseCase = get<UpdateProductStatusUseCase>(),
+        updateProductQtyNeededUseCase = get<UpdateProductQtyNeededUseCase>(),
+        changeProductAisleUseCase = get<ChangeProductAisleUseCase>()
     )
 
     private suspend fun getShoppingList(): Location {
@@ -90,112 +88,185 @@ class ProductShoppingListItemViewModelTest : KoinTest {
     fun removeItem_ItemIsValidProduct_ProductRemoved() = runTest {
         val existingAisle = getShoppingList().aisles.first()
         val aisleProduct = existingAisle.products.last()
-        val shoppingListItem = getProductShoppingListItemViewModel(existingAisle, aisleProduct)
+        val shoppingListItem = getProductShoppingListItemViewModel(existingAisle.rank, aisleProduct)
 
         shoppingListItem.remove()
 
         val removedProduct = get<ProductRepository>().get(aisleProduct.product.id)
-        Assert.assertNull(removedProduct)
+        assertNull(removedProduct)
     }
 
     @Test
     fun removeItem_ItemIsInvalidProduct_NoProductRemoved() = runTest {
-        val shoppingListItem = ProductShoppingListItemViewModel(
-            aisleRank = 1000,
-            rank = 1000,
-            id = -1,
-            name = "Dummy",
-            inStock = false,
-            qtyNeeded = 0.0,
-            noteId = null,
-            noteText = null,
+        val ap = AisleProduct(
+            id = 1,
             aisleId = 1,
-            aisleProductId = 1,
-            updateAisleProductRankUseCase = get<UpdateAisleProductRankUseCase>(),
-            removeProductUseCase = get<RemoveProductUseCase>(),
-            qtyIncrement = 1.0,
-            trackingMode = TrackingMode.DEFAULT,
-            unitOfMeasure = "Qty",
-            selected = false
+            product = Product(
+                id = -1,
+                name = "Dummy",
+                inStock = false,
+                qtyNeeded = 0.0,
+                noteId = null,
+                note = null,
+                qtyIncrement = 1.0,
+                trackingMode = TrackingMode.DEFAULT,
+                unitOfMeasure = "Qty"
+            ),
+            rank = 1000
         )
 
+        val shoppingListItem = getProductShoppingListItemViewModel(1000, ap)
         val productRepository = get<ProductRepository>()
         val productCountBefore = productRepository.getAll().count()
 
         shoppingListItem.remove()
 
         val productCountAfter = productRepository.getAll().count()
-        Assert.assertEquals(productCountBefore, productCountAfter)
+        assertEquals(productCountBefore, productCountAfter)
     }
 
     @Test
     fun updateItemRank_ProductMovedInSameAisle_ProductRankUpdated() = runTest {
         val existingAisle = getShoppingList().aisles.first { it.products.count() > 1 }
         val movedAisleProduct = existingAisle.products.last()
-        val shoppingListItem = getProductShoppingListItemViewModel(existingAisle, movedAisleProduct)
+        val shoppingListItem =
+            getProductShoppingListItemViewModel(existingAisle.rank, movedAisleProduct)
 
         val precedingAisleProduct = existingAisle.products.first { it.id != movedAisleProduct.id }
         val precedingItem =
-            getProductShoppingListItemViewModel(existingAisle, precedingAisleProduct)
+            getProductShoppingListItemViewModel(existingAisle.rank, precedingAisleProduct)
 
         shoppingListItem.updateRank(precedingItem)
 
         val updatedAisleProduct = get<AisleProductRepository>().get(movedAisleProduct.id)
-        Assert.assertEquals(precedingItem.rank + 1, updatedAisleProduct?.rank)
+        assertEquals(precedingItem.rank + 1, updatedAisleProduct?.rank)
     }
 
     @Test
     fun updateItemRank_ProductMovedToDifferentAisle_ProductAisleUpdated() = runTest {
         val existingAisle = getShoppingList().aisles.first()
         val movedAisleProduct = existingAisle.products.last()
-        val shoppingListItem = getProductShoppingListItemViewModel(existingAisle, movedAisleProduct)
+        val shoppingListItem =
+            getProductShoppingListItemViewModel(existingAisle.rank, movedAisleProduct)
 
         val targetAisle = get<AisleRepository>().getAll()
             .first { it.locationId == existingAisle.locationId && !it.isDefault && it.id != existingAisle.id }
 
         val precedingItem = AisleShoppingListItemViewModel(
-            rank = targetAisle.rank,
-            id = targetAisle.id,
-            name = targetAisle.name,
-            isDefault = targetAisle.isDefault,
-            childCount = 0,
-            locationId = targetAisle.locationId,
-            expanded = targetAisle.expanded,
+            aisle = targetAisle,
             updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
             getAisleUseCase = get<GetAisleUseCase>(),
             removeAisleUseCase = get<RemoveAisleUseCase>(),
+            updateAisleExpandedUseCase = get<UpdateAisleExpandedUseCase>(),
             selected = false
         )
 
         shoppingListItem.updateRank(precedingItem)
 
         val updatedAisleProduct = get<AisleProductRepository>().get(movedAisleProduct.id)
-        Assert.assertEquals(1, updatedAisleProduct?.rank)
-        Assert.assertEquals(targetAisle.id, updatedAisleProduct?.aisleId)
+        assertEquals(1, updatedAisleProduct?.rank)
+        assertEquals(targetAisle.id, updatedAisleProduct?.aisleId)
     }
 
     @Test
     fun updateItemRank_NullPrecedingItem_ProductRankIsOne() = runTest {
         val existingAisle = getShoppingList().aisles.first { it.products.count() > 1 }
         val movedAisleProduct = existingAisle.products.last()
-        val shoppingListItem = getProductShoppingListItemViewModel(existingAisle, movedAisleProduct)
+        val shoppingListItem =
+            getProductShoppingListItemViewModel(existingAisle.rank, movedAisleProduct)
 
         shoppingListItem.updateRank(null)
 
         val updatedAisleProduct = get<AisleProductRepository>().get(movedAisleProduct.id)
-        Assert.assertEquals(1, updatedAisleProduct?.rank)
-        Assert.assertEquals(existingAisle.id, updatedAisleProduct?.aisleId)
+        assertEquals(1, updatedAisleProduct?.rank)
+        assertEquals(existingAisle.id, updatedAisleProduct?.aisleId)
     }
 
     @Test
-    fun copyWith_SelectedValue_SelectedUpdated() = runTest {
+    fun onCreate_PropertiesInitializedCorrectly() = runTest {
+        val existingAisle = getShoppingList().aisles.first()
+        val aisleProduct = existingAisle.products.first()
+        val shoppingListItem = getProductShoppingListItemViewModel(existingAisle.rank, aisleProduct)
+
+        assertEquals(aisleProduct.product.id, shoppingListItem.id)
+        assertEquals(aisleProduct.product.name, shoppingListItem.name)
+        assertEquals(aisleProduct.product.inStock, shoppingListItem.inStock)
+        assertEquals(aisleProduct.product.qtyNeeded, shoppingListItem.qtyNeeded)
+        assertEquals(aisleProduct.product.noteId, shoppingListItem.noteId)
+        assertEquals(aisleProduct.product.note?.noteText, shoppingListItem.noteText)
+        assertEquals(aisleProduct.product.qtyIncrement, shoppingListItem.qtyIncrement)
+        assertEquals(aisleProduct.product.unitOfMeasure, shoppingListItem.unitOfMeasure)
+        assertEquals(aisleProduct.product.trackingMode, shoppingListItem.trackingMode)
+        assertEquals(aisleProduct.rank, shoppingListItem.rank)
+        assertEquals(existingAisle.rank, shoppingListItem.aisleRank)
+    }
+
+    private suspend fun updateStatus_ArrangeActAssert(newInStock: Boolean) {
+        val initialItems = getShoppingList().aisles.flatMap { aisle ->
+            aisle.products
+                .filter { it.product.inStock != newInStock }
+                .map { product -> aisle to product } // Creates a Pair<Aisle, AisleProduct>
+        }
+
+        val existingAisle = initialItems.first().first
+        val aisleProduct = initialItems.first().second
+        val shoppingListItem = getProductShoppingListItemViewModel(existingAisle.rank, aisleProduct)
+
+        shoppingListItem.updateStatus(newInStock)
+
+        val updatedProduct = get<ProductRepository>().get(aisleProduct.product.id)
+        assertEquals(newInStock, updatedProduct?.inStock)
+    }
+
+    @Test
+    fun updateStatus_InStockTrue_ProductUpdatedToInStock() = runTest {
+        updateStatus_ArrangeActAssert(true)
+    }
+
+    @Test
+    fun updateStatus_InStockFalse_ProductUpdatedToNotInStock() = runTest {
+        updateStatus_ArrangeActAssert(false)
+    }
+
+    @Test
+    fun updateQtyNeeded_ValidQtyNeeded_ProductQtyNeededUpdated() = runTest {
+        val existingAisle = getShoppingList().aisles.first()
+        val aisleProduct = existingAisle.products.first()
+        val newQty = aisleProduct.product.qtyNeeded + 2.0
+        val shoppingListItem = getProductShoppingListItemViewModel(existingAisle.rank, aisleProduct)
+
+        shoppingListItem.updateQtyNeeded(newQty)
+
+        val updatedProduct = get<ProductRepository>().get(aisleProduct.product.id)
+        assertEquals(newQty, updatedProduct?.qtyNeeded)
+    }
+
+    @Test
+    fun updateQtyNeeded_QtyNeededIsNull_ProductQtyNeededNotUpdated() = runTest {
+        val existingAisle = getShoppingList().aisles.first()
+        val aisleProduct = existingAisle.products.first()
+        val newQty = null
+        val shoppingListItem = getProductShoppingListItemViewModel(existingAisle.rank, aisleProduct)
+
+        shoppingListItem.updateQtyNeeded(newQty)
+
+        val updatedProduct = get<ProductRepository>().get(aisleProduct.product.id)
+        assertEquals(aisleProduct.product.qtyNeeded, updatedProduct?.qtyNeeded)
+    }
+
+    @Test
+    fun updateAisle_ValidAisle_ProductAisleUpdated() = runTest {
         val existingAisle = getShoppingList().aisles.first()
         val aisleProduct = existingAisle.products.last()
-        val shoppingListItem = getProductShoppingListItemViewModel(existingAisle, aisleProduct)
-        val selectedBefore = shoppingListItem.selected
+        val shoppingListItem =
+            getProductShoppingListItemViewModel(existingAisle.rank, aisleProduct)
 
-        val updatedShoppingListItem = shoppingListItem.copyWith(selected = !selectedBefore)
+        val targetAisle = get<AisleRepository>().getAll()
+            .first { it.locationId == existingAisle.locationId && !it.isDefault && it.id != existingAisle.id }
 
-        Assert.assertTrue(updatedShoppingListItem.selected != selectedBefore)
+        shoppingListItem.updateAisle(targetAisle.id)
+
+        val updatedAisleProduct = get<AisleProductRepository>().get(aisleProduct.id)
+        assertEquals(targetAisle.id, updatedAisleProduct?.aisleId)
     }
 }

@@ -22,22 +22,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.aisle.usecase.ExpandCollapseAislesForLocationUseCase
-import com.aisleron.domain.aisle.usecase.GetAisleUseCase
 import com.aisleron.domain.aisle.usecase.GetAislesForLocationUseCase
-import com.aisleron.domain.aisle.usecase.RemoveAisleUseCase
-import com.aisleron.domain.aisle.usecase.UpdateAisleExpandedUseCase
-import com.aisleron.domain.aisle.usecase.UpdateAisleRankUseCase
-import com.aisleron.domain.aisleproduct.usecase.ChangeProductAisleUseCase
-import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductRankUseCase
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.location.usecase.SortLocationByNameUseCase
 import com.aisleron.domain.loyaltycard.LoyaltyCard
 import com.aisleron.domain.loyaltycard.usecase.GetLoyaltyCardForLocationUseCase
-import com.aisleron.domain.product.usecase.RemoveProductUseCase
-import com.aisleron.domain.product.usecase.UpdateProductQtyNeededUseCase
-import com.aisleron.domain.product.usecase.UpdateProductStatusUseCase
 import com.aisleron.domain.shoppinglist.ShoppingListFilter
 import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
 import com.aisleron.ui.bundles.AisleListEntry
@@ -69,19 +60,11 @@ import kotlin.coroutines.cancellation.CancellationException
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 class ShoppingListViewModel(
     private val getShoppingListUseCase: GetShoppingListUseCase,
-    private val updateProductStatusUseCase: UpdateProductStatusUseCase,
-    private val updateAisleProductRankUseCase: UpdateAisleProductRankUseCase,
-    private val updateAisleRankUseCase: UpdateAisleRankUseCase,
-    private val removeAisleUseCase: RemoveAisleUseCase,
-    private val removeProductUseCase: RemoveProductUseCase,
-    private val getAisleUseCase: GetAisleUseCase,
-    private val updateAisleExpandedUseCase: UpdateAisleExpandedUseCase,
     private val sortLocationByNameUseCase: SortLocationByNameUseCase,
     private val getLoyaltyCardForLocationUseCase: GetLoyaltyCardForLocationUseCase,
-    private val updateProductQtyNeededUseCase: UpdateProductQtyNeededUseCase,
     private val expandCollapseAislesForLocationUseCase: ExpandCollapseAislesForLocationUseCase,
     private val getAislesForLocationUseCase: GetAislesForLocationUseCase,
-    private val changeProductAisleUseCase: ChangeProductAisleUseCase,
+    private val shoppingListItemViewModelFactory: ShoppingListItemViewModelFactory,
     debounceTime: Long = 300,
     coroutineScopeProvider: CoroutineScope? = null
 ) : ViewModel() {
@@ -178,7 +161,7 @@ class ShoppingListViewModel(
         get() = (shoppingListUiState.value as? ShoppingListUiState.Updated)
             ?.shoppingList?.filter { it.selected } ?: emptyList()
 
-    private data class QtyUpdate(val itemId: Int, val quantity: Double)
+    private data class QtyUpdate(val item: ProductShoppingListItem, val quantity: Double?)
 
     private val _quantityUpdates = MutableSharedFlow<QtyUpdate>(extraBufferCapacity = 1)
     private val quantityUpdaterJob = _quantityUpdates
@@ -186,7 +169,8 @@ class ShoppingListViewModel(
         .distinctUntilChanged()
         .onEach { update ->
             coroutineScope.launchHandling {
-                updateProductQtyNeededUseCase(update.itemId, update.quantity)
+                (update.item as ProductShoppingListItemViewModel)
+                    .updateQtyNeeded(update.quantity)
             }
         }
         .launchIn(coroutineScope)
@@ -216,18 +200,8 @@ class ShoppingListViewModel(
                 )
 
                 listOf(
-                    AisleShoppingListItemViewModel(
-                        rank = a.rank,
-                        id = a.id,
-                        name = a.name,
-                        isDefault = a.isDefault,
-                        locationId = a.locationId,
-                        expanded = a.expanded,
-                        selected = selections.contains(aisleSignature),
-                        updateAisleRankUseCase = updateAisleRankUseCase,
-                        getAisleUseCase = getAisleUseCase,
-                        removeAisleUseCase = removeAisleUseCase,
-                        childCount = a.products.count()
+                    shoppingListItemViewModelFactory.createAisleItemViewModel(
+                        a, selections.contains(aisleSignature)
                     )
                 ) + a.products.filter { (a.expanded || showAllProducts) }
                     .map { ap ->
@@ -235,36 +209,12 @@ class ShoppingListViewModel(
                             ShoppingListItem.ItemType.PRODUCT, ap.product.id, ap.aisleId
                         )
 
-                        ProductShoppingListItemViewModel(
-                            aisleRank = a.rank,
-                            rank = ap.rank,
-                            id = ap.product.id,
-                            name = ap.product.name,
-                            inStock = ap.product.inStock,
-                            qtyNeeded = ap.product.qtyNeeded,
-                            noteId = ap.product.noteId,
-                            aisleId = ap.aisleId,
-                            selected = selections.contains(productSignature),
-                            aisleProductId = ap.id,
-                            removeProductUseCase = removeProductUseCase,
-                            updateAisleProductRankUseCase = updateAisleProductRankUseCase,
-                            qtyIncrement = ap.product.qtyIncrement,
-                            unitOfMeasure = ap.product.unitOfMeasure,
-                            trackingMode = ap.product.trackingMode,
-                            noteText = ap.product.note?.noteText
+                        shoppingListItemViewModelFactory.createProductItemViewModel(
+                            ap, a.rank, selections.contains(productSignature)
                         )
                     }
             }
         }?.toMutableList() ?: mutableListOf()
-
-        filteredList.sortWith(
-            compareBy(
-                { it.aisleRank },
-                { it.aisleId },
-                { it.itemType },
-                { it.rank },
-                { it.name })
-        )
 
         if (filteredList.isEmpty()) {
             filteredList.add(EmptyShoppingListItem())
@@ -289,17 +239,17 @@ class ShoppingListViewModel(
 
     fun updateProductStatus(item: ProductShoppingListItem, inStock: Boolean) {
         coroutineScope.launchHandling {
-            updateProductStatusUseCase(item.id, inStock)
+            (item as ProductShoppingListItemViewModel).updateStatus(inStock)
         }
     }
 
     fun updateProductNeededQuantity(item: ProductShoppingListItem, quantity: Double?) {
-        quantity?.let { _quantityUpdates.tryEmit(QtyUpdate(item.id, it)) }
+        _quantityUpdates.tryEmit(QtyUpdate(item, quantity))
     }
 
     fun updateAisleExpanded(item: AisleShoppingListItem, expanded: Boolean) {
         coroutineScope.launchHandling {
-            updateAisleExpandedUseCase(item.id, expanded)
+            (item as AisleShoppingListItemViewModel).updateExpanded(expanded)
         }
     }
 
@@ -317,10 +267,10 @@ class ShoppingListViewModel(
     }
 
     fun updateSelectedProductAisle(selectedAisleId: Int) {
-        val items = selectedListItems.filterIsInstance<ProductShoppingListItem>()
+        val items = selectedListItems.filterIsInstance<ProductShoppingListItemViewModel>()
         coroutineScope.launchHandling {
             items.forEach {
-                changeProductAisleUseCase(it.id, it.aisleId, selectedAisleId)
+                it.updateAisle(selectedAisleId)
             }
 
             clearSelectedListItems()

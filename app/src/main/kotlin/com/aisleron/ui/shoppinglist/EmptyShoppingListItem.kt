@@ -17,8 +17,6 @@
 
 package com.aisleron.ui.shoppinglist
 
-
-
 data class EmptyShoppingListItem(
     override val rank: Int = 1,
     override val name: String = ""
@@ -27,9 +25,6 @@ data class EmptyShoppingListItem(
     override val id: Int get() = 0
     override val aisleId: Int get() = id
     override val selected: Boolean get() = false
-    override fun copyWith(selected: Boolean): EmptyShoppingListItem =
-        this.copyWith(selected = selected)
-
     override val itemType: ShoppingListItem.ItemType
         get() = ShoppingListItem.ItemType.EMPTY_LIST
 }

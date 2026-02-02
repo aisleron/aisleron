@@ -24,12 +24,9 @@ interface ShoppingListItem {
     val name: String
     val aisleId: Int
     val itemType: ItemType
-
     val selected: Boolean
 
     override fun equals(other: Any?): Boolean
-
-    fun copyWith(selected: Boolean): ShoppingListItem
 
     enum class ItemType {
         AISLE, PRODUCT, EMPTY_LIST

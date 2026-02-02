@@ -20,21 +20,24 @@ package com.aisleron.ui.shoppinglist
 import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.aisle.usecase.GetAisleUseCase
 import com.aisleron.domain.aisle.usecase.RemoveAisleUseCase
+import com.aisleron.domain.aisle.usecase.UpdateAisleExpandedUseCase
 import com.aisleron.domain.aisle.usecase.UpdateAisleRankUseCase
 
-data class AisleShoppingListItemViewModel(
-    override val rank: Int,
-    override val id: Int,
-    override val name: String,
-    override val isDefault: Boolean,
-    override var childCount: Int = 0,
-    override val locationId: Int,
-    override val expanded: Boolean,
+class AisleShoppingListItemViewModel(
+    private val aisle: Aisle,
     override val selected: Boolean,
     private val updateAisleRankUseCase: UpdateAisleRankUseCase,
     private val getAisleUseCase: GetAisleUseCase,
-    private val removeAisleUseCase: RemoveAisleUseCase
+    private val removeAisleUseCase: RemoveAisleUseCase,
+    private val updateAisleExpandedUseCase: UpdateAisleExpandedUseCase
 ) : AisleShoppingListItem, ShoppingListItemViewModel {
+    override val childCount: Int get() = aisle.products.count()
+    override val locationId: Int get() = aisle.locationId
+    override val isDefault: Boolean get() = aisle.isDefault
+    override val expanded: Boolean get() = aisle.expanded
+    override val rank: Int get() = aisle.rank
+    override val id: Int get() = aisle.id
+    override val name: String get() = aisle.name
 
     override suspend fun remove() {
         val aisle = getAisleUseCase(id)
@@ -43,18 +46,29 @@ data class AisleShoppingListItemViewModel(
 
     override suspend fun updateRank(precedingItem: ShoppingListItem?) {
         updateAisleRankUseCase(
-            Aisle(
-                id = id,
-                name = name,
-                products = emptyList(),
-                locationId = locationId,
-                rank = precedingItem?.let { it.aisleRank + 1 } ?: 1,
-                isDefault = isDefault,
-                expanded = expanded
+            aisle.copy(
+                rank = precedingItem?.let { it.aisleRank + 1 } ?: 1
             )
         )
     }
 
-    override fun copyWith(selected: Boolean): AisleShoppingListItemViewModel =
-        this.copy(selected = selected)
+    suspend fun updateExpanded(expanded: Boolean) {
+        updateAisleExpandedUseCase(id, expanded)
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is AisleShoppingListItemViewModel) return false
+
+        if (aisle != other.aisle) return false
+        if (selected != other.selected) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = aisle.hashCode()
+        result = 31 * result + selected.hashCode()
+        return result
+    }
 }

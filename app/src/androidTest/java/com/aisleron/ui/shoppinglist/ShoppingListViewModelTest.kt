@@ -19,6 +19,7 @@ package com.aisleron.ui.shoppinglist
 
 import com.aisleron.di.KoinTestRule
 import com.aisleron.di.daoTestModule
+import com.aisleron.di.factoryModule
 import com.aisleron.di.repositoryModule
 import com.aisleron.di.useCaseModule
 import com.aisleron.di.viewModelTestModule
@@ -29,12 +30,8 @@ import com.aisleron.domain.aisle.usecase.AddAisleUseCase
 import com.aisleron.domain.aisle.usecase.ExpandCollapseAislesForLocationUseCase
 import com.aisleron.domain.aisle.usecase.GetAisleUseCase
 import com.aisleron.domain.aisle.usecase.GetAislesForLocationUseCase
-import com.aisleron.domain.aisle.usecase.RemoveAisleUseCase
-import com.aisleron.domain.aisle.usecase.UpdateAisleExpandedUseCase
-import com.aisleron.domain.aisle.usecase.UpdateAisleRankUseCase
 import com.aisleron.domain.aisleproduct.AisleProductRepository
 import com.aisleron.domain.aisleproduct.usecase.ChangeProductAisleUseCase
-import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductRankUseCase
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationRepository
@@ -47,9 +44,6 @@ import com.aisleron.domain.loyaltycard.LoyaltyCardRepository
 import com.aisleron.domain.loyaltycard.usecase.GetLoyaltyCardForLocationUseCase
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.ProductRepository
-import com.aisleron.domain.product.usecase.RemoveProductUseCase
-import com.aisleron.domain.product.usecase.UpdateProductQtyNeededUseCase
-import com.aisleron.domain.product.usecase.UpdateProductStatusUseCase
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import com.aisleron.domain.shoppinglist.ShoppingListFilter
 import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
@@ -86,7 +80,9 @@ class ShoppingListViewModelTest : KoinTest {
 
     @get:Rule
     val koinTestRule = KoinTestRule(
-        modules = listOf(daoTestModule, viewModelTestModule, repositoryModule, useCaseModule)
+        modules = listOf(
+            daoTestModule, viewModelTestModule, repositoryModule, useCaseModule, factoryModule
+        )
     )
 
     @Before
@@ -351,20 +347,12 @@ class ShoppingListViewModelTest : KoinTest {
     @Test
     fun constructor_NoCoroutineScopeProvided_ShoppingListViewModelReturned() {
         val vm = ShoppingListViewModel(
-            get<GetShoppingListUseCase>(),
-            get<UpdateProductStatusUseCase>(),
-            get<UpdateAisleProductRankUseCase>(),
-            get<UpdateAisleRankUseCase>(),
-            get<RemoveAisleUseCase>(),
-            get<RemoveProductUseCase>(),
-            get<GetAisleUseCase>(),
-            get<UpdateAisleExpandedUseCase>(),
-            get<SortLocationByNameUseCase>(),
-            get<GetLoyaltyCardForLocationUseCase>(),
-            get<UpdateProductQtyNeededUseCase>(),
-            get<ExpandCollapseAislesForLocationUseCase>(),
-            get<GetAislesForLocationUseCase>(),
-            get<ChangeProductAisleUseCase>(),
+            getShoppingListUseCase = get<GetShoppingListUseCase>(),
+            sortLocationByNameUseCase = get<SortLocationByNameUseCase>(),
+            getLoyaltyCardForLocationUseCase = get<GetLoyaltyCardForLocationUseCase>(),
+            expandCollapseAislesForLocationUseCase = get<ExpandCollapseAislesForLocationUseCase>(),
+            getAislesForLocationUseCase = get<GetAislesForLocationUseCase>(),
+            shoppingListItemViewModelFactory = get<ShoppingListItemViewModelFactory>()
         )
 
         Assert.assertNotNull(vm)
@@ -701,14 +689,13 @@ class ShoppingListViewModelTest : KoinTest {
     fun selectedItems_SetAndClear_HandledCorrectly() = runTest {
         val aisle = get<AisleRepository>().getAll().first { !it.isDefault }
         shoppingListViewModel.hydrate(aisle.locationId, FilterType.ALL)
-        val shoppingListItem = getAisleListItems(shoppingListViewModel).first { it.id == aisle.id }
+        val sliBefore = getAisleListItems(shoppingListViewModel).first { it.id == aisle.id }
 
-        shoppingListViewModel.toggleItemSelection(shoppingListItem)
+        shoppingListViewModel.toggleItemSelection(sliBefore)
 
-        assertEquals(
-            shoppingListItem.copyWith(selected = true),
-            shoppingListViewModel.selectedListItems.first()
-        )
+        val sliAfter = getAisleListItems(shoppingListViewModel).first { it.id == aisle.id }
+        assertEquals(sliBefore.id, sliAfter.id)
+        assertTrue { sliBefore.selected != sliAfter.selected }
 
         shoppingListViewModel.clearSelectedListItems()
         assertNull(shoppingListViewModel.selectedListItems.firstOrNull())

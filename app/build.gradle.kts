@@ -219,6 +219,7 @@ dependencies {
     // Testing
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation(project(":testData"))
+    testImplementation("org.junit.jupiter:junit-jupiter:${Versions.JUNIT}")
     testImplementation("org.junit.jupiter:junit-jupiter-api:${Versions.JUNIT}")
     testImplementation("org.junit.jupiter:junit-jupiter-params:${Versions.JUNIT}")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.COROUTINES}")
