@@ -291,7 +291,7 @@ class ShoppingListFragmentTest : KoinTest {
             aisles = emptyList(),
             showDefaultAisle = false,
             expanded = true,
-            rank = get<LocationRepository>().getLocationMaxRank() + 1
+            rank = get<LocationRepository>().getMaxRank() + 1
         )
 
         val locationId = get<LocationRepository>().add(location)

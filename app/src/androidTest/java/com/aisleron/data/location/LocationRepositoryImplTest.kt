@@ -132,7 +132,7 @@ class LocationRepositoryImplTest : RepositoryImplTest<Location>() {
         addMultipleItems()
         val expected = locationRepository.getAll().maxOf { it.rank }
 
-        val actual = locationRepository.getLocationMaxRank()
+        val actual = locationRepository.getMaxRank()
 
         assertEquals(expected, actual)
     }

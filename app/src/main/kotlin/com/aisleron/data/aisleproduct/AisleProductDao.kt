@@ -50,5 +50,5 @@ interface AisleProductDao : BaseDao<AisleProductEntity> {
     suspend fun removeProductsFromAisle(aisleId: Int)
 
     @Query("SELECT COALESCE(MAX(rank), 0) FROM AisleProduct WHERE aisleId = :aisleId")
-    suspend fun getAisleProductMaxRank(aisleId: Int): Int
+    suspend fun getMaxRank(aisleId: Int): Int
 }

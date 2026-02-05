@@ -32,8 +32,8 @@ class AisleProductRepositoryImpl(
         aisleProductDao.removeProductsFromAisle(aisleId)
     }
 
-    override suspend fun getAisleProductMaxRank(aisleId: Int): Int {
-        return aisleProductDao.getAisleProductMaxRank(aisleId)
+    override suspend fun getMaxRank(aisleId: Int): Int {
+        return aisleProductDao.getMaxRank(aisleId)
     }
 
     override suspend fun getProductAisles(productId: Int): List<AisleProduct> {

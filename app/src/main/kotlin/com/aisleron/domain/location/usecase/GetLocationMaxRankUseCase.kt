@@ -27,7 +27,7 @@ class GetLocationMaxRankUseCaseImpl(
     val locationRepository: LocationRepository
 ) : GetLocationMaxRankUseCase {
     override suspend fun invoke(): Int {
-        return locationRepository.getLocationMaxRank()
+        return locationRepository.getMaxRank()
     }
 
 }

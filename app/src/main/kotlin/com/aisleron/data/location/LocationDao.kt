@@ -39,7 +39,7 @@ interface LocationDao : BaseDao<LocationEntity> {
     suspend fun getLocationByName(name: String): LocationEntity?
 
     @Query("SELECT COALESCE(MAX(rank), 0) FROM Location")
-    suspend fun getLocationMaxRank(): Int
+    suspend fun getMaxRank(): Int
 
     /**
      * Location With Aisles

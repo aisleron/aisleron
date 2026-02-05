@@ -55,7 +55,7 @@ class CopyProductUseCaseImpl(
                             ap.copy(
                                 id = 0,
                                 product = addedProduct,
-                                rank = aisleProductRepository.getAisleProductMaxRank(ap.aisleId) + 1
+                                rank = aisleProductRepository.getMaxRank(ap.aisleId) + 1
                             )
                         )
                     }

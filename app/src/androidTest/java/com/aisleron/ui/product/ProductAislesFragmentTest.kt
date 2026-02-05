@@ -189,7 +189,7 @@ class ProductAislesFragmentTest : KoinTest {
                 aisles = emptyList(),
                 showDefaultAisle = true,
                 expanded = true,
-                rank = get<LocationRepository>().getLocationMaxRank() + 1
+                rank = get<LocationRepository>().getMaxRank() + 1
             )
         )
 

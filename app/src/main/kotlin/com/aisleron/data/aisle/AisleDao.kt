@@ -68,5 +68,5 @@ interface AisleDao : BaseDao<AisleEntity> {
     suspend fun moveRanks(locationId: Int, fromRank: Int)
 
     @Query("SELECT COALESCE(MAX(rank), 0) FROM Aisle WHERE locationId = :locationId and isDefault = 0")
-    suspend fun getAisleMaxRank(locationId: Int): Int
+    suspend fun getMaxRank(locationId: Int): Int
 }

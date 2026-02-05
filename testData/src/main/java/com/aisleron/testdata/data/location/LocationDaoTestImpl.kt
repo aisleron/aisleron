@@ -77,7 +77,7 @@ class LocationDaoTestImpl(private val aisleDao: AisleDaoTestImpl) : LocationDao 
         return locationList.find { it.name.uppercase() == name.uppercase() }
     }
 
-    override suspend fun getLocationMaxRank(): Int {
+    override suspend fun getMaxRank(): Int {
         return locationList.maxOf { it.rank }
     }
 

@@ -22,6 +22,6 @@ import com.aisleron.domain.aisleproduct.AisleProductRepository
 
 class GetAisleProductMaxRankUseCase(private val aisleProductRepository: AisleProductRepository) {
     suspend operator fun invoke(aisle: Aisle): Int {
-        return aisleProductRepository.getAisleProductMaxRank(aisle.id)
+        return aisleProductRepository.getMaxRank(aisle.id)
     }
 }
