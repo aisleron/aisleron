@@ -1014,10 +1014,10 @@ class ShoppingListViewModelTest : KoinTest {
             shoppingListViewModel.navigateToEditShop()
         }
 
-        assert(event is ShoppingListViewModel.ShoppingListEvent.NavigateToEditShop)
+        assert(event is ShoppingListViewModel.ShoppingListEvent.NavigateToEditLocation)
 
-        val navEvent = event as ShoppingListViewModel.ShoppingListEvent.NavigateToEditShop
-        assertEquals(shoppingList.id, navEvent.id)
+        val navEvent = event as ShoppingListViewModel.ShoppingListEvent.NavigateToEditLocation
+        assertEquals(shoppingList.id, navEvent.locationId)
     }
 
     @Test
@@ -1037,5 +1037,90 @@ class ShoppingListViewModelTest : KoinTest {
         } finally {
             job.cancel()
         }
+    }
+
+
+    @Test
+    fun navigateToEditItem_NoItemsSelected_NoEventEmitted() = runTest {
+        val collectedEvents = mutableListOf<ShoppingListViewModel.ShoppingListEvent>()
+        val job = launch(UnconfinedTestDispatcher(testScheduler)) {
+            shoppingListViewModel.events.toList(collectedEvents)
+        }
+        try {
+            shoppingListViewModel.navigateToEditItem()
+
+            // Force the scheduler to run any pending coroutines
+            runCurrent()
+
+            assertTrue(collectedEvents.isEmpty())
+        } finally {
+            job.cancel()
+        }
+    }
+
+    @Test
+    fun navigateToEditItem_MultipleItemsSelected_NoEventEmitted() = runTest {
+        val shoppingList = getShoppingList()
+        shoppingListViewModel.hydrate(shoppingList.id, shoppingList.defaultFilter)
+        val listItems = getProductListItems(shoppingListViewModel)
+
+        shoppingListViewModel.toggleItemSelection(listItems.first())
+        shoppingListViewModel.toggleItemSelection(listItems.last())
+
+        val collectedEvents = mutableListOf<ShoppingListViewModel.ShoppingListEvent>()
+        val job = launch(UnconfinedTestDispatcher(testScheduler)) {
+            shoppingListViewModel.events.toList(collectedEvents)
+        }
+        try {
+            shoppingListViewModel.navigateToEditItem()
+
+            // Force the scheduler to run any pending coroutines
+            runCurrent()
+
+            assertTrue(collectedEvents.isEmpty())
+        } finally {
+            job.cancel()
+        }
+    }
+
+    @Test
+    fun navigateToEditItem_ItemIsAisle_NavigateToEditAisleEventEmitted() = runTest {
+        val shoppingList = getShoppingList()
+        shoppingListViewModel.hydrate(shoppingList.id, shoppingList.defaultFilter)
+        val item = getAisleListItems(shoppingListViewModel).first { !it.isDefault }
+
+        shoppingListViewModel.toggleItemSelection(item)
+
+        val event = awaitEvent(shoppingListViewModel) {
+            shoppingListViewModel.navigateToEditItem()
+        }
+
+        assertEquals(
+            ShoppingListViewModel.ShoppingListEvent.NavigateToEditAisle(item.id),
+            event
+        )
+    }
+
+    @Test
+    fun navigateToEditItem_ItemIsProduct_NavigateToEditProductEventEmitted() = runTest {
+        val shoppingList = getShoppingList()
+        shoppingListViewModel.hydrate(shoppingList.id, shoppingList.defaultFilter)
+        val item = getProductListItems(shoppingListViewModel).first()
+
+        shoppingListViewModel.toggleItemSelection(item)
+
+        val event = awaitEvent(shoppingListViewModel) {
+            shoppingListViewModel.navigateToEditItem()
+        }
+
+        assertEquals(
+            ShoppingListViewModel.ShoppingListEvent.NavigateToEditProduct(item.id),
+            event
+        )
+    }
+
+    @Test
+    fun navigateToEditItem_ItemIsLocation_NavigateToEditLocationEventEmitted() = runTest {
+        //TODO: Implement when Location becomes selectable
     }
 }

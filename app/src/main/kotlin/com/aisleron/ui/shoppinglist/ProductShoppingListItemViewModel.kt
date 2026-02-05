@@ -60,6 +60,9 @@ class ProductShoppingListItemViewModel(
         )
     }
 
+    override fun editNavigationEvent(): ShoppingListViewModel.ShoppingListEvent =
+        ShoppingListViewModel.ShoppingListEvent.NavigateToEditProduct(id)
+
     suspend fun updateStatus(inStock: Boolean) {
         updateProductStatusUseCase(id, inStock)
     }

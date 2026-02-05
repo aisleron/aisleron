@@ -51,6 +51,9 @@ class LocationShoppingListItemViewModel(
         )*/
     }
 
+    override fun editNavigationEvent(): ShoppingListViewModel.ShoppingListEvent =
+        ShoppingListViewModel.ShoppingListEvent.NavigateToEditLocation(id)
+
     override suspend fun updateExpanded(expanded: Boolean) {
         // TODO: Add updateLocationExpandedUseCase
         //updateLocationExpandedUseCase(id, expanded)

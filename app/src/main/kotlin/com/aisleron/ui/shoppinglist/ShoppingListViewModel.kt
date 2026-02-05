@@ -386,10 +386,19 @@ class ShoppingListViewModel(
     }
 
     fun navigateToEditShop() {
-        _locationId.value ?: return
+        val locationId = _locationId.value ?: return
 
         coroutineScope.launchHandling {
-            _events.emit(ShoppingListEvent.NavigateToEditShop(_locationId.value))
+            _events.emit(ShoppingListEvent.NavigateToEditLocation(locationId))
+        }
+    }
+
+    fun navigateToEditItem() {
+        val item =
+            selectedListItems.filterIsInstance<ShoppingListItemViewModel>().singleOrNull() ?: return
+
+        coroutineScope.launchHandling {
+            _events.emit(item.editNavigationEvent())
         }
     }
 
@@ -427,7 +436,9 @@ class ShoppingListViewModel(
         ) : ShoppingListEvent()
 
         data class NavigateToLoyaltyCard(val loyaltyCard: LoyaltyCard?) : ShoppingListEvent()
-        data class NavigateToEditShop(val id: Int?) : ShoppingListEvent()
+        data class NavigateToEditLocation(val locationId: Int) : ShoppingListEvent()
+        data class NavigateToEditAisle(val aisleId: Int) : ShoppingListEvent()
+        data class NavigateToEditProduct(val productId: Int) : ShoppingListEvent()
     }
 
     sealed class ListTitle {

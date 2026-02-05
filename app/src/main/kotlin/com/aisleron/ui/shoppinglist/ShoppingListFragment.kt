@@ -292,13 +292,17 @@ class ShoppingListFragment(
                     )
                 }
 
-                is ShoppingListViewModel.ShoppingListEvent.NavigateToLoyaltyCard -> {
+                is ShoppingListViewModel.ShoppingListEvent.NavigateToLoyaltyCard ->
                     event.loyaltyCard?.let { showLoyaltyCard(event.loyaltyCard) }
-                }
 
-                is ShoppingListViewModel.ShoppingListEvent.NavigateToEditShop -> {
-                    event.id?.let { navigateToEditShop(it) }
-                }
+                is ShoppingListViewModel.ShoppingListEvent.NavigateToEditLocation ->
+                    navigateToEditShop(event.locationId)
+
+                is ShoppingListViewModel.ShoppingListEvent.NavigateToEditAisle ->
+                    showEditAisleDialog(event.aisleId)
+
+                is ShoppingListViewModel.ShoppingListEvent.NavigateToEditProduct ->
+                    navigateToEditProduct(event.productId)
             }
         }
     }
@@ -515,13 +519,6 @@ class ShoppingListFragment(
         actionMode?.finish()
     }
 
-    private fun editShoppingListItem(item: ShoppingListItem) {
-        when (item) {
-            is AisleShoppingListItem -> showEditAisleDialog(item.aisleId)
-            is ProductShoppingListItem -> navigateToEditProduct(item.id)
-        }
-    }
-
     override fun onQueryTextSubmit(query: String?): Boolean {
         return false
     }
@@ -579,7 +576,7 @@ class ShoppingListFragment(
 
         var result = true
         when (item.itemId) {
-            R.id.mnu_edit_shopping_list_item -> editShoppingListItem(actionModeItems.first())
+            R.id.mnu_edit_shopping_list_item -> shoppingListViewModel.navigateToEditItem()
             R.id.mnu_delete_shopping_list_item -> confirmDelete(requireContext())
             R.id.mnu_add_product_to_aisle -> navigateToAddProduct(
                 shoppingListViewModel.productFilter, actionModeItems.first().aisleId

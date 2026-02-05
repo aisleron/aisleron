@@ -32,14 +32,17 @@ import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.koin.test.KoinTest
 import org.koin.test.get
+import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 class AisleShoppingListItemViewModelTest : KoinTest {
+    private val aisleRepository: AisleRepository by lazy { get<AisleRepository>() }
+
 
     @get:Rule
     val koinTestRule = KoinTestRule(
@@ -64,7 +67,7 @@ class AisleShoppingListItemViewModelTest : KoinTest {
 
     private suspend fun getAisle(): Aisle {
         val existingLocationId = get<LocationRepository>().getAll().first().id
-        return get<AisleRepository>().getAll()
+        return aisleRepository.getAll()
             .last { it.locationId == existingLocationId && !it.isDefault }
     }
 
@@ -75,8 +78,8 @@ class AisleShoppingListItemViewModelTest : KoinTest {
 
         shoppingListItem.remove()
 
-        val removedAisle = get<AisleRepository>().get(existingAisle.id)
-        Assert.assertNull(removedAisle)
+        val removedAisle = aisleRepository.get(existingAisle.id)
+        assertNull(removedAisle)
     }
 
     @Test
@@ -92,20 +95,18 @@ class AisleShoppingListItemViewModelTest : KoinTest {
         )
 
         val shoppingListItem = getAisleShoppingListItemViewModel(aisle)
-        val aisleRepository = get<AisleRepository>()
         val aisleCountBefore = aisleRepository.getAll().count()
 
         shoppingListItem.remove()
 
         val aisleCountAfter = aisleRepository.getAll().count()
-        Assert.assertEquals(aisleCountBefore, aisleCountAfter)
+        assertEquals(aisleCountBefore, aisleCountAfter)
     }
 
     @Test
     fun updateItemRank_AisleMoved_AisleRankUpdated() = runTest {
         val movedAisle = getAisle()
         val shoppingListItem = getAisleShoppingListItemViewModel(movedAisle)
-        val aisleRepository = get<AisleRepository>()
         val precedingAisle = aisleRepository.getAll()
             .first { it.locationId == movedAisle.locationId && !it.isDefault && it.id != movedAisle.id }
 
@@ -114,7 +115,7 @@ class AisleShoppingListItemViewModelTest : KoinTest {
         shoppingListItem.updateRank(precedingItem)
 
         val updatedAisle = aisleRepository.get(movedAisle.id)
-        Assert.assertEquals(precedingItem.rank + 1, updatedAisle?.rank)
+        assertEquals(precedingItem.rank + 1, updatedAisle?.rank)
     }
 
     @Test
@@ -124,30 +125,29 @@ class AisleShoppingListItemViewModelTest : KoinTest {
 
         shoppingListItem.updateRank(null)
 
-        val updatedAisle = get<AisleRepository>().get(movedAisle.id)
-        Assert.assertEquals(1, updatedAisle?.rank)
+        val updatedAisle = aisleRepository.get(movedAisle.id)
+        assertEquals(1, updatedAisle?.rank)
     }
 
     private suspend fun updateExpandedArrangeActAssert(expanded: Boolean) {
         val aisle = getAisle().copy(expanded = !expanded)
-        val aisleRepo = get<AisleRepository>()
-        aisleRepo.update(aisle)
+        aisleRepository.update(aisle)
 
         val shoppingListItem = getAisleShoppingListItemViewModel(aisle)
 
         shoppingListItem.updateExpanded(expanded)
 
-        val updatedAisle = aisleRepo.get(aisle.id)
-        Assert.assertEquals(expanded, updatedAisle?.expanded)
+        val updatedAisle = aisleRepository.get(aisle.id)
+        assertEquals(expanded, updatedAisle?.expanded)
     }
 
     @Test
-    fun updateAisleExpanded_ExpandedTrue_AisleUpdatedToExpanded() = runTest {
+    fun updateExpanded_ExpandedTrue_AisleUpdatedToExpanded() = runTest {
         updateExpandedArrangeActAssert(true)
     }
 
     @Test
-    fun updateAisleExpanded_ExpandedFalse_AisleUpdatedToNotExpanded() = runTest {
+    fun updateExpanded_ExpandedFalse_AisleUpdatedToNotExpanded() = runTest {
         updateExpandedArrangeActAssert(false)
     }
 
@@ -157,12 +157,25 @@ class AisleShoppingListItemViewModelTest : KoinTest {
 
         val shoppingListItem = getAisleShoppingListItemViewModel(existingAisle)
 
-        Assert.assertEquals(existingAisle.id, shoppingListItem.id)
-        Assert.assertEquals(existingAisle.name, shoppingListItem.name)
-        Assert.assertEquals(existingAisle.rank, shoppingListItem.rank)
-        Assert.assertEquals(existingAisle.locationId, shoppingListItem.locationId)
-        Assert.assertEquals(existingAisle.isDefault, shoppingListItem.isDefault)
-        Assert.assertEquals(existingAisle.expanded, shoppingListItem.expanded)
-        Assert.assertEquals(existingAisle.products.count(), shoppingListItem.childCount)
+        assertEquals(existingAisle.id, shoppingListItem.id)
+        assertEquals(existingAisle.name, shoppingListItem.name)
+        assertEquals(existingAisle.rank, shoppingListItem.rank)
+        assertEquals(existingAisle.locationId, shoppingListItem.locationId)
+        assertEquals(existingAisle.isDefault, shoppingListItem.isDefault)
+        assertEquals(existingAisle.expanded, shoppingListItem.expanded)
+        assertEquals(existingAisle.products.count(), shoppingListItem.childCount)
+    }
+
+    @Test
+    fun navigateToEditEvent_ReturnsNavigateToEditAisleEvent() = runTest {
+        val existingAisle = getAisle()
+        val shoppingListItem = getAisleShoppingListItemViewModel(existingAisle)
+
+        val event = shoppingListItem.editNavigationEvent()
+
+        assertEquals(
+            ShoppingListViewModel.ShoppingListEvent.NavigateToEditAisle(existingAisle.id),
+            event
+        )
     }
 }

@@ -53,6 +53,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
 class ProductShoppingListItemViewModelTest : KoinTest {
+    private val productRepository: ProductRepository by lazy { get<ProductRepository>() }
 
     @get:Rule
     val koinTestRule = KoinTestRule(
@@ -92,7 +93,7 @@ class ProductShoppingListItemViewModelTest : KoinTest {
 
         shoppingListItem.remove()
 
-        val removedProduct = get<ProductRepository>().get(aisleProduct.product.id)
+        val removedProduct = productRepository.get(aisleProduct.product.id)
         assertNull(removedProduct)
     }
 
@@ -116,7 +117,6 @@ class ProductShoppingListItemViewModelTest : KoinTest {
         )
 
         val shoppingListItem = getProductShoppingListItemViewModel(1000, ap)
-        val productRepository = get<ProductRepository>()
         val productCountBefore = productRepository.getAll().count()
 
         shoppingListItem.remove()
@@ -214,7 +214,7 @@ class ProductShoppingListItemViewModelTest : KoinTest {
 
         shoppingListItem.updateStatus(newInStock)
 
-        val updatedProduct = get<ProductRepository>().get(aisleProduct.product.id)
+        val updatedProduct = productRepository.get(aisleProduct.product.id)
         assertEquals(newInStock, updatedProduct?.inStock)
     }
 
@@ -237,7 +237,7 @@ class ProductShoppingListItemViewModelTest : KoinTest {
 
         shoppingListItem.updateQtyNeeded(newQty)
 
-        val updatedProduct = get<ProductRepository>().get(aisleProduct.product.id)
+        val updatedProduct = productRepository.get(aisleProduct.product.id)
         assertEquals(newQty, updatedProduct?.qtyNeeded)
     }
 
@@ -250,7 +250,7 @@ class ProductShoppingListItemViewModelTest : KoinTest {
 
         shoppingListItem.updateQtyNeeded(newQty)
 
-        val updatedProduct = get<ProductRepository>().get(aisleProduct.product.id)
+        val updatedProduct = productRepository.get(aisleProduct.product.id)
         assertEquals(aisleProduct.product.qtyNeeded, updatedProduct?.qtyNeeded)
     }
 
@@ -268,5 +268,19 @@ class ProductShoppingListItemViewModelTest : KoinTest {
 
         val updatedAisleProduct = get<AisleProductRepository>().get(aisleProduct.id)
         assertEquals(targetAisle.id, updatedAisleProduct?.aisleId)
+    }
+
+    @Test
+    fun navigateToEditEvent_ReturnsNavigateToEditProductEvent() = runTest {
+        val existingAisle = getShoppingList().aisles.first()
+        val aisleProduct = existingAisle.products.first()
+        val shoppingListItem = getProductShoppingListItemViewModel(existingAisle.rank, aisleProduct)
+
+        val event = shoppingListItem.editNavigationEvent()
+
+        assertEquals(
+            ShoppingListViewModel.ShoppingListEvent.NavigateToEditProduct(aisleProduct.product.id),
+            event
+        )
     }
 }
