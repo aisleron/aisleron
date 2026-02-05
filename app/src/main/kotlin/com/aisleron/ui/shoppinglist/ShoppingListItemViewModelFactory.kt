@@ -44,7 +44,7 @@ class ShoppingListItemViewModelFactory(
         aisleProduct: AisleProduct, aisleRank: Int, isSelected: Boolean
     ) = ProductShoppingListItemViewModel(
         aisleProduct = aisleProduct,
-        aisleRank = aisleRank,
+        headerRank = aisleRank,
         selected = isSelected,
         removeProductUseCase = removeProductUseCase,
         updateAisleProductRankUseCase = updateAisleProductRankUseCase,

@@ -50,7 +50,9 @@ class LocationDaoTestImpl(private val aisleDao: AisleDaoTestImpl) : LocationDao 
                 name = it.name,
                 pinned = it.pinned,
                 showDefaultAisle = it.showDefaultAisle,
-                noteId = it.noteId
+                noteId = it.noteId,
+                expanded = it.expanded,
+                rank = it.rank
             )
 
             locationList.add(newEntity)
@@ -73,6 +75,10 @@ class LocationDaoTestImpl(private val aisleDao: AisleDaoTestImpl) : LocationDao 
 
     override suspend fun getLocationByName(name: String): LocationEntity? {
         return locationList.find { it.name.uppercase() == name.uppercase() }
+    }
+
+    override suspend fun getLocationMaxRank(): Int {
+        return locationList.maxOf { it.rank }
     }
 
     override suspend fun getLocationWithAisles(locationId: Int): LocationWithAisles {

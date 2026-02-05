@@ -289,7 +289,9 @@ class ShoppingListFragmentTest : KoinTest {
             name = "No Aisle Shop",
             pinned = false,
             aisles = emptyList(),
-            showDefaultAisle = false
+            showDefaultAisle = false,
+            expanded = true,
+            rank = get<LocationRepository>().getLocationMaxRank() + 1
         )
 
         val locationId = get<LocationRepository>().add(location)
@@ -531,7 +533,7 @@ class ShoppingListFragmentTest : KoinTest {
         val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
 
         val scenario = getActivityScenario(bundle)
-        val aisleItem = onView(allOf(withText(aisle.name), withId(R.id.txt_aisle_name)))
+        val aisleItem = onView(allOf(withText(aisle.name), withId(R.id.txt_header_name)))
         aisleItem.perform(longClick())
         openActionBarOverflowOrOptionsMenu(getInstrumentation().targetContext)
         onView(withText(R.string.delete)).perform(click())
@@ -557,7 +559,7 @@ class ShoppingListFragmentTest : KoinTest {
         preferences.setShowEmptyAisles(true)
         getActivityScenario(bundle, preferences)
 
-        val aisleItem = onView(allOf(withText(aisle.name), withId(R.id.txt_aisle_name)))
+        val aisleItem = onView(allOf(withText(aisle.name), withId(R.id.txt_header_name)))
         aisleItem.perform(longClick())
         openActionBarOverflowOrOptionsMenu(getInstrumentation().targetContext)
         onView(withText(R.string.delete)).perform(click())
@@ -590,7 +592,7 @@ class ShoppingListFragmentTest : KoinTest {
         val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
 
         val scenario = getActivityScenario(bundle)
-        val aisleItem = onView(allOf(withText(aisle.name), withId(R.id.txt_aisle_name)))
+        val aisleItem = onView(allOf(withText(aisle.name), withId(R.id.txt_header_name)))
         aisleItem.perform(longClick())
         openActionBarOverflowOrOptionsMenu(getInstrumentation().targetContext)
         onView(withText(R.string.delete)).perform(click())
@@ -718,7 +720,7 @@ class ShoppingListFragmentTest : KoinTest {
 
         getActivityScenario(shoppingListBundle)
 
-        val aisleItem = onView(allOf(withText(aisle.name), withId(R.id.txt_aisle_name)))
+        val aisleItem = onView(allOf(withText(aisle.name), withId(R.id.txt_header_name)))
         aisleItem.perform(longClick())
         onView(withId(R.id.mnu_edit_shopping_list_item)).perform(click())
 
@@ -883,7 +885,7 @@ class ShoppingListFragmentTest : KoinTest {
 
         val productItem = onView(allOf(withText(product.name), withId(R.id.txt_product_name)))
         productItem.perform(longClick())
-        val aisleItem = onView(allOf(withText(aisle.name), withId(R.id.txt_aisle_name)))
+        val aisleItem = onView(allOf(withText(aisle.name), withId(R.id.txt_header_name)))
         aisleItem.perform(click())
 
         productItem.check(matches((isSelected())))
@@ -974,7 +976,7 @@ class ShoppingListFragmentTest : KoinTest {
 
         val productItem = onView(allOf(withText(product.name), withId(R.id.txt_product_name)))
         productItem.perform(longClick())
-        val aisleItem = onView(allOf(withText(aisle.name), withId(R.id.txt_aisle_name)))
+        val aisleItem = onView(allOf(withText(aisle.name), withId(R.id.txt_header_name)))
         aisleItem.perform(longClick())
 
         val actionBar = onContextualActionBar()

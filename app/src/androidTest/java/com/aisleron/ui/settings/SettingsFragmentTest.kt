@@ -57,6 +57,7 @@ import com.aisleron.R
 import com.aisleron.SharedPreferencesInitializer
 import com.aisleron.di.KoinTestRule
 import com.aisleron.di.daoTestModule
+import com.aisleron.di.factoryModule
 import com.aisleron.di.fragmentModule
 import com.aisleron.di.generalTestModule
 import com.aisleron.di.preferenceTestModule
@@ -93,7 +94,8 @@ class SettingsFragmentTest : KoinTest {
             useCaseModule,
             viewModelTestModule,
             generalTestModule,
-            preferenceTestModule
+            preferenceTestModule,
+            factoryModule
         )
     )
 

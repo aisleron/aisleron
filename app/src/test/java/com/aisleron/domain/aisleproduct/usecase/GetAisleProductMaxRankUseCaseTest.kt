@@ -26,6 +26,7 @@ import com.aisleron.domain.aisleproduct.AisleProductRepository
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.location.LocationType
+import com.aisleron.domain.location.usecase.GetLocationMaxRankUseCase
 import com.aisleron.domain.product.ProductRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions
@@ -52,7 +53,9 @@ class GetAisleProductMaxRankUseCaseTest {
                 name = "Rank Test Shop",
                 pinned = false,
                 aisles = emptyList(),
-                showDefaultAisle = true
+                showDefaultAisle = true,
+                expanded = true,
+                rank = dm.getUseCase<GetLocationMaxRankUseCase>().invoke() + 1
             )
         )
 

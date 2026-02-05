@@ -58,6 +58,7 @@ val viewModelTestModule = module {
             getLoyaltyCardForLocationUseCase = get(),
             getNoteParentUseCase = get(),
             applyNoteChangesUseCase = get(),
+            getLocationMaxRankUseCase = get(),
             TestScope(UnconfinedTestDispatcher())
         )
     }

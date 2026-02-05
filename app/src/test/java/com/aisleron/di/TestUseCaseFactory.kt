@@ -48,6 +48,8 @@ import com.aisleron.domain.location.usecase.AddLocationUseCaseImpl
 import com.aisleron.domain.location.usecase.CopyLocationUseCase
 import com.aisleron.domain.location.usecase.CopyLocationUseCaseImpl
 import com.aisleron.domain.location.usecase.GetHomeLocationUseCase
+import com.aisleron.domain.location.usecase.GetLocationMaxRankUseCase
+import com.aisleron.domain.location.usecase.GetLocationMaxRankUseCaseImpl
 import com.aisleron.domain.location.usecase.GetLocationUseCase
 import com.aisleron.domain.location.usecase.GetPinnedShopsUseCase
 import com.aisleron.domain.location.usecase.GetShopsUseCase
@@ -229,6 +231,10 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
 
     val getHomeLocationUseCase: GetHomeLocationUseCase by lazy {
         GetHomeLocationUseCase(repositoryFactory.locationRepository)
+    }
+
+    val getLocationMaxRankUseCase: GetLocationMaxRankUseCase by lazy {
+        GetLocationMaxRankUseCaseImpl(repositoryFactory.locationRepository)
     }
 
     val getLocationUseCase: GetLocationUseCase by lazy {
@@ -439,7 +445,8 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
             updateAisleProductRankUseCase = updateAisleProductRankUseCase,
             addLocationUseCase = addLocationUseCase,
             getAllProductsUseCase = getAllProductsUseCase,
-            getHomeLocationUseCase = getHomeLocationUseCase
+            getHomeLocationUseCase = getHomeLocationUseCase,
+            getLocationMaxRankUseCase = getLocationMaxRankUseCase
         )
     }
 
@@ -488,6 +495,7 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
             CopyLocationUseCase::class -> copyLocationUseCase as T
             GetHomeLocationUseCase::class -> getHomeLocationUseCase as T
             GetLocationUseCase::class -> getLocationUseCase as T
+            GetLocationMaxRankUseCase::class -> getLocationMaxRankUseCase as T
             IsLocationNameUniqueUseCase::class -> isLocationNameUniqueUseCase as T
             GetPinnedShopsUseCase::class -> getPinnedShopsUseCase as T
             GetShopsUseCase::class -> getShopsUseCase as T

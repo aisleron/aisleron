@@ -36,6 +36,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import com.aisleron.di.KoinTestRule
 import com.aisleron.di.daoTestModule
+import com.aisleron.di.factoryModule
 import com.aisleron.di.fragmentModule
 import com.aisleron.di.generalTestModule
 import com.aisleron.di.preferenceTestModule
@@ -72,7 +73,8 @@ class SearchBoxTest : KoinTest {
             repositoryModule,
             useCaseModule,
             generalTestModule,
-            preferenceTestModule
+            preferenceTestModule,
+            factoryModule
         )
     )
 
@@ -201,7 +203,8 @@ class SearchBoxTest : KoinTest {
                     hasDescendant(
                         allOf(
                             withText(productName),
-                            withId(R.id.txt_product_name))
+                            withId(R.id.txt_product_name)
+                        )
                     )
                 )
             )

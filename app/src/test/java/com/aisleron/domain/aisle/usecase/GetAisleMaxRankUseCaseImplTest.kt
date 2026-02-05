@@ -49,7 +49,9 @@ class GetAisleMaxRankUseCaseImplTest {
                 name = "Rank Test Shop",
                 pinned = false,
                 aisles = emptyList(),
-                showDefaultAisle = true
+                showDefaultAisle = true,
+                expanded = true,
+                rank = 10
             )
         )
 

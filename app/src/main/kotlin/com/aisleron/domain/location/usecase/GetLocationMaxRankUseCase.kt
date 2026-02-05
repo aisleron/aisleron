@@ -15,9 +15,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.ui.shoppinglist
+package com.aisleron.domain.location.usecase
 
-interface AisleShoppingListItem : HeaderShoppingListItem {
-    override val aisleId: Int
-        get() = id
+import com.aisleron.domain.location.LocationRepository
+
+interface GetLocationMaxRankUseCase {
+    suspend operator fun invoke(): Int
+}
+
+class GetLocationMaxRankUseCaseImpl(
+    val locationRepository: LocationRepository
+) : GetLocationMaxRankUseCase {
+    override suspend fun invoke(): Int {
+        return locationRepository.getLocationMaxRank()
+    }
+
 }

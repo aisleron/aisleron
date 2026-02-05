@@ -34,6 +34,7 @@ import com.aisleron.MainActivity
 import com.aisleron.R
 import com.aisleron.di.KoinTestRule
 import com.aisleron.di.daoTestModule
+import com.aisleron.di.factoryModule
 import com.aisleron.di.fragmentModule
 import com.aisleron.di.generalTestModule
 import com.aisleron.di.preferenceTestModule
@@ -67,7 +68,8 @@ class FabHandlerTest : KoinTest {
             repositoryModule,
             useCaseModule,
             generalTestModule,
-            preferenceTestModule
+            preferenceTestModule,
+            factoryModule
         )
     )
 

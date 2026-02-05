@@ -38,6 +38,9 @@ interface LocationDao : BaseDao<LocationEntity> {
     @Query("SELECT * FROM Location WHERE name = :name COLLATE NOCASE")
     suspend fun getLocationByName(name: String): LocationEntity?
 
+    @Query("SELECT COALESCE(MAX(rank), 0) FROM Location")
+    suspend fun getLocationMaxRank(): Int
+
     /**
      * Location With Aisles
      */

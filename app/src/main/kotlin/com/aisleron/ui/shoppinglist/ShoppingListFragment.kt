@@ -161,7 +161,7 @@ class ShoppingListFragment(
                                 }
 
                                 is ShoppingListViewModel.ShoppingListUiState.Updated -> {
-                                    updateTitle(it.locationType, it.productFilter, it.locationName)
+                                    updateTitle(it.title)
                                     setMenuItemVisibility()
 
                                     (view.adapter as ShoppingListItemRecyclerViewAdapter).submitList(
@@ -236,12 +236,12 @@ class ShoppingListFragment(
                             shoppingListViewModel.movedItem(item)
                         }
 
-                        override fun onAisleExpandToggle(
-                            item: AisleShoppingListItem, expanded: Boolean
+                        override fun onHeaderExpandToggle(
+                            item: HeaderShoppingListItem, expanded: Boolean
                         ) {
                             if (hasSelectedItems()) return
 
-                            shoppingListViewModel.updateAisleExpanded(item, expanded)
+                            shoppingListViewModel.updateExpanded(item, expanded)
                         }
 
                         override fun onDragStart(viewHolder: RecyclerView.ViewHolder) {
@@ -422,18 +422,13 @@ class ShoppingListFragment(
         }
     }
 
-    private fun updateTitle(
-        locationType: LocationType, productFilter: FilterType, locationName: String
-    ) {
-        val appTitle = when (locationType) {
-            LocationType.HOME ->
-                when (productFilter) {
-                    FilterType.IN_STOCK -> resources.getString(R.string.menu_in_stock)
-                    FilterType.NEEDED -> resources.getString(R.string.menu_needed)
-                    FilterType.ALL -> resources.getString(R.string.menu_all_items)
-                }
-
-            LocationType.SHOP -> locationName
+    private fun updateTitle(listTitle: ShoppingListViewModel.ListTitle) {
+        val appTitle = when (listTitle) {
+            ShoppingListViewModel.ListTitle.InStock -> resources.getString(R.string.menu_in_stock)
+            ShoppingListViewModel.ListTitle.Needed -> resources.getString(R.string.menu_needed)
+            ShoppingListViewModel.ListTitle.AllItems -> resources.getString(R.string.menu_all_items)
+            ShoppingListViewModel.ListTitle.AllShops -> "" // TODO: Add string resource
+            is ShoppingListViewModel.ListTitle.LocationName -> listTitle.name
         }
 
         applicationTitleUpdateListener.applicationTitleUpdated(requireActivity(), appTitle)

@@ -49,13 +49,15 @@ class LocationRepositoryImplTest : RepositoryImplTest<Location>() {
         pinned = false,
         aisles = emptyList(),
         showDefaultAisle = true,
-        defaultFilter = FilterType.NEEDED
+        defaultFilter = FilterType.NEEDED,
+        expanded = true,
+        rank = 1000
     )
 
     override suspend fun getMultipleNewItems(): List<Location> {
         return listOf(
             getSingleNewItem(),
-            getSingleNewItem().copy(name = "New Location 2", pinned = true)
+            getSingleNewItem().copy(name = "New Location 2", pinned = true, rank = 2000)
         )
     }
 
@@ -123,5 +125,15 @@ class LocationRepositoryImplTest : RepositoryImplTest<Location>() {
 
         assertNotNull(location)
         assertEquals(locationName, location.name)
+    }
+
+    @Test
+    fun getMaxRank_ReturnMaxRank() = runTest {
+        addMultipleItems()
+        val expected = locationRepository.getAll().maxOf { it.rank }
+
+        val actual = locationRepository.getLocationMaxRank()
+
+        assertEquals(expected, actual)
     }
 }

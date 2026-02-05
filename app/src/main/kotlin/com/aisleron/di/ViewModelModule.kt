@@ -51,7 +51,8 @@ val viewModelModule = module {
             removeLoyaltyCardFromLocationUseCase = get(),
             getLoyaltyCardForLocationUseCase = get(),
             getNoteParentUseCase = get(),
-            applyNoteChangesUseCase = get()
+            applyNoteChangesUseCase = get(),
+            getLocationMaxRankUseCase = get()
         )
     }
 

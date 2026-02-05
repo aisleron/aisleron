@@ -18,7 +18,7 @@
 package com.aisleron.ui.shoppinglist
 
 interface ShoppingListItem {
-    val aisleRank: Int
+    val headerRank: Int
     val rank: Int
     val id: Int
     val name: String
@@ -29,7 +29,7 @@ interface ShoppingListItem {
     override fun equals(other: Any?): Boolean
 
     enum class ItemType {
-        AISLE, PRODUCT, EMPTY_LIST
+        HEADER, PRODUCT, EMPTY_LIST
     }
 }
 

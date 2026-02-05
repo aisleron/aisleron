@@ -20,6 +20,8 @@ package com.aisleron.data
 import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.aisleron.data.aisle.AisleDao
 import com.aisleron.data.aisle.AisleEntity
 import com.aisleron.data.aisleproduct.AisleProductDao
@@ -47,13 +49,14 @@ import com.aisleron.data.product.ProductEntity
         NoteEntity::class
     ],
 
-    version = 6,
+    version = 7,
     autoMigrations = [
         AutoMigration(from = 1, to = 2),
         AutoMigration(from = 2, to = 3),
         AutoMigration(from = 3, to = 4),
         AutoMigration(from = 4, to = 5),
         AutoMigration(from = 5, to = 6)
+        /** Migration from 6 to 7 is done manually to set initial rank values [MIGRATION_6_7] */
     ]
 )
 abstract class AisleronDatabase : AisleronDb, RoomDatabase() {
@@ -65,4 +68,18 @@ abstract class AisleronDatabase : AisleronDb, RoomDatabase() {
     abstract override fun loyaltyCardDao(): LoyaltyCardDao
     abstract override fun locationLoyaltyCardDao(): LocationLoyaltyCardDao
     abstract override fun noteDao(): NoteDao
+
+    companion object {
+        @JvmField
+        val MIGRATION_6_7 = object : Migration(6, 7) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE Location ADD COLUMN expanded INTEGER NOT NULL DEFAULT 1")
+
+                // Initial rank is based on id so locations are ranked by order of creation
+                // Not doing this will lead to some really strange behavior when reordering
+                db.execSQL("ALTER TABLE Location ADD COLUMN rank INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("UPDATE Location SET rank = id")
+            }
+        }
+    }
 }

@@ -30,6 +30,7 @@ import com.aisleron.domain.aisleproduct.AisleProductRepository
 import com.aisleron.domain.aisleproduct.usecase.ChangeProductAisleUseCase
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.location.Location
+import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.location.usecase.AddLocationUseCase
 import com.aisleron.domain.location.usecase.GetLocationUseCase
@@ -467,7 +468,9 @@ class ProductViewModelTest() : KoinTest {
                 name = newStore,
                 pinned = false,
                 aisles = emptyList(),
-                showDefaultAisle = true
+                showDefaultAisle = true,
+                expanded = true,
+                rank = get<LocationRepository>().getLocationMaxRank() + 1
             )
         )
 

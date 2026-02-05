@@ -41,6 +41,7 @@ import com.aisleron.di.viewModelTestModule
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.aisle.AisleRepository
 import com.aisleron.domain.location.Location
+import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.location.usecase.AddLocationUseCase
 import com.aisleron.domain.product.Product
@@ -186,7 +187,9 @@ class ProductAislesFragmentTest : KoinTest {
                 name = newLocationName,
                 pinned = false,
                 aisles = emptyList(),
-                showDefaultAisle = true
+                showDefaultAisle = true,
+                expanded = true,
+                rank = get<LocationRepository>().getLocationMaxRank() + 1
             )
         )
 

@@ -31,7 +31,7 @@ class ShoppingListItemMoveCallbackListener(private val listener: Listener) :
     ): Int {
         val dragFlags = when (viewHolder) {
             is ShoppingListItemRecyclerViewAdapter.ProductListItemViewHolder,
-            is ShoppingListItemRecyclerViewAdapter.AisleViewHolder -> ItemTouchHelper.UP or ItemTouchHelper.DOWN
+            is ShoppingListItemRecyclerViewAdapter.HeaderViewHolder -> ItemTouchHelper.UP or ItemTouchHelper.DOWN
 
             else -> 0
         }
@@ -93,11 +93,11 @@ class ShoppingListItemMoveCallbackListener(private val listener: Listener) :
     ): Boolean {
         val allowProductDrop =
             current is ShoppingListItemRecyclerViewAdapter.ProductListItemViewHolder
-                    && !(target is ShoppingListItemRecyclerViewAdapter.AisleViewHolder && target.absoluteAdapterPosition == 0)
+                    && !(target is ShoppingListItemRecyclerViewAdapter.HeaderViewHolder && target.absoluteAdapterPosition == 0)
 
         val allowAisleDrop =
-            current is ShoppingListItemRecyclerViewAdapter.AisleViewHolder
-                    && target is ShoppingListItemRecyclerViewAdapter.AisleViewHolder
+            current is ShoppingListItemRecyclerViewAdapter.HeaderViewHolder
+                    && target is ShoppingListItemRecyclerViewAdapter.HeaderViewHolder
 
         return allowProductDrop || allowAisleDrop
     }

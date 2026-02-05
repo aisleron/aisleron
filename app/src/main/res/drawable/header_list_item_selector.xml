@@ -24,7 +24,7 @@
         <selector>
             <item
                 android:state_selected="true"
-                android:drawable="@drawable/aisle_list_item_selected" />
+                android:drawable="@drawable/header_list_item_selected" />
         </selector>
     </item>
 </layer-list>

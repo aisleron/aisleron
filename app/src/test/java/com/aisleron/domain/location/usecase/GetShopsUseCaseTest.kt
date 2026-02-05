@@ -47,6 +47,8 @@ class GetShopsUseCaseTest {
 
     @Test
     fun getShops_ShopsDefined_ReturnShopsList() = runTest {
+        val maxRank = dm.getUseCase<GetLocationMaxRankUseCase>().invoke()
+
         dm.getRepository<LocationRepository>().add(
             listOf(
                 Location(
@@ -56,7 +58,9 @@ class GetShopsUseCaseTest {
                     name = "Shop 1",
                     pinned = false,
                     aisles = emptyList(),
-                    showDefaultAisle = true
+                    showDefaultAisle = true,
+                    expanded = true,
+                    rank = maxRank + 1
                 ),
                 Location(
                     id = 2000,
@@ -65,7 +69,9 @@ class GetShopsUseCaseTest {
                     name = "Shop 2",
                     pinned = false,
                     aisles = emptyList(),
-                    showDefaultAisle = true
+                    showDefaultAisle = true,
+                    expanded = true,
+                    rank = maxRank + 2
                 ),
             )
         )

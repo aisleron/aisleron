@@ -44,7 +44,9 @@ class DbInitializer(
             name = "Home",
             pinned = false,
             showDefaultAisle = true,
-            noteId = null
+            noteId = null,
+            expanded = true,
+            rank = 1
         )
         coroutineScope.launch {
             val homeId = locationDao.upsert(home)[0].toInt()

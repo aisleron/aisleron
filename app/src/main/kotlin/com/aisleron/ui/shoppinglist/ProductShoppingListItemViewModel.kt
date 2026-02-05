@@ -27,7 +27,7 @@ import com.aisleron.domain.product.usecase.UpdateProductStatusUseCase
 
 class ProductShoppingListItemViewModel(
     private val aisleProduct: AisleProduct,
-    override val aisleRank: Int,
+    override val headerRank: Int,
     override val selected: Boolean,
     private val updateAisleProductRankUseCase: UpdateAisleProductRankUseCase,
     private val removeProductUseCase: RemoveProductUseCase,
@@ -77,7 +77,7 @@ class ProductShoppingListItemViewModel(
         if (other !is ProductShoppingListItemViewModel) return false
 
         if (aisleProduct != other.aisleProduct) return false
-        if (aisleRank != other.aisleRank) return false
+        if (headerRank != other.headerRank) return false
         if (selected != other.selected) return false
 
         return true
@@ -85,7 +85,7 @@ class ProductShoppingListItemViewModel(
 
     override fun hashCode(): Int {
         var result = aisleProduct.hashCode()
-        result = 31 * result + aisleRank
+        result = 31 * result + headerRank
         result = 31 * result + selected.hashCode()
         return result
     }

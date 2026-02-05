@@ -30,7 +30,7 @@ class AisleShoppingListItemViewModel(
     private val getAisleUseCase: GetAisleUseCase,
     private val removeAisleUseCase: RemoveAisleUseCase,
     private val updateAisleExpandedUseCase: UpdateAisleExpandedUseCase
-) : AisleShoppingListItem, ShoppingListItemViewModel {
+) : AisleShoppingListItem, HeaderShoppingListItemViewModel {
     override val childCount: Int get() = aisle.products.count()
     override val locationId: Int get() = aisle.locationId
     override val isDefault: Boolean get() = aisle.isDefault
@@ -47,12 +47,12 @@ class AisleShoppingListItemViewModel(
     override suspend fun updateRank(precedingItem: ShoppingListItem?) {
         updateAisleRankUseCase(
             aisle.copy(
-                rank = precedingItem?.let { it.aisleRank + 1 } ?: 1
+                rank = precedingItem?.let { it.headerRank + 1 } ?: 1
             )
         )
     }
 
-    suspend fun updateExpanded(expanded: Boolean) {
+    override suspend fun updateExpanded(expanded: Boolean) {
         updateAisleExpandedUseCase(id, expanded)
     }
 

@@ -21,7 +21,7 @@ data class EmptyShoppingListItem(
     override val rank: Int = 1,
     override val name: String = ""
 ) : ShoppingListItem {
-    override val aisleRank: Int get() = rank
+    override val headerRank: Int get() = rank
     override val id: Int get() = 0
     override val aisleId: Int get() = id
     override val selected: Boolean get() = false

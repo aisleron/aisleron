@@ -28,7 +28,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.LocationType
 import junit.framework.TestCase.assertNotNull
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 import java.io.IOException
@@ -208,7 +208,9 @@ class DatabaseMigrationTest {
             val qtyIncrement = cursorProduct.getDouble(cursorProduct.getColumnIndex("qtyIncrement"))
             assertEquals(1.0, qtyIncrement)
 
-            val unitOfMeasure = cursorProduct.getString(cursorProduct.getColumnIndex("unitOfMeasure"))
+            val unitOfMeasure =
+                cursorProduct.getString(cursorProduct.getColumnIndex("unitOfMeasure"))
+
             assertEquals("", unitOfMeasure)
 
             val trackingMode = cursorProduct.getString(cursorProduct.getColumnIndex("trackingMode"))
@@ -220,9 +222,40 @@ class DatabaseMigrationTest {
         }
     }
 
+
     @Test
     @Throws(IOException::class)
-    fun migrateAll() {
+    fun migrate6to7() {
+        helper.createDatabase(testDb, 6).apply {
+            populateV5Database(this)
+            close()
+        }
+
+        val db = helper.runMigrationsAndValidate(testDb, 7, true, AisleronDatabase.MIGRATION_6_7)
+
+        db.apply {
+            val queryLocation = SupportSQLiteQueryBuilder.builder("Location")
+            val cursorLocation: Cursor = query(queryLocation.create())
+            cursorLocation.moveToFirst()
+
+            // Check expanded exists on Location
+            val expanded = cursorLocation.getInt(cursorLocation.getColumnIndex("expanded"))
+            assertEquals(1, expanded)
+
+            // Check migration sets initial rank equal to Id
+            val id = cursorLocation.getInt(cursorLocation.getColumnIndex("id"))
+            val rank = cursorLocation.getInt(cursorLocation.getColumnIndex("rank"))
+            assertEquals(id, rank)
+
+            cursorLocation.close()
+
+            close()
+        }
+    }
+
+    @Test
+    @Throws(IOException::class)
+    fun migrateAll() = runTest {
         helper.createDatabase(testDb, 1).apply {
             populateV1Database(this)
             close()
@@ -232,13 +265,15 @@ class DatabaseMigrationTest {
             InstrumentationRegistry.getInstrumentation().targetContext,
             AisleronDatabase::class.java,
             testDb
-        ).build()
+        )
+            .addMigrations(AisleronDatabase.MIGRATION_6_7)
+            .build()
 
         // LoyaltyCard introduced in V3
-        val loyaltyCards = runBlocking { db.loyaltyCardDao().getLoyaltyCards() }
+        val loyaltyCards = db.loyaltyCardDao().getLoyaltyCards()
         assertNotNull(loyaltyCards)
 
-        val product = runBlocking { db.productDao().getProducts().first() }
+        val product = db.productDao().getProducts().first()
 
         // Product.qtyNeeded introduced in V4, updated to Double in V6
         assertEquals(0.0, product.qtyNeeded)
@@ -247,11 +282,16 @@ class DatabaseMigrationTest {
         assertNull(product.noteId)
 
         // Note introduced in V5
-        val notes = runBlocking { db.noteDao().getNotes() }
+        val notes = db.noteDao().getNotes()
         assertNotNull(notes)
 
         // Product.qtyIncrement introduced in V6
         assertEquals(1.0, product.qtyIncrement)
+
+        // Location Expanded and Rank introduced in V7
+        val location = db.locationDao().getLocations().first()
+        assertEquals(true, location.expanded)
+        assertEquals(location.id, location.rank)
 
         db.close()
     }

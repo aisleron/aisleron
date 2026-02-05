@@ -145,7 +145,9 @@ class CaptureScreenshots : KoinTest {
                     name = "Corner Convenience",
                     pinned = false,
                     aisles = emptyList(),
-                    showDefaultAisle = true
+                    showDefaultAisle = true,
+                    expanded = true,
+                    rank = get<LocationRepository>().getLocationMaxRank() + 1
                 )
             )
 

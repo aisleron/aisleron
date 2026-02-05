@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025-2026 aisleron.com
+ * Copyright (C) 2026 aisleron.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -17,7 +17,15 @@
 
 package com.aisleron.ui.shoppinglist
 
-interface AisleShoppingListItem : HeaderShoppingListItem {
-    override val aisleId: Int
-        get() = id
+interface HeaderShoppingListItem : ShoppingListItem {
+    val childCount: Int
+    val locationId: Int
+    val expanded: Boolean
+    val isDefault: Boolean
+
+    override val headerRank: Int
+        get() = rank
+
+    override val itemType: ShoppingListItem.ItemType
+        get() = ShoppingListItem.ItemType.HEADER
 }

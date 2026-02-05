@@ -56,6 +56,8 @@ import com.aisleron.domain.location.usecase.AddLocationUseCaseImpl
 import com.aisleron.domain.location.usecase.CopyLocationUseCase
 import com.aisleron.domain.location.usecase.CopyLocationUseCaseImpl
 import com.aisleron.domain.location.usecase.GetHomeLocationUseCase
+import com.aisleron.domain.location.usecase.GetLocationMaxRankUseCase
+import com.aisleron.domain.location.usecase.GetLocationMaxRankUseCaseImpl
 import com.aisleron.domain.location.usecase.GetLocationUseCase
 import com.aisleron.domain.location.usecase.GetPinnedShopsUseCase
 import com.aisleron.domain.location.usecase.GetShopsUseCase
@@ -128,6 +130,7 @@ val useCaseModule = module {
     factory<GetPinnedShopsUseCase> { GetPinnedShopsUseCase(locationRepository = get()) }
     factory<IsLocationNameUniqueUseCase> { IsLocationNameUniqueUseCase(locationRepository = get()) }
     factory<GetHomeLocationUseCase> { GetHomeLocationUseCase(locationRepository = get()) }
+    factory<GetLocationMaxRankUseCase> { GetLocationMaxRankUseCaseImpl(locationRepository = get()) }
 
     factory<UpdateLocationUseCase> {
         UpdateLocationUseCase(
@@ -346,7 +349,8 @@ val useCaseModule = module {
             updateAisleProductRankUseCase = get(),
             addLocationUseCase = get(),
             getAllProductsUseCase = get(),
-            getHomeLocationUseCase = get()
+            getHomeLocationUseCase = get(),
+            getLocationMaxRankUseCase = get()
         )
     }
 

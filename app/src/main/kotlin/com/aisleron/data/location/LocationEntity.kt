@@ -45,5 +45,7 @@ data class LocationEntity(
     val name: String,
     val pinned: Boolean,
     @ColumnInfo(defaultValue = "1") val showDefaultAisle: Boolean,
-    @ColumnInfo(index = true) val noteId: Int?
+    @ColumnInfo(index = true) val noteId: Int?,
+    @ColumnInfo(defaultValue = "1") val expanded: Boolean,
+    val rank: Int
 )

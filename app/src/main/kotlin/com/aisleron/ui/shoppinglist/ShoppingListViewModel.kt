@@ -124,7 +124,7 @@ class ShoppingListViewModel(
 
                     val state: ShoppingListUiState = ShoppingListUiState.Updated(
                         shoppingList = listItems,
-                        locationName = collectedLocation?.name ?: "",
+                        title = getListTitle(collectedLocation),
                         locationType = collectedLocation?.type ?: LocationType.HOME,
                         productFilter = combinedFilter.productFilter ?: FilterType.NEEDED
                     )
@@ -196,7 +196,7 @@ class ShoppingListViewModel(
         val filteredList: MutableList<ShoppingListItem> = location?.let { l ->
             l.aisles.flatMap { a ->
                 val aisleSignature = SelectedSignature(
-                    ShoppingListItem.ItemType.AISLE, a.id, a.id
+                    ShoppingListItem.ItemType.HEADER, a.id, a.id
                 )
 
                 listOf(
@@ -247,9 +247,9 @@ class ShoppingListViewModel(
         _quantityUpdates.tryEmit(QtyUpdate(item, quantity))
     }
 
-    fun updateAisleExpanded(item: AisleShoppingListItem, expanded: Boolean) {
+    fun updateExpanded(item: HeaderShoppingListItem, expanded: Boolean) {
         coroutineScope.launchHandling {
-            (item as AisleShoppingListItemViewModel).updateExpanded(expanded)
+            (item as HeaderShoppingListItemViewModel).updateExpanded(expanded)
         }
     }
 
@@ -393,6 +393,19 @@ class ShoppingListViewModel(
         }
     }
 
+    private fun getListTitle(collectedLocation: Location?): ListTitle =
+        when (productFilter) {
+            FilterType.IN_STOCK -> ListTitle.InStock
+            FilterType.NEEDED -> ListTitle.Needed
+            FilterType.ALL -> ListTitle.AllItems
+        }.let { baseTitle ->
+            if (collectedLocation == null || collectedLocation.type == LocationType.HOME) {
+                baseTitle
+            } else {
+                ListTitle.LocationName(collectedLocation.name)
+            }
+        }
+
     sealed class ShoppingListUiState {
         data object Empty : ShoppingListUiState()
         data object Loading : ShoppingListUiState()
@@ -402,7 +415,7 @@ class ShoppingListViewModel(
 
         data class Updated(
             val shoppingList: List<ShoppingListItem>,
-            val locationName: String,
+            val title: ListTitle,
             val locationType: LocationType,
             val productFilter: FilterType
         ) : ShoppingListUiState()
@@ -417,7 +430,17 @@ class ShoppingListViewModel(
         data class NavigateToEditShop(val id: Int?) : ShoppingListEvent()
     }
 
+    sealed class ListTitle {
+        data class LocationName(val name: String) : ListTitle()
+        object InStock : ListTitle()
+        object Needed : ListTitle()
+        object AllItems : ListTitle()
+        object AllShops : ListTitle()
+    }
+
     companion object {
         const val TAG = "ShoppingListViewModel"
     }
 }
+
+

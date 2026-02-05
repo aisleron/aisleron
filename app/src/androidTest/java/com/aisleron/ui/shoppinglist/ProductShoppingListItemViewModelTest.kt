@@ -65,11 +65,11 @@ class ProductShoppingListItemViewModelTest : KoinTest {
     }
 
     private fun getProductShoppingListItemViewModel(
-        aisleRank: Int,
+        headerRank: Int,
         aisleProduct: AisleProduct
     ) = ProductShoppingListItemViewModel(
         aisleProduct = aisleProduct,
-        aisleRank = aisleRank,
+        headerRank = headerRank,
         selected = false,
         updateAisleProductRankUseCase = get<UpdateAisleProductRankUseCase>(),
         removeProductUseCase = get<RemoveProductUseCase>(),
@@ -198,7 +198,7 @@ class ProductShoppingListItemViewModelTest : KoinTest {
         assertEquals(aisleProduct.product.unitOfMeasure, shoppingListItem.unitOfMeasure)
         assertEquals(aisleProduct.product.trackingMode, shoppingListItem.trackingMode)
         assertEquals(aisleProduct.rank, shoppingListItem.rank)
-        assertEquals(existingAisle.rank, shoppingListItem.aisleRank)
+        assertEquals(existingAisle.rank, shoppingListItem.headerRank)
     }
 
     private suspend fun updateStatus_ArrangeActAssert(newInStock: Boolean) {

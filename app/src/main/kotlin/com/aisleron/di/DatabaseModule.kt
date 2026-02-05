@@ -33,12 +33,14 @@ val databaseModule = module {
             androidApplication(),
             AisleronDatabase::class.java,
             "aisleron.db"
-        ).addCallback(object : RoomDatabase.Callback() {
-            override fun onCreate(db: SupportSQLiteDatabase) {
-                super.onCreate(db)
-                DbInitializer(get(), get()).invoke()
-            }
-        }).build()
+        )
+            .addMigrations(AisleronDatabase.MIGRATION_6_7)
+            .addCallback(object : RoomDatabase.Callback() {
+                override fun onCreate(db: SupportSQLiteDatabase) {
+                    super.onCreate(db)
+                    DbInitializer(get(), get()).invoke()
+                }
+            }).build()
     }
 
     single<TransactionRunner> { RoomTransactionRunner(get()) }

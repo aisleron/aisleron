@@ -73,7 +73,7 @@ class AddLocationUseCaseTest {
         }
     }
 
-    private fun getNewLocation(showDefaultAisle: Boolean): Location {
+    private suspend fun getNewLocation(showDefaultAisle: Boolean): Location {
         val newLocation = Location(
             id = 0,
             type = LocationType.SHOP,
@@ -81,7 +81,9 @@ class AddLocationUseCaseTest {
             name = "Shop Add New Location",
             pinned = false,
             aisles = emptyList(),
-            showDefaultAisle = showDefaultAisle
+            showDefaultAisle = showDefaultAisle,
+            expanded = true,
+            rank = dm.getUseCase<GetLocationMaxRankUseCase>().invoke() + 1
         )
         return newLocation
     }

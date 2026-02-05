@@ -32,5 +32,7 @@ data class Location(
     val aisles: List<Aisle>,
     val showDefaultAisle: Boolean,
     override val noteId: Int? = null,
-    override val note: Note? = null
+    override val note: Note? = null,
+    val expanded: Boolean,
+    val rank: Int
 ) : Serializable, NoteParent

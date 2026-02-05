@@ -27,6 +27,7 @@ import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.location.usecase.AddLocationUseCase
 import com.aisleron.domain.location.usecase.GetHomeLocationUseCase
+import com.aisleron.domain.location.usecase.GetLocationMaxRankUseCase
 import com.aisleron.domain.product.Product
 import com.aisleron.domain.preferences.TrackingMode
 import com.aisleron.domain.product.usecase.AddProductUseCase
@@ -46,7 +47,8 @@ class CreateSampleDataUseCaseImpl(
     private val updateAisleProductRankUseCase: UpdateAisleProductRankUseCase,
     private val addLocationUseCase: AddLocationUseCase,
     private val getAllProductsUseCase: GetAllProductsUseCase,
-    private val getHomeLocationUseCase: GetHomeLocationUseCase
+    private val getHomeLocationUseCase: GetHomeLocationUseCase,
+    private val getLocationMaxRankUseCase: GetLocationMaxRankUseCase
 ) : CreateSampleDataUseCase {
 
     companion object {
@@ -180,7 +182,9 @@ class CreateSampleDataUseCaseImpl(
             name = SHOP_NAME,
             pinned = true,
             aisles = emptyList(),
-            showDefaultAisle = true
+            showDefaultAisle = true,
+            expanded = true,
+            rank = getLocationMaxRankUseCase() + 1
         )
 
         val shopId = addLocationUseCase(location)
