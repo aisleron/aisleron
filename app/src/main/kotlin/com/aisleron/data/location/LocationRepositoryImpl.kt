@@ -19,6 +19,7 @@ package com.aisleron.data.location
 
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationRepository
+import com.aisleron.domain.location.LocationType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -43,6 +44,11 @@ class LocationRepositoryImpl(
     override fun getLocationWithAislesWithProducts(id: Int): Flow<Location?> {
         val locationEntity = locationDao.getLocationWithAislesWithProducts(id)
         return locationEntity.map { it?.let { LocationWithAislesWithProductsMapper().toModel(it) } }
+    }
+
+    override fun getLocationsWithAislesWithProducts(type: LocationType): Flow<List<Location>> {
+        val locationEntity = locationDao.getLocationsWithAislesWithProducts(type)
+        return locationEntity.map { LocationWithAislesWithProductsMapper().toModelList(it) }
     }
 
     override suspend fun getLocationWithAisles(id: Int): Location {

@@ -160,8 +160,11 @@ class LocationShoppingListItemViewModelTest : KoinTest {
         assertEquals(existingLocation.id, shoppingListItem.locationId)
         assertEquals(false, shoppingListItem.isDefault)
         assertEquals(existingLocation.expanded, shoppingListItem.expanded)
-        //assertEquals(existingLocation. , shoppingListItem.aisleId)
-        //assertEquals(existingLocation.products.count(), shoppingListItem.childCount)
+        // Not populating aisle for these items so can't validate counts
+        // assertEquals(existingLocation.aisles.first().id, shoppingListItem.aisleId)
+        // assertEquals(
+        //     existingLocation.aisles.sumOf { it.products.size }, shoppingListItem.childCount
+        // )
     }
 
     @Test

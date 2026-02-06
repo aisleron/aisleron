@@ -104,6 +104,25 @@ class LocationDaoTestImpl(private val aisleDao: AisleDaoTestImpl) : LocationDao 
         return flowOf(result)
     }
 
+    override fun getLocationsWithAislesWithProducts(locationType: LocationType): Flow<List<LocationWithAislesWithProducts>> {
+        val locations = locationList.filter { it.type == locationType }
+
+        val result = mutableListOf<LocationWithAislesWithProducts>()
+        locations.forEach { location ->
+            result.add(
+                LocationWithAislesWithProducts(
+                    location = location,
+                    aisles = runBlocking {
+                        aisleDao.getAislesWithProducts()
+                            .filter { it.aisle.locationId == location.id }
+                    }
+                )
+            )
+        }
+
+        return flowOf(result.toList())
+    }
+
     override fun getShops(): Flow<List<LocationEntity>> {
         return flowOf(locationList.filter { it.type == LocationType.SHOP })
     }

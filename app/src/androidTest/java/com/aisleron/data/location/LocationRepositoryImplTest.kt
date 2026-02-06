@@ -136,4 +136,32 @@ class LocationRepositoryImplTest : RepositoryImplTest<Location>() {
 
         assertEquals(expected, actual)
     }
+
+    @Test
+    fun getLocationWithAislesWithProducts_LocationIdProvided_ReturnSingleLocation() = runTest {
+        addMultipleItems()
+        val locationId = locationRepository.getAll().first { it.type == LocationType.SHOP }.id
+
+        val location = locationRepository.getLocationWithAislesWithProducts(locationId).first()
+
+        assertEquals(locationId, location?.id)
+    }
+
+    @Test
+    fun getLocationWithAislesWithProducts_InvalidLocationIdProvided_NoLocationReturned() = runTest {
+        val location = locationRepository.getLocationWithAislesWithProducts(-1).first()
+
+        assertNull(location)
+    }
+
+    @Test
+    fun getLocationsWithAislesWithProducts_TypeSpecified_MatchesLocationTypeCount() = runTest {
+        addMultipleItems()
+        val shopCount = locationRepository.getAll().count { it.type == LocationType.SHOP }
+
+        val resultCount =
+            locationRepository.getLocationsWithAislesWithProducts(LocationType.SHOP).first().size
+
+        assertEquals(shopCount, resultCount)
+    }
 }

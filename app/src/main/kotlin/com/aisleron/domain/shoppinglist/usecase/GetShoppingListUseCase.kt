@@ -22,6 +22,7 @@ import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.aisleproduct.AisleProduct
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationRepository
+import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.note.usecase.GetNotesUseCase
 import com.aisleron.domain.shoppinglist.ShoppingListFilter
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -29,67 +30,95 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 
 interface GetShoppingListUseCase {
     operator fun invoke(locationId: Int, filter: ShoppingListFilter): Flow<Location?>
+
+    operator fun invoke(
+        locationType: LocationType, filter: ShoppingListFilter
+    ): Flow<List<Location>>
 }
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class GetShoppingListUseCaseImpl(
     private val locationRepository: LocationRepository,
     private val getNotesUseCase: GetNotesUseCase
 ) : GetShoppingListUseCase {
-    @OptIn(ExperimentalCoroutinesApi::class)
     override operator fun invoke(locationId: Int, filter: ShoppingListFilter): Flow<Location?> {
         return locationRepository.getLocationWithAislesWithProducts(locationId)
             .flatMapLatest { location ->
                 if (location == null) return@flatMapLatest flowOf(null)
 
-                val productNameQuery = filter.productNameQuery.trim()
-                val productFilter =
-                    resolveProductFilter(productNameQuery, filter.productFilter, location)
-
-                val aislesWithFilteredProducts = location.aisles.map { aisle ->
-                    aisle.copy(
-                        products = aisle.products.filter { ap ->
-                            isValidAisleProduct(ap, productFilter, productNameQuery)
-                        }.sortedWith(compareBy<AisleProduct> { it.rank }
-                            .thenBy(String.CASE_INSENSITIVE_ORDER) { it.product.name }
-                        )
-                    )
-                }
-
-                val filteredAisles = aislesWithFilteredProducts.filter { aisle ->
-                    isValidAisle(
-                        aisle, location.showDefaultAisle, productNameQuery, filter.showEmptyAisles
-                    )
-                }.sortedWith(compareBy<Aisle> { it.rank }
-                    .thenBy(String.CASE_INSENSITIVE_ORDER) { it.name }
-                )
-
-                val noteIds = filteredAisles
-                    .flatMap { it.products }
-                    .mapNotNull { it.product.noteId }
-                    .distinct()
-
-                //  Combine the location flow with the notes flow
-                combine(
-                    flowOf(filteredAisles),
-                    getNotesUseCase(noteIds)
-                ) { aisles, notes ->
-                    val notesMap = notes.associateBy { it.id }
-
-                    // Map notes into the structure
-                    val hydratedAisles = aisles.map { aisle ->
-                        aisle.copy(
-                            products = aisle.products.map { ap ->
-                                ap.copy(product = ap.product.copy(note = notesMap[ap.product.noteId]))
-                            }
-                        )
-                    }
-
-                    location.copy(aisles = hydratedAisles)
-                }
+                applyFiltersAndHydrate(listOf(location), filter, true)
+                    .map { it.firstOrNull() }
             }
+    }
+
+    override operator fun invoke(
+        locationType: LocationType, filter: ShoppingListFilter
+    ): Flow<List<Location>> {
+        return locationRepository.getLocationsWithAislesWithProducts(locationType)
+            .flatMapLatest { locations ->
+                applyFiltersAndHydrate(locations, filter, false)
+            }
+    }
+
+    private suspend fun applyFiltersAndHydrate(
+        locations: List<Location>, filter: ShoppingListFilter, viewByAisle: Boolean
+    ): Flow<List<Location>> {
+        if (locations.isEmpty()) return flowOf(emptyList())
+
+        val productNameQuery = filter.productNameQuery.trim()
+
+        // 1. Filter Aisle/Products for every location
+        val processedLocations = locations.map { location ->
+            val productFilter =
+                resolveProductFilter(productNameQuery, filter.productFilter, location)
+
+            val filteredAisles = location.aisles.map { aisle ->
+                aisle.copy(
+                    products = aisle.products.filter {
+                        isValidAisleProduct(it, productFilter, productNameQuery)
+                    }.sortedWith(compareBy<AisleProduct> { it.rank }
+                        .thenBy(String.CASE_INSENSITIVE_ORDER) { it.product.name }
+                    )
+                )
+            }.filter {
+                isValidAisle(
+                    it,
+                    location.showDefaultAisle,
+                    productNameQuery,
+                    filter.showEmptyAisles,
+                    viewByAisle
+                )
+            }.sortedWith(compareBy<Aisle> { it.rank }
+                .thenBy(String.CASE_INSENSITIVE_ORDER) { it.name }
+            )
+
+            location.copy(aisles = filteredAisles)
+        }.filter {
+            isValidLocation(it, filter.showEmptyAisles)
+        }.sortedWith(compareBy<Location> { it.rank }
+            .thenBy(String.CASE_INSENSITIVE_ORDER) { it.name }
+        )
+
+        // 2. Extract all Note IDs
+        val allNoteIds = processedLocations
+            .flatMap { it.aisles }.flatMap { it.products }
+            .mapNotNull { it.product.noteId }.distinct()
+
+        // 3. Hydrate with Notes
+        return combine(flowOf(processedLocations), getNotesUseCase(allNoteIds)) { locList, notes ->
+            val notesMap = notes.associateBy { it.id }
+            locList.map { loc ->
+                loc.copy(aisles = loc.aisles.map { aisle ->
+                    aisle.copy(products = aisle.products.map { ap ->
+                        ap.copy(product = ap.product.copy(note = notesMap[ap.product.noteId]))
+                    })
+                })
+            }
+        }
     }
 
     private fun resolveProductFilter(
@@ -99,12 +128,22 @@ class GetShoppingListUseCaseImpl(
     else
         productFilter ?: location.defaultFilter
 
+    private fun isValidLocation(location: Location, showEmptyAisles: Boolean): Boolean {
+        val hasValidAisles = location.aisles.isNotEmpty()
+
+        return (hasValidAisles || showEmptyAisles)
+    }
+
     private fun isValidAisle(
-        aisle: Aisle, showDefaultAisle: Boolean, productNameQuery: String, showEmptyAisles: Boolean
+        aisle: Aisle,
+        showDefaultAisle: Boolean,
+        productNameQuery: String,
+        showEmptyAisles: Boolean,
+        viewByAisle: Boolean
     ): Boolean {
         val hasValidProducts = aisle.products.isNotEmpty()
 
-        val showDefault = showDefaultAisle || productNameQuery.isNotBlank()
+        val showDefault = (showDefaultAisle || productNameQuery.isNotBlank()) && viewByAisle
 
         return (showDefault || !aisle.isDefault) && (hasValidProducts || showEmptyAisles)
     }

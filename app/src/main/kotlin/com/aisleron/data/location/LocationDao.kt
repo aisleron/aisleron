@@ -21,6 +21,7 @@ import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
 import com.aisleron.data.base.BaseDao
+import com.aisleron.domain.location.LocationType
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -54,6 +55,11 @@ interface LocationDao : BaseDao<LocationEntity> {
     @Transaction
     @Query("SELECT * FROM Location WHERE id = :locationId")
     fun getLocationWithAislesWithProducts(locationId: Int): Flow<LocationWithAislesWithProducts?>
+
+
+    @Transaction
+    @Query("SELECT * FROM Location WHERE type = :locationType")
+    fun getLocationsWithAislesWithProducts(locationType: LocationType): Flow<List<LocationWithAislesWithProducts>>
 
     /**
      * Shop Specific Queries

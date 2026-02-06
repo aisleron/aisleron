@@ -99,7 +99,6 @@ class ShoppingListViewModelTest : KoinTest {
         shoppingListViewModel.hydrate(existingLocation.id, existingLocation.defaultFilter)
 
         val result = awaitUiStateUpdated(shoppingListViewModel)
-        assertEquals(existingLocation.defaultFilter, result.productFilter)
         assertEquals(existingLocation.type, result.locationType)
         assertEquals(existingLocation.defaultFilter, shoppingListViewModel.productFilter)
         assertEquals(existingLocation.id, shoppingListViewModel.locationId.value)
@@ -116,7 +115,6 @@ class ShoppingListViewModelTest : KoinTest {
         val result = awaitUiStateUpdated(shoppingListViewModel)
 
         Assert.assertEquals(ShoppingListViewModel.ListTitle.Needed, result.title)
-        Assert.assertEquals(FilterType.NEEDED, result.productFilter)
         Assert.assertEquals(LocationType.HOME, result.locationType)
     }
 
@@ -924,6 +922,12 @@ class ShoppingListViewModelTest : KoinTest {
         declare<GetShoppingListUseCase> {
             object : GetShoppingListUseCase {
                 override fun invoke(locationId: Int, filter: ShoppingListFilter): Flow<Location?> =
+                    flow {
+                        throw Exception(exceptionMessage)
+                    }
+
+                override fun invoke(
+                    locationType: LocationType, filter: ShoppingListFilter): Flow<List<Location>> =
                     flow {
                         throw Exception(exceptionMessage)
                     }

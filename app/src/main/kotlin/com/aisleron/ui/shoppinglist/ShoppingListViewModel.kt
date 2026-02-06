@@ -125,8 +125,7 @@ class ShoppingListViewModel(
                     val state: ShoppingListUiState = ShoppingListUiState.Updated(
                         shoppingList = listItems,
                         title = getListTitle(collectedLocation),
-                        locationType = collectedLocation?.type ?: LocationType.HOME,
-                        productFilter = combinedFilter.productFilter ?: FilterType.NEEDED
+                        locationType = collectedLocation?.type ?: LocationType.HOME
                     )
 
                     state
@@ -425,8 +424,7 @@ class ShoppingListViewModel(
         data class Updated(
             val shoppingList: List<ShoppingListItem>,
             val title: ListTitle,
-            val locationType: LocationType,
-            val productFilter: FilterType
+            val locationType: LocationType
         ) : ShoppingListUiState()
     }
 

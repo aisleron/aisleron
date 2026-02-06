@@ -193,6 +193,26 @@ class GetShoppingListUseCaseImplTest {
         assertEquals(noteBefore, productAfter.note)
     }
 
+    @Test
+    fun getShoppingList_LocationTypeProvided_ReturnMultipleLocations() = runTest {
+        val shopCount = locationRepository.getAll().count { it.type == LocationType.SHOP }
+
+        val shoppingList = getShoppingListUseCase(LocationType.SHOP, ShoppingListFilter()).first()
+
+        assertEquals(shopCount, shoppingList.size)
+    }
+
+    @Test
+    fun getShoppingList_NoMatchingLocationTypes_ReturnEmptyList() = runTest {
+        locationRepository.getAll().filter { it.type == LocationType.SHOP }.forEach {
+            locationRepository.remove(it)
+        }
+
+        val shoppingList = getShoppingListUseCase(LocationType.SHOP, ShoppingListFilter()).first()
+
+        assertEquals(0, shoppingList.size)
+    }
+
     private companion object {
         @JvmStatic
         fun showFilteredProducts(): Stream<Arguments> = Stream.of(
@@ -209,9 +229,4 @@ class GetShoppingListUseCaseImplTest {
             Arguments.of(false)
         )
     }
-
-    /**
-     * Tests for all filtering options:
-     * * productQuery filters products
-     */
 }
