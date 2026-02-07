@@ -174,7 +174,9 @@ class AisleShoppingListItemViewModelTest : KoinTest {
         val event = shoppingListItem.editNavigationEvent()
 
         assertEquals(
-            ShoppingListViewModel.ShoppingListEvent.NavigateToEditAisle(existingAisle.id),
+            ShoppingListViewModel.ShoppingListEvent.NavigateToEditAisle(
+                existingAisle.id, existingAisle.locationId
+            ),
             event
         )
     }

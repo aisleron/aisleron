@@ -54,7 +54,9 @@ class GetShoppingListUseCaseImplTest {
 
     @Test
     fun getShoppingList_NonExistentId_ReturnNull() = runTest {
-        val shoppingList: Location? = getShoppingListUseCase(2001, ShoppingListFilter()).first()
+        val shoppingList: Location? =
+            getShoppingListUseCase(2001, ShoppingListFilter(FilterType.ALL)).first()
+
         assertNull(shoppingList)
     }
 
@@ -65,9 +67,10 @@ class GetShoppingListUseCaseImplTest {
 
     @Test
     fun getShoppingList_ExistingId_ReturnLocation() = runTest {
-        val locationId = getShop().id
+        val location = getShop()
 
-        val shoppingList = getShoppingListUseCase(locationId, ShoppingListFilter()).first()
+        val shoppingList =
+            getShoppingListUseCase(location.id, ShoppingListFilter(location.defaultFilter)).first()
 
         assertNotNull(shoppingList)
         assertTrue(shoppingList!!.aisles.isNotEmpty())
@@ -82,7 +85,9 @@ class GetShoppingListUseCaseImplTest {
         val location = getShop().copy(defaultFilter = filterType)
         locationRepository.update(location)
 
-        val shoppingList = getShoppingListUseCase(location.id, ShoppingListFilter()).first()!!
+        val shoppingList = getShoppingListUseCase(
+            location.id, ShoppingListFilter(location.defaultFilter)
+        ).first()!!
 
         val allReturnedProducts = shoppingList.aisles.flatMap { it.products }
         assertTrue(allReturnedProducts.isNotEmpty())
@@ -98,7 +103,8 @@ class GetShoppingListUseCaseImplTest {
         val location = getShop().copy(showDefaultAisle = showDefaultAisle)
         locationRepository.update(location)
         val shoppingListFilter = ShoppingListFilter(
-            showEmptyAisles = true
+            showEmptyAisles = true,
+            productFilter = location.defaultFilter
         )
 
         val shoppingList = getShoppingListUseCase(location.id, shoppingListFilter).first()!!
@@ -135,7 +141,8 @@ class GetShoppingListUseCaseImplTest {
         }
 
         val shoppingListFilter = ShoppingListFilter(
-            showEmptyAisles = true
+            showEmptyAisles = true,
+            productFilter = location.defaultFilter
         )
 
         val shoppingList = getShoppingListUseCase(location.id, shoppingListFilter).first()!!
@@ -158,7 +165,8 @@ class GetShoppingListUseCaseImplTest {
         val query = location.aisles.first().products.first().product.name
         val shoppingListFilter = ShoppingListFilter(
             productNameQuery = query,
-            showEmptyAisles = true
+            showEmptyAisles = true,
+            productFilter = location.defaultFilter
         )
 
         val shoppingList = getShoppingListUseCase(location.id, shoppingListFilter).first()!!
@@ -185,7 +193,9 @@ class GetShoppingListUseCaseImplTest {
 
         dm.getRepository<ProductRepository>().update(productBefore)
 
-        val shoppingList = getShoppingListUseCase(location.id, ShoppingListFilter()).first()!!
+        val shoppingList = getShoppingListUseCase(
+            location.id, ShoppingListFilter(location.defaultFilter)
+        ).first()!!
 
         val productAfter = shoppingList.aisles.flatMap { it.products }
             .first { it.product.id == productBefore.id }.product
@@ -197,7 +207,8 @@ class GetShoppingListUseCaseImplTest {
     fun getShoppingList_LocationTypeProvided_ReturnMultipleLocations() = runTest {
         val shopCount = locationRepository.getAll().count { it.type == LocationType.SHOP }
 
-        val shoppingList = getShoppingListUseCase(LocationType.SHOP, ShoppingListFilter()).first()
+        val shoppingList =
+            getShoppingListUseCase(LocationType.SHOP, ShoppingListFilter(FilterType.NEEDED)).first()
 
         assertEquals(shopCount, shoppingList.size)
     }
@@ -208,7 +219,8 @@ class GetShoppingListUseCaseImplTest {
             locationRepository.remove(it)
         }
 
-        val shoppingList = getShoppingListUseCase(LocationType.SHOP, ShoppingListFilter()).first()
+        val shoppingList =
+            getShoppingListUseCase(LocationType.SHOP, ShoppingListFilter(FilterType.NEEDED)).first()
 
         assertEquals(0, shoppingList.size)
     }

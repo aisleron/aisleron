@@ -60,6 +60,7 @@ import com.aisleron.ui.FabHandler
 import com.aisleron.ui.FabHandlerTestImpl
 import com.aisleron.ui.bundles.AddEditLocationBundle
 import com.aisleron.ui.bundles.Bundler
+import com.aisleron.ui.shoppinglist.ShoppingListGrouping
 import com.aisleron.utils.SystemIds
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -138,7 +139,11 @@ class ShopListFragmentTest : KoinTest {
         val bundle = navController.backStack.last().arguments
         val shoppingListBundle = bundler.getShoppingListBundle(bundle)
 
-        assertEquals(shopLocation.id, shoppingListBundle.locationId)
+        assertEquals(
+            shopLocation.id,
+            (shoppingListBundle.listGrouping as? ShoppingListGrouping.AisleGrouping)?.locationId
+        )
+
         assertEquals(shopLocation.defaultFilter, shoppingListBundle.filterType)
         assertEquals(R.id.nav_shopping_list, navController.currentDestination?.id)
     }

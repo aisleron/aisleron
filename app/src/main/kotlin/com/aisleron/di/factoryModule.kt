@@ -18,6 +18,7 @@
 package com.aisleron.di
 
 import com.aisleron.ui.shoppinglist.ShoppingListItemViewModelFactory
+import com.aisleron.ui.shoppinglist.coordinator.ShoppingListCoordinatorFactory
 import org.koin.dsl.module
 
 val factoryModule = module {
@@ -32,6 +33,17 @@ val factoryModule = module {
             updateProductStatusUseCase = get(),
             updateProductQtyNeededUseCase = get(),
             changeProductAisleUseCase = get()
+        )
+    }
+
+    factory<ShoppingListCoordinatorFactory> {
+        ShoppingListCoordinatorFactory(
+            getShoppingListUseCase = get(),
+            shoppingListItemViewModelFactory = get(),
+            expandCollapseAislesForLocationUseCase = get(),
+            getAislesForLocationUseCase = get(),
+            sortLocationByNameUseCase = get(),
+            getLoyaltyCardForLocationUseCase = get()
         )
     }
 }

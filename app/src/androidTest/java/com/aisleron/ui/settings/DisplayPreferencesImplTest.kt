@@ -22,6 +22,7 @@ import com.aisleron.SharedPreferencesInitializer
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.preferences.ApplicationTheme
 import com.aisleron.domain.preferences.PureBlackStyle
+import com.aisleron.ui.shoppinglist.ShoppingListGrouping
 import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -66,7 +67,7 @@ class DisplayPreferencesImplTest {
         data class TestCase(
             val description: String,
             val setup: () -> Unit,
-            val expectedLocationId: Int,
+            val expectedListGrouping: ShoppingListGrouping,
             val expectedFilterType: FilterType
         )
 
@@ -74,38 +75,38 @@ class DisplayPreferencesImplTest {
             TestCase(
                 description = "In-Stock filter",
                 setup = { sharedPreferencesInitializer.setStartingList(1, FilterType.IN_STOCK) },
-                expectedLocationId = 1,
-                expectedFilterType = FilterType.IN_STOCK
+                expectedFilterType = FilterType.IN_STOCK,
+                expectedListGrouping = ShoppingListGrouping.AisleGrouping(1)
             ),
             TestCase(
                 description = "Needed filter",
                 setup = { sharedPreferencesInitializer.setStartingList(7, FilterType.NEEDED) },
-                expectedLocationId = 7,
-                expectedFilterType = FilterType.NEEDED
+                expectedFilterType = FilterType.NEEDED,
+                expectedListGrouping = ShoppingListGrouping.AisleGrouping(7)
             ),
             TestCase(
                 description = "All filter",
                 setup = { sharedPreferencesInitializer.setStartingList(5, FilterType.ALL) },
-                expectedLocationId = 5,
-                expectedFilterType = FilterType.ALL
+                expectedFilterType = FilterType.ALL,
+                expectedListGrouping = ShoppingListGrouping.AisleGrouping(5)
             ),
             TestCase(
                 description = "No value defined, should default",
                 setup = { /* no setup */ },
-                expectedLocationId = 1,
-                expectedFilterType = FilterType.IN_STOCK
+                expectedFilterType = FilterType.IN_STOCK,
+                expectedListGrouping = ShoppingListGrouping.AisleGrouping(1)
             ),
             TestCase(
                 description = "Invalid ID saved, should default ID",
                 setup = { sharedPreferencesInitializer.setStartingList("x|${FilterType.ALL.name}") },
-                expectedLocationId = 1,
-                expectedFilterType = FilterType.ALL
+                expectedFilterType = FilterType.ALL,
+                expectedListGrouping = ShoppingListGrouping.AisleGrouping(1)
             ),
             TestCase(
                 description = "Invalid filter type, should default filter",
                 setup = { sharedPreferencesInitializer.setStartingList("1|x") },
-                expectedLocationId = 1,
-                expectedFilterType = FilterType.IN_STOCK
+                expectedFilterType = FilterType.IN_STOCK,
+                expectedListGrouping = ShoppingListGrouping.AisleGrouping(1)
             )
         )
 
@@ -116,8 +117,8 @@ class DisplayPreferencesImplTest {
             val shoppingListBundle = displayPreferences.startingList()
 
             assertEquals(
-                case.expectedLocationId,
-                shoppingListBundle.locationId,
+                case.expectedListGrouping,
+                shoppingListBundle.listGrouping,
                 "Failed id for: ${case.description}"
             )
 

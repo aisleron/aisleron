@@ -21,17 +21,14 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aisleron.domain.FilterType
-import com.aisleron.domain.aisle.usecase.ExpandCollapseAislesForLocationUseCase
-import com.aisleron.domain.aisle.usecase.GetAislesForLocationUseCase
 import com.aisleron.domain.base.AisleronException
-import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationType
-import com.aisleron.domain.location.usecase.SortLocationByNameUseCase
 import com.aisleron.domain.loyaltycard.LoyaltyCard
-import com.aisleron.domain.loyaltycard.usecase.GetLoyaltyCardForLocationUseCase
 import com.aisleron.domain.shoppinglist.ShoppingListFilter
-import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
 import com.aisleron.ui.bundles.AisleListEntry
+import com.aisleron.ui.shoppinglist.coordinator.AisleListCoordinator
+import com.aisleron.ui.shoppinglist.coordinator.ShoppingListCoordinator
+import com.aisleron.ui.shoppinglist.coordinator.ShoppingListCoordinatorFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -45,26 +42,18 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlin.collections.listOf
 import kotlin.coroutines.cancellation.CancellationException
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 class ShoppingListViewModel(
-    private val getShoppingListUseCase: GetShoppingListUseCase,
-    private val sortLocationByNameUseCase: SortLocationByNameUseCase,
-    private val getLoyaltyCardForLocationUseCase: GetLoyaltyCardForLocationUseCase,
-    private val expandCollapseAislesForLocationUseCase: ExpandCollapseAislesForLocationUseCase,
-    private val getAislesForLocationUseCase: GetAislesForLocationUseCase,
-    private val shoppingListItemViewModelFactory: ShoppingListItemViewModelFactory,
+    private val shoppingListStreamProviderFactory: ShoppingListCoordinatorFactory,
     debounceTime: Long = 300,
     coroutineScopeProvider: CoroutineScope? = null
 ) : ViewModel() {
@@ -80,13 +69,10 @@ class ShoppingListViewModel(
     private val _events = MutableSharedFlow<ShoppingListEvent>()
     val events = _events.asSharedFlow()
 
-    private val _locationId = MutableStateFlow<Int?>(null)
-    val locationId: StateFlow<Int?> get() = _locationId
-
     private val _searchQuery = MutableStateFlow("")
     private val _shoppingListFilters = MutableStateFlow<ShoppingListFilter?>(null)
 
-    private data class SelectedSignature(
+    data class SelectedSignature(
         val itemType: ShoppingListItem.ItemType,
         val itemId: Int,
         val aisleId: Int
@@ -95,45 +81,36 @@ class ShoppingListViewModel(
     private val _selectedSignatures = MutableStateFlow<Set<SelectedSignature>>(emptySet())
 
     private data class ShoppingListStateParams(
-        val id: Int?,
         val query: String,
         val filters: ShoppingListFilter?,
         val selections: Set<SelectedSignature>
     )
 
+    private var shoppingListCoordinator: ShoppingListCoordinator? = null
+    private val aisleListCoordinator: AisleListCoordinator?
+        get() = shoppingListCoordinator as? AisleListCoordinator
+
     val shoppingListUiState: StateFlow<ShoppingListUiState> = combine(
-        _locationId,
         _searchQuery.debounce(debounceTime).distinctUntilChanged(),
         _shoppingListFilters,
         _selectedSignatures
-    ) { id, query, filters, selections ->
-        ShoppingListStateParams(id, query, filters, selections)
+    ) { query, filters, selections ->
+        ShoppingListStateParams(query, filters, selections)
     }.flatMapLatest { pkg ->
-        val (id, query, filters, selections) = pkg
+        val (query, filters, selections) = pkg
 
-        if (id == null || filters == null) {
+        if (shoppingListCoordinator == null || filters == null) {
             flowOf(ShoppingListUiState.Empty)
         } else {
             val combinedFilter = filters.copy(productNameQuery = query.trim())
 
-            getShoppingListUseCase(id, combinedFilter)
-                .map { collectedLocation ->
-                    val listItems = mapShoppingList(
-                        collectedLocation, combinedFilter.productNameQuery.isNotBlank(), selections
-                    )
-
-                    val state: ShoppingListUiState = ShoppingListUiState.Updated(
-                        shoppingList = listItems,
-                        title = getListTitle(collectedLocation),
-                        locationType = collectedLocation?.type ?: LocationType.HOME
-                    )
-
-                    state
-                }
-                .onStart { emit(ShoppingListUiState.Loading) }
-                .catch { e ->
-                    emit(mapToErrorState(e))
-                }
+            shoppingListCoordinator?.let {
+                it.getShoppingListState(combinedFilter, selections)
+                    .onStart { emit(ShoppingListUiState.Loading) }
+                    .catch { e ->
+                        emit(mapToErrorState(e))
+                    }
+            } ?: flowOf(ShoppingListUiState.Empty)
         }
     }.stateIn(
         scope = coroutineScope,
@@ -141,20 +118,8 @@ class ShoppingListViewModel(
         initialValue = ShoppingListUiState.Loading
     )
 
-    val loyaltyCard: StateFlow<LoyaltyCard?> = _locationId
-        .flatMapLatest { id ->
-            if (id == null) flowOf(null)
-            else {
-                flow<LoyaltyCard?> {
-                    emit(getLoyaltyCardForLocationUseCase(id))
-                }
-            }
-        }
-        .stateIn(
-            scope = coroutineScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = null
-        )
+    private val _loyaltyCard = MutableStateFlow<LoyaltyCard?>(null)
+    val loyaltyCard: StateFlow<LoyaltyCard?> = _loyaltyCard
 
     val selectedListItems: List<ShoppingListItem>
         get() = (shoppingListUiState.value as? ShoppingListUiState.Updated)
@@ -187,47 +152,17 @@ class ShoppingListViewModel(
 
     fun hasSelectedItems(): Boolean = selectedListItems.isNotEmpty()
 
-    private fun mapShoppingList(
-        location: Location?,
-        showAllProducts: Boolean,
-        selections: Set<SelectedSignature>
-    ): List<ShoppingListItem> {
-        val filteredList: MutableList<ShoppingListItem> = location?.let { l ->
-            l.aisles.flatMap { a ->
-                val aisleSignature = SelectedSignature(
-                    ShoppingListItem.ItemType.HEADER, a.id, a.id
-                )
-
-                listOf(
-                    shoppingListItemViewModelFactory.createAisleItemViewModel(
-                        a, selections.contains(aisleSignature)
-                    )
-                ) + a.products.filter { (a.expanded || showAllProducts) }
-                    .map { ap ->
-                        val productSignature = SelectedSignature(
-                            ShoppingListItem.ItemType.PRODUCT, ap.product.id, ap.aisleId
-                        )
-
-                        shoppingListItemViewModelFactory.createProductItemViewModel(
-                            ap, a.rank, selections.contains(productSignature)
-                        )
-                    }
-            }
-        }?.toMutableList() ?: mutableListOf()
-
-        if (filteredList.isEmpty()) {
-            filteredList.add(EmptyShoppingListItem())
-        }
-
-        return filteredList.toList()
-    }
-
-    fun hydrate(locationId: Int, productFilter: FilterType, showEmptyAisles: Boolean = false) {
+    fun hydrate(
+        listGrouping: ShoppingListGrouping,
+        productFilter: FilterType,
+        showEmptyAisles: Boolean = false
+    ) {
         if (hydrated) return
 
+        shoppingListCoordinator = shoppingListStreamProviderFactory.create(listGrouping)
         _showEmptyAisles = showEmptyAisles
+        loadLoyaltyCard()
 
-        _locationId.value = locationId
         _shoppingListFilters.value = ShoppingListFilter(
             productFilter = productFilter,
             showEmptyAisles = _showEmptyAisles
@@ -259,9 +194,15 @@ class ShoppingListViewModel(
         }
     }
 
-    fun expandCollapseAisles() {
+    fun expandCollapseHeaders() {
         coroutineScope.launchHandling {
-            expandCollapseAislesForLocationUseCase(_locationId.value ?: 0)
+            shoppingListCoordinator?.expandCollapseHeaders()
+        }
+    }
+
+    fun loadLoyaltyCard() {
+        coroutineScope.launchHandling {
+            _loyaltyCard.value = aisleListCoordinator?.loadLoyaltyCard()
         }
     }
 
@@ -300,12 +241,13 @@ class ShoppingListViewModel(
                 showEmptyAisles = _showEmptyAisles
             )
         }
+
+        loadLoyaltyCard()
     }
 
     fun movedItem(item: ShoppingListItem) {
         //TODO: Do some smarts to only expand the list if I'm dragging an aisle,
         //      dragging a product across an aisle, or reached the end of the list
-        //TODO: When dragging an aisle, hide all products
         if (_shoppingListFilters.value?.showEmptyAisles ?: _showEmptyAisles) return
 
         _shoppingListFilters.update { it?.copy(showEmptyAisles = true) }
@@ -323,17 +265,13 @@ class ShoppingListViewModel(
 
     fun sortListByName() {
         coroutineScope.launchHandling {
-            sortLocationByNameUseCase(_locationId.value ?: 0)
+            shoppingListCoordinator?.sortByName()
         }
     }
 
     fun requestLocationAisles() {
         coroutineScope.launchHandling {
-            val aisles = getAislesForLocationUseCase(_locationId.value ?: 0)
-                .sortedBy { it.rank }
-                .map { AisleListEntry(it.id, it.name) }
-
-            _aislesForLocation.value = aisles
+            _aislesForLocation.value = aisleListCoordinator?.requestLocationAisles() ?: emptyList()
         }
     }
 
@@ -377,18 +315,18 @@ class ShoppingListViewModel(
         selectedListItems.singleOrNull()?.aisleId ?: -1
 
     fun navigateToLoyaltyCard() {
-        loyaltyCard.value ?: return
-
         coroutineScope.launchHandling {
-            _events.emit(ShoppingListEvent.NavigateToLoyaltyCard(loyaltyCard.value))
+            aisleListCoordinator?.let {
+                _events.emit(it.navigateToLoyaltyCardEvent())
+            }
         }
     }
 
     fun navigateToEditShop() {
-        val locationId = _locationId.value ?: return
-
         coroutineScope.launchHandling {
-            _events.emit(ShoppingListEvent.NavigateToEditLocation(locationId))
+            aisleListCoordinator?.let {
+                _events.emit(it.navigateToEditShopEvent())
+            }
         }
     }
 
@@ -401,18 +339,21 @@ class ShoppingListViewModel(
         }
     }
 
-    private fun getListTitle(collectedLocation: Location?): ListTitle =
-        when (productFilter) {
-            FilterType.IN_STOCK -> ListTitle.InStock
-            FilterType.NEEDED -> ListTitle.Needed
-            FilterType.ALL -> ListTitle.AllItems
-        }.let { baseTitle ->
-            if (collectedLocation == null || collectedLocation.type == LocationType.HOME) {
-                baseTitle
-            } else {
-                ListTitle.LocationName(collectedLocation.name)
+    fun navigateToAddSingleAisle() {
+        coroutineScope.launchHandling {
+            aisleListCoordinator?.let {
+                _events.emit(it.navigateToAddSingleAisleEvent())
             }
         }
+    }
+
+    fun navigateToAddMultipleAisles() {
+        coroutineScope.launchHandling {
+            aisleListCoordinator?.let {
+                _events.emit(it.navigateToAddMultipleAislesEvent())
+            }
+        }
+    }
 
     sealed class ShoppingListUiState {
         data object Empty : ShoppingListUiState()
@@ -435,8 +376,10 @@ class ShoppingListViewModel(
 
         data class NavigateToLoyaltyCard(val loyaltyCard: LoyaltyCard?) : ShoppingListEvent()
         data class NavigateToEditLocation(val locationId: Int) : ShoppingListEvent()
-        data class NavigateToEditAisle(val aisleId: Int) : ShoppingListEvent()
         data class NavigateToEditProduct(val productId: Int) : ShoppingListEvent()
+        data class NavigateToEditAisle(val aisleId: Int, val locationId: Int) : ShoppingListEvent()
+        data class NavigateToAddSingleAisle(val locationId: Int) : ShoppingListEvent()
+        data class NavigateToAddMultipleAisles(val locationId: Int) : ShoppingListEvent()
     }
 
     sealed class ListTitle {
@@ -451,5 +394,3 @@ class ShoppingListViewModel(
         const val TAG = "ShoppingListViewModel"
     }
 }
-
-

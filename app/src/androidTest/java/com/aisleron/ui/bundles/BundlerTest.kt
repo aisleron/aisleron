@@ -24,6 +24,7 @@ import com.aisleron.domain.location.LocationType
 import com.aisleron.ui.aisle.AisleDialogFragment
 import com.aisleron.ui.copyentity.CopyEntityType
 import com.aisleron.ui.note.NoteParentRef
+import com.aisleron.ui.shoppinglist.ShoppingListGrouping
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertNotNull
@@ -198,7 +199,11 @@ class BundlerTest {
         val shoppingListBundle =
             getParcelableBundle(bundle, "shoppingList", ShoppingListBundle::class.java)
 
-        assertEquals(locationId, shoppingListBundle?.locationId)
+        assertEquals(
+            locationId,
+            (shoppingListBundle?.listGrouping as? ShoppingListGrouping.AisleGrouping)?.locationId
+        )
+
         assertEquals(filterType, shoppingListBundle?.filterType)
     }
 
@@ -217,7 +222,7 @@ class BundlerTest {
 
     @Test
     fun testGetShoppingListBundle_InvalidBundle_ReturnDefaultShoppingListBundle() {
-        val shoppingListBundle = ShoppingListBundle(null, null)
+        val shoppingListBundle = ShoppingListBundle(1, null)
         val bundledShoppingList = bundler.getShoppingListBundle(Bundle())
         assertEquals(shoppingListBundle, bundledShoppingList)
     }
@@ -231,12 +236,13 @@ class BundlerTest {
 
     @Test
     fun testGetShoppingListBundle_BundledAttributes_ReturnBundle() {
+        val locationId = 123
         val shoppingListBundle = ShoppingListBundle(
-            locationId = 123,
-            filterType = FilterType.IN_STOCK
+            filterType = FilterType.IN_STOCK,
+            listGrouping = ShoppingListGrouping.AisleGrouping(locationId)
         )
         val bundle = Bundle()
-        bundle.putInt("locationId", shoppingListBundle.locationId)
+        bundle.putInt("locationId", locationId)
         bundle.putSerializable("filterType", shoppingListBundle.filterType)
         val bundledShoppingList = bundler.getShoppingListBundle(bundle)
         assertEquals(shoppingListBundle, bundledShoppingList)

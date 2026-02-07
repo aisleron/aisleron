@@ -74,7 +74,7 @@ class GetShoppingListUseCaseImpl(
         // 1. Filter Aisle/Products for every location
         val processedLocations = locations.map { location ->
             val productFilter =
-                resolveProductFilter(productNameQuery, filter.productFilter, location)
+                resolveProductFilter(productNameQuery, filter.productFilter)
 
             val filteredAisles = location.aisles.map { aisle ->
                 aisle.copy(
@@ -122,11 +122,11 @@ class GetShoppingListUseCaseImpl(
     }
 
     private fun resolveProductFilter(
-        productNameQuery: String, productFilter: FilterType?, location: Location
+        productNameQuery: String, productFilter: FilterType
     ): FilterType = if (productNameQuery.isNotBlank())
         FilterType.ALL
     else
-        productFilter ?: location.defaultFilter
+        productFilter
 
     private fun isValidLocation(location: Location, showEmptyAisles: Boolean): Boolean {
         val hasValidAisles = location.aisles.isNotEmpty()

@@ -15,12 +15,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.domain.shoppinglist
+package com.aisleron.ui.shoppinglist.coordinator
 
-import com.aisleron.domain.FilterType
+import com.aisleron.domain.shoppinglist.ShoppingListFilter
+import com.aisleron.ui.shoppinglist.ShoppingListViewModel
+import kotlinx.coroutines.flow.Flow
 
-data class ShoppingListFilter(
-    val productFilter: FilterType,
-    val productNameQuery: String = "",
-    val showEmptyAisles: Boolean = false
-)
+interface ShoppingListCoordinator {
+    fun getShoppingListState(
+        filters: ShoppingListFilter,
+        selections: Set<ShoppingListViewModel.SelectedSignature>
+    ): Flow<ShoppingListViewModel.ShoppingListUiState>
+
+    suspend fun expandCollapseHeaders()
+    suspend fun sortByName()
+}
+

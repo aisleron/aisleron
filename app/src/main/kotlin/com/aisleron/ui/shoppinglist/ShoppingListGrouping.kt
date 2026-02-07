@@ -15,12 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.domain.shoppinglist
+package com.aisleron.ui.shoppinglist
 
-import com.aisleron.domain.FilterType
+import android.os.Parcelable
+import com.aisleron.domain.location.LocationType
+import kotlinx.parcelize.Parcelize
 
-data class ShoppingListFilter(
-    val productFilter: FilterType,
-    val productNameQuery: String = "",
-    val showEmptyAisles: Boolean = false
-)
+@Parcelize
+sealed class ShoppingListGrouping : Parcelable {
+    data class AisleGrouping(val locationId: Int) : ShoppingListGrouping()
+    data class LocationGrouping(val locationType: LocationType) : ShoppingListGrouping()
+}

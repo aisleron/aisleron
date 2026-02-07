@@ -37,12 +37,7 @@ import org.koin.dsl.module
 val viewModelTestModule = module {
     viewModel {
         ShoppingListViewModel(
-            getShoppingListUseCase = get(),
-            sortLocationByNameUseCase = get(),
-            getLoyaltyCardForLocationUseCase = get(),
-            expandCollapseAislesForLocationUseCase = get(),
-            getAislesForLocationUseCase = get(),
-            shoppingListItemViewModelFactory = get(),
+            shoppingListStreamProviderFactory = get(),
             debounceTime = 0,
             TestScope(UnconfinedTestDispatcher())
         )

@@ -103,7 +103,7 @@ class ShoppingListFragment(
         super.onCreate(savedInstanceState)
         val shoppingListBundle = Bundler().getShoppingListBundle(arguments)
         shoppingListViewModel.hydrate(
-            shoppingListBundle.locationId,
+            shoppingListBundle.listGrouping,
             shoppingListBundle.filterType,
             shoppingListPreferences.showEmptyAisles()
         )
@@ -119,7 +119,7 @@ class ShoppingListFragment(
             }
 
             if (addNewAisle) {
-                showAddSingleAisleDialog()
+                shoppingListViewModel.navigateToAddSingleAisle()
             }
         }
 
@@ -298,11 +298,17 @@ class ShoppingListFragment(
                 is ShoppingListViewModel.ShoppingListEvent.NavigateToEditLocation ->
                     navigateToEditShop(event.locationId)
 
-                is ShoppingListViewModel.ShoppingListEvent.NavigateToEditAisle ->
-                    showEditAisleDialog(event.aisleId)
-
                 is ShoppingListViewModel.ShoppingListEvent.NavigateToEditProduct ->
                     navigateToEditProduct(event.productId)
+
+                is ShoppingListViewModel.ShoppingListEvent.NavigateToEditAisle ->
+                    showEditAisleDialog(event.aisleId, event.locationId)
+
+                is ShoppingListViewModel.ShoppingListEvent.NavigateToAddMultipleAisles ->
+                    showAddMultiAisleDialog(event.locationId)
+
+                is ShoppingListViewModel.ShoppingListEvent.NavigateToAddSingleAisle ->
+                    showAddSingleAisleDialog(event.locationId)
             }
         }
     }
@@ -379,7 +385,9 @@ class ShoppingListFragment(
         ).show()
     }
 
-    private fun showAisleDialog(aisleId: Int, action: AisleDialogFragment.AisleDialogAction) {
+    private fun showAisleDialog(
+        aisleId: Int, locationId: Int, action: AisleDialogFragment.AisleDialogAction
+    ) {
         val requestKey = when (action) {
             AisleDialogFragment.AisleDialogAction.ADD_SINGLE -> ADD_AISLE_REQUEST_KEY
             AisleDialogFragment.AisleDialogAction.ADD_MULTIPLE -> ADD_AISLE_REQUEST_KEY
@@ -389,23 +397,23 @@ class ShoppingListFragment(
         val aisleDialogBundle = AisleDialogBundle(
             aisleId = aisleId,
             action = action,
-            locationId = shoppingListViewModel.locationId.value ?: -1
+            locationId = locationId
         )
 
         AisleDialogFragment.newInstance(aisleDialogBundle, requestKey)
             .show(childFragmentManager, AisleDialogFragment.TAG)
     }
 
-    private fun showAddSingleAisleDialog() {
-        showAisleDialog(-1, AisleDialogFragment.AisleDialogAction.ADD_SINGLE)
+    private fun showAddSingleAisleDialog(locationId: Int) {
+        showAisleDialog(-1, locationId, AisleDialogFragment.AisleDialogAction.ADD_SINGLE)
     }
 
-    private fun showAddMultiAisleDialog() {
-        showAisleDialog(-1, AisleDialogFragment.AisleDialogAction.ADD_MULTIPLE)
+    private fun showAddMultiAisleDialog(locationId: Int) {
+        showAisleDialog(-1, locationId, AisleDialogFragment.AisleDialogAction.ADD_MULTIPLE)
     }
 
-    private fun showEditAisleDialog(aisleId: Int) {
-        showAisleDialog(aisleId, AisleDialogFragment.AisleDialogAction.EDIT)
+    private fun showEditAisleDialog(aisleId: Int, locationId: Int) {
+        showAisleDialog(aisleId, locationId, AisleDialogFragment.AisleDialogAction.EDIT)
     }
 
     private fun initializeFab() {
@@ -422,7 +430,7 @@ class ShoppingListFragment(
         }
 
         fabHandler.setFabOnClickListener(this.requireActivity(), FabHandler.FabOption.ADD_AISLE) {
-            showAddMultiAisleDialog()
+            shoppingListViewModel.navigateToAddMultipleAisles()
         }
     }
 
@@ -647,7 +655,7 @@ class ShoppingListFragment(
             }
 
             R.id.mnu_expand_collapse_aisles -> {
-                shoppingListViewModel.expandCollapseAisles()
+                shoppingListViewModel.expandCollapseHeaders()
                 true
             }
 

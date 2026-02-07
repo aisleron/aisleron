@@ -76,9 +76,11 @@ class CreateSampleDataUseCaseTest {
         createSampleDataUseCase()
 
         val locationRepository = dm.getRepository<LocationRepository>()
-        val homeId = locationRepository.getHome().id
+        val home = locationRepository.getHome()
         val homeList =
-            dm.getUseCase<GetShoppingListUseCase>().invoke(homeId, ShoppingListFilter()).first()!!
+            dm.getUseCase<GetShoppingListUseCase>().invoke(
+                home.id, ShoppingListFilter(productFilter = home.defaultFilter)
+            ).first()!!
 
         val aisleProductCountAfter = homeList.aisles.find { !it.isDefault }?.products?.count() ?: 0
 
@@ -103,9 +105,11 @@ class CreateSampleDataUseCaseTest {
         createSampleDataUseCase()
 
         val locationRepository = dm.getRepository<LocationRepository>()
-        val shopId = locationRepository.getShops().first().first().id
+        val shop = locationRepository.getShops().first().first()
         val shopList =
-            dm.getUseCase<GetShoppingListUseCase>().invoke(shopId, ShoppingListFilter()).first()!!
+            dm.getUseCase<GetShoppingListUseCase>().invoke(
+                shop.id, ShoppingListFilter(productFilter = shop.defaultFilter)
+            ).first()!!
 
         val aisleProductCountAfter = shopList.aisles.find { !it.isDefault }?.products?.count() ?: 0
 

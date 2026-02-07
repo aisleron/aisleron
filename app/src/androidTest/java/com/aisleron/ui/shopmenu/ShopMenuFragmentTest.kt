@@ -39,10 +39,12 @@ import com.aisleron.di.viewModelTestModule
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import com.aisleron.ui.bundles.Bundler
+import com.aisleron.ui.shoppinglist.ShoppingListGrouping
 import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -124,8 +126,12 @@ class ShopMenuFragmentTest : KoinTest {
         val bundle = navController.currentBackStackEntry?.arguments
         val shoppingListBundle = bundler.getShoppingListBundle(bundle)
 
-        Assert.assertEquals(shopLocation.id, shoppingListBundle.locationId)
-        Assert.assertEquals(shopLocation.defaultFilter, shoppingListBundle.filterType)
-        Assert.assertEquals(R.id.nav_shopping_list, navController.currentDestination?.id)
+        assertEquals(
+            shopLocation.id,
+            (shoppingListBundle.listGrouping as? ShoppingListGrouping.AisleGrouping)?.locationId
+        )
+
+        assertEquals(shopLocation.defaultFilter, shoppingListBundle.filterType)
+        assertEquals(R.id.nav_shopping_list, navController.currentDestination?.id)
     }
 }
