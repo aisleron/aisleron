@@ -659,3 +659,20 @@ specific requirements.
 if any, to sign a "copyright disclaimer" for the program, if necessary.
 For more information on this, and how to apply and follow the GNU AGPL, see
 <https://www.gnu.org/licenses/>.
+
+App Store Exception to the GNU Affero General Public License version 3.0
+
+  As an additional permission under Section 7 of the GNU Affero General 
+Public License, version 3.0 (AGPLv3), the Copyright Holder(s) of this 
+software give you permission to convey the software through a Digital 
+Storefront (including but not limited to the Apple App Store, Google Play 
+Store, and Microsoft Store) notwithstanding any terms of service or 
+'Further Restrictions' imposed by those storefronts that would otherwise 
+conflict with the terms of the AGPLv3.
+
+  This exception does not invalidate any other requirements of the AGPLv3, 
+including the requirement to provide the Corresponding Source for the 
+software to its users. All other portions of the AGPLv3 remain in full force
+and effect.
+
+
