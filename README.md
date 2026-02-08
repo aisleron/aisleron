@@ -62,3 +62,6 @@ Documentation is available at [Aisleron.com](https://aisleron.com/docs/documenta
 
 Contribute to translations on
 the [Aisleron Hosted Weblate page](https://hosted.weblate.org/projects/aisleron-shopping-list/).
+
+## Licensing
+This project is licensed under the AGPL 3.0 with an App Store Exception. See the LICENSE file for details.
