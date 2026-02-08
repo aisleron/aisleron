@@ -29,6 +29,16 @@ All Pull Requests must meet the following standards before they can be merged:
 * **Localization and Translations:** All new or modified string values must be fully translated into all supported languages. 
     * The use of AI tools for translation is permitted and encouraged to expedite this process. 
     * Contributors are responsible for ensuring that AI-generated translations are contextually accurate and correctly formatted according to the project's localization files (e.g., preserving placeholders or keys).
+ 
+## Build System and Dependencies
+
+To ensure build stability and maintain a clean supply chain, we have strict rules regarding the project's configuration files:
+
+* **Dependency Versions:** Do not update Gradle dependency versions, Android Gradle Plugin (AGP), or build tool versions in your Pull Request. These updates are managed centrally by the maintainers to prevent compatibility regressions.
+* **Third-Party Libraries:** Do not add new third-party libraries unless they are absolutely essential to the core functionality of your contribution.
+    * If a library is required, you must provide a justification in the PR description.
+    * **Licensing:** Any added library must be compatible with the AGPL 3.0 license. Permissive licenses (like MIT, Apache 2.0, or BSD) are generally acceptable, but proprietary or "source-available" libraries with restrictive clauses are strictly prohibited.
+    * **Vetting:** All new dependencies will undergo a manual security and license audit before the PR can be merged.
 
 ## AI Usage Policy
 
