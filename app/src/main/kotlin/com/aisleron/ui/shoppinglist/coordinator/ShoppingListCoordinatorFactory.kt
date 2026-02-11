@@ -48,7 +48,11 @@ class ShoppingListCoordinatorFactory(
                 )
 
             is ShoppingListGrouping.LocationGrouping ->
-                LocationListCoordinator(getShoppingListUseCase, shoppingListItemViewModelFactory)
+                LocationListCoordinator(
+                    getShoppingListUseCase = getShoppingListUseCase,
+                    shoppingListItemViewModelFactory = shoppingListItemViewModelFactory,
+                    locationType = grouping.locationType
+                )
         }
     }
 }

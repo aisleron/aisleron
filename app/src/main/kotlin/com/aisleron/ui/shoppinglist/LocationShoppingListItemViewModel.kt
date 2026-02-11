@@ -20,13 +20,14 @@ package com.aisleron.ui.shoppinglist
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.usecase.GetLocationUseCase
 import com.aisleron.domain.location.usecase.RemoveLocationUseCase
+import com.aisleron.domain.location.usecase.UpdateLocationRankUseCase
 
 class LocationShoppingListItemViewModel(
     private val location: Location,
     override val selected: Boolean,
-    // private val updateLocationRankUseCase: UpdateLocationRankUseCase,
     private val getLocationUseCase: GetLocationUseCase,
     private val removeLocationUseCase: RemoveLocationUseCase,
+    private val updateLocationRankUseCase: UpdateLocationRankUseCase,
     // private val updateLocationExpandedUseCase: UpdateLocationExpandedUseCase
 ) : LocationShoppingListItem, HeaderShoppingListItemViewModel {
     override val childCount: Int get() = location.aisles.sumOf { it.products.size }
@@ -36,6 +37,8 @@ class LocationShoppingListItemViewModel(
     override val id: Int get() = location.id
     override val name: String get() = location.name
     override val aisleId: Int get() = location.aisles.firstOrNull { !it.isDefault }?.id ?: 0
+    override val uniqueId: ShoppingListItem.UniqueId
+        get() = ShoppingListItem.UniqueId(itemType, id)
 
     override suspend fun remove() {
         val removeLocation = getLocationUseCase(id)
@@ -43,12 +46,9 @@ class LocationShoppingListItemViewModel(
     }
 
     override suspend fun updateRank(precedingItem: ShoppingListItem?) {
-        // TODO: Add updateLocationRankUseCase
-        /*updateLocationRankUseCase(
-            location.copy(
-                rank = precedingItem?.let { it.headerRank + 1 } ?: 1
-            )
-        )*/
+        updateLocationRankUseCase(
+            location, precedingItem?.let { it.headerRank + 1 } ?: 1
+        )
     }
 
     override fun editNavigationEvent(): ShoppingListViewModel.ShoppingListEvent =

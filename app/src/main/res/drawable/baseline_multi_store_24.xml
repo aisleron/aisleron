@@ -1,0 +1,29 @@
+<!--
+  ~ Copyright (C) 2026 aisleron.com
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as
+  ~ published by the Free Software Foundation, either version 3 of the
+  ~ License, or (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="?attr/colorOnSurface"
+        android:pathData="M6.944,1v1.875h15.111L22.055,1zM6.944,10.813L6.944,16h9.445v-5.187h-1.89v3.312L8.834,14.125v-3.312zM18.055,10.375h2.111L20.166,16h1.89v-5.625L23,10.375L23,8.5l-0.945,-4.687L6.945,3.813L6.301,7h11.753z" />
+    <path
+        android:fillColor="?attr/colorOnSurface"
+        android:pathData="M1.944,9.875L1.944,8h15.112v1.875zM1.944,23v-5.625L1,17.375L1,15.5l0.944,-4.687h15.112L18,15.5v1.875h-0.944L17.056,23h-1.89v-5.625L11.39,17.375L11.39,23zM3.834,21.125L9.5,21.125v-3.75L3.833,17.375z" />
+</vector>

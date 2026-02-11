@@ -73,7 +73,7 @@ class ShoppingListItemRecyclerViewAdapter(
         override fun areItemsTheSame(
             oldItem: ShoppingListItem, newItem: ShoppingListItem
         ): Boolean {
-            return (oldItem.itemType == newItem.itemType && oldItem.id == newItem.id)
+            return oldItem.uniqueId == newItem.uniqueId
         }
 
         override fun areContentsTheSame(

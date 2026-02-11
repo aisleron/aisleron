@@ -25,6 +25,7 @@ import com.aisleron.domain.location.LocationType
 import com.aisleron.ui.aisle.AisleDialogFragment
 import com.aisleron.ui.copyentity.CopyEntityType
 import com.aisleron.ui.note.NoteParentRef
+import com.aisleron.ui.shoppinglist.ShoppingListGrouping
 
 class Bundler {
 
@@ -103,6 +104,14 @@ class Bundler {
         val shoppingListBundle = ShoppingListBundle(
             locationId = locationId,
             filterType = filterType
+        )
+        return makeShoppingListBundle(shoppingListBundle)
+    }
+
+    fun makeShoppingListBundle(filterType: FilterType, listGrouping: ShoppingListGrouping): Bundle {
+        val shoppingListBundle = ShoppingListBundle(
+            filterType = filterType,
+            listGrouping = listGrouping
         )
         return makeShoppingListBundle(shoppingListBundle)
     }

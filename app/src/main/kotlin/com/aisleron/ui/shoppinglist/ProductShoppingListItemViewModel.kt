@@ -29,6 +29,7 @@ class ProductShoppingListItemViewModel(
     private val aisleProduct: AisleProduct,
     override val headerRank: Int,
     override val selected: Boolean,
+    override val locationId: Int,
     private val updateAisleProductRankUseCase: UpdateAisleProductRankUseCase,
     private val removeProductUseCase: RemoveProductUseCase,
     private val updateProductStatusUseCase: UpdateProductStatusUseCase,
@@ -46,6 +47,8 @@ class ProductShoppingListItemViewModel(
     override val id: Int get() = aisleProduct.product.id
     override val name: String get() = aisleProduct.product.name
     override val aisleId: Int get() = aisleProduct.aisleId
+    override val uniqueId: ShoppingListItem.UniqueId
+        get() = ShoppingListItem.UniqueId(itemType, aisleProduct.id)
 
     override suspend fun remove() {
         removeProductUseCase(id)

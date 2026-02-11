@@ -42,6 +42,15 @@ interface LocationDao : BaseDao<LocationEntity> {
     @Query("SELECT COALESCE(MAX(rank), 0) FROM Location")
     suspend fun getMaxRank(): Int
 
+    @Transaction
+    suspend fun updateRank(location: LocationEntity) {
+        moveRanks(location.rank)
+        upsert(location)
+    }
+
+    @Query("UPDATE Location SET rank = rank + 1 WHERE rank >= :fromRank")
+    suspend fun moveRanks(fromRank: Int)
+
     /**
      * Location With Aisles
      */

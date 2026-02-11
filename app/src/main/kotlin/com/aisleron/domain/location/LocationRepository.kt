@@ -29,4 +29,5 @@ interface LocationRepository : BaseRepository<Location> {
     suspend fun getLocationWithAisles(id: Int): Location
     suspend fun getByName(name: String): Location?
     suspend fun getMaxRank(): Int
+    suspend fun updateLocationRank(location: Location)
 }

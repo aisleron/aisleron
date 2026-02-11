@@ -91,15 +91,26 @@ class ShoppingListItemMoveCallbackListener(private val listener: Listener) :
         current: RecyclerView.ViewHolder,
         target: RecyclerView.ViewHolder
     ): Boolean {
+        val adapter = recyclerView.adapter as? ShoppingListItemRecyclerViewAdapter ?: return false
+        val currentItem = adapter.currentList.getOrNull(current.absoluteAdapterPosition)
+        val targetItem = adapter.currentList.getOrNull(target.absoluteAdapterPosition)
+
+        // TODO: Review product drop logic, e.g. can check for
+        //       target is ShoppingListItemRecyclerViewAdapter.HeaderViewHolder be removed?
+
+        // TODO: Figure out why drag up goes wrong when loading a new list item type
+        //       e.g. try to drag up to an aisle that is out of view initially
         val allowProductDrop =
             current is ShoppingListItemRecyclerViewAdapter.ProductListItemViewHolder
                     && !(target is ShoppingListItemRecyclerViewAdapter.HeaderViewHolder && target.absoluteAdapterPosition == 0)
+                    && currentItem?.locationId == targetItem?.locationId
+                    && targetItem !is LocationShoppingListItem
 
-        val allowAisleDrop =
+        val allowHeaderDrop =
             current is ShoppingListItemRecyclerViewAdapter.HeaderViewHolder
                     && target is ShoppingListItemRecyclerViewAdapter.HeaderViewHolder
 
-        return allowProductDrop || allowAisleDrop
+        return allowProductDrop || allowHeaderDrop
     }
 
     override fun interpolateOutOfBoundsScroll(

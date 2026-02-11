@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.koin.test.get
+import kotlin.collections.first
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -163,5 +164,30 @@ class LocationRepositoryImplTest : RepositoryImplTest<Location>() {
             locationRepository.getLocationsWithAislesWithProducts(LocationType.SHOP).first().size
 
         assertEquals(shopCount, resultCount)
+    }
+
+    @Test
+    fun updateLocationRank_NewRankProvided_LocationRankUpdated() = runTest {
+        val existingLocation = locationRepository.getAll().first { it.type == LocationType.SHOP }
+        val updateLocation = existingLocation.copy(rank = 1001)
+
+        locationRepository.updateLocationRank(updateLocation)
+
+        val updatedLocation = locationRepository.get(existingLocation.id)
+        assertEquals(updateLocation, updatedLocation)
+    }
+
+    @Test
+    fun updateLocationRank_LocationRankUpdated_OtherLocationsMoved() = runTest {
+        addMultipleItems()
+        val existingLocation = locationRepository.getAll().first { it.type == LocationType.SHOP }
+        val updateLocation = existingLocation.copy(rank = existingLocation.rank + 1)
+        val maxRankBefore: Int = locationRepository.getAll().maxOf { it.rank }
+
+        locationRepository.updateLocationRank(updateLocation)
+
+        val maxRankAfter: Int = locationRepository.getAll().maxOf { it.rank }
+
+        assertEquals(maxRankBefore + 1, maxRankAfter)
     }
 }

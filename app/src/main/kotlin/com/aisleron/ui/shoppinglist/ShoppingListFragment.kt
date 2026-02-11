@@ -44,7 +44,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.aisleron.R
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.base.AisleronException
-import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.loyaltycard.LoyaltyCard
 import com.aisleron.ui.AisleronExceptionMap
 import com.aisleron.ui.AisleronFragment
@@ -346,14 +345,11 @@ class ShoppingListFragment(
 
     private fun setMenuItemVisibility() {
         val currentState = shoppingListViewModel.shoppingListUiState.value
-        val currentLocationType =
-            if (currentState is ShoppingListViewModel.ShoppingListUiState.Updated) {
-                currentState.locationType
-            } else {
-                LocationType.HOME // Safe fallback for the very first load
-            }
 
-        editShopMenuItem?.isVisible = currentLocationType == LocationType.SHOP
+        editShopMenuItem?.isVisible =
+            (currentState is ShoppingListViewModel.ShoppingListUiState.Updated)
+                    && currentState.showEditShop
+
         loyaltyCardMenuItem?.isVisible = shoppingListViewModel.loyaltyCard.value != null
     }
 
@@ -439,7 +435,7 @@ class ShoppingListFragment(
             ShoppingListViewModel.ListTitle.InStock -> resources.getString(R.string.menu_in_stock)
             ShoppingListViewModel.ListTitle.Needed -> resources.getString(R.string.menu_needed)
             ShoppingListViewModel.ListTitle.AllItems -> resources.getString(R.string.menu_all_items)
-            ShoppingListViewModel.ListTitle.AllShops -> "" // TODO: Add string resource
+            ShoppingListViewModel.ListTitle.AllShops -> resources.getString(R.string.menu_all_shops)
             is ShoppingListViewModel.ListTitle.LocationName -> listTitle.name
         }
 

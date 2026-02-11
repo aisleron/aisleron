@@ -63,6 +63,10 @@ class LocationRepositoryImpl(
         return locationDao.getMaxRank()
     }
 
+    override suspend fun updateLocationRank(location: Location) {
+        locationDao.updateRank(locationMapper.fromModel(location))
+    }
+
     override suspend fun get(id: Int): Location? {
         return locationDao.getLocation(id)?.let { locationMapper.toModel(it) }
     }

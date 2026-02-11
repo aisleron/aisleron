@@ -24,7 +24,10 @@ data class EmptyShoppingListItem(
     override val headerRank: Int get() = rank
     override val id: Int get() = 0
     override val aisleId: Int get() = id
+    override val locationId: Int get() = id
     override val selected: Boolean get() = false
     override val itemType: ShoppingListItem.ItemType
         get() = ShoppingListItem.ItemType.EMPTY_LIST
+    override val uniqueId: ShoppingListItem.UniqueId
+        get() = ShoppingListItem.UniqueId(itemType, id)
 }

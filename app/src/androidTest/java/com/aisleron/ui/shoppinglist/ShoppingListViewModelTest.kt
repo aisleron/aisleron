@@ -103,7 +103,7 @@ class ShoppingListViewModelTest : KoinTest {
         )
 
         val result = awaitUiStateUpdated(shoppingListViewModel)
-        assertEquals(existingLocation.type, result.locationType)
+        assertTrue(result.showEditShop)
         assertEquals(existingLocation.defaultFilter, shoppingListViewModel.productFilter)
         assertEquals(
             existingLocation.name,
@@ -118,7 +118,7 @@ class ShoppingListViewModelTest : KoinTest {
         val result = awaitUiStateUpdated(shoppingListViewModel)
 
         Assert.assertEquals(ShoppingListViewModel.ListTitle.Needed, result.title)
-        Assert.assertEquals(LocationType.HOME, result.locationType)
+        assertFalse(result.showEditShop)
     }
 
     @Test

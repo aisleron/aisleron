@@ -19,7 +19,6 @@ package com.aisleron.ui.shoppinglist
 
 interface HeaderShoppingListItem : ShoppingListItem {
     val childCount: Int
-    val locationId: Int
     val expanded: Boolean
     val isDefault: Boolean
 

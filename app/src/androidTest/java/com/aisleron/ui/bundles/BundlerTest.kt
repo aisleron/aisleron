@@ -191,9 +191,10 @@ class BundlerTest {
     }
 
     @Test
-    fun testMakeShoppingListBundle_ParametersProvided_ShoppingListBundleReturned() {
+    fun makeShoppingListBundle_ParametersProvided_ShoppingListBundleReturned() {
         val locationId = 123
         val filterType = FilterType.NEEDED
+
         val bundle = bundler.makeShoppingListBundle(locationId, filterType)
 
         val shoppingListBundle =
@@ -205,6 +206,36 @@ class BundlerTest {
         )
 
         assertEquals(filterType, shoppingListBundle?.filterType)
+    }
+
+    @Test
+    fun makeShoppingListBundle_IsAisleGrouping_ReturnsAisleGroupingBundle() {
+        val locationId = 123
+        val filterType = FilterType.NEEDED
+        val grouping = ShoppingListGrouping.AisleGrouping(locationId)
+        val expectedBundle = ShoppingListBundle(filterType, grouping)
+
+        val bundle = bundler.makeShoppingListBundle(filterType, grouping)
+
+        val shoppingListBundle =
+            getParcelableBundle(bundle, "shoppingList", ShoppingListBundle::class.java)
+
+        assertEquals(expectedBundle, shoppingListBundle)
+    }
+
+    @Test
+    fun makeShoppingListBundle_IsShopGrouping_ReturnsShopGroupingBundle() {
+        val locationType = LocationType.SHOP
+        val filterType = FilterType.NEEDED
+        val grouping = ShoppingListGrouping.LocationGrouping(locationType)
+        val expectedBundle = ShoppingListBundle(filterType, grouping)
+
+        val bundle = bundler.makeShoppingListBundle(filterType, grouping)
+
+        val shoppingListBundle =
+            getParcelableBundle(bundle, "shoppingList", ShoppingListBundle::class.java)
+
+        assertEquals(expectedBundle, shoppingListBundle)
     }
 
 

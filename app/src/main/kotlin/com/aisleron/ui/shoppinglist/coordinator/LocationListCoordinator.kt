@@ -17,22 +17,41 @@
 
 package com.aisleron.ui.shoppinglist.coordinator
 
+import com.aisleron.domain.FilterType
+import com.aisleron.domain.location.Location
+import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.shoppinglist.ShoppingListFilter
 import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
+import com.aisleron.ui.shoppinglist.EmptyShoppingListItem
+import com.aisleron.ui.shoppinglist.ShoppingListItem
 import com.aisleron.ui.shoppinglist.ShoppingListItemViewModelFactory
-import com.aisleron.ui.shoppinglist.ShoppingListViewModel
-import kotlinx.coroutines.flow.Flow
+import com.aisleron.ui.shoppinglist.ShoppingListViewModel.ListTitle
+import com.aisleron.ui.shoppinglist.ShoppingListViewModel.ShoppingListUiState
+import kotlinx.coroutines.flow.map
+import kotlin.collections.map
 
 class LocationListCoordinator(
     private val getShoppingListUseCase: GetShoppingListUseCase,
-    private val shoppingListItemViewModelFactory: ShoppingListItemViewModelFactory
+    private val shoppingListItemViewModelFactory: ShoppingListItemViewModelFactory,
+    private val locationType: LocationType
 ) : ShoppingListCoordinator {
     override fun getShoppingListState(
         filters: ShoppingListFilter,
-        selections: Set<ShoppingListViewModel.SelectedSignature>
-    ): Flow<ShoppingListViewModel.ShoppingListUiState> {
-        throw NotImplementedError("Not implemented yet")
-    }
+        selections: Set<ShoppingListItem.UniqueId>
+    ) = getShoppingListUseCase(locationType, filters)
+        .map { collectedLocations ->
+            val listItems = mapShoppingList(
+                collectedLocations, filters.productNameQuery.isNotBlank(), selections
+            )
+
+            val state: ShoppingListUiState = ShoppingListUiState.Updated(
+                shoppingList = listItems,
+                title = getListTitle(locationType, filters.productFilter),
+                showEditShop = false
+            )
+
+            state
+        }
 
     override suspend fun expandCollapseHeaders() {
         TODO("Not yet implemented")
@@ -41,4 +60,45 @@ class LocationListCoordinator(
     override suspend fun sortByName() {
         TODO("Not yet implemented")
     }
+
+    private fun mapShoppingList(
+        locations: List<Location>,
+        showAllProducts: Boolean,
+        selections: Set<ShoppingListItem.UniqueId>
+    ): List<ShoppingListItem> {
+        val filteredList: MutableList<ShoppingListItem> = locations.flatMap { location ->
+            val locationHeader = shoppingListItemViewModelFactory.createLocationItemViewModel(
+                location, selections
+            )
+
+            val productItems = location.aisles.flatMap { aisle ->
+                aisle.products
+                    .filter { location.expanded || showAllProducts }
+                    .map { ap ->
+                        shoppingListItemViewModelFactory.createProductItemViewModel(
+                            ap, aisle.rank, location.id, selections
+                        )
+                    }
+            }
+
+            listOf(locationHeader) + productItems
+        }.toMutableList()
+
+        if (filteredList.isEmpty()) {
+            filteredList.add(EmptyShoppingListItem())
+        }
+
+        return filteredList.toList()
+    }
+
+    private fun getListTitle(locationType: LocationType, productFilter: FilterType): ListTitle =
+        when (locationType) {
+            LocationType.SHOP -> ListTitle.AllShops
+            LocationType.HOME ->
+                when (productFilter) {
+                    FilterType.ALL -> ListTitle.AllItems
+                    FilterType.IN_STOCK -> ListTitle.InStock
+                    FilterType.NEEDED -> ListTitle.Needed
+                }
+        }
 }

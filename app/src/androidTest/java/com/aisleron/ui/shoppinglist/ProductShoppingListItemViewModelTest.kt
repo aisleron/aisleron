@@ -67,11 +67,13 @@ class ProductShoppingListItemViewModelTest : KoinTest {
 
     private fun getProductShoppingListItemViewModel(
         headerRank: Int,
-        aisleProduct: AisleProduct
+        aisleProduct: AisleProduct,
+        locationId: Int
     ) = ProductShoppingListItemViewModel(
         aisleProduct = aisleProduct,
         headerRank = headerRank,
         selected = false,
+        locationId = locationId,
         updateAisleProductRankUseCase = get<UpdateAisleProductRankUseCase>(),
         removeProductUseCase = get<RemoveProductUseCase>(),
         updateProductStatusUseCase = get<UpdateProductStatusUseCase>(),
@@ -89,7 +91,11 @@ class ProductShoppingListItemViewModelTest : KoinTest {
     fun removeItem_ItemIsValidProduct_ProductRemoved() = runTest {
         val existingAisle = getShoppingList().aisles.first()
         val aisleProduct = existingAisle.products.last()
-        val shoppingListItem = getProductShoppingListItemViewModel(existingAisle.rank, aisleProduct)
+        val shoppingListItem = getProductShoppingListItemViewModel(
+            existingAisle.rank,
+            aisleProduct,
+            existingAisle.locationId
+        )
 
         shoppingListItem.remove()
 
@@ -116,7 +122,7 @@ class ProductShoppingListItemViewModelTest : KoinTest {
             rank = 1000
         )
 
-        val shoppingListItem = getProductShoppingListItemViewModel(1000, ap)
+        val shoppingListItem = getProductShoppingListItemViewModel(1000, ap, 1)
         val productCountBefore = productRepository.getAll().count()
 
         shoppingListItem.remove()
@@ -130,11 +136,19 @@ class ProductShoppingListItemViewModelTest : KoinTest {
         val existingAisle = getShoppingList().aisles.first { it.products.count() > 1 }
         val movedAisleProduct = existingAisle.products.last()
         val shoppingListItem =
-            getProductShoppingListItemViewModel(existingAisle.rank, movedAisleProduct)
+            getProductShoppingListItemViewModel(
+                existingAisle.rank,
+                movedAisleProduct,
+                existingAisle.locationId
+            )
 
         val precedingAisleProduct = existingAisle.products.first { it.id != movedAisleProduct.id }
         val precedingItem =
-            getProductShoppingListItemViewModel(existingAisle.rank, precedingAisleProduct)
+            getProductShoppingListItemViewModel(
+                existingAisle.rank,
+                precedingAisleProduct,
+                existingAisle.locationId
+            )
 
         shoppingListItem.updateRank(precedingItem)
 
@@ -147,7 +161,11 @@ class ProductShoppingListItemViewModelTest : KoinTest {
         val existingAisle = getShoppingList().aisles.first()
         val movedAisleProduct = existingAisle.products.last()
         val shoppingListItem =
-            getProductShoppingListItemViewModel(existingAisle.rank, movedAisleProduct)
+            getProductShoppingListItemViewModel(
+                existingAisle.rank,
+                movedAisleProduct,
+                existingAisle.locationId
+            )
 
         val targetAisle = get<AisleRepository>().getAll()
             .first { it.locationId == existingAisle.locationId && !it.isDefault && it.id != existingAisle.id }
@@ -173,7 +191,11 @@ class ProductShoppingListItemViewModelTest : KoinTest {
         val existingAisle = getShoppingList().aisles.first { it.products.count() > 1 }
         val movedAisleProduct = existingAisle.products.last()
         val shoppingListItem =
-            getProductShoppingListItemViewModel(existingAisle.rank, movedAisleProduct)
+            getProductShoppingListItemViewModel(
+                existingAisle.rank,
+                movedAisleProduct,
+                existingAisle.locationId
+            )
 
         shoppingListItem.updateRank(null)
 
@@ -186,7 +208,11 @@ class ProductShoppingListItemViewModelTest : KoinTest {
     fun onCreate_PropertiesInitializedCorrectly() = runTest {
         val existingAisle = getShoppingList().aisles.first()
         val aisleProduct = existingAisle.products.first()
-        val shoppingListItem = getProductShoppingListItemViewModel(existingAisle.rank, aisleProduct)
+        val shoppingListItem = getProductShoppingListItemViewModel(
+            existingAisle.rank,
+            aisleProduct,
+            existingAisle.locationId
+        )
 
         assertEquals(aisleProduct.product.id, shoppingListItem.id)
         assertEquals(aisleProduct.product.name, shoppingListItem.name)
@@ -210,7 +236,11 @@ class ProductShoppingListItemViewModelTest : KoinTest {
 
         val existingAisle = initialItems.first().first
         val aisleProduct = initialItems.first().second
-        val shoppingListItem = getProductShoppingListItemViewModel(existingAisle.rank, aisleProduct)
+        val shoppingListItem = getProductShoppingListItemViewModel(
+            existingAisle.rank,
+            aisleProduct,
+            existingAisle.locationId
+        )
 
         shoppingListItem.updateStatus(newInStock)
 
@@ -233,7 +263,11 @@ class ProductShoppingListItemViewModelTest : KoinTest {
         val existingAisle = getShoppingList().aisles.first()
         val aisleProduct = existingAisle.products.first()
         val newQty = aisleProduct.product.qtyNeeded + 2.0
-        val shoppingListItem = getProductShoppingListItemViewModel(existingAisle.rank, aisleProduct)
+        val shoppingListItem = getProductShoppingListItemViewModel(
+            existingAisle.rank,
+            aisleProduct,
+            existingAisle.locationId
+        )
 
         shoppingListItem.updateQtyNeeded(newQty)
 
@@ -246,7 +280,11 @@ class ProductShoppingListItemViewModelTest : KoinTest {
         val existingAisle = getShoppingList().aisles.first()
         val aisleProduct = existingAisle.products.first()
         val newQty = null
-        val shoppingListItem = getProductShoppingListItemViewModel(existingAisle.rank, aisleProduct)
+        val shoppingListItem = getProductShoppingListItemViewModel(
+            existingAisle.rank,
+            aisleProduct,
+            existingAisle.locationId
+        )
 
         shoppingListItem.updateQtyNeeded(newQty)
 
@@ -259,7 +297,11 @@ class ProductShoppingListItemViewModelTest : KoinTest {
         val existingAisle = getShoppingList().aisles.first()
         val aisleProduct = existingAisle.products.last()
         val shoppingListItem =
-            getProductShoppingListItemViewModel(existingAisle.rank, aisleProduct)
+            getProductShoppingListItemViewModel(
+                existingAisle.rank,
+                aisleProduct,
+                existingAisle.locationId
+            )
 
         val targetAisle = get<AisleRepository>().getAll()
             .first { it.locationId == existingAisle.locationId && !it.isDefault && it.id != existingAisle.id }
@@ -274,7 +316,11 @@ class ProductShoppingListItemViewModelTest : KoinTest {
     fun navigateToEditEvent_ReturnsNavigateToEditProductEvent() = runTest {
         val existingAisle = getShoppingList().aisles.first()
         val aisleProduct = existingAisle.products.first()
-        val shoppingListItem = getProductShoppingListItemViewModel(existingAisle.rank, aisleProduct)
+        val shoppingListItem = getProductShoppingListItemViewModel(
+            existingAisle.rank,
+            aisleProduct,
+            existingAisle.locationId
+        )
 
         val event = shoppingListItem.editNavigationEvent()
 

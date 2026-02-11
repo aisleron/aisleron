@@ -28,6 +28,7 @@ import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.location.usecase.GetLocationUseCase
 import com.aisleron.domain.location.usecase.RemoveLocationUseCase
+import com.aisleron.domain.location.usecase.UpdateLocationRankUseCase
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -62,7 +63,8 @@ class LocationShoppingListItemViewModelTest : KoinTest {
             location = existingLocation,
             selected = false,
             getLocationUseCase = get<GetLocationUseCase>(),
-            removeLocationUseCase = get<RemoveLocationUseCase>()
+            removeLocationUseCase = get<RemoveLocationUseCase>(),
+            updateLocationRankUseCase = get<UpdateLocationRankUseCase>()
         )
     }
 

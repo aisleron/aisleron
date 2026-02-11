@@ -15,29 +15,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.ui.shoppinglist
+package com.aisleron.domain.location.usecase
 
-interface ShoppingListItem {
-    val headerRank: Int
-    val rank: Int
-    val id: Int
-    val name: String
-    val aisleId: Int
-    val locationId: Int
-    val itemType: ItemType
-    val selected: Boolean
-    val uniqueId: UniqueId
+import com.aisleron.domain.location.Location
+import com.aisleron.domain.location.LocationRepository
 
-    override fun equals(other: Any?): Boolean
-
-    enum class ItemType {
-        HEADER, PRODUCT, EMPTY_LIST
+class UpdateLocationRankUseCase(
+    private val locationRepository: LocationRepository
+) {
+    suspend operator fun invoke(location: Location, newRank: Int) {
+        locationRepository.updateLocationRank(location.copy(rank = newRank))
     }
-
-    data class UniqueId(
-        val itemType: ItemType,
-        val id: Int,
-    )
 }
-
-

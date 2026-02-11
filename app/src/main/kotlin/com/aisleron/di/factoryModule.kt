@@ -32,7 +32,10 @@ val factoryModule = module {
             removeProductUseCase = get(),
             updateProductStatusUseCase = get(),
             updateProductQtyNeededUseCase = get(),
-            changeProductAisleUseCase = get()
+            changeProductAisleUseCase = get(),
+            getLocationUseCase = get(),
+            removeLocationUseCase = get(),
+            updateLocationRankUseCase = get()
         )
     }
 

@@ -25,6 +25,10 @@ import com.aisleron.domain.aisle.usecase.UpdateAisleRankUseCase
 import com.aisleron.domain.aisleproduct.AisleProduct
 import com.aisleron.domain.aisleproduct.usecase.ChangeProductAisleUseCase
 import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductRankUseCase
+import com.aisleron.domain.location.Location
+import com.aisleron.domain.location.usecase.GetLocationUseCase
+import com.aisleron.domain.location.usecase.RemoveLocationUseCase
+import com.aisleron.domain.location.usecase.UpdateLocationRankUseCase
 import com.aisleron.domain.product.usecase.RemoveProductUseCase
 import com.aisleron.domain.product.usecase.UpdateProductQtyNeededUseCase
 import com.aisleron.domain.product.usecase.UpdateProductStatusUseCase
@@ -38,14 +42,21 @@ class ShoppingListItemViewModelFactory(
     private val removeProductUseCase: RemoveProductUseCase,
     private val updateProductStatusUseCase: UpdateProductStatusUseCase,
     private val updateProductQtyNeededUseCase: UpdateProductQtyNeededUseCase,
-    private val changeProductAisleUseCase: ChangeProductAisleUseCase
+    private val changeProductAisleUseCase: ChangeProductAisleUseCase,
+    private val getLocationUseCase: GetLocationUseCase,
+    private val removeLocationUseCase: RemoveLocationUseCase,
+    private val updateLocationRankUseCase: UpdateLocationRankUseCase
 ) {
     fun createProductItemViewModel(
-        aisleProduct: AisleProduct, aisleRank: Int, isSelected: Boolean
+        aisleProduct: AisleProduct,
+        headerRank: Int,
+        locationId: Int,
+        selections: Set<ShoppingListItem.UniqueId>
     ) = ProductShoppingListItemViewModel(
         aisleProduct = aisleProduct,
-        headerRank = aisleRank,
-        selected = isSelected,
+        headerRank = headerRank,
+        selected = isSelected(selections, ShoppingListItem.ItemType.PRODUCT, aisleProduct.id),
+        locationId = locationId,
         removeProductUseCase = removeProductUseCase,
         updateAisleProductRankUseCase = updateAisleProductRankUseCase,
         updateProductStatusUseCase = updateProductStatusUseCase,
@@ -54,13 +65,34 @@ class ShoppingListItemViewModelFactory(
     )
 
     fun createAisleItemViewModel(
-        aisle: Aisle, isSelected: Boolean
+        aisle: Aisle, selections: Set<ShoppingListItem.UniqueId>
     ) = AisleShoppingListItemViewModel(
         aisle = aisle,
-        selected = isSelected,
+        selected = isSelectedHeader(selections, aisle.id),
         updateAisleRankUseCase = updateAisleRankUseCase,
         getAisleUseCase = getAisleUseCase,
         removeAisleUseCase = removeAisleUseCase,
         updateAisleExpandedUseCase = updateAisleExpandedUseCase
     )
+
+    fun createLocationItemViewModel(
+        location: Location, selections: Set<ShoppingListItem.UniqueId>
+    ) = LocationShoppingListItemViewModel(
+        selected = isSelectedHeader(selections, location.id),
+        location = location,
+        getLocationUseCase = getLocationUseCase,
+        removeLocationUseCase = removeLocationUseCase,
+        updateLocationRankUseCase = updateLocationRankUseCase
+    )
+
+    private fun isSelected(
+        selections: Set<ShoppingListItem.UniqueId>, itemType: ShoppingListItem.ItemType, id: Int
+    ): Boolean =
+        selections.contains(ShoppingListItem.UniqueId(itemType, id))
+
+    private fun isSelectedHeader(
+        selections: Set<ShoppingListItem.UniqueId>, id: Int
+    ): Boolean =
+        isSelected(selections, ShoppingListItem.ItemType.HEADER, id)
+
 }

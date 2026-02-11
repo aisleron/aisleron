@@ -22,7 +22,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.base.AisleronException
-import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.loyaltycard.LoyaltyCard
 import com.aisleron.domain.shoppinglist.ShoppingListFilter
 import com.aisleron.ui.bundles.AisleListEntry
@@ -72,18 +71,12 @@ class ShoppingListViewModel(
     private val _searchQuery = MutableStateFlow("")
     private val _shoppingListFilters = MutableStateFlow<ShoppingListFilter?>(null)
 
-    data class SelectedSignature(
-        val itemType: ShoppingListItem.ItemType,
-        val itemId: Int,
-        val aisleId: Int
-    )
-
-    private val _selectedSignatures = MutableStateFlow<Set<SelectedSignature>>(emptySet())
+    private val _selectedSignatures = MutableStateFlow<Set<ShoppingListItem.UniqueId>>(emptySet())
 
     private data class ShoppingListStateParams(
         val query: String,
         val filters: ShoppingListFilter?,
-        val selections: Set<SelectedSignature>
+        val selections: Set<ShoppingListItem.UniqueId>
     )
 
     private var shoppingListCoordinator: ShoppingListCoordinator? = null
@@ -140,7 +133,7 @@ class ShoppingListViewModel(
         .launchIn(coroutineScope)
 
     fun toggleItemSelection(item: ShoppingListItem) {
-        val signature = SelectedSignature(item.itemType, item.id, item.aisleId)
+        val signature = item.uniqueId
         _selectedSignatures.update { current ->
             if (current.contains(signature)) current - signature else current + signature
         }
@@ -365,7 +358,7 @@ class ShoppingListViewModel(
         data class Updated(
             val shoppingList: List<ShoppingListItem>,
             val title: ListTitle,
-            val locationType: LocationType
+            val showEditShop: Boolean
         ) : ShoppingListUiState()
     }
 
@@ -382,7 +375,7 @@ class ShoppingListViewModel(
         data class NavigateToAddMultipleAisles(val locationId: Int) : ShoppingListEvent()
     }
 
-    sealed class ListTitle {
+    sealed class ListTitle() {
         data class LocationName(val name: String) : ListTitle()
         object InStock : ListTitle()
         object Needed : ListTitle()

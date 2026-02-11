@@ -38,6 +38,8 @@ class AisleShoppingListItemViewModel(
     override val rank: Int get() = aisle.rank
     override val id: Int get() = aisle.id
     override val name: String get() = aisle.name
+    override val uniqueId: ShoppingListItem.UniqueId
+        get() = ShoppingListItem.UniqueId(itemType, id)
 
     override suspend fun remove() {
         val aisle = getAisleUseCase(id)

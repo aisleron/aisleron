@@ -32,7 +32,6 @@ import com.aisleron.ui.shoppinglist.EmptyShoppingListItem
 import com.aisleron.ui.shoppinglist.ShoppingListItem
 import com.aisleron.ui.shoppinglist.ShoppingListItemViewModelFactory
 import com.aisleron.ui.shoppinglist.ShoppingListViewModel.ListTitle
-import com.aisleron.ui.shoppinglist.ShoppingListViewModel.SelectedSignature
 import com.aisleron.ui.shoppinglist.ShoppingListViewModel.ShoppingListEvent
 import com.aisleron.ui.shoppinglist.ShoppingListViewModel.ShoppingListUiState
 import kotlinx.coroutines.flow.map
@@ -49,7 +48,7 @@ class AisleListCoordinator(
     private var loyaltyCard: LoyaltyCard? = null
 
     override fun getShoppingListState(
-        filters: ShoppingListFilter, selections: Set<SelectedSignature>
+        filters: ShoppingListFilter, selections: Set<ShoppingListItem.UniqueId>
     ) = getShoppingListUseCase(locationId, filters)
         .map { collectedLocation ->
             val listItems = mapShoppingList(
@@ -59,7 +58,7 @@ class AisleListCoordinator(
             val state: ShoppingListUiState = ShoppingListUiState.Updated(
                 shoppingList = listItems,
                 title = getListTitle(collectedLocation, filters.productFilter),
-                locationType = collectedLocation?.type ?: LocationType.HOME
+                showEditShop = collectedLocation?.type == LocationType.SHOP
             )
 
             state
@@ -98,26 +97,18 @@ class AisleListCoordinator(
     private fun mapShoppingList(
         location: Location?,
         showAllProducts: Boolean,
-        selections: Set<SelectedSignature>
+        selections: Set<ShoppingListItem.UniqueId>
     ): List<ShoppingListItem> {
         val filteredList: MutableList<ShoppingListItem> = location?.let { l ->
             l.aisles.flatMap { a ->
-                val aisleSignature = SelectedSignature(
-                    ShoppingListItem.ItemType.HEADER, a.id, a.id
-                )
-
                 listOf(
                     shoppingListItemViewModelFactory.createAisleItemViewModel(
-                        a, selections.contains(aisleSignature)
+                        a, selections
                     )
                 ) + a.products.filter { (a.expanded || showAllProducts) }
                     .map { ap ->
-                        val productSignature = SelectedSignature(
-                            ShoppingListItem.ItemType.PRODUCT, ap.product.id, ap.aisleId
-                        )
-
                         shoppingListItemViewModelFactory.createProductItemViewModel(
-                            ap, a.rank, selections.contains(productSignature)
+                            ap, a.rank, location.id, selections
                         )
                     }
             }

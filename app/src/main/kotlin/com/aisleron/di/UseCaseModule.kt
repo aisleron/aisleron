@@ -66,6 +66,7 @@ import com.aisleron.domain.location.usecase.RemoveLocationUseCase
 import com.aisleron.domain.location.usecase.RemoveLocationUseCaseImpl
 import com.aisleron.domain.location.usecase.SortLocationByNameUseCase
 import com.aisleron.domain.location.usecase.SortLocationByNameUseCaseImpl
+import com.aisleron.domain.location.usecase.UpdateLocationRankUseCase
 import com.aisleron.domain.location.usecase.UpdateLocationUseCase
 import com.aisleron.domain.loyaltycard.usecase.AddLoyaltyCardToLocationUseCase
 import com.aisleron.domain.loyaltycard.usecase.AddLoyaltyCardToLocationUseCaseImpl
@@ -131,6 +132,7 @@ val useCaseModule = module {
     factory<IsLocationNameUniqueUseCase> { IsLocationNameUniqueUseCase(locationRepository = get()) }
     factory<GetHomeLocationUseCase> { GetHomeLocationUseCase(locationRepository = get()) }
     factory<GetLocationMaxRankUseCase> { GetLocationMaxRankUseCaseImpl(locationRepository = get()) }
+    factory<UpdateLocationRankUseCase> { UpdateLocationRankUseCase(locationRepository = get()) }
 
     factory<UpdateLocationUseCase> {
         UpdateLocationUseCase(

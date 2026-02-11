@@ -18,13 +18,14 @@
 package com.aisleron.ui.shoppinglist.coordinator
 
 import com.aisleron.domain.shoppinglist.ShoppingListFilter
+import com.aisleron.ui.shoppinglist.ShoppingListItem
 import com.aisleron.ui.shoppinglist.ShoppingListViewModel
 import kotlinx.coroutines.flow.Flow
 
 interface ShoppingListCoordinator {
     fun getShoppingListState(
         filters: ShoppingListFilter,
-        selections: Set<ShoppingListViewModel.SelectedSignature>
+        selections: Set<ShoppingListItem.UniqueId>
     ): Flow<ShoppingListViewModel.ShoppingListUiState>
 
     suspend fun expandCollapseHeaders()

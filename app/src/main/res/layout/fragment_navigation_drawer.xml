@@ -104,6 +104,14 @@
                 tools:layout="@layout/fragment_shop_menu_item" />
 
             <TextView
+                android:id="@+id/nav_needed_in_shops"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/menu_needed_in_shops"
+                app:drawableStartCompat="@drawable/baseline_multi_store_24"
+                android:textAppearance="?attr/textAppearanceListItem" />
+
+            <TextView
                 android:id="@+id/nav_all_shops"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

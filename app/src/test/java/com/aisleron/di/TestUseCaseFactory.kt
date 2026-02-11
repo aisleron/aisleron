@@ -58,6 +58,7 @@ import com.aisleron.domain.location.usecase.RemoveLocationUseCase
 import com.aisleron.domain.location.usecase.RemoveLocationUseCaseImpl
 import com.aisleron.domain.location.usecase.SortLocationByNameUseCase
 import com.aisleron.domain.location.usecase.SortLocationByNameUseCaseImpl
+import com.aisleron.domain.location.usecase.UpdateLocationRankUseCase
 import com.aisleron.domain.location.usecase.UpdateLocationUseCase
 import com.aisleron.domain.loyaltycard.usecase.AddLoyaltyCardToLocationUseCase
 import com.aisleron.domain.loyaltycard.usecase.AddLoyaltyCardToLocationUseCaseImpl
@@ -267,6 +268,10 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
             updateAisleUseCase = updateAisleUseCase,
             updateAisleProductUseCase = updateAisleProductsUseCase
         )
+    }
+
+    val updateLocationRankUseCase: UpdateLocationRankUseCase by lazy {
+        UpdateLocationRankUseCase(repositoryFactory.locationRepository)
     }
 
     val updateLocationUseCase: UpdateLocationUseCase by lazy {
@@ -501,6 +506,7 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
             GetShopsUseCase::class -> getShopsUseCase as T
             RemoveLocationUseCase::class -> removeLocationUseCase as T
             SortLocationByNameUseCase::class -> sortLocationByNameUseCase as T
+            UpdateLocationRankUseCase::class -> updateLocationRankUseCase as T
             UpdateLocationUseCase::class -> updateLocationUseCase as T
 
             //Loyalty Card Use Cases
