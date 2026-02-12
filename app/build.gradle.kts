@@ -167,6 +167,23 @@ android {
     }
 }
 
+gradle.taskGraph.whenReady {
+    val isReleaseTask = allTasks.any {
+        it.name.contains("assembleRelease", ignoreCase = true) ||
+                it.name.contains("bundleRelease", ignoreCase = true)
+    }
+
+    if (isReleaseTask) {
+        val releaseConfig = android.signingConfigs.findByName("release")
+        if (releaseConfig == null || releaseConfig.storeFile == null) {
+            throw GradleException(
+                "CRITICAL ERROR: You are attempting a Release build without a signing key.\n" +
+                        "Production binaries must be signed. Check your keystore.properties file."
+            )
+        }
+    }
+}
+
 dependencies {
     // Implementation
     implementation("androidx.core:core-ktx:1.17.0")
