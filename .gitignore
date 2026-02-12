@@ -26,6 +26,7 @@ replay_pid*
 
 # Specific Files #
 keystore.properties
+local.properties
 
 # fastlane files
 /fastlane/README.md
