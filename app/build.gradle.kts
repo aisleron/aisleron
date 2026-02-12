@@ -55,21 +55,18 @@ android {
     }
 
     signingConfigs {
-        // Create a variable called keystorePropertiesFile, and initialize it to your
-        // keystore.properties file, in the rootProject folder.
         val keystorePropertiesFile = rootProject.file("keystore.properties")
 
-        // Initialize a new Properties() object called keystoreProperties.
-        val keystoreProperties = Properties()
+        if (keystorePropertiesFile.exists()) {
+            val keystoreProperties = Properties()
+            keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 
-        // Load your keystore.properties file into the keystoreProperties object.
-        keystoreProperties.load(FileInputStream(keystorePropertiesFile))
-
-        create("release") {
-            keyAlias = keystoreProperties["keyAlias"] as String
-            keyPassword = keystoreProperties["keyPassword"] as String
-            storeFile = file(keystoreProperties["storeFile"] as String)
-            storePassword = keystoreProperties["storePassword"] as String
+            create("release") {
+                keyAlias = keystoreProperties["keyAlias"] as String
+                keyPassword = keystoreProperties["keyPassword"] as String
+                storeFile = file(keystoreProperties["storeFile"] as String)
+                storePassword = keystoreProperties["storePassword"] as String
+            }
         }
     }
     namespace = "com.aisleron"
@@ -101,7 +98,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("release")
+            signingConfig = signingConfigs.findByName("release")
         }
 
         debug {
@@ -166,6 +163,23 @@ android {
                 substitute(module("org.hamcrest:hamcrest-library"))
                     .using(module("org.hamcrest:hamcrest:3.0"))
             }
+        }
+    }
+}
+
+gradle.taskGraph.whenReady {
+    val isReleaseTask = allTasks.any {
+        it.name.contains("assembleRelease", ignoreCase = true) ||
+                it.name.contains("bundleRelease", ignoreCase = true)
+    }
+
+    if (isReleaseTask) {
+        val releaseConfig = android.signingConfigs.findByName("release")
+        if (releaseConfig == null || releaseConfig.storeFile == null) {
+            throw GradleException(
+                "CRITICAL ERROR: You are attempting a Release build without a signing key.\n" +
+                        "Production binaries must be signed. Check your keystore.properties file."
+            )
         }
     }
 }
