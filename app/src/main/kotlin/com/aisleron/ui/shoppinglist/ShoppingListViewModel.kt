@@ -249,9 +249,12 @@ class ShoppingListViewModel(
     fun removeSelectedItems() {
         val aisleItems = selectedListItems.filterIsInstance<AisleShoppingListItemViewModel>()
         val productItems = selectedListItems.filterIsInstance<ProductShoppingListItemViewModel>()
+        val locationItems = selectedListItems.filterIsInstance<LocationShoppingListItemViewModel>()
+
         coroutineScope.launchHandling {
             productItems.forEach { it.remove() }
             aisleItems.forEach { it.remove() }
+            locationItems.forEach { it.remove() }
             clearSelectedListItems()
         }
     }
