@@ -33,7 +33,7 @@ interface LocationDao : BaseDao<LocationEntity> {
     @Query("SELECT * FROM Location WHERE id = :locationId")
     suspend fun getLocation(locationId: Int): LocationEntity?
 
-    @Query("SELECT * FROM Location")
+    @Query("SELECT * FROM Location  ORDER BY rank")
     suspend fun getLocations(): List<LocationEntity>
 
     @Query("SELECT * FROM Location WHERE name = :name COLLATE NOCASE")
@@ -67,16 +67,16 @@ interface LocationDao : BaseDao<LocationEntity> {
 
 
     @Transaction
-    @Query("SELECT * FROM Location WHERE type = :locationType")
+    @Query("SELECT * FROM Location WHERE type = :locationType ORDER BY rank")
     fun getLocationsWithAislesWithProducts(locationType: LocationType): Flow<List<LocationWithAislesWithProducts>>
 
     /**
      * Shop Specific Queries
      */
-    @Query("SELECT * FROM Location WHERE type = 'SHOP'")
+    @Query("SELECT * FROM Location WHERE type = 'SHOP' ORDER BY rank")
     fun getShops(): Flow<List<LocationEntity>>
 
-    @Query("SELECT * FROM Location WHERE type = 'SHOP' AND pinned = 1")
+    @Query("SELECT * FROM Location WHERE type = 'SHOP' AND pinned = 1 ORDER BY rank")
     fun getPinnedShops(): Flow<List<LocationEntity>>
 
     /**

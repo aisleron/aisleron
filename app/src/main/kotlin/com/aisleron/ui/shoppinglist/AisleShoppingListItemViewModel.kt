@@ -58,7 +58,7 @@ class AisleShoppingListItemViewModel(
         ShoppingListViewModel.ShoppingListEvent.NavigateToEditAisle(id, locationId)
 
     override suspend fun updateExpanded(expanded: Boolean) {
-        updateAisleExpandedUseCase(id, expanded)
+        updateAisleExpandedUseCase(aisle, expanded)
     }
 
     override fun equals(other: Any?): Boolean {

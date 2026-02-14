@@ -58,6 +58,8 @@ import com.aisleron.domain.location.usecase.RemoveLocationUseCase
 import com.aisleron.domain.location.usecase.RemoveLocationUseCaseImpl
 import com.aisleron.domain.location.usecase.SortLocationByNameUseCase
 import com.aisleron.domain.location.usecase.SortLocationByNameUseCaseImpl
+import com.aisleron.domain.location.usecase.UpdateLocationExpandedUseCase
+import com.aisleron.domain.location.usecase.UpdateLocationExpandedUseCaseImpl
 import com.aisleron.domain.location.usecase.UpdateLocationRankUseCase
 import com.aisleron.domain.location.usecase.UpdateLocationUseCase
 import com.aisleron.domain.loyaltycard.usecase.AddLoyaltyCardToLocationUseCase
@@ -159,7 +161,6 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
 
     val updateAisleExpandedUseCase: UpdateAisleExpandedUseCase by lazy {
         UpdateAisleExpandedUseCaseImpl(
-            getAisleUseCase = getAisleUseCase,
             updateAisleUseCase = updateAisleUseCase
         )
     }
@@ -267,6 +268,12 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
             repositoryFactory.locationRepository,
             updateAisleUseCase = updateAisleUseCase,
             updateAisleProductUseCase = updateAisleProductsUseCase
+        )
+    }
+
+    val updateLocationExpandedUseCase: UpdateLocationExpandedUseCase by lazy {
+        UpdateLocationExpandedUseCaseImpl(
+            updateLocationUseCase = updateLocationUseCase
         )
     }
 
@@ -506,6 +513,7 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
             GetShopsUseCase::class -> getShopsUseCase as T
             RemoveLocationUseCase::class -> removeLocationUseCase as T
             SortLocationByNameUseCase::class -> sortLocationByNameUseCase as T
+            UpdateLocationExpandedUseCase::class -> updateLocationExpandedUseCase as T
             UpdateLocationRankUseCase::class -> updateLocationRankUseCase as T
             UpdateLocationUseCase::class -> updateLocationUseCase as T
 

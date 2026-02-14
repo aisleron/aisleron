@@ -28,6 +28,7 @@ import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.location.usecase.GetLocationUseCase
 import com.aisleron.domain.location.usecase.RemoveLocationUseCase
+import com.aisleron.domain.location.usecase.UpdateLocationExpandedUseCase
 import com.aisleron.domain.location.usecase.UpdateLocationRankUseCase
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import kotlinx.coroutines.runBlocking
@@ -64,7 +65,8 @@ class LocationShoppingListItemViewModelTest : KoinTest {
             selected = false,
             getLocationUseCase = get<GetLocationUseCase>(),
             removeLocationUseCase = get<RemoveLocationUseCase>(),
-            updateLocationRankUseCase = get<UpdateLocationRankUseCase>()
+            updateLocationRankUseCase = get<UpdateLocationRankUseCase>(),
+            updateLocationExpandedUseCase = get<UpdateLocationExpandedUseCase>()
         )
     }
 
@@ -106,9 +108,9 @@ class LocationShoppingListItemViewModelTest : KoinTest {
     fun updateItemRank_LocationMoved_LocationRankUpdated() = runTest {
         val movedShop = getShop()
         val shoppingListItem = getLocationShoppingListItemViewModel(movedShop)
-        val precedingLocation = locationRepository.getAll()
-            .first { it.type == movedShop.type && it.id != movedShop.id }
 
+        val precedingId = locationRepository.add(movedShop.copy(id = 0, rank = movedShop.rank + 1))
+        val precedingLocation = locationRepository.get(precedingId)!!
         val precedingItem = getLocationShoppingListItemViewModel(precedingLocation)
 
         shoppingListItem.updateRank(precedingItem)

@@ -15,10 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.domain.aisle.usecase
+package com.aisleron.domain.location.usecase
 
 import com.aisleron.di.TestDependencyManager
-import com.aisleron.domain.aisle.AisleRepository
+import com.aisleron.domain.location.LocationRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -28,27 +28,27 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import java.util.stream.Stream
 
-class UpdateAisleExpandedUseCaseTest {
+class UpdateLocationExpandedUseCaseImplTest {
     private lateinit var dm: TestDependencyManager
-    private lateinit var updateAisleExpandedUseCase: UpdateAisleExpandedUseCase
+    private lateinit var updateLocationExpandedUseCase: UpdateLocationExpandedUseCase
 
     @BeforeEach
     fun setUp() {
         dm = TestDependencyManager()
-        updateAisleExpandedUseCase = dm.getUseCase()
+        updateLocationExpandedUseCase = dm.getUseCase()
     }
 
     @ParameterizedTest(name = "Test when Expanded is {0}")
     @MethodSource("expandedArguments")
-    fun updateAisleExpanded_AisleExists_ExpandedUpdated(expanded: Boolean) = runTest {
-        val existingAisle = dm.getRepository<AisleRepository>().getAll().first()
+    fun updateLocationExpanded_LocationExists_ExpandedUpdated(expanded: Boolean) = runTest {
+        val existingLocation = dm.getRepository<LocationRepository>().getAll().first()
 
-        val updatedAisle = updateAisleExpandedUseCase(existingAisle, expanded)
+        val updatedLocation = updateLocationExpandedUseCase(existingLocation, expanded)
 
-        assertNotNull(updatedAisle)
-        assertEquals(existingAisle.id, updatedAisle.id)
-        assertEquals(existingAisle.name, updatedAisle.name)
-        assertEquals(expanded, updatedAisle.expanded)
+        assertNotNull(updatedLocation)
+        assertEquals(existingLocation.id, updatedLocation.id)
+        assertEquals(existingLocation.name, updatedLocation.name)
+        assertEquals(expanded, updatedLocation.expanded)
     }
 
     private companion object {

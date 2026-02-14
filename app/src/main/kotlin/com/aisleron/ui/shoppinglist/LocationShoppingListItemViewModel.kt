@@ -20,6 +20,7 @@ package com.aisleron.ui.shoppinglist
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.usecase.GetLocationUseCase
 import com.aisleron.domain.location.usecase.RemoveLocationUseCase
+import com.aisleron.domain.location.usecase.UpdateLocationExpandedUseCase
 import com.aisleron.domain.location.usecase.UpdateLocationRankUseCase
 
 class LocationShoppingListItemViewModel(
@@ -28,7 +29,7 @@ class LocationShoppingListItemViewModel(
     private val getLocationUseCase: GetLocationUseCase,
     private val removeLocationUseCase: RemoveLocationUseCase,
     private val updateLocationRankUseCase: UpdateLocationRankUseCase,
-    // private val updateLocationExpandedUseCase: UpdateLocationExpandedUseCase
+    private val updateLocationExpandedUseCase: UpdateLocationExpandedUseCase
 ) : LocationShoppingListItem, HeaderShoppingListItemViewModel {
     override val childCount: Int get() = location.aisles.sumOf { it.products.size }
     override val isDefault: Boolean get() = false
@@ -55,8 +56,7 @@ class LocationShoppingListItemViewModel(
         ShoppingListViewModel.ShoppingListEvent.NavigateToEditLocation(id)
 
     override suspend fun updateExpanded(expanded: Boolean) {
-        // TODO: Add updateLocationExpandedUseCase
-        //updateLocationExpandedUseCase(id, expanded)
+        updateLocationExpandedUseCase(location, expanded)
     }
 
     override fun equals(other: Any?): Boolean {

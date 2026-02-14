@@ -15,20 +15,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.domain.aisle.usecase
+package com.aisleron.domain.location.usecase
 
-import com.aisleron.domain.aisle.Aisle
+import com.aisleron.domain.location.Location
 
-interface UpdateAisleExpandedUseCase {
-    suspend operator fun invoke(aisle: Aisle, expanded: Boolean): Aisle
+interface UpdateLocationExpandedUseCase {
+    suspend operator fun invoke(location: Location, expanded: Boolean): Location
 }
 
-class UpdateAisleExpandedUseCaseImpl(
-    private val updateAisleUseCase: UpdateAisleUseCase
-) : UpdateAisleExpandedUseCase {
-    override suspend operator fun invoke(aisle: Aisle, expanded: Boolean): Aisle {
-        val updatedAisle = aisle.copy(expanded = expanded)
-        updateAisleUseCase(updatedAisle)
-        return updatedAisle
+class UpdateLocationExpandedUseCaseImpl(
+    private val updateLocationUseCase: UpdateLocationUseCase
+) : UpdateLocationExpandedUseCase {
+    override suspend operator fun invoke(location: Location, expanded: Boolean): Location {
+        val updatedLocation = location.copy(expanded = expanded)
+        updateLocationUseCase(updatedLocation)
+        return updatedLocation
     }
 }

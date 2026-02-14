@@ -28,6 +28,7 @@ import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductRankUseCase
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.usecase.GetLocationUseCase
 import com.aisleron.domain.location.usecase.RemoveLocationUseCase
+import com.aisleron.domain.location.usecase.UpdateLocationExpandedUseCase
 import com.aisleron.domain.location.usecase.UpdateLocationRankUseCase
 import com.aisleron.domain.product.usecase.RemoveProductUseCase
 import com.aisleron.domain.product.usecase.UpdateProductQtyNeededUseCase
@@ -45,7 +46,8 @@ class ShoppingListItemViewModelFactory(
     private val changeProductAisleUseCase: ChangeProductAisleUseCase,
     private val getLocationUseCase: GetLocationUseCase,
     private val removeLocationUseCase: RemoveLocationUseCase,
-    private val updateLocationRankUseCase: UpdateLocationRankUseCase
+    private val updateLocationRankUseCase: UpdateLocationRankUseCase,
+    private val updateLocationExpandedUseCase: UpdateLocationExpandedUseCase
 ) {
     fun createProductItemViewModel(
         aisleProduct: AisleProduct,
@@ -82,7 +84,8 @@ class ShoppingListItemViewModelFactory(
         location = location,
         getLocationUseCase = getLocationUseCase,
         removeLocationUseCase = removeLocationUseCase,
-        updateLocationRankUseCase = updateLocationRankUseCase
+        updateLocationRankUseCase = updateLocationRankUseCase,
+        updateLocationExpandedUseCase = updateLocationExpandedUseCase
     )
 
     private fun isSelected(

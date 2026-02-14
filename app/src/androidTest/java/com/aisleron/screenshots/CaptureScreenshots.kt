@@ -757,7 +757,7 @@ class CaptureScreenshots : KoinTest {
 
     private suspend fun collapseAllAisles() {
         get<AisleRepository>().getAll().forEach {
-            get<UpdateAisleExpandedUseCase>().invoke(it.id, false)
+            get<UpdateAisleExpandedUseCase>().invoke(it, false)
         }
     }
 
