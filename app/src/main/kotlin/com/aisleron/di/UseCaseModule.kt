@@ -55,6 +55,8 @@ import com.aisleron.domain.location.usecase.AddLocationUseCase
 import com.aisleron.domain.location.usecase.AddLocationUseCaseImpl
 import com.aisleron.domain.location.usecase.CopyLocationUseCase
 import com.aisleron.domain.location.usecase.CopyLocationUseCaseImpl
+import com.aisleron.domain.location.usecase.ExpandCollapseLocationsUseCase
+import com.aisleron.domain.location.usecase.ExpandCollapseLocationsUseCaseImpl
 import com.aisleron.domain.location.usecase.GetHomeLocationUseCase
 import com.aisleron.domain.location.usecase.GetLocationMaxRankUseCase
 import com.aisleron.domain.location.usecase.GetLocationMaxRankUseCaseImpl
@@ -180,6 +182,10 @@ val useCaseModule = module {
 
     factory<UpdateLocationExpandedUseCase> {
         UpdateLocationExpandedUseCaseImpl(updateLocationUseCase = get())
+    }
+
+    factory<ExpandCollapseLocationsUseCase> {
+        ExpandCollapseLocationsUseCaseImpl(locationRepository = get())
     }
 
     /**

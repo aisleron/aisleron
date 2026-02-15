@@ -59,6 +59,10 @@ class LocationRepositoryImpl(
         return locationDao.getLocationByName(name.trim())?.let { locationMapper.toModel(it) }
     }
 
+    override suspend fun getByType(locationType: LocationType): List<Location> {
+        return locationMapper.toModelList(locationDao.getByType(locationType))
+    }
+
     override suspend fun getMaxRank(): Int {
         return locationDao.getMaxRank()
     }

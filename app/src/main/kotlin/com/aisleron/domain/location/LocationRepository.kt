@@ -28,6 +28,7 @@ interface LocationRepository : BaseRepository<Location> {
     fun getLocationsWithAislesWithProducts(type: LocationType): Flow<List<Location>>
     suspend fun getLocationWithAisles(id: Int): Location
     suspend fun getByName(name: String): Location?
+    suspend fun getByType(locationType: LocationType): List<Location>
     suspend fun getMaxRank(): Int
     suspend fun updateLocationRank(location: Location)
 }

@@ -188,8 +188,13 @@ class ShoppingListViewModel(
     }
 
     fun expandCollapseHeaders() {
+        val headers = (shoppingListUiState.value as? ShoppingListUiState.Updated)
+            ?.shoppingList?.filterIsInstance<HeaderShoppingListItem>() ?: return
+
+        val expandHeaders = headers.none { it.expanded }
+
         coroutineScope.launchHandling {
-            shoppingListCoordinator?.expandCollapseHeaders()
+            shoppingListCoordinator?.expandCollapseHeaders(expandHeaders)
         }
     }
 

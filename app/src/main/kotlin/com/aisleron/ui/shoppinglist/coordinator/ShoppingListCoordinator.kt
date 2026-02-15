@@ -28,7 +28,7 @@ interface ShoppingListCoordinator {
         selections: Set<ShoppingListItem.UniqueId>
     ): Flow<ShoppingListViewModel.ShoppingListUiState>
 
-    suspend fun expandCollapseHeaders()
+    suspend fun expandCollapseHeaders(expand: Boolean)
     suspend fun sortByName()
 }
 

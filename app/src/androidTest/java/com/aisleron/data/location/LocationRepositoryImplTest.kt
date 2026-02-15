@@ -190,4 +190,16 @@ class LocationRepositoryImplTest : RepositoryImplTest<Location>() {
 
         assertEquals(maxRankBefore + 1, maxRankAfter)
     }
+
+    @Test
+    fun getByType_TypeIsShop_OnlyShopsReturned() = runTest {
+        addMultipleItems()
+
+        val shops = locationRepository.getByType(LocationType.SHOP)
+
+        val shopCount = locationRepository.getAll().count { it.type == LocationType.SHOP }
+        assertEquals(shopCount, shops.count())
+
+        assertTrue(shops.all { it.type == LocationType.SHOP })
+    }
 }

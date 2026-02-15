@@ -20,6 +20,7 @@ package com.aisleron.ui.shoppinglist.coordinator
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationType
+import com.aisleron.domain.location.usecase.ExpandCollapseLocationsUseCase
 import com.aisleron.domain.shoppinglist.ShoppingListFilter
 import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
 import com.aisleron.ui.shoppinglist.EmptyShoppingListItem
@@ -32,6 +33,7 @@ import kotlin.collections.map
 
 class LocationListCoordinator(
     private val getShoppingListUseCase: GetShoppingListUseCase,
+    private val expandCollapseLocationsUseCase: ExpandCollapseLocationsUseCase,
     private val shoppingListItemViewModelFactory: ShoppingListItemViewModelFactory,
     private val locationType: LocationType
 ) : ShoppingListCoordinator {
@@ -53,8 +55,8 @@ class LocationListCoordinator(
             state
         }
 
-    override suspend fun expandCollapseHeaders() {
-        TODO("Not yet implemented")
+    override suspend fun expandCollapseHeaders(expand: Boolean) {
+        expandCollapseLocationsUseCase(locationType, expand)
     }
 
     override suspend fun sortByName() {

@@ -64,8 +64,8 @@ class AisleListCoordinator(
             state
         }
 
-    override suspend fun expandCollapseHeaders() {
-        expandCollapseAislesForLocationUseCase(locationId)
+    override suspend fun expandCollapseHeaders(expand: Boolean) {
+        expandCollapseAislesForLocationUseCase(locationId, expand)
     }
 
     override suspend fun sortByName() {

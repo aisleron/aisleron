@@ -74,7 +74,7 @@ class LocationDaoTestImpl(private val aisleDao: AisleDaoTestImpl) : LocationDao 
     }
 
     override suspend fun getLocationByName(name: String): LocationEntity? {
-        return locationList.find { it.name.uppercase() == name.uppercase() }
+        return locationList.find { it.name.equals(name, ignoreCase = true) }
     }
 
     override suspend fun getMaxRank(): Int {
@@ -88,6 +88,10 @@ class LocationDaoTestImpl(private val aisleDao: AisleDaoTestImpl) : LocationDao 
             locationList.removeAt(locationList.indexOf(it))
             locationList.add(newLocation)
         }
+    }
+
+    override suspend fun getByType(locationType: LocationType): List<LocationEntity> {
+        return locationList.filter { it.type == locationType }.sortedBy { it.rank }
     }
 
     override suspend fun getLocationWithAisles(locationId: Int): LocationWithAisles {

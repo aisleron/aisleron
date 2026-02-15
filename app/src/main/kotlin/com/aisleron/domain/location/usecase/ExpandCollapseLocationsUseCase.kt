@@ -15,24 +15,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.domain.aisle.usecase
+package com.aisleron.domain.location.usecase
 
-import com.aisleron.domain.aisle.AisleRepository
+import com.aisleron.domain.location.LocationRepository
+import com.aisleron.domain.location.LocationType
 
-interface ExpandCollapseAislesForLocationUseCase {
-    suspend operator fun invoke(locationId: Int, expand: Boolean)
+interface ExpandCollapseLocationsUseCase {
+    suspend operator fun invoke(locationType: LocationType, expand: Boolean)
 }
 
-class ExpandCollapseAislesForLocationUseCaseImpl(
-    private val aisleRepository: AisleRepository
-) : ExpandCollapseAislesForLocationUseCase {
-    override suspend operator fun invoke(locationId: Int, expand: Boolean) {
-        val aisles = aisleRepository.getForLocation(locationId)
-        val updatedAisles = aisles.filter { it.expanded != expand }
+class ExpandCollapseLocationsUseCaseImpl(
+    private val locationRepository: LocationRepository
+) : ExpandCollapseLocationsUseCase {
+    override suspend operator fun invoke(locationType: LocationType, expand: Boolean) {
+        val locations = locationRepository.getByType(locationType)
+        val updatedLocations = locations.filter { it.expanded != expand }
             .map { it.copy(expanded = expand) }
 
-        if (updatedAisles.isEmpty()) return
+        if (updatedLocations.isEmpty()) return
 
-        aisleRepository.update(updatedAisles)
+        locationRepository.update(updatedLocations)
     }
 }

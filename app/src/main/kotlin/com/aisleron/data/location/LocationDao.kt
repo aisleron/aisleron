@@ -51,6 +51,9 @@ interface LocationDao : BaseDao<LocationEntity> {
     @Query("UPDATE Location SET rank = rank + 1 WHERE rank >= :fromRank")
     suspend fun moveRanks(fromRank: Int)
 
+    @Query("SELECT * FROM Location WHERE type = :locationType ORDER BY rank")
+    suspend fun getByType(locationType: LocationType): List<LocationEntity>
+
     /**
      * Location With Aisles
      */
