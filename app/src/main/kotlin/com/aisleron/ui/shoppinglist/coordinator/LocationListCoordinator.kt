@@ -21,6 +21,7 @@ import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.location.usecase.ExpandCollapseLocationsUseCase
+import com.aisleron.domain.location.usecase.SortLocationTypeByNameUseCase
 import com.aisleron.domain.shoppinglist.ShoppingListFilter
 import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
 import com.aisleron.ui.shoppinglist.EmptyShoppingListItem
@@ -35,6 +36,7 @@ class LocationListCoordinator(
     private val getShoppingListUseCase: GetShoppingListUseCase,
     private val expandCollapseLocationsUseCase: ExpandCollapseLocationsUseCase,
     private val shoppingListItemViewModelFactory: ShoppingListItemViewModelFactory,
+    private val sortLocationTypeByNameUseCase: SortLocationTypeByNameUseCase,
     private val locationType: LocationType
 ) : ShoppingListCoordinator {
     override fun getShoppingListState(
@@ -60,7 +62,7 @@ class LocationListCoordinator(
     }
 
     override suspend fun sortByName() {
-        TODO("Not yet implemented")
+        sortLocationTypeByNameUseCase(locationType, true)
     }
 
     private fun mapShoppingList(

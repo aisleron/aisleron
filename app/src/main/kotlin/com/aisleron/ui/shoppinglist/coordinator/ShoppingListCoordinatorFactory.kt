@@ -21,6 +21,7 @@ import com.aisleron.domain.aisle.usecase.ExpandCollapseAislesForLocationUseCase
 import com.aisleron.domain.aisle.usecase.GetAislesForLocationUseCase
 import com.aisleron.domain.location.usecase.ExpandCollapseLocationsUseCase
 import com.aisleron.domain.location.usecase.SortLocationByNameUseCase
+import com.aisleron.domain.location.usecase.SortLocationTypeByNameUseCase
 import com.aisleron.domain.loyaltycard.usecase.GetLoyaltyCardForLocationUseCase
 import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
 import com.aisleron.ui.shoppinglist.ShoppingListGrouping
@@ -33,7 +34,8 @@ class ShoppingListCoordinatorFactory(
     private val sortLocationByNameUseCase: SortLocationByNameUseCase,
     private val getAislesForLocationUseCase: GetAislesForLocationUseCase,
     private val getLoyaltyCardForLocationUseCase: GetLoyaltyCardForLocationUseCase,
-    private val expandCollapseLocationsUseCase: ExpandCollapseLocationsUseCase
+    private val expandCollapseLocationsUseCase: ExpandCollapseLocationsUseCase,
+    private val sortLocationTypeByNameUseCase: SortLocationTypeByNameUseCase
 ) {
     fun create(grouping: ShoppingListGrouping): ShoppingListCoordinator {
         return when (grouping) {
@@ -53,6 +55,7 @@ class ShoppingListCoordinatorFactory(
                     getShoppingListUseCase = getShoppingListUseCase,
                     expandCollapseLocationsUseCase = expandCollapseLocationsUseCase,
                     shoppingListItemViewModelFactory = shoppingListItemViewModelFactory,
+                    sortLocationTypeByNameUseCase = sortLocationTypeByNameUseCase,
                     locationType = grouping.locationType
                 )
         }

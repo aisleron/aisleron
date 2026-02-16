@@ -41,8 +41,9 @@ class RemoveAisleUseCaseImpl(
 
         val defaultAisle = aisleRepository.getDefaultAisleFor(aisleWithProducts.locationId)
         if (defaultAisle != null) {
-            val aisleProducts = aisleWithProducts.products
-            aisleProducts.forEach { it.aisleId = defaultAisle.id }
+            val aisleProducts =
+                aisleWithProducts.products.map { it.copy(aisleId = defaultAisle.id) }
+
             updateAisleProductsUseCase(aisleProducts)
         } else {
             removeProductsFromAisleUseCase(aisleWithProducts)

@@ -58,6 +58,8 @@ import com.aisleron.domain.location.usecase.RemoveLocationUseCase
 import com.aisleron.domain.location.usecase.RemoveLocationUseCaseImpl
 import com.aisleron.domain.location.usecase.SortLocationByNameUseCase
 import com.aisleron.domain.location.usecase.SortLocationByNameUseCaseImpl
+import com.aisleron.domain.location.usecase.SortLocationTypeByNameUseCase
+import com.aisleron.domain.location.usecase.SortLocationTypeByNameUseCaseImpl
 import com.aisleron.domain.location.usecase.UpdateLocationExpandedUseCase
 import com.aisleron.domain.location.usecase.UpdateLocationExpandedUseCaseImpl
 import com.aisleron.domain.location.usecase.UpdateLocationRankUseCase
@@ -268,6 +270,14 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
             repositoryFactory.locationRepository,
             updateAisleUseCase = updateAisleUseCase,
             updateAisleProductUseCase = updateAisleProductsUseCase
+        )
+    }
+
+    val sortLocationTypeByNameUseCase: SortLocationTypeByNameUseCase by lazy {
+        SortLocationTypeByNameUseCaseImpl(
+            repositoryFactory.locationRepository,
+            sortLocationByNameUseCase = sortLocationByNameUseCase,
+            transactionRunner = transactionRunner
         )
     }
 
@@ -513,6 +523,7 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
             GetShopsUseCase::class -> getShopsUseCase as T
             RemoveLocationUseCase::class -> removeLocationUseCase as T
             SortLocationByNameUseCase::class -> sortLocationByNameUseCase as T
+            SortLocationTypeByNameUseCase::class -> sortLocationTypeByNameUseCase as T
             UpdateLocationExpandedUseCase::class -> updateLocationExpandedUseCase as T
             UpdateLocationRankUseCase::class -> updateLocationRankUseCase as T
             UpdateLocationUseCase::class -> updateLocationUseCase as T

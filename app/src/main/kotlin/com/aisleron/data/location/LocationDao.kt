@@ -33,7 +33,7 @@ interface LocationDao : BaseDao<LocationEntity> {
     @Query("SELECT * FROM Location WHERE id = :locationId")
     suspend fun getLocation(locationId: Int): LocationEntity?
 
-    @Query("SELECT * FROM Location  ORDER BY rank")
+    @Query("SELECT * FROM Location  ORDER BY type, rank")
     suspend fun getLocations(): List<LocationEntity>
 
     @Query("SELECT * FROM Location WHERE name = :name COLLATE NOCASE")

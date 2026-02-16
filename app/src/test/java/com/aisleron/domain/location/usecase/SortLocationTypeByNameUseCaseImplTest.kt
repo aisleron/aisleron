@@ -18,33 +18,33 @@
 package com.aisleron.domain.location.usecase
 
 import com.aisleron.di.TestDependencyManager
+import com.aisleron.domain.FilterType
 import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.aisle.AisleRepository
 import com.aisleron.domain.aisle.usecase.AddAisleUseCase
+import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationRepository
-import com.aisleron.domain.preferences.TrackingMode
-import com.aisleron.domain.product.Product
-import com.aisleron.domain.product.usecase.AddProductUseCase
+import com.aisleron.domain.location.LocationType
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class SortLocationByNameUseCaseImplTest {
+class SortLocationTypeByNameUseCaseImplTest {
     private lateinit var dm: TestDependencyManager
-    private lateinit var sortLocationByNameUseCase: SortLocationByNameUseCase
+    private lateinit var sortLocationTypeByNameUseCase: SortLocationTypeByNameUseCase
     private lateinit var locationRepository: LocationRepository
 
     @BeforeEach
     fun setUp() {
         dm = TestDependencyManager()
-        sortLocationByNameUseCase = dm.getUseCase()
+        sortLocationTypeByNameUseCase = dm.getUseCase()
         locationRepository = dm.getRepository()
     }
 
     @Test
-    fun sortLocationByName_WithAisles_AislesSorted() = runTest {
+    fun sortLocationTypeByName_SortAisles_aislesSorted() = runTest {
         val locationId = locationRepository.getShops().first().first().id
         val addAisleUseCase = dm.getUseCase<AddAisleUseCase>()
 
@@ -61,7 +61,7 @@ class SortLocationByNameUseCaseImplTest {
         addAisleUseCase(aisle)
         addAisleUseCase(aisle.copy(name = "AAA", rank = 2002))
 
-        sortLocationByNameUseCase(locationId)
+        sortLocationTypeByNameUseCase(LocationType.SHOP, true)
 
         val aisles = dm.getRepository<AisleRepository>().getForLocation(locationId)
 
@@ -71,35 +71,28 @@ class SortLocationByNameUseCaseImplTest {
     }
 
     @Test
-    fun sortLocationByName_WithProducts_ProductsSorted() = runTest {
-        val locationId = locationRepository.getShops().first().first().id
-        val addProductUseCase = dm.getUseCase<AddProductUseCase>()
+    fun sortLocationTypeByNam_HasMultipleLocations_LocationsSorted() = runTest {
+        val addLocationUseCase = dm.getUseCase<AddLocationUseCase>()
 
-        val product = Product(
+        val location = Location(
             id = 0,
             name = "ZZZ",
-            inStock = false,
-            qtyNeeded = 0.0,
-            noteId = null,
-            qtyIncrement = 1.0,
-            trackingMode = TrackingMode.DEFAULT,
-            unitOfMeasure = "Qty"
+            rank = 2000,
+            expanded = true,
+            type = LocationType.SHOP,
+            defaultFilter = FilterType.NEEDED,
+            pinned = false,
+            aisles = emptyList(),
+            showDefaultAisle = true
         )
 
-        addProductUseCase(product)
-        addProductUseCase(product.copy(name = "AAA"))
+        addLocationUseCase(location)
+        addLocationUseCase(location.copy(name = "AAA", rank = 2002))
 
-        sortLocationByNameUseCase(locationId)
+        sortLocationTypeByNameUseCase(LocationType.SHOP, false)
 
-        val sortedProducts =
-            locationRepository.getLocationWithAislesWithProducts(locationId)
-                .first()!!.aisles.first { it.isDefault }.products
-
-        assertEquals(1, sortedProducts.first { it.product.name == "AAA" }.rank)
-        assertEquals(
-            sortedProducts.maxOf { it.rank }, sortedProducts.first { it.product.name == "ZZZ" }.rank
-        )
+        val locations = locationRepository.getByType(LocationType.SHOP)
+        assertEquals(1, locations.first { it.name == "AAA" }.rank)
+        assertEquals(locations.maxOf { it.rank }, locations.first { it.name == "ZZZ" }.rank)
     }
 }
-
-

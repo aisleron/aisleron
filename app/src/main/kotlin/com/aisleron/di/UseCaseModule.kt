@@ -68,6 +68,8 @@ import com.aisleron.domain.location.usecase.RemoveLocationUseCase
 import com.aisleron.domain.location.usecase.RemoveLocationUseCaseImpl
 import com.aisleron.domain.location.usecase.SortLocationByNameUseCase
 import com.aisleron.domain.location.usecase.SortLocationByNameUseCaseImpl
+import com.aisleron.domain.location.usecase.SortLocationTypeByNameUseCase
+import com.aisleron.domain.location.usecase.SortLocationTypeByNameUseCaseImpl
 import com.aisleron.domain.location.usecase.UpdateLocationExpandedUseCase
 import com.aisleron.domain.location.usecase.UpdateLocationExpandedUseCaseImpl
 import com.aisleron.domain.location.usecase.UpdateLocationRankUseCase
@@ -168,6 +170,14 @@ val useCaseModule = module {
             locationRepository = get(),
             updateAisleUseCase = get(),
             updateAisleProductUseCase = get()
+        )
+    }
+
+    factory<SortLocationTypeByNameUseCase> {
+        SortLocationTypeByNameUseCaseImpl(
+            locationRepository = get(),
+            sortLocationByNameUseCase = get(),
+            transactionRunner = get()
         )
     }
 

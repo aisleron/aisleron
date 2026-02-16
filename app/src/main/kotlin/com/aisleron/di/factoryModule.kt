@@ -48,7 +48,8 @@ val factoryModule = module {
             getAislesForLocationUseCase = get(),
             sortLocationByNameUseCase = get(),
             getLoyaltyCardForLocationUseCase = get(),
-            expandCollapseLocationsUseCase = get()
+            expandCollapseLocationsUseCase = get(),
+            sortLocationTypeByNameUseCase = get()
         )
     }
 }
