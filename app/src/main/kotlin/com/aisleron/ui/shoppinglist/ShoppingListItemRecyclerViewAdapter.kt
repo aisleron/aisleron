@@ -83,6 +83,9 @@ class ShoppingListItemRecyclerViewAdapter(
         }
 
         override fun getChangePayload(oldItem: ShoppingListItem, newItem: ShoppingListItem): Any? {
+            // Force a full rebind if the rank changes to avoid weird caching issues
+            if (oldItem.rank != newItem.rank) return null
+
             val payload = mutableSetOf<String>()
 
             if (oldItem.selected != newItem.selected) {

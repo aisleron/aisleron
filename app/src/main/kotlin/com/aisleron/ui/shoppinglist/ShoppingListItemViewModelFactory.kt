@@ -18,7 +18,6 @@
 package com.aisleron.ui.shoppinglist
 
 import com.aisleron.domain.aisle.Aisle
-import com.aisleron.domain.aisle.usecase.GetAisleUseCase
 import com.aisleron.domain.aisle.usecase.RemoveAisleUseCase
 import com.aisleron.domain.aisle.usecase.UpdateAisleExpandedUseCase
 import com.aisleron.domain.aisle.usecase.UpdateAisleRankUseCase
@@ -36,7 +35,6 @@ import com.aisleron.domain.product.usecase.UpdateProductStatusUseCase
 
 class ShoppingListItemViewModelFactory(
     private val updateAisleRankUseCase: UpdateAisleRankUseCase,
-    private val getAisleUseCase: GetAisleUseCase,
     private val removeAisleUseCase: RemoveAisleUseCase,
     private val updateAisleProductRankUseCase: UpdateAisleProductRankUseCase,
     private val updateAisleExpandedUseCase: UpdateAisleExpandedUseCase,
@@ -69,13 +67,20 @@ class ShoppingListItemViewModelFactory(
     fun createAisleItemViewModel(
         aisle: Aisle, selections: Set<ShoppingListItem.UniqueId>
     ) = AisleShoppingListItemViewModel(
-        aisle = aisle,
         selected = isSelectedHeader(selections, aisle.id),
-        updateAisleRankUseCase = updateAisleRankUseCase,
-        getAisleUseCase = getAisleUseCase,
-        removeAisleUseCase = removeAisleUseCase,
-        updateAisleExpandedUseCase = updateAisleExpandedUseCase
-    )
+        childCount = aisle.products.count(),
+        locationId = aisle.locationId,
+        isDefault = aisle.isDefault,
+        expanded = aisle.expanded,
+        rank = aisle.rank,
+        id = aisle.id,
+        name = aisle.name
+    ).apply {
+        this.updateAisleRankUseCase = this@ShoppingListItemViewModelFactory.updateAisleRankUseCase
+        this.removeAisleUseCase = this@ShoppingListItemViewModelFactory.removeAisleUseCase
+        this.updateAisleExpandedUseCase =
+            this@ShoppingListItemViewModelFactory.updateAisleExpandedUseCase
+    }
 
     fun createLocationItemViewModel(
         location: Location, selections: Set<ShoppingListItem.UniqueId>

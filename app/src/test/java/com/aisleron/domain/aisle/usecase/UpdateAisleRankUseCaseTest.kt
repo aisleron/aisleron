@@ -25,42 +25,54 @@ import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertNull
 
 class UpdateAisleRankUseCaseTest {
     private lateinit var dm: TestDependencyManager
     private lateinit var updateAisleRankUseCase: UpdateAisleRankUseCase
     private lateinit var existingAisle: Aisle
+    private lateinit var aisleRepository: AisleRepository
 
 
     @BeforeEach
     fun setUp() {
         dm = TestDependencyManager()
-        val aisleRepository = dm.getRepository<AisleRepository>()
         updateAisleRankUseCase = dm.getUseCase()
+        aisleRepository = dm.getRepository()
         existingAisle = runBlocking { aisleRepository.getAll().first { !it.isDefault } }
     }
 
     @Test
     fun updateAisleRank_NewRankProvided_AisleRankUpdated() = runTest {
-        val updateAisle = existingAisle.copy(rank = 1001)
+        val newRank = 1001
 
-        updateAisleRankUseCase(updateAisle)
+        updateAisleRankUseCase(existingAisle.id, 1001)
 
-        val updatedAisle: Aisle? = dm.getRepository<AisleRepository>().get(existingAisle.id)
-        assertEquals(updateAisle, updatedAisle)
+        val updatedAisle: Aisle? = aisleRepository.get(existingAisle.id)
+        assertEquals(existingAisle.copy(rank = newRank), updatedAisle)
     }
 
     @Test
     fun updateAisleRank_AisleRankUpdated_OtherAislesMoved() = runTest {
-        val updateAisle = existingAisle.copy(rank = existingAisle.rank + 1)
-        val maxAisleRankBefore: Int = dm.getRepository<AisleRepository>().getAll()
+        val newRank = existingAisle.rank + 1
+        val maxAisleRankBefore: Int = aisleRepository.getAll()
             .filter { it.locationId == existingAisle.locationId }.maxOf { it.rank }
 
-        updateAisleRankUseCase(updateAisle)
+        updateAisleRankUseCase(existingAisle.id, newRank)
 
-        val maxAisleRankAfter: Int = dm.getRepository<AisleRepository>().getAll()
+        val maxAisleRankAfter: Int = aisleRepository.getAll()
             .filter { it.locationId == existingAisle.locationId }.maxOf { it.rank }
 
         assertEquals(maxAisleRankBefore + 1, maxAisleRankAfter)
+    }
+
+    @Test
+    fun updateAisleRank_InvalidIdProvided_NoAislesUpdated() = runTest {
+        val newRank = 1001
+
+        updateAisleRankUseCase(-1, 1001)
+
+        val updatedAisle = aisleRepository.getAll().firstOrNull { it.rank == newRank }
+        assertNull(updatedAisle)
     }
 }

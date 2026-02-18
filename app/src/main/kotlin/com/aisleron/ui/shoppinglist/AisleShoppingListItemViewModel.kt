@@ -17,63 +17,40 @@
 
 package com.aisleron.ui.shoppinglist
 
-import com.aisleron.domain.aisle.Aisle
-import com.aisleron.domain.aisle.usecase.GetAisleUseCase
 import com.aisleron.domain.aisle.usecase.RemoveAisleUseCase
 import com.aisleron.domain.aisle.usecase.UpdateAisleExpandedUseCase
 import com.aisleron.domain.aisle.usecase.UpdateAisleRankUseCase
 
-class AisleShoppingListItemViewModel(
-    private val aisle: Aisle,
+data class AisleShoppingListItemViewModel(
     override val selected: Boolean,
-    private val updateAisleRankUseCase: UpdateAisleRankUseCase,
-    private val getAisleUseCase: GetAisleUseCase,
-    private val removeAisleUseCase: RemoveAisleUseCase,
-    private val updateAisleExpandedUseCase: UpdateAisleExpandedUseCase
+    override val childCount: Int,
+    override val locationId: Int,
+    override val isDefault: Boolean,
+    override val expanded: Boolean,
+    override val rank: Int,
+    override val id: Int,
+    override val name: String
 ) : AisleShoppingListItem, HeaderShoppingListItemViewModel {
-    override val childCount: Int get() = aisle.products.count()
-    override val locationId: Int get() = aisle.locationId
-    override val isDefault: Boolean get() = aisle.isDefault
-    override val expanded: Boolean get() = aisle.expanded
-    override val rank: Int get() = aisle.rank
-    override val id: Int get() = aisle.id
-    override val name: String get() = aisle.name
+    lateinit var updateAisleRankUseCase: UpdateAisleRankUseCase
+    lateinit var removeAisleUseCase: RemoveAisleUseCase
+    lateinit var updateAisleExpandedUseCase: UpdateAisleExpandedUseCase
+
     override val uniqueId: ShoppingListItem.UniqueId
         get() = ShoppingListItem.UniqueId(itemType, id)
 
     override suspend fun remove() {
-        val aisle = getAisleUseCase(id)
-        aisle?.let { removeAisleUseCase(it) }
+        removeAisleUseCase(id)
     }
 
     override suspend fun updateRank(precedingItem: ShoppingListItem?) {
-        updateAisleRankUseCase(
-            aisle.copy(
-                rank = precedingItem?.let { it.headerRank + 1 } ?: 1
-            )
-        )
+        val newRank = precedingItem?.let { it.headerRank + 1 } ?: 1
+        updateAisleRankUseCase(id, newRank)
     }
 
     override fun editNavigationEvent(): ShoppingListViewModel.ShoppingListEvent =
         ShoppingListViewModel.ShoppingListEvent.NavigateToEditAisle(id, locationId)
 
     override suspend fun updateExpanded(expanded: Boolean) {
-        updateAisleExpandedUseCase(aisle, expanded)
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is AisleShoppingListItemViewModel) return false
-
-        if (aisle != other.aisle) return false
-        if (selected != other.selected) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = aisle.hashCode()
-        result = 31 * result + selected.hashCode()
-        return result
+        updateAisleExpandedUseCase(id, expanded)
     }
 }

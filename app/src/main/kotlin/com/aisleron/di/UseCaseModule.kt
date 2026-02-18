@@ -240,6 +240,7 @@ val useCaseModule = module {
 
     factory<UpdateAisleExpandedUseCase> {
         UpdateAisleExpandedUseCaseImpl(
+            aisleRepository = get(),
             updateAisleUseCase = get()
         )
     }

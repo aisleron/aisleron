@@ -21,8 +21,8 @@ import com.aisleron.di.TestDependencyManager
 import com.aisleron.domain.aisle.AisleRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -31,29 +31,51 @@ import java.util.stream.Stream
 class UpdateAisleExpandedUseCaseTest {
     private lateinit var dm: TestDependencyManager
     private lateinit var updateAisleExpandedUseCase: UpdateAisleExpandedUseCase
+    private lateinit var aisleRepository: AisleRepository
 
     @BeforeEach
     fun setUp() {
         dm = TestDependencyManager()
         updateAisleExpandedUseCase = dm.getUseCase()
+        aisleRepository = dm.getRepository()
     }
 
-    @ParameterizedTest(name = "Test when Expanded is {0}")
-    @MethodSource("expandedArguments")
-    fun updateAisleExpanded_AisleExists_ExpandedUpdated(expanded: Boolean) = runTest {
-        val existingAisle = dm.getRepository<AisleRepository>().getAll().first()
+    @ParameterizedTest(name = "Test when Expand is {0}")
+    @MethodSource("expandArguments")
+    fun updateAisleExpanded_AisleExists_ExpandedUpdated(expand: Boolean) = runTest {
+        val existingAisle = aisleRepository.getAll().first()
 
-        val updatedAisle = updateAisleExpandedUseCase(existingAisle, expanded)
+        updateAisleExpandedUseCase(existingAisle, expand)
 
-        assertNotNull(updatedAisle)
-        assertEquals(existingAisle.id, updatedAisle.id)
-        assertEquals(existingAisle.name, updatedAisle.name)
-        assertEquals(expanded, updatedAisle.expanded)
+        val updatedAisle = aisleRepository.get(existingAisle.id)
+        assertEquals(existingAisle.copy(expanded = expand), updatedAisle)
+    }
+
+    @ParameterizedTest(name = "Test when Expand is {0}")
+    @MethodSource("expandArguments")
+    fun updateAisleExpanded_UpdateById_ExpandedUpdated(expand: Boolean) = runTest {
+        val existingAisle = aisleRepository.getAll().first()
+
+        updateAisleExpandedUseCase(existingAisle.id, expand)
+
+        val updatedAisle = aisleRepository.get(existingAisle.id)
+        assertEquals(existingAisle.copy(expanded = expand), updatedAisle)
+    }
+
+    @Test
+    fun updateAisleExpanded_InvalidIdProvided_NoAislesUpdated() = runTest {
+        val expand = false
+        val expandedCountBefore = aisleRepository.getAll().count { it.expanded }
+
+        updateAisleExpandedUseCase(-1, expand)
+
+        val expandedCountAfter = aisleRepository.getAll().count { it.expanded }
+        assertEquals(expandedCountBefore, expandedCountAfter)
     }
 
     private companion object {
         @JvmStatic
-        fun expandedArguments(): Stream<Arguments> = Stream.of(
+        fun expandArguments(): Stream<Arguments> = Stream.of(
             Arguments.of(true),
             Arguments.of(false)
         )

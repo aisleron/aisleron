@@ -24,7 +24,6 @@ import com.aisleron.di.useCaseModule
 import com.aisleron.di.viewModelTestModule
 import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.aisle.AisleRepository
-import com.aisleron.domain.aisle.usecase.GetAisleUseCase
 import com.aisleron.domain.aisle.usecase.RemoveAisleUseCase
 import com.aisleron.domain.aisle.usecase.UpdateAisleExpandedUseCase
 import com.aisleron.domain.aisle.usecase.UpdateAisleRankUseCase
@@ -56,13 +55,19 @@ class AisleShoppingListItemViewModelTest : KoinTest {
 
     private fun getAisleShoppingListItemViewModel(existingAisle: Aisle): AisleShoppingListItemViewModel {
         return AisleShoppingListItemViewModel(
-            aisle = existingAisle,
             selected = false,
-            updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
-            getAisleUseCase = get<GetAisleUseCase>(),
-            removeAisleUseCase = get<RemoveAisleUseCase>(),
+            childCount = existingAisle.products.count(),
+            locationId = existingAisle.locationId,
+            isDefault = existingAisle.isDefault,
+            expanded = existingAisle.expanded,
+            rank = existingAisle.rank,
+            id = existingAisle.id,
+            name = existingAisle.name,
+        ).apply {
+            updateAisleRankUseCase = get<UpdateAisleRankUseCase>()
+            removeAisleUseCase = get<RemoveAisleUseCase>()
             updateAisleExpandedUseCase = get<UpdateAisleExpandedUseCase>()
-        )
+        }
     }
 
     private suspend fun getAisle(): Aisle {

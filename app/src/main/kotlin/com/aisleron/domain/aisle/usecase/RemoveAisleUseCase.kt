@@ -25,6 +25,7 @@ import com.aisleron.domain.base.AisleronException
 
 interface RemoveAisleUseCase {
     suspend operator fun invoke(aisle: Aisle)
+    suspend operator fun invoke(aisleId: Int)
 }
 
 class RemoveAisleUseCaseImpl(
@@ -49,5 +50,10 @@ class RemoveAisleUseCaseImpl(
             removeProductsFromAisleUseCase(aisleWithProducts)
         }
         aisleRepository.remove(aisleWithProducts)
+    }
+
+    override suspend fun invoke(aisleId: Int) {
+        val aisle = aisleRepository.get(aisleId)
+        aisle?.let { invoke(it) }
     }
 }

@@ -81,8 +81,8 @@ class LocationDaoTestImpl(private val aisleDao: AisleDaoTestImpl) : LocationDao 
         return locationList.maxOf { it.rank }
     }
 
-    override suspend fun moveRanks(fromRank: Int) {
-        val locations = locationList.filter { it.rank >= fromRank }
+    override suspend fun moveRanks(locationType: LocationType, fromRank: Int) {
+        val locations = locationList.filter { it.type == locationType && it.rank >= fromRank }
         locations.forEach {
             val newLocation = it.copy(rank = it.rank + 1)
             locationList.removeAt(locationList.indexOf(it))

@@ -23,7 +23,6 @@ import com.aisleron.di.repositoryModule
 import com.aisleron.di.useCaseModule
 import com.aisleron.di.viewModelTestModule
 import com.aisleron.domain.aisle.AisleRepository
-import com.aisleron.domain.aisle.usecase.GetAisleUseCase
 import com.aisleron.domain.aisle.usecase.RemoveAisleUseCase
 import com.aisleron.domain.aisle.usecase.UpdateAisleExpandedUseCase
 import com.aisleron.domain.aisle.usecase.UpdateAisleRankUseCase
@@ -171,13 +170,19 @@ class ProductShoppingListItemViewModelTest : KoinTest {
             .first { it.locationId == existingAisle.locationId && !it.isDefault && it.id != existingAisle.id }
 
         val precedingItem = AisleShoppingListItemViewModel(
-            aisle = targetAisle,
-            updateAisleRankUseCase = get<UpdateAisleRankUseCase>(),
-            getAisleUseCase = get<GetAisleUseCase>(),
-            removeAisleUseCase = get<RemoveAisleUseCase>(),
-            updateAisleExpandedUseCase = get<UpdateAisleExpandedUseCase>(),
-            selected = false
-        )
+            selected = false,
+            childCount = targetAisle.products.count(),
+            locationId = targetAisle.locationId,
+            isDefault = targetAisle.isDefault,
+            expanded = targetAisle.expanded,
+            rank = targetAisle.rank,
+            id = targetAisle.id,
+            name = targetAisle.name
+        ).apply {
+            updateAisleRankUseCase = get<UpdateAisleRankUseCase>()
+            removeAisleUseCase = get<RemoveAisleUseCase>()
+            updateAisleExpandedUseCase = get<UpdateAisleExpandedUseCase>()
+        }
 
         shoppingListItem.updateRank(precedingItem)
 

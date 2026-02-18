@@ -17,13 +17,16 @@
 
 package com.aisleron.domain.aisle.usecase
 
-import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.aisle.AisleRepository
 
 class UpdateAisleRankUseCase(
     private val aisleRepository: AisleRepository
 ) {
-    suspend operator fun invoke(aisle: Aisle) {
-        aisleRepository.updateAisleRank(aisle)
+    suspend operator fun invoke(aisleId: Int, newRank: Int) {
+        val aisle = aisleRepository.get(aisleId)
+        aisle?.let {
+            val updatedAisle = it.copy(rank = newRank)
+            aisleRepository.updateAisleRank(updatedAisle)
+        }
     }
 }
