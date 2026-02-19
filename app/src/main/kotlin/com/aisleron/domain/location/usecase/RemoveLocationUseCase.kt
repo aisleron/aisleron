@@ -25,6 +25,7 @@ import com.aisleron.domain.location.LocationRepository
 
 interface RemoveLocationUseCase {
     suspend operator fun invoke(location: Location)
+    suspend operator fun invoke(locationId: Int)
 }
 
 class RemoveLocationUseCaseImpl(
@@ -43,5 +44,10 @@ class RemoveLocationUseCaseImpl(
         }
 
         locationRepository.remove(loc)
+    }
+
+    override suspend fun invoke(locationId: Int) {
+        val location = locationRepository.get(locationId)
+        location?.let { invoke(it) }
     }
 }

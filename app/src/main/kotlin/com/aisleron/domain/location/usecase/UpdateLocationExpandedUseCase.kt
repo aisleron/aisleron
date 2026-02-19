@@ -17,18 +17,20 @@
 
 package com.aisleron.domain.location.usecase
 
-import com.aisleron.domain.location.Location
+import com.aisleron.domain.location.LocationRepository
 
 interface UpdateLocationExpandedUseCase {
-    suspend operator fun invoke(location: Location, expanded: Boolean): Location
+    suspend operator fun invoke(locationId: Int, expanded: Boolean)
 }
 
 class UpdateLocationExpandedUseCaseImpl(
-    private val updateLocationUseCase: UpdateLocationUseCase
+    private val locationRepository: LocationRepository
 ) : UpdateLocationExpandedUseCase {
-    override suspend operator fun invoke(location: Location, expanded: Boolean): Location {
-        val updatedLocation = location.copy(expanded = expanded)
-        updateLocationUseCase(updatedLocation)
-        return updatedLocation
+    override suspend operator fun invoke(locationId: Int, expanded: Boolean) {
+        val location = locationRepository.get(locationId)
+        location?.let {
+            val updatedLocation = it.copy(expanded = expanded)
+            locationRepository.update(updatedLocation)
+        }
     }
 }

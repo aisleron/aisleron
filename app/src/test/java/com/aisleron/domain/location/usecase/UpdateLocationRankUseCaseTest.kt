@@ -27,6 +27,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertNull
 
 class UpdateLocationRankUseCaseTest {
     private lateinit var dm: TestDependencyManager
@@ -47,7 +48,7 @@ class UpdateLocationRankUseCaseTest {
     fun updateLocationRank_NewRankProvided_LocationRankUpdated() = runTest {
         val newRank = 1001
 
-        updateLocationRankUseCase(existingLocation, newRank)
+        updateLocationRankUseCase(existingLocation.id, newRank)
 
         val updatedLocation = locationRepository.get(existingLocation.id)
         assertEquals(existingLocation.copy(rank = newRank), updatedLocation)
@@ -72,10 +73,20 @@ class UpdateLocationRankUseCaseTest {
         val newRank = existingLocation.rank + 1
         val maxRankBefore: Int = locationRepository.getAll().maxOf { it.rank }
 
-        updateLocationRankUseCase(existingLocation, newRank)
+        updateLocationRankUseCase(existingLocation.id, newRank)
 
         val maxRankAfter: Int = locationRepository.getAll().maxOf { it.rank }
         assertEquals(maxRankBefore + 1, maxRankAfter)
+    }
+
+    @Test
+    fun updateLocationRank_InvalidIdProvided_NoLocationsUpdated() = runTest {
+        val newRank = 1001
+
+        updateLocationRankUseCase(-1, 1001)
+
+        val updatedAisle = locationRepository.getAll().firstOrNull { it.rank == newRank }
+        assertNull(updatedAisle)
     }
 
 }

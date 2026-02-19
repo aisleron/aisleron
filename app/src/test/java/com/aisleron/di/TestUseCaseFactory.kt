@@ -163,8 +163,7 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
 
     val updateAisleExpandedUseCase: UpdateAisleExpandedUseCase by lazy {
         UpdateAisleExpandedUseCaseImpl(
-            repositoryFactory.aisleRepository,
-            updateAisleUseCase = updateAisleUseCase
+            repositoryFactory.aisleRepository
         )
     }
 
@@ -284,7 +283,7 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
 
     val updateLocationExpandedUseCase: UpdateLocationExpandedUseCase by lazy {
         UpdateLocationExpandedUseCaseImpl(
-            updateLocationUseCase = updateLocationUseCase
+            repositoryFactory.locationRepository
         )
     }
 

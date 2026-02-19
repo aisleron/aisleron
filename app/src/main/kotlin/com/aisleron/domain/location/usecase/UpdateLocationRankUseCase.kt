@@ -17,13 +17,16 @@
 
 package com.aisleron.domain.location.usecase
 
-import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationRepository
 
 class UpdateLocationRankUseCase(
     private val locationRepository: LocationRepository
 ) {
-    suspend operator fun invoke(location: Location, newRank: Int) {
-        locationRepository.updateLocationRank(location.copy(rank = newRank))
+    suspend operator fun invoke(locationId: Int, newRank: Int) {
+        val location = locationRepository.get(locationId)
+        location?.let {
+            val updatedLocation = it.copy(rank = newRank)
+            locationRepository.updateLocationRank(updatedLocation)
+        }
     }
 }

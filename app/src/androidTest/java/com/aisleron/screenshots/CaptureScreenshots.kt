@@ -97,6 +97,7 @@ import java.lang.Thread.sleep
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
+@Suppress("SameParameterValue")
 @RunWith(AndroidJUnit4::class)
 class CaptureScreenshots : KoinTest {
     private val searchBoxResId = SystemIds.SEARCH_BOX
@@ -757,7 +758,7 @@ class CaptureScreenshots : KoinTest {
 
     private suspend fun collapseAllAisles() {
         get<AisleRepository>().getAll().forEach {
-            get<UpdateAisleExpandedUseCase>().invoke(it, false)
+            get<UpdateAisleExpandedUseCase>().invoke(it.id, false)
         }
     }
 

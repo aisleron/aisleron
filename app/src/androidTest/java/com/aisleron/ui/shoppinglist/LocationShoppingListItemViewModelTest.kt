@@ -26,7 +26,6 @@ import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.location.LocationType
-import com.aisleron.domain.location.usecase.GetLocationUseCase
 import com.aisleron.domain.location.usecase.RemoveLocationUseCase
 import com.aisleron.domain.location.usecase.UpdateLocationExpandedUseCase
 import com.aisleron.domain.location.usecase.UpdateLocationRankUseCase
@@ -61,13 +60,18 @@ class LocationShoppingListItemViewModelTest : KoinTest {
 
     private fun getLocationShoppingListItemViewModel(existingLocation: Location): LocationShoppingListItemViewModel {
         return LocationShoppingListItemViewModel(
-            location = existingLocation,
             selected = false,
-            getLocationUseCase = get<GetLocationUseCase>(),
-            removeLocationUseCase = get<RemoveLocationUseCase>(),
-            updateLocationRankUseCase = get<UpdateLocationRankUseCase>(),
+            childCount = existingLocation.aisles.sumOf { it.products.size },
+            expanded = existingLocation.expanded,
+            rank = existingLocation.rank,
+            id = existingLocation.id,
+            name = existingLocation.name,
+            aisleId = existingLocation.aisles.firstOrNull { !it.isDefault }?.id ?: 0,
+        ).apply {
+            removeLocationUseCase = get<RemoveLocationUseCase>()
+            updateLocationRankUseCase = get<UpdateLocationRankUseCase>()
             updateLocationExpandedUseCase = get<UpdateLocationExpandedUseCase>()
-        )
+        }
     }
 
     @Test

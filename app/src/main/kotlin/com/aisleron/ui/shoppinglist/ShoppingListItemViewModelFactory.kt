@@ -25,7 +25,6 @@ import com.aisleron.domain.aisleproduct.AisleProduct
 import com.aisleron.domain.aisleproduct.usecase.ChangeProductAisleUseCase
 import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductRankUseCase
 import com.aisleron.domain.location.Location
-import com.aisleron.domain.location.usecase.GetLocationUseCase
 import com.aisleron.domain.location.usecase.RemoveLocationUseCase
 import com.aisleron.domain.location.usecase.UpdateLocationExpandedUseCase
 import com.aisleron.domain.location.usecase.UpdateLocationRankUseCase
@@ -42,7 +41,6 @@ class ShoppingListItemViewModelFactory(
     private val updateProductStatusUseCase: UpdateProductStatusUseCase,
     private val updateProductQtyNeededUseCase: UpdateProductQtyNeededUseCase,
     private val changeProductAisleUseCase: ChangeProductAisleUseCase,
-    private val getLocationUseCase: GetLocationUseCase,
     private val removeLocationUseCase: RemoveLocationUseCase,
     private val updateLocationRankUseCase: UpdateLocationRankUseCase,
     private val updateLocationExpandedUseCase: UpdateLocationExpandedUseCase
@@ -104,12 +102,18 @@ class ShoppingListItemViewModelFactory(
         location: Location, selections: Set<ShoppingListItem.UniqueId>
     ) = LocationShoppingListItemViewModel(
         selected = isSelectedHeader(selections, location.id),
-        location = location,
-        getLocationUseCase = getLocationUseCase,
-        removeLocationUseCase = removeLocationUseCase,
-        updateLocationRankUseCase = updateLocationRankUseCase,
-        updateLocationExpandedUseCase = updateLocationExpandedUseCase
-    )
+        childCount = location.aisles.sumOf { it.products.size },
+        expanded = location.expanded,
+        rank = location.rank,
+        id = location.id,
+        name = location.name,
+        aisleId = location.aisles.firstOrNull { !it.isDefault }?.id ?: 0
+    ).apply {
+        removeLocationUseCase = this@ShoppingListItemViewModelFactory.removeLocationUseCase
+        updateLocationRankUseCase = this@ShoppingListItemViewModelFactory.updateLocationRankUseCase
+        updateLocationExpandedUseCase =
+            this@ShoppingListItemViewModelFactory.updateLocationExpandedUseCase
+    }
 
     private fun isSelected(
         selections: Set<ShoppingListItem.UniqueId>, itemType: ShoppingListItem.ItemType, id: Int

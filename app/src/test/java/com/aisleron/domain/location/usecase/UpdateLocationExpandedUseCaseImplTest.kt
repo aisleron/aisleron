@@ -21,8 +21,8 @@ import com.aisleron.di.TestDependencyManager
 import com.aisleron.domain.location.LocationRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -31,29 +31,40 @@ import java.util.stream.Stream
 class UpdateLocationExpandedUseCaseImplTest {
     private lateinit var dm: TestDependencyManager
     private lateinit var updateLocationExpandedUseCase: UpdateLocationExpandedUseCase
+    private lateinit var locationRepository: LocationRepository
 
     @BeforeEach
     fun setUp() {
         dm = TestDependencyManager()
         updateLocationExpandedUseCase = dm.getUseCase()
+        locationRepository = dm.getRepository()
     }
 
-    @ParameterizedTest(name = "Test when Expanded is {0}")
-    @MethodSource("expandedArguments")
-    fun updateLocationExpanded_LocationExists_ExpandedUpdated(expanded: Boolean) = runTest {
-        val existingLocation = dm.getRepository<LocationRepository>().getAll().first()
+    @ParameterizedTest(name = "Test when Expand is {0}")
+    @MethodSource("expandArguments")
+    fun updateLocationExpanded_LocationExists_ExpandedUpdated(expand: Boolean) = runTest {
+        val existingLocation = locationRepository.getAll().first()
 
-        val updatedLocation = updateLocationExpandedUseCase(existingLocation, expanded)
+        updateLocationExpandedUseCase(existingLocation.id, expand)
 
-        assertNotNull(updatedLocation)
-        assertEquals(existingLocation.id, updatedLocation.id)
-        assertEquals(existingLocation.name, updatedLocation.name)
-        assertEquals(expanded, updatedLocation.expanded)
+        val updatedLocation = locationRepository.get(existingLocation.id)
+        assertEquals(existingLocation.copy(expanded = expand), updatedLocation)
+    }
+
+    @Test
+    fun updateLocationExpanded_InvalidIdProvided_NoLocationsUpdated() = runTest {
+        val expand = false
+        val expandedCountBefore = locationRepository.getAll().count { it.expanded }
+
+        updateLocationExpandedUseCase(-1, expand)
+
+        val expandedCountAfter = locationRepository.getAll().count { it.expanded }
+        assertEquals(expandedCountBefore, expandedCountAfter)
     }
 
     private companion object {
         @JvmStatic
-        fun expandedArguments(): Stream<Arguments> = Stream.of(
+        fun expandArguments(): Stream<Arguments> = Stream.of(
             Arguments.of(true),
             Arguments.of(false)
         )

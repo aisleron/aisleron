@@ -191,7 +191,7 @@ val useCaseModule = module {
     }
 
     factory<UpdateLocationExpandedUseCase> {
-        UpdateLocationExpandedUseCaseImpl(updateLocationUseCase = get())
+        UpdateLocationExpandedUseCaseImpl(locationRepository = get())
     }
 
     factory<ExpandCollapseLocationsUseCase> {
@@ -240,8 +240,7 @@ val useCaseModule = module {
 
     factory<UpdateAisleExpandedUseCase> {
         UpdateAisleExpandedUseCaseImpl(
-            aisleRepository = get(),
-            updateAisleUseCase = get()
+            aisleRepository = get()
         )
     }
 

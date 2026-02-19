@@ -17,25 +17,20 @@
 
 package com.aisleron.domain.aisle.usecase
 
-import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.aisle.AisleRepository
 
 interface UpdateAisleExpandedUseCase {
-    suspend operator fun invoke(aisle: Aisle, expanded: Boolean)
     suspend operator fun invoke(aisleId: Int, expanded: Boolean)
 }
 
 class UpdateAisleExpandedUseCaseImpl(
-    private val aisleRepository: AisleRepository,
-    private val updateAisleUseCase: UpdateAisleUseCase
+    private val aisleRepository: AisleRepository
 ) : UpdateAisleExpandedUseCase {
-    override suspend operator fun invoke(aisle: Aisle, expanded: Boolean) {
-        val updatedAisle = aisle.copy(expanded = expanded)
-        updateAisleUseCase(updatedAisle)
-    }
-
     override suspend fun invoke(aisleId: Int, expanded: Boolean) {
         val aisle = aisleRepository.get(aisleId)
-        aisle?.let { invoke(it, expanded) }
+        aisle?.let {
+            val updatedAisle = aisle.copy(expanded = expanded)
+            aisleRepository.update(updatedAisle)
+        }
     }
 }

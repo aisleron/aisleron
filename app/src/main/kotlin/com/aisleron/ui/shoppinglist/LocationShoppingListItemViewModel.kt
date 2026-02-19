@@ -17,38 +17,34 @@
 
 package com.aisleron.ui.shoppinglist
 
-import com.aisleron.domain.location.Location
-import com.aisleron.domain.location.usecase.GetLocationUseCase
 import com.aisleron.domain.location.usecase.RemoveLocationUseCase
 import com.aisleron.domain.location.usecase.UpdateLocationExpandedUseCase
 import com.aisleron.domain.location.usecase.UpdateLocationRankUseCase
 
-class LocationShoppingListItemViewModel(
-    private val location: Location,
+data class LocationShoppingListItemViewModel(
     override val selected: Boolean,
-    private val getLocationUseCase: GetLocationUseCase,
-    private val removeLocationUseCase: RemoveLocationUseCase,
-    private val updateLocationRankUseCase: UpdateLocationRankUseCase,
-    private val updateLocationExpandedUseCase: UpdateLocationExpandedUseCase
+    override val childCount: Int,
+    override val isDefault: Boolean = false,
+    override val expanded: Boolean,
+    override val rank: Int,
+    override val id: Int,
+    override val name: String,
+    override val aisleId: Int,
 ) : LocationShoppingListItem, HeaderShoppingListItemViewModel {
-    override val childCount: Int get() = location.aisles.sumOf { it.products.size }
-    override val isDefault: Boolean get() = false
-    override val expanded: Boolean get() = location.expanded
-    override val rank: Int get() = location.rank
-    override val id: Int get() = location.id
-    override val name: String get() = location.name
-    override val aisleId: Int get() = location.aisles.firstOrNull { !it.isDefault }?.id ?: 0
+    lateinit var removeLocationUseCase: RemoveLocationUseCase
+    lateinit var updateLocationRankUseCase: UpdateLocationRankUseCase
+    lateinit var updateLocationExpandedUseCase: UpdateLocationExpandedUseCase
+
     override val uniqueId: ShoppingListItem.UniqueId
         get() = ShoppingListItem.UniqueId(itemType, id)
 
     override suspend fun remove() {
-        val removeLocation = getLocationUseCase(id)
-        removeLocation?.let { removeLocationUseCase(it) }
+        removeLocationUseCase(id)
     }
 
     override suspend fun updateRank(precedingItem: ShoppingListItem?) {
         updateLocationRankUseCase(
-            location, precedingItem?.let { it.headerRank + 1 } ?: 1
+            id, precedingItem?.let { it.headerRank + 1 } ?: 1
         )
     }
 
@@ -56,22 +52,6 @@ class LocationShoppingListItemViewModel(
         ShoppingListViewModel.ShoppingListEvent.NavigateToEditLocation(id)
 
     override suspend fun updateExpanded(expanded: Boolean) {
-        updateLocationExpandedUseCase(location, expanded)
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is LocationShoppingListItemViewModel) return false
-
-        if (location != other.location) return false
-        if (selected != other.selected) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = location.hashCode()
-        result = 31 * result + selected.hashCode()
-        return result
+        updateLocationExpandedUseCase(id, expanded)
     }
 }

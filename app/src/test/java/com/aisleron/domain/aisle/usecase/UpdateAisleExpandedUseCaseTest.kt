@@ -45,17 +45,6 @@ class UpdateAisleExpandedUseCaseTest {
     fun updateAisleExpanded_AisleExists_ExpandedUpdated(expand: Boolean) = runTest {
         val existingAisle = aisleRepository.getAll().first()
 
-        updateAisleExpandedUseCase(existingAisle, expand)
-
-        val updatedAisle = aisleRepository.get(existingAisle.id)
-        assertEquals(existingAisle.copy(expanded = expand), updatedAisle)
-    }
-
-    @ParameterizedTest(name = "Test when Expand is {0}")
-    @MethodSource("expandArguments")
-    fun updateAisleExpanded_UpdateById_ExpandedUpdated(expand: Boolean) = runTest {
-        val existingAisle = aisleRepository.getAll().first()
-
         updateAisleExpandedUseCase(existingAisle.id, expand)
 
         val updatedAisle = aisleRepository.get(existingAisle.id)
