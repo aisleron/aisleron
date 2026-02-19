@@ -25,7 +25,6 @@ val factoryModule = module {
     factory<ShoppingListItemViewModelFactory> {
         ShoppingListItemViewModelFactory(
             updateAisleRankUseCase = get(),
-            getAisleUseCase = get(),
             removeAisleUseCase = get(),
             updateAisleProductRankUseCase = get(),
             updateAisleExpandedUseCase = get(),

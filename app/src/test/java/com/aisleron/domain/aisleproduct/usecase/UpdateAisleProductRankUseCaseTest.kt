@@ -18,51 +18,87 @@
 package com.aisleron.domain.aisleproduct.usecase
 
 import com.aisleron.di.TestDependencyManager
+import com.aisleron.domain.aisle.AisleRepository
 import com.aisleron.domain.aisleproduct.AisleProduct
 import com.aisleron.domain.aisleproduct.AisleProductRepository
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertNull
 
 class UpdateAisleProductRankUseCaseTest {
     private lateinit var dm: TestDependencyManager
     private lateinit var updateAisleProductRankUseCase: UpdateAisleProductRankUseCase
     private lateinit var existingAisleProduct: AisleProduct
+    private lateinit var aisleProductRepository: AisleProductRepository
 
     @BeforeEach
     fun setUp() {
         dm = TestDependencyManager()
-        val aisleProductRepository = dm.getRepository<AisleProductRepository>()
+        aisleProductRepository = dm.getRepository<AisleProductRepository>()
         updateAisleProductRankUseCase = dm.getUseCase()
         existingAisleProduct = runBlocking { aisleProductRepository.getAll().first() }
     }
 
     @Test
     fun updateAisleProductRank_NewRankProvided_AisleProductRankUpdated() = runTest {
-        val updateAisleProduct = existingAisleProduct.copy(rank = 1001)
+        val newRank = 1001
+        val newAisle = existingAisleProduct.aisleId
 
-        updateAisleProductRankUseCase(updateAisleProduct)
+        updateAisleProductRankUseCase(existingAisleProduct.id, newRank, newAisle)
 
-        val updatedAisleProduct =
-            dm.getRepository<AisleProductRepository>().get(existingAisleProduct.id)
-
-        Assertions.assertEquals(updateAisleProduct, updatedAisleProduct)
+        val updatedAisleProduct = aisleProductRepository.get(existingAisleProduct.id)
+        assertEquals(existingAisleProduct.copy(rank = newRank), updatedAisleProduct)
     }
 
     @Test
     fun updateAisleProductRank_AisleProductRankUpdated_OtherAisleProductsMoved() = runTest {
-        val updateAisleProduct = existingAisleProduct.copy(rank = existingAisleProduct.rank + 1)
-        val aisleProductRepository = dm.getRepository<AisleProductRepository>()
+        val newRank = existingAisleProduct.rank + 1
+        val newAisle = existingAisleProduct.aisleId
         val maxAisleProductRankBefore = aisleProductRepository.getAll()
             .filter { it.aisleId == existingAisleProduct.aisleId }.maxOf { it.rank }
 
-        updateAisleProductRankUseCase(updateAisleProduct)
+        updateAisleProductRankUseCase(existingAisleProduct.id, newRank, newAisle)
 
         val maxAisleProductRankAfter = aisleProductRepository.getAll()
             .filter { it.aisleId == existingAisleProduct.aisleId }.maxOf { it.rank }
 
-        Assertions.assertEquals(maxAisleProductRankBefore + 1, maxAisleProductRankAfter)
+        assertEquals(maxAisleProductRankBefore + 1, maxAisleProductRankAfter)
     }
+
+    @Test
+    fun updateAisleProductRank_InvalidIdProvided_NoAislesUpdated() = runTest {
+        val newRank = 1001
+        val newAisle = existingAisleProduct.aisleId
+
+        updateAisleProductRankUseCase(-1, newRank, newAisle)
+
+        val updatedAisleProduct = aisleProductRepository.getAll().firstOrNull { it.rank == newRank }
+        assertNull(updatedAisleProduct)
+    }
+
+
+    @Test
+    fun updateAisleProductRank_NewAisleProvided_AisleProductAisleUpdated() = runTest {
+        val aisleRepository = dm.getRepository<AisleRepository>()
+        val locationId = aisleRepository.get(existingAisleProduct.aisleId)!!.locationId
+        val newAisle = aisleRepository.getAll()
+            .first { it.locationId == locationId && it.id != existingAisleProduct.aisleId }.id
+
+        updateAisleProductRankUseCase(
+            existingAisleProduct.id,
+            existingAisleProduct.rank,
+            newAisle
+        )
+
+        val updatedAisleProduct = aisleProductRepository.get(existingAisleProduct.id)
+        assertEquals(existingAisleProduct.copy(aisleId = newAisle), updatedAisleProduct)
+    }
+
+    /**
+     *
+     * Test invalid aisle
+     */
 }

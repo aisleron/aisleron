@@ -53,16 +53,34 @@ class ShoppingListItemViewModelFactory(
         locationId: Int,
         selections: Set<ShoppingListItem.UniqueId>
     ) = ProductShoppingListItemViewModel(
-        aisleProduct = aisleProduct,
         headerRank = headerRank,
         selected = isSelected(selections, ShoppingListItem.ItemType.PRODUCT, aisleProduct.id),
         locationId = locationId,
-        removeProductUseCase = removeProductUseCase,
-        updateAisleProductRankUseCase = updateAisleProductRankUseCase,
-        updateProductStatusUseCase = updateProductStatusUseCase,
-        updateProductQtyNeededUseCase = updateProductQtyNeededUseCase,
-        changeProductAisleUseCase = changeProductAisleUseCase
-    )
+        inStock = aisleProduct.product.inStock,
+        qtyNeeded = aisleProduct.product.qtyNeeded,
+        noteId = aisleProduct.product.noteId,
+        noteText = aisleProduct.product.note?.noteText,
+        qtyIncrement = aisleProduct.product.qtyIncrement,
+        unitOfMeasure = aisleProduct.product.unitOfMeasure,
+        trackingMode = aisleProduct.product.trackingMode,
+        rank = aisleProduct.rank,
+        id = aisleProduct.product.id,
+        name = aisleProduct.product.name,
+        aisleId = aisleProduct.aisleId,
+        aisleProductId = aisleProduct.id
+    ).apply {
+        removeProductUseCase = this@ShoppingListItemViewModelFactory.removeProductUseCase
+        updateAisleProductRankUseCase =
+            this@ShoppingListItemViewModelFactory.updateAisleProductRankUseCase
+
+        updateProductStatusUseCase =
+            this@ShoppingListItemViewModelFactory.updateProductStatusUseCase
+
+        updateProductQtyNeededUseCase =
+            this@ShoppingListItemViewModelFactory.updateProductQtyNeededUseCase
+
+        changeProductAisleUseCase = this@ShoppingListItemViewModelFactory.changeProductAisleUseCase
+    }
 
     fun createAisleItemViewModel(
         aisle: Aisle, selections: Set<ShoppingListItem.UniqueId>
@@ -76,9 +94,9 @@ class ShoppingListItemViewModelFactory(
         id = aisle.id,
         name = aisle.name
     ).apply {
-        this.updateAisleRankUseCase = this@ShoppingListItemViewModelFactory.updateAisleRankUseCase
-        this.removeAisleUseCase = this@ShoppingListItemViewModelFactory.removeAisleUseCase
-        this.updateAisleExpandedUseCase =
+        updateAisleRankUseCase = this@ShoppingListItemViewModelFactory.updateAisleRankUseCase
+        removeAisleUseCase = this@ShoppingListItemViewModelFactory.removeAisleUseCase
+        updateAisleExpandedUseCase =
             this@ShoppingListItemViewModelFactory.updateAisleExpandedUseCase
     }
 

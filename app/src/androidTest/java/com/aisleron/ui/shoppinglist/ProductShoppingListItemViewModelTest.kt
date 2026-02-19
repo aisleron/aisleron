@@ -69,16 +69,28 @@ class ProductShoppingListItemViewModelTest : KoinTest {
         aisleProduct: AisleProduct,
         locationId: Int
     ) = ProductShoppingListItemViewModel(
-        aisleProduct = aisleProduct,
         headerRank = headerRank,
         selected = false,
         locationId = locationId,
-        updateAisleProductRankUseCase = get<UpdateAisleProductRankUseCase>(),
-        removeProductUseCase = get<RemoveProductUseCase>(),
-        updateProductStatusUseCase = get<UpdateProductStatusUseCase>(),
-        updateProductQtyNeededUseCase = get<UpdateProductQtyNeededUseCase>(),
+        inStock = aisleProduct.product.inStock,
+        qtyNeeded = aisleProduct.product.qtyNeeded,
+        noteId = aisleProduct.product.noteId,
+        noteText = aisleProduct.product.note?.noteText,
+        qtyIncrement = aisleProduct.product.qtyIncrement,
+        unitOfMeasure = aisleProduct.product.unitOfMeasure,
+        trackingMode = aisleProduct.product.trackingMode,
+        rank = aisleProduct.rank,
+        id = aisleProduct.product.id,
+        name = aisleProduct.product.name,
+        aisleId = aisleProduct.aisleId,
+        aisleProductId = aisleProduct.id
+    ).apply {
+        updateAisleProductRankUseCase = get<UpdateAisleProductRankUseCase>()
+        removeProductUseCase = get<RemoveProductUseCase>()
+        updateProductStatusUseCase = get<UpdateProductStatusUseCase>()
+        updateProductQtyNeededUseCase = get<UpdateProductQtyNeededUseCase>()
         changeProductAisleUseCase = get<ChangeProductAisleUseCase>()
-    )
+    }
 
     private suspend fun getShoppingList(): Location {
         val locationRepository = get<LocationRepository>()

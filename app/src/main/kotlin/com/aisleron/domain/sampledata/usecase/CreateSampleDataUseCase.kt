@@ -231,11 +231,7 @@ class CreateSampleDataUseCaseImpl(
         newRank: Int,
         newAisleName: String
     ) {
-        val updatedAisleProduct = currentAisleProduct.copy(
-            rank = newRank,
-            aisleId = shoppingList.aisles.first { it.name == newAisleName }.id
-        )
-
-        updateAisleProductRankUseCase(updatedAisleProduct)
+        val aisleId = shoppingList.aisles.first { it.name == newAisleName }.id
+        updateAisleProductRankUseCase(currentAisleProduct.id, newRank, aisleId)
     }
 }
