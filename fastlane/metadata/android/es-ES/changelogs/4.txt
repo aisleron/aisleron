@@ -1,0 +1,2 @@
+* Ajustar el encabezado del panel de navegación para que ocupe menos espacio
+* Corregir algunas inconsistencias al seleccionar o deseleccionar elementos en las listas

@@ -1,0 +1,10 @@
+Mejoras:
+* Nuevo: Copiar una tienda o producto
+* Opción para mostrar u ocultar pasillos vacíos
+* Volver a la pantalla de bienvenida la primera vez que se inicia
+* Los nombres de los pasillos ahora son únicos por lista
+
+Corrección de errores:
+* Los detalles del producto/tienda ya no son claros al cambiar de aplicación
+* Se corrigió la falta de tiendas ancladas después de restaurar la base de datos
+* Se corrigió el desplazamiento al arrastrar productos

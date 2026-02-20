@@ -1,0 +1,11 @@
+Mejoras:
+* Se añadió la posibilidad de gestionar los pasillos al añadir o editar un producto.
+* Se permitió el seguimiento de las cantidades en decimales.
+* Se añadió la unidad de medida al inventario de productos.
+* Se añadió la función de selección múltiple a la lista de productos.
+* Se añadió la opción de configurar el modo de seguimiento por producto.
+* Se añadió un aviso para guardar cambios al salir de la página del producto.
+
+Corrección de errores:
+* Se corrigió un comportamiento inesperado de reordenamiento de pasillos cuando
+	había muchos pasillos sin clasificar.
