@@ -1,0 +1,12 @@
+Mejoras:
+* Gestión de pasillos de productos al añadir o editar.
+* Compatibilidad con cantidades decimales y unidades de medida.
+* Función de selección múltiple en las listas de productos.
+* Opciones de seguimiento por producto.
+* Guardar avisos al salir de las páginas de producto.
+* Se añadieron traducciones al búlgaro.
+
+Corrección de errores:
+* Se mejoró la lógica de reordenación de pasillos.
+* Borrar los filtros de búsqueda al navegar por las listas.
+* Se corrigió un posible fallo al pulsar Entrar al introducir la cantidad.

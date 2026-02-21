@@ -1,0 +1,2 @@
+Mejoras
+* Actualización para la prueba de compilación de Google Play

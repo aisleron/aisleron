@@ -1,0 +1,6 @@
+Mejoras:
+* Se añadió una sección "Contribuir" a la página "Acerca de".
+* Se añadieron traducciones al turco.
+
+Corrección de errores:
+* Se corrigió la eliminación de recursos de idiomas del paquete de Play Store.

@@ -1,0 +1,5 @@
+Améliorations :
+* Implémentation de design Matériel 3, couleurs dynamiques et d'un style Pure Black
+* Amélioration de la liste des produits et de l'affichage des objets sur les petits appareils
+* Ajout des traductions italiennes et africaines
+* Traductions mises à jour
