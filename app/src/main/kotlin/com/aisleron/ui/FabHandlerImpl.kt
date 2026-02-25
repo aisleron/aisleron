@@ -19,6 +19,7 @@ package com.aisleron.ui
 
 import android.app.Activity
 import android.content.res.ColorStateList
+import android.util.TypedValue
 import android.view.View
 import androidx.annotation.AttrRes
 import androidx.core.content.res.ResourcesCompat
@@ -92,24 +93,40 @@ class FabHandlerImpl(private val resourceProvider: ResourceProvider) : FabHandle
     }
 
     private fun toggleFabMenu(activity: Activity, setMenuExpanded: Boolean) {
+        val fabMenuItemGap = dpToPx(activity, 4f)
+
+        // Fab menu entries are anchored center of the main fab. Calculate the offset to be
+        // half the main fab height, + 2x the gap between menu entries. This makes toe fab menu
+        // align to Material Design guidelines (4dp between entries, 8dp from main)
+        var yTranslation = -(getActualViewHeight(fabMain(activity)) / 2) - (fabMenuItemGap * 2)
+
         fabMenuExpanded = setMenuExpanded
-        for (fabOption in FabHandler.FabOption.entries) {
-            when (fabOption) {
-                FabHandler.FabOption.ADD_PRODUCT -> toggleSingleFabView(
-                    fabAddProduct(activity), setMenuExpanded
-                )
-
-                FabHandler.FabOption.ADD_AISLE -> toggleSingleFabView(
-                    fabAddAisle(activity), setMenuExpanded
-                )
-
-                FabHandler.FabOption.ADD_SHOP -> toggleSingleFabView(
-                    fabAddShop(activity), setMenuExpanded
-                )
+        for (fabOption in fabEntries) {
+            val fab = when (fabOption) {
+                FabHandler.FabOption.ADD_PRODUCT -> fabAddProduct(activity)
+                FabHandler.FabOption.ADD_AISLE -> fabAddAisle(activity)
+                FabHandler.FabOption.ADD_SHOP -> fabAddShop(activity)
             }
+
+            toggleSingleFabView(fab, setMenuExpanded)
+
+            fab.translationY = yTranslation
+            yTranslation = yTranslation - getActualViewHeight(fab) - fabMenuItemGap
         }
 
         toggleFabMain(fabMain(activity), setMenuExpanded)
+    }
+
+    private fun getActualViewHeight(view: View): Float {
+        val matchParent = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+        view.measure(matchParent, matchParent)
+        return view.measuredHeight.toFloat()
+    }
+
+    private fun dpToPx(activity: Activity, dp: Float): Float {
+        return TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP, dp, activity.resources.displayMetrics
+        )
     }
 
     override fun setFabOnClickListener(
@@ -204,8 +221,16 @@ class FabHandlerImpl(private val resourceProvider: ResourceProvider) : FabHandle
             getColor(com.google.android.material.R.attr.colorOnPrimaryContainer, fab)
     }
 
+    private fun hideFabViews() {
+        _fabAddShop?.let { toggleSingleFabView(it, false) }
+        _fabAddAisle?.let { toggleSingleFabView(it, false) }
+        _fabAddProduct?.let { toggleSingleFabView(it, false) }
+    }
+
     override fun setFabItems(activity: Activity, vararg fabOptions: FabHandler.FabOption) {
         setFabMainClosed(fabMain(activity))
+        hideFabViews()
+
         fabEntries = fabOptions.distinctBy { it.name }.toMutableList()
         when (fabEntries.count()) {
             0 -> fabMain(activity).hide()
