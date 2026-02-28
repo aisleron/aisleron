@@ -1,0 +1,10 @@
+Améliorations :
+* Ajout de la capacité à gérer les allées lors de l'ajout ou de la modification d'un produit.
+* Autorisation du suivi des quantités en valeur décimales.
+* Ajout de l'Unité de Mesure à l'inventaire des produits.
+* Ajout de la capacité de sélection multiple à la liste des produits.
+* Ajout de l'option pour activer le mode de suivi par produit.
+* Ajout de l'annonce d'enregistrement lors de la fermeture de la page si des changements ne sont pas enregistrés.
+
+Correction de bugs:
+* Correction du comportement de réarrangement des allées lorsqu'il y avait de nombreuses allées non rangées.

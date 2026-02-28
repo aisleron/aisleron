@@ -1,0 +1,10 @@
+Mejoras
+* Se añadió compatibilidad para la búsqueda de tarjetas de fidelización a través de Catima (Monedero de
+ Tarjetas de Fidelización).
+* Se introdujo la compatibilidad con el idioma ruso.
+* Se actualizó el SDK de destino a Android 15 (nivel de API 35) para mejorar la compatibilidad.
+
+Corrección de errores
+* Se solucionó un problema por el cual la casilla de verificación del elemento inferior de la lista quedaba
+ oculta por el botón de acción flotante (FAB).
+* Se solucionó un problema que impedía la apertura de los archivos de copia de seguridad .sqlite en Android 15.

@@ -14,13 +14,11 @@
   ~
   ~ You should have received a copy of the GNU Affero General Public License
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
-  -->
-
-<resources>
-    <string name="navigation_drawer_open">Abrir caja de navegacion</string>
-    <string name="navigation_drawer_close">Cerrar caja de navegaciòn</string>
-    <string name="nav_header_subtitle">Vuela a travès de las tiendas!</string>
-    <string name="nav_header_desc">Cabezal de navegacion</string>
+  --><resources>
+    <string name="navigation_drawer_open">Abrir caja de navegación</string>
+    <string name="navigation_drawer_close">Cerrar caja de navegación</string>
+    <string name="nav_header_subtitle">Vuela a través de las tiendas!</string>
+    <string name="nav_header_desc">Cabezal de navegación</string>
     <string name="action_search">Buscar</string>
     <string name="menu_settings">Ajustes</string>
     <string name="home">Inicio</string>
@@ -182,7 +180,7 @@
     <string name="show_note">Mostrar nota</string>
     <string name="note_dialog_title">Nota para %1$s</string>
     <string name="loading">Cargando…</string>
-    <string name="dismiss">Descartar</string>
+    <string name="dismiss">Despedir</string>
     <string name="view_changes">Ver cambios</string>
     <string name="updated_notification">Aisleron se ha actualizado de %1$s a %2$s.</string>
     <string name="pure_black_style">Estilo negro puro</string>

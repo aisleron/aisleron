@@ -1,0 +1,6 @@
+Mejoras:
+* Se añadió un selector de idioma en Preferencias.
+* Se añadió una sugerencia de nota de producto en las entradas de la lista de la compra.
+
+Corrección de errores:
+* Se solucionó el problema de desplazamiento de la pestaña de notas en la página Editar producto.

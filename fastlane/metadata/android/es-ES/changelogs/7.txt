@@ -1,0 +1,12 @@
+Mejoras
+* Se añadió una opción para mostrar u ocultar el pasillo predeterminado de una tienda.
+* Se mejoró la configuración de visibilidad: los productos no mapeados ahora se ocultan cuando
+	el pasillo predeterminado está oculto.
+* Se introdujo la función de expandir/contraer pasillos.
+* Se añadió una opción para mostrar u ocultar los pasillos vacíos, que se ocultan por defecto.
+* Se habilitó la edición de una tienda directamente desde la lista de la compra.
+* Se añadió una opción para ordenar una lista por nombre.
+* Se añadió texto explicativo a las listas en blanco para aclarar por qué no se muestran los artículos.
+
+Corrección de errores
+* Se mejoró la fiabilidad de las acciones de pulsación prolongada en los artículos de la lista de la compra.
