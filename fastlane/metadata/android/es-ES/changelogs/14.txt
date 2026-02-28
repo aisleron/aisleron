@@ -1,0 +1,5 @@
+Mejoras:
+* Se implementaron los estilos Material 3, Dynamic Colors y Pure Black.
+* Se mejoró la visualización de la lista de productos en dispositivos de pantalla pequeña.
+* Se añadieron traducciones al italiano y al afrikáans.
+* Se actualizaron las traducciones.

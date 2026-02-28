@@ -1,0 +1,7 @@
+Mejoras:
+* Se añadieron notas a productos y tiendas
+* Se añadió una opción para elegir la lista de inicio al abrir la app
+* Se añadió una opción para expandir o contraer todos los pasillos a la vez
+* Se introdujo una pancarta de notificación de actualizaciones para destacar las nuevas versiones
+* Se actualizaron las traducciones al francés y al sueco
+* Se añadió la traducción al ucraniano

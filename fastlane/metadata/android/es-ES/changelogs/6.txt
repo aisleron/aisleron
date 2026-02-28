@@ -1,1 +1,1 @@
-* Añade traducciones al Francès y Polaco desde el Weblate alojado.
+* Añade traducciones al Francés y Polaco desde el Weblate alojado.
