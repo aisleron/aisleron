@@ -20,6 +20,8 @@ package com.aisleron.ui.shoppinglist
 import com.aisleron.domain.location.usecase.RemoveLocationUseCase
 import com.aisleron.domain.location.usecase.UpdateLocationExpandedUseCase
 import com.aisleron.domain.location.usecase.UpdateLocationRankUseCase
+import com.aisleron.ui.copyentity.CopyEntityType
+import com.aisleron.ui.note.NoteParentRef
 
 data class LocationShoppingListItemViewModel(
     override val selected: Boolean,
@@ -50,6 +52,19 @@ data class LocationShoppingListItemViewModel(
 
     override fun editNavigationEvent(): ShoppingListViewModel.ShoppingListEvent =
         ShoppingListViewModel.ShoppingListEvent.NavigateToEditLocation(id)
+
+    override fun copyDialogNavigationEvent(): ShoppingListViewModel.ShoppingListEvent {
+        return ShoppingListViewModel.ShoppingListEvent.NavigateToCopyDialogEvent(
+            entityType = CopyEntityType.Location(id),
+            name = name
+        )
+    }
+
+    override fun noteDialogNavigationEvent(): ShoppingListViewModel.ShoppingListEvent {
+        return ShoppingListViewModel.ShoppingListEvent.NavigateToNoteDialogEvent(
+            parentRef = NoteParentRef.Location(id)
+        )
+    }
 
     override suspend fun updateExpanded(expanded: Boolean) {
         updateLocationExpandedUseCase(id, expanded)

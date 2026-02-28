@@ -139,7 +139,7 @@ class ShoppingListFragment(
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
-        initializeFab()
+        initializeFab(false)
 
         val view = inflater.inflate(R.layout.fragment_shopping_list, container, false)
 
@@ -167,7 +167,11 @@ class ShoppingListFragment(
                                         it.shoppingList
                                     )
 
-                                    initializeActionMode(shoppingListViewModel.selectedListItems)
+                                    initializeFab(it.manageAisles)
+                                    initializeActionMode(
+                                        shoppingListViewModel.selectedListItems,
+                                        it.manageAisles
+                                    )
                                 }
 
                                 else -> Unit
@@ -254,7 +258,7 @@ class ShoppingListFragment(
                         }
 
                         override fun onShowNoteClick(item: ShoppingListItem) {
-                            showNoteDialog(item)
+                            shoppingListViewModel.navigateToNoteDialog(item)
                         }
                     },
 
@@ -283,6 +287,7 @@ class ShoppingListFragment(
     private suspend fun collectEvents() {
         shoppingListViewModel.events.collect { event ->
             when (event) {
+                ShoppingListViewModel.ShoppingListEvent.NoEvent -> Unit
                 is ShoppingListViewModel.ShoppingListEvent.ShowError -> {
                     displayErrorSnackBar(
                         event.errorCode,
@@ -308,6 +313,12 @@ class ShoppingListFragment(
 
                 is ShoppingListViewModel.ShoppingListEvent.NavigateToAddSingleAisle ->
                     showAddSingleAisleDialog(event.locationId)
+
+                is ShoppingListViewModel.ShoppingListEvent.NavigateToCopyDialogEvent ->
+                    showCopyDialog(event.entityType, event.name)
+
+                is ShoppingListViewModel.ShoppingListEvent.NavigateToNoteDialogEvent ->
+                    showNoteDialog(event.parentRef)
             }
         }
     }
@@ -318,7 +329,9 @@ class ShoppingListFragment(
         super.onDestroyView()
     }
 
-    private fun initializeActionMode(selectedItems: List<ShoppingListItem>) {
+    private fun initializeActionMode(
+        selectedItems: List<ShoppingListItem>, showAislePicker: Boolean
+    ) {
         if (selectedItems.isEmpty()) {
             actionMode?.finish()
             return
@@ -328,7 +341,7 @@ class ShoppingListFragment(
             this@ShoppingListFragment
         )
 
-        setActionModeOptions(actionMode, selectedItems)
+        setActionModeOptions(actionMode, selectedItems, showAislePicker)
     }
 
     private fun showAislePickerDialog(aisleList: List<AisleListEntry>) {
@@ -344,12 +357,11 @@ class ShoppingListFragment(
     }
 
     private fun setMenuItemVisibility() {
-        val currentState = shoppingListViewModel.shoppingListUiState.value
+        val showEditShop =
+            (shoppingListViewModel.shoppingListUiState.value as? ShoppingListViewModel.ShoppingListUiState.Updated)?.showEditShop
+                ?: false
 
-        editShopMenuItem?.isVisible =
-            (currentState is ShoppingListViewModel.ShoppingListUiState.Updated)
-                    && currentState.showEditShop
-
+        editShopMenuItem?.isVisible = showEditShop
         loyaltyCardMenuItem?.isVisible = shoppingListViewModel.loyaltyCard.value != null
     }
 
@@ -412,14 +424,18 @@ class ShoppingListFragment(
         showAisleDialog(aisleId, locationId, AisleDialogFragment.AisleDialogAction.EDIT)
     }
 
-    private fun initializeFab() {
+    private fun initializeFab(showAisleFab: Boolean) {
+        val fabItems = mutableListOf<FabHandler.FabOption>()
+        fabItems.add(FabHandler.FabOption.ADD_SHOP)
+
+        if (showAisleFab) {
+            fabItems.add(FabHandler.FabOption.ADD_AISLE)
+        }
+
+        fabItems.add(FabHandler.FabOption.ADD_PRODUCT)
+
         fabHandler.setFabOnClickedListener(this)
-        fabHandler.setFabItems(
-            this.requireActivity(),
-            FabHandler.FabOption.ADD_SHOP,
-            FabHandler.FabOption.ADD_AISLE,
-            FabHandler.FabOption.ADD_PRODUCT
-        )
+        fabHandler.setFabItems(this.requireActivity(), *fabItems.toTypedArray())
 
         fabHandler.setFabOnClickListener(this.requireActivity(), FabHandler.FabOption.ADD_PRODUCT) {
             navigateToAddProduct(shoppingListViewModel.productFilter)
@@ -489,11 +505,11 @@ class ShoppingListFragment(
         dialog.show()
     }
 
-    private fun showCopyProductDialog(item: ShoppingListItem) {
+    private fun showCopyDialog(entityType: CopyEntityType, name: String) {
         val dialog = CopyEntityDialogFragment.newInstance(
-            type = CopyEntityType.Product(item.id),
-            title = getString(R.string.copy_entity_title, item.name),
-            defaultName = "${item.name} (${getString(android.R.string.copy)})",
+            type = entityType,
+            title = getString(R.string.copy_entity_title, name),
+            defaultName = "$name (${getString(android.R.string.copy)})",
             nameHint = getString(R.string.new_product_name)
         )
 
@@ -502,7 +518,7 @@ class ShoppingListFragment(
             requireView().postDelayed({
                 Snackbar.make(
                     requireView(),
-                    getString(R.string.entity_copied, item.name),
+                    getString(R.string.entity_copied, name),
                     Snackbar.LENGTH_SHORT
                 )
                     .setAnchorView(fabHandler.getFabView(this.requireActivity()))
@@ -513,9 +529,9 @@ class ShoppingListFragment(
         dialog.show(childFragmentManager, "copyDialog")
     }
 
-    private fun showNoteDialog(item: ShoppingListItem) {
+    private fun showNoteDialog(noteParentRef: NoteParentRef) {
         val dialog = NoteDialogFragment.newInstance(
-            noteParentRef = NoteParentRef.Product(item.id)
+            noteParentRef = noteParentRef
         )
 
         dialog.show(childFragmentManager, "noteDialog")
@@ -553,18 +569,22 @@ class ShoppingListFragment(
         }
     }
 
-    private fun setActionModeOptions(mode: ActionMode?, selectedItems: List<ShoppingListItem>) {
+    private fun setActionModeOptions(
+        mode: ActionMode?, selectedItems: List<ShoppingListItem>, showAislePicker: Boolean
+    ) {
         mode?.title = getSelectedItemsDescription(selectedItems)
 
         val productsOnly = selectedItems.all { it is ProductShoppingListItem }
         val aislesOnly = selectedItems.all { it is AisleShoppingListItem }
+        val locationsOnly = selectedItems.all { it is LocationShoppingListItem }
         val singleItem = selectedItems.size == 1
+        val showNoteAndCopy = singleItem && (productsOnly || locationsOnly)
 
         mode?.menu?.let {
             it.findItem(R.id.mnu_add_product_to_aisle).isVisible = singleItem && aislesOnly
-            it.findItem(R.id.mnu_copy_shopping_list_item).isVisible = singleItem && productsOnly
-            it.findItem(R.id.mnu_product_note).isVisible = singleItem && productsOnly
-            it.findItem(R.id.mnu_aisle_picker).isVisible = productsOnly
+            it.findItem(R.id.mnu_copy_shopping_list_item).isVisible = showNoteAndCopy
+            it.findItem(R.id.mnu_show_note).isVisible = showNoteAndCopy
+            it.findItem(R.id.mnu_aisle_picker).isVisible = productsOnly && showAislePicker
             it.findItem(R.id.mnu_edit_shopping_list_item).isVisible = singleItem
             it.findItem(R.id.mnu_delete_shopping_list_item)
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
@@ -586,8 +606,8 @@ class ShoppingListFragment(
                 shoppingListViewModel.productFilter, actionModeItems.first().aisleId
             )
 
-            R.id.mnu_copy_shopping_list_item -> showCopyProductDialog(actionModeItems.first())
-            R.id.mnu_product_note -> showNoteDialog(actionModeItems.first())
+            R.id.mnu_copy_shopping_list_item -> shoppingListViewModel.navigateToCopyDialog()
+            R.id.mnu_show_note -> shoppingListViewModel.navigateToNoteDialog()
             R.id.mnu_aisle_picker -> shoppingListViewModel.requestLocationAisles()
             else -> result = false // No action picked
         }

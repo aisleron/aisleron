@@ -58,7 +58,8 @@ class AisleListCoordinator(
             val state: ShoppingListUiState = ShoppingListUiState.Updated(
                 shoppingList = listItems,
                 title = getListTitle(collectedLocation, filters.productFilter),
-                showEditShop = collectedLocation?.type == LocationType.SHOP
+                showEditShop = collectedLocation?.type == LocationType.SHOP,
+                manageAisles = true
             )
 
             state

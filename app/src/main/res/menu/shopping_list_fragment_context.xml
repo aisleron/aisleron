@@ -26,7 +26,7 @@
         app:showAsAction="ifRoom"
         android:menuCategory="container" />
     <item
-        android:id="@+id/mnu_product_note"
+        android:id="@+id/mnu_show_note"
         android:title="@string/show_note"
         android:icon="@drawable/baseline_sticky_note_2_24"
         app:showAsAction="always"

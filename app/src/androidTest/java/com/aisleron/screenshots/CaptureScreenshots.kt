@@ -731,7 +731,7 @@ class CaptureScreenshots : KoinTest {
     }
 
     private fun clickProductNote() {
-        onView(withId(R.id.mnu_product_note))
+        onView(withId(R.id.mnu_show_note))
             .perform(click())
     }
 

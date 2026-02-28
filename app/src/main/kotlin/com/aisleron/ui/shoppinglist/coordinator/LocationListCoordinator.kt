@@ -51,7 +51,8 @@ class LocationListCoordinator(
             val state: ShoppingListUiState = ShoppingListUiState.Updated(
                 shoppingList = listItems,
                 title = getListTitle(locationType, filters.productFilter),
-                showEditShop = false
+                showEditShop = false,
+                manageAisles = false
             )
 
             state

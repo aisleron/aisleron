@@ -25,6 +25,8 @@ import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.loyaltycard.LoyaltyCard
 import com.aisleron.domain.shoppinglist.ShoppingListFilter
 import com.aisleron.ui.bundles.AisleListEntry
+import com.aisleron.ui.copyentity.CopyEntityType
+import com.aisleron.ui.note.NoteParentRef
 import com.aisleron.ui.shoppinglist.coordinator.AisleListCoordinator
 import com.aisleron.ui.shoppinglist.coordinator.ShoppingListCoordinator
 import com.aisleron.ui.shoppinglist.coordinator.ShoppingListCoordinatorFactory
@@ -356,6 +358,26 @@ class ShoppingListViewModel(
         }
     }
 
+    fun navigateToCopyDialog() {
+        val item =
+            selectedListItems.filterIsInstance<ShoppingListItemViewModel>().singleOrNull() ?: return
+
+        coroutineScope.launchHandling {
+            _events.emit(item.copyDialogNavigationEvent())
+        }
+    }
+
+    fun navigateToNoteDialog() {
+        val item = selectedListItems.singleOrNull() ?: return
+        navigateToNoteDialog(item)
+    }
+
+    fun navigateToNoteDialog(item: ShoppingListItem) {
+        coroutineScope.launchHandling {
+            _events.emit((item as ShoppingListItemViewModel).noteDialogNavigationEvent())
+        }
+    }
+
     sealed class ShoppingListUiState {
         data object Empty : ShoppingListUiState()
         data object Loading : ShoppingListUiState()
@@ -366,11 +388,13 @@ class ShoppingListViewModel(
         data class Updated(
             val shoppingList: List<ShoppingListItem>,
             val title: ListTitle,
-            val showEditShop: Boolean
+            val showEditShop: Boolean,
+            val manageAisles: Boolean
         ) : ShoppingListUiState()
     }
 
     sealed class ShoppingListEvent {
+        object NoEvent : ShoppingListEvent()
         data class ShowError(
             val errorCode: AisleronException.ExceptionCode, val errorMessage: String?
         ) : ShoppingListEvent()
@@ -381,9 +405,14 @@ class ShoppingListViewModel(
         data class NavigateToEditAisle(val aisleId: Int, val locationId: Int) : ShoppingListEvent()
         data class NavigateToAddSingleAisle(val locationId: Int) : ShoppingListEvent()
         data class NavigateToAddMultipleAisles(val locationId: Int) : ShoppingListEvent()
+        data class NavigateToCopyDialogEvent(
+            val entityType: CopyEntityType, val name: String
+        ) : ShoppingListEvent()
+
+        data class NavigateToNoteDialogEvent(val parentRef: NoteParentRef) : ShoppingListEvent()
     }
 
-    sealed class ListTitle() {
+    sealed class ListTitle {
         data class LocationName(val name: String) : ListTitle()
         object InStock : ListTitle()
         object Needed : ListTitle()

@@ -23,6 +23,8 @@ import com.aisleron.domain.preferences.TrackingMode
 import com.aisleron.domain.product.usecase.RemoveProductUseCase
 import com.aisleron.domain.product.usecase.UpdateProductQtyNeededUseCase
 import com.aisleron.domain.product.usecase.UpdateProductStatusUseCase
+import com.aisleron.ui.copyentity.CopyEntityType
+import com.aisleron.ui.note.NoteParentRef
 
 data class ProductShoppingListItemViewModel(
     override val headerRank: Int,
@@ -62,6 +64,19 @@ data class ProductShoppingListItemViewModel(
 
     override fun editNavigationEvent(): ShoppingListViewModel.ShoppingListEvent =
         ShoppingListViewModel.ShoppingListEvent.NavigateToEditProduct(id)
+
+    override fun copyDialogNavigationEvent(): ShoppingListViewModel.ShoppingListEvent {
+        return ShoppingListViewModel.ShoppingListEvent.NavigateToCopyDialogEvent(
+            entityType = CopyEntityType.Product(id),
+            name = name
+        )
+    }
+
+    override fun noteDialogNavigationEvent(): ShoppingListViewModel.ShoppingListEvent {
+        return ShoppingListViewModel.ShoppingListEvent.NavigateToNoteDialogEvent(
+            parentRef = NoteParentRef.Product(id)
+        )
+    }
 
     suspend fun updateStatus(inStock: Boolean) {
         updateProductStatusUseCase(id, inStock)

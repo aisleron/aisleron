@@ -21,4 +21,6 @@ interface ShoppingListItemViewModel {
     suspend fun remove()
     suspend fun updateRank(precedingItem: ShoppingListItem?)
     fun editNavigationEvent(): ShoppingListViewModel.ShoppingListEvent
+    fun copyDialogNavigationEvent(): ShoppingListViewModel.ShoppingListEvent
+    fun noteDialogNavigationEvent(): ShoppingListViewModel.ShoppingListEvent
 }

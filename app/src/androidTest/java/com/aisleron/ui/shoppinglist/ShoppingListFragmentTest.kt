@@ -300,6 +300,31 @@ class ShoppingListFragmentTest : KoinTest {
         onView(withText(R.string.empty_list_title)).check(matches(isDisplayed()))
     }
 
+    private fun validateFabMenuItems(
+        fabItems: List<FabHandler.FabOption>,
+        showAddShop: Boolean = true,
+        showAddAisle: Boolean = true,
+        showAddProduct: Boolean = true
+    ) {
+        assertEquals(fabItems.contains(FabHandler.FabOption.ADD_SHOP), showAddShop)
+        assertEquals(fabItems.contains(FabHandler.FabOption.ADD_AISLE), showAddAisle)
+        assertEquals(fabItems.contains(FabHandler.FabOption.ADD_PRODUCT), showAddProduct)
+    }
+
+    @Test
+    fun onCreateShoppingListFragment_IsAisleGrouping_ShowAllFab() = runTest {
+        val location = getLocation(LocationType.SHOP)
+        val bundle = bundler.makeShoppingListBundle(location.id, location.defaultFilter)
+        getFragmentScenario(bundle)
+        validateFabMenuItems(fabHandler.getFabItems())
+    }
+
+    @Test
+    fun onCreateShoppingListFragment_IsLocationGrouping_HideAddAisleFab() = runTest {
+        getFragmentScenario(shopListGroupingBundle())
+        validateFabMenuItems(fabHandler.getFabItems(), showAddAisle = false)
+    }
+
     private suspend fun getShoppingList(locationId: Int? = null): Location {
         val locationRepository = get<LocationRepository>()
         val shopId =
@@ -323,7 +348,7 @@ class ShoppingListFragmentTest : KoinTest {
         actionModeTitle: String,
         showAddProductToAisle: Boolean = false,
         showEditShoppingListItem: Boolean = false,
-        showProductNote: Boolean = false,
+        showNote: Boolean = false,
         showAislePicker: Boolean = false,
         showDelete: Boolean = false,
         showCopy: Boolean = false
@@ -339,7 +364,7 @@ class ShoppingListFragmentTest : KoinTest {
             )
         )
 
-        actionBar.check(validateToolbarItem(R.id.mnu_product_note, showProductNote))
+        actionBar.check(validateToolbarItem(R.id.mnu_show_note, showNote))
         actionBar.check(validateToolbarItem(R.id.mnu_aisle_picker, showAislePicker))
 
         openActionBarOverflowOrOptionsMenu(getInstrumentation().targetContext)
@@ -367,7 +392,7 @@ class ShoppingListFragmentTest : KoinTest {
     }
 
     @Test
-    fun onLongClick_IsProduct_ShowProductActionModeContextMenu() = runTest {
+    fun onLongClick_IsProductOnAisleGrouping_ShowProductActionModeContextMenu() = runTest {
         val shoppingList = getShoppingList()
         getActivityScenario(
             bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
@@ -380,8 +405,53 @@ class ShoppingListFragmentTest : KoinTest {
         validateActionModeMenuItems(
             actionModeTitle = product.name,
             showEditShoppingListItem = true,
-            showProductNote = true,
+            showNote = true,
             showAislePicker = true,
+            showCopy = true,
+            showDelete = true
+        )
+    }
+
+    private fun shopListGroupingBundle() =
+        bundler.makeShoppingListBundle(
+            FilterType.NEEDED, ShoppingListGrouping.LocationGrouping(LocationType.SHOP)
+        )
+
+    @Test
+    fun onLongClick_IsProductOnLocationGrouping_ShowProductActionModeContextMenu() = runTest {
+        val shoppingList = getShoppingList()
+        getActivityScenario(
+            shopListGroupingBundle()
+        )
+
+        val product = getProduct(shoppingList, false)
+
+        onView(withText(product.name)).perform(longClick())
+
+        validateActionModeMenuItems(
+            actionModeTitle = product.name,
+            showEditShoppingListItem = true,
+            showNote = true,
+            showAislePicker = false,
+            showCopy = true,
+            showDelete = true
+        )
+    }
+
+    @Test
+    fun onLongClick_IsLocation_ShowLocationActionModeContextMenu() = runTest {
+        val location = getLocation(LocationType.SHOP)
+        getActivityScenario(
+            shopListGroupingBundle()
+        )
+
+        onView(withText(location.name)).perform(longClick())
+
+        validateActionModeMenuItems(
+            actionModeTitle = location.name,
+            showEditShoppingListItem = true,
+            showNote = true,
+            showAislePicker = false,
             showCopy = true,
             showDelete = true
         )
@@ -1559,7 +1629,7 @@ class ShoppingListFragmentTest : KoinTest {
         val productItem = onView(allOf(withText(product.name), withId(R.id.txt_product_name)))
         productItem.perform(longClick())
 
-        onView(withId(R.id.mnu_product_note)).perform(click())
+        onView(withId(R.id.mnu_show_note)).perform(click())
 
         onView(withText(showNoteDialogTitle))
             .inRoot(isDialog())
@@ -1579,7 +1649,7 @@ class ShoppingListFragmentTest : KoinTest {
         }
 
         onView(withText(product.name)).perform(longClick())
-        onView(withId(R.id.mnu_product_note)).perform(click())
+        onView(withId(R.id.mnu_show_note)).perform(click())
 
         onView(withText(buttonResId))
             .inRoot(isDialog())

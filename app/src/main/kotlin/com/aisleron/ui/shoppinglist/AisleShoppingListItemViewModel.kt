@@ -50,6 +50,14 @@ data class AisleShoppingListItemViewModel(
     override fun editNavigationEvent(): ShoppingListViewModel.ShoppingListEvent =
         ShoppingListViewModel.ShoppingListEvent.NavigateToEditAisle(id, locationId)
 
+    override fun copyDialogNavigationEvent(): ShoppingListViewModel.ShoppingListEvent {
+        return ShoppingListViewModel.ShoppingListEvent.NoEvent
+    }
+
+    override fun noteDialogNavigationEvent(): ShoppingListViewModel.ShoppingListEvent {
+        return ShoppingListViewModel.ShoppingListEvent.NoEvent
+    }
+
     override suspend fun updateExpanded(expanded: Boolean) {
         updateAisleExpandedUseCase(id, expanded)
     }
