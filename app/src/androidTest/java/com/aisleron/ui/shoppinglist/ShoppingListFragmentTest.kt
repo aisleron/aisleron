@@ -1198,7 +1198,7 @@ class ShoppingListFragmentTest : KoinTest {
     }
 
     @Test
-    fun onMenuItemSelected_ItemIsShowLoyaltyCardAndNoLoyaltyCard_LoyaltyCardNotShown() = runTest {
+    fun onMenuItemSelected_ItemIsShowLoyaltyCardAndNoLoyaltyCard_ShowErrorSnackbar() = runTest {
         val shoppingList = getShoppingList()
         val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
         val menuItem = getMenuItem(R.id.mnu_show_loyalty_card)
@@ -1209,6 +1209,10 @@ class ShoppingListFragmentTest : KoinTest {
         ).onFragment { fragment ->
             fragment.onMenuItemSelected(menuItem)
         }
+
+        val snackbar = onView(withId(SystemIds.SNACKBAR_TEXT))
+        snackbar.checkVisibility(View.VISIBLE)
+        snackbar.check(matches(withText(R.string.loyalty_card_not_found_exception)))
 
         assertFalse { loyaltyCardProvider.loyaltyCardDisplayed }
     }
@@ -1245,13 +1249,9 @@ class ShoppingListFragmentTest : KoinTest {
             fragment.onMenuItemSelected(menuItem)
         }
 
-        onView(withId(SystemIds.SNACKBAR_TEXT)).check(
-            matches(
-                ViewMatchers.withEffectiveVisibility(
-                    ViewMatchers.Visibility.VISIBLE
-                )
-            )
-        )
+        val snackbar = onView(withId(SystemIds.SNACKBAR_TEXT))
+        snackbar.checkVisibility(View.VISIBLE)
+        snackbar.check(matches(withText(containsString(loyaltyCardProvider.exceptionMessage))))
     }
 
     private fun ViewInteraction.checkVisibility(

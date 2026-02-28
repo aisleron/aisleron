@@ -38,6 +38,7 @@ class AisleronExceptionMap {
             ExceptionCode.SAMPLE_DATA_CREATION_EXCEPTION -> R.string.sample_data_creation_exception
             ExceptionCode.LOYALTY_CARD_PROVIDER_EXCEPTION -> R.string.loyalty_card_provider_missing_exception
             ExceptionCode.INVALID_LOYALTY_CARD_EXCEPTION -> R.string.invalid_loyalty_card_exception
+            ExceptionCode.LOYALTY_CARD_NOT_FOUND_EXCEPTION -> R.string.loyalty_card_not_found_exception
             ExceptionCode.AISLE_MOVE_EXCEPTION -> R.string.aisle_move_exception
         }
     }

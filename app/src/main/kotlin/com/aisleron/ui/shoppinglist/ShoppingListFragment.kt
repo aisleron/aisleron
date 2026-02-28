@@ -189,7 +189,6 @@ class ShoppingListFragment(
                     }
 
                     launch { collectEvents() }
-                    launch { collectLoyaltyCard() }
                 }
             }
 
@@ -278,12 +277,6 @@ class ShoppingListFragment(
         return view
     }
 
-    private suspend fun collectLoyaltyCard() {
-        shoppingListViewModel.loyaltyCard.collect { loyaltyCard ->
-            loyaltyCardMenuItem?.isVisible = loyaltyCard != null
-        }
-    }
-
     private suspend fun collectEvents() {
         shoppingListViewModel.events.collect { event ->
             when (event) {
@@ -297,7 +290,7 @@ class ShoppingListFragment(
                 }
 
                 is ShoppingListViewModel.ShoppingListEvent.NavigateToLoyaltyCard ->
-                    event.loyaltyCard?.let { showLoyaltyCard(event.loyaltyCard) }
+                    showLoyaltyCard(event.loyaltyCard)
 
                 is ShoppingListViewModel.ShoppingListEvent.NavigateToEditLocation ->
                     navigateToEditShop(event.locationId)
@@ -357,12 +350,11 @@ class ShoppingListFragment(
     }
 
     private fun setMenuItemVisibility() {
-        val showEditShop =
-            (shoppingListViewModel.shoppingListUiState.value as? ShoppingListViewModel.ShoppingListUiState.Updated)?.showEditShop
-                ?: false
+        val currentState =
+            shoppingListViewModel.shoppingListUiState.value as? ShoppingListViewModel.ShoppingListUiState.Updated
 
-        editShopMenuItem?.isVisible = showEditShop
-        loyaltyCardMenuItem?.isVisible = shoppingListViewModel.loyaltyCard.value != null
+        editShopMenuItem?.isVisible = currentState?.showEditShop ?: false
+        loyaltyCardMenuItem?.isVisible = currentState?.showLoyaltyCard ?: false
     }
 
     private fun displayStatusChangeSnackBar(item: ProductShoppingListItem, inStock: Boolean) {
@@ -679,11 +671,22 @@ class ShoppingListFragment(
         }
     }
 
-    private fun showLoyaltyCard(loyaltyCard: LoyaltyCard) {
+    private fun showLoyaltyCard(loyaltyCard: LoyaltyCard?) {
         try {
+            if (loyaltyCard == null) {
+                throw AisleronException.LoyaltyCardNotFoundException()
+            }
+
             loyaltyCardProvider.displayLoyaltyCard(requireContext(), loyaltyCard)
         } catch (_: AisleronException.LoyaltyCardProviderException) {
             loyaltyCardProvider.showNotInstalledDialog(requireContext())
+        } catch (ae: AisleronException) {
+            displayErrorSnackBar(
+                ae.exceptionCode,
+                ae.message,
+                fabHandler.getFabView(this.requireActivity())
+            )
+
         } catch (e: Exception) {
             displayErrorSnackBar(
                 AisleronException.ExceptionCode.GENERIC_EXCEPTION,

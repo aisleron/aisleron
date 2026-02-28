@@ -33,6 +33,8 @@ class LoyaltyCardProviderTestImpl(
     private var _loyaltyCardDisplayed: Boolean = false
     val loyaltyCardDisplayed: Boolean get() = _loyaltyCardDisplayed
 
+    val exceptionMessage = "Something went wrong in the Loyalty Card Provider"
+
     private lateinit var _onLoyaltyCardSelected: (LoyaltyCard?) -> Unit
 
     override val packageName: String get() = "Test Loyalty Card Provider"
@@ -46,7 +48,7 @@ class LoyaltyCardProviderTestImpl(
         }
 
         if (throwGenericException) {
-            throw Exception("Something went wrong in the Loyalty Card Provider")
+            throw Exception(exceptionMessage)
         }
 
         val loyaltyCard = LoyaltyCard(

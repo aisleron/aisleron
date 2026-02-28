@@ -184,10 +184,6 @@ class ShoppingListViewModelTest : KoinTest {
                 as ShoppingListViewModel.ShoppingListUiState.Updated
     }
 
-    private suspend fun awaitLoyaltyCard(viewModel: ShoppingListViewModel): LoyaltyCard? {
-        return viewModel.loyaltyCard.first()
-    }
-
     @Test
     fun removeItem_SelectedItemsIsDefaultAisle_UiStateIsError() = runTest {
         val shoppingList = getShoppingList()
@@ -583,51 +579,6 @@ class ShoppingListViewModelTest : KoinTest {
         val error = event as ShoppingListViewModel.ShoppingListEvent.ShowError
         Assert.assertEquals(AisleronException.ExceptionCode.GENERIC_EXCEPTION, error.errorCode)
         Assert.assertEquals(exceptionMessage, error.errorMessage)
-    }
-
-    @Test
-    fun hydrate_LocationHasLoyaltyCard_LoyaltyCardPopulated() = runTest {
-        val existingLocation =
-            get<LocationRepository>().getAll().first { it.type == LocationType.SHOP }
-
-        val loyaltyCard = LoyaltyCard(
-            id = 0,
-            name = "Test Loyalty Card",
-            provider = LoyaltyCardProviderType.CATIMA,
-            intent = "Dummy Intent"
-        )
-
-        val loyaltyCardRepository = get<LoyaltyCardRepository>()
-        val loyaltyCardId = loyaltyCardRepository.add(loyaltyCard)
-        loyaltyCardRepository.addToLocation(existingLocation.id, loyaltyCardId)
-
-        shoppingListViewModel.hydrate(
-            getAisleGrouping(existingLocation.id),
-            existingLocation.defaultFilter
-        )
-
-        val loyaltyCardResult = awaitLoyaltyCard(shoppingListViewModel)
-        assertEquals(loyaltyCard.copy(id = loyaltyCardId), loyaltyCardResult)
-    }
-
-    @Test
-    fun hydrate_LocationHasNoLoyaltyCard_LoyaltyCardIsNull() = runTest {
-        val existingLocation =
-            get<LocationRepository>().getAll().first { it.type == LocationType.SHOP }
-
-        val loyaltyCardRepository = get<LoyaltyCardRepository>()
-        val loyaltyCard = loyaltyCardRepository.getForLocation(existingLocation.id)
-        loyaltyCard?.let {
-            loyaltyCardRepository.removeFromLocation(existingLocation.id, it.id)
-        }
-
-        shoppingListViewModel.hydrate(
-            getAisleGrouping(existingLocation.id),
-            existingLocation.defaultFilter
-        )
-
-        val loyaltyCardResult = awaitLoyaltyCard(shoppingListViewModel)
-        assertNull(loyaltyCardResult)
     }
 
     @Test
@@ -1068,7 +1019,7 @@ class ShoppingListViewModelTest : KoinTest {
 
         loyaltyCardRepository.addToLocation(shoppingList.id, loyaltyCardId)
         shoppingListViewModel.hydrate(getAisleGrouping(shoppingList.id), shoppingList.defaultFilter)
-        val loyaltyCard = awaitLoyaltyCard(shoppingListViewModel)
+        val loyaltyCard = loyaltyCardRepository.get(loyaltyCardId)
 
         val event = awaitEvent(shoppingListViewModel) {
             shoppingListViewModel.navigateToLoyaltyCard()

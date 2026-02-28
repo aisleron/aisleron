@@ -254,6 +254,10 @@ class ShopListFragmentTest : KoinTest {
                 override suspend fun invoke(location: Location) {
                     throw Exception(exceptionMessage)
                 }
+
+                override suspend fun invoke(locationId: Int) {
+                    throw Exception(exceptionMessage)
+                }
             }
         }
 

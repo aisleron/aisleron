@@ -113,9 +113,6 @@ class ShoppingListViewModel(
         initialValue = ShoppingListUiState.Loading
     )
 
-    private val _loyaltyCard = MutableStateFlow<LoyaltyCard?>(null)
-    val loyaltyCard: StateFlow<LoyaltyCard?> = _loyaltyCard
-
     val selectedListItems: List<ShoppingListItem>
         get() = (shoppingListUiState.value as? ShoppingListUiState.Updated)
             ?.shoppingList?.filter { it.selected } ?: emptyList()
@@ -156,7 +153,6 @@ class ShoppingListViewModel(
 
         shoppingListCoordinator = shoppingListStreamProviderFactory.create(listGrouping)
         _showEmptyAisles = showEmptyAisles
-        loadLoyaltyCard()
 
         _shoppingListFilters.value = ShoppingListFilter(
             productFilter = productFilter,
@@ -200,12 +196,6 @@ class ShoppingListViewModel(
         }
     }
 
-    fun loadLoyaltyCard() {
-        coroutineScope.launchHandling {
-            _loyaltyCard.value = aisleListCoordinator?.loadLoyaltyCard()
-        }
-    }
-
     fun updateSelectedProductAisle(selectedAisleId: Int) {
         val items = selectedListItems.filterIsInstance<ProductShoppingListItemViewModel>()
         coroutineScope.launchHandling {
@@ -241,8 +231,6 @@ class ShoppingListViewModel(
                 showEmptyAisles = _showEmptyAisles
             )
         }
-
-        loadLoyaltyCard()
     }
 
     fun movedItem(item: ShoppingListItem) {
@@ -389,7 +377,8 @@ class ShoppingListViewModel(
             val shoppingList: List<ShoppingListItem>,
             val title: ListTitle,
             val showEditShop: Boolean,
-            val manageAisles: Boolean
+            val manageAisles: Boolean,
+            val showLoyaltyCard: Boolean
         ) : ShoppingListUiState()
     }
 

@@ -23,7 +23,6 @@ import com.aisleron.domain.aisle.usecase.GetAislesForLocationUseCase
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.location.usecase.SortLocationByNameUseCase
-import com.aisleron.domain.loyaltycard.LoyaltyCard
 import com.aisleron.domain.loyaltycard.usecase.GetLoyaltyCardForLocationUseCase
 import com.aisleron.domain.shoppinglist.ShoppingListFilter
 import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
@@ -45,8 +44,6 @@ class AisleListCoordinator(
     private val getLoyaltyCardForLocationUseCase: GetLoyaltyCardForLocationUseCase,
     private val locationId: Int
 ) : ShoppingListCoordinator {
-    private var loyaltyCard: LoyaltyCard? = null
-
     override fun getShoppingListState(
         filters: ShoppingListFilter, selections: Set<ShoppingListItem.UniqueId>
     ) = getShoppingListUseCase(locationId, filters)
@@ -59,7 +56,8 @@ class AisleListCoordinator(
                 shoppingList = listItems,
                 title = getListTitle(collectedLocation, filters.productFilter),
                 showEditShop = collectedLocation?.type == LocationType.SHOP,
-                manageAisles = true
+                manageAisles = true,
+                showLoyaltyCard = getLoyaltyCardForLocationUseCase(locationId) != null
             )
 
             state
@@ -81,19 +79,16 @@ class AisleListCoordinator(
     fun navigateToEditShopEvent(): ShoppingListEvent =
         ShoppingListEvent.NavigateToEditLocation(locationId)
 
-    fun navigateToLoyaltyCardEvent(): ShoppingListEvent =
-        ShoppingListEvent.NavigateToLoyaltyCard(loyaltyCard)
+    suspend fun navigateToLoyaltyCardEvent(): ShoppingListEvent {
+        val loyaltyCard = getLoyaltyCardForLocationUseCase(locationId)
+        return ShoppingListEvent.NavigateToLoyaltyCard(loyaltyCard)
+    }
 
     fun navigateToAddSingleAisleEvent(): ShoppingListEvent =
         ShoppingListEvent.NavigateToAddSingleAisle(locationId)
 
     fun navigateToAddMultipleAislesEvent(): ShoppingListEvent =
         ShoppingListEvent.NavigateToAddMultipleAisles(locationId)
-
-    suspend fun loadLoyaltyCard(): LoyaltyCard? {
-        loyaltyCard = getLoyaltyCardForLocationUseCase(locationId)
-        return loyaltyCard
-    }
 
     private fun mapShoppingList(
         location: Location?,

@@ -52,7 +52,8 @@ class LocationListCoordinator(
                 shoppingList = listItems,
                 title = getListTitle(locationType, filters.productFilter),
                 showEditShop = false,
-                manageAisles = false
+                manageAisles = false,
+                showLoyaltyCard = false
             )
 
             state
