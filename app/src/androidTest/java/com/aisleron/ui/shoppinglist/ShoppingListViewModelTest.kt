@@ -1380,4 +1380,37 @@ class ShoppingListViewModelTest : KoinTest {
             job.cancel()
         }
     }
+
+    @Test
+    fun navigateToLocationList_ItemIsLocation_EmitNavigateToLocationList() = runTest {
+        shoppingListViewModel.hydrate(getLocationGrouping(LocationType.SHOP), FilterType.NEEDED)
+        val item = getLocationListItems(shoppingListViewModel).first()
+        shoppingListViewModel.toggleItemSelection(item)
+
+        val event = awaitEvent(shoppingListViewModel) {
+            shoppingListViewModel.navigateToLocationList()
+        }
+
+        val expected = ShoppingListViewModel.ShoppingListEvent.NavigateToLocationList(
+            item.id, FilterType.NEEDED
+        )
+
+        assertEquals(expected, event)
+    }
+
+    @Test
+    fun navigateToLocationList_NoItemSelected_NoEventEmitted() = runTest {
+        val collectedEvents = mutableListOf<ShoppingListViewModel.ShoppingListEvent>()
+        val job = launch(UnconfinedTestDispatcher(testScheduler)) {
+            shoppingListViewModel.events.toList(collectedEvents)
+        }
+        try {
+            shoppingListViewModel.navigateToLocationList()
+
+            runCurrent()
+            assertTrue(collectedEvents.isEmpty())
+        } finally {
+            job.cancel()
+        }
+    }
 }

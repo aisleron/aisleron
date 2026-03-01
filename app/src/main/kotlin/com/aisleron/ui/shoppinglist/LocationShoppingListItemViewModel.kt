@@ -17,6 +17,7 @@
 
 package com.aisleron.ui.shoppinglist
 
+import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.usecase.RemoveLocationUseCase
 import com.aisleron.domain.location.usecase.UpdateLocationExpandedUseCase
 import com.aisleron.domain.location.usecase.UpdateLocationRankUseCase
@@ -77,4 +78,7 @@ data class LocationShoppingListItemViewModel(
         val loyaltyCard = getLoyaltyCardForLocationUseCase(id)
         return ShoppingListViewModel.ShoppingListEvent.NavigateToLoyaltyCard(loyaltyCard)
     }
+
+    fun navigateToLocationListEvent(productFilter: FilterType) =
+        ShoppingListViewModel.ShoppingListEvent.NavigateToLocationList(id, productFilter)
 }

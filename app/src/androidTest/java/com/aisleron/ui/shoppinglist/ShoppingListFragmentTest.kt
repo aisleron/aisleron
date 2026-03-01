@@ -352,7 +352,8 @@ class ShoppingListFragmentTest : KoinTest {
         showAislePicker: Boolean = false,
         showDelete: Boolean = false,
         showCopy: Boolean = false,
-        showLoyaltyCard: Boolean = false
+        showLoyaltyCard: Boolean = false,
+        showLocationList: Boolean = false
     ) {
         val actionBar = onContextualActionBar()
         actionBar.check(matches(isDisplayed()))
@@ -372,6 +373,8 @@ class ShoppingListFragmentTest : KoinTest {
         openActionBarOverflowOrOptionsMenu(getInstrumentation().targetContext)
         onView(withText(R.string.delete)).check(validateOverflowItem(showDelete))
         onView(withText(android.R.string.copy)).check(validateOverflowItem(showCopy))
+
+        onView(withText(containsString("Show "))).check(validateOverflowItem(showLocationList))
     }
 
     @Test
@@ -456,7 +459,8 @@ class ShoppingListFragmentTest : KoinTest {
             showAislePicker = false,
             showCopy = true,
             showDelete = true,
-            showLoyaltyCard = false
+            showLoyaltyCard = false,
+            showLocationList = true
         )
     }
 
@@ -476,7 +480,8 @@ class ShoppingListFragmentTest : KoinTest {
             showAislePicker = false,
             showCopy = true,
             showDelete = true,
-            showLoyaltyCard = true
+            showLoyaltyCard = true,
+            showLocationList = true
         )
     }
 
@@ -1724,6 +1729,35 @@ class ShoppingListFragmentTest : KoinTest {
         onView(withId(R.id.mnu_show_loyalty_card)).perform(click())
 
         assertTrue { loyaltyCardProvider.loyaltyCardDisplayed }
+    }
+
+    @Test
+    fun onActionItemClicked_ItemIsShowLLocationList_ShowLocationShoppingList() = runTest {
+        val shoppingListBundle = shopListGroupingBundle()
+
+        val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
+        val scenario = getActivityScenario(shoppingListBundle)
+        scenario.onActivity {
+            navController.setGraph(R.navigation.mobile_navigation)
+            navController.setCurrentDestination(R.id.nav_shopping_list)
+            Navigation.setViewNavController(activityFragment.requireView(), navController)
+        }
+
+        val location = getLocation(LocationType.SHOP)
+        val buttonName = getInstrumentation().targetContext.getString(
+            R.string.show_location_list, location.name
+        )
+
+        onView(withText(location.name)).perform(longClick())
+        openActionBarOverflowOrOptionsMenu(getInstrumentation().targetContext)
+        onView(withText(buttonName)).perform(click())
+
+        val bundle = navController.backStack.last().arguments
+        val resultBundle = bundler.getShoppingListBundle(bundle)
+        assertTrue(resultBundle.listGrouping is ShoppingListGrouping.AisleGrouping)
+        assertEquals(location.id, resultBundle.listGrouping.locationId)
+        assertEquals(FilterType.NEEDED, resultBundle.filterType)
+
     }
 
     @Test

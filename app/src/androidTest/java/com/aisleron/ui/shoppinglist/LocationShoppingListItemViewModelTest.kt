@@ -257,4 +257,18 @@ class LocationShoppingListItemViewModelTest : KoinTest {
         assertEquals(expected, shoppingListItem.uniqueId)
     }
 
+    @Test
+    fun navigateToLocationListEvent_ReturnsNavigateToLocationListEvent() = runTest {
+        val existingLocation = getShop()
+        val shoppingListItem = getLocationShoppingListItemViewModel(existingLocation)
+
+        val event = shoppingListItem.navigateToLocationListEvent(existingLocation.defaultFilter)
+
+        val expected = ShoppingListViewModel.ShoppingListEvent.NavigateToLocationList(
+            existingLocation.id, existingLocation.defaultFilter
+        )
+
+        assertEquals(expected, event)
+    }
+
 }

@@ -312,8 +312,19 @@ class ShoppingListFragment(
 
                 is ShoppingListViewModel.ShoppingListEvent.NavigateToNoteDialog ->
                     showNoteDialog(event.parentRef)
+
+                is ShoppingListViewModel.ShoppingListEvent.NavigateToLocationList ->
+                    navigateToLocationList(event.locationId, event.productFilter)
             }
         }
+    }
+
+    private fun navigateToLocationList(locationId: Int, productFilter: FilterType) {
+        val bundle = Bundler().makeShoppingListBundle(
+            locationId, productFilter
+        )
+
+        this.findNavController().navigate(R.id.nav_shopping_list, bundle)
     }
 
     override fun onDestroyView() {
@@ -571,8 +582,9 @@ class ShoppingListFragment(
         val locationsOnly = selectedItems.all { it is LocationShoppingListItem }
         val singleItem = selectedItems.size == 1
         val showNoteAndCopy = singleItem && (productsOnly || locationsOnly)
-        val showLoyaltyCard = singleItem && locationsOnly
-                && (selectedItems.single() as LocationShoppingListItem).showLoyaltyCard
+
+        val locationItem = selectedItems.singleOrNull() as? LocationShoppingListItem
+        val showLoyaltyCard = locationItem?.showLoyaltyCard ?: false
 
         mode?.menu?.let {
             it.findItem(R.id.mnu_add_product_to_aisle).isVisible = singleItem && aislesOnly
@@ -581,6 +593,15 @@ class ShoppingListFragment(
             it.findItem(R.id.mnu_aisle_picker).isVisible = productsOnly && showAislePicker
             it.findItem(R.id.mnu_edit_shopping_list_item).isVisible = singleItem
             it.findItem(R.id.mnu_show_loyalty_card).isVisible = showLoyaltyCard
+
+            val mnuShowLocationList = it.findItem(R.id.mnu_show_location_list)
+            mnuShowLocationList.isVisible = singleItem && locationsOnly
+
+            locationItem?.let { l ->
+                mnuShowLocationList.title = getString(R.string.show_location_list, l.name)
+            }
+
+
             it.findItem(R.id.mnu_delete_shopping_list_item)
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
         }
@@ -605,6 +626,7 @@ class ShoppingListFragment(
             R.id.mnu_show_note -> shoppingListViewModel.navigateToNoteDialog()
             R.id.mnu_aisle_picker -> shoppingListViewModel.requestLocationAisles()
             R.id.mnu_show_loyalty_card -> shoppingListViewModel.navigateToItemLoyaltyCard()
+            R.id.mnu_show_location_list -> shoppingListViewModel.navigateToLocationList()
             else -> result = false // No action picked
         }
 

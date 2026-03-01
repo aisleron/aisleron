@@ -55,11 +55,16 @@
         android:icon="@drawable/baseline_delete_24"
         app:showAsAction="never"
         android:menuCategory="secondary" />
-
     <item
         android:id="@+id/mnu_copy_shopping_list_item"
         android:title="@android:string/copy"
         android:icon="@drawable/baseline_content_copy_24"
         app:showAsAction="never"
         android:menuCategory="secondary" />
+    <item
+        android:id="@+id/mnu_show_location_list"
+        android:title="@string/show_location_list"
+        android:icon="@drawable/baseline_store_24"
+        app:showAsAction="ifRoom"
+        android:menuCategory="container" />
 </menu>

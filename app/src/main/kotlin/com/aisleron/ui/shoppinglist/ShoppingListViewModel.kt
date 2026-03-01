@@ -376,6 +376,19 @@ class ShoppingListViewModel(
         }
     }
 
+    fun navigateToLocationList() {
+        val item =
+            selectedListItems.filterIsInstance<LocationShoppingListItemViewModel>().singleOrNull()
+
+        val productFilter = _shoppingListFilters.value?.productFilter
+
+        if (item == null || productFilter == null) return
+
+        coroutineScope.launchHandling {
+            _events.emit(item.navigateToLocationListEvent(productFilter))
+        }
+    }
+
     sealed class ShoppingListUiState {
         data object Empty : ShoppingListUiState()
         data object Loading : ShoppingListUiState()
@@ -409,6 +422,10 @@ class ShoppingListViewModel(
         ) : ShoppingListEvent()
 
         data class NavigateToNoteDialog(val parentRef: NoteParentRef) : ShoppingListEvent()
+
+        data class NavigateToLocationList(
+            val locationId: Int, val productFilter: FilterType
+        ) : ShoppingListEvent()
     }
 
     sealed class ListTitle {
