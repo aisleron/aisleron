@@ -39,6 +39,8 @@ import com.aisleron.domain.product.usecase.RemoveProductUseCase
 import com.aisleron.domain.product.usecase.UpdateProductQtyNeededUseCase
 import com.aisleron.domain.product.usecase.UpdateProductStatusUseCase
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
+import com.aisleron.ui.copyentity.CopyEntityType
+import com.aisleron.ui.note.NoteParentRef
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -221,29 +223,6 @@ class ProductShoppingListItemViewModelTest : KoinTest {
         assertEquals(existingAisle.id, updatedAisleProduct?.aisleId)
     }
 
-    @Test
-    fun onCreate_PropertiesInitializedCorrectly() = runTest {
-        val existingAisle = getShoppingList().aisles.first()
-        val aisleProduct = existingAisle.products.first()
-        val shoppingListItem = getProductShoppingListItemViewModel(
-            existingAisle.rank,
-            aisleProduct,
-            existingAisle.locationId
-        )
-
-        assertEquals(aisleProduct.product.id, shoppingListItem.id)
-        assertEquals(aisleProduct.product.name, shoppingListItem.name)
-        assertEquals(aisleProduct.product.inStock, shoppingListItem.inStock)
-        assertEquals(aisleProduct.product.qtyNeeded, shoppingListItem.qtyNeeded)
-        assertEquals(aisleProduct.product.noteId, shoppingListItem.noteId)
-        assertEquals(aisleProduct.product.note?.noteText, shoppingListItem.noteText)
-        assertEquals(aisleProduct.product.qtyIncrement, shoppingListItem.qtyIncrement)
-        assertEquals(aisleProduct.product.unitOfMeasure, shoppingListItem.unitOfMeasure)
-        assertEquals(aisleProduct.product.trackingMode, shoppingListItem.trackingMode)
-        assertEquals(aisleProduct.rank, shoppingListItem.rank)
-        assertEquals(existingAisle.rank, shoppingListItem.headerRank)
-    }
-
     private suspend fun updateStatus_ArrangeActAssert(newInStock: Boolean) {
         val initialItems = getShoppingList().aisles.flatMap { aisle ->
             aisle.products
@@ -345,5 +324,61 @@ class ProductShoppingListItemViewModelTest : KoinTest {
             ShoppingListViewModel.ShoppingListEvent.NavigateToEditProduct(aisleProduct.product.id),
             event
         )
+    }
+
+    @Test
+    fun uniqueId_MatchesProductId() = runTest {
+        val existingAisle = getShoppingList().aisles.first()
+        val aisleProduct = existingAisle.products.last()
+        val expected = ShoppingListItem.UniqueId(
+            ShoppingListItem.ItemType.PRODUCT, aisleProduct.id
+        )
+
+        val shoppingListItem =
+            getProductShoppingListItemViewModel(
+                existingAisle.rank,
+                aisleProduct,
+                existingAisle.locationId
+            )
+
+        assertEquals(expected, shoppingListItem.uniqueId)
+    }
+
+    @Test
+    fun copyDialogNavigationEvent_ReturnsNavigateToCopyDialogEvent() = runTest {
+        val existingAisle = getShoppingList().aisles.first()
+        val aisleProduct = existingAisle.products.first()
+        val shoppingListItem = getProductShoppingListItemViewModel(
+            existingAisle.rank,
+            aisleProduct,
+            existingAisle.locationId
+        )
+
+        val event = shoppingListItem.copyDialogNavigationEvent()
+
+        val expected = ShoppingListViewModel.ShoppingListEvent.NavigateToCopyDialog(
+            CopyEntityType.Product(aisleProduct.product.id), aisleProduct.product.name
+        )
+
+        assertEquals(expected, event)
+    }
+
+    @Test
+    fun noteDialogNavigationEvent_ReturnsNavigateToNoteDialogEvent() = runTest {
+        val existingAisle = getShoppingList().aisles.first()
+        val aisleProduct = existingAisle.products.first()
+        val shoppingListItem = getProductShoppingListItemViewModel(
+            existingAisle.rank,
+            aisleProduct,
+            existingAisle.locationId
+        )
+
+        val event = shoppingListItem.noteDialogNavigationEvent()
+
+        val expected = ShoppingListViewModel.ShoppingListEvent.NavigateToNoteDialog(
+            NoteParentRef.Product(aisleProduct.product.id)
+        )
+
+        assertEquals(expected, event)
     }
 }

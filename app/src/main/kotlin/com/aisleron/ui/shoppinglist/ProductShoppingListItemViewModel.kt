@@ -66,14 +66,14 @@ data class ProductShoppingListItemViewModel(
         ShoppingListViewModel.ShoppingListEvent.NavigateToEditProduct(id)
 
     override fun copyDialogNavigationEvent(): ShoppingListViewModel.ShoppingListEvent {
-        return ShoppingListViewModel.ShoppingListEvent.NavigateToCopyDialogEvent(
+        return ShoppingListViewModel.ShoppingListEvent.NavigateToCopyDialog(
             entityType = CopyEntityType.Product(id),
             name = name
         )
     }
 
     override fun noteDialogNavigationEvent(): ShoppingListViewModel.ShoppingListEvent {
-        return ShoppingListViewModel.ShoppingListEvent.NavigateToNoteDialogEvent(
+        return ShoppingListViewModel.ShoppingListEvent.NavigateToNoteDialog(
             parentRef = NoteParentRef.Product(id)
         )
     }

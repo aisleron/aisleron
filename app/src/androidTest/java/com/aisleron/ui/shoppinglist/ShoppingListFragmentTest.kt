@@ -351,7 +351,8 @@ class ShoppingListFragmentTest : KoinTest {
         showNote: Boolean = false,
         showAislePicker: Boolean = false,
         showDelete: Boolean = false,
-        showCopy: Boolean = false
+        showCopy: Boolean = false,
+        showLoyaltyCard: Boolean = false
     ) {
         val actionBar = onContextualActionBar()
         actionBar.check(matches(isDisplayed()))
@@ -366,6 +367,7 @@ class ShoppingListFragmentTest : KoinTest {
 
         actionBar.check(validateToolbarItem(R.id.mnu_show_note, showNote))
         actionBar.check(validateToolbarItem(R.id.mnu_aisle_picker, showAislePicker))
+        actionBar.check(validateToolbarItem(R.id.mnu_show_loyalty_card, showLoyaltyCard))
 
         openActionBarOverflowOrOptionsMenu(getInstrumentation().targetContext)
         onView(withText(R.string.delete)).check(validateOverflowItem(showDelete))
@@ -453,7 +455,28 @@ class ShoppingListFragmentTest : KoinTest {
             showNote = true,
             showAislePicker = false,
             showCopy = true,
-            showDelete = true
+            showDelete = true,
+            showLoyaltyCard = false
+        )
+    }
+
+    @Test
+    fun onLongClick_LocationHasLoyaltyCard_ShowLocationActionModeContextMenu() = runTest {
+        val shoppingList = getShoppingListWithLoyaltyCard()
+        getActivityScenario(
+            shopListGroupingBundle()
+        )
+
+        onView(withText(shoppingList.name)).perform(longClick())
+
+        validateActionModeMenuItems(
+            actionModeTitle = shoppingList.name,
+            showEditShoppingListItem = true,
+            showNote = true,
+            showAislePicker = false,
+            showCopy = true,
+            showDelete = true,
+            showLoyaltyCard = true
         )
     }
 
@@ -1687,6 +1710,20 @@ class ShoppingListFragmentTest : KoinTest {
         onView(withText(product.name))
             .inRoot(isDialog())
             .check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun onActionItemClicked_ItemIsShowLoyaltyCardAndHasLoyaltyCard_ShowLoyaltyCard() = runTest {
+        val shoppingList = getShoppingListWithLoyaltyCard()
+
+        val bundle = shopListGroupingBundle()
+        val loyaltyCardProvider = LoyaltyCardProviderTestImpl()
+        getActivityScenario(bundle, loyaltyCardProvider = loyaltyCardProvider)
+
+        onView(withText(shoppingList.name)).perform(longClick())
+        onView(withId(R.id.mnu_show_loyalty_card)).perform(click())
+
+        assertTrue { loyaltyCardProvider.loyaltyCardDisplayed }
     }
 
     @Test

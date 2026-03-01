@@ -28,6 +28,7 @@ import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.usecase.RemoveLocationUseCase
 import com.aisleron.domain.location.usecase.UpdateLocationExpandedUseCase
 import com.aisleron.domain.location.usecase.UpdateLocationRankUseCase
+import com.aisleron.domain.loyaltycard.usecase.GetLoyaltyCardForLocationUseCase
 import com.aisleron.domain.product.usecase.RemoveProductUseCase
 import com.aisleron.domain.product.usecase.UpdateProductQtyNeededUseCase
 import com.aisleron.domain.product.usecase.UpdateProductStatusUseCase
@@ -43,7 +44,8 @@ class ShoppingListItemViewModelFactory(
     private val changeProductAisleUseCase: ChangeProductAisleUseCase,
     private val removeLocationUseCase: RemoveLocationUseCase,
     private val updateLocationRankUseCase: UpdateLocationRankUseCase,
-    private val updateLocationExpandedUseCase: UpdateLocationExpandedUseCase
+    private val updateLocationExpandedUseCase: UpdateLocationExpandedUseCase,
+    private val getLoyaltyCardForLocationUseCase: GetLoyaltyCardForLocationUseCase
 ) {
     fun createProductItemViewModel(
         aisleProduct: AisleProduct,
@@ -98,7 +100,7 @@ class ShoppingListItemViewModelFactory(
             this@ShoppingListItemViewModelFactory.updateAisleExpandedUseCase
     }
 
-    fun createLocationItemViewModel(
+    suspend fun createLocationItemViewModel(
         location: Location, selections: Set<ShoppingListItem.UniqueId>
     ) = LocationShoppingListItemViewModel(
         selected = isSelectedHeader(selections, location.id),
@@ -107,12 +109,16 @@ class ShoppingListItemViewModelFactory(
         rank = location.rank,
         id = location.id,
         name = location.name,
-        aisleId = location.aisles.firstOrNull { !it.isDefault }?.id ?: 0
+        aisleId = location.aisles.firstOrNull { !it.isDefault }?.id ?: 0,
+        showLoyaltyCard = getLoyaltyCardForLocationUseCase(location.id) != null
     ).apply {
         removeLocationUseCase = this@ShoppingListItemViewModelFactory.removeLocationUseCase
         updateLocationRankUseCase = this@ShoppingListItemViewModelFactory.updateLocationRankUseCase
         updateLocationExpandedUseCase =
             this@ShoppingListItemViewModelFactory.updateLocationExpandedUseCase
+
+        getLoyaltyCardForLocationUseCase =
+            this@ShoppingListItemViewModelFactory.getLoyaltyCardForLocationUseCase
     }
 
     private fun isSelected(

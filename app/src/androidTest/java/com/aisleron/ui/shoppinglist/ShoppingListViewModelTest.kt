@@ -1032,6 +1032,55 @@ class ShoppingListViewModelTest : KoinTest {
     }
 
     @Test
+    fun navigateToItemLoyaltyCard_ItemHasLoyaltyCard_EmitNavigateToLoyaltyCardEvent() = runTest {
+        val shoppingList = getShoppingList()
+        val loyaltyCardRepository = get<LoyaltyCardRepository>()
+        val loyaltyCardId = loyaltyCardRepository.add(
+            LoyaltyCard(
+                id = 0,
+                name = "Test Loyalty Card",
+                provider = LoyaltyCardProviderType.CATIMA,
+                intent = "Dummy Intent"
+            )
+        )
+
+        loyaltyCardRepository.addToLocation(shoppingList.id, loyaltyCardId)
+        shoppingListViewModel.hydrate(getLocationGrouping(shoppingList.type), shoppingList.defaultFilter)
+        val loyaltyCard = loyaltyCardRepository.get(loyaltyCardId)
+
+        val item = getLocationListItems(shoppingListViewModel).first { it.id == shoppingList.id }
+        shoppingListViewModel.toggleItemSelection(item)
+
+        val event = awaitEvent(shoppingListViewModel) {
+            shoppingListViewModel.navigateToItemLoyaltyCard()
+        }
+
+        assert(event is ShoppingListViewModel.ShoppingListEvent.NavigateToLoyaltyCard)
+
+        val navEvent = event as ShoppingListViewModel.ShoppingListEvent.NavigateToLoyaltyCard
+        assertEquals(loyaltyCard, navEvent.loyaltyCard)
+    }
+
+    @Test
+    fun navigateToItemLoyaltyCard_NoItemSelected_NoEventEmitted() = runTest {
+        // Create a list to catch any events
+        val collectedEvents = mutableListOf<ShoppingListViewModel.ShoppingListEvent>()
+        val job = launch(UnconfinedTestDispatcher(testScheduler)) {
+            shoppingListViewModel.events.toList(collectedEvents)
+        }
+        try {
+            shoppingListViewModel.navigateToItemLoyaltyCard()
+
+            // Force the scheduler to run any pending coroutines
+            runCurrent()
+
+            assertTrue(collectedEvents.isEmpty())
+        } finally {
+            job.cancel()
+        }
+    }
+
+    @Test
     fun navigateToEditShop_LocationIdIsPopulated_EmitNavigateToEditShopEvent() = runTest {
         val shoppingList = getShoppingList()
         shoppingListViewModel.hydrate(getAisleGrouping(shoppingList.id), shoppingList.defaultFilter)
@@ -1224,7 +1273,7 @@ class ShoppingListViewModelTest : KoinTest {
             shoppingListViewModel.navigateToCopyDialog()
         }
 
-        val expected = ShoppingListViewModel.ShoppingListEvent.NavigateToCopyDialogEvent(
+        val expected = ShoppingListViewModel.ShoppingListEvent.NavigateToCopyDialog(
             CopyEntityType.Product(item.id), item.name
         )
 
@@ -1241,7 +1290,7 @@ class ShoppingListViewModelTest : KoinTest {
             shoppingListViewModel.navigateToCopyDialog()
         }
 
-        val expected = ShoppingListViewModel.ShoppingListEvent.NavigateToCopyDialogEvent(
+        val expected = ShoppingListViewModel.ShoppingListEvent.NavigateToCopyDialog(
             CopyEntityType.Location(item.id), item.name
         )
 
@@ -1292,7 +1341,7 @@ class ShoppingListViewModelTest : KoinTest {
             shoppingListViewModel.navigateToNoteDialog()
         }
 
-        val expected = ShoppingListViewModel.ShoppingListEvent.NavigateToNoteDialogEvent(
+        val expected = ShoppingListViewModel.ShoppingListEvent.NavigateToNoteDialog(
             NoteParentRef.Product(item.id)
         )
 
@@ -1309,7 +1358,7 @@ class ShoppingListViewModelTest : KoinTest {
             shoppingListViewModel.navigateToNoteDialog()
         }
 
-        val expected = ShoppingListViewModel.ShoppingListEvent.NavigateToNoteDialogEvent(
+        val expected = ShoppingListViewModel.ShoppingListEvent.NavigateToNoteDialog(
             NoteParentRef.Location(item.id)
         )
 

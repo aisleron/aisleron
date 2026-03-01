@@ -20,4 +20,6 @@ package com.aisleron.ui.shoppinglist
 interface LocationShoppingListItem : HeaderShoppingListItem {
     override val locationId: Int
         get() = id
+
+    val showLoyaltyCard: Boolean
 }

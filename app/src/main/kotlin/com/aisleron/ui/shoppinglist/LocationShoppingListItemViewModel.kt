@@ -20,6 +20,7 @@ package com.aisleron.ui.shoppinglist
 import com.aisleron.domain.location.usecase.RemoveLocationUseCase
 import com.aisleron.domain.location.usecase.UpdateLocationExpandedUseCase
 import com.aisleron.domain.location.usecase.UpdateLocationRankUseCase
+import com.aisleron.domain.loyaltycard.usecase.GetLoyaltyCardForLocationUseCase
 import com.aisleron.ui.copyentity.CopyEntityType
 import com.aisleron.ui.note.NoteParentRef
 
@@ -32,10 +33,12 @@ data class LocationShoppingListItemViewModel(
     override val id: Int,
     override val name: String,
     override val aisleId: Int,
+    override val showLoyaltyCard: Boolean
 ) : LocationShoppingListItem, HeaderShoppingListItemViewModel {
     lateinit var removeLocationUseCase: RemoveLocationUseCase
     lateinit var updateLocationRankUseCase: UpdateLocationRankUseCase
     lateinit var updateLocationExpandedUseCase: UpdateLocationExpandedUseCase
+    lateinit var getLoyaltyCardForLocationUseCase: GetLoyaltyCardForLocationUseCase
 
     override val uniqueId: ShoppingListItem.UniqueId
         get() = ShoppingListItem.UniqueId(itemType, id)
@@ -54,19 +57,24 @@ data class LocationShoppingListItemViewModel(
         ShoppingListViewModel.ShoppingListEvent.NavigateToEditLocation(id)
 
     override fun copyDialogNavigationEvent(): ShoppingListViewModel.ShoppingListEvent {
-        return ShoppingListViewModel.ShoppingListEvent.NavigateToCopyDialogEvent(
+        return ShoppingListViewModel.ShoppingListEvent.NavigateToCopyDialog(
             entityType = CopyEntityType.Location(id),
             name = name
         )
     }
 
     override fun noteDialogNavigationEvent(): ShoppingListViewModel.ShoppingListEvent {
-        return ShoppingListViewModel.ShoppingListEvent.NavigateToNoteDialogEvent(
+        return ShoppingListViewModel.ShoppingListEvent.NavigateToNoteDialog(
             parentRef = NoteParentRef.Location(id)
         )
     }
 
     override suspend fun updateExpanded(expanded: Boolean) {
         updateLocationExpandedUseCase(id, expanded)
+    }
+
+    suspend fun navigateToLoyaltyCardEvent(): ShoppingListViewModel.ShoppingListEvent {
+        val loyaltyCard = getLoyaltyCardForLocationUseCase(id)
+        return ShoppingListViewModel.ShoppingListEvent.NavigateToLoyaltyCard(loyaltyCard)
     }
 }

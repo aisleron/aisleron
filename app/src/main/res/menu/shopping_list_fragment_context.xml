@@ -32,6 +32,12 @@
         app:showAsAction="always"
         android:menuCategory="container" />
     <item
+        android:id="@+id/mnu_show_loyalty_card"
+        android:title="@string/loyalty_card"
+        android:icon="@drawable/loyalty_card_24"
+        app:showAsAction="always"
+        android:menuCategory="container" />
+    <item
         android:id="@+id/mnu_aisle_picker"
         android:title="@string/aisle_picker"
         android:icon="@drawable/baseline_aisle_24"

@@ -67,7 +67,7 @@ class LocationListCoordinator(
         sortLocationTypeByNameUseCase(locationType, true)
     }
 
-    private fun mapShoppingList(
+    private suspend fun mapShoppingList(
         locations: List<Location>,
         showAllProducts: Boolean,
         selections: Set<ShoppingListItem.UniqueId>

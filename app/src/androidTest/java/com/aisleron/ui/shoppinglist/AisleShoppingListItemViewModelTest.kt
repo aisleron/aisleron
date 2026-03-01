@@ -157,21 +157,6 @@ class AisleShoppingListItemViewModelTest : KoinTest {
     }
 
     @Test
-    fun onCreate_PropertiesInitializedCorrectly() = runTest {
-        val existingAisle = getAisle()
-
-        val shoppingListItem = getAisleShoppingListItemViewModel(existingAisle)
-
-        assertEquals(existingAisle.id, shoppingListItem.id)
-        assertEquals(existingAisle.name, shoppingListItem.name)
-        assertEquals(existingAisle.rank, shoppingListItem.rank)
-        assertEquals(existingAisle.locationId, shoppingListItem.locationId)
-        assertEquals(existingAisle.isDefault, shoppingListItem.isDefault)
-        assertEquals(existingAisle.expanded, shoppingListItem.expanded)
-        assertEquals(existingAisle.products.count(), shoppingListItem.childCount)
-    }
-
-    @Test
     fun navigateToEditEvent_ReturnsNavigateToEditAisleEvent() = runTest {
         val existingAisle = getAisle()
         val shoppingListItem = getAisleShoppingListItemViewModel(existingAisle)
@@ -184,5 +169,39 @@ class AisleShoppingListItemViewModelTest : KoinTest {
             ),
             event
         )
+    }
+
+    @Test
+    fun uniqueId_MatchesAisleId() = runTest {
+        val existingAisle = getAisle()
+        val expected = ShoppingListItem.UniqueId(
+            ShoppingListItem.ItemType.HEADER, existingAisle.id
+        )
+
+        val shoppingListItem = getAisleShoppingListItemViewModel(existingAisle)
+
+        assertEquals(expected, shoppingListItem.uniqueId)
+    }
+
+    @Test
+    fun copyDialogNavigationEvent_ReturnsNoEvent() = runTest {
+        val existingAisle = getAisle()
+        val shoppingListItem = getAisleShoppingListItemViewModel(existingAisle)
+
+        val event = shoppingListItem.copyDialogNavigationEvent()
+
+        val expected = ShoppingListViewModel.ShoppingListEvent.NoEvent
+        assertEquals(expected, event)
+    }
+
+    @Test
+    fun noteDialogNavigationEvent_ReturnsNoEvent() = runTest {
+        val existingAisle = getAisle()
+        val shoppingListItem = getAisleShoppingListItemViewModel(existingAisle)
+
+        val event = shoppingListItem.noteDialogNavigationEvent()
+
+        val expected = ShoppingListViewModel.ShoppingListEvent.NoEvent
+        assertEquals(expected, event)
     }
 }

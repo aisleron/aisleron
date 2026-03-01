@@ -307,10 +307,10 @@ class ShoppingListFragment(
                 is ShoppingListViewModel.ShoppingListEvent.NavigateToAddSingleAisle ->
                     showAddSingleAisleDialog(event.locationId)
 
-                is ShoppingListViewModel.ShoppingListEvent.NavigateToCopyDialogEvent ->
+                is ShoppingListViewModel.ShoppingListEvent.NavigateToCopyDialog ->
                     showCopyDialog(event.entityType, event.name)
 
-                is ShoppingListViewModel.ShoppingListEvent.NavigateToNoteDialogEvent ->
+                is ShoppingListViewModel.ShoppingListEvent.NavigateToNoteDialog ->
                     showNoteDialog(event.parentRef)
             }
         }
@@ -571,6 +571,8 @@ class ShoppingListFragment(
         val locationsOnly = selectedItems.all { it is LocationShoppingListItem }
         val singleItem = selectedItems.size == 1
         val showNoteAndCopy = singleItem && (productsOnly || locationsOnly)
+        val showLoyaltyCard = singleItem && locationsOnly
+                && (selectedItems.single() as LocationShoppingListItem).showLoyaltyCard
 
         mode?.menu?.let {
             it.findItem(R.id.mnu_add_product_to_aisle).isVisible = singleItem && aislesOnly
@@ -578,6 +580,7 @@ class ShoppingListFragment(
             it.findItem(R.id.mnu_show_note).isVisible = showNoteAndCopy
             it.findItem(R.id.mnu_aisle_picker).isVisible = productsOnly && showAislePicker
             it.findItem(R.id.mnu_edit_shopping_list_item).isVisible = singleItem
+            it.findItem(R.id.mnu_show_loyalty_card).isVisible = showLoyaltyCard
             it.findItem(R.id.mnu_delete_shopping_list_item)
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
         }
@@ -601,6 +604,7 @@ class ShoppingListFragment(
             R.id.mnu_copy_shopping_list_item -> shoppingListViewModel.navigateToCopyDialog()
             R.id.mnu_show_note -> shoppingListViewModel.navigateToNoteDialog()
             R.id.mnu_aisle_picker -> shoppingListViewModel.requestLocationAisles()
+            R.id.mnu_show_loyalty_card -> shoppingListViewModel.navigateToItemLoyaltyCard()
             else -> result = false // No action picked
         }
 

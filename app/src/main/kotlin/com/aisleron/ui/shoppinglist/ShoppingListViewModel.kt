@@ -366,6 +366,16 @@ class ShoppingListViewModel(
         }
     }
 
+    fun navigateToItemLoyaltyCard() {
+        val item =
+            selectedListItems.filterIsInstance<LocationShoppingListItemViewModel>().singleOrNull()
+                ?: return
+
+        coroutineScope.launchHandling {
+            _events.emit(item.navigateToLoyaltyCardEvent())
+        }
+    }
+
     sealed class ShoppingListUiState {
         data object Empty : ShoppingListUiState()
         data object Loading : ShoppingListUiState()
@@ -394,11 +404,11 @@ class ShoppingListViewModel(
         data class NavigateToEditAisle(val aisleId: Int, val locationId: Int) : ShoppingListEvent()
         data class NavigateToAddSingleAisle(val locationId: Int) : ShoppingListEvent()
         data class NavigateToAddMultipleAisles(val locationId: Int) : ShoppingListEvent()
-        data class NavigateToCopyDialogEvent(
+        data class NavigateToCopyDialog(
             val entityType: CopyEntityType, val name: String
         ) : ShoppingListEvent()
 
-        data class NavigateToNoteDialogEvent(val parentRef: NoteParentRef) : ShoppingListEvent()
+        data class NavigateToNoteDialog(val parentRef: NoteParentRef) : ShoppingListEvent()
     }
 
     sealed class ListTitle {

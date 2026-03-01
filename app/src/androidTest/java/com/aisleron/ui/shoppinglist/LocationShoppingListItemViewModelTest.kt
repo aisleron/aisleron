@@ -29,7 +29,13 @@ import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.location.usecase.RemoveLocationUseCase
 import com.aisleron.domain.location.usecase.UpdateLocationExpandedUseCase
 import com.aisleron.domain.location.usecase.UpdateLocationRankUseCase
+import com.aisleron.domain.loyaltycard.LoyaltyCard
+import com.aisleron.domain.loyaltycard.LoyaltyCardProviderType
+import com.aisleron.domain.loyaltycard.LoyaltyCardRepository
+import com.aisleron.domain.loyaltycard.usecase.GetLoyaltyCardForLocationUseCase
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
+import com.aisleron.ui.copyentity.CopyEntityType
+import com.aisleron.ui.note.NoteParentRef
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -58,7 +64,7 @@ class LocationShoppingListItemViewModelTest : KoinTest {
 
     private suspend fun getShop(): Location = getLocation(LocationType.SHOP)
 
-    private fun getLocationShoppingListItemViewModel(existingLocation: Location): LocationShoppingListItemViewModel {
+    private suspend fun getLocationShoppingListItemViewModel(existingLocation: Location): LocationShoppingListItemViewModel {
         return LocationShoppingListItemViewModel(
             selected = false,
             childCount = existingLocation.aisles.sumOf { it.products.size },
@@ -67,10 +73,12 @@ class LocationShoppingListItemViewModelTest : KoinTest {
             id = existingLocation.id,
             name = existingLocation.name,
             aisleId = existingLocation.aisles.firstOrNull { !it.isDefault }?.id ?: 0,
+            showLoyaltyCard = get<GetLoyaltyCardForLocationUseCase>().invoke(existingLocation.id) != null
         ).apply {
             removeLocationUseCase = get<RemoveLocationUseCase>()
             updateLocationRankUseCase = get<UpdateLocationRankUseCase>()
             updateLocationExpandedUseCase = get<UpdateLocationExpandedUseCase>()
+            getLoyaltyCardForLocationUseCase = get<GetLoyaltyCardForLocationUseCase>()
         }
     }
 
@@ -157,25 +165,6 @@ class LocationShoppingListItemViewModelTest : KoinTest {
     }
 
     @Test
-    fun onCreate_PropertiesInitializedCorrectly() = runTest {
-        val existingLocation = getShop()
-
-        val shoppingListItem = getLocationShoppingListItemViewModel(existingLocation)
-
-        assertEquals(existingLocation.id, shoppingListItem.id)
-        assertEquals(existingLocation.name, shoppingListItem.name)
-        assertEquals(existingLocation.rank, shoppingListItem.rank)
-        assertEquals(existingLocation.id, shoppingListItem.locationId)
-        assertEquals(false, shoppingListItem.isDefault)
-        assertEquals(existingLocation.expanded, shoppingListItem.expanded)
-        // Not populating aisle for these items so can't validate counts
-        // assertEquals(existingLocation.aisles.first().id, shoppingListItem.aisleId)
-        // assertEquals(
-        //     existingLocation.aisles.sumOf { it.products.size }, shoppingListItem.childCount
-        // )
-    }
-
-    @Test
     fun navigateToEditEvent_ReturnsNavigateToEditLocationEvent() = runTest {
         val existingLocation = getShop()
         val shoppingListItem = getLocationShoppingListItemViewModel(existingLocation)
@@ -186,6 +175,86 @@ class LocationShoppingListItemViewModelTest : KoinTest {
             ShoppingListViewModel.ShoppingListEvent.NavigateToEditLocation(existingLocation.id),
             event
         )
+    }
+
+    @Test
+    fun copyDialogNavigationEvent_ReturnsNavigateToCopyDialogEvent() = runTest {
+        val existingLocation = getShop()
+        val shoppingListItem = getLocationShoppingListItemViewModel(existingLocation)
+
+        val event = shoppingListItem.copyDialogNavigationEvent()
+
+        val expected = ShoppingListViewModel.ShoppingListEvent.NavigateToCopyDialog(
+            CopyEntityType.Location(existingLocation.id), existingLocation.name
+        )
+
+        assertEquals(expected, event)
+    }
+
+    @Test
+    fun noteDialogNavigationEvent_ReturnsNavigateToNoteDialogEvent() = runTest {
+        val existingLocation = getShop()
+        val shoppingListItem = getLocationShoppingListItemViewModel(existingLocation)
+
+        val event = shoppingListItem.noteDialogNavigationEvent()
+
+        val expected = ShoppingListViewModel.ShoppingListEvent.NavigateToNoteDialog(
+            NoteParentRef.Location(existingLocation.id)
+        )
+
+        assertEquals(expected, event)
+    }
+
+    @Test
+    fun navigateToLoyaltyCardEvent_LocationHasLoyaltyCard_ReturnsNavigateToLoyaltyCard() = runTest {
+        val existingLocation = getShop()
+        val loyaltyCardRepository = get<LoyaltyCardRepository>()
+        val loyaltyCardId = loyaltyCardRepository.add(
+            LoyaltyCard(
+                id = 0,
+                name = "Test Loyalty Card",
+                provider = LoyaltyCardProviderType.CATIMA,
+                intent = "Dummy Intent"
+            )
+        )
+
+        loyaltyCardRepository.addToLocation(existingLocation.id, loyaltyCardId)
+        val loyaltyCard = loyaltyCardRepository.get(loyaltyCardId)
+        val shoppingListItem = getLocationShoppingListItemViewModel(existingLocation)
+
+        val event = shoppingListItem.navigateToLoyaltyCardEvent()
+
+        val expected = ShoppingListViewModel.ShoppingListEvent.NavigateToLoyaltyCard(
+            loyaltyCard
+        )
+
+        assertEquals(expected, event)
+    }
+
+    @Test
+    fun navigateToLoyaltyCardEvent_NoLoyaltyCard_ReturnsEventWithNullLoyaltyCard() = runTest {
+        val existingLocation = getShop()
+        val shoppingListItem = getLocationShoppingListItemViewModel(existingLocation)
+
+        val event = shoppingListItem.navigateToLoyaltyCardEvent()
+
+        val expected = ShoppingListViewModel.ShoppingListEvent.NavigateToLoyaltyCard(
+            null
+        )
+
+        assertEquals(expected, event)
+    }
+
+    @Test
+    fun uniqueId_MatchesLocationId() = runTest {
+        val existingLocation = getShop()
+        val expected = ShoppingListItem.UniqueId(
+            ShoppingListItem.ItemType.HEADER, existingLocation.id
+        )
+
+        val shoppingListItem = getLocationShoppingListItemViewModel(existingLocation)
+
+        assertEquals(expected, shoppingListItem.uniqueId)
     }
 
 }
