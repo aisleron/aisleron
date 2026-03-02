@@ -45,7 +45,7 @@ class NavigationDrawerFragment : Fragment() {
         with(binding) {
             //Set onclick listener for views that navigate based on their Id matching a navigation graph destination
             val navButtons =
-                setOf(navInStock, navNeeded, navAllItems, navSettings, navAllShops, navAbout)
+                setOf(navInStock, navNeeded, navAllItems, navSettings, navAllLists, navAbout)
 
             for (view in navButtons) {
                 view.setOnClickListener {
@@ -53,7 +53,7 @@ class NavigationDrawerFragment : Fragment() {
                 }
             }
 
-            navNeededInShops.setOnClickListener {
+            navAllShops.setOnClickListener {
                 val bundle = Bundler().makeShoppingListBundle(
                     filterType = FilterType.NEEDED,
                     listGrouping = ShoppingListGrouping.LocationGrouping(LocationType.SHOP)

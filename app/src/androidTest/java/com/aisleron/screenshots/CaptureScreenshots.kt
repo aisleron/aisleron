@@ -55,6 +55,7 @@ import com.aisleron.R
 import com.aisleron.SharedPreferencesInitializer
 import com.aisleron.di.KoinTestRule
 import com.aisleron.di.daoTestModule
+import com.aisleron.di.factoryModule
 import com.aisleron.di.fragmentModule
 import com.aisleron.di.generalModule
 import com.aisleron.di.preferenceModule
@@ -113,7 +114,8 @@ class CaptureScreenshots : KoinTest {
             repositoryModule,
             useCaseModule,
             generalModule,
-            preferenceModule
+            preferenceModule,
+            factoryModule
         )
     )
 
@@ -148,7 +150,7 @@ class CaptureScreenshots : KoinTest {
                     aisles = emptyList(),
                     showDefaultAisle = true,
                     expanded = true,
-                    rank = get<LocationRepository>().getMaxRank() + 1
+                    rank = 10 //get<LocationRepository>().getMaxRank() + 1
                 )
             )
 
@@ -249,6 +251,7 @@ class CaptureScreenshots : KoinTest {
     }
 
     private fun clickFab(fabOption: FabHandler.FabOption) {
+        sleep(200)
         clickMainFab()
 
         val fabId = when (fabOption) {
@@ -285,6 +288,7 @@ class CaptureScreenshots : KoinTest {
     }
 
     private fun selectShoppingListItem(productName: String) {
+        sleep(200)
         onView(withText(productName))
             .perform(longClick())
     }
@@ -491,7 +495,7 @@ class CaptureScreenshots : KoinTest {
 
     private fun navigateToShopList() {
         openNavigationDrawer()
-        onView(withId(R.id.nav_all_shops))
+        onView(withId(R.id.nav_all_lists))
             .perform(click())
     }
 

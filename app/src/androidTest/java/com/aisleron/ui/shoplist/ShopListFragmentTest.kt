@@ -130,7 +130,7 @@ class ShopListFragmentTest : KoinTest {
 
         getActivityScenario().onActivity {
             navController.setGraph(R.navigation.mobile_navigation)
-            navController.setCurrentDestination(R.id.nav_all_shops)
+            navController.setCurrentDestination(R.id.nav_all_lists)
             Navigation.setViewNavController(activityFragment.requireView(), navController)
         }
 
@@ -175,7 +175,7 @@ class ShopListFragmentTest : KoinTest {
 
         getActivityScenario().onActivity {
             navController.setGraph(R.navigation.mobile_navigation)
-            navController.setCurrentDestination(R.id.nav_all_shops)
+            navController.setCurrentDestination(R.id.nav_all_lists)
             Navigation.setViewNavController(activityFragment.requireView(), navController)
         }
 

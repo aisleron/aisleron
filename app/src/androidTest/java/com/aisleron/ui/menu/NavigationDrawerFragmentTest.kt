@@ -81,8 +81,9 @@ class NavigationDrawerFragmentTest(
                 arrayOf("navInStock", R.id.nav_in_stock, R.id.nav_in_stock),
                 arrayOf("navNeeded", R.id.nav_needed, R.id.nav_needed),
                 arrayOf("navAllItems", R.id.nav_all_items, R.id.nav_all_items),
+                arrayOf("navAllShops", R.id.nav_all_shops, R.id.nav_shopping_list),
                 arrayOf("navSettings", R.id.nav_settings, R.id.nav_settings),
-                arrayOf("navAllShops", R.id.nav_all_shops, R.id.nav_all_shops)
+                arrayOf("navAllLists", R.id.nav_all_lists, R.id.nav_all_lists)
             )
         }
     }
