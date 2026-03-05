@@ -1,0 +1,6 @@
+Miglioramenti:
+* Aggiunta una sezione "Contribuisci" alla pagina Informazioni.
+* Aggiunte traduzioni in Turco.
+
+Correzioni di bug:
+* Corretto il problema relativo alla rimozione delle risorse linguistiche dal bundle del Play Store.
