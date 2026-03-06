@@ -1,0 +1,10 @@
+Miglioramenti:
+* Aggiunta la possibilità di gestire le corsie durante l'aggiunta o la modifica di un prodotto.
+* Possibilità di tracciare le quantità in valori decimali.
+* Aggiunta l'unità di misura all'inventario dei prodotti.
+* Aggiunta la possibilità di selezione multipla all'elenco prodotti.
+* Aggiunta l'opzione per impostare la modalità di tracciamento per prodotto.
+* Aggiunta la richiesta di salvataggio quando si esce dalla pagina del prodotto in caso di modifiche non salvate.
+
+Correzioni di bug:
+* Corretto un comportamento imprevisto di riordino delle corsie in presenza di molte corsie non classificate.

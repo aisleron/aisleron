@@ -1,0 +1,6 @@
+Miglioramenti:
+* Aggiunto un selettore di lingua nelle Preferenze.
+* Aggiunto un suggerimento per le note sul prodotto nelle voci della lista della spesa.
+
+Correzioni di bug:
+* Risolto il problema di scorrimento della scheda delle note nella pagina Modifica prodotto.
