@@ -11,6 +11,7 @@
     <string name="menu_all_shops">Bütün dükkânlar</string>
     <string name="menu_shops">Dükkânlar</string>
     <string name="menu_about">Hakkında</string>
+    <string name="menu_all_lists">Tüm Listeler</string>
     <string name="home">Başlangıç</string>
     <string name="display_options_header">Görüntüleme seçenekleri</string>
     <string name="system_theme">Sistem teması</string>
@@ -117,7 +118,8 @@
     <string name="duplicate_product_exception">HATA: Var olan bir ürünün aynısı eklenemez</string>
     <string name="duplicate_location_exception">HATA: Var olan bir konumun aynısı eklenemez</string>
     <string name="sample_data_creation_exception">HATA: Var olan bir veri tabanının içine örnek veriler yüklenemez</string>
-    <string name="aisle_move_exception">HATA: Reyon değişikliği aynı konum içerisinde olmalı.</string>
+    <string name="aisle_move_exception">HATA: Reyon değişikliği aynı konum içerisinde olmalı</string>
+    <string name="loyalty_card_not_found_exception">HATA: Sadakat kartı bulunamadı</string>
     <string name="about_legal_header">Lisanslar ve Politikalar</string>
     <string name="about_support_version_summary">Şu anki sürüm: %1$s</string>
     <string name="about_support_report_issue_summary">Bir hata ya da özellik eklenmesi talebi gönderin</string>
@@ -182,4 +184,5 @@
     <string name="copy_entity_title">%1$s kopyala</string>
     <string name="expand_collapse_aisles">Reyon dökümlerini aç/kapa</string>
     <string name="items_selected">%1$d madde</string>
+    <string name="show_location_list">%1$s Göster</string>
 </resources>

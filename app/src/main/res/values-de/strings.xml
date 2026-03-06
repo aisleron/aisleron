@@ -23,6 +23,7 @@
     <string name="menu_all_shops">Alle Geschäfte</string>
     <string name="menu_shops">Geschäfte</string>
     <string name="menu_about">Über</string>
+    <string name="menu_all_lists">Alle Listen</string>
     <string name="light_theme">Helles Thema</string>
     <string name="dark_theme">Dunkles Thema</string>
     <string name="theme">Thema</string>
@@ -85,7 +86,8 @@
     <string name="duplicate_location_exception">FEHLER: Es ist nicht möglich, ein Duplikat eines bereits vorhandenen Standorts hinzuzufügen</string>
     <string name="sample_data_creation_exception">FEHLER: Es ist nicht möglich, Beispieldaten in eine vorhandene Datenbank zu laden</string>
     <string name="loyalty_card_provider_missing_exception">FEHLER: Anbieter von Kundenkarten nicht installiert oder nicht gefunden</string>
-    <string name="aisle_move_exception">FEHLER: Das Verschieben des Ganges muss innerhalb desselben Standorts erfolgen.</string>
+    <string name="aisle_move_exception">FEHLER: Das Verschieben des Ganges muss innerhalb desselben Standorts erfolgen</string>
+    <string name="loyalty_card_not_found_exception">FEHLER: Kundenkarte nicht gefunden</string>
     <string name="new_aisle">Neuer Gang</string>
     <string name="aisles_selected">%1$d Gänge</string>
     <string name="products_selected">%1$d Produkte</string>
@@ -199,4 +201,5 @@
     <string name="about_contribute_translate_summary">Hilf mit, Aisleron in weiteren Sprachen verfügbar zu machen</string>
     <string name="about_contribute_donate_title">Spenden</string>
     <string name="about_contribute_donate_summary">Unterstütze Aisleron finanziell</string>
+    <string name="show_location_list">%1$s anzeigen</string>
 </resources>

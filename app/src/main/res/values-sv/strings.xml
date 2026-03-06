@@ -40,6 +40,7 @@
     <string name="db_restore_success">Återställning slutförd</string>
     <string name="nav_header_subtitle">Flyg fram genom butikerna!</string>
     <string name="menu_about">Om</string>
+    <string name="menu_all_lists">Alla listor</string>
     <string name="about_support_sourcecode_title">Källkod</string>
     <string name="about_support_version_summary">Aktuell version: %1$s</string>
     <string name="about_support_sourcecode_summary">Se källkoden på GitHub</string>
@@ -96,7 +97,8 @@
     <string name="duplicate_location_exception">FEL: Det går inte att lägga till en dubblett av en befintlig plats</string>
     <string name="sample_data_creation_exception">FEL: Det går inte att läsa in exempeldata i en befintlig databas</string>
     <string name="loyalty_card_provider_missing_exception">FEL: Lojalitetskortsleverantör inte installerad eller aktivitet hittades inte</string>
-    <string name="aisle_move_exception">FEL: Gångflytt måste ske inom samma plats.</string>
+    <string name="aisle_move_exception">FEL: Gångflytt måste ske inom samma plats</string>
+    <string name="loyalty_card_not_found_exception">FEL: Lojalitetskort hittades inte</string>
     <string name="about_legal_header">Licenser och policyer</string>
     <string name="about_legal_license_title">Aisleron-licens</string>
     <string name="about_legal_privacy_title">Aisleron sekretesspolicy</string>
@@ -199,4 +201,5 @@
     <string name="about_contribute_translate_summary">Hjälp till att göra Aisleron tillgänglig på fler språk</string>
     <string name="about_contribute_donate_title">Donera</string>
     <string name="about_contribute_donate_summary">Bidra ekonomiskt till Aisleron</string>
+    <string name="show_location_list">Visa %1$s</string>
 </resources>

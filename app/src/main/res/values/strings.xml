@@ -31,6 +31,7 @@
     <string name="menu_all_shops">All Shops</string>
     <string name="menu_shops">Shops</string>
     <string name="menu_about">About</string>
+    <string name="menu_all_lists">All Lists</string>
     <string name="home">Home</string>
 
     <!-- Preferences -->
@@ -101,7 +102,8 @@
     <string name="duplicate_location_exception">ERROR: Cannot add a duplicate of an existing location</string>
     <string name="sample_data_creation_exception">ERROR: Cannot load sample data into an existing database</string>
     <string name="loyalty_card_provider_missing_exception">ERROR: Loyalty card provider not installed or activity not found</string>
-    <string name="aisle_move_exception">ERROR: Aisle move must be within the same Location.</string>
+    <string name="aisle_move_exception">ERROR: Aisle move must be within the same Location</string>
+    <string name="loyalty_card_not_found_exception">ERROR: Loyalty card not found</string>
 
     <!-- About Preferences -->
     <string name="about_support_header">Support</string>
@@ -248,4 +250,5 @@
     <string name="save_changes_title">Save Changes?</string>
     <string name="save_changes_message">You have unsaved changes. Do you want to save them before leaving?</string>
     <string name="keep_editing">Keep Editing</string>
+    <string name="show_location_list">Show %1$s</string>
 </resources>
