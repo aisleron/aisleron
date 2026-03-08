@@ -64,6 +64,7 @@ import com.aisleron.di.useCaseModule
 import com.aisleron.di.viewModelTestModule
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.LocationRepository
+import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import com.aisleron.ui.ApplicationTitleUpdateListener
 import com.aisleron.ui.ApplicationTitleUpdateListenerImpl
@@ -142,7 +143,7 @@ class MainActivityTest : KoinTest {
     private fun runHomeListOptionTest(filterType: FilterType, expectedResId: Int) {
         declare<ApplicationTitleUpdateListener> { ApplicationTitleUpdateListenerImpl() }
         sharedPreferencesInitializer.setIsInitialized(true)
-        sharedPreferencesInitializer.setStartingList(1, filterType)
+        sharedPreferencesInitializer.setStartingList(1, filterType, LocationType.HOME)
 
         ActivityScenario.launch(MainActivity::class.java).use { scenario ->
             scenario.onActivity { activity ->
@@ -173,11 +174,28 @@ class MainActivityTest : KoinTest {
         val location = get<LocationRepository>().getShops().first().first()
 
         sharedPreferencesInitializer.setIsInitialized(true)
-        sharedPreferencesInitializer.setStartingList(location.id, location.defaultFilter)
+        sharedPreferencesInitializer.setStartingList(
+            location.id, location.defaultFilter, location.type
+        )
 
         val activity = ActivityScenario.launch(MainActivity::class.java)
         activity.onActivity {
             assertEquals(location.name, it.supportActionBar?.title)
+        }
+    }
+
+    @Test
+    fun appStart_StartPageIsAllShops_ShowAllShops() = runTest {
+        declare<ApplicationTitleUpdateListener> { ApplicationTitleUpdateListenerImpl() }
+        sharedPreferencesInitializer.setIsInitialized(true)
+        sharedPreferencesInitializer.setStartingList(null, FilterType.NEEDED, LocationType.SHOP)
+
+        val activity = ActivityScenario.launch(MainActivity::class.java)
+        activity.onActivity { activity ->
+            assertEquals(
+                activity.getString(R.string.menu_all_shops),
+                activity.supportActionBar?.title
+            )
         }
     }
 
@@ -485,7 +503,7 @@ class MainActivityTest : KoinTest {
         get<CreateSampleDataUseCase>().invoke()
         val location = get<LocationRepository>().getShops().first().first()
         sharedPreferencesInitializer.setIsInitialized(true)
-        sharedPreferencesInitializer.setStartingList(location.id, FilterType.ALL)
+        sharedPreferencesInitializer.setStartingList(location.id, FilterType.ALL, location.type)
         return ActivityScenario.launch(MainActivity::class.java)
     }
 

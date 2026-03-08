@@ -20,6 +20,7 @@ package com.aisleron.ui.settings
 import android.content.Context
 import androidx.preference.PreferenceManager
 import com.aisleron.domain.FilterType
+import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.preferences.ApplicationTheme
 import com.aisleron.domain.preferences.PureBlackStyle
 import com.aisleron.ui.bundles.ShoppingListBundle
@@ -39,16 +40,28 @@ class DisplayPreferencesImpl(context: Context) : DisplayPreferences {
     }
 
     override fun startingList(): ShoppingListBundle {
-        val startList = prefs.getString(STARTING_LIST, null) ?: "1|IN_STOCK"
-        val (locationIdStr, filterTypeStr) = startList.split("|")
-        val locationId = locationIdStr.toIntOrNull() ?: 1
-        val filterType = try {
-            FilterType.valueOf(filterTypeStr)
-        } catch (_: IllegalArgumentException) {
-            FilterType.IN_STOCK
-        }
+        val startList = prefs.getString(STARTING_LIST, null) ?: "1|IN_STOCK|"
+        val parts = startList.split("|")
+        val locationId = parts.getOrNull(0)?.toIntOrNull()
+        val filterType = parts.getOrNull(1)?.let {
+            try {
+                FilterType.valueOf(it)
+            } catch (_: Exception) {
+                FilterType.IN_STOCK
+            }
+        } ?: FilterType.IN_STOCK
 
-        return ShoppingListBundle(locationId, filterType)
+        val locationType = parts.getOrNull(2)
+            ?.takeIf { it.isNotBlank() && it != "null" }
+            ?.let {
+                try {
+                    LocationType.valueOf(it)
+                } catch (_: Exception) {
+                    null
+                }
+            }
+
+        return ShoppingListBundle(locationId, filterType, locationType)
     }
 
     override fun dynamicColor(): Boolean =

@@ -20,6 +20,7 @@ package com.aisleron.ui.settings
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.aisleron.SharedPreferencesInitializer
 import com.aisleron.domain.FilterType
+import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.preferences.ApplicationTheme
 import com.aisleron.domain.preferences.PureBlackStyle
 import com.aisleron.ui.shoppinglist.ShoppingListGrouping
@@ -68,25 +69,37 @@ class DisplayPreferencesImplTest {
             val description: String,
             val setup: () -> Unit,
             val expectedListGrouping: ShoppingListGrouping,
-            val expectedFilterType: FilterType
+            val expectedFilterType: FilterType,
         )
 
         val testCases = listOf(
             TestCase(
                 description = "In-Stock filter",
-                setup = { sharedPreferencesInitializer.setStartingList(1, FilterType.IN_STOCK) },
+                setup = {
+                    sharedPreferencesInitializer.setStartingList(
+                        1, FilterType.IN_STOCK, null
+                    )
+                },
                 expectedFilterType = FilterType.IN_STOCK,
                 expectedListGrouping = ShoppingListGrouping.AisleGrouping(1)
             ),
             TestCase(
                 description = "Needed filter",
-                setup = { sharedPreferencesInitializer.setStartingList(7, FilterType.NEEDED) },
+                setup = {
+                    sharedPreferencesInitializer.setStartingList(
+                        7, FilterType.NEEDED, null
+                    )
+                },
                 expectedFilterType = FilterType.NEEDED,
                 expectedListGrouping = ShoppingListGrouping.AisleGrouping(7)
             ),
             TestCase(
                 description = "All filter",
-                setup = { sharedPreferencesInitializer.setStartingList(5, FilterType.ALL) },
+                setup = {
+                    sharedPreferencesInitializer.setStartingList(
+                        5, FilterType.ALL, null
+                    )
+                },
                 expectedFilterType = FilterType.ALL,
                 expectedListGrouping = ShoppingListGrouping.AisleGrouping(5)
             ),
@@ -98,14 +111,32 @@ class DisplayPreferencesImplTest {
             ),
             TestCase(
                 description = "Invalid ID saved, should default ID",
-                setup = { sharedPreferencesInitializer.setStartingList("x|${FilterType.ALL.name}") },
+                setup = { sharedPreferencesInitializer.setStartingList("x|${FilterType.ALL.name}|") },
                 expectedFilterType = FilterType.ALL,
                 expectedListGrouping = ShoppingListGrouping.AisleGrouping(1)
             ),
             TestCase(
                 description = "Invalid filter type, should default filter",
-                setup = { sharedPreferencesInitializer.setStartingList("1|x") },
+                setup = { sharedPreferencesInitializer.setStartingList("1|x|") },
                 expectedFilterType = FilterType.IN_STOCK,
+                expectedListGrouping = ShoppingListGrouping.AisleGrouping(1)
+            ),
+            TestCase(
+                description = "Invalid location type, should default to aisle grouping",
+                setup = { sharedPreferencesInitializer.setStartingList("|${FilterType.ALL.name}|x") },
+                expectedFilterType = FilterType.ALL,
+                expectedListGrouping = ShoppingListGrouping.AisleGrouping(1)
+            ),
+            TestCase(
+                description = "All Shops",
+                setup = { sharedPreferencesInitializer.setStartingList("|${FilterType.NEEDED.name}|${LocationType.SHOP.name}") },
+                expectedFilterType = FilterType.NEEDED,
+                expectedListGrouping = ShoppingListGrouping.LocationGrouping(LocationType.SHOP)
+            ),
+            TestCase(
+                description = "Pre-location grouping",
+                setup = { sharedPreferencesInitializer.setStartingList("1|${FilterType.NEEDED.name}") },
+                expectedFilterType = FilterType.NEEDED,
                 expectedListGrouping = ShoppingListGrouping.AisleGrouping(1)
             )
         )

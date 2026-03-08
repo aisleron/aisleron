@@ -103,7 +103,8 @@ class Bundler {
     fun makeShoppingListBundle(locationId: Int, filterType: FilterType): Bundle {
         val shoppingListBundle = ShoppingListBundle(
             locationId = locationId,
-            filterType = filterType
+            filterType = filterType,
+            locationType = null
         )
         return makeShoppingListBundle(shoppingListBundle)
     }
@@ -127,8 +128,8 @@ class Bundler {
                 } else {
                     @Suppress("DEPRECATION")
                     bundle?.getSerializable(ARG_FILTER_TYPE) as FilterType?
-                }
-            result = ShoppingListBundle(locationId, filterType)
+                } ?: FilterType.IN_STOCK
+            result = ShoppingListBundle(locationId, filterType, null)
         }
         return result
     }

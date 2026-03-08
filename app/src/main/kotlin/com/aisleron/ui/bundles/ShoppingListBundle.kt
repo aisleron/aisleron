@@ -29,14 +29,16 @@ data class ShoppingListBundle(
     val listGrouping: ShoppingListGrouping
 ) : Parcelable {
     companion object {
-        operator fun invoke(locationId: Int?, filterType: FilterType?): ShoppingListBundle {
-            val listGrouping = if (locationId != null) {
-                ShoppingListGrouping.AisleGrouping(locationId)
+        operator fun invoke(
+            locationId: Int?, filterType: FilterType, locationType: LocationType?
+        ): ShoppingListBundle {
+            val listGrouping = if (locationType != null && locationId == null) {
+                ShoppingListGrouping.LocationGrouping(locationType)
             } else {
-                ShoppingListGrouping.LocationGrouping(LocationType.SHOP)
+                ShoppingListGrouping.AisleGrouping(locationId ?: 1)
             }
 
-            return ShoppingListBundle(filterType ?: FilterType.ALL, listGrouping)
+            return ShoppingListBundle(filterType, listGrouping)
         }
     }
 }
