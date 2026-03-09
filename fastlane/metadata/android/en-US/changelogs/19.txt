@@ -1,4 +1,5 @@
 Enhancements:
+* Added the option to view the product list grouped by location/shop.
 * Added a Contribute section to the About page.
 * Added Turkish translations.
 
