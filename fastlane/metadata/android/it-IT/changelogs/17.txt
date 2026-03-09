@@ -1,0 +1,12 @@
+Miglioramenti:
+* Gestione delle corsie dei prodotti durante l'aggiunta/modifica.
+* Supporto per quantità decimali e unità di misura.
+* Possibilità di selezione multipla negli elenchi prodotti.
+* Opzioni di modalità di tracciamento per prodotto.
+* Salvataggio dei prompt all'uscita dalle pagine prodotto.
+* Aggiunte traduzioni in Bulgaro.
+
+Correzioni di bug:
+* Migliorata la logica di riordino delle corsie.
+* Cancellazione dei filtri di ricerca durante la navigazione negli elenchi.
+* Risolto un potenziale crash quando si preme Invio durante l'inserimento della quantità.

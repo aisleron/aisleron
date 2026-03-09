@@ -1,0 +1,5 @@
+Miglioramenti:
+* Implementato il design Material 3, i colori dinamici e gli stili Pure Black.
+* Migliorata la visualizzazione degli elementi dell'elenco prodotti sui dispositivi con schermo piccolo.
+* Aggiunte traduzioni in Italiano e Afrikaans.
+* Traduzioni aggiornate.
