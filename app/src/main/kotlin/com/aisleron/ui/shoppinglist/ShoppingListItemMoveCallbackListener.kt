@@ -23,7 +23,7 @@ import kotlin.math.sign
 
 private const val OUT_OF_BOUNDS_SCROLL_MULTIPLIER = 10
 
-class ShoppingListItemMoveCallbackListener(private val adapter: ShoppingListItemRecyclerViewAdapter) :
+class ShoppingListItemMoveCallbackListener(private val listener: Listener) :
     ItemTouchHelper.Callback() {
     override fun getMovementFlags(
         recyclerView: RecyclerView,
@@ -31,7 +31,7 @@ class ShoppingListItemMoveCallbackListener(private val adapter: ShoppingListItem
     ): Int {
         val dragFlags = when (viewHolder) {
             is ShoppingListItemRecyclerViewAdapter.ProductListItemViewHolder,
-            is ShoppingListItemRecyclerViewAdapter.AisleViewHolder -> ItemTouchHelper.UP or ItemTouchHelper.DOWN
+            is ShoppingListItemRecyclerViewAdapter.HeaderViewHolder -> ItemTouchHelper.UP or ItemTouchHelper.DOWN
 
             else -> 0
         }
@@ -47,7 +47,7 @@ class ShoppingListItemMoveCallbackListener(private val adapter: ShoppingListItem
         viewHolder: RecyclerView.ViewHolder,
         target: RecyclerView.ViewHolder
     ): Boolean {
-        adapter.onRowMove(viewHolder, target)
+        listener.onRowMove(viewHolder, target)
         return true
     }
 
@@ -61,12 +61,12 @@ class ShoppingListItemMoveCallbackListener(private val adapter: ShoppingListItem
         y: Int
     ) {
         super.onMoved(recyclerView, viewHolder, fromPos, target, toPos, x, y)
-        adapter.onRowMoved(fromPos, toPos)
+        listener.onRowMoved(fromPos, toPos)
     }
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
         if (viewHolder is ShoppingListItemRecyclerViewAdapter.ProductListItemViewHolder) {
-            adapter.onRowSwiped(viewHolder, direction)
+            listener.onRowSwiped(viewHolder, direction)
         }
 
     }
@@ -76,14 +76,14 @@ class ShoppingListItemMoveCallbackListener(private val adapter: ShoppingListItem
 
         if (actionState != ItemTouchHelper.ACTION_STATE_IDLE) {
             if (viewHolder is RecyclerView.ViewHolder) {
-                adapter.onRowSelected(viewHolder)
+                listener.onRowSelected(viewHolder)
             }
         }
     }
 
     override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
         super.clearView(recyclerView, viewHolder)
-        adapter.onRowClear(viewHolder)
+        listener.onRowClear(viewHolder)
     }
 
     override fun canDropOver(
@@ -91,15 +91,26 @@ class ShoppingListItemMoveCallbackListener(private val adapter: ShoppingListItem
         current: RecyclerView.ViewHolder,
         target: RecyclerView.ViewHolder
     ): Boolean {
+        val adapter = recyclerView.adapter as? ShoppingListItemRecyclerViewAdapter ?: return false
+        val currentItem = adapter.currentList.getOrNull(current.absoluteAdapterPosition)
+        val targetItem = adapter.currentList.getOrNull(target.absoluteAdapterPosition)
+
+        // TODO: Review product drop logic, e.g. can check for
+        //       target is ShoppingListItemRecyclerViewAdapter.HeaderViewHolder be removed?
+
+        // TODO: Figure out why drag up goes wrong when loading a new list item type
+        //       e.g. try to drag up to an aisle that is out of view initially
         val allowProductDrop =
             current is ShoppingListItemRecyclerViewAdapter.ProductListItemViewHolder
-                    && !(target is ShoppingListItemRecyclerViewAdapter.AisleViewHolder && target.absoluteAdapterPosition == 0)
+                    && !(target is ShoppingListItemRecyclerViewAdapter.HeaderViewHolder && target.absoluteAdapterPosition == 0)
+                    && currentItem?.locationId == targetItem?.locationId
+                    && targetItem !is LocationShoppingListItem
 
-        val allowAisleDrop =
-            current is ShoppingListItemRecyclerViewAdapter.AisleViewHolder
-                    && target is ShoppingListItemRecyclerViewAdapter.AisleViewHolder
+        val allowHeaderDrop =
+            current is ShoppingListItemRecyclerViewAdapter.HeaderViewHolder
+                    && target is ShoppingListItemRecyclerViewAdapter.HeaderViewHolder
 
-        return allowProductDrop || allowAisleDrop
+        return allowProductDrop || allowHeaderDrop
     }
 
     override fun interpolateOutOfBoundsScroll(

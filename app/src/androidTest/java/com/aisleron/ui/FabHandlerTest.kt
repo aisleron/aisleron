@@ -34,6 +34,7 @@ import com.aisleron.MainActivity
 import com.aisleron.R
 import com.aisleron.di.KoinTestRule
 import com.aisleron.di.daoTestModule
+import com.aisleron.di.factoryModule
 import com.aisleron.di.fragmentModule
 import com.aisleron.di.generalTestModule
 import com.aisleron.di.preferenceTestModule
@@ -67,7 +68,8 @@ class FabHandlerTest : KoinTest {
             repositoryModule,
             useCaseModule,
             generalTestModule,
-            preferenceTestModule
+            preferenceTestModule,
+            factoryModule
         )
     )
 
@@ -263,4 +265,48 @@ class FabHandlerTest : KoinTest {
             FabHandler.FabOption.ADD_PRODUCT
         )
     }
+
+    @Test
+    fun clickFab_AddAisleFabExcluded_AddAisleFabNotDisplayed() {
+        scenario.onActivity {
+            fabHandler.setFabItems(
+                it,
+                FabHandler.FabOption.ADD_SHOP,
+                FabHandler.FabOption.ADD_PRODUCT
+            )
+        }
+
+        onView(withId(R.id.fab)).perform(click())
+
+        onView(withId(R.id.fab)).check(matches(isDisplayed()))
+        onView(withId(R.id.fab_add_shop)).check(matches(isDisplayed()))
+        onView(withId(R.id.fab_add_aisle)).check(matches(not(isDisplayed())))
+        onView(withId(R.id.fab_add_product)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun reset_IsCalled_ResetFab() = runTest {
+        scenario.onActivity {
+            setAllFabItems(it)
+        }
+
+        val fab = onView(withId(R.id.fab))
+        fab.perform(click())
+
+        scenario.onActivity {
+            fabHandler.reset()
+        }
+
+        fab.check(matches(isDisplayed()))
+        scenario.onActivity {
+            val fab = it.findViewById<FloatingActionButton>(R.id.fab)
+            assertEquals(0f, fab.rotation)
+        }
+    }
+
+    /**
+     * Test:
+     * * hideFabViews
+     * * reset (How)?
+     */
 }

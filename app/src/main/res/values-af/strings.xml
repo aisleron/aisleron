@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <!--
   ~ Copyright (C) 2026 aisleron.com
   ~
@@ -29,6 +30,7 @@
     <string name="menu_all_shops">Alle Winkels</string>
     <string name="menu_shops">Winkels</string>
     <string name="menu_about">Oor</string>
+    <string name="menu_all_lists">Alle lyste</string>
     <string name="home">Tuis</string>
     <string name="display_options_header">Vertoonopsies</string>
     <string name="show_on_lock_screen">Wys op sluitskerm</string>
@@ -61,7 +63,7 @@
     <string name="pure_black_first_class">Eersteklas</string>
     <string name="generic_error">FOUT: %1$s</string>
     <string name="delete_default_aisle_exception">FOUT: Verstekgang kan nie verwyder word nie</string>
-    <string name="duplicate_product_name_exception">FOUT: Produ Naam moet uniek wees</string>
+    <string name="duplicate_product_name_exception">FOUT: Produk Naam moet uniek wees</string>
     <string name="duplicate_location_name_exception">FOUT: Pleknaam moet uniek wees</string>
     <string name="duplicate_aisle_name_exception">FOUT: Gangnaam moet uniek wees per lys</string>
     <string name="invalid_location_exception">FOUT: Ongeldige Plek-ID verskaf</string>
@@ -71,9 +73,10 @@
     <string name="invalid_db_restore_file_exception">FOUT: Ongeldige herstelbron</string>
     <string name="duplicate_product_exception">FOUT: Kan nie \'n duplikaat van \'n bestaande produk byvoeg nie</string>
     <string name="duplicate_location_exception">FOUT: Kan nie \'n duplikaat van \'n bestaande plek byvoeg nie</string>
-    <string name="sample_data_creation_exception">FOUT: Kan nie voorbeeldata in \'n bestaande databasis laai nie</string>
+    <string name="sample_data_creation_exception">FOUT: Kan nie voorbeelddata in \'n bestaande databasis laai nie</string>
     <string name="loyalty_card_provider_missing_exception">FOUT: Lojaliteitskaartverskaffer nie geïnstalleer of aktiwiteit nie gevind nie</string>
-    <string name="aisle_move_exception">FOUT: Gangskuif moet binne dieselfde Plek wees.</string>
+    <string name="aisle_move_exception">FOUT: Gangskuif moet binne dieselfde Plek wees</string>
+    <string name="loyalty_card_not_found_exception">FOUT: Lojaliteitskaart nie gevind nie</string>
     <string name="about_support_header">Ondersteuning</string>
     <string name="about_legal_header">Lisensies en Beleide</string>
     <string name="about_support_version_title">Weergawe-geskiedenis</string>
@@ -207,4 +210,5 @@
     <string name="about_contribute_translate_summary">Help om Aisleron in meer tale beskikbaar te stel</string>
     <string name="about_contribute_donate_title">Skenk</string>
     <string name="about_contribute_donate_summary">Dra finansieel by tot Aisleron</string>
+    <string name="show_location_list">Wys %1$s</string>
 </resources>

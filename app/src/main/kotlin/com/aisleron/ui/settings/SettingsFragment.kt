@@ -42,6 +42,7 @@ import androidx.preference.PreferenceFragmentCompat
 import com.aisleron.R
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.base.AisleronException
+import com.aisleron.domain.location.LocationType
 import com.aisleron.ui.AisleronExceptionMap
 import com.aisleron.ui.AisleronFragment
 import com.aisleron.ui.widgets.ErrorSnackBar
@@ -162,28 +163,7 @@ class SettingsFragment : PreferenceFragmentCompat(), AisleronFragment {
                     when (it) {
                         SettingsViewModel.UiState.Empty -> Unit
                         is SettingsViewModel.UiState.LocationListUpdated -> {
-                            val pageNames = mutableListOf(
-                                getString(R.string.menu_in_stock),
-                                getString(R.string.menu_needed),
-                                getString(R.string.menu_all_items)
-                            )
-
-                            val pageValues = mutableListOf(
-                                "${it.homeLocationId}|${FilterType.IN_STOCK.name}",
-                                "${it.homeLocationId}|${FilterType.NEEDED.name}",
-                                "${it.homeLocationId}|${FilterType.ALL.name}",
-                            )
-
-                            pageNames += it.locationOptions.map { option -> option.name }
-                            pageValues += it.locationOptions.map { option -> "${option.id}|${option.filterType.name}" }
-
-                            val startLocationPref =
-                                findPreference<ListPreference>("starting_list")!!
-
-                            startLocationPref.entries = pageNames.toTypedArray()
-                            startLocationPref.entryValues = pageValues.toTypedArray()
-                            startLocationPref.summaryProvider =
-                                ListPreference.SimpleSummaryProvider.getInstance()
+                            prepareStartingListOption(it.homeLocationId, it.locationOptions)
                         }
 
                         is SettingsViewModel.UiState.Processing -> {
@@ -202,6 +182,40 @@ class SettingsFragment : PreferenceFragmentCompat(), AisleronFragment {
                 }
             }
         }
+    }
+
+    private fun startingListValueBuilder(
+        locationId: Int?, productFilter: FilterType, locationType: LocationType?
+    ): String = "${locationId ?: ""}|${productFilter.name}|${locationType?.name ?: ""}"
+
+    private fun prepareStartingListOption(
+        homeLocationId: Int, locationOptions: List<StartLocationOption>
+    ) {
+        val pageNames = mutableListOf(
+            getString(R.string.menu_in_stock),
+            getString(R.string.menu_needed),
+            getString(R.string.menu_all_items)
+        )
+
+        val pageValues = mutableListOf(
+            startingListValueBuilder(homeLocationId, FilterType.IN_STOCK, null),
+            startingListValueBuilder(homeLocationId, FilterType.NEEDED, null),
+            startingListValueBuilder(homeLocationId, FilterType.ALL, null)
+        )
+
+        pageNames += locationOptions.map { option -> option.name }
+        pageValues += locationOptions.map { option ->
+            startingListValueBuilder(option.id, option.filterType, null)
+        }
+
+        pageNames += getString(R.string.menu_all_shops)
+        pageValues += startingListValueBuilder(null, FilterType.NEEDED, LocationType.SHOP)
+
+        val startLocationPref = findPreference<ListPreference>("starting_list")!!
+        startLocationPref.entries = pageNames.toTypedArray()
+        startLocationPref.entryValues = pageValues.toTypedArray()
+        startLocationPref.summaryProvider =
+            ListPreference.SimpleSummaryProvider.getInstance()
     }
 
     private fun selectBackupFolder(

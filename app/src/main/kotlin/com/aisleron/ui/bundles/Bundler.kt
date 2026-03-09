@@ -25,6 +25,7 @@ import com.aisleron.domain.location.LocationType
 import com.aisleron.ui.aisle.AisleDialogFragment
 import com.aisleron.ui.copyentity.CopyEntityType
 import com.aisleron.ui.note.NoteParentRef
+import com.aisleron.ui.shoppinglist.ShoppingListGrouping
 
 class Bundler {
 
@@ -102,7 +103,16 @@ class Bundler {
     fun makeShoppingListBundle(locationId: Int, filterType: FilterType): Bundle {
         val shoppingListBundle = ShoppingListBundle(
             locationId = locationId,
-            filterType = filterType
+            filterType = filterType,
+            locationType = null
+        )
+        return makeShoppingListBundle(shoppingListBundle)
+    }
+
+    fun makeShoppingListBundle(filterType: FilterType, listGrouping: ShoppingListGrouping): Bundle {
+        val shoppingListBundle = ShoppingListBundle(
+            filterType = filterType,
+            listGrouping = listGrouping
         )
         return makeShoppingListBundle(shoppingListBundle)
     }
@@ -118,8 +128,8 @@ class Bundler {
                 } else {
                     @Suppress("DEPRECATION")
                     bundle?.getSerializable(ARG_FILTER_TYPE) as FilterType?
-                }
-            result = ShoppingListBundle(locationId, filterType)
+                } ?: FilterType.IN_STOCK
+            result = ShoppingListBundle(locationId, filterType, null)
         }
         return result
     }

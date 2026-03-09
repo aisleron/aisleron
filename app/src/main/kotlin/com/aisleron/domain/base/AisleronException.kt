@@ -64,6 +64,9 @@ sealed class AisleronException(
     class InvalidLoyaltyCardException(message: String? = null, cause: Throwable? = null) :
         AisleronException(ExceptionCode.INVALID_LOYALTY_CARD_EXCEPTION, message, cause)
 
+    class LoyaltyCardNotFoundException(message: String? = null, cause: Throwable? = null) :
+        AisleronException(ExceptionCode.LOYALTY_CARD_NOT_FOUND_EXCEPTION, message, cause)
+
     class AisleMoveException(message: String? = null, cause: Throwable? = null) :
         AisleronException(ExceptionCode.AISLE_MOVE_EXCEPTION, message, cause)
 
@@ -82,6 +85,7 @@ sealed class AisleronException(
         SAMPLE_DATA_CREATION_EXCEPTION,
         LOYALTY_CARD_PROVIDER_EXCEPTION,
         INVALID_LOYALTY_CARD_EXCEPTION,
+        LOYALTY_CARD_NOT_FOUND_EXCEPTION,
         INVALID_PRODUCT_EXCEPTION,
         AISLE_MOVE_EXCEPTION
     }

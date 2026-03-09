@@ -21,6 +21,7 @@ import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.aisleron.domain.FilterType
+import com.aisleron.domain.location.LocationType
 
 class SharedPreferencesInitializer {
 
@@ -100,8 +101,8 @@ class SharedPreferencesInitializer {
         setPreferenceValue(PREF_KEEP_SCREEN_ON, keepScreenOn)
     }
 
-    fun setStartingList(locationId: Int, filterType: FilterType) {
-        setStartingList("${locationId}|${filterType.name}")
+    fun setStartingList(locationId: Int?, filterType: FilterType, locationType: LocationType?) {
+        setStartingList("${locationId ?: ""}|${filterType.name}|${locationType?.name ?: ""}")
     }
 
     fun setStartingList(value: String) {

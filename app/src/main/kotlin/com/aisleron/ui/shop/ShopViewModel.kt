@@ -24,6 +24,7 @@ import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.location.usecase.AddLocationUseCase
+import com.aisleron.domain.location.usecase.GetLocationMaxRankUseCase
 import com.aisleron.domain.location.usecase.UpdateLocationUseCase
 import com.aisleron.domain.loyaltycard.LoyaltyCard
 import com.aisleron.domain.loyaltycard.usecase.AddLoyaltyCardToLocationUseCase
@@ -52,6 +53,7 @@ class ShopViewModel(
     private val getLoyaltyCardForLocationUseCase: GetLoyaltyCardForLocationUseCase,
     private val getNoteParentUseCase: GetNoteParentUseCase,
     private val applyNoteChangesUseCase: ApplyNoteChangesUseCase,
+    private val getLocationMaxRankUseCase: GetLocationMaxRankUseCase,
     coroutineScopeProvider: CoroutineScope? = null
 ) : ViewModel(), NoteViewModel {
     private var _location: Location? = null
@@ -199,7 +201,9 @@ class ShopViewModel(
                 name = name,
                 pinned = pinned,
                 aisles = emptyList(),
-                showDefaultAisle = showDefaultAisle
+                showDefaultAisle = showDefaultAisle,
+                expanded = true,
+                rank = getLocationMaxRankUseCase() + 1
             )
         )
     }

@@ -20,11 +20,10 @@ package com.aisleron.domain.location.usecase
 import com.aisleron.di.TestDependencyManager
 import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.aisle.AisleRepository
-import com.aisleron.domain.aisle.usecase.AddAisleUseCaseImpl
-import com.aisleron.domain.aisle.usecase.IsAisleNameUniqueUseCase
+import com.aisleron.domain.aisle.usecase.AddAisleUseCase
 import com.aisleron.domain.location.LocationRepository
-import com.aisleron.domain.product.Product
 import com.aisleron.domain.preferences.TrackingMode
+import com.aisleron.domain.product.Product
 import com.aisleron.domain.product.usecase.AddProductUseCase
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -35,23 +34,19 @@ import org.junit.jupiter.api.Test
 class SortLocationByNameUseCaseImplTest {
     private lateinit var dm: TestDependencyManager
     private lateinit var sortLocationByNameUseCase: SortLocationByNameUseCase
+    private lateinit var locationRepository: LocationRepository
 
     @BeforeEach
     fun setUp() {
         dm = TestDependencyManager()
         sortLocationByNameUseCase = dm.getUseCase()
+        locationRepository = dm.getRepository()
     }
 
     @Test
     fun sortLocationByName_WithAisles_AislesSorted() = runTest {
-        val locationRepository = dm.getRepository<LocationRepository>()
-        val aisleRepository = dm.getRepository<AisleRepository>()
         val locationId = locationRepository.getShops().first().first().id
-        val addAisleUseCase = AddAisleUseCaseImpl(
-            aisleRepository,
-            GetLocationUseCase(locationRepository),
-            IsAisleNameUniqueUseCase(aisleRepository)
-        )
+        val addAisleUseCase = dm.getUseCase<AddAisleUseCase>()
 
         val aisle = Aisle(
             name = "ZZZ",
@@ -68,8 +63,7 @@ class SortLocationByNameUseCaseImplTest {
 
         sortLocationByNameUseCase(locationId)
 
-        val aisles =
-            locationRepository.getLocationWithAislesWithProducts(locationId).first()!!.aisles
+        val aisles = dm.getRepository<AisleRepository>().getForLocation(locationId)
 
         assertEquals(1, aisles.first { it.name == "AAA" }.rank)
         assertEquals(aisles.maxOf { it.rank } - 1, aisles.first { it.name == "ZZZ" }.rank)
@@ -78,7 +72,6 @@ class SortLocationByNameUseCaseImplTest {
 
     @Test
     fun sortLocationByName_WithProducts_ProductsSorted() = runTest {
-        val locationRepository = dm.getRepository<LocationRepository>()
         val locationId = locationRepository.getShops().first().first().id
         val addProductUseCase = dm.getUseCase<AddProductUseCase>()
 

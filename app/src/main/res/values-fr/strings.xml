@@ -106,6 +106,7 @@
     <string name="db_restore_processing">Restauration en cours…</string>
     <string name="welcome_import_db"><h3>Importez une base de données existante</h3> Importez une liste de courses à partir d\'une sauvegarde antérieure dans la page Paramètres</string>
     <string name="menu_all_shops">Tous les magasins</string>
+    <string name="menu_all_lists">Toutes les listes</string>
     <string name="display_options_header">Options d\'affichage</string>
     <string name="dark_theme">Thème sombre</string>
     <string name="invalid_db_name_exception">ERREUR : Impossible de déterminer le nom de la base de données</string>
@@ -116,7 +117,8 @@
     <string name="duplicate_aisle_name_exception">ERREUR : le nom de l’allée doit être unique par liste</string>
     <string name="invalid_product_exception">ERREUR : identifiant de produit non valide fourni</string>
     <string name="loyalty_card_provider_missing_exception">ERREUR : fournisseur de carte de fidélité non installé ou activité introuvable</string>
-    <string name="aisle_move_exception">ERREUR : Le déplacement du rayon doit se faire à l\'intérieur du même emplacement.</string>
+    <string name="aisle_move_exception">ERREUR : Le déplacement du rayon doit se faire à l\'intérieur du même emplacement</string>
+    <string name="loyalty_card_not_found_exception">ERREUR : Carte de fidélité non trouvée</string>
     <string name="empty_list_title">Cette liste est actuellement vide</string>
     <string name="empty_list_description">Cela pourrait être parce que :</string>
     <string name="empty_list_reasons">- Aucun article n’est nécessaire pour le moment \n- Aucun produit ou rayon n’a encore été ajouté \n- Les éléments existent mais ne sont pas assignés à une allée visible</string>
@@ -199,4 +201,5 @@
     <string name="about_contribute_translate_summary">Aidez-nous à rendre Aisleron disponible dans plus de langues</string>
     <string name="about_contribute_donate_title">Faire un don</string>
     <string name="about_contribute_donate_summary">Contribuer financièrement à Aisleron</string>
+    <string name="show_location_list">Afficher %1$s</string>
 </resources>

@@ -22,10 +22,10 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:longClickable="true"
-    android:background="@drawable/aisle_list_item_selector">
+    android:background="@drawable/header_list_item_selector">
 
     <TextView
-        android:id="@+id/txt_aisle_name"
+        android:id="@+id/txt_header_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/aisle"

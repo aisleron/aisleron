@@ -20,16 +20,14 @@ package com.aisleron.domain.aisle.usecase
 import com.aisleron.domain.aisle.AisleRepository
 
 interface ExpandCollapseAislesForLocationUseCase {
-    suspend operator fun invoke(locationId: Int)
+    suspend operator fun invoke(locationId: Int, expand: Boolean)
 }
 
 class ExpandCollapseAislesForLocationUseCaseImpl(
     private val aisleRepository: AisleRepository
 ) : ExpandCollapseAislesForLocationUseCase {
-    override suspend operator fun invoke(locationId: Int) {
+    override suspend operator fun invoke(locationId: Int, expand: Boolean) {
         val aisles = aisleRepository.getForLocation(locationId)
-        val expand = aisles.none { it.expanded }
-
         val updatedAisles = aisles.filter { it.expanded != expand }
             .map { it.copy(expanded = expand) }
 

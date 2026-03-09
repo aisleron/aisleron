@@ -37,20 +37,7 @@ import org.koin.dsl.module
 val viewModelTestModule = module {
     viewModel {
         ShoppingListViewModel(
-            getShoppingListUseCase = get(),
-            updateProductStatusUseCase = get(),
-            updateAisleProductRankUseCase = get(),
-            updateAisleRankUseCase = get(),
-            removeAisleUseCase = get(),
-            removeProductUseCase = get(),
-            getAisleUseCase = get(),
-            updateAisleExpandedUseCase = get(),
-            sortLocationByNameUseCase = get(),
-            getLoyaltyCardForLocationUseCase = get(),
-            updateProductQtyNeededUseCase = get(),
-            expandCollapseAislesForLocationUseCase = get(),
-            getAislesForLocationUseCase = get(),
-            changeProductAisleUseCase = get(),
+            shoppingListStreamProviderFactory = get(),
             debounceTime = 0,
             TestScope(UnconfinedTestDispatcher())
         )
@@ -66,6 +53,7 @@ val viewModelTestModule = module {
             getLoyaltyCardForLocationUseCase = get(),
             getNoteParentUseCase = get(),
             applyNoteChangesUseCase = get(),
+            getLocationMaxRankUseCase = get(),
             TestScope(UnconfinedTestDispatcher())
         )
     }

@@ -29,7 +29,9 @@ class LocationMapper : MapperBaseImpl<LocationEntity, Location>() {
         pinned = value.pinned,
         aisles = emptyList(),
         showDefaultAisle = value.showDefaultAisle,
-        noteId = value.noteId
+        noteId = value.noteId,
+        expanded = value.expanded,
+        rank = value.rank
     )
 
     override fun fromModel(value: Location) = LocationEntity(
@@ -39,6 +41,8 @@ class LocationMapper : MapperBaseImpl<LocationEntity, Location>() {
         pinned = value.pinned,
         type = value.type,
         showDefaultAisle = value.showDefaultAisle,
-        noteId = value.noteId
+        noteId = value.noteId,
+        expanded = value.expanded,
+        rank = value.rank
     )
 }

@@ -57,15 +57,21 @@ import com.aisleron.R
 import com.aisleron.SharedPreferencesInitializer
 import com.aisleron.di.KoinTestRule
 import com.aisleron.di.daoTestModule
+import com.aisleron.di.factoryModule
 import com.aisleron.di.fragmentModule
 import com.aisleron.di.generalTestModule
 import com.aisleron.di.preferenceTestModule
 import com.aisleron.di.repositoryModule
 import com.aisleron.di.useCaseModule
 import com.aisleron.di.viewModelTestModule
+import com.aisleron.domain.FilterType
 import com.aisleron.domain.backup.DatabaseMaintenance
+import com.aisleron.domain.location.LocationRepository
+import com.aisleron.domain.location.LocationType
+import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import com.aisleron.testdata.data.maintenance.DatabaseMaintenanceDbNameTestImpl
 import com.aisleron.utils.SystemIds
+import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.allOf
 import org.hamcrest.CoreMatchers.startsWith
 import org.hamcrest.Matchers
@@ -74,6 +80,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.koin.test.KoinTest
+import org.koin.test.get
 import org.koin.test.mock.declare
 import java.util.Calendar
 import java.util.Locale
@@ -93,7 +100,8 @@ class SettingsFragmentTest : KoinTest {
             useCaseModule,
             viewModelTestModule,
             generalTestModule,
-            preferenceTestModule
+            preferenceTestModule,
+            factoryModule
         )
     )
 
@@ -453,6 +461,50 @@ class SettingsFragmentTest : KoinTest {
             }
 
             scenario.close()
+        }
+    }
+
+    private fun startingListChange_ArrangeActAssert(
+        scenario: FragmentScenario<SettingsFragment>, optionText: String, expectedResult: String
+    ) {
+        var themePreference: ListPreference? = null
+        scenario.onFragment { fragment ->
+            themePreference = fragment.findPreference("starting_list")
+        }
+
+        clickOption(R.string.starting_list)
+        onView(withText(optionText)).inRoot(isDialog()).perform(click())
+
+        assertEquals(optionText, themePreference?.summary)
+        assertEquals(expectedResult, themePreference?.value)
+    }
+
+    @Test
+    fun startingList_SelectValue_PreferenceUpdated() = runTest {
+        get<CreateSampleDataUseCase>().invoke()
+        val shop =
+            get<LocationRepository>().getAll().first { it.type == LocationType.SHOP && it.pinned }
+
+        val context = getInstrumentation().targetContext
+        val startListOptions = listOf(
+            Pair(context.getString(R.string.menu_in_stock), "1|${FilterType.IN_STOCK.name}|"),
+            Pair(context.getString(R.string.menu_needed), "1|${FilterType.NEEDED.name}|"),
+            Pair(context.getString(R.string.menu_all_items), "1|${FilterType.ALL.name}|"),
+            Pair(shop.name, "${shop.id}|${shop.defaultFilter.name}|"),
+            Pair(
+                context.getString(R.string.menu_all_shops),
+                "|${FilterType.NEEDED.name}|${LocationType.SHOP}"
+            )
+        )
+
+        getFragmentScenario().use { scenario ->
+            startListOptions.forEach { (option, expectedResult) ->
+                try {
+                    startingListChange_ArrangeActAssert(scenario, option, expectedResult)
+                } catch (e: Exception) {
+                    throw AssertionError("Failed to set starting list to $option", e)
+                }
+            }
         }
     }
 }

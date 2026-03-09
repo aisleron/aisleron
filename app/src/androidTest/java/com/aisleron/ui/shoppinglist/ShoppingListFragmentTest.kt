@@ -63,6 +63,7 @@ import com.aisleron.AppCompatActivityTestImpl
 import com.aisleron.R
 import com.aisleron.di.KoinTestRule
 import com.aisleron.di.daoTestModule
+import com.aisleron.di.factoryModule
 import com.aisleron.di.generalTestModule
 import com.aisleron.di.repositoryModule
 import com.aisleron.di.useCaseModule
@@ -131,7 +132,8 @@ class ShoppingListFragmentTest : KoinTest {
             viewModelTestModule,
             repositoryModule,
             useCaseModule,
-            generalTestModule
+            generalTestModule,
+            factoryModule
         )
     )
 
@@ -287,13 +289,40 @@ class ShoppingListFragmentTest : KoinTest {
             name = "No Aisle Shop",
             pinned = false,
             aisles = emptyList(),
-            showDefaultAisle = false
+            showDefaultAisle = false,
+            expanded = true,
+            rank = get<LocationRepository>().getMaxRank() + 1
         )
 
         val locationId = get<LocationRepository>().add(location)
         getFragmentScenario(bundler.makeShoppingListBundle(locationId, location.defaultFilter))
 
         onView(withText(R.string.empty_list_title)).check(matches(isDisplayed()))
+    }
+
+    private fun validateFabMenuItems(
+        fabItems: List<FabHandler.FabOption>,
+        showAddShop: Boolean = true,
+        showAddAisle: Boolean = true,
+        showAddProduct: Boolean = true
+    ) {
+        assertEquals(fabItems.contains(FabHandler.FabOption.ADD_SHOP), showAddShop)
+        assertEquals(fabItems.contains(FabHandler.FabOption.ADD_AISLE), showAddAisle)
+        assertEquals(fabItems.contains(FabHandler.FabOption.ADD_PRODUCT), showAddProduct)
+    }
+
+    @Test
+    fun onCreateShoppingListFragment_IsAisleGrouping_ShowAllFab() = runTest {
+        val location = getLocation(LocationType.SHOP)
+        val bundle = bundler.makeShoppingListBundle(location.id, location.defaultFilter)
+        getFragmentScenario(bundle)
+        validateFabMenuItems(fabHandler.getFabItems())
+    }
+
+    @Test
+    fun onCreateShoppingListFragment_IsLocationGrouping_HideAddAisleFab() = runTest {
+        getFragmentScenario(shopListGroupingBundle())
+        validateFabMenuItems(fabHandler.getFabItems(), showAddAisle = false)
     }
 
     private suspend fun getShoppingList(locationId: Int? = null): Location {
@@ -319,10 +348,12 @@ class ShoppingListFragmentTest : KoinTest {
         actionModeTitle: String,
         showAddProductToAisle: Boolean = false,
         showEditShoppingListItem: Boolean = false,
-        showProductNote: Boolean = false,
+        showNote: Boolean = false,
         showAislePicker: Boolean = false,
         showDelete: Boolean = false,
-        showCopy: Boolean = false
+        showCopy: Boolean = false,
+        showLoyaltyCard: Boolean = false,
+        showLocationList: Boolean = false
     ) {
         val actionBar = onContextualActionBar()
         actionBar.check(matches(isDisplayed()))
@@ -335,12 +366,15 @@ class ShoppingListFragmentTest : KoinTest {
             )
         )
 
-        actionBar.check(validateToolbarItem(R.id.mnu_product_note, showProductNote))
+        actionBar.check(validateToolbarItem(R.id.mnu_show_note, showNote))
         actionBar.check(validateToolbarItem(R.id.mnu_aisle_picker, showAislePicker))
+        actionBar.check(validateToolbarItem(R.id.mnu_show_loyalty_card, showLoyaltyCard))
 
         openActionBarOverflowOrOptionsMenu(getInstrumentation().targetContext)
         onView(withText(R.string.delete)).check(validateOverflowItem(showDelete))
         onView(withText(android.R.string.copy)).check(validateOverflowItem(showCopy))
+
+        onView(withText(containsString("Show "))).check(validateOverflowItem(showLocationList))
     }
 
     @Test
@@ -363,7 +397,7 @@ class ShoppingListFragmentTest : KoinTest {
     }
 
     @Test
-    fun onLongClick_IsProduct_ShowProductActionModeContextMenu() = runTest {
+    fun onLongClick_IsProductOnAisleGrouping_ShowProductActionModeContextMenu() = runTest {
         val shoppingList = getShoppingList()
         getActivityScenario(
             bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
@@ -376,10 +410,78 @@ class ShoppingListFragmentTest : KoinTest {
         validateActionModeMenuItems(
             actionModeTitle = product.name,
             showEditShoppingListItem = true,
-            showProductNote = true,
+            showNote = true,
             showAislePicker = true,
             showCopy = true,
             showDelete = true
+        )
+    }
+
+    private fun shopListGroupingBundle() =
+        bundler.makeShoppingListBundle(
+            FilterType.NEEDED, ShoppingListGrouping.LocationGrouping(LocationType.SHOP)
+        )
+
+    @Test
+    fun onLongClick_IsProductOnLocationGrouping_ShowProductActionModeContextMenu() = runTest {
+        val shoppingList = getShoppingList()
+        getActivityScenario(
+            shopListGroupingBundle()
+        )
+
+        val product = getProduct(shoppingList, false)
+
+        onView(withText(product.name)).perform(longClick())
+
+        validateActionModeMenuItems(
+            actionModeTitle = product.name,
+            showEditShoppingListItem = true,
+            showNote = true,
+            showAislePicker = false,
+            showCopy = true,
+            showDelete = true
+        )
+    }
+
+    @Test
+    fun onLongClick_IsLocation_ShowLocationActionModeContextMenu() = runTest {
+        val location = getLocation(LocationType.SHOP)
+        getActivityScenario(
+            shopListGroupingBundle()
+        )
+
+        onView(withText(location.name)).perform(longClick())
+
+        validateActionModeMenuItems(
+            actionModeTitle = location.name,
+            showEditShoppingListItem = true,
+            showNote = true,
+            showAislePicker = false,
+            showCopy = true,
+            showDelete = true,
+            showLoyaltyCard = false,
+            showLocationList = true
+        )
+    }
+
+    @Test
+    fun onLongClick_LocationHasLoyaltyCard_ShowLocationActionModeContextMenu() = runTest {
+        val shoppingList = getShoppingListWithLoyaltyCard()
+        getActivityScenario(
+            shopListGroupingBundle()
+        )
+
+        onView(withText(shoppingList.name)).perform(longClick())
+
+        validateActionModeMenuItems(
+            actionModeTitle = shoppingList.name,
+            showEditShoppingListItem = true,
+            showNote = true,
+            showAislePicker = false,
+            showCopy = true,
+            showDelete = true,
+            showLoyaltyCard = true,
+            showLocationList = true
         )
     }
 
@@ -529,7 +631,7 @@ class ShoppingListFragmentTest : KoinTest {
         val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
 
         val scenario = getActivityScenario(bundle)
-        val aisleItem = onView(allOf(withText(aisle.name), withId(R.id.txt_aisle_name)))
+        val aisleItem = onView(allOf(withText(aisle.name), withId(R.id.txt_header_name)))
         aisleItem.perform(longClick())
         openActionBarOverflowOrOptionsMenu(getInstrumentation().targetContext)
         onView(withText(R.string.delete)).perform(click())
@@ -555,7 +657,7 @@ class ShoppingListFragmentTest : KoinTest {
         preferences.setShowEmptyAisles(true)
         getActivityScenario(bundle, preferences)
 
-        val aisleItem = onView(allOf(withText(aisle.name), withId(R.id.txt_aisle_name)))
+        val aisleItem = onView(allOf(withText(aisle.name), withId(R.id.txt_header_name)))
         aisleItem.perform(longClick())
         openActionBarOverflowOrOptionsMenu(getInstrumentation().targetContext)
         onView(withText(R.string.delete)).perform(click())
@@ -588,7 +690,7 @@ class ShoppingListFragmentTest : KoinTest {
         val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
 
         val scenario = getActivityScenario(bundle)
-        val aisleItem = onView(allOf(withText(aisle.name), withId(R.id.txt_aisle_name)))
+        val aisleItem = onView(allOf(withText(aisle.name), withId(R.id.txt_header_name)))
         aisleItem.perform(longClick())
         openActionBarOverflowOrOptionsMenu(getInstrumentation().targetContext)
         onView(withText(R.string.delete)).perform(click())
@@ -716,7 +818,7 @@ class ShoppingListFragmentTest : KoinTest {
 
         getActivityScenario(shoppingListBundle)
 
-        val aisleItem = onView(allOf(withText(aisle.name), withId(R.id.txt_aisle_name)))
+        val aisleItem = onView(allOf(withText(aisle.name), withId(R.id.txt_header_name)))
         aisleItem.perform(longClick())
         onView(withId(R.id.mnu_edit_shopping_list_item)).perform(click())
 
@@ -881,7 +983,7 @@ class ShoppingListFragmentTest : KoinTest {
 
         val productItem = onView(allOf(withText(product.name), withId(R.id.txt_product_name)))
         productItem.perform(longClick())
-        val aisleItem = onView(allOf(withText(aisle.name), withId(R.id.txt_aisle_name)))
+        val aisleItem = onView(allOf(withText(aisle.name), withId(R.id.txt_header_name)))
         aisleItem.perform(click())
 
         productItem.check(matches((isSelected())))
@@ -972,7 +1074,7 @@ class ShoppingListFragmentTest : KoinTest {
 
         val productItem = onView(allOf(withText(product.name), withId(R.id.txt_product_name)))
         productItem.perform(longClick())
-        val aisleItem = onView(allOf(withText(aisle.name), withId(R.id.txt_aisle_name)))
+        val aisleItem = onView(allOf(withText(aisle.name), withId(R.id.txt_header_name)))
         aisleItem.perform(longClick())
 
         val actionBar = onContextualActionBar()
@@ -1124,7 +1226,7 @@ class ShoppingListFragmentTest : KoinTest {
     }
 
     @Test
-    fun onMenuItemSelected_ItemIsShowLoyaltyCardAndNoLoyaltyCard_LoyaltyCardNotShown() = runTest {
+    fun onMenuItemSelected_ItemIsShowLoyaltyCardAndNoLoyaltyCard_ShowErrorSnackbar() = runTest {
         val shoppingList = getShoppingList()
         val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
         val menuItem = getMenuItem(R.id.mnu_show_loyalty_card)
@@ -1135,6 +1237,10 @@ class ShoppingListFragmentTest : KoinTest {
         ).onFragment { fragment ->
             fragment.onMenuItemSelected(menuItem)
         }
+
+        val snackbar = onView(withId(SystemIds.SNACKBAR_TEXT))
+        snackbar.checkVisibility(View.VISIBLE)
+        snackbar.check(matches(withText(R.string.loyalty_card_not_found_exception)))
 
         assertFalse { loyaltyCardProvider.loyaltyCardDisplayed }
     }
@@ -1171,13 +1277,9 @@ class ShoppingListFragmentTest : KoinTest {
             fragment.onMenuItemSelected(menuItem)
         }
 
-        onView(withId(SystemIds.SNACKBAR_TEXT)).check(
-            matches(
-                ViewMatchers.withEffectiveVisibility(
-                    ViewMatchers.Visibility.VISIBLE
-                )
-            )
-        )
+        val snackbar = onView(withId(SystemIds.SNACKBAR_TEXT))
+        snackbar.checkVisibility(View.VISIBLE)
+        snackbar.check(matches(withText(containsString(loyaltyCardProvider.exceptionMessage))))
     }
 
     private fun ViewInteraction.checkVisibility(
@@ -1555,7 +1657,7 @@ class ShoppingListFragmentTest : KoinTest {
         val productItem = onView(allOf(withText(product.name), withId(R.id.txt_product_name)))
         productItem.perform(longClick())
 
-        onView(withId(R.id.mnu_product_note)).perform(click())
+        onView(withId(R.id.mnu_show_note)).perform(click())
 
         onView(withText(showNoteDialogTitle))
             .inRoot(isDialog())
@@ -1575,7 +1677,7 @@ class ShoppingListFragmentTest : KoinTest {
         }
 
         onView(withText(product.name)).perform(longClick())
-        onView(withId(R.id.mnu_product_note)).perform(click())
+        onView(withId(R.id.mnu_show_note)).perform(click())
 
         onView(withText(buttonResId))
             .inRoot(isDialog())
@@ -1613,6 +1715,49 @@ class ShoppingListFragmentTest : KoinTest {
         onView(withText(product.name))
             .inRoot(isDialog())
             .check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun onActionItemClicked_ItemIsShowLoyaltyCardAndHasLoyaltyCard_ShowLoyaltyCard() = runTest {
+        val shoppingList = getShoppingListWithLoyaltyCard()
+
+        val bundle = shopListGroupingBundle()
+        val loyaltyCardProvider = LoyaltyCardProviderTestImpl()
+        getActivityScenario(bundle, loyaltyCardProvider = loyaltyCardProvider)
+
+        onView(withText(shoppingList.name)).perform(longClick())
+        onView(withId(R.id.mnu_show_loyalty_card)).perform(click())
+
+        assertTrue { loyaltyCardProvider.loyaltyCardDisplayed }
+    }
+
+    @Test
+    fun onActionItemClicked_ItemIsShowLLocationList_ShowLocationShoppingList() = runTest {
+        val shoppingListBundle = shopListGroupingBundle()
+
+        val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
+        val scenario = getActivityScenario(shoppingListBundle)
+        scenario.onActivity {
+            navController.setGraph(R.navigation.mobile_navigation)
+            navController.setCurrentDestination(R.id.nav_shopping_list)
+            Navigation.setViewNavController(activityFragment.requireView(), navController)
+        }
+
+        val location = getLocation(LocationType.SHOP)
+        val buttonName = getInstrumentation().targetContext.getString(
+            R.string.show_location_list, location.name
+        )
+
+        onView(withText(location.name)).perform(longClick())
+        openActionBarOverflowOrOptionsMenu(getInstrumentation().targetContext)
+        onView(withText(buttonName)).perform(click())
+
+        val bundle = navController.backStack.last().arguments
+        val resultBundle = bundler.getShoppingListBundle(bundle)
+        assertTrue(resultBundle.listGrouping is ShoppingListGrouping.AisleGrouping)
+        assertEquals(location.id, resultBundle.listGrouping.locationId)
+        assertEquals(FilterType.NEEDED, resultBundle.filterType)
+
     }
 
     @Test

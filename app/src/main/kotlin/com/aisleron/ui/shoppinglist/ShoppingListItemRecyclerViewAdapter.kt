@@ -42,8 +42,8 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.aisleron.R
-import com.aisleron.databinding.FragmentAisleListItemBinding
 import com.aisleron.databinding.FragmentEmptyListItemBinding
+import com.aisleron.databinding.FragmentHeaderListItemBinding
 import com.aisleron.databinding.FragmentProductListItemBinding
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.preferences.NoteHint
@@ -73,7 +73,7 @@ class ShoppingListItemRecyclerViewAdapter(
         override fun areItemsTheSame(
             oldItem: ShoppingListItem, newItem: ShoppingListItem
         ): Boolean {
-            return (oldItem.itemType == newItem.itemType && oldItem.id == newItem.id)
+            return oldItem.uniqueId == newItem.uniqueId
         }
 
         override fun areContentsTheSame(
@@ -83,6 +83,9 @@ class ShoppingListItemRecyclerViewAdapter(
         }
 
         override fun getChangePayload(oldItem: ShoppingListItem, newItem: ShoppingListItem): Any? {
+            // Force a full rebind if the rank changes to avoid weird caching issues
+            if (oldItem.rank != newItem.rank) return null
+
             val payload = mutableSetOf<String>()
 
             if (oldItem.selected != newItem.selected) {
@@ -97,8 +100,8 @@ class ShoppingListItemRecyclerViewAdapter(
         val viewItemType = ShoppingListItem.ItemType.entries[viewType]
 
         val newViewHolder = when (viewItemType) {
-            ShoppingListItem.ItemType.AISLE -> AisleViewHolder(
-                FragmentAisleListItemBinding.inflate(
+            ShoppingListItem.ItemType.HEADER -> HeaderViewHolder(
+                FragmentHeaderListItemBinding.inflate(
                     LayoutInflater.from(parent.context), parent, false
                 )
             )
@@ -190,7 +193,7 @@ class ShoppingListItemRecyclerViewAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         when (val item = getItem(position)) {
-            is AisleShoppingListItem -> (holder as AisleViewHolder).bind(item)
+            is HeaderShoppingListItem -> (holder as HeaderViewHolder).bind(item)
             is ProductShoppingListItem -> (holder as ProductListItemViewHolder).bind(item)
         }
     }
@@ -199,13 +202,15 @@ class ShoppingListItemRecyclerViewAdapter(
         return getItem(position).itemType.ordinal
     }
 
-    inner class AisleViewHolder(binding: FragmentAisleListItemBinding) : ViewHolder(binding.root) {
-        private val contentView: TextView = binding.txtAisleName
+    inner class HeaderViewHolder(
+        binding: FragmentHeaderListItemBinding
+    ) : ViewHolder(binding.root) {
+        private val contentView: TextView = binding.txtHeaderName
         private val productCountView: TextView = binding.txtProductCnt
         private val rootView = binding.root
 
         @SuppressLint("ClickableViewAccessibility")
-        fun bind(item: AisleShoppingListItem) {
+        fun bind(item: HeaderShoppingListItem) {
             rootView.isSelected = item.selected
             contentView.text = item.name
             if (item.isDefault) {
@@ -216,7 +221,7 @@ class ShoppingListItemRecyclerViewAdapter(
 
             contentView.setOnClickListener { _ ->
                 if (!listener.hasSelectedItems()) {
-                    listener.onAisleExpandToggle(item, !item.expanded)
+                    listener.onHeaderExpandToggle(item, !item.expanded)
                 } else {
                     itemView.performClick()
                 }
@@ -368,7 +373,7 @@ class ShoppingListItemRecyclerViewAdapter(
         fun onListPositionChanged(item: ShoppingListItem, precedingItem: ShoppingListItem?)
         fun onLongClick(item: ShoppingListItem, view: View): Boolean
         fun onMoved(item: ShoppingListItem)
-        fun onAisleExpandToggle(item: AisleShoppingListItem, expanded: Boolean)
+        fun onHeaderExpandToggle(item: HeaderShoppingListItem, expanded: Boolean)
         fun onDragStart(viewHolder: ViewHolder)
         fun onMove(item: ShoppingListItem)
         fun hasSelectedItems(): Boolean
@@ -403,9 +408,9 @@ class ShoppingListItemRecyclerViewAdapter(
 
         itemMoved = false
 
-        //Collect the aisle details from the row above the moved item; the item above will
-        //always be an aisle or in the same aisle as the item was dropped on.
-        //Maybe there's a better way to do this.
+        // Collect the aisle details from the row above the moved item; the item above will always
+        // be an aisle, location with an aisle, or in the same aisle as the item was dropped on.
+        // Maybe there's a better way to do this.
         val item = getItem(viewHolder.absoluteAdapterPosition)
         var precedingItem: ShoppingListItem? = null
         if (viewHolder.absoluteAdapterPosition > 0) {

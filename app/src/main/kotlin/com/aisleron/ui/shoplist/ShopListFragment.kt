@@ -78,7 +78,7 @@ class ShopListFragment(private val fabHandler: FabHandler) : Fragment(), ActionM
 
     private fun navigateToShoppingList(item: ShopListItemViewModel) {
         val bundle = Bundler().makeShoppingListBundle(item.id, item.defaultFilter)
-        this.findNavController().navigate(R.id.action_nav_all_shops_to_nav_shopping_list, bundle)
+        this.findNavController().navigate(R.id.action_nav_all_lists_to_nav_shopping_list, bundle)
     }
 
     private fun navigateToEditShop(locationId: Int) {

@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.koin.test.get
+import kotlin.collections.first
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -49,13 +50,15 @@ class LocationRepositoryImplTest : RepositoryImplTest<Location>() {
         pinned = false,
         aisles = emptyList(),
         showDefaultAisle = true,
-        defaultFilter = FilterType.NEEDED
+        defaultFilter = FilterType.NEEDED,
+        expanded = true,
+        rank = 1000
     )
 
     override suspend fun getMultipleNewItems(): List<Location> {
         return listOf(
             getSingleNewItem(),
-            getSingleNewItem().copy(name = "New Location 2", pinned = true)
+            getSingleNewItem().copy(name = "New Location 2", pinned = true, rank = 2000)
         )
     }
 
@@ -123,5 +126,80 @@ class LocationRepositoryImplTest : RepositoryImplTest<Location>() {
 
         assertNotNull(location)
         assertEquals(locationName, location.name)
+    }
+
+    @Test
+    fun getMaxRank_ReturnMaxRank() = runTest {
+        addMultipleItems()
+        val expected = locationRepository.getAll().maxOf { it.rank }
+
+        val actual = locationRepository.getMaxRank()
+
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun getLocationWithAislesWithProducts_LocationIdProvided_ReturnSingleLocation() = runTest {
+        addMultipleItems()
+        val locationId = locationRepository.getAll().first { it.type == LocationType.SHOP }.id
+
+        val location = locationRepository.getLocationWithAislesWithProducts(locationId).first()
+
+        assertEquals(locationId, location?.id)
+    }
+
+    @Test
+    fun getLocationWithAislesWithProducts_InvalidLocationIdProvided_NoLocationReturned() = runTest {
+        val location = locationRepository.getLocationWithAislesWithProducts(-1).first()
+
+        assertNull(location)
+    }
+
+    @Test
+    fun getLocationsWithAislesWithProducts_TypeSpecified_MatchesLocationTypeCount() = runTest {
+        addMultipleItems()
+        val shopCount = locationRepository.getAll().count { it.type == LocationType.SHOP }
+
+        val resultCount =
+            locationRepository.getLocationsWithAislesWithProducts(LocationType.SHOP).first().size
+
+        assertEquals(shopCount, resultCount)
+    }
+
+    @Test
+    fun updateLocationRank_NewRankProvided_LocationRankUpdated() = runTest {
+        val existingLocation = locationRepository.getAll().first { it.type == LocationType.SHOP }
+        val updateLocation = existingLocation.copy(rank = 1001)
+
+        locationRepository.updateLocationRank(updateLocation)
+
+        val updatedLocation = locationRepository.get(existingLocation.id)
+        assertEquals(updateLocation, updatedLocation)
+    }
+
+    @Test
+    fun updateLocationRank_LocationRankUpdated_OtherLocationsMoved() = runTest {
+        addMultipleItems()
+        val existingLocation = locationRepository.getAll().first { it.type == LocationType.SHOP }
+        val updateLocation = existingLocation.copy(rank = existingLocation.rank + 1)
+        val maxRankBefore: Int = locationRepository.getAll().maxOf { it.rank }
+
+        locationRepository.updateLocationRank(updateLocation)
+
+        val maxRankAfter: Int = locationRepository.getAll().maxOf { it.rank }
+
+        assertEquals(maxRankBefore + 1, maxRankAfter)
+    }
+
+    @Test
+    fun getByType_TypeIsShop_OnlyShopsReturned() = runTest {
+        addMultipleItems()
+
+        val shops = locationRepository.getByType(LocationType.SHOP)
+
+        val shopCount = locationRepository.getAll().count { it.type == LocationType.SHOP }
+        assertEquals(shopCount, shops.count())
+
+        assertTrue(shops.all { it.type == LocationType.SHOP })
     }
 }

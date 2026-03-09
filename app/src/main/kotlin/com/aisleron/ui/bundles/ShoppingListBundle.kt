@@ -19,15 +19,26 @@ package com.aisleron.ui.bundles
 
 import android.os.Parcelable
 import com.aisleron.domain.FilterType
+import com.aisleron.domain.location.LocationType
+import com.aisleron.ui.shoppinglist.ShoppingListGrouping
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class ShoppingListBundle(
-    val locationId: Int,
-    val filterType: FilterType
+    val filterType: FilterType,
+    val listGrouping: ShoppingListGrouping
 ) : Parcelable {
     companion object {
-        operator fun invoke(locationId: Int?, filterType: FilterType?) =
-            ShoppingListBundle(locationId ?: 1, filterType ?: FilterType.ALL)
+        operator fun invoke(
+            locationId: Int?, filterType: FilterType, locationType: LocationType?
+        ): ShoppingListBundle {
+            val listGrouping = if (locationType != null && locationId == null) {
+                ShoppingListGrouping.LocationGrouping(locationType)
+            } else {
+                ShoppingListGrouping.AisleGrouping(locationId ?: 1)
+            }
+
+            return ShoppingListBundle(filterType, listGrouping)
+        }
     }
 }

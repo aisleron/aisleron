@@ -44,7 +44,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.aisleron.R
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.base.AisleronException
-import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.loyaltycard.LoyaltyCard
 import com.aisleron.ui.AisleronExceptionMap
 import com.aisleron.ui.AisleronFragment
@@ -103,7 +102,7 @@ class ShoppingListFragment(
         super.onCreate(savedInstanceState)
         val shoppingListBundle = Bundler().getShoppingListBundle(arguments)
         shoppingListViewModel.hydrate(
-            shoppingListBundle.locationId,
+            shoppingListBundle.listGrouping,
             shoppingListBundle.filterType,
             shoppingListPreferences.showEmptyAisles()
         )
@@ -119,7 +118,7 @@ class ShoppingListFragment(
             }
 
             if (addNewAisle) {
-                showAddSingleAisleDialog()
+                shoppingListViewModel.navigateToAddSingleAisle()
             }
         }
 
@@ -140,7 +139,7 @@ class ShoppingListFragment(
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
-        initializeFab()
+        initializeFab(false)
 
         val view = inflater.inflate(R.layout.fragment_shopping_list, container, false)
 
@@ -161,14 +160,18 @@ class ShoppingListFragment(
                                 }
 
                                 is ShoppingListViewModel.ShoppingListUiState.Updated -> {
-                                    updateTitle(it.locationType, it.productFilter, it.locationName)
+                                    updateTitle(it.title)
                                     setMenuItemVisibility()
 
                                     (view.adapter as ShoppingListItemRecyclerViewAdapter).submitList(
                                         it.shoppingList
                                     )
 
-                                    initializeActionMode(shoppingListViewModel.selectedListItems)
+                                    initializeFab(it.manageAisles)
+                                    initializeActionMode(
+                                        shoppingListViewModel.selectedListItems,
+                                        it.manageAisles
+                                    )
                                 }
 
                                 else -> Unit
@@ -186,7 +189,6 @@ class ShoppingListFragment(
                     }
 
                     launch { collectEvents() }
-                    launch { collectLoyaltyCard() }
                 }
             }
 
@@ -236,12 +238,12 @@ class ShoppingListFragment(
                             shoppingListViewModel.movedItem(item)
                         }
 
-                        override fun onAisleExpandToggle(
-                            item: AisleShoppingListItem, expanded: Boolean
+                        override fun onHeaderExpandToggle(
+                            item: HeaderShoppingListItem, expanded: Boolean
                         ) {
                             if (hasSelectedItems()) return
 
-                            shoppingListViewModel.updateAisleExpanded(item, expanded)
+                            shoppingListViewModel.updateExpanded(item, expanded)
                         }
 
                         override fun onDragStart(viewHolder: RecyclerView.ViewHolder) {
@@ -255,7 +257,7 @@ class ShoppingListFragment(
                         }
 
                         override fun onShowNoteClick(item: ShoppingListItem) {
-                            showNoteDialog(item)
+                            shoppingListViewModel.navigateToNoteDialog(item)
                         }
                     },
 
@@ -275,15 +277,10 @@ class ShoppingListFragment(
         return view
     }
 
-    private suspend fun collectLoyaltyCard() {
-        shoppingListViewModel.loyaltyCard.collect { loyaltyCard ->
-            loyaltyCardMenuItem?.isVisible = loyaltyCard != null
-        }
-    }
-
     private suspend fun collectEvents() {
         shoppingListViewModel.events.collect { event ->
             when (event) {
+                ShoppingListViewModel.ShoppingListEvent.NoEvent -> Unit
                 is ShoppingListViewModel.ShoppingListEvent.ShowError -> {
                     displayErrorSnackBar(
                         event.errorCode,
@@ -292,15 +289,42 @@ class ShoppingListFragment(
                     )
                 }
 
-                is ShoppingListViewModel.ShoppingListEvent.NavigateToLoyaltyCard -> {
-                    event.loyaltyCard?.let { showLoyaltyCard(event.loyaltyCard) }
-                }
+                is ShoppingListViewModel.ShoppingListEvent.NavigateToLoyaltyCard ->
+                    showLoyaltyCard(event.loyaltyCard)
 
-                is ShoppingListViewModel.ShoppingListEvent.NavigateToEditShop -> {
-                    event.id?.let { navigateToEditShop(it) }
-                }
+                is ShoppingListViewModel.ShoppingListEvent.NavigateToEditLocation ->
+                    navigateToEditShop(event.locationId)
+
+                is ShoppingListViewModel.ShoppingListEvent.NavigateToEditProduct ->
+                    navigateToEditProduct(event.productId)
+
+                is ShoppingListViewModel.ShoppingListEvent.NavigateToEditAisle ->
+                    showEditAisleDialog(event.aisleId, event.locationId)
+
+                is ShoppingListViewModel.ShoppingListEvent.NavigateToAddMultipleAisles ->
+                    showAddMultiAisleDialog(event.locationId)
+
+                is ShoppingListViewModel.ShoppingListEvent.NavigateToAddSingleAisle ->
+                    showAddSingleAisleDialog(event.locationId)
+
+                is ShoppingListViewModel.ShoppingListEvent.NavigateToCopyDialog ->
+                    showCopyDialog(event.entityType, event.name)
+
+                is ShoppingListViewModel.ShoppingListEvent.NavigateToNoteDialog ->
+                    showNoteDialog(event.parentRef)
+
+                is ShoppingListViewModel.ShoppingListEvent.NavigateToLocationList ->
+                    navigateToLocationList(event.locationId, event.productFilter)
             }
         }
+    }
+
+    private fun navigateToLocationList(locationId: Int, productFilter: FilterType) {
+        val bundle = Bundler().makeShoppingListBundle(
+            locationId, productFilter
+        )
+
+        this.findNavController().navigate(R.id.nav_shopping_list, bundle)
     }
 
     override fun onDestroyView() {
@@ -309,7 +333,9 @@ class ShoppingListFragment(
         super.onDestroyView()
     }
 
-    private fun initializeActionMode(selectedItems: List<ShoppingListItem>) {
+    private fun initializeActionMode(
+        selectedItems: List<ShoppingListItem>, showAislePicker: Boolean
+    ) {
         if (selectedItems.isEmpty()) {
             actionMode?.finish()
             return
@@ -319,7 +345,7 @@ class ShoppingListFragment(
             this@ShoppingListFragment
         )
 
-        setActionModeOptions(actionMode, selectedItems)
+        setActionModeOptions(actionMode, selectedItems, showAislePicker)
     }
 
     private fun showAislePickerDialog(aisleList: List<AisleListEntry>) {
@@ -335,16 +361,11 @@ class ShoppingListFragment(
     }
 
     private fun setMenuItemVisibility() {
-        val currentState = shoppingListViewModel.shoppingListUiState.value
-        val currentLocationType =
-            if (currentState is ShoppingListViewModel.ShoppingListUiState.Updated) {
-                currentState.locationType
-            } else {
-                LocationType.HOME // Safe fallback for the very first load
-            }
+        val currentState =
+            shoppingListViewModel.shoppingListUiState.value as? ShoppingListViewModel.ShoppingListUiState.Updated
 
-        editShopMenuItem?.isVisible = currentLocationType == LocationType.SHOP
-        loyaltyCardMenuItem?.isVisible = shoppingListViewModel.loyaltyCard.value != null
+        editShopMenuItem?.isVisible = currentState?.showEditShop ?: false
+        loyaltyCardMenuItem?.isVisible = currentState?.showLoyaltyCard ?: false
     }
 
     private fun displayStatusChangeSnackBar(item: ProductShoppingListItem, inStock: Boolean) {
@@ -375,7 +396,9 @@ class ShoppingListFragment(
         ).show()
     }
 
-    private fun showAisleDialog(aisleId: Int, action: AisleDialogFragment.AisleDialogAction) {
+    private fun showAisleDialog(
+        aisleId: Int, locationId: Int, action: AisleDialogFragment.AisleDialogAction
+    ) {
         val requestKey = when (action) {
             AisleDialogFragment.AisleDialogAction.ADD_SINGLE -> ADD_AISLE_REQUEST_KEY
             AisleDialogFragment.AisleDialogAction.ADD_MULTIPLE -> ADD_AISLE_REQUEST_KEY
@@ -385,55 +408,54 @@ class ShoppingListFragment(
         val aisleDialogBundle = AisleDialogBundle(
             aisleId = aisleId,
             action = action,
-            locationId = shoppingListViewModel.locationId.value ?: -1
+            locationId = locationId
         )
 
         AisleDialogFragment.newInstance(aisleDialogBundle, requestKey)
             .show(childFragmentManager, AisleDialogFragment.TAG)
     }
 
-    private fun showAddSingleAisleDialog() {
-        showAisleDialog(-1, AisleDialogFragment.AisleDialogAction.ADD_SINGLE)
+    private fun showAddSingleAisleDialog(locationId: Int) {
+        showAisleDialog(-1, locationId, AisleDialogFragment.AisleDialogAction.ADD_SINGLE)
     }
 
-    private fun showAddMultiAisleDialog() {
-        showAisleDialog(-1, AisleDialogFragment.AisleDialogAction.ADD_MULTIPLE)
+    private fun showAddMultiAisleDialog(locationId: Int) {
+        showAisleDialog(-1, locationId, AisleDialogFragment.AisleDialogAction.ADD_MULTIPLE)
     }
 
-    private fun showEditAisleDialog(aisleId: Int) {
-        showAisleDialog(aisleId, AisleDialogFragment.AisleDialogAction.EDIT)
+    private fun showEditAisleDialog(aisleId: Int, locationId: Int) {
+        showAisleDialog(aisleId, locationId, AisleDialogFragment.AisleDialogAction.EDIT)
     }
 
-    private fun initializeFab() {
+    private fun initializeFab(showAisleFab: Boolean) {
+        val fabItems = mutableListOf<FabHandler.FabOption>()
+        fabItems.add(FabHandler.FabOption.ADD_SHOP)
+
+        if (showAisleFab) {
+            fabItems.add(FabHandler.FabOption.ADD_AISLE)
+        }
+
+        fabItems.add(FabHandler.FabOption.ADD_PRODUCT)
+
         fabHandler.setFabOnClickedListener(this)
-        fabHandler.setFabItems(
-            this.requireActivity(),
-            FabHandler.FabOption.ADD_SHOP,
-            FabHandler.FabOption.ADD_AISLE,
-            FabHandler.FabOption.ADD_PRODUCT
-        )
+        fabHandler.setFabItems(this.requireActivity(), *fabItems.toTypedArray())
 
         fabHandler.setFabOnClickListener(this.requireActivity(), FabHandler.FabOption.ADD_PRODUCT) {
             navigateToAddProduct(shoppingListViewModel.productFilter)
         }
 
         fabHandler.setFabOnClickListener(this.requireActivity(), FabHandler.FabOption.ADD_AISLE) {
-            showAddMultiAisleDialog()
+            shoppingListViewModel.navigateToAddMultipleAisles()
         }
     }
 
-    private fun updateTitle(
-        locationType: LocationType, productFilter: FilterType, locationName: String
-    ) {
-        val appTitle = when (locationType) {
-            LocationType.HOME ->
-                when (productFilter) {
-                    FilterType.IN_STOCK -> resources.getString(R.string.menu_in_stock)
-                    FilterType.NEEDED -> resources.getString(R.string.menu_needed)
-                    FilterType.ALL -> resources.getString(R.string.menu_all_items)
-                }
-
-            LocationType.SHOP -> locationName
+    private fun updateTitle(listTitle: ShoppingListViewModel.ListTitle) {
+        val appTitle = when (listTitle) {
+            ShoppingListViewModel.ListTitle.InStock -> resources.getString(R.string.menu_in_stock)
+            ShoppingListViewModel.ListTitle.Needed -> resources.getString(R.string.menu_needed)
+            ShoppingListViewModel.ListTitle.AllItems -> resources.getString(R.string.menu_all_items)
+            ShoppingListViewModel.ListTitle.AllShops -> resources.getString(R.string.menu_all_shops)
+            is ShoppingListViewModel.ListTitle.LocationName -> listTitle.name
         }
 
         applicationTitleUpdateListener.applicationTitleUpdated(requireActivity(), appTitle)
@@ -486,11 +508,11 @@ class ShoppingListFragment(
         dialog.show()
     }
 
-    private fun showCopyProductDialog(item: ShoppingListItem) {
+    private fun showCopyDialog(entityType: CopyEntityType, name: String) {
         val dialog = CopyEntityDialogFragment.newInstance(
-            type = CopyEntityType.Product(item.id),
-            title = getString(R.string.copy_entity_title, item.name),
-            defaultName = "${item.name} (${getString(android.R.string.copy)})",
+            type = entityType,
+            title = getString(R.string.copy_entity_title, name),
+            defaultName = "$name (${getString(android.R.string.copy)})",
             nameHint = getString(R.string.new_product_name)
         )
 
@@ -499,7 +521,7 @@ class ShoppingListFragment(
             requireView().postDelayed({
                 Snackbar.make(
                     requireView(),
-                    getString(R.string.entity_copied, item.name),
+                    getString(R.string.entity_copied, name),
                     Snackbar.LENGTH_SHORT
                 )
                     .setAnchorView(fabHandler.getFabView(this.requireActivity()))
@@ -510,21 +532,14 @@ class ShoppingListFragment(
         dialog.show(childFragmentManager, "copyDialog")
     }
 
-    private fun showNoteDialog(item: ShoppingListItem) {
+    private fun showNoteDialog(noteParentRef: NoteParentRef) {
         val dialog = NoteDialogFragment.newInstance(
-            noteParentRef = NoteParentRef.Product(item.id)
+            noteParentRef = noteParentRef
         )
 
         dialog.show(childFragmentManager, "noteDialog")
         // TODO: Add a callback from the dialog to finish the action mode
         actionMode?.finish()
-    }
-
-    private fun editShoppingListItem(item: ShoppingListItem) {
-        when (item) {
-            is AisleShoppingListItem -> showEditAisleDialog(item.aisleId)
-            is ProductShoppingListItem -> navigateToEditProduct(item.id)
-        }
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
@@ -557,19 +572,36 @@ class ShoppingListFragment(
         }
     }
 
-    private fun setActionModeOptions(mode: ActionMode?, selectedItems: List<ShoppingListItem>) {
+    private fun setActionModeOptions(
+        mode: ActionMode?, selectedItems: List<ShoppingListItem>, showAislePicker: Boolean
+    ) {
         mode?.title = getSelectedItemsDescription(selectedItems)
 
         val productsOnly = selectedItems.all { it is ProductShoppingListItem }
         val aislesOnly = selectedItems.all { it is AisleShoppingListItem }
+        val locationsOnly = selectedItems.all { it is LocationShoppingListItem }
         val singleItem = selectedItems.size == 1
+        val showNoteAndCopy = singleItem && (productsOnly || locationsOnly)
+
+        val locationItem = selectedItems.singleOrNull() as? LocationShoppingListItem
+        val showLoyaltyCard = locationItem?.showLoyaltyCard ?: false
 
         mode?.menu?.let {
             it.findItem(R.id.mnu_add_product_to_aisle).isVisible = singleItem && aislesOnly
-            it.findItem(R.id.mnu_copy_shopping_list_item).isVisible = singleItem && productsOnly
-            it.findItem(R.id.mnu_product_note).isVisible = singleItem && productsOnly
-            it.findItem(R.id.mnu_aisle_picker).isVisible = productsOnly
+            it.findItem(R.id.mnu_copy_shopping_list_item).isVisible = showNoteAndCopy
+            it.findItem(R.id.mnu_show_note).isVisible = showNoteAndCopy
+            it.findItem(R.id.mnu_aisle_picker).isVisible = productsOnly && showAislePicker
             it.findItem(R.id.mnu_edit_shopping_list_item).isVisible = singleItem
+            it.findItem(R.id.mnu_show_loyalty_card).isVisible = showLoyaltyCard
+
+            val mnuShowLocationList = it.findItem(R.id.mnu_show_location_list)
+            mnuShowLocationList.isVisible = singleItem && locationsOnly
+
+            locationItem?.let { l ->
+                mnuShowLocationList.title = getString(R.string.show_location_list, l.name)
+            }
+
+
             it.findItem(R.id.mnu_delete_shopping_list_item)
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
         }
@@ -584,15 +616,17 @@ class ShoppingListFragment(
 
         var result = true
         when (item.itemId) {
-            R.id.mnu_edit_shopping_list_item -> editShoppingListItem(actionModeItems.first())
+            R.id.mnu_edit_shopping_list_item -> shoppingListViewModel.navigateToEditItem()
             R.id.mnu_delete_shopping_list_item -> confirmDelete(requireContext())
             R.id.mnu_add_product_to_aisle -> navigateToAddProduct(
                 shoppingListViewModel.productFilter, actionModeItems.first().aisleId
             )
 
-            R.id.mnu_copy_shopping_list_item -> showCopyProductDialog(actionModeItems.first())
-            R.id.mnu_product_note -> showNoteDialog(actionModeItems.first())
+            R.id.mnu_copy_shopping_list_item -> shoppingListViewModel.navigateToCopyDialog()
+            R.id.mnu_show_note -> shoppingListViewModel.navigateToNoteDialog()
             R.id.mnu_aisle_picker -> shoppingListViewModel.requestLocationAisles()
+            R.id.mnu_show_loyalty_card -> shoppingListViewModel.navigateToItemLoyaltyCard()
+            R.id.mnu_show_location_list -> shoppingListViewModel.navigateToLocationList()
             else -> result = false // No action picked
         }
 
@@ -655,7 +689,7 @@ class ShoppingListFragment(
             }
 
             R.id.mnu_expand_collapse_aisles -> {
-                shoppingListViewModel.expandCollapseAisles()
+                shoppingListViewModel.expandCollapseHeaders()
                 true
             }
 
@@ -663,11 +697,22 @@ class ShoppingListFragment(
         }
     }
 
-    private fun showLoyaltyCard(loyaltyCard: LoyaltyCard) {
+    private fun showLoyaltyCard(loyaltyCard: LoyaltyCard?) {
         try {
+            if (loyaltyCard == null) {
+                throw AisleronException.LoyaltyCardNotFoundException()
+            }
+
             loyaltyCardProvider.displayLoyaltyCard(requireContext(), loyaltyCard)
         } catch (_: AisleronException.LoyaltyCardProviderException) {
             loyaltyCardProvider.showNotInstalledDialog(requireContext())
+        } catch (ae: AisleronException) {
+            displayErrorSnackBar(
+                ae.exceptionCode,
+                ae.message,
+                fabHandler.getFabView(this.requireActivity())
+            )
+
         } catch (e: Exception) {
             displayErrorSnackBar(
                 AisleronException.ExceptionCode.GENERIC_EXCEPTION,

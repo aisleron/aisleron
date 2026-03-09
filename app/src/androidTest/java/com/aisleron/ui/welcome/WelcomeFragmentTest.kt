@@ -46,6 +46,7 @@ import com.aisleron.R
 import com.aisleron.SharedPreferencesInitializer
 import com.aisleron.di.KoinTestRule
 import com.aisleron.di.daoTestModule
+import com.aisleron.di.factoryModule
 import com.aisleron.di.fragmentModule
 import com.aisleron.di.generalTestModule
 import com.aisleron.di.inMemoryDatabaseTestModule
@@ -116,7 +117,14 @@ class WelcomeFragmentTest : KoinTest {
 
     @Test
     fun applicationStarted_AppNotInitialized_WelcomeScreenDisplayed() {
-        loadKoinModules(listOf(preferenceTestModule, fragmentModule, generalTestModule))
+        loadKoinModules(
+            listOf(
+                preferenceTestModule,
+                fragmentModule,
+                generalTestModule,
+                factoryModule
+            )
+        )
         SharedPreferencesInitializer().setIsInitialized(false)
         val scenario = ActivityScenario.launch(MainActivity::class.java)
         scenario.use { s ->
@@ -136,7 +144,8 @@ class WelcomeFragmentTest : KoinTest {
                 preferenceTestModule,
                 fragmentModule,
                 generalTestModule,
-                inMemoryDatabaseTestModule
+                inMemoryDatabaseTestModule,
+                factoryModule
             )
         )
         SharedPreferencesInitializer().setIsInitialized(true)
@@ -312,7 +321,8 @@ class WelcomeFragmentTest : KoinTest {
                 preferenceTestModule,
                 fragmentModule,
                 generalTestModule,
-                inMemoryDatabaseTestModule
+                inMemoryDatabaseTestModule,
+                factoryModule
             )
         )
         SharedPreferencesInitializer().setIsInitialized(false)

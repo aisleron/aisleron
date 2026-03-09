@@ -24,6 +24,7 @@
     <string name="action_search">Szukaj</string>
     <string name="done">Gotowe</string>
     <string name="menu_about">O aplikacji</string>
+    <string name="menu_all_lists">Wszystkie listy</string>
     <string name="delete">Usuń</string>
     <string name="home">Strona główna</string>
     <string name="menu_needed">Potrzebne</string>
@@ -81,7 +82,8 @@
     <string name="duplicate_location_exception">BŁĄD: Nie można dodać duplikatu istniejącej lokalizacji</string>
     <string name="sample_data_creation_exception">BŁĄD: Nie można załadować danych przykładowych do istniejącej bazy danych</string>
     <string name="loyalty_card_provider_missing_exception">BŁĄD: Dostawca karty lojalnościowej nie jest zainstalowany lub nie znaleziono aktywności</string>
-    <string name="aisle_move_exception">BŁĄD: Przeniesienie alejki musi odbywać się w obrębie tej samej lokalizacji.</string>
+    <string name="aisle_move_exception">BŁĄD: Przeniesienie alejki musi odbywać się w obrębie tej samej lokalizacji</string>
+    <string name="loyalty_card_not_found_exception">BŁĄD: Nie znaleziono karty lojalnościowej</string>
     <string name="about_legal_header">Licencje i zasady</string>
     <string name="about_support_version_title">Historia wersji</string>
     <string name="about_support_report_issue_title">Zgłoś problem</string>
@@ -199,4 +201,5 @@
     <string name="about_contribute_translate_summary">Pomóż udostępnić Aisleron w większej liczbie języków</string>
     <string name="about_contribute_donate_title">Wesprzyj</string>
     <string name="about_contribute_donate_summary">Wesprzyj Aisleron finansowo</string>
+    <string name="show_location_list">Pokaż %1$s</string>
 </resources>

@@ -85,12 +85,12 @@
         tools:layout="@xml/root_preferences" />
 
     <fragment
-        android:id="@+id/nav_all_shops"
+        android:id="@+id/nav_all_lists"
         android:name="com.aisleron.ui.shoplist.ShopListFragment"
-        android:label="@string/menu_all_shops"
+        android:label="@string/menu_all_lists"
         tools:layout="@layout/fragment_shop_list">
         <action
-            android:id="@+id/action_nav_all_shops_to_nav_shopping_list"
+            android:id="@+id/action_nav_all_lists_to_nav_shopping_list"
             app:destination="@id/nav_shopping_list">
             <argument
                 android:name="com.aisleron.domain.FilterType"

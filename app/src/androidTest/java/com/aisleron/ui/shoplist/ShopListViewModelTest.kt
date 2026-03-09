@@ -127,6 +127,10 @@ class ShopListViewModelTest : KoinTest {
                 override suspend operator fun invoke(location: Location) {
                     throw Exception("Error on remove location")
                 }
+
+                override suspend fun invoke(locationId: Int) {
+                    throw Exception("Error on remove location")
+                }
             },
             getLocationUseCase = get<GetLocationUseCase>(),
             coroutineScopeProvider = TestScope(UnconfinedTestDispatcher())

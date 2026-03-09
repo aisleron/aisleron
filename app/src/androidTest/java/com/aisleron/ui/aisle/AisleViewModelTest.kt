@@ -100,7 +100,7 @@ class AisleViewModelTest : KoinTest {
         val newAisleName = "Add New Aisle Test"
         aisleViewModel.hydrate(-1, existingLocation.id)
         aisleViewModel.setAisleName(newAisleName)
-        val aisleMaxRank = get<AisleRepository>().getAisleMaxRank(existingLocation.id)
+        val aisleMaxRank = get<AisleRepository>().getMaxRank(existingLocation.id)
 
         aisleViewModel.addAisle()
 

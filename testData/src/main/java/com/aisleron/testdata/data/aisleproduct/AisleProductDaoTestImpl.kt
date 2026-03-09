@@ -69,7 +69,7 @@ class AisleProductDaoTestImpl(private val productDao: ProductDaoTestImpl) : Aisl
         aisleProductList.removeIf { it.aisleId == aisleId }
     }
 
-    override suspend fun getAisleProductMaxRank(aisleId: Int): Int {
+    override suspend fun getMaxRank(aisleId: Int): Int {
         return aisleProductList.filter { it.aisleId == aisleId }.maxOfOrNull { it.rank } ?: 0
     }
 

@@ -17,15 +17,7 @@
 
 package com.aisleron.ui.shoppinglist
 
-interface AisleShoppingListItem : ShoppingListItem {
-    var childCount: Int
-    val locationId: Int
-    val isDefault: Boolean
-    val expanded: Boolean
+interface AisleShoppingListItem : HeaderShoppingListItem {
     override val aisleId: Int
         get() = id
-    override val itemType: ShoppingListItem.ItemType
-        get() = ShoppingListItem.ItemType.AISLE
-    override val aisleRank: Int
-        get() = rank
 }

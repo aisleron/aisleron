@@ -61,7 +61,9 @@ class UpdateLocationUseCaseTest {
                 name = "Shop 99",
                 pinned = false,
                 aisles = emptyList(),
-                showDefaultAisle = true
+                showDefaultAisle = true,
+                expanded = true,
+                rank = dm.getUseCase<GetLocationMaxRankUseCase>().invoke() + 1
             )
         )
 

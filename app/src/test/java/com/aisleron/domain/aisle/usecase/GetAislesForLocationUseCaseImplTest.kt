@@ -23,6 +23,7 @@ import com.aisleron.domain.aisle.AisleRepository
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.location.LocationType
+import com.aisleron.domain.location.usecase.GetLocationMaxRankUseCase
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -59,7 +60,9 @@ class GetAislesForLocationUseCaseImplTest {
                 pinned = false,
                 emptyList(),
                 showDefaultAisle = true,
-                noteId = null
+                noteId = null,
+                expanded = true,
+                rank = dm.getUseCase<GetLocationMaxRankUseCase>().invoke() + 1
             )
         )
 

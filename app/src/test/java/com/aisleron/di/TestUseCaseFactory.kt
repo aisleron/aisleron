@@ -48,6 +48,8 @@ import com.aisleron.domain.location.usecase.AddLocationUseCaseImpl
 import com.aisleron.domain.location.usecase.CopyLocationUseCase
 import com.aisleron.domain.location.usecase.CopyLocationUseCaseImpl
 import com.aisleron.domain.location.usecase.GetHomeLocationUseCase
+import com.aisleron.domain.location.usecase.GetLocationMaxRankUseCase
+import com.aisleron.domain.location.usecase.GetLocationMaxRankUseCaseImpl
 import com.aisleron.domain.location.usecase.GetLocationUseCase
 import com.aisleron.domain.location.usecase.GetPinnedShopsUseCase
 import com.aisleron.domain.location.usecase.GetShopsUseCase
@@ -56,6 +58,11 @@ import com.aisleron.domain.location.usecase.RemoveLocationUseCase
 import com.aisleron.domain.location.usecase.RemoveLocationUseCaseImpl
 import com.aisleron.domain.location.usecase.SortLocationByNameUseCase
 import com.aisleron.domain.location.usecase.SortLocationByNameUseCaseImpl
+import com.aisleron.domain.location.usecase.SortLocationTypeByNameUseCase
+import com.aisleron.domain.location.usecase.SortLocationTypeByNameUseCaseImpl
+import com.aisleron.domain.location.usecase.UpdateLocationExpandedUseCase
+import com.aisleron.domain.location.usecase.UpdateLocationExpandedUseCaseImpl
+import com.aisleron.domain.location.usecase.UpdateLocationRankUseCase
 import com.aisleron.domain.location.usecase.UpdateLocationUseCase
 import com.aisleron.domain.loyaltycard.usecase.AddLoyaltyCardToLocationUseCase
 import com.aisleron.domain.loyaltycard.usecase.AddLoyaltyCardToLocationUseCaseImpl
@@ -156,8 +163,7 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
 
     val updateAisleExpandedUseCase: UpdateAisleExpandedUseCase by lazy {
         UpdateAisleExpandedUseCaseImpl(
-            getAisleUseCase = getAisleUseCase,
-            updateAisleUseCase = updateAisleUseCase
+            repositoryFactory.aisleRepository
         )
     }
 
@@ -231,6 +237,10 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
         GetHomeLocationUseCase(repositoryFactory.locationRepository)
     }
 
+    val getLocationMaxRankUseCase: GetLocationMaxRankUseCase by lazy {
+        GetLocationMaxRankUseCaseImpl(repositoryFactory.locationRepository)
+    }
+
     val getLocationUseCase: GetLocationUseCase by lazy {
         GetLocationUseCase(repositoryFactory.locationRepository)
     }
@@ -261,6 +271,24 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
             updateAisleUseCase = updateAisleUseCase,
             updateAisleProductUseCase = updateAisleProductsUseCase
         )
+    }
+
+    val sortLocationTypeByNameUseCase: SortLocationTypeByNameUseCase by lazy {
+        SortLocationTypeByNameUseCaseImpl(
+            repositoryFactory.locationRepository,
+            sortLocationByNameUseCase = sortLocationByNameUseCase,
+            transactionRunner = transactionRunner
+        )
+    }
+
+    val updateLocationExpandedUseCase: UpdateLocationExpandedUseCase by lazy {
+        UpdateLocationExpandedUseCaseImpl(
+            repositoryFactory.locationRepository
+        )
+    }
+
+    val updateLocationRankUseCase: UpdateLocationRankUseCase by lazy {
+        UpdateLocationRankUseCase(repositoryFactory.locationRepository)
     }
 
     val updateLocationUseCase: UpdateLocationUseCase by lazy {
@@ -439,7 +467,8 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
             updateAisleProductRankUseCase = updateAisleProductRankUseCase,
             addLocationUseCase = addLocationUseCase,
             getAllProductsUseCase = getAllProductsUseCase,
-            getHomeLocationUseCase = getHomeLocationUseCase
+            getHomeLocationUseCase = getHomeLocationUseCase,
+            getLocationMaxRankUseCase = getLocationMaxRankUseCase
         )
     }
 
@@ -488,11 +517,15 @@ class TestUseCaseFactory(private val repositoryFactory: TestRepositoryFactory) {
             CopyLocationUseCase::class -> copyLocationUseCase as T
             GetHomeLocationUseCase::class -> getHomeLocationUseCase as T
             GetLocationUseCase::class -> getLocationUseCase as T
+            GetLocationMaxRankUseCase::class -> getLocationMaxRankUseCase as T
             IsLocationNameUniqueUseCase::class -> isLocationNameUniqueUseCase as T
             GetPinnedShopsUseCase::class -> getPinnedShopsUseCase as T
             GetShopsUseCase::class -> getShopsUseCase as T
             RemoveLocationUseCase::class -> removeLocationUseCase as T
             SortLocationByNameUseCase::class -> sortLocationByNameUseCase as T
+            SortLocationTypeByNameUseCase::class -> sortLocationTypeByNameUseCase as T
+            UpdateLocationExpandedUseCase::class -> updateLocationExpandedUseCase as T
+            UpdateLocationRankUseCase::class -> updateLocationRankUseCase as T
             UpdateLocationUseCase::class -> updateLocationUseCase as T
 
             //Loyalty Card Use Cases

@@ -55,6 +55,7 @@ import com.aisleron.R
 import com.aisleron.SharedPreferencesInitializer
 import com.aisleron.di.KoinTestRule
 import com.aisleron.di.daoTestModule
+import com.aisleron.di.factoryModule
 import com.aisleron.di.fragmentModule
 import com.aisleron.di.generalModule
 import com.aisleron.di.preferenceModule
@@ -97,6 +98,7 @@ import java.lang.Thread.sleep
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
+@Suppress("SameParameterValue")
 @RunWith(AndroidJUnit4::class)
 class CaptureScreenshots : KoinTest {
     private val searchBoxResId = SystemIds.SEARCH_BOX
@@ -112,7 +114,8 @@ class CaptureScreenshots : KoinTest {
             repositoryModule,
             useCaseModule,
             generalModule,
-            preferenceModule
+            preferenceModule,
+            factoryModule
         )
     )
 
@@ -145,7 +148,9 @@ class CaptureScreenshots : KoinTest {
                     name = "Corner Convenience",
                     pinned = false,
                     aisles = emptyList(),
-                    showDefaultAisle = true
+                    showDefaultAisle = true,
+                    expanded = true,
+                    rank = 10 //get<LocationRepository>().getMaxRank() + 1
                 )
             )
 
@@ -246,6 +251,7 @@ class CaptureScreenshots : KoinTest {
     }
 
     private fun clickFab(fabOption: FabHandler.FabOption) {
+        sleep(200)
         clickMainFab()
 
         val fabId = when (fabOption) {
@@ -282,6 +288,7 @@ class CaptureScreenshots : KoinTest {
     }
 
     private fun selectShoppingListItem(productName: String) {
+        sleep(200)
         onView(withText(productName))
             .perform(longClick())
     }
@@ -488,7 +495,7 @@ class CaptureScreenshots : KoinTest {
 
     private fun navigateToShopList() {
         openNavigationDrawer()
-        onView(withId(R.id.nav_all_shops))
+        onView(withId(R.id.nav_all_lists))
             .perform(click())
     }
 
@@ -728,7 +735,7 @@ class CaptureScreenshots : KoinTest {
     }
 
     private fun clickProductNote() {
-        onView(withId(R.id.mnu_product_note))
+        onView(withId(R.id.mnu_show_note))
             .perform(click())
     }
 

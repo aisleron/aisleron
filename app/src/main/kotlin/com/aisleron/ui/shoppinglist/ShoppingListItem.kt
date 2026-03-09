@@ -18,21 +18,26 @@
 package com.aisleron.ui.shoppinglist
 
 interface ShoppingListItem {
-    val aisleRank: Int
+    val headerRank: Int
     val rank: Int
     val id: Int
     val name: String
     val aisleId: Int
+    val locationId: Int
     val itemType: ItemType
-
     val selected: Boolean
+    val uniqueId: UniqueId
 
     override fun equals(other: Any?): Boolean
 
-    fun copyWith(selected: Boolean): ShoppingListItem
-
     enum class ItemType {
-        AISLE, PRODUCT, EMPTY_LIST
+        HEADER, PRODUCT, EMPTY_LIST
     }
+
+    data class UniqueId(
+        val itemType: ItemType,
+        val id: Int,
+    )
 }
+
 

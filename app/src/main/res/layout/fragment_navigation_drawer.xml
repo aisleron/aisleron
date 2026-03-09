@@ -108,7 +108,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/menu_all_shops"
-                app:drawableStartCompat="@drawable/baseline_shopping_cart_24"
+                app:drawableStartCompat="@drawable/baseline_multi_store_24"
                 android:textAppearance="?attr/textAppearanceListItem" />
 
             <View
@@ -116,6 +116,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="?android:attr/listDivider" />
+
+            <TextView
+                android:id="@+id/nav_all_lists"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/menu_all_lists"
+                app:drawableStartCompat="@drawable/baseline_shopping_list_24"
+                android:textAppearance="?attr/textAppearanceListItem" />
 
             <TextView
                 android:id="@+id/nav_settings"

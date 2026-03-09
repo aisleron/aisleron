@@ -1,0 +1,34 @@
+/*
+ * Copyright (C) 2026 aisleron.com
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package com.aisleron.ui.shoppinglist.coordinator
+
+import com.aisleron.domain.shoppinglist.ShoppingListFilter
+import com.aisleron.ui.shoppinglist.ShoppingListItem
+import com.aisleron.ui.shoppinglist.ShoppingListViewModel
+import kotlinx.coroutines.flow.Flow
+
+interface ShoppingListCoordinator {
+    fun getShoppingListState(
+        filters: ShoppingListFilter,
+        selections: Set<ShoppingListItem.UniqueId>
+    ): Flow<ShoppingListViewModel.ShoppingListUiState>
+
+    suspend fun expandCollapseHeaders(expand: Boolean)
+    suspend fun sortByName()
+}
+

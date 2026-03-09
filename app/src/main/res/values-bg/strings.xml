@@ -29,6 +29,7 @@
     <string name="menu_all_shops">Всички магазини</string>
     <string name="menu_shops">Магазини</string>
     <string name="menu_about">Относно</string>
+    <string name="menu_all_lists">Всички списъци</string>
     <string name="home">Начало</string>
     <string name="display_options_header">Опции за показване</string>
     <string name="show_on_lock_screen">Показване на заключен екран</string>
@@ -76,7 +77,8 @@
     <string name="duplicate_location_exception">ГРЕШКА: Не може да се добави дубликат на съществуващо местоположение</string>
     <string name="sample_data_creation_exception">ГРЕШКА: Не може да се заредят примерни данни в съществуваща база данни</string>
     <string name="loyalty_card_provider_missing_exception">ГРЕШКА: Доставчикът на карта за лоялност не е инсталиран или не е намерена активност</string>
-    <string name="aisle_move_exception">ГРЕШКА: Преместването на пътеката трябва да е в рамките на едно и също местоположение.</string>
+    <string name="aisle_move_exception">ГРЕШКА: Преместването на пътеката трябва да е в рамките на едно и също местоположение</string>
+    <string name="loyalty_card_not_found_exception">ГРЕШКА: Картата за лоялност не е намерена</string>
     <string name="about_support_header">Поддръжка</string>
     <string name="about_legal_header">Лицензи и Политики</string>
     <string name="about_support_version_title">История на версиите</string>
@@ -199,4 +201,5 @@
     <string name="about_contribute_translate_summary">Помогнете да направим Aisleron достъпен на повече езици</string>
     <string name="about_contribute_donate_title">Дарение</string>
     <string name="about_contribute_donate_summary">Подкрепете Aisleron финансово</string>
+    <string name="show_location_list">Покажи %1$s</string>
 </resources>

@@ -21,6 +21,7 @@ import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
 import com.aisleron.data.base.BaseDao
+import com.aisleron.domain.location.LocationType
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -32,11 +33,26 @@ interface LocationDao : BaseDao<LocationEntity> {
     @Query("SELECT * FROM Location WHERE id = :locationId")
     suspend fun getLocation(locationId: Int): LocationEntity?
 
-    @Query("SELECT * FROM Location")
+    @Query("SELECT * FROM Location  ORDER BY type, rank")
     suspend fun getLocations(): List<LocationEntity>
 
     @Query("SELECT * FROM Location WHERE name = :name COLLATE NOCASE")
     suspend fun getLocationByName(name: String): LocationEntity?
+
+    @Query("SELECT COALESCE(MAX(rank), 0) FROM Location")
+    suspend fun getMaxRank(): Int
+
+    @Transaction
+    suspend fun updateRank(location: LocationEntity) {
+        moveRanks(location.type, location.rank)
+        upsert(location)
+    }
+
+    @Query("UPDATE Location SET rank = rank + 1 WHERE type = :locationType and rank >= :fromRank")
+    suspend fun moveRanks(locationType: LocationType, fromRank: Int)
+
+    @Query("SELECT * FROM Location WHERE type = :locationType ORDER BY rank")
+    suspend fun getByType(locationType: LocationType): List<LocationEntity>
 
     /**
      * Location With Aisles
@@ -52,13 +68,18 @@ interface LocationDao : BaseDao<LocationEntity> {
     @Query("SELECT * FROM Location WHERE id = :locationId")
     fun getLocationWithAislesWithProducts(locationId: Int): Flow<LocationWithAislesWithProducts?>
 
+
+    @Transaction
+    @Query("SELECT * FROM Location WHERE type = :locationType ORDER BY rank")
+    fun getLocationsWithAislesWithProducts(locationType: LocationType): Flow<List<LocationWithAislesWithProducts>>
+
     /**
      * Shop Specific Queries
      */
-    @Query("SELECT * FROM Location WHERE type = 'SHOP'")
+    @Query("SELECT * FROM Location WHERE type = 'SHOP' ORDER BY rank")
     fun getShops(): Flow<List<LocationEntity>>
 
-    @Query("SELECT * FROM Location WHERE type = 'SHOP' AND pinned = 1")
+    @Query("SELECT * FROM Location WHERE type = 'SHOP' AND pinned = 1 ORDER BY rank")
     fun getPinnedShops(): Flow<List<LocationEntity>>
 
     /**

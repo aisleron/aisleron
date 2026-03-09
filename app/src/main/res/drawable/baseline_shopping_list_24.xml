@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (C) 2025-2026 aisleron.com
+  ~ Copyright (C) 2026 aisleron.com
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU Affero General Public License as
@@ -16,15 +15,12 @@
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item>
-        <color android:color="@android:color/transparent" />
-    </item>
-    <item>
-        <selector>
-            <item
-                android:state_selected="true"
-                android:drawable="@drawable/aisle_list_item_selected" />
-        </selector>
-    </item>
-</layer-list>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:pathData="M21,2L3,2a1,1 0,0 0,-1 1v2.5a1,1 0,0 0,1 1h18a1,1 0,0 0,1 -1L22,3a1,1 0,0 0,-1 -1zM21,8L6,8a1,1 0,0 0,-1 1v1.5a1,1 0,0 0,1 1h15a1,1 0,0 0,1 -1L22,9a1,1 0,0 0,-1 -1zM6,13h15a1,1 0,0 1,1 1v1.5a1,1 0,0 1,-1 1L6,16.5a1,1 0,0 1,-1 -1L5,14a1,1 0,0 1,1 -1zM21,18L6,18a1,1 0,0 0,-1 1v1.5a1,1 0,0 0,1 1h15a1,1 0,0 0,1 -1L22,19a1,1 0,0 0,-1 -1z"
+        android:fillColor="?attr/colorOnSurface" />
+</vector>

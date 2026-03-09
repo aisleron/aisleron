@@ -149,9 +149,4 @@ class AisleRepositoryImplTest : RepositoryImplTest<Aisle>() {
 
         assertEquals(maxAisleRankBefore + 1, maxAisleRankAfter)
     }
-
-    /**
-     * Extra Tests
-     * updateAisleRank(aisle: Aisle)
-     */
 }

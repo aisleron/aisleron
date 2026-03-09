@@ -50,7 +50,9 @@ class LocationDaoTestImpl(private val aisleDao: AisleDaoTestImpl) : LocationDao 
                 name = it.name,
                 pinned = it.pinned,
                 showDefaultAisle = it.showDefaultAisle,
-                noteId = it.noteId
+                noteId = it.noteId,
+                expanded = it.expanded,
+                rank = it.rank
             )
 
             locationList.add(newEntity)
@@ -72,7 +74,24 @@ class LocationDaoTestImpl(private val aisleDao: AisleDaoTestImpl) : LocationDao 
     }
 
     override suspend fun getLocationByName(name: String): LocationEntity? {
-        return locationList.find { it.name.uppercase() == name.uppercase() }
+        return locationList.find { it.name.equals(name, ignoreCase = true) }
+    }
+
+    override suspend fun getMaxRank(): Int {
+        return locationList.maxOf { it.rank }
+    }
+
+    override suspend fun moveRanks(locationType: LocationType, fromRank: Int) {
+        val locations = locationList.filter { it.type == locationType && it.rank >= fromRank }
+        locations.forEach {
+            val newLocation = it.copy(rank = it.rank + 1)
+            locationList.removeAt(locationList.indexOf(it))
+            locationList.add(newLocation)
+        }
+    }
+
+    override suspend fun getByType(locationType: LocationType): List<LocationEntity> {
+        return locationList.filter { it.type == locationType }.sortedBy { it.rank }
     }
 
     override suspend fun getLocationWithAisles(locationId: Int): LocationWithAisles {
@@ -96,6 +115,25 @@ class LocationDaoTestImpl(private val aisleDao: AisleDaoTestImpl) : LocationDao 
             )
         }
         return flowOf(result)
+    }
+
+    override fun getLocationsWithAislesWithProducts(locationType: LocationType): Flow<List<LocationWithAislesWithProducts>> {
+        val locations = locationList.filter { it.type == locationType }
+
+        val result = mutableListOf<LocationWithAislesWithProducts>()
+        locations.forEach { location ->
+            result.add(
+                LocationWithAislesWithProducts(
+                    location = location,
+                    aisles = runBlocking {
+                        aisleDao.getAislesWithProducts()
+                            .filter { it.aisle.locationId == location.id }
+                    }
+                )
+            )
+        }
+
+        return flowOf(result.toList())
     }
 
     override fun getShops(): Flow<List<LocationEntity>> {

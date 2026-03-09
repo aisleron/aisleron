@@ -24,6 +24,7 @@ import com.aisleron.domain.location.LocationType
 import com.aisleron.ui.aisle.AisleDialogFragment
 import com.aisleron.ui.copyentity.CopyEntityType
 import com.aisleron.ui.note.NoteParentRef
+import com.aisleron.ui.shoppinglist.ShoppingListGrouping
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertNotNull
@@ -190,16 +191,51 @@ class BundlerTest {
     }
 
     @Test
-    fun testMakeShoppingListBundle_ParametersProvided_ShoppingListBundleReturned() {
+    fun makeShoppingListBundle_AisleGroupingParametersProvided_ShoppingListBundleReturned() {
         val locationId = 123
         val filterType = FilterType.NEEDED
+
         val bundle = bundler.makeShoppingListBundle(locationId, filterType)
 
         val shoppingListBundle =
             getParcelableBundle(bundle, "shoppingList", ShoppingListBundle::class.java)
 
-        assertEquals(locationId, shoppingListBundle?.locationId)
+        assertEquals(
+            locationId,
+            (shoppingListBundle?.listGrouping as? ShoppingListGrouping.AisleGrouping)?.locationId
+        )
+
         assertEquals(filterType, shoppingListBundle?.filterType)
+    }
+
+    @Test
+    fun makeShoppingListBundle_IsAisleGrouping_ReturnsAisleGroupingBundle() {
+        val locationId = 123
+        val filterType = FilterType.NEEDED
+        val grouping = ShoppingListGrouping.AisleGrouping(locationId)
+        val expectedBundle = ShoppingListBundle(filterType, grouping)
+
+        val bundle = bundler.makeShoppingListBundle(filterType, grouping)
+
+        val shoppingListBundle =
+            getParcelableBundle(bundle, "shoppingList", ShoppingListBundle::class.java)
+
+        assertEquals(expectedBundle, shoppingListBundle)
+    }
+
+    @Test
+    fun makeShoppingListBundle_IsShopGrouping_ReturnsShopGroupingBundle() {
+        val locationType = LocationType.SHOP
+        val filterType = FilterType.NEEDED
+        val grouping = ShoppingListGrouping.LocationGrouping(locationType)
+        val expectedBundle = ShoppingListBundle(filterType, grouping)
+
+        val bundle = bundler.makeShoppingListBundle(filterType, grouping)
+
+        val shoppingListBundle =
+            getParcelableBundle(bundle, "shoppingList", ShoppingListBundle::class.java)
+
+        assertEquals(expectedBundle, shoppingListBundle)
     }
 
 
@@ -207,7 +243,8 @@ class BundlerTest {
     fun testGetShoppingListBundle_ValidBundle_ReturnBundle() {
         val shoppingListBundle = ShoppingListBundle(
             locationId = 123,
-            filterType = FilterType.NEEDED
+            filterType = FilterType.NEEDED,
+            locationType = null
         )
         val bundle = Bundle()
         bundle.putParcelable("shoppingList", shoppingListBundle)
@@ -217,26 +254,27 @@ class BundlerTest {
 
     @Test
     fun testGetShoppingListBundle_InvalidBundle_ReturnDefaultShoppingListBundle() {
-        val shoppingListBundle = ShoppingListBundle(null, null)
+        val expected = ShoppingListBundle(1, FilterType.IN_STOCK, null)
         val bundledShoppingList = bundler.getShoppingListBundle(Bundle())
-        assertEquals(shoppingListBundle, bundledShoppingList)
+        assertEquals(expected, bundledShoppingList)
     }
 
     @Test
     fun testGetShoppingListBundle_NullBundle_ReturnDefaultShoppingListBundle() {
-        val shoppingListBundle = ShoppingListBundle(null, null)
+        val expected = ShoppingListBundle(1, FilterType.IN_STOCK, null)
         val bundledShoppingList = bundler.getShoppingListBundle(null)
-        assertEquals(shoppingListBundle, bundledShoppingList)
+        assertEquals(expected, bundledShoppingList)
     }
 
     @Test
     fun testGetShoppingListBundle_BundledAttributes_ReturnBundle() {
+        val locationId = 123
         val shoppingListBundle = ShoppingListBundle(
-            locationId = 123,
-            filterType = FilterType.IN_STOCK
+            filterType = FilterType.IN_STOCK,
+            listGrouping = ShoppingListGrouping.AisleGrouping(locationId)
         )
         val bundle = Bundle()
-        bundle.putInt("locationId", shoppingListBundle.locationId)
+        bundle.putInt("locationId", locationId)
         bundle.putSerializable("filterType", shoppingListBundle.filterType)
         val bundledShoppingList = bundler.getShoppingListBundle(bundle)
         assertEquals(shoppingListBundle, bundledShoppingList)

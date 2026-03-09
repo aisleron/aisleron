@@ -22,8 +22,13 @@ import com.aisleron.domain.aisle.AisleRepository
 import com.aisleron.domain.location.LocationRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
+import java.util.stream.Stream
 
 class ExpandCollapseAislesForLocationUseCaseTest {
     private lateinit var dm: TestDependencyManager
@@ -37,33 +42,20 @@ class ExpandCollapseAislesForLocationUseCaseTest {
         )
     }
 
-    @Test
-    fun expandCollapseAislesForLocation_hasExpandedAisles_CollapseAllAisles() = runTest {
+
+    @ParameterizedTest(name = "Expanded is {0}")
+    @MethodSource("expandArguments")
+    fun expandCollapseAislesForLocation_UpdatesExpanded(expand: Boolean) = runTest {
         val locationId = dm.getRepository<LocationRepository>().getHome().id
         val aisleRepository = dm.getRepository<AisleRepository>()
         val aisles = aisleRepository.getForLocation(locationId)
         aisleRepository.update(aisles.first().copy(expanded = true))
         aisleRepository.update(aisles.last().copy(expanded = false))
 
-        useCase(locationId)
+        useCase(locationId, expand)
 
         val aislesAfter = aisleRepository.getForLocation(locationId)
-        Assertions.assertFalse(aislesAfter.any { it.expanded })
-        Assertions.assertEquals(aislesAfter.count(), aislesAfter.count { !it.expanded })
-    }
-
-    @Test
-    fun expandCollapseAislesForLocation_noExpandedAisles_ExpandAllAisles() = runTest {
-        val locationId = dm.getRepository<LocationRepository>().getHome().id
-        val aisleRepository = dm.getRepository<AisleRepository>()
-        val aisles = aisleRepository.getForLocation(locationId)
-        aisleRepository.update(aisles.map { it.copy(expanded = false) })
-
-        useCase(locationId)
-
-        val aislesAfter = aisleRepository.getForLocation(locationId)
-        Assertions.assertFalse(aislesAfter.any { !it.expanded })
-        Assertions.assertEquals(aislesAfter.count(), aislesAfter.count { it.expanded })
+        assertTrue(aislesAfter.all { it.expanded == expand })
     }
 
     @Test
@@ -71,17 +63,17 @@ class ExpandCollapseAislesForLocationUseCaseTest {
         val aisleRepository = dm.getRepository<AisleRepository>()
         val expandedBefore = aisleRepository.getAll().count { it.expanded }
 
-        useCase(-1)
+        useCase(-1, true)
 
         val expandedAfter = aisleRepository.getAll().count { it.expanded }
         Assertions.assertEquals(expandedBefore, expandedAfter)
     }
 
-    /**
-     * Tests
-     *  Has expanded aisle, collapse
-     *  All collapsed, expand
-     *  No aisles;
-     */
-
+    private companion object {
+        @JvmStatic
+        fun expandArguments(): Stream<Arguments> = Stream.of(
+            Arguments.of(true),
+            Arguments.of(false)
+        )
+    }
 }

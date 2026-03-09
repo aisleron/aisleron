@@ -116,7 +116,7 @@ class MainActivity : AisleronActivity() {
                 R.id.nav_in_stock,
                 R.id.nav_needed,
                 R.id.nav_all_items,
-                R.id.nav_all_shops,
+                R.id.nav_all_lists,
                 R.id.nav_shopping_list
             ), drawerLayout
         )

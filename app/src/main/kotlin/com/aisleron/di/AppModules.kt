@@ -28,6 +28,7 @@ val appModules = module {
         preferenceModule,
         repositoryModule,
         useCaseModule,
-        viewModelModule
+        viewModelModule,
+        factoryModule
     )
 }

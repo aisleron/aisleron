@@ -97,7 +97,9 @@ class RemoveLocationUseCaseTest {
                 name = "Dummy Shop",
                 pinned = false,
                 aisles = emptyList(),
-                showDefaultAisle = true
+                showDefaultAisle = true,
+                expanded = true,
+                rank = dm.getUseCase<GetLocationMaxRankUseCase>().invoke() + 1
             )
         )
         val newLocation = locationRepository.get(newLocationId)!!

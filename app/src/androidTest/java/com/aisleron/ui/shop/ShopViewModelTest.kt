@@ -27,6 +27,7 @@ import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.location.usecase.AddLocationUseCase
+import com.aisleron.domain.location.usecase.GetLocationMaxRankUseCase
 import com.aisleron.domain.location.usecase.UpdateLocationUseCase
 import com.aisleron.domain.loyaltycard.LoyaltyCard
 import com.aisleron.domain.loyaltycard.LoyaltyCardProviderType
@@ -195,7 +196,8 @@ class ShopViewModelTest(private val pinned: Boolean, private val showDefaultAisl
             get<RemoveLoyaltyCardFromLocationUseCase>(),
             get<GetLoyaltyCardForLocationUseCase>(),
             get<GetNoteParentUseCase>(),
-            get<ApplyNoteChangesUseCase>()
+            get<ApplyNoteChangesUseCase>(),
+            get<GetLocationMaxRankUseCase>()
         )
 
         Assert.assertNotNull(svm)

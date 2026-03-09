@@ -60,6 +60,7 @@ import com.aisleron.ui.FabHandler
 import com.aisleron.ui.FabHandlerTestImpl
 import com.aisleron.ui.bundles.AddEditLocationBundle
 import com.aisleron.ui.bundles.Bundler
+import com.aisleron.ui.shoppinglist.ShoppingListGrouping
 import com.aisleron.utils.SystemIds
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -129,7 +130,7 @@ class ShopListFragmentTest : KoinTest {
 
         getActivityScenario().onActivity {
             navController.setGraph(R.navigation.mobile_navigation)
-            navController.setCurrentDestination(R.id.nav_all_shops)
+            navController.setCurrentDestination(R.id.nav_all_lists)
             Navigation.setViewNavController(activityFragment.requireView(), navController)
         }
 
@@ -138,7 +139,11 @@ class ShopListFragmentTest : KoinTest {
         val bundle = navController.backStack.last().arguments
         val shoppingListBundle = bundler.getShoppingListBundle(bundle)
 
-        assertEquals(shopLocation.id, shoppingListBundle.locationId)
+        assertEquals(
+            shopLocation.id,
+            (shoppingListBundle.listGrouping as? ShoppingListGrouping.AisleGrouping)?.locationId
+        )
+
         assertEquals(shopLocation.defaultFilter, shoppingListBundle.filterType)
         assertEquals(R.id.nav_shopping_list, navController.currentDestination?.id)
     }
@@ -170,7 +175,7 @@ class ShopListFragmentTest : KoinTest {
 
         getActivityScenario().onActivity {
             navController.setGraph(R.navigation.mobile_navigation)
-            navController.setCurrentDestination(R.id.nav_all_shops)
+            navController.setCurrentDestination(R.id.nav_all_lists)
             Navigation.setViewNavController(activityFragment.requireView(), navController)
         }
 
@@ -247,6 +252,10 @@ class ShopListFragmentTest : KoinTest {
         declare<RemoveLocationUseCase> {
             object : RemoveLocationUseCase {
                 override suspend fun invoke(location: Location) {
+                    throw Exception(exceptionMessage)
+                }
+
+                override suspend fun invoke(locationId: Int) {
                     throw Exception(exceptionMessage)
                 }
             }

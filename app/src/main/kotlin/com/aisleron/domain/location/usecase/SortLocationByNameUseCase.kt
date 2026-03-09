@@ -39,10 +39,9 @@ class SortLocationByNameUseCaseImpl(
                     val sortedAisleProducts = aisle.products
                         .sortedBy { it.product.name.lowercase() }
                         .mapIndexed { index, aisleProduct ->
-                            aisleProduct.rank = index + 1
-                            aisleProduct
+                            aisleProduct.copy(rank = index + 1)
                         }
-                    updateAisleProductUseCase(aisle.products)
+                    updateAisleProductUseCase(sortedAisleProducts)
                     aisle.copy(products = sortedAisleProducts)
                 }
                 .sortedWith(compareBy({ it.isDefault }, { it.name.lowercase() }))

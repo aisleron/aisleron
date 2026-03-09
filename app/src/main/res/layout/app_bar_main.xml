@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <!--
   ~ Copyright (C) 2025-2026 aisleron.com
   ~
@@ -107,7 +108,7 @@
         android:contentDescription="@string/main_fab"
         android:theme="@style/ThemeOverlay.Material3.FloatingActionButton.Primary"
         app:srcCompat="@android:drawable/ic_input_add"
-        app:useCompatPadding="false"/>
+        app:useCompatPadding="false" />
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/fab_add_shop"
@@ -131,10 +132,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="@string/add_aisle_fab"
-        app:layout_anchor="@id/fab_add_shop"
-        app:layout_anchorGravity="top|end"
+        app:layout_anchor="@id/fab"
+        app:layout_anchorGravity="center|center"
         android:layout_gravity="top"
-        android:translationY="-4dp"
+        android:translationX="28dp"
+        android:translationY="-96dp"
         android:text="@string/add_aisle"
         android:visibility="gone"
         tools:visibility="visible"
@@ -147,10 +149,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="@string/add_product_fab"
-        app:layout_anchor="@id/fab_add_aisle"
-        app:layout_anchorGravity="top|end"
+        app:layout_anchor="@id/fab"
+        app:layout_anchorGravity="center|center"
         android:layout_gravity="top"
-        android:translationY="-4dp"
+        android:translationX="28dp"
+        android:translationY="-156dp"
         android:text="@string/add_product"
         android:visibility="gone"
         tools:visibility="visible"

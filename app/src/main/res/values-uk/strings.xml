@@ -29,6 +29,7 @@
     <string name="menu_all_shops">Усі магазини</string>
     <string name="menu_shops">Магазини</string>
     <string name="menu_about">Про нас</string>
+    <string name="menu_all_lists">Усі списки</string>
     <string name="home">Головна</string>
     <string name="display_options_header">Параметри відображення</string>
     <string name="show_on_lock_screen">Показувати на екрані блокування</string>
@@ -66,7 +67,8 @@
     <string name="duplicate_location_exception">ПОМИЛКА: Неможливо додати дублікат існуючого місцезнаходження</string>
     <string name="sample_data_creation_exception">ПОМИЛКА: Не вдається завантажити зразок даних у існуючу базу даних</string>
     <string name="loyalty_card_provider_missing_exception">ПОМИЛКА: Постачальник картки лояльності не встановлено або активність не знайдено</string>
-    <string name="aisle_move_exception">ПОМИЛКА: Переміщення проходу повинно відбуватися в межах одного Місцезнаходження.</string>
+    <string name="aisle_move_exception">ПОМИЛКА: Переміщення проходу повинно відбуватися в межах одного Місцезнаходження</string>
+    <string name="loyalty_card_not_found_exception">ПОМИЛКА: Картку лояльності не знайдено</string>
     <string name="new_aisle">Новий прохід</string>
     <string name="aisles_selected">%1$d Проходи</string>
     <string name="products_selected">%1$d Товари</string>
@@ -199,4 +201,5 @@
     <string name="about_contribute_translate_summary">Допоможіть зробити Aisleron доступним більшою кількістю мов</string>
     <string name="about_contribute_donate_title">Пожертвувати</string>
     <string name="about_contribute_donate_summary">Підтримати проект Aisleron фінансово</string>
+    <string name="show_location_list">Показати %1$s</string>
 </resources>

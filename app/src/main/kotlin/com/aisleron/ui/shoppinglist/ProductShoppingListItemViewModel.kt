@@ -17,55 +17,76 @@
 
 package com.aisleron.ui.shoppinglist
 
-import com.aisleron.domain.aisleproduct.AisleProduct
+import com.aisleron.domain.aisleproduct.usecase.ChangeProductAisleUseCase
 import com.aisleron.domain.aisleproduct.usecase.UpdateAisleProductRankUseCase
-import com.aisleron.domain.product.Product
 import com.aisleron.domain.preferences.TrackingMode
 import com.aisleron.domain.product.usecase.RemoveProductUseCase
+import com.aisleron.domain.product.usecase.UpdateProductQtyNeededUseCase
+import com.aisleron.domain.product.usecase.UpdateProductStatusUseCase
+import com.aisleron.ui.copyentity.CopyEntityType
+import com.aisleron.ui.note.NoteParentRef
 
 data class ProductShoppingListItemViewModel(
-    override val aisleRank: Int,
-    override val rank: Int,
-    override val id: Int,
-    override val name: String,
-    override val aisleId: Int,
+    override val headerRank: Int,
     override val selected: Boolean,
+    override val locationId: Int,
     override val inStock: Boolean,
     override val qtyNeeded: Double,
     override val noteId: Int?,
     override val noteText: String?,
-    private val aisleProductId: Int,
     override val qtyIncrement: Double,
     override val unitOfMeasure: String,
     override val trackingMode: TrackingMode,
-    private val updateAisleProductRankUseCase: UpdateAisleProductRankUseCase,
-    private val removeProductUseCase: RemoveProductUseCase
+    override val rank: Int,
+    override val id: Int,
+    override val name: String,
+    override val aisleId: Int,
+    val aisleProductId: Int
 ) : ProductShoppingListItem, ShoppingListItemViewModel {
+    lateinit var updateAisleProductRankUseCase: UpdateAisleProductRankUseCase
+    lateinit var removeProductUseCase: RemoveProductUseCase
+    lateinit var updateProductStatusUseCase: UpdateProductStatusUseCase
+    lateinit var updateProductQtyNeededUseCase: UpdateProductQtyNeededUseCase
+    lateinit var changeProductAisleUseCase: ChangeProductAisleUseCase
+
+    override val uniqueId: ShoppingListItem.UniqueId
+        get() = ShoppingListItem.UniqueId(itemType, aisleProductId)
 
     override suspend fun remove() {
         removeProductUseCase(id)
     }
 
     override suspend fun updateRank(precedingItem: ShoppingListItem?) {
-        updateAisleProductRankUseCase(
-            AisleProduct(
-                rank = if (precedingItem?.itemType == itemType) precedingItem.rank + 1 else 1,
-                aisleId = precedingItem?.aisleId ?: aisleId,
-                id = aisleProductId,
-                product = Product(
-                    id = id,
-                    name = name,
-                    inStock = inStock,
-                    qtyNeeded = qtyNeeded,
-                    noteId = noteId,
-                    qtyIncrement = qtyIncrement,
-                    unitOfMeasure = unitOfMeasure,
-                    trackingMode = trackingMode
-                )
-            )
+        val newRank = if (precedingItem?.itemType == itemType) precedingItem.rank + 1 else 1
+        val newAisleId = precedingItem?.aisleId ?: aisleId
+        updateAisleProductRankUseCase(aisleProductId, newRank, newAisleId)
+    }
+
+    override fun editNavigationEvent(): ShoppingListViewModel.ShoppingListEvent =
+        ShoppingListViewModel.ShoppingListEvent.NavigateToEditProduct(id)
+
+    override fun copyDialogNavigationEvent(): ShoppingListViewModel.ShoppingListEvent {
+        return ShoppingListViewModel.ShoppingListEvent.NavigateToCopyDialog(
+            entityType = CopyEntityType.Product(id),
+            name = name
         )
     }
 
-    override fun copyWith(selected: Boolean): ProductShoppingListItemViewModel =
-        this.copy(selected = selected)
+    override fun noteDialogNavigationEvent(): ShoppingListViewModel.ShoppingListEvent {
+        return ShoppingListViewModel.ShoppingListEvent.NavigateToNoteDialog(
+            parentRef = NoteParentRef.Product(id)
+        )
+    }
+
+    suspend fun updateStatus(inStock: Boolean) {
+        updateProductStatusUseCase(id, inStock)
+    }
+
+    suspend fun updateQtyNeeded(qtyNeeded: Double?) {
+        qtyNeeded?.let { updateProductQtyNeededUseCase(id, it) }
+    }
+
+    suspend fun updateAisle(newAisleId: Int) {
+        changeProductAisleUseCase(id, aisleId, newAisleId)
+    }
 }

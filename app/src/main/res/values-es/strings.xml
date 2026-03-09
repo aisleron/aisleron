@@ -29,6 +29,7 @@
     <string name="menu_all_shops">Todas las tiendas</string>
     <string name="menu_shops">Tiendas</string>
     <string name="menu_about">Acerca de</string>
+    <string name="menu_all_lists">Todas las listas</string>
     <string name="display_options_header">Opciones de visualización</string>
     <string name="system_theme">Tema del sistema</string>
     <string name="light_theme">Tema claro</string>
@@ -71,7 +72,8 @@
     <string name="duplicate_location_exception">ERROR: No se puede agregar un duplicado de una ubicación existente</string>
     <string name="sample_data_creation_exception">ERROR: No se pueden cargar datos de muestra en una base de datos existente</string>
     <string name="loyalty_card_provider_missing_exception">ERROR: Proveedor de tarjeta de fidelidad no instalado o actividad no encontrada</string>
-    <string name="aisle_move_exception">ERROR: El movimiento del pasillo debe ser dentro de la misma Ubicación.</string>
+    <string name="aisle_move_exception">ERROR: El movimiento del pasillo debe ser dentro de la misma Ubicación</string>
+    <string name="loyalty_card_not_found_exception">ERROR: Tarjeta de fidelidad no encontrada</string>
     <string name="about_support_header">Soporte</string>
     <string name="about_legal_header">Licencias y políticas</string>
     <string name="about_support_version_title">Historial de versiones</string>
@@ -197,4 +199,5 @@
     <string name="about_contribute_translate_summary">Ayuda a que Aisleron esté disponible en más idiomas</string>
     <string name="about_contribute_donate_title">Donar</string>
     <string name="about_contribute_donate_summary">Contribuye financieramente a Aisleron</string>
+    <string name="show_location_list">Mostrar %1$s</string>
 </resources>
