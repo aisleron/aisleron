@@ -14,6 +14,7 @@ Streamline your shopping with this intuitive, easy-to-use shopping list app. Whe
 * Show on Lock Screen: No need to unlock your screen at the end of each aisle. Your shopping list will be displayed over the lock screen for convenience.
 * Easy Editing: Long-press any item to edit or delete it
 * Loyalty Cards: Integrate with [Catima — Loyalty Card Wallet](https://catima.app/) to quickly open your store loyalty card.
+* Multiple Views: View your shopping list at home, per shop, or across all shops.
 
 ## Why you'll love it:
 

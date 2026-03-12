@@ -86,7 +86,11 @@ class ShoppingListViewModel(
         get() = shoppingListCoordinator as? AisleListCoordinator
 
     val shoppingListUiState: StateFlow<ShoppingListUiState> = combine(
-        _searchQuery.debounce(debounceTime).distinctUntilChanged(),
+        _searchQuery
+            .debounce { query ->
+                if (query.isBlank()) 0L else debounceTime
+            }
+            .distinctUntilChanged(),
         _shoppingListFilters,
         _selectedSignatures
     ) { query, filters, selections ->

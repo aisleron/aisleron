@@ -24,6 +24,7 @@ import android.net.Uri
 import android.util.Log
 import androidx.annotation.IdRes
 import androidx.annotation.StringRes
+import androidx.appcompat.widget.ActionBarContextView
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso
@@ -61,10 +62,12 @@ import com.aisleron.di.generalModule
 import com.aisleron.di.preferenceModule
 import com.aisleron.di.repositoryModule
 import com.aisleron.di.useCaseModule
-import com.aisleron.di.viewModelModule
+import com.aisleron.di.viewModelTestModule
 import com.aisleron.domain.FilterType
+import com.aisleron.domain.aisle.Aisle
 import com.aisleron.domain.aisle.AisleRepository
 import com.aisleron.domain.aisle.usecase.UpdateAisleExpandedUseCase
+import com.aisleron.domain.aisleproduct.usecase.ChangeProductAisleUseCase
 import com.aisleron.domain.backup.DatabaseMaintenance
 import com.aisleron.domain.location.Location
 import com.aisleron.domain.location.LocationRepository
@@ -101,7 +104,6 @@ import java.time.format.DateTimeFormatter
 @Suppress("SameParameterValue")
 @RunWith(AndroidJUnit4::class)
 class CaptureScreenshots : KoinTest {
-    private val searchBoxResId = SystemIds.SEARCH_BOX
     private val saveBigSuper = "Save Big Super"
 
 
@@ -110,7 +112,7 @@ class CaptureScreenshots : KoinTest {
         modules = listOf(
             daoTestModule,
             fragmentModule,
-            viewModelModule,
+            viewModelTestModule,
             repositoryModule,
             useCaseModule,
             generalModule,
@@ -140,19 +142,7 @@ class CaptureScreenshots : KoinTest {
 
         runBlocking {
             get<CreateSampleDataUseCase>().invoke()
-            get<AddLocationUseCase>().invoke(
-                Location(
-                    id = 0,
-                    type = LocationType.SHOP,
-                    defaultFilter = FilterType.NEEDED,
-                    name = "Corner Convenience",
-                    pinned = false,
-                    aisles = emptyList(),
-                    showDefaultAisle = true,
-                    expanded = true,
-                    rank = 10 //get<LocationRepository>().getMaxRank() + 1
-                )
-            )
+            createCornerConvenience()
 
             val frozenVeg = get<ProductRepository>().getByName("Frozen Vegetables")
             frozenVeg?.let {
@@ -177,6 +167,48 @@ class CaptureScreenshots : KoinTest {
         }
     }
 
+    private suspend fun createCornerConvenience() {
+        val locationId = get<AddLocationUseCase>().invoke(
+            Location(
+                id = 0,
+                type = LocationType.SHOP,
+                defaultFilter = FilterType.NEEDED,
+                name = "Corner Convenience",
+                pinned = false,
+                aisles = emptyList(),
+                showDefaultAisle = true,
+                expanded = true,
+                rank = 10
+            )
+        )
+
+        val defaultAisleId = get<AisleRepository>().getAll()
+            .first { it.isDefault && it.locationId == locationId }.id
+
+        val aisleId = get<AisleRepository>().add(
+            Aisle(
+                name = "Spices",
+                products = emptyList(),
+                locationId = locationId,
+                rank = 1,
+                id = 0,
+                isDefault = false,
+                expanded = true
+            )
+        )
+
+        val salt = get<ProductRepository>().getByName("Salt")
+        salt?.let {
+            get<UpdateProductStatusUseCase>().invoke(it.id, false)
+            get<ChangeProductAisleUseCase>().invoke(it.id, defaultAisleId, aisleId)
+        }
+    }
+
+    private fun takeScreenshot(screenshotName: String, waitMillis: Long = 0) {
+        sleep(waitMillis)
+        Screengrab.screenshot(screenshotName)
+    }
+
     private fun getActivityScenario(): ActivityScenario<MainActivity> {
         val scenario = ActivityScenario.launch(MainActivity::class.java)
         onView(withId(R.id.app_bar_main))
@@ -197,10 +229,7 @@ class CaptureScreenshots : KoinTest {
         deleteProducts()
         SharedPreferencesInitializer().setIsInitialized(false)
         getActivityScenario().use {
-            // Sleep to make the Welcome screen scrollbar disappears
-            // sleep(2000)
-
-            Screengrab.screenshot("alr-010-welcome-page")
+            takeScreenshot("alr-010-welcome-page")
         }
     }
 
@@ -208,14 +237,14 @@ class CaptureScreenshots : KoinTest {
     fun screenshot_BlankList() = runTest {
         deleteProducts()
         getActivityScenario().use {
-            Screengrab.screenshot("alr-020-blank-list")
+            takeScreenshot("alr-020-blank-list")
         }
     }
 
     @Test
     fun screenshot_SampleItemsList() {
         getActivityScenario().use {
-            Screengrab.screenshot("alr-030-sample-items-list")
+            takeScreenshot("alr-030-sample-items-list")
         }
     }
 
@@ -228,7 +257,7 @@ class CaptureScreenshots : KoinTest {
     fun screenshot_NavigationDrawer() {
         getActivityScenario().use {
             openNavigationDrawer()
-            Screengrab.screenshot("alr-040-navigation-drawer")
+            takeScreenshot("alr-040-navigation-drawer")
         }
     }
 
@@ -246,12 +275,11 @@ class CaptureScreenshots : KoinTest {
     fun screenshot_Settings() {
         getActivityScenario().use {
             navigateToSettings()
-            Screengrab.screenshot("alr-050-settings")
+            takeScreenshot("alr-050-settings")
         }
     }
 
     private fun clickFab(fabOption: FabHandler.FabOption) {
-        sleep(200)
         clickMainFab()
 
         val fabId = when (fabOption) {
@@ -268,7 +296,7 @@ class CaptureScreenshots : KoinTest {
     fun screenshot_AddProduct() {
         getActivityScenario().use {
             clickFab(FabHandler.FabOption.ADD_PRODUCT)
-            Screengrab.screenshot("alr-060-add-product")
+            takeScreenshot("alr-060-add-product")
         }
     }
 
@@ -283,12 +311,11 @@ class CaptureScreenshots : KoinTest {
             clickFab(FabHandler.FabOption.ADD_PRODUCT)
             Espresso.closeSoftKeyboard()
             clickProductExtraOptions()
-            Screengrab.screenshot("alr-065-product-extra-options")
+            takeScreenshot("alr-065-product-extra-options")
         }
     }
 
     private fun selectShoppingListItem(productName: String) {
-        sleep(200)
         onView(withText(productName))
             .perform(longClick())
     }
@@ -297,7 +324,7 @@ class CaptureScreenshots : KoinTest {
     fun screenshot_SelectProduct() {
         getActivityScenario().use {
             selectShoppingListItem("Apples")
-            Screengrab.screenshot("alr-070-select-product")
+            takeScreenshot("alr-070-select-product")
         }
     }
 
@@ -311,7 +338,7 @@ class CaptureScreenshots : KoinTest {
         getActivityScenario().use {
             selectShoppingListItem("Apples")
             clickEditShoppingListItem()
-            Screengrab.screenshot("alr-080-edit-product")
+            takeScreenshot("alr-080-edit-product")
         }
     }
 
@@ -335,10 +362,10 @@ class CaptureScreenshots : KoinTest {
             clickProductExtraOptions()
 
             selectProductExtrasTab(R.string.product_tab_aisles)
-            Screengrab.screenshot("alr-085-010-product-aisles")
+            takeScreenshot("alr-085-010-product-aisles")
 
             selectProductAislesEntry(saveBigSuper)
-            Screengrab.screenshot("alr-085-020-product-aisle-picker")
+            takeScreenshot("alr-085-020-product-aisle-picker")
         }
     }
 
@@ -361,7 +388,7 @@ class CaptureScreenshots : KoinTest {
 
             selectProductExtrasTab(R.string.product_tab_aisles)
             selectProductExtrasTab(R.string.product_tab_inventory)
-            Screengrab.screenshot("alr-086-010-product-inventory")
+            takeScreenshot("alr-086-010-product-inventory")
         }
     }
 
@@ -370,7 +397,7 @@ class CaptureScreenshots : KoinTest {
         onView(
             allOf(
                 withContentDescription("More options"),
-                isDescendantOfA(isAssignableFrom(androidx.appcompat.widget.ActionBarContextView::class.java))
+                isDescendantOfA(isAssignableFrom(ActionBarContextView::class.java))
             )
         ).perform(click())
     }
@@ -380,7 +407,7 @@ class CaptureScreenshots : KoinTest {
         getActivityScenario().use {
             selectShoppingListItem("Apples")
             openCabOverflowMenu()
-            Screengrab.screenshot("alr-090-select-product-delete")
+            takeScreenshot("alr-090-select-product-delete")
         }
     }
 
@@ -395,7 +422,7 @@ class CaptureScreenshots : KoinTest {
             selectShoppingListItem("Apples")
             openCabOverflowMenu()
             clickDeleteShoppingListItem()
-            Screengrab.screenshot("alr-100-delete-product")
+            takeScreenshot("alr-100-delete-product")
         }
     }
 
@@ -410,8 +437,7 @@ class CaptureScreenshots : KoinTest {
             selectShoppingListItem("Apples")
             openCabOverflowMenu()
             clickCopyProduct()
-            sleep(300)
-            Screengrab.screenshot("alr-105-copy-product")
+            takeScreenshot("alr-105-copy-product", 300)
         }
     }
 
@@ -425,7 +451,7 @@ class CaptureScreenshots : KoinTest {
         getActivityScenario().use {
             selectShoppingListItem("Apples")
             clickShoppingListAislePicker()
-            Screengrab.screenshot("alr-107-010-shopping-list-aisle-picker")
+            takeScreenshot("alr-107-010-shopping-list-aisle-picker")
         }
     }
 
@@ -433,7 +459,7 @@ class CaptureScreenshots : KoinTest {
     fun screenshot_AddAisle() {
         getActivityScenario().use {
             clickFab(FabHandler.FabOption.ADD_AISLE)
-            Screengrab.screenshot("alr-110-add-aisle")
+            takeScreenshot("alr-110-add-aisle")
         }
     }
 
@@ -441,7 +467,7 @@ class CaptureScreenshots : KoinTest {
     fun screenshot_SelectAisle() {
         getActivityScenario().use {
             selectShoppingListItem("Pantry")
-            Screengrab.screenshot("alr-120-select-aisle")
+            takeScreenshot("alr-120-select-aisle")
         }
     }
 
@@ -450,7 +476,7 @@ class CaptureScreenshots : KoinTest {
         getActivityScenario().use {
             selectShoppingListItem("Pantry")
             clickEditShoppingListItem()
-            Screengrab.screenshot("alr-130-edit-aisle")
+            takeScreenshot("alr-130-edit-aisle")
         }
     }
 
@@ -459,7 +485,7 @@ class CaptureScreenshots : KoinTest {
         getActivityScenario().use {
             selectShoppingListItem("Pantry")
             openCabOverflowMenu()
-            Screengrab.screenshot("alr-140-select-aisle-delete")
+            takeScreenshot("alr-140-select-aisle-delete")
         }
     }
 
@@ -469,7 +495,7 @@ class CaptureScreenshots : KoinTest {
             selectShoppingListItem("Pantry")
             openCabOverflowMenu()
             clickDeleteShoppingListItem()
-            Screengrab.screenshot("alr-150-delete-aisle")
+            takeScreenshot("alr-150-delete-aisle")
         }
     }
 
@@ -477,7 +503,7 @@ class CaptureScreenshots : KoinTest {
     fun screenshot_AddShop() {
         getActivityScenario().use {
             clickFab(FabHandler.FabOption.ADD_SHOP)
-            Screengrab.screenshot("alr-160-add-shop")
+            takeScreenshot("alr-160-add-shop")
         }
     }
 
@@ -489,11 +515,11 @@ class CaptureScreenshots : KoinTest {
             onView(withId(R.id.txt_toggle_extra_options))
                 .perform(click())
 
-            Screengrab.screenshot("alr-165-shop-extra-options")
+            takeScreenshot("alr-165-shop-extra-options")
         }
     }
 
-    private fun navigateToShopList() {
+    private fun navigateToAllLists() {
         openNavigationDrawer()
         onView(withId(R.id.nav_all_lists))
             .perform(click())
@@ -512,9 +538,9 @@ class CaptureScreenshots : KoinTest {
     @Test
     fun screenshot_SelectShop() {
         getActivityScenario().use {
-            navigateToShopList()
+            navigateToAllLists()
             selectShop(saveBigSuper)
-            Screengrab.screenshot("alr-170-select-shop")
+            takeScreenshot("alr-170-select-shop")
         }
     }
 
@@ -526,20 +552,20 @@ class CaptureScreenshots : KoinTest {
     @Test
     fun screenshot_EditShop() {
         getActivityScenario().use {
-            navigateToShopList()
+            navigateToAllLists()
             selectShop(saveBigSuper)
             clickEditShopListItem()
-            Screengrab.screenshot("alr-180-edit-shop")
+            takeScreenshot("alr-180-edit-shop")
         }
     }
 
     @Test
     fun screenshot_SelectShopDelete() {
         getActivityScenario().use {
-            navigateToShopList()
+            navigateToAllLists()
             selectShop(saveBigSuper)
             openCabOverflowMenu()
-            Screengrab.screenshot("alr-190-select-shop-delete")
+            takeScreenshot("alr-190-select-shop-delete")
         }
     }
 
@@ -551,11 +577,11 @@ class CaptureScreenshots : KoinTest {
     @Test
     fun screenshot_DeleteShop() {
         getActivityScenario().use {
-            navigateToShopList()
+            navigateToAllLists()
             selectShop(saveBigSuper)
             openCabOverflowMenu()
             clickDeleteShopListItem()
-            Screengrab.screenshot("alr-200-delete-shop")
+            takeScreenshot("alr-200-delete-shop")
         }
     }
 
@@ -567,12 +593,12 @@ class CaptureScreenshots : KoinTest {
     @Test
     fun screenshot_CopyShop() {
         getActivityScenario().use {
-            navigateToShopList()
+            navigateToAllLists()
             selectShop(saveBigSuper)
             openCabOverflowMenu()
             clickCopyShop()
-            sleep(300)
-            Screengrab.screenshot("alr-185-copy-shop")
+            takeScreenshot("alr-185-copy-shop", 300)
+
         }
     }
 
@@ -586,7 +612,7 @@ class CaptureScreenshots : KoinTest {
     fun screenshot_AllItemsList() {
         getActivityScenario().use {
             navigateToAllItemsList(R.id.nav_all_items)
-            Screengrab.screenshot("alr-210-all-items-list")
+            takeScreenshot("alr-210-all-items-list")
         }
     }
 
@@ -602,7 +628,7 @@ class CaptureScreenshots : KoinTest {
 
     private fun getSearchTextBox(): ViewInteraction = onView(
         allOf(
-            withId(searchBoxResId),
+            withId(SystemIds.SEARCH_BOX),
             isDisplayed()
         )
     )
@@ -617,8 +643,7 @@ class CaptureScreenshots : KoinTest {
     fun screenshot_Search() {
         getActivityScenario().use {
             performSearch("b")
-            sleep(500)
-            Screengrab.screenshot("alr-220-search")
+            takeScreenshot("alr-220-search", 500)
         }
     }
 
@@ -652,7 +677,7 @@ class CaptureScreenshots : KoinTest {
         getActivityScenario().use {
             navigateToSettings()
             selectRestoreDatabase()
-            Screengrab.screenshot("alr-230-confirm-restore")
+            takeScreenshot("alr-230-confirm-restore")
         }
     }
 
@@ -676,7 +701,7 @@ class CaptureScreenshots : KoinTest {
         getActivityScenario().use {
             navigateToPinnedShop(saveBigSuper)
             toggleProductStatus("Toothpaste")
-            Screengrab.screenshot("alr-240-status-change-snackbar")
+            takeScreenshot("alr-240-status-change-snackbar")
         }
     }
 
@@ -684,7 +709,7 @@ class CaptureScreenshots : KoinTest {
     fun screenshot_NeededList() {
         getActivityScenario().use {
             navigateToAllItemsList(R.id.nav_needed)
-            Screengrab.screenshot("alr-250-needed-list")
+            takeScreenshot("alr-250-needed-list")
         }
     }
 
@@ -692,7 +717,7 @@ class CaptureScreenshots : KoinTest {
     fun screenshot_ShopList() {
         getActivityScenario().use {
             navigateToPinnedShop(saveBigSuper)
-            Screengrab.screenshot("alr-260-shop-list")
+            takeScreenshot("alr-260-shop-list")
         }
     }
 
@@ -707,15 +732,15 @@ class CaptureScreenshots : KoinTest {
         setAllProductStatus(false)
         getActivityScenario().use {
             navigateToPinnedShop(saveBigSuper)
-            Screengrab.screenshot("alr-270-shop-list-full")
+            takeScreenshot("alr-270-shop-list-full")
         }
     }
 
     @Test
     fun screenshot_AllShops() = runTest {
         getActivityScenario().use {
-            navigateToShopList()
-            Screengrab.screenshot("alr-280-all-shops")
+            navigateToAllLists()
+            takeScreenshot("alr-280-all-lists")
         }
     }
 
@@ -730,7 +755,7 @@ class CaptureScreenshots : KoinTest {
         getActivityScenario().use {
             navigateToPinnedShop(saveBigSuper)
             openToolbarOverflowMenu()
-            Screengrab.screenshot("alr-290-shop-list-menu")
+            takeScreenshot("alr-290-shop-list-menu")
         }
     }
 
@@ -751,7 +776,7 @@ class CaptureScreenshots : KoinTest {
             selectShoppingListItem("Apples")
             clickProductNote()
             enterNoteText("The freshest apples are at the farmers market.\n\nAsk for Farmer Brown.")
-            Screengrab.screenshot("alr-330-notes-dialog")
+            takeScreenshot("alr-330-notes-dialog")
         }
     }
 
@@ -771,7 +796,7 @@ class CaptureScreenshots : KoinTest {
         collapseAllAisles()
         getActivityScenario().use {
             clickMainFab()
-            Screengrab.screenshot("alr-900-fab-buttons")
+            takeScreenshot("alr-900-fab-buttons")
         }
     }
 
@@ -786,7 +811,7 @@ class CaptureScreenshots : KoinTest {
         SharedPreferencesInitializer().setTrackingMode(SharedPreferencesInitializer.TrackingMode.QUANTITY)
         setProductQuantity("Bread", 2.0)
         getActivityScenario().use {
-            Screengrab.screenshot("alr-340-qty-product")
+            takeScreenshot("alr-340-qty-product")
         }
     }
 
@@ -796,7 +821,21 @@ class CaptureScreenshots : KoinTest {
         setProductQuantity("Butter", 4.0)
         getActivityScenario().use {
             navigateToPinnedShop(saveBigSuper)
-            Screengrab.screenshot("alr-350-qty-chk-product")
+            takeScreenshot("alr-350-qty-chk-product")
+        }
+    }
+
+    private fun navigateToAllShops() {
+        openNavigationDrawer()
+        onView(withId(R.id.nav_all_shops))
+            .perform(click())
+    }
+
+    @Test
+    fun screenshot_AllShopsList() = runTest {
+        getActivityScenario().use {
+            navigateToAllShops()
+            takeScreenshot("alr-360-001-all-shops")
         }
     }
 
@@ -810,7 +849,7 @@ class CaptureScreenshots : KoinTest {
     fun screenshot_About() {
         getActivityScenario().use {
             navigateToAbout()
-            Screengrab.screenshot("alr-055-about")
+            takeScreenshot("alr-055-about")
         }
     }
 }
