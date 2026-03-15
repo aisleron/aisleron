@@ -15,13 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import com.android.build.api.variant.ApplicationAndroidComponentsExtension
 import java.io.FileInputStream
 import java.util.Properties
 
 plugins {
     id("com.android.application")
-    id("org.jetbrains.kotlin.android")
     id("com.google.devtools.ksp")
     id("org.jetbrains.kotlin.plugin.parcelize")
     // id("androidx.navigation.safeargs.kotlin")
@@ -29,17 +28,17 @@ plugins {
     id("com.autonomousapps.dependency-analysis")
 }
 
-apply("../gradle/jacoco.gradle")
+apply("../gradle/jacoco.gradle.kts")
 
 object Versions {
     const val COROUTINES = "1.10.2"
-    const val JUNIT = "6.0.2"
+    const val JUNIT = "6.0.3"
     const val ESPRESSO = "3.7.0"
     const val FRAGMENT = "1.8.9"
     const val LIFECYCLE = "2.10.0"
     const val ROOM = "2.8.4"
     const val KOIN = "4.1.1"
-    const val NAVIGATION = "2.9.6"
+    const val NAVIGATION = "2.9.7"
 }
 
 // Keep this list aligned with the values in the language_codes array in arrays.xml and with locale_config.xml
@@ -85,10 +84,6 @@ android {
         testInstrumentationRunnerArguments["notPackage"] = "com.aisleron.screenshots"
     }
 
-    ksp {
-        arg("room.schemaLocation", "$projectDir/schemas")
-    }
-
     buildTypes {
         release {
             isDebuggable = false
@@ -115,19 +110,9 @@ android {
         targetCompatibility = JavaVersion.VERSION_21
     }
 
-    kotlin {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_21)
-        }
-    }
-
     buildFeatures {
         viewBinding = true
         buildConfig = true
-    }
-
-    tasks.withType<Test> {
-        useJUnitPlatform() // Make all tests use JUnit 5
     }
 
     packaging {
@@ -137,11 +122,6 @@ android {
                 "META-INF/LICENSE-notice.md"
             )
         )
-    }
-
-    sourceSets {
-        // Adds exported schema location as test app assets.
-        getByName("androidTest").assets.srcDir("$projectDir/schemas")
     }
 
     androidResources {
@@ -184,14 +164,33 @@ gradle.taskGraph.whenReady {
     }
 }
 
+val androidComponents = extensions.getByType<ApplicationAndroidComponentsExtension>()
+androidComponents.onVariants { variant ->
+    variant.androidTest?.sources?.assets?.addStaticSourceDirectory("$projectDir/schemas")
+}
+
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
+}
+
+tasks.withType<Test> {
+    useJUnitPlatform() // Make all tests use JUnit 5
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
 dependencies {
     // Implementation
-    implementation("androidx.core:core-ktx:1.17.0")
-    implementation("androidx.activity:activity-ktx:1.12.2")
+    implementation("androidx.core:core-ktx:1.18.0")
+    implementation("androidx.activity:activity-ktx:1.13.0")
     implementation("androidx.appcompat:appcompat:1.7.1")
     implementation("com.google.android.material:material:1.13.0")
     implementation("androidx.recyclerview:recyclerview:1.4.0")
-    implementation("androidx.collection:collection-ktx:1.5.0")
+    implementation("androidx.collection:collection-ktx:1.6.0")
     implementation("androidx.cardview:cardview:1.0.0")
     implementation("androidx.drawerlayout:drawerlayout:1.2.0")
     implementation("androidx.constraintlayout:constraintlayout:2.2.1")
@@ -201,7 +200,7 @@ dependencies {
     implementation("androidx.documentfile:documentfile:1.1.0")
     implementation("androidx.preference:preference-ktx:1.2.1")
     implementation("androidx.viewpager2:viewpager2:1.1.0")
-    implementation("org.jetbrains.kotlin:kotlin-parcelize-runtime:2.3.0")
+    implementation("org.jetbrains.kotlin:kotlin-parcelize-runtime:2.3.10")
     implementation("androidx.fragment:fragment-ktx:${Versions.FRAGMENT}")
 
     // Lifecycle
@@ -256,10 +255,4 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-intents:${Versions.ESPRESSO}")
 
     androidTestImplementation("org.hamcrest:hamcrest:3.0")
-}
-
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
 }
