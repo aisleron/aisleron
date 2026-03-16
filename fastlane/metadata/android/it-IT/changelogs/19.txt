@@ -1,4 +1,5 @@
 Miglioramenti:
+* Aggiunta l'opzione per visualizzare la lista prodotti raggruppati per luogo/negozio.
 * Aggiunta una sezione "Contribuisci" alla pagina Informazioni.
 * Aggiunte traduzioni in Turco.
 
