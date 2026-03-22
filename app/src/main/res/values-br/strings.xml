@@ -1,4 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="navigation_drawer_open">Digeriñ al lañser</string>
+    <string name="navigation_drawer_close">Serriñ al lañser merdeiñ</string>
+    <string name="nav_header_subtitle">Ergerzhit ar stalioù !</string>
+    <string name="nav_header_desc">Talbenn verdeiñ</string>
+    <string name="action_search">Klask</string>
+    <string name="menu_in_stock">Stok er gêr</string>
+    <string name="menu_needed">Rekis</string>
+    <string name="menu_all_items">An holl elfennoù</string>
+    <string name="menu_settings">Arventennoù</string>
+    <string name="menu_all_shops">An holl stalioù</string>
+    <string name="menu_shops">Stalioù</string>
+    <string name="menu_about">Diwar-benn</string>
+    <string name="menu_all_lists">An holl listennadoù</string>
+    <string name="home">Degemer</string>
+    <string name="display_options_header">Dibarzhioù diskwel</string>
+    <string name="show_on_lock_screen">Diskouez war ar skramm morailhañ</string>
 </resources>
