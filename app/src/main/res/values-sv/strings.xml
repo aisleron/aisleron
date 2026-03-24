@@ -14,9 +14,7 @@
   ~
   ~ You should have received a copy of the GNU Affero General Public License
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
-  -->
-
-<resources>
+  --><resources>
     <string name="action_search">Sök</string>
     <string name="menu_needed">Saknas</string>
     <string name="menu_all_items">Alla varor</string>
