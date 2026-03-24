@@ -115,8 +115,8 @@
     <string name="duplicate_aisle_name_exception">ERREUR : le nom de l’allée doit être unique par liste</string>
     <string name="invalid_product_exception">ERREUR : identifiant de produit non valide fourni</string>
     <string name="loyalty_card_provider_missing_exception">ERREUR : fournisseur de carte de fidélité non installé ou activité introuvable</string>
-    <string name="aisle_move_exception">ERREUR : Le déplacement du rayon doit se faire à l\'intérieur du même emplacement</string>
-    <string name="loyalty_card_not_found_exception">ERREUR : Carte de fidélité non trouvée</string>
+    <string name="aisle_move_exception">ERREUR : Le déplacement du rayon doit se faire à l\'intérieur du même emplacement</string>
+    <string name="loyalty_card_not_found_exception">ERREUR : Carte de fidélité non trouvée</string>
     <string name="empty_list_title">Cette liste est actuellement vide</string>
     <string name="empty_list_description">Cela pourrait être parce que :</string>
     <string name="empty_list_reasons">- Aucun article n’est nécessaire pour le moment \n- Aucun produit ou rayon n’a encore été ajouté \n- Les éléments existent mais ne sont pas assignés à une allée visible</string>
@@ -206,4 +206,18 @@
     <string name="id_label" translatable="false"></string>
     <string name="aisleron_documentation_url" translatable="false"></string>
     <string name="app_name" translatable="false"></string>
+    <string name="language_spanish_es" translatable="false"></string>
+    <string name="language_polish_pl" translatable="false"></string>
+    <string name="aisleron_translate_url" translatable="false"></string>
+    <string name="language_russian_ru" translatable="false"></string>
+    <string name="language_french_fr" translatable="false"></string>
+    <string name="language_ukrainian_uk" translatable="false"></string>
+    <string name="language_bulgarian_bg" translatable="false"></string>
+    <string name="language_turkish_tr" translatable="false"></string>
+    <string name="language_swedish_sv" translatable="false"></string>
+    <string name="language_afrikaans_af" translatable="false"></string>
+    <string name="language_german_de" translatable="false"></string>
+    <string name="language_italian_it" translatable="false"></string>
+    <string name="language_english_en" translatable="false"></string>
+    <string name="aisleron_donate_url" translatable="false"></string>
 </resources>
