@@ -98,10 +98,10 @@
     <string name="about_legal_3rdparty_summary">Wyświetl licencje stron trzecich online</string>
     <string name="welcome_app_title">Pierwsze kroki</string>
     <string name="welcome_message">Cieszymy się, że możemy pomóc Ci uczynić zakupy łatwiejszymi i bardziej zorganizowanymi. Aby rozpocząć, wybierz jedną z poniższych opcji:</string>
-    <string name="welcome_add_own_product">&lt;h3&gt;Dodaj własne produkty&lt;/h3&gt; Zacznij tworzyć spersonalizowaną listę zakupów od zera, dodając sklepy, alejki i produkty</string>
-    <string name="welcome_load_sample_items">&lt;h3&gt;Załaduj przykładowe elementy&lt;/h3&gt; Wypróbuj wstępnie wypełnioną listę, aby dowiedzieć się, jak działa aplikacja</string>
-    <string name="welcome_import_db">&lt;h3&gt;Importuj istniejącą bazę danych&lt;/h3&gt; Przenieś listę zakupów z wcześniejszej kopii zapasowej, importując ją ze strony Ustawienia</string>
-    <string name="welcome_documentation">&lt;h3&gt;Wyświetl dokumentację&lt;/h3&gt; Wyświetl dokumentację Aisleron online, aby dowiedzieć się więcej o funkcjach aplikacji</string>
+    <string name="welcome_add_own_product"><h3>Dodaj własne produkty</h3> Zacznij tworzyć spersonalizowaną listę zakupów od zera, dodając sklepy, alejki i produkty</string>
+    <string name="welcome_load_sample_items"><h3>Załaduj przykładowe elementy</h3> Wypróbuj wstępnie wypełnioną listę, aby dowiedzieć się, jak działa aplikacja</string>
+    <string name="welcome_import_db"><h3>Importuj istniejącą bazę danych</h3> Przenieś listę zakupów z wcześniejszej kopii zapasowej, importując ją ze strony Ustawienia</string>
+    <string name="welcome_documentation"><h3>Wyświetl dokumentację</h3> Wyświetl dokumentację Aisleron online, aby dowiedzieć się więcej o funkcjach aplikacji</string>
     <string name="welcome_title">Witamy w Aisleron</string>
     <string name="empty_list_title">Ta lista jest obecnie pusta</string>
     <string name="empty_list_description">Może to być spowodowane tym, że:</string>
@@ -113,7 +113,7 @@
     <string name="get_loyalty_card">Wyszukaj kartę lojalnościową</string>
     <string name="loyalty_card_provider_catima">Catima — portfel kart lojalnościowych</string>
     <string name="loyalty_card_provider_missing_title">Nie zainstalowano dostawcy kart lojalnościowych</string>
-    <string name="loyalty_card_provider_missing_message">&lt;b&gt;&lt;i&gt;%1$s&lt;/i&gt;&lt;/b&gt; jest wymagany do wyświetlania kart lojalnościowych. Czy chcesz otworzyć ich stronę internetową, aby dowiedzieć się więcej na ten temat?</string>
+    <string name="loyalty_card_provider_missing_message"><b><i>%1$s</i></b> jest wymagany do wyświetlania kart lojalnościowych. Czy chcesz otworzyć ich stronę internetową, aby dowiedzieć się więcej na ten temat?</string>
     <string name="invalid_loyalty_card_exception">BŁĄD: Podano nieprawidłowy identyfikator karty lojalnościowej</string>
     <string name="tracking_mode">Tryb śledzenia</string>
     <string name="tracking_checkbox">Pole wyboru</string>
@@ -206,4 +206,18 @@
     <string name="id_label" translatable="false"></string>
     <string name="aisleron_documentation_url" translatable="false"></string>
     <string name="app_name" translatable="false"></string>
+    <string name="language_spanish_es" translatable="false"></string>
+    <string name="language_polish_pl" translatable="false"></string>
+    <string name="aisleron_translate_url" translatable="false"></string>
+    <string name="language_russian_ru" translatable="false"></string>
+    <string name="language_french_fr" translatable="false"></string>
+    <string name="language_ukrainian_uk" translatable="false"></string>
+    <string name="language_bulgarian_bg" translatable="false"></string>
+    <string name="language_turkish_tr" translatable="false"></string>
+    <string name="language_swedish_sv" translatable="false"></string>
+    <string name="language_afrikaans_af" translatable="false"></string>
+    <string name="language_german_de" translatable="false"></string>
+    <string name="language_italian_it" translatable="false"></string>
+    <string name="language_english_en" translatable="false"></string>
+    <string name="aisleron_donate_url" translatable="false"></string>
 </resources>
