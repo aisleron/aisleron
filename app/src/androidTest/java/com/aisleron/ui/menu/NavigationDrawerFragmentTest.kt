@@ -19,26 +19,28 @@ package com.aisleron.ui.menu
 
 import androidx.fragment.app.testing.FragmentScenario
 import androidx.fragment.app.testing.launchFragmentInContainer
-import androidx.navigation.Navigation
-import androidx.navigation.testing.TestNavHostController
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import com.aisleron.R
 import com.aisleron.di.KoinTestRule
 import com.aisleron.di.daoTestModule
-import com.aisleron.di.fragmentModule
+import com.aisleron.di.generalTestModule
 import com.aisleron.di.repositoryModule
 import com.aisleron.di.useCaseModule
 import com.aisleron.di.viewModelTestModule
+import com.aisleron.ui.navigation.Navigator
+import com.aisleron.ui.navigation.NavigatorTestImpl
+import com.aisleron.ui.shopmenu.ShopMenuFragment
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import org.koin.test.KoinTest
+import org.koin.test.get
 
 @RunWith(value = Parameterized::class)
 class NavigationDrawerFragmentTest(
@@ -46,31 +48,49 @@ class NavigationDrawerFragmentTest(
     private val textViewId: Int,
     private val navTargetId: Int
 ) : KoinTest {
+    private lateinit var navigator: NavigatorTestImpl
 
     @get:Rule
     val koinTestRule = KoinTestRule(
         modules = listOf(
-            daoTestModule, fragmentModule, repositoryModule, useCaseModule, viewModelTestModule
+            daoTestModule, repositoryModule, useCaseModule, viewModelTestModule, generalTestModule
         )
     )
 
-    private fun getFragmentScenario(): FragmentScenario<NavigationDrawerFragment> =
-        launchFragmentInContainer<NavigationDrawerFragment>(
+    @Before
+    fun setUp() {
+        navigator = get<Navigator>() as NavigatorTestImpl
+    }
+
+    private fun getFragmentScenario(): FragmentScenario<NavigationDrawerFragment> {
+        val testFactory = object : androidx.fragment.app.FragmentFactory() {
+            override fun instantiate(
+                classLoader: ClassLoader, className: String
+            ): androidx.fragment.app.Fragment {
+                return when (className) {
+                    NavigationDrawerFragment::class.java.name -> NavigationDrawerFragment(navigator)
+                    ShopMenuFragment::class.java.name -> ShopMenuFragment(navigator)
+
+                    else -> super.instantiate(classLoader, className)
+                }
+            }
+        }
+
+
+        return launchFragmentInContainer<NavigationDrawerFragment>(
             themeResId = R.style.Theme_Aisleron,
-            instantiate = { NavigationDrawerFragment() },
+            factory = testFactory,
             fragmentArgs = null
         )
+    }
 
     @Test
     fun onClick_textViewClicked_NavigateToTargetView() = runTest {
-        val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
-        getFragmentScenario().onFragment { fragment ->
-            navController.setGraph(R.navigation.mobile_navigation)
-            Navigation.setViewNavController(fragment.requireView(), navController)
-        }
+        getFragmentScenario()
 
         onView(withId(textViewId)).perform(ViewActions.click())
-        Assert.assertEquals(navTargetId, navController.currentDestination?.id)
+
+        Assert.assertEquals(navTargetId, navigator.destination)
     }
 
     companion object {

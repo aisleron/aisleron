@@ -48,6 +48,7 @@ import com.aisleron.ui.ApplicationTitleUpdateListener
 import com.aisleron.ui.FabHandler
 import com.aisleron.ui.bundles.AddEditProductBundle
 import com.aisleron.ui.bundles.Bundler
+import com.aisleron.ui.navigation.Navigator
 import com.aisleron.ui.settings.ProductPreferences
 import com.aisleron.ui.widgets.ErrorSnackBar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -61,7 +62,8 @@ class ProductFragment(
     private val applicationTitleUpdateListener: ApplicationTitleUpdateListener,
     private val productPreferences: ProductPreferences,
     private val fabHandler: FabHandler,
-) : Fragment(), MenuProvider, AisleronFragment {
+    private val navigator: Navigator
+) : Fragment(), MenuProvider, AisleronFragment, FabHandler.FabClickedCallBack {
 
     private var showAddShopFab: Boolean = false
     private val productViewModel: ProductViewModel by viewModel()
@@ -92,7 +94,8 @@ class ProductFragment(
             productViewModel.hydrate(
                 addEditProductBundle.productId,
                 addEditProductBundle.inStock ?: false,
-                addEditProductBundle.aisleId
+                addEditProductBundle.aisleId,
+                addEditProductBundle.name
             )
         }
     }
@@ -108,7 +111,8 @@ class ProductFragment(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setWindowInsetListeners(this, binding.root, false, R.dimen.text_margin,
+        setWindowInsetListeners(
+            this, binding.root, false, R.dimen.text_margin,
             applyMargins = true,
             applyBottomPadding = false
         )
@@ -238,6 +242,7 @@ class ProductFragment(
                 && binding.pgrProductOptions.currentItem == ProductTabsAdapter.ProductTab.TAB_AISLES.ordinal
 
         if (showAddShopFab) {
+            fabHandler.setFabOnClickedListener(this)
             fabHandler.setFabItems(requireActivity(), FabHandler.FabOption.ADD_SHOP)
         } else {
             fabHandler.setFabItems(requireActivity())
@@ -258,8 +263,9 @@ class ProductFragment(
     }
 
     override fun onDestroyView() {
-        super.onDestroyView()
+        fabHandler.reset()
         _binding = null
+        super.onDestroyView()
     }
 
     override fun onResume() {
@@ -315,5 +321,11 @@ class ProductFragment(
         val dialog: AlertDialog = builder.create()
 
         dialog.show()
+    }
+
+    override fun fabClicked(fabOption: FabHandler.FabOption) {
+        if (fabOption == FabHandler.FabOption.ADD_SHOP) {
+            navigator.navigateToAddShop()
+        }
     }
 }

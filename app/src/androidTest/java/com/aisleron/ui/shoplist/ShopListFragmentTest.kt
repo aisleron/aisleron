@@ -21,10 +21,7 @@ import android.view.View
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
-import androidx.navigation.Navigation
-import androidx.navigation.testing.TestNavHostController
 import androidx.test.core.app.ActivityScenario
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
 import androidx.test.espresso.UiController
@@ -48,6 +45,7 @@ import com.aisleron.AppCompatActivityTestImpl
 import com.aisleron.R
 import com.aisleron.di.KoinTestRule
 import com.aisleron.di.daoTestModule
+import com.aisleron.di.generalTestModule
 import com.aisleron.di.repositoryModule
 import com.aisleron.di.useCaseModule
 import com.aisleron.di.viewModelTestModule
@@ -60,6 +58,8 @@ import com.aisleron.ui.FabHandler
 import com.aisleron.ui.FabHandlerTestImpl
 import com.aisleron.ui.bundles.AddEditLocationBundle
 import com.aisleron.ui.bundles.Bundler
+import com.aisleron.ui.navigation.Navigator
+import com.aisleron.ui.navigation.NavigatorTestImpl
 import com.aisleron.ui.shoppinglist.ShoppingListGrouping
 import com.aisleron.utils.SystemIds
 import kotlinx.coroutines.runBlocking
@@ -81,16 +81,20 @@ class ShopListFragmentTest : KoinTest {
     private lateinit var bundler: Bundler
     private lateinit var fabHandler: FabHandlerTestImpl
     private lateinit var activityFragment: ShopListFragment
+    private lateinit var navigator: NavigatorTestImpl
 
     @get:Rule
     val koinTestRule = KoinTestRule(
-        modules = listOf(daoTestModule, viewModelTestModule, repositoryModule, useCaseModule)
+        modules = listOf(
+            daoTestModule, viewModelTestModule, repositoryModule, useCaseModule, generalTestModule
+        )
     )
 
     @Before
     fun setUp() {
         bundler = Bundler()
         fabHandler = FabHandlerTestImpl()
+        navigator = get<Navigator>() as NavigatorTestImpl
         runBlocking { get<CreateSampleDataUseCase>().invoke() }
     }
 
@@ -105,7 +109,7 @@ class ShopListFragmentTest : KoinTest {
     private fun getActivityScenario(): ActivityScenario<AppCompatActivityTestImpl> {
         val scenario = ActivityScenario.launch(AppCompatActivityTestImpl::class.java)
         scenario.onActivity { activity ->
-            activityFragment = ShopListFragment(fabHandler)
+            activityFragment = ShopListFragment(fabHandler, navigator)
             activity.supportFragmentManager.beginTransaction()
                 .replace(android.R.id.content, activityFragment, "SHOP_LIST")
                 .commitNow()
@@ -117,35 +121,21 @@ class ShopListFragmentTest : KoinTest {
     }
 
     @Test
-    fun newInstance_CallNewInstance_ReturnsFragment() {
-        val fragment =
-            ShopListFragment.newInstance(3, fabHandler)
-        Assert.assertNotNull(fragment)
-    }
-
-    @Test
     fun onClick_IsValidLocation_NavigateToShoppingList() = runTest {
         val shopLocation = get<LocationRepository>().getAll().first { it.id != 1 }
-        val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
 
-        getActivityScenario().onActivity {
-            navController.setGraph(R.navigation.mobile_navigation)
-            navController.setCurrentDestination(R.id.nav_all_lists)
-            Navigation.setViewNavController(activityFragment.requireView(), navController)
-        }
+        getActivityScenario()
 
         onView(withText(shopLocation.name)).perform(click())
 
-        val bundle = navController.backStack.last().arguments
-        val shoppingListBundle = bundler.getShoppingListBundle(bundle)
-
+        val shoppingListBundle = bundler.getShoppingListBundle(navigator.bundle)
         assertEquals(
             shopLocation.id,
             (shoppingListBundle.listGrouping as? ShoppingListGrouping.AisleGrouping)?.locationId
         )
 
         assertEquals(shopLocation.defaultFilter, shoppingListBundle.filterType)
-        assertEquals(R.id.nav_shopping_list, navController.currentDestination?.id)
+        assertEquals(R.id.nav_shopping_list, navigator.destination)
     }
 
     @Test
@@ -171,24 +161,18 @@ class ShopListFragmentTest : KoinTest {
     @Test
     fun onActionItemClicked_ActionItemIsEdit_NavigateToEditShop() = runTest {
         val editLocation = get<LocationRepository>().getAll().first { it.id != 1 }
-        val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
 
-        getActivityScenario().onActivity {
-            navController.setGraph(R.navigation.mobile_navigation)
-            navController.setCurrentDestination(R.id.nav_all_lists)
-            Navigation.setViewNavController(activityFragment.requireView(), navController)
-        }
+        getActivityScenario()
 
         onView(withText(editLocation.name)).perform(longClick())
         onView(withId(R.id.mnu_edit_shop_list_item)).perform(click())
 
-        val bundle = navController.backStack.last().arguments
-        val addEditLocationBundle = bundler.getAddEditLocationBundle(bundle)
-
+        val addEditLocationBundle = bundler.getAddEditLocationBundle(navigator.bundle)
         assertEquals(editLocation.id, addEditLocationBundle.locationId)
         assertEquals(editLocation.type, addEditLocationBundle.locationType)
         assertEquals(AddEditLocationBundle.LocationAction.EDIT, addEditLocationBundle.actionType)
-        assertEquals(R.id.nav_add_shop, navController.currentDestination?.id)
+
+        assertEquals(R.id.nav_add_shop, navigator.destination)
     }
 
     @Test
@@ -298,25 +282,18 @@ class ShopListFragmentTest : KoinTest {
     }
 
     @Test
-    fun onClickAddShopFab_ActionModeIsActive_DismissActionModeContextMenu() {
-        runTest {
-            val selectedLocation = get<LocationRepository>().getAll().first { it.id != 1 }
-            val shopItem =
-                onView(allOf(withText(selectedLocation.name), withId(R.id.txt_shop_name)))
-            val scenario = getActivityScenario()
+    fun onClickAddShopFab_ActionModeIsActive_DismissActionModeContextMenu() = runTest {
+        val selectedLocation = get<LocationRepository>().getAll().first { it.id != 1 }
+        val shopItem =
+            onView(allOf(withText(selectedLocation.name), withId(R.id.txt_shop_name)))
+        val scenario = getActivityScenario()
 
-            shopItem.perform(longClick())
-
-            scenario.onActivity { activity ->
-                fabHandler.setFabOnClickListener(
-                    activity, FabHandler.FabOption.ADD_SHOP
-                ) {}
-
-                fabHandler.clickFab(FabHandler.FabOption.ADD_SHOP, activityFragment.requireView())
-            }
-
-            onContextualActionBar().checkVisibility(View.GONE)
+        shopItem.perform(longClick())
+        scenario.onActivity {
+            fabHandler.clickFab(FabHandler.FabOption.ADD_SHOP)
         }
+
+        onContextualActionBar().checkVisibility(View.GONE)
     }
 
     private fun onContextualActionBar(): ViewInteraction =
@@ -383,6 +360,11 @@ class ShopListFragmentTest : KoinTest {
         openActionBarOverflowOrOptionsMenu(getInstrumentation().targetContext)
         onView(withText(android.R.string.copy)).perform(click())
 
+        // Verify that the Copy dialog is shown
+        onView(withText(copyDialogTitle))
+            .inRoot(isDialog())
+            .check(matches(isDisplayed()))
+
         onView(withText(android.R.string.cancel))
             .inRoot(isDialog())
             .perform(click())
@@ -436,6 +418,18 @@ class ShopListFragmentTest : KoinTest {
     @Test
     fun onActionItemClicked_ShowNoteCompleted_DialogClosed() = runTest {
         testShowNoteClosed(android.R.string.ok)
+    }
+
+    @Test
+    fun onClickAddShopFab_NavigateToAddShop() = runTest {
+        getActivityScenario().onActivity {
+            fabHandler.clickFab(FabHandler.FabOption.ADD_SHOP)
+        }
+
+        val addEditShopBundle = bundler.getAddEditLocationBundle(navigator.bundle)
+        assertEquals(AddEditLocationBundle.LocationAction.ADD, addEditShopBundle.actionType)
+
+        assertEquals(R.id.nav_add_shop, navigator.destination)
     }
 
     private fun ViewInteraction.checkVisibility(

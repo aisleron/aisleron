@@ -1045,9 +1045,11 @@ class ShoppingListViewModelTest : KoinTest {
         )
 
         loyaltyCardRepository.addToLocation(shoppingList.id, loyaltyCardId)
-        shoppingListViewModel.hydrate(getLocationGrouping(shoppingList.type), shoppingList.defaultFilter)
-        val loyaltyCard = loyaltyCardRepository.get(loyaltyCardId)
+        shoppingListViewModel.hydrate(
+            getLocationGrouping(shoppingList.type), shoppingList.defaultFilter
+        )
 
+        val loyaltyCard = loyaltyCardRepository.get(loyaltyCardId)
         val item = getLocationListItems(shoppingListViewModel).first { it.id == shoppingList.id }
         shoppingListViewModel.toggleItemSelection(item)
 
@@ -1412,5 +1414,76 @@ class ShoppingListViewModelTest : KoinTest {
         } finally {
             job.cancel()
         }
+    }
+
+    @Test
+    fun navigateToAddShop_EmitNavigateToAddShop() = runTest {
+        shoppingListViewModel.hydrate(getLocationGrouping(LocationType.SHOP), FilterType.NEEDED)
+
+        val event = awaitEvent(shoppingListViewModel) {
+            shoppingListViewModel.navigateToAddShop()
+        }
+
+        val expected = ShoppingListViewModel.ShoppingListEvent.NavigateToAddShop
+        assertEquals(expected, event)
+    }
+
+    @Test
+    fun navigateToAddProduct_NoAisleOrSearchQuery_EmitNavigateToAddProduct() = runTest {
+        val name = ""
+        val aisleId: Int? = null
+
+        shoppingListViewModel.hydrate(getLocationGrouping(LocationType.SHOP), FilterType.NEEDED)
+
+        val event = awaitEvent(shoppingListViewModel) {
+            shoppingListViewModel.navigateToAddProduct()
+        }
+
+        val expected = ShoppingListViewModel.ShoppingListEvent.NavigateToAddProduct(
+            name, FilterType.NEEDED, aisleId
+        )
+
+        assertEquals(expected, event)
+    }
+
+    @Test
+    fun navigateToAddProduct_HasSearchQuery_EmitNavigateToAddProductWithName() = runTest {
+        val name = "Test Add Product Navigation"
+        val aisleId: Int? = null
+
+        shoppingListViewModel.hydrate(getLocationGrouping(LocationType.SHOP), FilterType.NEEDED)
+        shoppingListViewModel.submitProductSearch(name)
+
+        val event = awaitEvent(shoppingListViewModel) {
+            shoppingListViewModel.navigateToAddProduct()
+        }
+
+        val expected = ShoppingListViewModel.ShoppingListEvent.NavigateToAddProduct(
+            name, FilterType.NEEDED, aisleId
+        )
+
+        assertEquals(expected, event)
+    }
+
+    @Test
+    fun navigateToAddProduct_HasSelectedAisle_EmitNavigateToAddProductWithAisleId() = runTest {
+        val name = ""
+
+        val shoppingList = getShoppingList()
+        shoppingListViewModel.hydrate(getAisleGrouping(shoppingList.id), shoppingList.defaultFilter)
+
+        val item = getAisleListItems(shoppingListViewModel).first()
+        shoppingListViewModel.toggleItemSelection(item)
+        val aisleId = item.id
+
+        val event = awaitEvent(shoppingListViewModel) {
+            shoppingListViewModel.navigateToAddProduct()
+        }
+
+        val expected = ShoppingListViewModel.ShoppingListEvent.NavigateToAddProduct(
+            name, FilterType.NEEDED, aisleId
+        )
+
+        assertEquals(expected, event)
     }
 }

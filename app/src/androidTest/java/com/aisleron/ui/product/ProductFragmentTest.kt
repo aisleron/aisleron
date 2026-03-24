@@ -40,6 +40,7 @@ import androidx.test.uiautomator.UiDevice
 import com.aisleron.R
 import com.aisleron.di.KoinTestRule
 import com.aisleron.di.daoTestModule
+import com.aisleron.di.generalTestModule
 import com.aisleron.di.repositoryModule
 import com.aisleron.di.useCaseModule
 import com.aisleron.di.viewModelTestModule
@@ -52,7 +53,10 @@ import com.aisleron.ui.AddEditFragmentListenerTestImpl
 import com.aisleron.ui.ApplicationTitleUpdateListenerTestImpl
 import com.aisleron.ui.FabHandler
 import com.aisleron.ui.FabHandlerTestImpl
+import com.aisleron.ui.bundles.AddEditLocationBundle
 import com.aisleron.ui.bundles.Bundler
+import com.aisleron.ui.navigation.Navigator
+import com.aisleron.ui.navigation.NavigatorTestImpl
 import com.aisleron.ui.settings.ProductPreferencesTestImpl
 import com.aisleron.utils.SystemIds
 import kotlinx.coroutines.runBlocking
@@ -77,10 +81,13 @@ class ProductFragmentTest : KoinTest {
     private lateinit var applicationTitleUpdateListener: ApplicationTitleUpdateListenerTestImpl
     private lateinit var fabHandler: FabHandlerTestImpl
     private lateinit var productRepository: ProductRepository
+    private lateinit var navigator: NavigatorTestImpl
 
     @get:Rule
     val koinTestRule = KoinTestRule(
-        modules = listOf(daoTestModule, viewModelTestModule, repositoryModule, useCaseModule)
+        modules = listOf(
+            daoTestModule, viewModelTestModule, repositoryModule, useCaseModule, generalTestModule
+        )
     )
 
     @Before
@@ -90,6 +97,7 @@ class ProductFragmentTest : KoinTest {
         applicationTitleUpdateListener = ApplicationTitleUpdateListenerTestImpl()
         productRepository = get<ProductRepository>()
         fabHandler = FabHandlerTestImpl()
+        navigator = get<Navigator>() as NavigatorTestImpl
         runBlocking { get<CreateSampleDataUseCase>().invoke() }
     }
 
@@ -457,7 +465,8 @@ class ProductFragmentTest : KoinTest {
                     addEditFragmentListener,
                     applicationTitleUpdateListener,
                     productPreferences ?: ProductPreferencesTestImpl(),
-                    fabHandler
+                    fabHandler,
+                    navigator
                 )
             }
         )
@@ -603,5 +612,29 @@ class ProductFragmentTest : KoinTest {
                 )
             )
             .check(matches(withText(startsWithIgnoringCase("ERROR"))))
+    }
+
+    @Test
+    fun onClickFab_IsAddShopFab_NavigateToAddShop() = runTest {
+        val preferences = getShowExtraOptionsPreference(true)
+        val existingProduct = productRepository.getAll().first()
+        val productBundle = bundler.makeEditProductBundle(existingProduct.id)
+        val scenario = getFragmentScenario(productBundle, preferences)
+
+        // Fab is hidden on notes tab
+        switchToExtrasTab(R.string.tab_notes)
+        assertEquals(0, fabHandler.getFabItems().size)
+
+        // Fab is displayed when switching to the Aisle tab
+        switchToExtrasTab(R.string.product_tab_aisles)
+
+        scenario.onFragment {
+            fabHandler.clickFab(FabHandler.FabOption.ADD_SHOP)
+        }
+
+        val addEditShopBundle = bundler.getAddEditLocationBundle(navigator.bundle)
+        Assert.assertEquals(AddEditLocationBundle.LocationAction.ADD, addEditShopBundle.actionType)
+
+        Assert.assertEquals(R.id.nav_add_shop, navigator.destination)
     }
 }

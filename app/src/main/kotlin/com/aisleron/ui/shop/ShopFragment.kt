@@ -243,26 +243,6 @@ class ShopFragment(
         }
     }
 
-    companion object {
-
-        @JvmStatic
-        fun newInstance(
-            name: String?,
-            addEditFragmentListener: AddEditFragmentListener,
-            applicationTitleUpdateListener: ApplicationTitleUpdateListener,
-            loyaltyCardProvider: LoyaltyCardProvider,
-            shopPreferences: ShopPreferences
-        ) =
-            ShopFragment(
-                addEditFragmentListener,
-                applicationTitleUpdateListener,
-                loyaltyCardProvider,
-                shopPreferences
-            ).apply {
-                arguments = Bundler().makeAddLocationBundle(name)
-            }
-    }
-
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
         menuInflater.inflate(R.menu.add_edit_fragment_main, menu)
     }

@@ -18,8 +18,6 @@
 package com.aisleron.ui
 
 import android.view.View
-import android.view.View.OnClickListener
-import androidx.navigation.findNavController
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.UiController
@@ -84,20 +82,6 @@ class FabHandlerTest : KoinTest {
     @After
     fun tearDown() {
         scenario.close()
-    }
-
-    @Test
-    fun clickFab_IsAddShop_NavigateToAddShop() {
-        scenario.onActivity {
-            fabHandler.setFabItems(it, FabHandler.FabOption.ADD_SHOP)
-        }
-
-        onView(withId(R.id.fab)).perform(click())
-
-        scenario.onActivity {
-            val navController = it.findNavController(R.id.nav_host_fragment_content_main)
-            assertEquals(R.id.nav_add_shop, navController.currentDestination?.id)
-        }
     }
 
     @Test
@@ -184,9 +168,28 @@ class FabHandlerTest : KoinTest {
             fabHandler.setFabItems(it)
         }
 
-
-
         onView(withId(R.id.fab)).check(matches(not(isDisplayed())))
+    }
+
+    @Test
+    fun setFab_CalledWithDifferentItems_MenuUpdated() {
+        scenario.onActivity {
+            setAllFabItems(it)
+        }
+
+        onView(withId(R.id.fab)).perform(click())
+        onView(withId(R.id.fab_add_shop)).check(matches(isDisplayed()))
+        onView(withId(R.id.fab_add_aisle)).check(matches(isDisplayed()))
+        onView(withId(R.id.fab_add_product)).check(matches(isDisplayed()))
+
+        scenario.onActivity {
+            fabHandler.setFabItems(it, FabHandler.FabOption.ADD_PRODUCT, FabHandler.FabOption.ADD_SHOP)
+        }
+
+        onView(withId(R.id.fab)).perform(click())
+        onView(withId(R.id.fab_add_shop)).check(matches(isDisplayed()))
+        onView(withId(R.id.fab_add_aisle)).check(matches(not(isDisplayed())))
+        onView(withId(R.id.fab_add_product)).check(matches(isDisplayed()))
     }
 
     @Test
@@ -200,34 +203,44 @@ class FabHandlerTest : KoinTest {
         }
     }
 
-    private fun clickFab_ArrangeActAssert(fabOption: FabHandler.FabOption, clickMessage: String) {
-        val fabOnClick = object {
-            var message: String = ""
-            val onClick = OnClickListener { message = clickMessage }
+    private fun getFabClickedCallBack() = object : FabHandler.FabClickedCallBack {
+        var option: FabHandler.FabOption? = null
+        override fun fabClicked(fabOption: FabHandler.FabOption) {
+            option = fabOption
         }
+    }
+
+    private fun clickFab_ArrangeActAssert(fabOption: FabHandler.FabOption) {
+        val fabClickedCallBack = getFabClickedCallBack()
 
         scenario.onActivity {
+            fabHandler.setFabOnClickedListener(fabClickedCallBack)
             fabHandler.setFabItems(it, fabOption)
-            fabHandler.setFabOnClickListener(
-                it, fabOption, fabOnClick.onClick
-            )
         }
 
         onView(withId(R.id.fab)).perform(click())
 
-        assertEquals(clickMessage, fabOnClick.message)
+        assertEquals(fabOption, fabClickedCallBack.option)
     }
 
     @Test
-    fun clickFab_IsAddProduct_ProductOnClickTriggered() {
-        val clickMessage = "Product Button Clicked"
-        clickFab_ArrangeActAssert(FabHandler.FabOption.ADD_PRODUCT, clickMessage)
+    fun clickFab_IsAddProduct_CallbackIsAddProduct() {
+        clickFab_ArrangeActAssert(FabHandler.FabOption.ADD_PRODUCT)
     }
 
     @Test
-    fun clickFab_IsAddAisle_AisleOnClickTriggered() {
-        val clickMessage = "Aisle Button Clicked"
-        clickFab_ArrangeActAssert(FabHandler.FabOption.ADD_AISLE, clickMessage)
+    fun clickFab_IsAddAisle_CallbackIsAddAisle() {
+        clickFab_ArrangeActAssert(FabHandler.FabOption.ADD_AISLE)
+    }
+
+    @Test
+    fun clickFab_IsAddShop_CallbackIsAddShop() {
+        clickFab_ArrangeActAssert(FabHandler.FabOption.ADD_SHOP)
+    }
+
+    @Test
+    fun clickFab_IsSearch_CallbackIsSearch() {
+        clickFab_ArrangeActAssert(FabHandler.FabOption.SEARCH)
     }
 
     @Test
@@ -236,7 +249,7 @@ class FabHandlerTest : KoinTest {
         scenario.onActivity {
             setAllFabItems(it)
             // This listener does nothing, simulating the bug case
-            fabHandler.setFabOnClickListener(it, FabHandler.FabOption.ADD_PRODUCT) { }
+            fabHandler.setFabOnClickedListener(getFabClickedCallBack())
         }
 
         // Act 1: Open the main FAB menu
@@ -303,10 +316,4 @@ class FabHandlerTest : KoinTest {
             assertEquals(0f, fab.rotation)
         }
     }
-
-    /**
-     * Test:
-     * * hideFabViews
-     * * reset (How)?
-     */
 }

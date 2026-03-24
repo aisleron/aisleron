@@ -21,12 +21,9 @@ import android.app.Instrumentation
 import android.content.Intent
 import androidx.fragment.app.testing.FragmentScenario
 import androidx.fragment.app.testing.launchFragmentInContainer
-import androidx.navigation.Navigation
 import androidx.navigation.findNavController
-import androidx.navigation.testing.TestNavHostController
 import androidx.preference.PreferenceManager
 import androidx.test.core.app.ActivityScenario
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -61,6 +58,10 @@ import com.aisleron.domain.product.ProductRepository
 import com.aisleron.domain.preferences.TrackingMode
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import com.aisleron.ui.FabHandlerTestImpl
+import com.aisleron.ui.bundles.Bundler
+import com.aisleron.ui.navigation.Navigator
+import com.aisleron.ui.navigation.NavigatorImpl
+import com.aisleron.ui.navigation.NavigatorTestImpl
 import com.aisleron.ui.settings.WelcomePreferencesTestImpl
 import com.aisleron.utils.SystemIds
 import kotlinx.coroutines.runBlocking
@@ -82,10 +83,13 @@ import kotlin.test.assertTrue
 
 class WelcomeFragmentTest : KoinTest {
     private lateinit var fabHandler: FabHandlerTestImpl
+    private lateinit var navigator: NavigatorTestImpl
 
     @get:Rule
     val koinTestRule = KoinTestRule(
-        modules = listOf(daoTestModule, viewModelTestModule, repositoryModule, useCaseModule)
+        modules = listOf(
+            daoTestModule, viewModelTestModule, repositoryModule, useCaseModule, generalTestModule
+        )
     )
 
     private fun getFragmentScenario(
@@ -95,7 +99,8 @@ class WelcomeFragmentTest : KoinTest {
             themeResId = R.style.Theme_Aisleron,
             instantiate = {
                 WelcomeFragment(
-                    welcomePreferences ?: WelcomePreferencesTestImpl()
+                    welcomePreferences ?: WelcomePreferencesTestImpl(),
+                    navigator
                 )
             }
         )
@@ -103,16 +108,8 @@ class WelcomeFragmentTest : KoinTest {
     @Before
     fun setUp() {
         fabHandler = FabHandlerTestImpl()
+        navigator = get<Navigator>() as NavigatorTestImpl
         SharedPreferencesInitializer().clearPreferences()
-    }
-
-    @Test
-    fun newInstance_CallNewInstance_ReturnsFragment() {
-        val fragment =
-            WelcomeFragment.newInstance(
-                WelcomePreferencesTestImpl()
-            )
-        Assert.assertNotNull(fragment)
     }
 
     @Test
@@ -125,13 +122,16 @@ class WelcomeFragmentTest : KoinTest {
                 factoryModule
             )
         )
+
+        declare<Navigator> { NavigatorImpl(Bundler()) }
+
         SharedPreferencesInitializer().setIsInitialized(false)
         val scenario = ActivityScenario.launch(MainActivity::class.java)
         scenario.use { s ->
             s.onActivity { a ->
                 val navController = a.findNavController(R.id.nav_host_fragment_content_main)
-
                 assertEquals(R.id.nav_welcome, navController.currentDestination?.id)
+
                 assertEquals(a.getString(R.string.welcome_app_title), a.supportActionBar?.title)
             }
         }
@@ -153,8 +153,8 @@ class WelcomeFragmentTest : KoinTest {
         scenario.use { s ->
             s.onActivity { a ->
                 val navController = a.findNavController(R.id.nav_host_fragment_content_main)
-
                 assertEquals(R.id.nav_shopping_list, navController.currentDestination?.id)
+
                 assertEquals(a.getString(R.string.app_name), a.supportActionBar?.title)
             }
         }
@@ -165,41 +165,23 @@ class WelcomeFragmentTest : KoinTest {
         val productCountBefore = get<ProductRepository>().getAll().count()
         val locationCountBefore = get<LocationRepository>().getAll().count()
         val aisleCountBefore = get<AisleRepository>().getAll().count()
-
-        val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
-        getFragmentScenario().onFragment { fragment ->
-            navController.setGraph(R.navigation.mobile_navigation)
-            navController.setCurrentDestination(R.id.nav_welcome)
-            Navigation.setViewNavController(fragment.requireView(), navController)
-        }
+        val welcomePreferences = WelcomePreferencesTestImpl()
+        val initialisedBefore = welcomePreferences.isInitialized()
+        getFragmentScenario(welcomePreferences)
 
         val welcomeOption = onView(withId(R.id.txt_welcome_add_own_product))
         welcomeOption.perform(click())
 
         val productCountAfter = get<ProductRepository>().getAll().count()
-        val locationCountAfter = get<LocationRepository>().getAll().count()
-        val aisleCountAfter = get<AisleRepository>().getAll().count()
-
         assertEquals(productCountBefore, productCountAfter)
+
+        val locationCountAfter = get<LocationRepository>().getAll().count()
         assertEquals(locationCountBefore, locationCountAfter)
+
+        val aisleCountAfter = get<AisleRepository>().getAll().count()
         assertEquals(aisleCountBefore, aisleCountAfter)
-        Assert.assertEquals(R.id.nav_in_stock, navController.currentDestination?.id)
-    }
 
-    @Test
-    fun welcomePage_SelectAddOwnProducts_InitializeOptionSet() {
-        val welcomePreferences = WelcomePreferencesTestImpl()
-        val initialisedBefore = welcomePreferences.isInitialized()
-
-        val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
-        getFragmentScenario(welcomePreferences).onFragment { fragment ->
-            navController.setGraph(R.navigation.mobile_navigation)
-            navController.setCurrentDestination(R.id.nav_welcome)
-            Navigation.setViewNavController(fragment.requireView(), navController)
-        }
-
-        val welcomeOption = onView(withId(R.id.txt_welcome_add_own_product))
-        welcomeOption.perform(click())
+        Assert.assertEquals(R.id.nav_in_stock, navigator.destination)
 
         Assert.assertFalse(initialisedBefore)
         Assert.assertTrue(welcomePreferences.isInitialized())
@@ -210,41 +192,23 @@ class WelcomeFragmentTest : KoinTest {
         val productCountBefore = get<ProductRepository>().getAll().count()
         val locationCountBefore = get<LocationRepository>().getAll().count()
         val aisleCountBefore = get<AisleRepository>().getAll().count()
-
-        val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
-        getFragmentScenario().onFragment { fragment ->
-            navController.setGraph(R.navigation.mobile_navigation)
-            navController.setCurrentDestination(R.id.nav_welcome)
-            Navigation.setViewNavController(fragment.requireView(), navController)
-        }
+        val welcomePreferences = WelcomePreferencesTestImpl()
+        val initialisedBefore = welcomePreferences.isInitialized()
+        getFragmentScenario(welcomePreferences)
 
         val welcomeOption = onView(withId(R.id.txt_welcome_load_sample_items))
         welcomeOption.perform(click())
 
         val productCountAfter = get<ProductRepository>().getAll().count()
-        val locationCountAfter = get<LocationRepository>().getAll().count()
-        val aisleCountAfter = get<AisleRepository>().getAll().count()
-
         assertTrue(productCountBefore < productCountAfter)
+
+        val locationCountAfter = get<LocationRepository>().getAll().count()
         assertTrue(locationCountBefore < locationCountAfter)
+
+        val aisleCountAfter = get<AisleRepository>().getAll().count()
         assertTrue(aisleCountBefore < aisleCountAfter)
-        Assert.assertEquals(R.id.nav_in_stock, navController.currentDestination?.id)
-    }
 
-    @Test
-    fun welcomePage_SelectLoadSampleItems_InitializeOptionSet() {
-        val welcomePreferences = WelcomePreferencesTestImpl()
-        val initialisedBefore = welcomePreferences.isInitialized()
-
-        val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
-        getFragmentScenario(welcomePreferences).onFragment { fragment ->
-            navController.setGraph(R.navigation.mobile_navigation)
-            navController.setCurrentDestination(R.id.nav_welcome)
-            Navigation.setViewNavController(fragment.requireView(), navController)
-        }
-
-        val welcomeOption = onView(withId(R.id.txt_welcome_load_sample_items))
-        welcomeOption.perform(click())
+        Assert.assertEquals(R.id.nav_in_stock, navigator.destination)
 
         Assert.assertFalse(initialisedBefore)
         Assert.assertTrue(welcomePreferences.isInitialized())
@@ -281,37 +245,18 @@ class WelcomeFragmentTest : KoinTest {
     }
 
     @Test
-    fun welcomePage_SelectRestoreDatabase_InitializeOptionSet() {
+    fun welcomePage_SelectRestoreDatabase_NavigateToSettings() {
         val welcomePreferences = WelcomePreferencesTestImpl()
         val initialisedBefore = welcomePreferences.isInitialized()
-
-        val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
-        getFragmentScenario(welcomePreferences).onFragment { fragment ->
-            navController.setGraph(R.navigation.mobile_navigation)
-            navController.setCurrentDestination(R.id.nav_welcome)
-            Navigation.setViewNavController(fragment.requireView(), navController)
-        }
+        getFragmentScenario(welcomePreferences)
 
         val welcomeOption = onView(withId(R.id.txt_welcome_import_db))
         welcomeOption.perform(click())
+
+        Assert.assertEquals(R.id.nav_settings, navigator.destination)
 
         Assert.assertFalse(initialisedBefore)
         Assert.assertTrue(welcomePreferences.isInitialized())
-    }
-
-    @Test
-    fun welcomePage_SelectRestoreDatabase_NavigateToSettings() {
-        val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
-        getFragmentScenario().onFragment { fragment ->
-            navController.setGraph(R.navigation.mobile_navigation)
-            navController.setCurrentDestination(R.id.nav_welcome)
-            Navigation.setViewNavController(fragment.requireView(), navController)
-        }
-
-        val welcomeOption = onView(withId(R.id.txt_welcome_import_db))
-        welcomeOption.perform(click())
-
-        Assert.assertEquals(R.id.nav_settings, navController.currentDestination?.id)
     }
 
     @Test
@@ -325,6 +270,9 @@ class WelcomeFragmentTest : KoinTest {
                 factoryModule
             )
         )
+
+        declare<Navigator> { NavigatorImpl(Bundler()) }
+
         SharedPreferencesInitializer().setIsInitialized(false)
         val scenario = ActivityScenario.launch(MainActivity::class.java)
 
@@ -354,7 +302,6 @@ class WelcomeFragmentTest : KoinTest {
         getFragmentScenario().onFragment { fragment ->
             documentsUri = fragment.getString(R.string.aisleron_documentation_url)
         }
-
 
         val expectedIntent = Matchers.allOf(hasAction(Intent.ACTION_VIEW), hasData(documentsUri))
         intending(expectedIntent).respondWith(Instrumentation.ActivityResult(0, null))
@@ -398,12 +345,7 @@ class WelcomeFragmentTest : KoinTest {
     @Test
     fun welcomePage_Initialized_UpdateVersionParametersSet() {
         val welcomePreferences = WelcomePreferencesTestImpl()
-        val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
-        getFragmentScenario(welcomePreferences).onFragment { fragment ->
-            navController.setGraph(R.navigation.mobile_navigation)
-            navController.setCurrentDestination(R.id.nav_welcome)
-            Navigation.setViewNavController(fragment.requireView(), navController)
-        }
+        getFragmentScenario(welcomePreferences)
 
         val welcomeOption = onView(withId(R.id.txt_welcome_load_sample_items))
         welcomeOption.perform(click())

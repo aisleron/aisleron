@@ -146,14 +146,14 @@
     <string name="edit_aisle">Wysig Gang</string>
     <string name="edit_location">Wysig Winkel</string>
     <string name="main_fab">Hoof FAB</string>
-    <string name="add_shop_fab">Voeg Winkel FAB By</string>
-    <string name="add_aisle_fab">Voeg Gang FAB By</string>
-    <string name="add_product_fab">Voeg Produk FAB By</string>
+    <string name="add_shop_fab">Voeg Winkel By FAB</string>
+    <string name="add_aisle_fab">Voeg Gang By FAB</string>
+    <string name="add_product_fab">Voeg Produk By FAB</string>
     <string name="title_activity_about">Oor Aisleron</string>
     <string name="shopping_list_options_header">Inkopielysopsies</string>
     <string name="hide_status_change_snack_bar">Versteek statusveranderingsboodskap</string>
     <string name="status_change_confirmation">%1$s geskuif na %2$s</string>
-    <string name="undo">ONgedaan maak</string>
+    <string name="undo">Ongedaan maak</string>
     <string name="aisleron_logo">Aisleron-logo</string>
     <string name="in_stock_at_home">In voorraad by die huis?</string>
     <string name="shop_logo">Winkellogo</string>
@@ -211,4 +211,6 @@
     <string name="about_contribute_donate_title">Skenk</string>
     <string name="about_contribute_donate_summary">Dra finansieel by tot Aisleron</string>
     <string name="show_location_list">Wys %1$s</string>
+    <string name="search">Soek</string>
+    <string name="search_fab">Soek-FAB</string>
 </resources>

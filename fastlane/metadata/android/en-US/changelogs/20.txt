@@ -1,0 +1,6 @@
+Enhancements:
+* Added a Search entry to the Floating Action Button menu.
+* Populate Name on Add Product page with search results if available.
+
+Bug Fixes:
+*

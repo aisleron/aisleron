@@ -31,17 +31,6 @@ class FabHandlerTestImpl : FabHandler {
         _fabClickedCallBack = fabClickedCallBack
     }
 
-    override fun setFabOnClickListener(
-        activity: Activity,
-        fabOption: FabHandler.FabOption,
-        onClickListener: View.OnClickListener
-    ) {
-        fabOnClick[fabOption] = View.OnClickListener {
-            onClickListener.onClick(it)
-            _fabClickedCallBack?.fabClicked(fabOption)
-        }
-    }
-
     override fun setFabItems(activity: Activity, vararg fabOptions: FabHandler.FabOption) {
         fabItems.clear()
         fabItems.addAll(fabOptions)
@@ -51,8 +40,8 @@ class FabHandlerTestImpl : FabHandler {
         fabOnClick.clear()
     }
 
-    fun clickFab(fabOption: FabHandler.FabOption, view: View) {
-        fabOnClick[fabOption]?.onClick(view)
+    fun clickFab(fabOption: FabHandler.FabOption) {
+        _fabClickedCallBack?.fabClicked(fabOption)
     }
 
     fun getFabItems(): List<FabHandler.FabOption> = fabItems

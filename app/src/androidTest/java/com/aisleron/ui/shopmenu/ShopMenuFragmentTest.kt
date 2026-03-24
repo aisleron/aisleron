@@ -21,9 +21,6 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.testing.FragmentScenario
 import androidx.fragment.app.testing.launchFragmentInContainer
-import androidx.navigation.Navigation
-import androidx.navigation.testing.TestNavHostController
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -33,17 +30,19 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import com.aisleron.R
 import com.aisleron.di.KoinTestRule
 import com.aisleron.di.daoTestModule
+import com.aisleron.di.generalTestModule
 import com.aisleron.di.repositoryModule
 import com.aisleron.di.useCaseModule
 import com.aisleron.di.viewModelTestModule
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import com.aisleron.ui.bundles.Bundler
+import com.aisleron.ui.navigation.Navigator
+import com.aisleron.ui.navigation.NavigatorTestImpl
 import com.aisleron.ui.shoppinglist.ShoppingListGrouping
 import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
@@ -53,16 +52,19 @@ import org.koin.test.get
 
 class ShopMenuFragmentTest : KoinTest {
     private lateinit var bundler: Bundler
+    private lateinit var navigator: NavigatorTestImpl
 
     @get:Rule
     val koinTestRule = KoinTestRule(
-        modules = listOf(daoTestModule, viewModelTestModule, repositoryModule, useCaseModule)
+        modules = listOf(
+            daoTestModule, viewModelTestModule, repositoryModule, useCaseModule, generalTestModule
+        )
     )
 
     private fun getFragmentScenario(): FragmentScenario<ShopMenuFragment> {
         val scenario = launchFragmentInContainer<ShopMenuFragment>(
             themeResId = R.style.Theme_Aisleron,
-            instantiate = { ShopMenuFragment() }
+            instantiate = { ShopMenuFragment(navigator) }
         )
 
         scenario.onFragment {
@@ -86,16 +88,10 @@ class ShopMenuFragmentTest : KoinTest {
         return scenario
     }
 
-    @Test
-    fun newInstance_CallNewInstance_ReturnsFragment() {
-        val fragment =
-            ShopMenuFragment.newInstance()
-        Assert.assertNotNull(fragment)
-    }
-
     @Before
     fun setUp() {
         bundler = Bundler()
+        navigator = get<Navigator>() as NavigatorTestImpl
         runBlocking { get<CreateSampleDataUseCase>().invoke() }
     }
 
@@ -110,28 +106,18 @@ class ShopMenuFragmentTest : KoinTest {
     fun onItemClick_IsValidLocation_NavigateToShoppingList() = runTest {
         val shopLocation = get<LocationRepository>().getAll().first { it.pinned }
 
-        // Create a TestNavHostController
-        val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
-
-        getFragmentScenario().onFragment { fragment ->
-            // Set the graph on the TestNavHostController
-            navController.setGraph(R.navigation.mobile_navigation)
-
-            // Make the NavController available via the findNavController() APIs
-            Navigation.setViewNavController(fragment.requireView(), navController)
-        }
+        getFragmentScenario()
 
         onView(withText(shopLocation.name)).perform(click())
 
-        val bundle = navController.currentBackStackEntry?.arguments
-        val shoppingListBundle = bundler.getShoppingListBundle(bundle)
+        val shoppingListBundle = bundler.getShoppingListBundle(navigator.bundle)
 
+        assertEquals(shopLocation.defaultFilter, shoppingListBundle.filterType)
         assertEquals(
             shopLocation.id,
             (shoppingListBundle.listGrouping as? ShoppingListGrouping.AisleGrouping)?.locationId
         )
 
-        assertEquals(shopLocation.defaultFilter, shoppingListBundle.filterType)
-        assertEquals(R.id.nav_shopping_list, navController.currentDestination?.id)
+        assertEquals(R.id.nav_shopping_list, navigator.destination)
     }
 }

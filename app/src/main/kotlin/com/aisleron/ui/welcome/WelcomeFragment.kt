@@ -30,12 +30,12 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.fragment.findNavController
 import com.aisleron.R
 import com.aisleron.databinding.FragmentWelcomeBinding
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.ui.AisleronExceptionMap
 import com.aisleron.ui.AisleronFragment
+import com.aisleron.ui.navigation.Navigator
 import com.aisleron.ui.settings.WelcomePreferences
 import com.aisleron.ui.widgets.ErrorSnackBar
 import com.google.android.material.snackbar.Snackbar
@@ -44,14 +44,9 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 class WelcomeFragment(
-    private val welcomePreferences: WelcomePreferences
+    private val welcomePreferences: WelcomePreferences,
+    private val navigator: Navigator
 ) : Fragment(), AisleronFragment {
-
-    companion object {
-        fun newInstance(
-            welcomePreferences: WelcomePreferences
-        ) = WelcomeFragment(welcomePreferences)
-    }
 
     private val viewModel: WelcomeViewModel by viewModel()
 
@@ -135,8 +130,7 @@ class WelcomeFragment(
     }
 
     private fun navigateTo(@IdRes resId: Int) {
-        val navController = findNavController()
-        navController.navigate(resId, null)
+        navigator.navigateToDefaultRoute(resId)
     }
 
     private fun displayErrorSnackBar(

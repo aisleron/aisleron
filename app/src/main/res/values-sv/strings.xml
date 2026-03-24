@@ -202,4 +202,6 @@
     <string name="about_contribute_donate_title">Donera</string>
     <string name="about_contribute_donate_summary">Bidra ekonomiskt till Aisleron</string>
     <string name="show_location_list">Visa %1$s</string>
+    <string name="search">Sök</string>
+    <string name="search_fab">Sök-FAB</string>
 </resources>

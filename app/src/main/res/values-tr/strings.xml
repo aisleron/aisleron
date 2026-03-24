@@ -185,4 +185,6 @@
     <string name="expand_collapse_aisles">Reyon dökümlerini aç/kapa</string>
     <string name="items_selected">%1$d madde</string>
     <string name="show_location_list">%1$s Göster</string>
+    <string name="search">Ara</string>
+    <string name="search_fab">Ara FAB</string>
 </resources>
