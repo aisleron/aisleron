@@ -14,9 +14,7 @@
   ~
   ~ You should have received a copy of the GNU Affero General Public License
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
-  -->
-
-<resources>
+  --><resources>
     <string name="edit">Edytuj</string>
     <string name="undo">COFNIJ</string>
     <string name="about_support_documentation_title">Dokumentacja</string>
@@ -204,4 +202,8 @@
     <string name="show_location_list">Pokaż %1$s</string>
     <string name="search">Szukaj</string>
     <string name="search_fab">Szukaj FAB</string>
+    <string name="nav_header_title" translatable="false"></string>
+    <string name="id_label" translatable="false"></string>
+    <string name="aisleron_documentation_url" translatable="false"></string>
+    <string name="app_name" translatable="false"></string>
 </resources>
