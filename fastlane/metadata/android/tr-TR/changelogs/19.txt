@@ -1,4 +1,5 @@
 İyileştirmeler:
+* Ürün listesinin konuma veya dükkâna göre gruplanarak görüntülenmesi seçeneği eklendi.
 * Hakkında sayfasına bir Katkı bölümü eklendi.
 * Türkçe çeviriler eklendi.
 
