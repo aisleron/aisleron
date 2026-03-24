@@ -17,9 +17,11 @@
 
 package com.aisleron.di
 
+import com.aisleron.ui.menu.NavigationDrawerFragment
 import com.aisleron.ui.product.ProductFragment
 import com.aisleron.ui.shop.ShopFragment
 import com.aisleron.ui.shoplist.ShopListFragment
+import com.aisleron.ui.shopmenu.ShopMenuFragment
 import com.aisleron.ui.shoppinglist.ShoppingListFragment
 import com.aisleron.ui.welcome.WelcomeFragment
 import org.koin.androidx.fragment.dsl.fragment
@@ -31,7 +33,8 @@ val fragmentModule = module {
             applicationTitleUpdateListener = get(),
             fabHandler = get(),
             shoppingListPreferences = get(),
-            loyaltyCardProvider = get()
+            loyaltyCardProvider = get(),
+            navigator = get()
         )
     }
 
@@ -40,7 +43,8 @@ val fragmentModule = module {
             addEditFragmentListener = get(),
             applicationTitleUpdateListener = get(),
             productPreferences = get(),
-            fabHandler = get()
+            fabHandler = get(),
+            navigator = get()
         )
     }
 
@@ -53,11 +57,29 @@ val fragmentModule = module {
         )
     }
 
-    fragment { ShopListFragment(fabHandler = get()) }
+    fragment {
+        ShopListFragment(
+            fabHandler = get(),
+            navigator = get()
+        )
+    }
+
+    fragment {
+        ShopMenuFragment(
+            navigator = get()
+        )
+    }
+
+    fragment {
+        NavigationDrawerFragment(
+            navigator = get()
+        )
+    }
 
     fragment {
         WelcomeFragment(
-            welcomePreferences = get()
+            welcomePreferences = get(),
+            navigator = get()
         )
     }
 

@@ -32,7 +32,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -42,9 +41,9 @@ import com.aisleron.ui.AisleronExceptionMap
 import com.aisleron.ui.AisleronFragment
 import com.aisleron.ui.FabHandler
 import com.aisleron.ui.FabHandler.FabClickedCallBack
-import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.copyentity.CopyEntityDialogFragment
 import com.aisleron.ui.copyentity.CopyEntityType
+import com.aisleron.ui.navigation.Navigator
 import com.aisleron.ui.note.NoteDialogFragment
 import com.aisleron.ui.note.NoteParentRef
 import com.aisleron.ui.widgets.ErrorSnackBar
@@ -53,10 +52,9 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-/**
- * A fragment representing a list of Items.
- */
-class ShopListFragment(private val fabHandler: FabHandler) : Fragment(), ActionMode.Callback,
+class ShopListFragment(
+    private val fabHandler: FabHandler, private val navigator: Navigator
+) : Fragment(), ActionMode.Callback,
     ShopListItemRecyclerViewAdapter.ShopListItemListener, FabClickedCallBack, AisleronFragment {
 
     private var actionMode: ActionMode? = null
@@ -74,16 +72,6 @@ class ShopListFragment(private val fabHandler: FabHandler) : Fragment(), ActionM
         }
 
         shopListViewModel.hydrateAllShops()
-    }
-
-    private fun navigateToShoppingList(item: ShopListItemViewModel) {
-        val bundle = Bundler().makeShoppingListBundle(item.id, item.defaultFilter)
-        this.findNavController().navigate(R.id.action_nav_all_lists_to_nav_shopping_list, bundle)
-    }
-
-    private fun navigateToEditShop(locationId: Int) {
-        val bundle = Bundler().makeEditLocationBundle(locationId)
-        this.findNavController().navigate(R.id.nav_add_shop, bundle)
     }
 
     override fun onCreateView(
@@ -115,14 +103,17 @@ class ShopListFragment(private val fabHandler: FabHandler) : Fragment(), ActionM
                     }
                 }
             }
+
             with(view) {
                 layoutManager = when {
                     columnCount <= 1 -> LinearLayoutManager(context)
                     else -> GridLayoutManager(context, columnCount)
                 }
+
                 adapter = ShopListItemRecyclerViewAdapter(this@ShopListFragment)
             }
         }
+
         return view
     }
 
@@ -218,7 +209,7 @@ class ShopListFragment(private val fabHandler: FabHandler) : Fragment(), ActionM
     }
 
     private fun editShopListItem(item: ShopListItemViewModel) {
-        navigateToEditShop(item.id)
+        navigator.navigateToEditShop(item.id)
     }
 
     override fun onDestroyActionMode(mode: ActionMode?) {
@@ -229,16 +220,7 @@ class ShopListFragment(private val fabHandler: FabHandler) : Fragment(), ActionM
     }
 
     companion object {
-
         const val ARG_COLUMN_COUNT = "column-count"
-
-        @JvmStatic
-        fun newInstance(columnCount: Int, fabHandler: FabHandler) =
-            ShopListFragment(fabHandler).apply {
-                arguments = Bundle().apply {
-                    putInt(ARG_COLUMN_COUNT, columnCount)
-                }
-            }
     }
 
     override fun onClick(item: ShopListItemViewModel) {
@@ -247,7 +229,7 @@ class ShopListFragment(private val fabHandler: FabHandler) : Fragment(), ActionM
             return
         }
 
-        navigateToShoppingList(item)
+        navigator.navigateToAisleGroupedProductList(item.id, item.defaultFilter)
     }
 
     override fun onLongClick(item: ShopListItemViewModel, view: View): Boolean {
@@ -269,5 +251,14 @@ class ShopListFragment(private val fabHandler: FabHandler) : Fragment(), ActionM
 
     override fun fabClicked(fabOption: FabHandler.FabOption) {
         actionMode?.finish()
+
+        if (fabOption == FabHandler.FabOption.ADD_SHOP) {
+            navigator.navigateToAddShop()
+        }
+    }
+
+    override fun onDestroyView() {
+        fabHandler.reset()
+        super.onDestroyView()
     }
 }

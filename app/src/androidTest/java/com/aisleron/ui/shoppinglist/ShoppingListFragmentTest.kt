@@ -28,10 +28,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import androidx.fragment.app.testing.FragmentScenario
 import androidx.fragment.app.testing.launchFragmentInContainer
-import androidx.navigation.Navigation
-import androidx.navigation.testing.TestNavHostController
 import androidx.test.core.app.ActivityScenario
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
 import androidx.test.espresso.Espresso.pressBack
@@ -95,6 +92,8 @@ import com.aisleron.ui.bundles.AddEditProductBundle
 import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.loyaltycard.LoyaltyCardProvider
 import com.aisleron.ui.loyaltycard.LoyaltyCardProviderTestImpl
+import com.aisleron.ui.navigation.Navigator
+import com.aisleron.ui.navigation.NavigatorTestImpl
 import com.aisleron.ui.settings.ShoppingListPreferencesTestImpl
 import com.aisleron.utils.SystemIds
 import kotlinx.coroutines.flow.first
@@ -124,6 +123,7 @@ class ShoppingListFragmentTest : KoinTest {
     private lateinit var applicationTitleUpdateListener: ApplicationTitleUpdateListenerTestImpl
     private lateinit var fabHandler: FabHandlerTestImpl
     private lateinit var activityFragment: ShoppingListFragment
+    private lateinit var navigator: NavigatorTestImpl
 
     @get:Rule
     val koinTestRule = KoinTestRule(
@@ -164,7 +164,8 @@ class ShoppingListFragmentTest : KoinTest {
                 applicationTitleUpdateListener,
                 fabHandler,
                 shoppingListPreferencesTestImpl ?: ShoppingListPreferencesTestImpl(),
-                loyaltyCardProvider ?: get<LoyaltyCardProvider>()
+                loyaltyCardProvider ?: get<LoyaltyCardProvider>(),
+                navigator = navigator
             ).apply {
                 arguments = fragmentArgs
             }
@@ -192,7 +193,8 @@ class ShoppingListFragmentTest : KoinTest {
                     applicationTitleUpdateListener,
                     fabHandler,
                     shoppingListPreferencesTestImpl ?: ShoppingListPreferencesTestImpl(),
-                    loyaltyCardProvider ?: get<LoyaltyCardProvider>()
+                    loyaltyCardProvider ?: get<LoyaltyCardProvider>(),
+                    navigator = navigator
                 )
             }
         )
@@ -212,6 +214,7 @@ class ShoppingListFragmentTest : KoinTest {
         bundler = Bundler()
         applicationTitleUpdateListener = ApplicationTitleUpdateListenerTestImpl()
         fabHandler = FabHandlerTestImpl()
+        navigator = get<Navigator>() as NavigatorTestImpl
         runBlocking { get<CreateSampleDataUseCase>().invoke() }
     }
 
@@ -726,24 +729,17 @@ class ShoppingListFragmentTest : KoinTest {
         val shoppingListBundle =
             bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
 
-        val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
-        val scenario = getActivityScenario(shoppingListBundle)
-        scenario.onActivity {
-            navController.setGraph(R.navigation.mobile_navigation)
-            navController.setCurrentDestination(R.id.nav_shopping_list)
-            Navigation.setViewNavController(activityFragment.requireView(), navController)
-        }
+        getActivityScenario(shoppingListBundle)
 
         val productItem = onView(allOf(withText(product.name), withId(R.id.txt_product_name)))
         productItem.perform(longClick())
         onView(withId(R.id.mnu_edit_shopping_list_item)).perform(click())
 
-        val bundle = navController.backStack.last().arguments
-        val addEditProductBundle = bundler.getAddEditProductBundle(bundle)
+        val addEditProductBundle = bundler.getAddEditProductBundle(navigator.bundle)
 
         assertEquals(product.id, addEditProductBundle.productId)
         assertEquals(AddEditProductBundle.ProductAction.EDIT, addEditProductBundle.actionType)
-        assertEquals(R.id.nav_add_product, navController.currentDestination?.id)
+        assertEquals(R.id.nav_add_product, navigator.destination)
     }
 
     @Test
@@ -837,24 +833,19 @@ class ShoppingListFragmentTest : KoinTest {
         val shoppingListBundle =
             bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
 
-        val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
-        getFragmentScenario(shoppingListBundle).onFragment { fragment ->
-            navController.setGraph(R.navigation.mobile_navigation)
-            navController.setCurrentDestination(R.id.nav_shopping_list)
-            Navigation.setViewNavController(fragment.requireView(), navController)
-            fabHandler.clickFab(FabHandler.FabOption.ADD_PRODUCT, fragment.requireView())
+        getFragmentScenario(shoppingListBundle).onFragment {
+            fabHandler.clickFab(FabHandler.FabOption.ADD_PRODUCT)
         }
 
-        val bundle = navController.backStack.last().arguments
-        val addEditProductBundle = bundler.getAddEditProductBundle(bundle)
-
-        assertNull(addEditProductBundle.name)
+        val addEditProductBundle = bundler.getAddEditProductBundle(navigator.bundle)
+        assertEquals("", addEditProductBundle.name)
         assertEquals(AddEditProductBundle.ProductAction.ADD, addEditProductBundle.actionType)
         assertEquals(
             shoppingList.defaultFilter == FilterType.IN_STOCK,
             addEditProductBundle.inStock
         )
-        assertEquals(R.id.nav_add_product, navController.currentDestination?.id)
+
+        assertEquals(R.id.nav_add_product, navigator.destination)
     }
 
     @Test
@@ -864,7 +855,7 @@ class ShoppingListFragmentTest : KoinTest {
             bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
 
         getFragmentScenario(shoppingListBundle).onFragment {
-            fabHandler.clickFab(FabHandler.FabOption.ADD_AISLE, it.requireView())
+            fabHandler.clickFab(FabHandler.FabOption.ADD_AISLE)
         }
 
         onView(withText(R.string.add_aisle))
@@ -878,6 +869,23 @@ class ShoppingListFragmentTest : KoinTest {
         onView(allOf(instanceOf(EditText::class.java)))
             .inRoot(isDialog())
             .check(matches(withText("")))
+    }
+
+    @Test
+    fun onClickFab_IsAddShopFab_NavigateToAddShop() = runTest {
+        val shoppingList = getShoppingList()
+        val shoppingListBundle =
+            bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
+
+        getFragmentScenario(shoppingListBundle).onFragment {
+            fabHandler.clickFab(FabHandler.FabOption.ADD_SHOP)
+        }
+
+        val addEditLocationBundle = bundler.getAddEditLocationBundle(navigator.bundle)
+        assertNull(addEditLocationBundle.name)
+        assertEquals(AddEditLocationBundle.LocationAction.ADD, addEditLocationBundle.actionType)
+
+        assertEquals(R.id.nav_add_shop, navigator.destination)
     }
 
     @Test
@@ -954,23 +962,16 @@ class ShoppingListFragmentTest : KoinTest {
         val shoppingListBundle =
             bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
 
-        val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
-        val scenario = getActivityScenario(shoppingListBundle)
-        scenario.onActivity {
-            navController.setGraph(R.navigation.mobile_navigation)
-            navController.setCurrentDestination(R.id.nav_shopping_list)
-            Navigation.setViewNavController(activityFragment.requireView(), navController)
-        }
+        getActivityScenario(shoppingListBundle)
 
         onView(withText(aisle.name)).perform(longClick())
         onView(withId(R.id.mnu_add_product_to_aisle)).perform(click())
 
-        assertEquals(R.id.nav_add_product, navController.currentDestination?.id)
-
-        val bundle = navController.backStack.last().arguments
-        val addEditProductBundle = bundler.getAddEditProductBundle(bundle)
+        val addEditProductBundle = bundler.getAddEditProductBundle(navigator.bundle)
         assertEquals(aisle.id, addEditProductBundle.aisleId)
         assertEquals(AddEditProductBundle.ProductAction.ADD, addEditProductBundle.actionType)
+
+        assertEquals(R.id.nav_add_product, navigator.destination)
     }
 
     @Test
@@ -991,74 +992,21 @@ class ShoppingListFragmentTest : KoinTest {
     }
 
     @Test
-    fun onClickAddAisleFab_ActionModeIsActive_DismissActionModeContextMenu() = runTest {
+    fun onClickFab_ActionModeIsActive_DismissActionModeContextMenu() = runTest {
+        // Only need to verify this on one fab since this happens in the OnFabClicked callback
         val shoppingList = getShoppingList()
         val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
         val scenario = getActivityScenario(bundle)
         val product = getProduct(shoppingList, false)
         val productItem = onView(allOf(withText(product.name), withId(R.id.txt_product_name)))
-
-        productItem.perform(longClick())
-        scenario.onActivity {
-            fabHandler.clickFab(FabHandler.FabOption.ADD_AISLE, activityFragment.requireView())
-        }
-
-        onView(withText(android.R.string.cancel))
-            .inRoot(isDialog())
-            .perform(click())
-
-        val actionBar = onContextualActionBar()
-        actionBar.check(matches(not(isDisplayed())))
-        scenario.onActivity {
-            assertFalse(activityFragment.hasSelectedItems())
-        }
-    }
-
-    @Test
-    fun onClickAddProductFab_ActionModeIsActive_DismissActionModeContextMenu() = runTest {
-        val shoppingList = getShoppingList()
-        val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
-        val scenario = getActivityScenario(bundle)
-        val product = getProduct(shoppingList, false)
-        val productItem = onView(allOf(withText(product.name), withId(R.id.txt_product_name)))
-
         productItem.perform(longClick())
 
-        val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
         scenario.onActivity {
-            navController.setGraph(R.navigation.mobile_navigation)
-            navController.setCurrentDestination(R.id.nav_shopping_list)
-            Navigation.setViewNavController(activityFragment.requireView(), navController)
-            fabHandler.clickFab(FabHandler.FabOption.ADD_PRODUCT, activityFragment.requireView())
+            fabHandler.clickFab(FabHandler.FabOption.SEARCH)
         }
 
         onContextualActionBar().checkVisibility(View.GONE)
-        scenario.onActivity {
-            assertFalse(activityFragment.hasSelectedItems())
-        }
-    }
-
-    @Test
-    fun onClickAddShopFab_ActionModeIsActive_DismissActionModeContextMenu() = runTest {
-        val shoppingList = getShoppingList()
-        val bundle = bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
-        val scenario = getActivityScenario(bundle)
-        val product = getProduct(shoppingList, false)
-        val productItem = onView(allOf(withText(product.name), withId(R.id.txt_product_name)))
-
-        productItem.perform(longClick())
-        scenario.onActivity {
-            fabHandler.setFabOnClickListener(
-                activityFragment.requireActivity(),
-                FabHandler.FabOption.ADD_SHOP
-            ) {}
-            fabHandler.clickFab(FabHandler.FabOption.ADD_SHOP, activityFragment.requireView())
-        }
-
-        onContextualActionBar().checkVisibility(View.GONE)
-        scenario.onActivity {
-            assertFalse(activityFragment.hasSelectedItems())
-        }
+        assertFalse(activityFragment.hasSelectedItems())
     }
 
     private fun onContextualActionBar(): ViewInteraction =
@@ -1094,20 +1042,15 @@ class ShoppingListFragmentTest : KoinTest {
             bundler.makeShoppingListBundle(shoppingList.id, shoppingList.defaultFilter)
 
         val menuItem = getMenuItem(R.id.mnu_edit_shop)
-        val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
         getFragmentScenario(shoppingListBundle).onFragment { fragment ->
-            navController.setGraph(R.navigation.mobile_navigation)
-            navController.setCurrentDestination(R.id.nav_shopping_list)
-            Navigation.setViewNavController(fragment.requireView(), navController)
             fragment.onMenuItemSelected(menuItem)
         }
 
-        val bundle = navController.backStack.last().arguments
-        val addEditShopBundle = bundler.getAddEditLocationBundle(bundle)
-
+        val addEditShopBundle = bundler.getAddEditLocationBundle(navigator.bundle)
         assertEquals(shoppingList.id, addEditShopBundle.locationId)
         assertEquals(AddEditLocationBundle.LocationAction.EDIT, addEditShopBundle.actionType)
-        assertEquals(R.id.nav_add_shop, navController.currentDestination?.id)
+
+        assertEquals(R.id.nav_add_shop, navigator.destination)
     }
 
     @Test
@@ -1732,16 +1675,9 @@ class ShoppingListFragmentTest : KoinTest {
     }
 
     @Test
-    fun onActionItemClicked_ItemIsShowLLocationList_ShowLocationShoppingList() = runTest {
+    fun onActionItemClicked_ItemIsShowLocationList_ShowLocationShoppingList() = runTest {
         val shoppingListBundle = shopListGroupingBundle()
-
-        val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
-        val scenario = getActivityScenario(shoppingListBundle)
-        scenario.onActivity {
-            navController.setGraph(R.navigation.mobile_navigation)
-            navController.setCurrentDestination(R.id.nav_shopping_list)
-            Navigation.setViewNavController(activityFragment.requireView(), navController)
-        }
+        getActivityScenario(shoppingListBundle)
 
         val location = getLocation(LocationType.SHOP)
         val buttonName = getInstrumentation().targetContext.getString(
@@ -1752,12 +1688,12 @@ class ShoppingListFragmentTest : KoinTest {
         openActionBarOverflowOrOptionsMenu(getInstrumentation().targetContext)
         onView(withText(buttonName)).perform(click())
 
-        val bundle = navController.backStack.last().arguments
-        val resultBundle = bundler.getShoppingListBundle(bundle)
+        val resultBundle = bundler.getShoppingListBundle(navigator.bundle)
         assertTrue(resultBundle.listGrouping is ShoppingListGrouping.AisleGrouping)
         assertEquals(location.id, resultBundle.listGrouping.locationId)
         assertEquals(FilterType.NEEDED, resultBundle.filterType)
 
+        assertEquals(R.id.nav_shopping_list, navigator.destination)
     }
 
     @Test

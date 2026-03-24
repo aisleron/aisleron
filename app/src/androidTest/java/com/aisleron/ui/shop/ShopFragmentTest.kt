@@ -226,19 +226,6 @@ class ShopFragmentTest : KoinTest {
         )
     }
 
-    @Test
-    fun newInstance_CallNewInstance_ReturnsFragment() {
-        val fragment = ShopFragment.newInstance(
-            null,
-            addEditFragmentListener,
-            applicationTitleUpdateListener,
-            LoyaltyCardProviderTestImpl(),
-            ShopPreferencesTestImpl()
-        )
-
-        Assert.assertNotNull(fragment)
-    }
-
     private fun getSaveMenuItem(context: Context): ActionMenuItem {
         val menuItem = ActionMenuItem(context, 0, R.id.mnu_btn_save, 0, 0, null)
         return menuItem

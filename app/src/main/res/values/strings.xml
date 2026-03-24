@@ -181,6 +181,7 @@
     <string name="aisle">Aisle</string>
     <string name="product">Product</string>
     <string name="add_product">Add Product</string>
+    <string name="search">Search</string>
     <string name="product_name">Product Name</string>
     <string name="save">Save</string>
     <string name="shop_name">Shop Name</string>
@@ -204,6 +205,7 @@
     <string name="add_shop_fab">Add Shop FAB</string>
     <string name="add_aisle_fab">Add Aisle FAB</string>
     <string name="add_product_fab">Add Product FAB</string>
+    <string name="search_fab">Search FAB</string>
     <string name="title_activity_about">About Aisleron</string>
     <string name="shopping_list_options_header">Shopping List Options</string>
     <string name="hide_status_change_snack_bar">Hide status change message</string>

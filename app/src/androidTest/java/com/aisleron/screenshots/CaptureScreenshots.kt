@@ -286,6 +286,7 @@ class CaptureScreenshots : KoinTest {
             FabHandler.FabOption.ADD_PRODUCT -> R.id.fab_add_product
             FabHandler.FabOption.ADD_AISLE -> R.id.fab_add_aisle
             FabHandler.FabOption.ADD_SHOP -> R.id.fab_add_shop
+            FabHandler.FabOption.SEARCH -> R.id.fab_search
         }
 
         onView(withId(fabId))

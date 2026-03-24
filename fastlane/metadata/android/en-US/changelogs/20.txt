@@ -1,0 +1,5 @@
+Enhancements:
+* Added a Search entry to the Floating Action Button menu.
+
+Bug Fixes:
+*

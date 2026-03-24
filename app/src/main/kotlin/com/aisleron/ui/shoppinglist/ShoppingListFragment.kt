@@ -37,12 +37,10 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.aisleron.R
-import com.aisleron.domain.FilterType
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.loyaltycard.LoyaltyCard
 import com.aisleron.ui.AisleronExceptionMap
@@ -59,6 +57,7 @@ import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.copyentity.CopyEntityDialogFragment
 import com.aisleron.ui.copyentity.CopyEntityType
 import com.aisleron.ui.loyaltycard.LoyaltyCardProvider
+import com.aisleron.ui.navigation.Navigator
 import com.aisleron.ui.note.NoteDialogFragment
 import com.aisleron.ui.note.NoteParentRef
 import com.aisleron.ui.settings.ShoppingListPreferences
@@ -72,10 +71,12 @@ class ShoppingListFragment(
     private val applicationTitleUpdateListener: ApplicationTitleUpdateListener,
     private val fabHandler: FabHandler,
     private val shoppingListPreferences: ShoppingListPreferences,
-    private val loyaltyCardProvider: LoyaltyCardProvider
+    private val loyaltyCardProvider: LoyaltyCardProvider,
+    private val navigator: Navigator
 ) : Fragment(), SearchView.OnQueryTextListener, ActionMode.Callback, FabClickedCallBack,
     MenuProvider, AisleronFragment {
 
+    private var searchMenuItem: MenuItem? = null
     private var searchView: SearchView? = null
     private val searchViewListener = object : OnAttachStateChangeListener {
         override fun onViewAttachedToWindow(v: View) {}
@@ -293,10 +294,10 @@ class ShoppingListFragment(
                     showLoyaltyCard(event.loyaltyCard)
 
                 is ShoppingListViewModel.ShoppingListEvent.NavigateToEditLocation ->
-                    navigateToEditShop(event.locationId)
+                    navigator.navigateToEditShop(event.locationId)
 
                 is ShoppingListViewModel.ShoppingListEvent.NavigateToEditProduct ->
-                    navigateToEditProduct(event.productId)
+                    navigator.navigateToEditProduct(event.productId)
 
                 is ShoppingListViewModel.ShoppingListEvent.NavigateToEditAisle ->
                     showEditAisleDialog(event.aisleId, event.locationId)
@@ -314,22 +315,25 @@ class ShoppingListFragment(
                     showNoteDialog(event.parentRef)
 
                 is ShoppingListViewModel.ShoppingListEvent.NavigateToLocationList ->
-                    navigateToLocationList(event.locationId, event.productFilter)
+                    navigator.navigateToAisleGroupedProductList(
+                        event.locationId, event.productFilter
+                    )
+
+                is ShoppingListViewModel.ShoppingListEvent.NavigateToAddProduct ->
+                    navigator.navigateToAddProduct(
+                        event.productFilter, event.productName, event.aisleId
+                    )
+
+                ShoppingListViewModel.ShoppingListEvent.NavigateToAddShop ->
+                    navigator.navigateToAddShop()
             }
         }
-    }
-
-    private fun navigateToLocationList(locationId: Int, productFilter: FilterType) {
-        val bundle = Bundler().makeShoppingListBundle(
-            locationId, productFilter
-        )
-
-        this.findNavController().navigate(R.id.nav_shopping_list, bundle)
     }
 
     override fun onDestroyView() {
         searchView?.removeOnAttachStateChangeListener(searchViewListener)
         searchView = null
+        fabHandler.reset()
         super.onDestroyView()
     }
 
@@ -429,6 +433,7 @@ class ShoppingListFragment(
 
     private fun initializeFab(showAisleFab: Boolean) {
         val fabItems = mutableListOf<FabHandler.FabOption>()
+        fabItems.add(FabHandler.FabOption.SEARCH)
         fabItems.add(FabHandler.FabOption.ADD_SHOP)
 
         if (showAisleFab) {
@@ -439,14 +444,6 @@ class ShoppingListFragment(
 
         fabHandler.setFabOnClickedListener(this)
         fabHandler.setFabItems(this.requireActivity(), *fabItems.toTypedArray())
-
-        fabHandler.setFabOnClickListener(this.requireActivity(), FabHandler.FabOption.ADD_PRODUCT) {
-            navigateToAddProduct(shoppingListViewModel.productFilter)
-        }
-
-        fabHandler.setFabOnClickListener(this.requireActivity(), FabHandler.FabOption.ADD_AISLE) {
-            shoppingListViewModel.navigateToAddMultipleAisles()
-        }
     }
 
     private fun updateTitle(listTitle: ShoppingListViewModel.ListTitle) {
@@ -461,35 +458,12 @@ class ShoppingListFragment(
         applicationTitleUpdateListener.applicationTitleUpdated(requireActivity(), appTitle)
     }
 
-    private fun navigateToAddProduct(filterType: FilterType, aisleId: Int? = null) {
-        val bundle = Bundler().makeAddProductBundle(
-            name = null,
-            inStock = filterType == FilterType.IN_STOCK,
-            aisleId = aisleId
-        )
-
-        this.findNavController().navigate(R.id.nav_add_product, bundle)
-    }
-
-    private fun navigateToEditProduct(productId: Int) {
-        val bundle = Bundler().makeEditProductBundle(
-            productId = productId
-        )
-
-        this.findNavController().navigate(R.id.nav_add_product, bundle)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val menuHost = requireActivity()
         menuHost.addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
 
         view.keepScreenOn = shoppingListPreferences.keepScreenOn()
-    }
-
-    private fun navigateToEditShop(locationId: Int) {
-        val bundle = Bundler().makeEditLocationBundle(locationId)
-        this.findNavController().navigate(R.id.nav_add_shop, bundle)
     }
 
     private fun confirmDelete(context: Context) {
@@ -612,16 +586,11 @@ class ShoppingListFragment(
     }
 
     override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
-        val actionModeItems = shoppingListViewModel.selectedListItems
-
         var result = true
         when (item.itemId) {
             R.id.mnu_edit_shopping_list_item -> shoppingListViewModel.navigateToEditItem()
             R.id.mnu_delete_shopping_list_item -> confirmDelete(requireContext())
-            R.id.mnu_add_product_to_aisle -> navigateToAddProduct(
-                shoppingListViewModel.productFilter, actionModeItems.first().aisleId
-            )
-
+            R.id.mnu_add_product_to_aisle -> shoppingListViewModel.navigateToAddProduct()
             R.id.mnu_copy_shopping_list_item -> shoppingListViewModel.navigateToCopyDialog()
             R.id.mnu_show_note -> shoppingListViewModel.navigateToNoteDialog()
             R.id.mnu_aisle_picker -> shoppingListViewModel.requestLocationAisles()
@@ -647,7 +616,8 @@ class ShoppingListFragment(
         val searchableInfo =
             searchManager.getSearchableInfo(requireActivity().componentName)
 
-        searchView = menu.findItem(R.id.action_search).actionView as SearchView
+        searchMenuItem = menu.findItem(R.id.action_search)
+        searchView = searchMenuItem?.actionView as? SearchView
         searchView?.setMaxWidth(Integer.MAX_VALUE)
         searchView?.setSearchableInfo(searchableInfo)
         searchView?.setOnQueryTextListener(this@ShoppingListFragment)
@@ -739,6 +709,18 @@ class ShoppingListFragment(
 
     override fun fabClicked(fabOption: FabHandler.FabOption) {
         actionMode?.finish()
+
+        when (fabOption) {
+            FabHandler.FabOption.ADD_PRODUCT -> shoppingListViewModel.navigateToAddProduct()
+            FabHandler.FabOption.ADD_AISLE -> shoppingListViewModel.navigateToAddMultipleAisles()
+            FabHandler.FabOption.ADD_SHOP -> shoppingListViewModel.navigateToAddShop()
+            FabHandler.FabOption.SEARCH ->
+                requireView().postDelayed({
+                    if (isAdded) { // Ensure fragment is still attached
+                        searchMenuItem?.expandActionView()
+                    }
+                }, 100)
+        }
     }
 
     fun hasSelectedItems(): Boolean = shoppingListViewModel.hasSelectedItems()

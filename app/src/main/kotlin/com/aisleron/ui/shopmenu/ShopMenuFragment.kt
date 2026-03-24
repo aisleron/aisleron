@@ -25,30 +25,23 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.aisleron.R
-import com.aisleron.ui.bundles.Bundler
+import com.aisleron.ui.navigation.Navigator
 import com.aisleron.ui.shoplist.ShopListItemViewModel
 import com.aisleron.ui.shoplist.ShopListViewModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-/**
- * A fragment representing a list of Items.
- */
-class ShopMenuFragment : Fragment(), ShopMenuRecyclerViewAdapter.ShopMenuItemListener {
+class ShopMenuFragment(
+    private val navigator: Navigator
+) : Fragment(), ShopMenuRecyclerViewAdapter.ShopMenuItemListener {
     private val shopListViewModel: ShopListViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         shopListViewModel.hydratePinnedShops()
-    }
-
-    private fun navigateToShoppingList(item: ShopListItemViewModel) {
-        val bundle = Bundler().makeShoppingListBundle(item.id, item.defaultFilter)
-        this.findNavController().navigate(R.id.nav_shopping_list, bundle)
     }
 
     override fun onCreateView(
@@ -80,15 +73,7 @@ class ShopMenuFragment : Fragment(), ShopMenuRecyclerViewAdapter.ShopMenuItemLis
         return view
     }
 
-    companion object {
-
-        @JvmStatic
-        fun newInstance() = ShopMenuFragment().apply {
-            arguments = null
-        }
-    }
-
     override fun onClick(item: ShopListItemViewModel) {
-        navigateToShoppingList(item)
+        navigator.navigateToAisleGroupedProductList(item.id, item.defaultFilter)
     }
 }

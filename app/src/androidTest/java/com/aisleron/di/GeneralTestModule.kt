@@ -23,8 +23,11 @@ import com.aisleron.ui.ApplicationTitleUpdateListener
 import com.aisleron.ui.ApplicationTitleUpdateListenerTestImpl
 import com.aisleron.ui.FabHandler
 import com.aisleron.ui.FabHandlerTestImpl
+import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.loyaltycard.LoyaltyCardProvider
 import com.aisleron.ui.loyaltycard.LoyaltyCardProviderTestImpl
+import com.aisleron.ui.navigation.Navigator
+import com.aisleron.ui.navigation.NavigatorTestImpl
 import com.aisleron.ui.resourceprovider.ResourceProvider
 import com.aisleron.ui.resourceprovider.ResourceProviderTestImpl
 import org.koin.dsl.module
@@ -35,4 +38,5 @@ val generalTestModule = module {
     factory<AddEditFragmentListener> { AddEditFragmentListenerTestImpl() }
     factory<LoyaltyCardProvider> { LoyaltyCardProviderTestImpl() }
     factory<ResourceProvider> { ResourceProviderTestImpl() }
+    factory<Navigator> { NavigatorTestImpl(Bundler()) }
 }

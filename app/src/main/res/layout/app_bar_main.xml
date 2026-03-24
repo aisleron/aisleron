@@ -161,4 +161,21 @@
         app:shapeAppearance="@style/Widget.Material3.ExtendedFloatingActionButton.Primary"
         app:icon="@drawable/baseline_add_product_24" />
 
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fab_search"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/search_fab"
+        app:layout_anchor="@id/fab"
+        app:layout_anchorGravity="center|center"
+        android:layout_gravity="top"
+        android:translationX="28dp"
+        android:translationY="-216dp"
+        android:text="@string/search"
+        android:visibility="gone"
+        tools:visibility="visible"
+        style="@style/Widget.Material3.ExtendedFloatingActionButton.Primary"
+        app:shapeAppearance="@style/Widget.Material3.ExtendedFloatingActionButton.Primary"
+        app:icon="@drawable/baseline_search_24" />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

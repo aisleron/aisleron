@@ -22,15 +22,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
-import com.aisleron.R
 import com.aisleron.databinding.FragmentNavigationDrawerBinding
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.LocationType
-import com.aisleron.ui.bundles.Bundler
-import com.aisleron.ui.shoppinglist.ShoppingListGrouping
+import com.aisleron.ui.navigation.Navigator
 
-class NavigationDrawerFragment : Fragment() {
+class NavigationDrawerFragment(private val navigator: Navigator) : Fragment() {
 
     private var _binding: FragmentNavigationDrawerBinding? = null
     private val binding get() = _binding!!
@@ -49,17 +46,12 @@ class NavigationDrawerFragment : Fragment() {
 
             for (view in navButtons) {
                 view.setOnClickListener {
-                    findNavController().navigate(it.id, null)
+                    navigator.navigateToDefaultRoute(view.id)
                 }
             }
 
             navAllShops.setOnClickListener {
-                val bundle = Bundler().makeShoppingListBundle(
-                    filterType = FilterType.NEEDED,
-                    listGrouping = ShoppingListGrouping.LocationGrouping(LocationType.SHOP)
-                )
-
-                findNavController().navigate(R.id.nav_shopping_list, bundle)
+                navigator.navigateToLocationGroupedProductList(LocationType.SHOP, FilterType.NEEDED)
             }
         }
 

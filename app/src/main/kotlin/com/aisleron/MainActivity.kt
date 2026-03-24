@@ -51,6 +51,8 @@ import com.aisleron.databinding.ActivityMainBinding
 import com.aisleron.domain.preferences.ApplicationTheme
 import com.aisleron.ui.FabHandler
 import com.aisleron.ui.bundles.Bundler
+import com.aisleron.ui.navigation.Navigator
+import com.aisleron.ui.navigation.NavigatorImpl
 import com.aisleron.ui.settings.DisplayPreferencesImpl
 import com.aisleron.ui.settings.WelcomePreferences
 import com.aisleron.ui.settings.WelcomePreferencesImpl
@@ -109,6 +111,9 @@ class MainActivity : AisleronActivity() {
 
         navController.setGraph(navGraph, shoppingListBundle)
 
+        val navigator: Navigator by inject()
+        (navigator as? NavigatorImpl)?.attach(navController)
+
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(
@@ -139,7 +144,7 @@ class MainActivity : AisleronActivity() {
         initialiseUpdateBanner(welcomePreferences)
 
         if (!welcomePreferences.isInitialized()) {
-            navController.navigate(R.id.nav_welcome)
+            navigator.navigateToWelcome()
         }
     }
 
