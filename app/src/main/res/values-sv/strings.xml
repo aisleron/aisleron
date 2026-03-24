@@ -106,10 +106,10 @@
     <string name="about_support_documentation_summary">Visa dokumentation online</string>
     <string name="about_legal_3rdparty_summary">Visa tredjepartslicenser online</string>
     <string name="welcome_message">Vi är glada över att kunna hjälpa dig att göra din shoppingupplevelse enklare och mer organiserad. Välj ett av följande alternativ för att komma igång:</string>
-    <string name="welcome_add_own_product">&lt;h3&gt;Lägg till dina egna produkter&lt;/h3&gt; Börja bygga en personlig inköpslista från grunden genom att lägga till butiker, gångar och produkter</string>
-    <string name="welcome_load_sample_items">&lt;h3&gt;Läs in exempelartiklar&lt;/h3&gt; Prova en förifylld lista för att få en känsla för hur appen fungerar</string>
-    <string name="welcome_import_db">&lt;h3&gt;Importera en befintlig databas&lt;/h3&gt; Hämta en inköpslista från en tidigare säkerhetskopia genom att importera den från sidan Inställningar</string>
-    <string name="welcome_documentation">&lt;h3&gt;Visa dokumentationen&lt;/h3&gt; Visa Aisleron-dokumentationen online för att få veta mer om appens funktioner</string>
+    <string name="welcome_add_own_product"><h3>Lägg till dina egna produkter</h3> Börja bygga en personlig inköpslista från grunden genom att lägga till butiker, gångar och produkter</string>
+    <string name="welcome_load_sample_items"><h3>Läs in exempelartiklar</h3> Prova en förifylld lista för att få en känsla för hur appen fungerar</string>
+    <string name="welcome_import_db"><h3>Importera en befintlig databas</h3> Hämta en inköpslista från en tidigare säkerhetskopia genom att importera den från sidan Inställningar</string>
+    <string name="welcome_documentation"><h3>Visa dokumentationen</h3> Visa Aisleron-dokumentationen online för att få veta mer om appens funktioner</string>
     <string name="empty_list_description">Detta kan bero på att:</string>
     <string name="empty_list_reasons">- Inga artiklar behövs för tillfället\n- Inga produkter eller gångar har lagts till än\n- Artiklar finns men är inte tilldelade en synlig gång</string>
     <string name="empty_list_instructions">Du kan lägga till produkter och gångar med knappen Lägg till längst ned till höger, eller använda sökfältet högst upp på skärmen för att hitta produkter och uppdatera deras status eller gångtilldelning.</string>
@@ -119,7 +119,7 @@
     <string name="get_loyalty_card">Sök upp bonuskort</string>
     <string name="loyalty_card_provider_catima">Catima — Plånbok för bonuskort</string>
     <string name="loyalty_card_provider_missing_title">Ingen leverantör av bonuskort installerad</string>
-    <string name="loyalty_card_provider_missing_message">&lt;b&gt;&lt;i&gt;%1$s&lt;/i&gt;&lt;/b&gt; krävs för att visa bonuskort. Vill du öppna deras webbplats för att lära dig mer om det?</string>
+    <string name="loyalty_card_provider_missing_message"><b><i>%1$s</i></b> krävs för att visa bonuskort. Vill du öppna deras webbplats för att lära dig mer om det?</string>
     <string name="invalid_loyalty_card_exception">FEL: Ogiltigt bonuskorts-ID angavs</string>
     <string name="tracking_mode">Spårningsläge</string>
     <string name="tracking_checkbox">Kryssruta</string>
@@ -202,4 +202,22 @@
     <string name="show_location_list">Visa %1$s</string>
     <string name="search">Sök</string>
     <string name="search_fab">Sök-FAB</string>
+    <string name="language_spanish_es" translatable="false"></string>
+    <string name="language_polish_pl" translatable="false"></string>
+    <string name="aisleron_translate_url" translatable="false"></string>
+    <string name="language_russian_ru" translatable="false"></string>
+    <string name="language_french_fr" translatable="false"></string>
+    <string name="nav_header_title" translatable="false"></string>
+    <string name="language_ukrainian_uk" translatable="false"></string>
+    <string name="language_bulgarian_bg" translatable="false"></string>
+    <string name="language_turkish_tr" translatable="false"></string>
+    <string name="id_label" translatable="false"></string>
+    <string name="language_swedish_sv" translatable="false"></string>
+    <string name="aisleron_documentation_url" translatable="false"></string>
+    <string name="language_afrikaans_af" translatable="false"></string>
+    <string name="language_german_de" translatable="false"></string>
+    <string name="language_italian_it" translatable="false"></string>
+    <string name="language_english_en" translatable="false"></string>
+    <string name="aisleron_donate_url" translatable="false"></string>
+    <string name="app_name" translatable="false"></string>
 </resources>
