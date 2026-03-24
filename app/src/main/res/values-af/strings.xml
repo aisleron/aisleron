@@ -219,4 +219,6 @@
     <string name="language_italian_it" translatable="false"></string>
     <string name="language_english_en" translatable="false"></string>
     <string name="aisleron_donate_url" translatable="false"></string>
+    <string name="aisleron_version_history_url" translatable="false"></string>
+    <string name="app_name" translatable="false"></string>
 </resources>
