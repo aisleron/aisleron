@@ -256,6 +256,15 @@ class ProductViewModelTest() : KoinTest {
     }
 
     @Test
+    fun testHydrate_AddProductWithName_NamePopulated() = runTest {
+        val name = "Test Product"
+
+        productViewModel.hydrate(0, true, name = name)
+
+        assertEquals(name, productViewModel.uiData.value.productName)
+    }
+
+    @Test
     fun constructor_NoCoroutineScopeProvided_ProductViewModelReturned() {
         val pvm = ProductViewModel(
             get<AddProductUseCase>(),
