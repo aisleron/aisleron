@@ -1,0 +1,5 @@
+Ausdehnungen:
+* Implementiert Material 3 gestalte, Dynamische Farben, und Pure Schwarz Stile.
+* Verbesser Produkt Liste Stück Display auf Klein Screen Vorrichtungen.
+* Zugefügt italienisch und Afrikaans Übersetzungen.
+* #Auf dem Laufenden Übersetzungen.
