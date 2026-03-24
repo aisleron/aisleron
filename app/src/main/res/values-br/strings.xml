@@ -174,36 +174,4 @@
     <string name="status_change_confirmation">%1$s diblaset war-zu %2$s</string>
     <string name="done">Echuet</string>
     <string name="tracking_none">Hini ebet (skubañ hekpen)</string>
-    <string name="language_spanish_es" translatable="false"></string>
-    <string name="welcome_load_sample_items"></string>
-    <string name="language_polish_pl" translatable="false"></string>
-    <string name="decrement"></string>
-    <string name="aisleron_translate_url" translatable="false"></string>
-    <string name="welcome_import_db"></string>
-    <string name="language_russian_ru" translatable="false"></string>
-    <string name="sort_confirm_message"></string>
-    <string name="language_french_fr" translatable="false"></string>
-    <string name="nav_header_title" translatable="false"></string>
-    <string name="welcome_add_own_product"></string>
-    <string name="empty_list_instructions"></string>
-    <string name="welcome_documentation"></string>
-    <string name="language_ukrainian_uk" translatable="false"></string>
-    <string name="language_bulgarian_bg" translatable="false"></string>
-    <string name="loyalty_card_provider_missing_message"></string>
-    <string name="increment"></string>
-    <string name="language_turkish_tr" translatable="false"></string>
-    <string name="id_label" translatable="false"></string>
-    <string name="language_swedish_sv" translatable="false"></string>
-    <string name="aisleron_documentation_url" translatable="false"></string>
-    <string name="language_afrikaans_af" translatable="false"></string>
-    <string name="language_german_de" translatable="false"></string>
-    <string name="language_italian_it" translatable="false"></string>
-    <string name="language_english_en" translatable="false"></string>
-    <string name="empty_list_reasons"></string>
-    <string name="aisleron_donate_url" translatable="false"></string>
-    <string name="aisleron_version_history_url" translatable="false"></string>
-    <string name="welcome_message"></string>
-    <string name="save_changes_message"></string>
-    <string name="app_name" translatable="false"></string>
-    <string name="qty_increments"></string>
 </resources>
