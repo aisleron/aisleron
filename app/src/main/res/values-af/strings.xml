@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <!--
   ~ Copyright (C) 2026 aisleron.com
   ~
@@ -15,9 +14,7 @@
   ~
   ~ You should have received a copy of the GNU Affero General Public License
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
-  -->
-
-<resources>
+  --><resources>
     <string name="nav_header_subtitle">Vlieg deur die winkels!</string>
     <string name="navigation_drawer_open">Maak navigasielaai oop</string>
     <string name="navigation_drawer_close">Maak navigasielaai toe</string>
@@ -84,7 +81,7 @@
     <string name="about_support_sourcecode_title">Bronkode</string>
     <string name="about_legal_license_title">Aisleron-lisensie</string>
     <string name="about_legal_privacy_title">Aisleron Privaatheidsbeleid</string>
-    <string name="about_support_version_summary">"Huidige weergawe: %1$s"</string>
+    <string name="about_support_version_summary">Huidige weergawe: %1$s</string>
     <string name="about_support_report_issue_summary">Teken \'n fout of funksieversoek aan</string>
     <string name="about_support_sourcecode_summary">Bekyk bronkode op GitHub</string>
     <string name="about_legal_license_summary">GNU Affero Algemene Publieke Lisensie (AGPL) weergawe 3</string>
@@ -95,30 +92,22 @@
     <string name="about_legal_3rdparty_summary">Bekyk 3de party lisensies aanlyn</string>
     <string name="welcome_app_title">Aan die gang kom</string>
     <string name="welcome_message">Ons is opgewonde om jou te help om jou inkopie-ervaring makliker en meer georganiseerd te maak. Om te begin, kies een van die volgende opsies:</string>
-    <string name="welcome_add_own_product">&lt;h3&gt;Voeg Jou Eie Produkte By&lt;/h3&gt; Begin om \'n persoonlike inkopielys van voor af te bou deur Winkels, Gange en Produkte by te voeg</string>
-    <string name="welcome_load_sample_items">&lt;h3&gt;Laai Voorbeelditems&lt;/h3&gt; Probeer \'n voorafgevulde lys om \'n gevoel te kry vir hoe die toepassing werk</string>
-    <string name="welcome_import_db">&lt;h3&gt;Voer \'n Bestaande Databasis In&lt;/h3&gt; Bring \'n inkopielys van \'n vroeëre rugsteun in deur dit vanaf die Instellings-bladsy in te voer</string>
-    <string name="welcome_documentation">&lt;h3&gt;Bekyk die Dokumentasie&lt;/h3&gt; Bekyk die Aisleron-dokumentasie aanlyn om meer uit te vind oor die toepassing se kenmerke</string>
+    <string name="welcome_add_own_product"><h3>Voeg Jou Eie Produkte By</h3> Begin om \'n persoonlike inkopielys van voor af te bou deur Winkels, Gange en Produkte by te voeg</string>
+    <string name="welcome_load_sample_items"><h3>Laai Voorbeelditems</h3> Probeer \'n voorafgevulde lys om \'n gevoel te kry vir hoe die toepassing werk</string>
+    <string name="welcome_import_db"><h3>Voer \'n Bestaande Databasis In</h3> Bring \'n inkopielys van \'n vroeëre rugsteun in deur dit vanaf die Instellings-bladsy in te voer</string>
+    <string name="welcome_documentation"><h3>Bekyk die Dokumentasie</h3> Bekyk die Aisleron-dokumentasie aanlyn om meer uit te vind oor die toepassing se kenmerke</string>
     <string name="welcome_title">Welkom by Aisleron</string>
     <string name="empty_list_title">Hierdie lys is tans leeg</string>
     <string name="empty_list_description">Dit kan wees omdat:</string>
-    <string name="empty_list_reasons">
-        - Geen items word op die oomblik benodig nie
-        \n- Geen produkte of gange is nog bygevoeg nie
-        \n- Items bestaan, maar is nie aan \'n sigbare gang toegewys nie
-    </string>
-    <string name="empty_list_instructions">
-        Jy kan produkte en gange byvoeg met die Voeg by-knoppie regs onder,
-        of gebruik die soekbalk bo-aan die skerm om produkte te vind en
-        hul status of gangtoewysing op te dateer.
-    </string>
+    <string name="empty_list_reasons">- Geen items word op die oomblik benodig nie \n- Geen produkte of gange is nog bygevoeg nie \n- Items bestaan, maar is nie aan \'n sigbare gang toegewys nie</string>
+    <string name="empty_list_instructions">Jy kan produkte en gange byvoeg met die Voeg by-knoppie regs onder, of gebruik die soekbalk bo-aan die skerm om produkte te vind en hul status of gangtoewysing op te dateer.</string>
     <string name="shop_loyalty_card_name">Lojaliteitskaart</string>
     <string name="loyalty_card">Lojaliteitskaart</string>
     <string name="delete_loyalty_card">Vee lojaliteitskaart uit</string>
     <string name="get_loyalty_card">Soek lojaliteitskaart</string>
     <string name="loyalty_card_provider_catima">Catima — Lojaliteitskaartbeursie</string>
     <string name="loyalty_card_provider_missing_title">Geen lojaliteitskaartverskaffer geïnstalleer nie</string>
-    <string name="loyalty_card_provider_missing_message">&lt;b&gt;&lt;i&gt;%1$s&lt;/i&gt;&lt;/b&gt; word vereis om lojaliteitskaarte te vertoon. Wil jy hul webwerf oopmaak om meer daaroor te wete te kom?</string>
+    <string name="loyalty_card_provider_missing_message"><b><i>%1$s</i></b> word vereis om lojaliteitskaarte te vertoon. Wil jy hul webwerf oopmaak om meer daaroor te wete te kom?</string>
     <string name="invalid_loyalty_card_exception">FOUT: Ongeldige Lojaliteitskaart-ID verskaf</string>
     <string name="tracking_mode">Naspeurmodus</string>
     <string name="tracking_checkbox">Merkblokkie</string>
@@ -146,14 +135,14 @@
     <string name="edit_aisle">Wysig Gang</string>
     <string name="edit_location">Wysig Winkel</string>
     <string name="main_fab">Hoof FAB</string>
-    <string name="add_shop_fab">Voeg Winkel By FAB</string>
-    <string name="add_aisle_fab">Voeg Gang By FAB</string>
-    <string name="add_product_fab">Voeg Produk By FAB</string>
+    <string name="add_shop_fab">Voeg Winkel FAB By</string>
+    <string name="add_aisle_fab">Voeg Gang FAB By</string>
+    <string name="add_product_fab">Voeg Produk FAB By</string>
     <string name="title_activity_about">Oor Aisleron</string>
     <string name="shopping_list_options_header">Inkopielysopsies</string>
     <string name="hide_status_change_snack_bar">Versteek statusveranderingsboodskap</string>
     <string name="status_change_confirmation">%1$s geskuif na %2$s</string>
-    <string name="undo">Ongedaan maak</string>
+    <string name="undo">ONgedaan maak</string>
     <string name="aisleron_logo">Aisleron-logo</string>
     <string name="in_stock_at_home">In voorraad by die huis?</string>
     <string name="shop_logo">Winkellogo</string>
@@ -213,4 +202,21 @@
     <string name="show_location_list">Wys %1$s</string>
     <string name="search">Soek</string>
     <string name="search_fab">Soek-FAB</string>
+    <string name="language_spanish_es" translatable="false"></string>
+    <string name="language_polish_pl" translatable="false"></string>
+    <string name="aisleron_translate_url" translatable="false"></string>
+    <string name="language_russian_ru" translatable="false"></string>
+    <string name="language_french_fr" translatable="false"></string>
+    <string name="nav_header_title" translatable="false"></string>
+    <string name="language_ukrainian_uk" translatable="false"></string>
+    <string name="language_bulgarian_bg" translatable="false"></string>
+    <string name="language_turkish_tr" translatable="false"></string>
+    <string name="id_label" translatable="false"></string>
+    <string name="language_swedish_sv" translatable="false"></string>
+    <string name="aisleron_documentation_url" translatable="false"></string>
+    <string name="language_afrikaans_af" translatable="false"></string>
+    <string name="language_german_de" translatable="false"></string>
+    <string name="language_italian_it" translatable="false"></string>
+    <string name="language_english_en" translatable="false"></string>
+    <string name="aisleron_donate_url" translatable="false"></string>
 </resources>
