@@ -1,0 +1,6 @@
+Améliorations :
+* Ajout d'un commutateur de langue dans Préférences.
+* Ajout d'une note de produit sur les entrées de liste d'achats.
+
+Corrections de bug :
+* Numéro de défilement de l'onglet note fixe sur la page Modifier Produit.
