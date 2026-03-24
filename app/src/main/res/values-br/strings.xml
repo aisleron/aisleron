@@ -16,4 +16,6 @@
     <string name="home">Degemer</string>
     <string name="display_options_header">Dibarzhioù diskwel</string>
     <string name="show_on_lock_screen">Diskouez war ar skramm morailhañ</string>
+    <string name="search">Klask</string>
+    <string name="search_fab">Klask FAB</string>
 </resources>

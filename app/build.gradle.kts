@@ -43,7 +43,7 @@ object Versions {
 
 // Keep this list aligned with the values in the language_codes array in arrays.xml and with locale_config.xml
 val supportedLocales =
-    listOf("en", "af", "bg", "de", "es", "fr", "it", "pl", "ru", "sv", "tr", "uk")
+    listOf("en", "af", "bg", "br", "de", "es", "fr", "it", "pl", "ru", "sv", "tr", "uk")
 
 android {
     dependenciesInfo {

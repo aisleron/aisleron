@@ -202,4 +202,6 @@
     <string name="about_contribute_donate_title">Пожертвовать</string>
     <string name="about_contribute_donate_summary">Поддержать проект Aisleron финансово</string>
     <string name="show_location_list">Показать %1$s</string>
+    <string name="search">Поиск</string>
+    <string name="search_fab">Поиск (FAB)</string>
 </resources>

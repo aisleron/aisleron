@@ -202,4 +202,6 @@
     <string name="about_contribute_donate_title">Wesprzyj</string>
     <string name="about_contribute_donate_summary">Wesprzyj Aisleron finansowo</string>
     <string name="show_location_list">Pokaż %1$s</string>
+    <string name="search">Szukaj</string>
+    <string name="search_fab">Szukaj FAB</string>
 </resources>

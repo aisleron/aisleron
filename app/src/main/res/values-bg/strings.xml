@@ -202,4 +202,6 @@
     <string name="about_contribute_donate_title">Дарение</string>
     <string name="about_contribute_donate_summary">Подкрепете Aisleron финансово</string>
     <string name="show_location_list">Покажи %1$s</string>
+    <string name="search">Търсене</string>
+    <string name="search_fab">Търсене (FAB)</string>
 </resources>
