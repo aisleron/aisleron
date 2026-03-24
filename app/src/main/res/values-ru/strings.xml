@@ -14,9 +14,7 @@
   ~
   ~ You should have received a copy of the GNU Affero General Public License
   ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
-  -->
-
-<resources>
+  --><resources>
     <string name="navigation_drawer_open">Открыть панель навигации</string>
     <string name="navigation_drawer_close">Закрыть панель навигации</string>
     <string name="nav_header_subtitle">Пролетись по магазинам!</string>
@@ -204,4 +202,5 @@
     <string name="show_location_list">Показать %1$s</string>
     <string name="search">Поиск</string>
     <string name="search_fab">Поиск (FAB)</string>
+    <string name="id_label" translatable="false"></string>
 </resources>
