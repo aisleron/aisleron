@@ -41,7 +41,7 @@ jobs:
     - name: Build Aisleron
       # -PincludeProfiles=false handles the F-Droid/GitHub mismatch
       # assembleDebug bypasses your signing key check
-      run: ./gradlew assembleDebug -PincludeProfiles=false
+      run: gradle assembleDebug
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
