@@ -1,20 +1,21 @@
-name: "CodeQL"
+name: "CodeQL Advanced"
 
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-  workflow_dispatch:
+  workflow_dispatch: # Allows you to trigger it manually from the UI
 
 jobs:
   analyze:
-    name: Analyze
+    name: Analyze (java-kotlin)
     runs-on: ubuntu-latest
     permissions:
+      security-events: write
+      packages: read
       actions: read
       contents: read
-      security-events: write
 
     steps:
     - name: Checkout repository
@@ -25,16 +26,24 @@ jobs:
       with:
         java-version: '21'
         distribution: 'temurin'
-        cache: gradle
+
+    # This handles the Gradle installation so you don't need the binary JAR
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v4
 
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v3
       with:
         languages: 'java-kotlin'
+        # Setting build-mode to manual tells GitHub NOT to use its "autobuilder"
+        build-mode: manual
 
-    # This replaces the failing 'autobuild' step
     - name: Build Aisleron
-      run: ./gradlew assembleDebug
+      # -PincludeProfiles=false handles the F-Droid/GitHub mismatch
+      # assembleDebug bypasses your signing key check
+      run: ./gradlew assembleDebug -PincludeProfiles=false
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
+      with:
+        category: "/language:java-kotlin"
