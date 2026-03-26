@@ -1,0 +1,6 @@
+Ausdehnungen:
+* Zugefügt eine Sprache switcher in Präferenzen.
+* Zugefügt eine Produkt Note Hinweis auf shoppen Liste Einträge.
+
+Käfer Klemmen:
+* Fester Note Deckel #Bildlauf Sachverhalt auf das Bearbeitung Produkt Seite.

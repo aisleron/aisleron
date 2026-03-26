@@ -1,0 +1,7 @@
+Ausdehnungen:
+* Zugefügt die Option zu anschauen die Produkt Liste gruppiert bei Drehort/Laden.
+* Zugefügt ein Spenden Sektion zu die Von Seite.
+* Zugefügt türkische Übersetzungen.
+
+Käfer Klemmen:
+* Feste Sprache Ressourcen seiend zerlegt von den Spiel Vorrat Bündel.

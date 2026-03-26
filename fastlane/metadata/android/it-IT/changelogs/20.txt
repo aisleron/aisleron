@@ -1,0 +1,7 @@
+Miglioramenti:
+* Aggiunto una voce di ricerca al menu pulsante azione galleggiante.
+* Populate Name on Add Product page con risultati di ricerca se disponibili.
+* Aggiunto Breton Traduzione
+
+Correzioni di bug:
+#

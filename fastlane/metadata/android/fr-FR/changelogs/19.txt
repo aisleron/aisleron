@@ -1,0 +1,7 @@
+Améliorations :
+* Ajout de l'option pour afficher la liste de produits regroupée par emplacement/shop.
+* Ajout d'une section Contribuer à la page A propos.
+* Ajout de traductions turques.
+
+Corrections de bug :
+* Les ressources linguistiques fixes sont dépouillées du groupe Play Store.

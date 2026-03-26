@@ -1,0 +1,12 @@
+Ausdehnungen:
+* Bring fertig Produkt Gänge während zufügen/Bearbeitung.
+* Unterstützung für dezimal Mengen & Einheiten von Messt ab.
+* Multi-#Ausgewählt Fähigkeit in Produkt Listen.
+* Per-Produkt #rückverfolgen Verfahren Optionen.
+* Speicher #wann #Eingabeaufforderung #hinausgehen Produkt Seiten.
+* Zugefügt bulgarische Übersetzungen.
+
+Käfer Klemmen:
+* Verbessert Gang reordering Logik.
+* Klare Suche Filter befahrend #wann Listen.
+* Festes Potential Krachen drückend Betritt #wann auf Menge Input.
