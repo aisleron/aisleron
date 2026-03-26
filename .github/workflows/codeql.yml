@@ -5,45 +5,61 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-  workflow_dispatch: # Allows you to trigger it manually from the UI
+  schedule:
+    - cron: '31 16 * * 0'
 
 jobs:
   analyze:
-    name: Analyze (java-kotlin)
-    runs-on: ubuntu-latest
+    name: Analyze (${{ matrix.language }})
+    runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-latest' }}
     permissions:
       security-events: write
       packages: read
       actions: read
       contents: read
 
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - language: actions
+          build-mode: none
+        - language: java-kotlin
+          build-mode: manual
+        - language: ruby
+          build-mode: none
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
 
+    # ADDED: Essential environment setup for Aisleron
     - name: Set up JDK 21
+      if: matrix.language == 'java-kotlin'
       uses: actions/setup-java@v4
       with:
         java-version: '21'
         distribution: 'temurin'
 
-    # This handles the Gradle installation so you don't need the binary JAR
     - name: Setup Gradle
+      if: matrix.language == 'java-kotlin'
       uses: gradle/actions/setup-gradle@v4
+      with:
+        gradle-version: wrapper
 
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v3
       with:
-        languages: 'java-kotlin'
-        # Setting build-mode to manual tells GitHub NOT to use its "autobuilder"
-        build-mode: manual
+        languages: ${{ matrix.language }}
+        build-mode: ${{ matrix.build-mode }}
 
-    - name: Build Aisleron
-      # -PincludeProfiles=false handles the F-Droid/GitHub mismatch
-      # assembleDebug bypasses your signing key check
-      run: gradle assembleDebug
+    - name: Run manual build steps
+      if: matrix.build-mode == 'manual'
+      shell: bash
+      run: |
+        gradle assembleDebug
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
       with:
-        category: "/language:java-kotlin"
+        category: "/language:${{matrix.language}}"
