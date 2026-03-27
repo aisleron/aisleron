@@ -25,10 +25,10 @@
     <string name="db_backup_success">Yedekleme tamamlandı</string>
     <string name="about_support_header">Destek</string>
     <string name="about_support_version_title">Sürüm tarihçesi</string>
-    <string name="about_support_report_issue_title">Sorun bildirin</string>
+    <string name="about_support_report_issue_title">Sorun bildirme</string>
     <string name="about_support_sourcecode_title">Kaynak kodu</string>
     <string name="about_legal_license_title">Aisleron Lisansı</string>
-    <string name="about_legal_privacy_title">Aisleron Mahremiyet politikası</string>
+    <string name="about_legal_privacy_title">Aisleron Mahremiyet Politikası</string>
     <string name="about_support_sourcecode_summary">Kaynak kodunu GitHub\'da görün</string>
     <string name="about_support_documentation_title">Dokümantasyon</string>
     <string name="welcome_title">Aisleron\'a hoşgeldiniz</string>
@@ -123,11 +123,11 @@
     <string name="about_legal_header">Lisanslar ve Politikalar</string>
     <string name="about_support_version_summary">Şu anki sürüm: %1$s</string>
     <string name="about_support_report_issue_summary">Bir hata ya da özellik eklenmesi talebi gönderin</string>
-    <string name="about_legal_license_summary">GNU Affero General Public License (AGPL) sürüm 3</string>
+    <string name="about_legal_license_summary">GNU Affero Genel Kamu Lisansı (Affero General Public License - AGPL) sürüm 3</string>
     <string name="about_legal_privacy_summary">Mahremiyet politikasını siteden okuyun</string>
     <string name="about_support_documentation_summary">Dokümantasyonu siteden okuyun</string>
-    <string name="about_legal_3rdparty_title">3. taraf lisansları</string>
-    <string name="about_legal_3rdparty_summary">3. taraf lisanslarını siteden okuyun</string>
+    <string name="about_legal_3rdparty_title">Üçüncü Taraf Lisansları</string>
+    <string name="about_legal_3rdparty_summary">Üçüncü tarafların lisanslarını siteden okuyun</string>
     <string name="welcome_app_title">İlk adımlar</string>
     <string name="welcome_message">Alışveriş deneyiminizi kolaylaştırmanıza ve düzene sokmanıza yardımcı olmaktan heyeacan duyuyoruz. Başlamak için aşağıdaki seçeneklerden birini seçin:</string>
     <string name="welcome_add_own_product"><h3>Kendi ürünlerinizi ekleyin</h3> Dükkânlar, reyonlar ve ürünler ekleyerek kendi alışveriş listenizi sıfırdan oluşturmaya başlayın</string>
