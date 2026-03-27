@@ -1,7 +1,7 @@
 Enhancements:
 * Added a Search entry to the Floating Action Button menu.
 * Populate Name on Add Product page with search results if available.
-* Added Breton translation
+* Added Breton translation.
 
 Bug Fixes:
-*
+* Fix incorrect pinned shop being displayed after reordering shops.
