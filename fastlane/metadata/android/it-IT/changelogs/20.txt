@@ -1,7 +1,7 @@
 Miglioramenti:
 * Aggiunto una voce di ricerca al menu pulsante azione galleggiante.
 * Populate Name on Add Product page con risultati di ricerca se disponibili.
-* Aggiunto Breton Traduzione
+* Aggiunto Breton traduzione.
 
 Correzioni di bug:
-#
+* Fissare il negozio a pinned errato che viene visualizzato dopo riordinare i negozi.
