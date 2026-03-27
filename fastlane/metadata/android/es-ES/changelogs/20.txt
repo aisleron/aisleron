@@ -1,7 +1,8 @@
 Mejoras:
 * Agregó una entrada de búsqueda al menú del botón de acción flotante.
-* Populate Name on Add Product page with search results if available.
+* Rellene el nombre en la página Agregar producto con los resultados de la
+  búsqueda, si están disponibles.
 * Traducción de bretón.
 
 Corrección de errores:
-* Arregla la tienda de pinned incorrecta que se muestra después de reordenar tiendas.
+* Repara la tienda pinchada incorrecta que se exhibe tras reordenar las tiendas.
