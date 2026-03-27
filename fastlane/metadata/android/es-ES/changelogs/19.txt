@@ -1,7 +1,7 @@
 Mejoras:
-* Se agregó la opción para ver la lista de productos agrupada por ubicación/shop.
-* Añadido una sección de Gentileza a la página Acerca.
-* Traducciones turcas agregadas.
+* Se agregó la opción para ver la lista de productos agrupada por lugar/tienda.
+* Se agregó una sección de Contribución a la página Acerca de.
+* Se agregaron traducciones turcas.
 
 Corrección de errores:
 * Los recursos de lenguaje fijo están siendo despojados del paquete Play Store.

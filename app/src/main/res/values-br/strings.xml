@@ -174,4 +174,5 @@
     <string name="status_change_confirmation">%1$s diblaset war-zu %2$s</string>
     <string name="done">Echuet</string>
     <string name="tracking_none">Hini ebet (skubañ hekpen)</string>
+    <string name="save_changes_message">Bez ho peus cheñchamantoù ha n\'int ket enrollet. Ha c\'hoant ho pefe da enrollañ anezho a-raok mont kuit?</string>
 </resources>
