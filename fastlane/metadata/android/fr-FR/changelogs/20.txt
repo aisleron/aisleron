@@ -1,7 +1,9 @@
 Améliorations :
+* Ajout de l'option pour afficher la liste de produits regroupée par emplacement/shop.
+* Ajout d'une section Contribuer à la page A propos.
 * Ajout d'une entrée de recherche dans le menu Bouton d'action flottante.
 * Populate Name on Add Product page with search results if available.
-* Ajout de la traduction bretonne.
+* Ajout de traductions turques et bretonnes.
 
 Corrections de bug :
 * Correction d'une pinte incorrecte affichée après la réorganisation des magasins.
