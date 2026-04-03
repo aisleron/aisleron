@@ -28,7 +28,7 @@ plugins {
     id("com.autonomousapps.dependency-analysis")
 }
 
-apply("../gradle/jacoco.gradle.kts")
+apply(file("../gradle/jacoco.gradle.kts"))
 
 object Versions {
     const val COROUTINES = "1.10.2"
