@@ -1,7 +1,7 @@
 Ausdehnungen:
 * Zugefügt einen Suche Eintrag zu der #Fließend Aktion Knopf Speisekarte.
 * #Bevölkern #Heißen weiter Produkt Seite Zufügen mit Suche Resultate ob verfügbar.
-* Zugefügt bretonischen Übersetzung
+* Zugefügt bretonische Übersetzung.
 
 Käfer Klemmen:
-*
+* Bring an inkorrekt gepinnt Laden seiend gezeigt #nachdem reordering Läden.
