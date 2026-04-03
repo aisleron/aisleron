@@ -141,7 +141,11 @@ class ProductFragmentTest : KoinTest {
         val newProductName = "Product Add New Test"
         val scenario = getFragmentScenario(bundle)
 
-        onView(withId(R.id.edt_product_name)).perform(typeText(newProductName))
+        onView(withId(R.id.edt_product_name)).perform(
+            clearText(),
+            typeText(newProductName)
+        )
+
         scenario.onFragment {
             val menuItem = getSaveMenuItem(it.requireContext())
             it.onMenuItemSelected(menuItem)
@@ -238,7 +242,10 @@ class ProductFragmentTest : KoinTest {
         val newProductName = "Product Add New Test"
         getFragmentScenario(bundle)
 
-        onView(withId(R.id.edt_product_name)).perform(typeText(newProductName))
+        onView(withId(R.id.edt_product_name)).perform(
+            clearText(),
+            typeText(newProductName)
+        )
 
         val device = UiDevice.getInstance(getInstrumentation())
 

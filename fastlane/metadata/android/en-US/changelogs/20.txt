@@ -1,7 +1,9 @@
 Enhancements:
+* Added the option to view the product list grouped by location/shop.
+* Added a Contribute section to the About page.
 * Added a Search entry to the Floating Action Button menu.
 * Populate Name on Add Product page with search results if available.
-* Added Breton translation.
+* Added Turkish and Breton translations.
 
 Bug Fixes:
 * Fix incorrect pinned shop being displayed after reordering shops.

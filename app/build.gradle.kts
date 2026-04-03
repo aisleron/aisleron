@@ -75,8 +75,8 @@ android {
         applicationId = "com.aisleron"
         minSdk = 24
         targetSdk = 36
-        versionCode = 19
-        versionName = "2026.2.0"
+        versionCode = 20
+        versionName = "2026.3.0"
         base.archivesName = "$applicationId-$versionName"
 
         testInstrumentationRunner = "com.aisleron.di.KoinInstrumentationTestRunner"
