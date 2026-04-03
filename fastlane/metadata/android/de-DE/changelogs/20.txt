@@ -1,7 +1,9 @@
-Ausdehnungen:
-* Zugefügt einen Suche Eintrag zu der #Fließend Aktion Knopf Speisekarte.
-* #Bevölkern #Heißen weiter Produkt Seite Zufügen mit Suche Resultate ob verfügbar.
-* Zugefügt bretonische Übersetzung.
+Verbesserungen:
+* Die Option wurde hinzugefügt, um die Produktliste nach Standort/Shop zu sehen.
+* Hinzugefügt einen Beitrag Abschnitt zu der Über-Seite.
+* Fügen Sie einen Sucheintrag zum Menü "Floating Action Button" hinzu.
+* Populate Name auf Produktseite mit Suchergebnissen hinzufügen, wenn vorhanden.
+* Hinzugefügt türkische und Breton Übersetzungen.
 
-Käfer Klemmen:
-* Bring an inkorrekt gepinnt Laden seiend gezeigt #nachdem reordering Läden.
+Fehler behoben:
+* Fix falsche gepinnte Shop angezeigt wird nach der Bestellung von Geschäften.
