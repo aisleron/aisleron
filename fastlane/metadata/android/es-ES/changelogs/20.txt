@@ -1,8 +1,9 @@
 Mejoras:
+* Se agregó la opción para ver la lista de productos agrupada por ubicación/shop.
+* Añadido una sección de Gentileza a la página Acerca.
 * Agregó una entrada de búsqueda al menú del botón de acción flotante.
-* Rellene el nombre en la página Agregar producto con los resultados de la
-  búsqueda, si están disponibles.
-* Traducción de bretón.
+* Populate Name on Add Product page with search results if available.
+* Traducciones turcas y bretonas.
 
 Corrección de errores:
-* Repara la tienda pinchada incorrecta que se exhibe tras reordenar las tiendas.
+* Arregla la tienda de pinned incorrecta que se muestra después de reordenar tiendas.
