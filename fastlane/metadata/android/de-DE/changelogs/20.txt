@@ -1,7 +1,9 @@
 Ausdehnungen:
+* Zugefügt die Option zu anschauen die Produkt Liste gruppiert bei Drehort/Laden.
+* Zugefügt ein Spenden Sektion zu die Von Seite.
 * Zugefügt einen Suche Eintrag zu der #Fließend Aktion Knopf Speisekarte.
 * #Bevölkern #Heißen weiter Produkt Seite Zufügen mit Suche Resultate ob verfügbar.
-* Zugefügt bretonische Übersetzung.
+* Zugefügt türkische und bretonische Übersetzungen.
 
 Käfer Klemmen:
 * Bring an inkorrekt gepinnt Laden seiend gezeigt #nachdem reordering Läden.
