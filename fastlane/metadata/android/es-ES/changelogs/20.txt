@@ -1,8 +1,8 @@
 Mejoras:
-* Se agregó la opción para ver la lista de productos agrupada por ubicación/shop.
-* Añadido una sección de Gentileza a la página Acerca.
-* Agregó una entrada de búsqueda al menú del botón de acción flotante.
-* Populate Name on Add Product page with search results if available.
+* Se agregó la opción para ver la lista de productos agrupada por ubicación/tienda.
+* Sección de Contribución añadida a la página Acerca.
+* Agregada entrada de búsqueda al menú del Botón de Acción Flotante.
+* Nombre Popular en la página Añadir Producto con resultados de búsqueda si están disponibles.
 * Traducciones turcas y bretonas.
 
 Corrección de errores:
