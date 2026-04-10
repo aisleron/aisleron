@@ -1,8 +1,9 @@
 Mejoras:
-* Agregó una entrada de búsqueda al menú del botón de acción flotante.
-* Rellene el nombre en la página Agregar producto con los resultados de la
-  búsqueda, si están disponibles.
-* Traducción de bretón.
+* Se agregó la opción para ver la lista de productos agrupada por ubicación/tienda.
+* Sección de Contribución añadida a la página Acerca.
+* Agregada entrada de búsqueda al menú del Botón de Acción Flotante.
+* Nombre Popular en la página Añadir Producto con resultados de búsqueda si están disponibles.
+* Traducciones turcas y bretonas.
 
 Corrección de errores:
-* Repara la tienda pinchada incorrecta que se exhibe tras reordenar las tiendas.
+* Arregla la tienda de pinned incorrecta que se muestra después de reordenar tiendas.
