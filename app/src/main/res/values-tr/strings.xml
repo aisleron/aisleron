@@ -167,8 +167,8 @@
     <string name="discard">Çöpe at</string>
     <string name="save_changes_message">Kaydedilmemiş değişiklikleriniz var. Çıkmadan önce kaydedilmelerini istiyor musunuz?</string>
     <string name="about_contribute_header">Katkıda bulunun</string>
-    <string name="about_contribute_donate_title">Bağış yapın</string>
-    <string name="about_contribute_donate_summary">Aisleron\'a maddi destek verin</string>
+    <string name="about_contribute_financial_title">Finansal Katkı</string>
+    <string name="about_contribute_financial_summary">Aisleron\'u finansal bir katkıyla destekleyin</string>
     <string name="loyalty_card_provider_missing_exception">HATA: Müşteri kartı sağlayıcısı kurulu değil ya da etkinlik bulunamadı</string>
     <string name="about_contribute_translate_title">Çevirin</string>
     <string name="about_contribute_translate_summary">Aisleron\'un başka dillerde çalışmasına yardımcı olun</string>

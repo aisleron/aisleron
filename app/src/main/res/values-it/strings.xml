@@ -199,8 +199,8 @@
     <string name="about_contribute_header">Contribuisci</string>
     <string name="about_contribute_translate_title">Traduci</string>
     <string name="about_contribute_translate_summary">Aiuta a rendere Aisleron disponibile in più lingue</string>
-    <string name="about_contribute_donate_title">Dona</string>
-    <string name="about_contribute_donate_summary">Contribuisci finanziariamente ad Aisleron</string>
+    <string name="about_contribute_financial_title">Contributo Finanziario</string>
+    <string name="about_contribute_financial_summary">Sostieni Aisleron con un contributo finanziario</string>
     <string name="show_location_list">Mostra %1$s</string>
     <string name="search">Cerca</string>
     <string name="search_fab">Cerca FAB</string>

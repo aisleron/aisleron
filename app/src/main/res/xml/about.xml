@@ -64,12 +64,12 @@
                 android:data="@string/aisleron_translate_url" />
         </Preference>
         <Preference
-            android:key="about_contribute_donate"
-            android:title="@string/about_contribute_donate_title"
-            android:summary="@string/about_contribute_donate_summary">
+            android:key="about_contribute_financial"
+            android:title="@string/about_contribute_financial_title"
+            android:summary="@string/about_contribute_financial_summary">
             <intent
                 android:action="android.intent.action.VIEW"
-                android:data="@string/aisleron_donate_url" />
+                android:data="@string/aisleron_financial_contribution_url" />
         </Preference>
     </PreferenceCategory>
 

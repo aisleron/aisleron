@@ -199,8 +199,8 @@
     <string name="about_contribute_header">Bidra</string>
     <string name="about_contribute_translate_title">Översätt</string>
     <string name="about_contribute_translate_summary">Hjälp till att göra Aisleron tillgänglig på fler språk</string>
-    <string name="about_contribute_donate_title">Donera</string>
-    <string name="about_contribute_donate_summary">Bidra ekonomiskt till Aisleron</string>
+    <string name="about_contribute_financial_title">Ekonomiskt Bidrag</string>
+    <string name="about_contribute_financial_summary">Stöd Aisleron med ett ekonomiskt bidrag</string>
     <string name="show_location_list">Visa %1$s</string>
     <string name="search">Sök</string>
     <string name="search_fab">Sök-FAB</string>

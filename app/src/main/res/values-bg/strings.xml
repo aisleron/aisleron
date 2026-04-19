@@ -199,8 +199,8 @@
     <string name="about_contribute_header">Сътрудничество</string>
     <string name="about_contribute_translate_title">Превод</string>
     <string name="about_contribute_translate_summary">Помогнете да направим Aisleron достъпен на повече езици</string>
-    <string name="about_contribute_donate_title">Дарение</string>
-    <string name="about_contribute_donate_summary">Подкрепете Aisleron финансово</string>
+    <string name="about_contribute_financial_title">Финансов Принос</string>
+    <string name="about_contribute_financial_summary">Подкрепете Aisleron с финансов принос</string>
     <string name="show_location_list">Покажи %1$s</string>
     <string name="search">Търсене</string>
     <string name="search_fab">Търсене (FAB)</string>

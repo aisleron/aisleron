@@ -208,8 +208,8 @@
     <string name="about_contribute_header">Dra by</string>
     <string name="about_contribute_translate_title">Vertaal</string>
     <string name="about_contribute_translate_summary">Help om Aisleron in meer tale beskikbaar te stel</string>
-    <string name="about_contribute_donate_title">Skenk</string>
-    <string name="about_contribute_donate_summary">Dra finansieel by tot Aisleron</string>
+    <string name="about_contribute_financial_title">Finansiële Bydrae</string>
+    <string name="about_contribute_financial_summary">Ondersteun Aisleron met \'n finansiële bydrae</string>
     <string name="show_location_list">Wys %1$s</string>
     <string name="search">Soek</string>
     <string name="search_fab">Soek-FAB</string>

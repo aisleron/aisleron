@@ -37,7 +37,7 @@ object Versions {
     const val FRAGMENT = "1.8.9"
     const val LIFECYCLE = "2.10.0"
     const val ROOM = "2.8.4"
-    const val KOIN = "4.1.1"
+    const val KOIN = "4.2.1"
     const val NAVIGATION = "2.9.7"
 }
 
@@ -196,11 +196,11 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.2.1")
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.3.0")
     implementation("androidx.customview:customview:1.2.0")
-    implementation("androidx.annotation:annotation:1.9.1")
+    implementation("androidx.annotation:annotation:1.10.0")
     implementation("androidx.documentfile:documentfile:1.1.0")
     implementation("androidx.preference:preference-ktx:1.2.1")
     implementation("androidx.viewpager2:viewpager2:1.1.0")
-    implementation("org.jetbrains.kotlin:kotlin-parcelize-runtime:2.3.10")
+    implementation("org.jetbrains.kotlin:kotlin-parcelize-runtime:2.3.20")
     implementation("androidx.fragment:fragment-ktx:${Versions.FRAGMENT}")
 
     // Lifecycle

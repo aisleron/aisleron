@@ -126,8 +126,8 @@
     <string name="about_contribute_header">Contribute</string>
     <string name="about_contribute_translate_title">Translate</string>
     <string name="about_contribute_translate_summary">Help to make Aisleron available in more languages</string>
-    <string name="about_contribute_donate_title">Donate</string>
-    <string name="about_contribute_donate_summary">Contribute to Aisleron financially</string>
+    <string name="about_contribute_financial_title">Financial Contribution</string>
+    <string name="about_contribute_financial_summary">Support Aisleron with a financial contribution</string>
 
     <!-- Welcome Page -->
     <string name="welcome_app_title">Getting Started</string>
@@ -158,7 +158,7 @@
     <string name="aisleron_documentation_url" translatable="false">https://aisleron.com/docs/documentation/</string>
     <string name="aisleron_version_history_url" translatable="false">https://aisleron.com/docs/version-history</string>
     <string name="aisleron_translate_url" translatable="false">https://aisleron.com/docs/contribute/translate</string>
-    <string name="aisleron_donate_url" translatable="false">https://aisleron.com/docs/contribute/donate</string>
+    <string name="aisleron_financial_contribution_url" translatable="false">https://aisleron.com/docs/contribute/financial_contributions</string>
 
     <!-- Loyalty cards -->
     <string name="shop_loyalty_card_name">Loyalty Card</string>

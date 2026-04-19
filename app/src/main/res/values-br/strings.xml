@@ -25,7 +25,6 @@
     <string name="show_location_list">Diskouez %1$s</string>
     <string name="about_legal_license_summary">GNU Affero General Public License (AGPL) stumm 3</string>
     <string name="about_support_documentation_title">Teuliadur</string>
-    <string name="about_contribute_donate_summary">Sikourit Aisleron en ur reiñ arc\'hant</string>
     <string name="use_dynamic_color_summary">Ober gant livioù ar sistem deveret eus an drekleur</string>
     <string name="save">Enrollañ</string>
     <string name="use_dynamic_color">Livioù frev</string>
@@ -132,7 +131,6 @@
     <string name="items_selected">%1$d a bennadoù</string>
     <string name="about_contribute_translate_title">Treiñ</string>
     <string name="keep_screen_on_summary">Mirout ouzh ar skramm a vezañ lazhet pa vezer o sellet ouzh ul listenn</string>
-    <string name="about_contribute_donate_title">Reiñ arc\'hant</string>
     <string name="shop_name">Anv ar stal</string>
     <string name="add_shop_fab">Ouzhpennañ ar stal FAB</string>
     <string name="sort_confirm_title">Kadarnaat ar rummañ</string>
@@ -175,4 +173,6 @@
     <string name="done">Echuet</string>
     <string name="tracking_none">Hini ebet (skubañ hekpen)</string>
     <string name="save_changes_message">Bez ho peus cheñchamantoù ha n\'int ket enrollet. Ha c\'hoant ho pefe da enrollañ anezho a-raok mont kuit?</string>
+    <string name="about_contribute_financial_title">Road Lakaet gant an Arc’hant</string>
+    <string name="about_contribute_financial_summary">Harpait Aisleron gant ur road lakaet gant an arc’hant</string>
 </resources>

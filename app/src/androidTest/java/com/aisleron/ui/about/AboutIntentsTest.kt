@@ -88,8 +88,8 @@ class AboutIntentsTest(private val resourceId: Int, private val expectedUri: Str
                     "https://aisleron.com/docs/contribute/translate"
                 ),
                 arrayOf(
-                    R.string.about_contribute_donate_title,
-                    "https://aisleron.com/docs/contribute/donate"
+                    R.string.about_contribute_financial_title,
+                    "https://aisleron.com/docs/contribute/financial_contributions"
                 )
             )
         }
