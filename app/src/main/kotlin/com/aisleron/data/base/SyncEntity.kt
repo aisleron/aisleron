@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025-2026 aisleron.com
+ * Copyright (C) 2026 aisleron.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,17 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.aisleron.domain.note
+package com.aisleron.data.base
 
-import com.aisleron.domain.base.BaseRepository
-import kotlinx.coroutines.flow.Flow
-
-interface NoteRepository : BaseRepository<Note> {
-    fun getMultiple(ids: List<Int>): Flow<List<Note>>
-
-    // TODO: Move to base repository
-    suspend fun getRemoved(id: Int): Note?
-
-    // TODO: Move to Base repository
-    suspend fun hardDelete(item: Note)
+interface SyncEntity {
+    val syncId: String?
+    val isRemoved: Boolean
+    val lastModifiedAt: Long
+    val serverUpdatedAt: Long?
 }

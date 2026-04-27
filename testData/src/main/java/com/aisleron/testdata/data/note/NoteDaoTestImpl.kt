@@ -25,16 +25,17 @@ import kotlinx.coroutines.flow.flowOf
 class NoteDaoTestImpl : NoteDao {
     private val noteList = mutableListOf<NoteEntity>()
 
-    override suspend fun getNote(noteId: Int): NoteEntity? {
-        return noteList.find { it.id == noteId }
+    override suspend fun getNote(noteId: Int, includeRemoved: Boolean): NoteEntity? {
+        return noteList.find { it.id == noteId && (!it.isRemoved || includeRemoved) }
     }
 
-    override suspend fun getNotes(): List<NoteEntity> {
-        return noteList
+    override suspend fun getNotes(includeRemoved: Boolean): List<NoteEntity> {
+        return noteList.filter { !it.isRemoved || includeRemoved }
     }
 
-    override fun getNotes(ids: List<Int>): Flow<List<NoteEntity>> {
-        val result = noteList.filter { note -> ids.contains(note.id) }
+    override fun getNotes(ids: List<Int>, includeRemoved: Boolean): Flow<List<NoteEntity>> {
+        val result =
+            noteList.filter { note -> ids.contains(note.id) && (!note.isRemoved || includeRemoved) }
         return flowOf(result)
     }
 
@@ -49,7 +50,11 @@ class NoteDaoTestImpl : NoteDao {
 
             val newEntity = NoteEntity(
                 id = id,
-                noteText = it.noteText
+                noteText = it.noteText,
+                syncId = it.syncId,
+                isRemoved = it.isRemoved,
+                lastModifiedAt = it.lastModifiedAt,
+                serverUpdatedAt = it.serverUpdatedAt
             )
 
             noteList.add(newEntity)

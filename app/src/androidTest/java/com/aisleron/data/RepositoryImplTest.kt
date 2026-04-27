@@ -180,18 +180,21 @@ abstract class RepositoryImplTest<T : AisleronItem> : KoinTest {
     }
 
     @Test
-    fun remove_ValidItemProvided_RemoveItem() = runTest {
+    fun remove_ValidItemProvided_FlaggedAsRemoved() = runTest {
         val itemId = addMultipleItems().first()
         val itemBefore = repository.get(itemId)!!
         val countBefore = repository.getAll().count()
 
         repository.remove(itemBefore)
 
+        val countAfter = repository.getAll().count()
+        assertEquals(countBefore.dec(), countAfter)
+
         val itemAfter = repository.get(itemId)
         assertNull(itemAfter)
 
-        val countAfter = repository.getAll().count()
-        assertEquals(countBefore.dec(), countAfter)
+        // val removedItem = repository.getRemoved(itemId)
+        // assertNotNull(removedItem)
     }
 
     @Test

@@ -17,10 +17,11 @@
 
 package com.aisleron.data.note
 
-import com.aisleron.data.base.MapperBaseImpl
+import com.aisleron.data.base.Mapper
+import com.aisleron.data.base.SyncEntity
 import com.aisleron.domain.note.Note
 
-class NoteMapper : MapperBaseImpl<NoteEntity, Note>() {
+class NoteMapper : Mapper<NoteEntity, Note> {
     override fun toModel(value: NoteEntity) = Note(
         id = value.id,
         noteText = value.noteText.trim()
@@ -29,5 +30,14 @@ class NoteMapper : MapperBaseImpl<NoteEntity, Note>() {
     override fun fromModel(value: Note) = NoteEntity(
         id = value.id,
         noteText = value.noteText.trim()
+    )
+
+    fun fromModel(value: Note, syncMetadata: SyncEntity?) = NoteEntity(
+        id = value.id,
+        noteText = value.noteText.trim(),
+        syncId = syncMetadata?.syncId,
+        isRemoved = syncMetadata?.isRemoved ?: false,
+        lastModifiedAt = System.currentTimeMillis(),
+        serverUpdatedAt = syncMetadata?.serverUpdatedAt
     )
 }

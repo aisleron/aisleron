@@ -26,43 +26,61 @@ class NoteRepositoryImpl(
     private val noteDao: NoteDao,
     private val noteMapper: NoteMapper
 ) : NoteRepository {
-    override suspend fun get(id: Int): Note? {
-        return noteDao.getNote(id)?.let { noteMapper.toModel(it) }
-    }
+    override suspend fun get(id: Int): Note? =
+        getNote(id, false)
 
     override suspend fun getAll(): List<Note> {
         return noteMapper.toModelList(noteDao.getNotes())
     }
 
     override suspend fun add(item: Note): Int {
-        return noteDao.upsert(noteMapper.fromModel(item)).single().toInt()
+        return noteDao.upsert(noteMapper.fromModel(item, null)).single().toInt()
     }
 
     override suspend fun add(items: List<Note>): List<Int> {
-        return upsertNotes(items)
+        val notes = items.map { noteMapper.fromModel(it, null) }
+        return upsertNotes(notes)
+    }
+
+    private suspend fun mapExisting(item: Note, includeDeleted: Boolean = false): NoteEntity {
+        val currentEntity = noteDao.getNote(item.id, includeDeleted)
+        return noteMapper.fromModel(item, currentEntity)
     }
 
     override suspend fun update(item: Note) {
-        noteDao.upsert(noteMapper.fromModel(item))
+        noteDao.upsert(mapExisting(item))
     }
 
     override suspend fun update(items: List<Note>) {
-        upsertNotes(items)
+        val notes = items.map { mapExisting(it) }
+        upsertNotes(notes)
     }
 
     override suspend fun remove(item: Note) {
-        noteDao.delete(noteMapper.fromModel(item))
+        val removeEntity = mapExisting(item).copy(isRemoved = true)
+        noteDao.upsert(removeEntity)
     }
 
-    private suspend fun upsertNotes(notes: List<Note>): List<Int> {
+    override suspend fun hardDelete(item: Note) {
+        noteDao.delete(mapExisting(item, true))
+    }
+
+    private suspend fun upsertNotes(notes: List<NoteEntity>): List<Int> {
         // '*' is a spread operator required to pass vararg down
         return noteDao
-            .upsert(*noteMapper.fromModelList(notes).map { it }.toTypedArray())
+            .upsert(*notes.toTypedArray())
             .map { it.toInt() }
     }
 
     override fun getMultiple(ids: List<Int>): Flow<List<Note>> {
         val noteEntities = noteDao.getNotes(ids)
         return noteEntities.map { noteMapper.toModelList(it) }
+    }
+
+    override suspend fun getRemoved(id: Int): Note? =
+        getNote(id, true)
+
+    private suspend fun getNote(id: Int, includeDeleted: Boolean): Note? {
+        return noteDao.getNote(id, includeDeleted)?.let { noteMapper.toModel(it) }
     }
 }

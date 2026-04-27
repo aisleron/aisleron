@@ -27,6 +27,8 @@ import org.junit.Test
 import org.koin.test.KoinTest
 import org.koin.test.get
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 class NoteRepositoryImplTest : KoinTest, RepositoryImplTest<Note>() {
     val noteRepository: NoteRepository get() = repository as NoteRepository
@@ -75,5 +77,34 @@ class NoteRepositoryImplTest : KoinTest, RepositoryImplTest<Note>() {
         val resultIds = items.map { it.id }
         assertEquals(1, resultIds.size)
         assertEquals(itemIds.sorted(), resultIds.sorted())
+    }
+
+
+    // TODO: Move to base repository test
+    @Test
+    fun removeNote_ValidItemProvided_FlaggedAsRemoved() = runTest {
+        val itemId = addMultipleItems().first()
+        val itemBefore = repository.get(itemId)!!
+
+        repository.remove(itemBefore)
+
+        val itemAfter = repository.get(itemId)
+        assertNull(itemAfter)
+
+        // TODO: Specifically, add this check to the remove_ValidItemProvided_FlaggedAsDeleted test
+        val itemDeleted = noteRepository.getRemoved(itemId)
+        assertNotNull(itemDeleted)
+    }
+
+    // TODO: Move to base repository test
+    @Test
+    fun hardDelete_ValidItemProvided_ItemDeleted() = runTest {
+        val itemId = addMultipleItems().first()
+        val itemBefore = repository.get(itemId)!!
+
+        noteRepository.hardDelete(itemBefore)
+
+        val itemAfter = noteRepository.getRemoved(itemId)
+        assertNull(itemAfter)
     }
 }

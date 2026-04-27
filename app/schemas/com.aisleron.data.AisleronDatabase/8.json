@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 8,
-    "identityHash": "f5cee05cffc55825fcc715aa852d53ef",
+    "identityHash": "84ed47c48b735fdacad64db122972daa",
     "entities": [
       {
         "tableName": "Aisle",
@@ -374,7 +374,7 @@
       },
       {
         "tableName": "Note",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `noteText` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `noteText` TEXT NOT NULL, `syncId` TEXT, `isRemoved` INTEGER NOT NULL DEFAULT 0, `lastModifiedAt` INTEGER NOT NULL DEFAULT 0, `serverUpdatedAt` INTEGER)",
         "fields": [
           {
             "fieldPath": "id",
@@ -387,6 +387,30 @@
             "columnName": "noteText",
             "affinity": "TEXT",
             "notNull": true
+          },
+          {
+            "fieldPath": "syncId",
+            "columnName": "syncId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "isRemoved",
+            "columnName": "isRemoved",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "lastModifiedAt",
+            "columnName": "lastModifiedAt",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "serverUpdatedAt",
+            "columnName": "serverUpdatedAt",
+            "affinity": "INTEGER"
           }
         ],
         "primaryKey": {
@@ -394,7 +418,37 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [
+          {
+            "name": "index_Note_syncId",
+            "unique": true,
+            "columnNames": [
+              "syncId"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_Note_syncId` ON `${TABLE_NAME}` (`syncId`)"
+          },
+          {
+            "name": "index_Note_isRemoved_id",
+            "unique": false,
+            "columnNames": [
+              "isRemoved",
+              "id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Note_isRemoved_id` ON `${TABLE_NAME}` (`isRemoved`, `id`)"
+          },
+          {
+            "name": "index_Note_lastModifiedAt",
+            "unique": false,
+            "columnNames": [
+              "lastModifiedAt"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Note_lastModifiedAt` ON `${TABLE_NAME}` (`lastModifiedAt`)"
+          }
+        ]
       },
       {
         "tableName": "ProductVariant",
@@ -469,7 +523,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f5cee05cffc55825fcc715aa852d53ef')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '84ed47c48b735fdacad64db122972daa')"
     ]
   }
 }
