@@ -17,10 +17,10 @@
 
 package com.aisleron.data.aisle
 
-import com.aisleron.data.base.MapperBaseImpl
+import com.aisleron.data.base.Mapper
 import com.aisleron.domain.aisle.Aisle
 
-class AisleMapper : MapperBaseImpl<AisleEntity, Aisle>() {
+class AisleMapper : Mapper<AisleEntity, Aisle> {
     override fun toModel(value: AisleEntity) = Aisle(
         name = value.name.trim(),
         id = value.id,

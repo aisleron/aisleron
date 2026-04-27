@@ -17,10 +17,10 @@
 
 package com.aisleron.data.location
 
-import com.aisleron.data.base.MapperBaseImpl
+import com.aisleron.data.base.Mapper
 import com.aisleron.domain.location.Location
 
-class LocationMapper : MapperBaseImpl<LocationEntity, Location>() {
+class LocationMapper : Mapper<LocationEntity, Location> {
     override fun toModel(value: LocationEntity) = Location(
         id = value.id,
         type = value.type,

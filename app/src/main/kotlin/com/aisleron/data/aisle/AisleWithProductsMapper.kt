@@ -18,10 +18,10 @@
 package com.aisleron.data.aisle
 
 import com.aisleron.data.aisleproduct.AisleProductRankMapper
-import com.aisleron.data.base.MapperBaseImpl
+import com.aisleron.data.base.Mapper
 import com.aisleron.domain.aisle.Aisle
 
-class AisleWithProductsMapper : MapperBaseImpl<AisleWithProducts, Aisle>() {
+class AisleWithProductsMapper : Mapper<AisleWithProducts, Aisle> {
     override fun toModel(value: AisleWithProducts) = Aisle(
         id = value.aisle.id,
         rank = value.aisle.rank,

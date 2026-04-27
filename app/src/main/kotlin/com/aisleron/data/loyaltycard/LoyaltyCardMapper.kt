@@ -17,10 +17,10 @@
 
 package com.aisleron.data.loyaltycard
 
-import com.aisleron.data.base.MapperBaseImpl
+import com.aisleron.data.base.Mapper
 import com.aisleron.domain.loyaltycard.LoyaltyCard
 
-class LoyaltyCardMapper : MapperBaseImpl<LoyaltyCardEntity, LoyaltyCard>() {
+class LoyaltyCardMapper : Mapper<LoyaltyCardEntity, LoyaltyCard> {
     override fun toModel(value: LoyaltyCardEntity) = LoyaltyCard(
         id = value.id,
         name = value.name.trim(),

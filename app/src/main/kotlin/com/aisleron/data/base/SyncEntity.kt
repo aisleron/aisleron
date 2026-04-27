@@ -17,6 +17,17 @@
 
 package com.aisleron.data.base
 
+/**
+ * Base fields required by a cloud sync entity.
+ *
+ * Sync entities need the following indices added to in the Room annotations:
+ * indices = [
+ *         Index(value = ["syncId"], unique = true),
+ *         Index(value = ["isRemoved", "id"]),
+ *         Index(value = ["lastModifiedAt"])
+ *     ]
+ */
+
 interface SyncEntity {
     val syncId: String?
     val isRemoved: Boolean
