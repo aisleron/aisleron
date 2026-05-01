@@ -24,12 +24,24 @@ class AisleProductRepositoryImpl(
     private val aisleProductDao: AisleProductDao,
     private val aisleProductRankMapper: AisleProductRankMapper
 ) : AisleProductRepository {
+    private suspend fun mapExisting(
+        item: AisleProduct, includeDeleted: Boolean
+    ): AisleProductRank {
+        val currentEntity = aisleProductDao.getAisleProduct(item.id, includeDeleted)
+        return aisleProductRankMapper.fromModel(item, currentEntity?.aisleProduct)
+    }
+
     override suspend fun updateAisleProductRank(item: AisleProduct) {
-        aisleProductDao.updateRank(aisleProductRankMapper.fromModel(item).aisleProduct)
+        val existingEntity = mapExisting(item, false).aisleProduct
+        aisleProductDao.updateRank(existingEntity)
     }
 
     override suspend fun removeProductsFromAisle(aisleId: Int) {
-        aisleProductDao.removeProductsFromAisle(aisleId)
+        aisleProductDao.toggleProductsOnAisleRemove(aisleId, true, System.currentTimeMillis())
+    }
+
+    override suspend fun restoreProductsToAisle(aisleId: Int) {
+        aisleProductDao.toggleProductsOnAisleRemove(aisleId, false, System.currentTimeMillis())
     }
 
     override suspend fun getMaxRank(aisleId: Int): Int {
@@ -42,9 +54,8 @@ class AisleProductRepositoryImpl(
         )
     }
 
-    override suspend fun get(id: Int): AisleProduct? {
-        return aisleProductDao.getAisleProduct(id)?.let { aisleProductRankMapper.toModel(it) }
-    }
+    override suspend fun get(id: Int): AisleProduct? =
+        getAisleProduct(id, false)
 
     override suspend fun getAll(): List<AisleProduct> {
         return aisleProductRankMapper.toModelList(aisleProductDao.getAisleProducts())
@@ -52,32 +63,59 @@ class AisleProductRepositoryImpl(
 
     override suspend fun add(item: AisleProduct): Int {
         return aisleProductDao
-            .upsert(aisleProductRankMapper.fromModel(item).aisleProduct)[0].toInt()
+            .upsert(aisleProductRankMapper.fromModel(item, null).aisleProduct)[0].toInt()
     }
 
     override suspend fun add(items: List<AisleProduct>): List<Int> {
-        return upsertAisleProducts(items)
+        val aisleProducts = items.map { aisleProductRankMapper.fromModel(it, null) }
+        return upsertAisleProducts(aisleProducts)
     }
 
-    private suspend fun upsertAisleProducts(aisleProducts: List<AisleProduct>): List<Int> {
+    private suspend fun upsertAisleProducts(aisleProducts: List<AisleProductRank>): List<Int> {
         // '*' is a spread operator required to pass vararg down
         return aisleProductDao
-            .upsert(*aisleProductRankMapper.fromModelList(aisleProducts)
-                .map { it.aisleProduct }
-                .map { it }.toTypedArray()
+            .upsert(
+                *aisleProducts
+                    .map { it.aisleProduct }
+                    .map { it }.toTypedArray()
             ).map { it.toInt() }
     }
 
 
     override suspend fun update(item: AisleProduct) {
-        aisleProductDao.upsert(aisleProductRankMapper.fromModel(item).aisleProduct)
+        aisleProductDao.upsert(mapExisting(item, false).aisleProduct)
     }
 
     override suspend fun update(items: List<AisleProduct>) {
-        upsertAisleProducts(items)
+        val aisleProducts = items.map { mapExisting(it, false) }
+        upsertAisleProducts(aisleProducts)
     }
 
     override suspend fun remove(item: AisleProduct) {
-        aisleProductDao.delete(aisleProductRankMapper.fromModel(item).aisleProduct)
+        val removeEntity = mapExisting(item, false).aisleProduct.copy(isRemoved = true)
+        aisleProductDao.upsert(removeEntity)
+    }
+
+    override suspend fun getRemoved(id: Int): AisleProduct? =
+        getAisleProduct(id, true)
+
+    override suspend fun restore(id: Int) {
+        val removedEntity = aisleProductDao.getAisleProduct(id, true) ?: return
+
+        val aisleProduct = aisleProductRankMapper.toModel(removedEntity)
+        val restoreEntity = aisleProductRankMapper.fromModel(
+            aisleProduct, removedEntity.aisleProduct
+        ).aisleProduct.copy(isRemoved = false)
+        aisleProductDao.upsert(restoreEntity)
+    }
+
+    override suspend fun hardDelete(item: AisleProduct) {
+        val deleteEntity = mapExisting(item, true).aisleProduct
+        aisleProductDao.delete(deleteEntity)
+    }
+
+    private suspend fun getAisleProduct(id: Int, includeDeleted: Boolean): AisleProduct? {
+        return aisleProductDao.getAisleProduct(id, includeDeleted)
+            ?.let { aisleProductRankMapper.toModel(it) }
     }
 }

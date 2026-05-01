@@ -30,7 +30,7 @@ class ProductVariantDaoTestImpl(
 
     override suspend fun getAll(): List<ProductVariantEntity> = variants.toList()
 
-    override suspend fun getById(id: Int): ProductVariantEntity? = variants.find { it.id == id }
+    override suspend fun getById(id: Int, includeRemoved: Boolean): ProductVariantEntity? = variants.find { it.id == id }
 
     override fun getByBarcode(barcode: String): Flow<ProductVariantEntity?> =
         flowOf(variants.find { it.barcode == barcode })
@@ -41,22 +41,16 @@ class ProductVariantDaoTestImpl(
     override fun barcodeExists(barcode: String): Flow<Boolean> =
         flowOf(variants.any { it.barcode == barcode })
 
-    override suspend fun deleteByBarcode(barcode: ProductVariantDao.BarcodeDeleteHelper): Int {
-        val initialSize = variants.size
-        variants.removeAll { it.barcode == barcode.value }
-        return initialSize - variants.size
-    }
-
     override fun getProductWithBarcode(barcode: String): Flow<com.aisleron.data.productvariant.ProductWithBarcode?> = flowOf(
-        kotlinx.coroutines.runBlocking {
-            val variant = variants.find { it.barcode == barcode } ?: return@runBlocking null
-            val product = productDao.getProduct(variant.productId) ?: return@runBlocking null
-            com.aisleron.data.productvariant.ProductWithBarcode(
-                variant = variant,
-                product = product
-            )
-        }
-    )
+            kotlinx.coroutines.runBlocking {
+                val variant = variants.find { it.barcode == barcode } ?: return@runBlocking null
+                val product = productDao.getProduct(variant.productId, false) ?: return@runBlocking null
+                com.aisleron.data.productvariant.ProductWithBarcode(
+                    variant = variant,
+                    product = product
+                )
+            }
+        )
 
     override suspend fun upsert(vararg entity: ProductVariantEntity): List<Long> {
         val ids = mutableListOf<Long>()

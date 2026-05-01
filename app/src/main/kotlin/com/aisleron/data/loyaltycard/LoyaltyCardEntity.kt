@@ -17,14 +17,28 @@
 
 package com.aisleron.data.loyaltycard
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.aisleron.data.base.SyncEntity
 import com.aisleron.domain.loyaltycard.LoyaltyCardProviderType
 
-@Entity(tableName = "LoyaltyCard")
+@Entity(
+    tableName = "LoyaltyCard",
+    indices = [
+        Index(value = ["syncId"], unique = true),
+        Index(value = ["isRemoved", "id"]),
+        Index(value = ["lastModifiedAt"])
+    ]
+)
 data class LoyaltyCardEntity(
     @PrimaryKey(autoGenerate = true) val id: Int,
     val name: String,
     val provider: LoyaltyCardProviderType,
-    val intent: String
-)
+    val intent: String,
+    override val syncId: String? = null,
+    @ColumnInfo(defaultValue = "0") override val isRemoved: Boolean = false,
+    @ColumnInfo(defaultValue = "0") override val lastModifiedAt: Long = System.currentTimeMillis(),
+    override val serverUpdatedAt: Long? = null
+) : SyncEntity

@@ -25,22 +25,36 @@ import com.aisleron.data.base.BaseDao
 
 @Dao
 interface ProductDao : BaseDao<ProductEntity> {
-    /**
-     * Product
-     */
-    @Query("SELECT * FROM Product WHERE id = :productId")
-    suspend fun getProduct(productId: Int): ProductEntity?
+    @Query("SELECT * FROM Product WHERE id = :productId AND (isRemoved = 0 OR :includeRemoved = 1)")
+    suspend fun getProduct(productId: Int, includeRemoved: Boolean): ProductEntity?
 
-    @Query("SELECT * FROM Product")
+    @Query("SELECT * FROM Product WHERE isRemoved = 0")
     suspend fun getProducts(): List<ProductEntity>
 
     @Transaction
-    suspend fun remove(product: ProductEntity, aisleProductDao: AisleProductDao) {
+    suspend fun delete(product: ProductEntity, aisleProductDao: AisleProductDao) {
         val aisleProducts = aisleProductDao.getAisleProductsByProduct(product.id)
         aisleProductDao.delete(*aisleProducts.map { it.aisleProduct }.toTypedArray())
         delete(product)
     }
 
-    @Query("SELECT * FROM Product WHERE name = :name COLLATE NOCASE")
+    @Query("SELECT * FROM Product WHERE name = :name COLLATE NOCASE AND isRemoved = 0")
     suspend fun getProductByName(name: String): ProductEntity?
+
+    @Query(
+        "UPDATE AisleProduct SET isRemoved = :isRemoved, lastModifiedAt = :lastModifiedAt " +
+                "WHERE productId = :productId"
+    )
+    suspend fun toggleAisleProductRemove(
+        productId: Int, isRemoved: Boolean, lastModifiedAt: Long
+    )
+
+    @Transaction
+    suspend fun updateProductRemovedState(product: ProductEntity) {
+        toggleAisleProductRemove(
+            product.id, product.isRemoved, product.lastModifiedAt
+        )
+
+        upsert(product)
+    }
 }

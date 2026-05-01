@@ -21,37 +21,49 @@ import com.aisleron.data.loyaltycard.LoyaltyCardDao
 import com.aisleron.data.loyaltycard.LoyaltyCardEntity
 import com.aisleron.domain.loyaltycard.LoyaltyCardProviderType
 
-class LoyaltyCardDaoTestImpl(private val locationLoyaltyCardDao: LocationLoyaltyCardDaoTestImpl) :
-    LoyaltyCardDao {
-
+class LoyaltyCardDaoTestImpl(
+    private val locationLoyaltyCardDao: LocationLoyaltyCardDaoTestImpl
+) : LoyaltyCardDao {
     private val loyaltyCardList = mutableListOf<LoyaltyCardEntity>()
+    private val activeItems: List<LoyaltyCardEntity> get() = loyaltyCardList.filter { !it.isRemoved }
 
-    override suspend fun getLoyaltyCard(loyaltyCardId: Int): LoyaltyCardEntity? {
-        return loyaltyCardList.find { it.id == loyaltyCardId }
+    override suspend fun getLoyaltyCard(
+        loyaltyCardId: Int, includeRemoved: Boolean
+    ): LoyaltyCardEntity? {
+        return loyaltyCardList.find { it.id == loyaltyCardId && (!it.isRemoved || includeRemoved) }
     }
 
     override suspend fun getProviderCard(
         provider: LoyaltyCardProviderType, intent: String
     ): LoyaltyCardEntity? {
-        return loyaltyCardList.find { it.provider == provider && it.intent == intent }
+        return activeItems.find { it.provider == provider && it.intent == intent }
     }
 
-    override suspend fun getLoyaltyCards(): List<LoyaltyCardEntity> {
-        return loyaltyCardList
-    }
+    override suspend fun getLoyaltyCards(): List<LoyaltyCardEntity> = activeItems
 
     override suspend fun getLoyaltyCardForLocation(locationId: Int): LoyaltyCardEntity? {
-        return loyaltyCardList.find {
+        return activeItems.find {
             it.id == locationLoyaltyCardDao.getLocationLoyaltyCard(
                 locationId
             )?.loyaltyCardId
         }
     }
 
+    override suspend fun toggleLocationLoyaltyCardRemove(
+        loyaltyCardId: Int, isRemoved: Boolean, lastModifiedAt: Long
+    ) {
+        val entity = locationLoyaltyCardDao.getLocationLoyaltyCard(loyaltyCardId)?.copy(
+            isRemoved = isRemoved,
+            lastModifiedAt = lastModifiedAt
+        ) ?: return
+
+        locationLoyaltyCardDao.upsert(entity)
+    }
+
     override suspend fun upsert(vararg entity: LoyaltyCardEntity): List<Long> {
         val result = mutableListOf<Long>()
         entity.forEach {
-            val existingEntity = getLoyaltyCard(it.id)
+            val existingEntity = getLoyaltyCard(it.id, true)
             val id = existingEntity?.let {
                 loyaltyCardList.removeAt(loyaltyCardList.indexOf(existingEntity))
                 existingEntity.id

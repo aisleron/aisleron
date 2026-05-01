@@ -22,10 +22,4 @@ import kotlinx.coroutines.flow.Flow
 
 interface NoteRepository : BaseRepository<Note> {
     fun getMultiple(ids: List<Int>): Flow<List<Note>>
-
-    // TODO: Move to base repository
-    suspend fun getRemoved(id: Int): Note?
-
-    // TODO: Move to Base repository
-    suspend fun hardDelete(item: Note)
 }

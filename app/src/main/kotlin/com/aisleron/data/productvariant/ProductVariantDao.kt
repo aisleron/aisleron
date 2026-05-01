@@ -25,34 +25,28 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ProductVariantDao : BaseDao<ProductVariantEntity> {
-    @Query("SELECT * FROM ProductVariant ORDER BY createdAt ASC")
+    @Query("SELECT * FROM ProductVariant WHERE isRemoved = 0 ORDER BY createdAt ASC")
     suspend fun getAll(): List<ProductVariantEntity>
 
-    @Query("SELECT * FROM ProductVariant WHERE id = :id")
-    suspend fun getById(id: Int): ProductVariantEntity?
+    @Query("SELECT * FROM ProductVariant WHERE id = :id AND (isRemoved = 0 OR :includeRemoved = 1)")
+    suspend fun getById(id: Int, includeRemoved: Boolean): ProductVariantEntity?
 
-    @Query("SELECT * FROM ProductVariant WHERE barcode = :barcode LIMIT 1")
+    @Query("SELECT * FROM ProductVariant WHERE barcode = :barcode AND isRemoved = 0 LIMIT 1")
     fun getByBarcode(barcode: String): Flow<ProductVariantEntity?>
 
-    @Query("SELECT * FROM ProductVariant WHERE productId = :productId ORDER BY createdAt ASC")
+    @Query("SELECT * FROM ProductVariant WHERE productId = :productId AND isRemoved = 0 ORDER BY createdAt ASC")
     fun getByProductId(productId: Int): Flow<List<ProductVariantEntity>>
 
-    @Query("SELECT EXISTS(SELECT 1 FROM ProductVariant WHERE barcode = :barcode LIMIT 1)")
+    @Query("SELECT EXISTS(SELECT 1 FROM ProductVariant WHERE barcode = :barcode AND isRemoved = 0 LIMIT 1)")
     fun barcodeExists(barcode: String): Flow<Boolean>
 
     @Transaction
-    @Query("SELECT * FROM ProductVariant WHERE barcode = :barcode LIMIT 1")
+    @Query("SELECT * FROM ProductVariant WHERE barcode = :barcode AND isRemoved = 0 LIMIT 1")
     fun getProductWithBarcode(barcode: String): Flow<ProductWithBarcode?>
 
-    @Query("DELETE FROM ProductVariant WHERE barcode = :barcode")
-    suspend fun deleteByBarcode(barcode: BarcodeDeleteHelper): Int
-
-    @Query("SELECT DISTINCT productId FROM ProductVariant WHERE productId IN (:productIds)")
+    @Query("SELECT DISTINCT productId FROM ProductVariant WHERE productId IN (:productIds) AND isRemoved = 0")
     suspend fun getProductIdsWithVariants(productIds: List<Int>): List<Int>
 
-    @Query("SELECT EXISTS(SELECT 1 FROM ProductVariant WHERE productId = :productId LIMIT 1)")
+    @Query("SELECT EXISTS(SELECT 1 FROM ProductVariant WHERE productId = :productId AND isRemoved = 0 LIMIT 1)")
     suspend fun hasVariants(productId: Int): Boolean
-
-    @JvmInline
-    value class BarcodeDeleteHelper(val value: String)
 }

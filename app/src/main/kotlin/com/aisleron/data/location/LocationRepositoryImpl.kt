@@ -67,43 +67,74 @@ class LocationRepositoryImpl(
         return locationDao.getMaxRank()
     }
 
-    override suspend fun updateLocationRank(location: Location) {
-        locationDao.updateRank(locationMapper.fromModel(location))
+    private suspend fun mapExisting(
+        item: Location, includeDeleted: Boolean
+    ): LocationEntity {
+        val currentEntity = locationDao.getLocation(item.id, includeDeleted)
+        return locationMapper.fromModel(item, currentEntity)
     }
 
-    override suspend fun get(id: Int): Location? {
-        return locationDao.getLocation(id)?.let { locationMapper.toModel(it) }
+    override suspend fun updateLocationRank(location: Location) {
+        locationDao.updateRank(mapExisting(location, false))
     }
+
+    override suspend fun get(id: Int): Location? =
+        getLocation(id, false)
 
     override suspend fun getAll(): List<Location> {
         return locationMapper.toModelList(locationDao.getLocations())
     }
 
     override suspend fun add(item: Location): Int {
-        return locationDao.upsert(locationMapper.fromModel(item))[0].toInt()
+        return locationDao.upsert(locationMapper.fromModel(item, null)).first().toInt()
     }
 
     override suspend fun add(items: List<Location>): List<Int> {
-        return upsertLocations(items)
+        val locations = items.map { locationMapper.fromModel(it, null) }
+        return upsertLocations(locations)
     }
 
     override suspend fun update(item: Location) {
-        locationDao.upsert(locationMapper.fromModel(item))
+        locationDao.upsert(mapExisting(item, false))
     }
 
     override suspend fun update(items: List<Location>) {
-        upsertLocations(items)
+        val locations = items.map { mapExisting(it, false) }
+        upsertLocations(locations)
     }
 
-    private suspend fun upsertLocations(locations: List<Location>): List<Int> {
+    private suspend fun upsertLocations(locations: List<LocationEntity>): List<Int> {
         // '*' is a spread operator required to pass vararg down
         return locationDao
-            .upsert(*locationMapper.fromModelList(locations).map { it }.toTypedArray())
+            .upsert(*locations.toTypedArray())
             .map { it.toInt() }
     }
 
     override suspend fun remove(item: Location) {
-        locationDao.delete(locationMapper.fromModel(item))
+        val removeEntity = mapExisting(item, false).copy(isRemoved = true)
+        locationDao.upsert(removeEntity)
+    }
+
+    private suspend fun getLocation(id: Int, includeDeleted: Boolean): Location? {
+        return locationDao.getLocation(id, includeDeleted)?.let { locationMapper.toModel(it) }
+    }
+
+    override suspend fun getRemoved(id: Int): Location? =
+        getLocation(id, true)
+
+    override suspend fun restore(id: Int) {
+        val removedEntity = locationDao.getLocation(id, true) ?: return
+
+        val location = locationMapper.toModel(removedEntity)
+        val restoreEntity = locationMapper.fromModel(
+            location, removedEntity
+        ).copy(isRemoved = false)
+
+        locationDao.upsert(restoreEntity)
+    }
+
+    override suspend fun hardDelete(item: Location) {
+        locationDao.delete(mapExisting(item, true))
     }
 }
 

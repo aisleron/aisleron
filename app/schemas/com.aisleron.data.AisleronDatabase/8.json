@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 8,
-    "identityHash": "84ed47c48b735fdacad64db122972daa",
+    "identityHash": "9e7392c452eb3faad2adb9afd3b86e3e",
     "entities": [
       {
         "tableName": "Aisle",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `locationId` INTEGER NOT NULL, `rank` INTEGER NOT NULL, `isDefault` INTEGER NOT NULL, `expanded` INTEGER NOT NULL DEFAULT 1)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `locationId` INTEGER NOT NULL, `rank` INTEGER NOT NULL, `isDefault` INTEGER NOT NULL, `expanded` INTEGER NOT NULL DEFAULT 1, `syncId` TEXT, `isRemoved` INTEGER NOT NULL DEFAULT 0, `lastModifiedAt` INTEGER NOT NULL DEFAULT 0, `serverUpdatedAt` INTEGER)",
         "fields": [
           {
             "fieldPath": "id",
@@ -44,6 +44,30 @@
             "affinity": "INTEGER",
             "notNull": true,
             "defaultValue": "1"
+          },
+          {
+            "fieldPath": "syncId",
+            "columnName": "syncId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "isRemoved",
+            "columnName": "isRemoved",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "lastModifiedAt",
+            "columnName": "lastModifiedAt",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "serverUpdatedAt",
+            "columnName": "serverUpdatedAt",
+            "affinity": "INTEGER"
           }
         ],
         "primaryKey": {
@@ -51,11 +75,41 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [
+          {
+            "name": "index_Aisle_syncId",
+            "unique": true,
+            "columnNames": [
+              "syncId"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_Aisle_syncId` ON `${TABLE_NAME}` (`syncId`)"
+          },
+          {
+            "name": "index_Aisle_isRemoved_id",
+            "unique": false,
+            "columnNames": [
+              "isRemoved",
+              "id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Aisle_isRemoved_id` ON `${TABLE_NAME}` (`isRemoved`, `id`)"
+          },
+          {
+            "name": "index_Aisle_lastModifiedAt",
+            "unique": false,
+            "columnNames": [
+              "lastModifiedAt"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Aisle_lastModifiedAt` ON `${TABLE_NAME}` (`lastModifiedAt`)"
+          }
+        ]
       },
       {
         "tableName": "Location",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `type` TEXT NOT NULL, `defaultFilter` TEXT NOT NULL, `name` TEXT NOT NULL, `pinned` INTEGER NOT NULL, `showDefaultAisle` INTEGER NOT NULL DEFAULT 1, `noteId` INTEGER, `expanded` INTEGER NOT NULL DEFAULT 1, `rank` INTEGER NOT NULL, FOREIGN KEY(`noteId`) REFERENCES `Note`(`id`) ON UPDATE CASCADE ON DELETE SET NULL )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `type` TEXT NOT NULL, `defaultFilter` TEXT NOT NULL, `name` TEXT NOT NULL, `pinned` INTEGER NOT NULL, `showDefaultAisle` INTEGER NOT NULL DEFAULT 1, `noteId` INTEGER, `expanded` INTEGER NOT NULL DEFAULT 1, `rank` INTEGER NOT NULL, `syncId` TEXT, `isRemoved` INTEGER NOT NULL DEFAULT 0, `lastModifiedAt` INTEGER NOT NULL DEFAULT 0, `serverUpdatedAt` INTEGER, FOREIGN KEY(`noteId`) REFERENCES `Note`(`id`) ON UPDATE CASCADE ON DELETE SET NULL )",
         "fields": [
           {
             "fieldPath": "id",
@@ -111,6 +165,30 @@
             "columnName": "rank",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "syncId",
+            "columnName": "syncId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "isRemoved",
+            "columnName": "isRemoved",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "lastModifiedAt",
+            "columnName": "lastModifiedAt",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "serverUpdatedAt",
+            "columnName": "serverUpdatedAt",
+            "affinity": "INTEGER"
           }
         ],
         "primaryKey": {
@@ -120,6 +198,34 @@
           ]
         },
         "indices": [
+          {
+            "name": "index_Location_syncId",
+            "unique": true,
+            "columnNames": [
+              "syncId"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_Location_syncId` ON `${TABLE_NAME}` (`syncId`)"
+          },
+          {
+            "name": "index_Location_isRemoved_id",
+            "unique": false,
+            "columnNames": [
+              "isRemoved",
+              "id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Location_isRemoved_id` ON `${TABLE_NAME}` (`isRemoved`, `id`)"
+          },
+          {
+            "name": "index_Location_lastModifiedAt",
+            "unique": false,
+            "columnNames": [
+              "lastModifiedAt"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Location_lastModifiedAt` ON `${TABLE_NAME}` (`lastModifiedAt`)"
+          },
           {
             "name": "index_Location_noteId",
             "unique": false,
@@ -146,7 +252,7 @@
       },
       {
         "tableName": "Product",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `inStock` INTEGER NOT NULL, `qtyNeeded` REAL NOT NULL DEFAULT 0, `noteId` INTEGER, `qtyIncrement` REAL NOT NULL DEFAULT 1, `unitOfMeasure` TEXT NOT NULL DEFAULT '', `trackingMode` TEXT, FOREIGN KEY(`noteId`) REFERENCES `Note`(`id`) ON UPDATE CASCADE ON DELETE SET NULL )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `inStock` INTEGER NOT NULL, `qtyNeeded` REAL NOT NULL DEFAULT 0, `noteId` INTEGER, `qtyIncrement` REAL NOT NULL DEFAULT 1, `unitOfMeasure` TEXT NOT NULL DEFAULT '', `trackingMode` TEXT, `syncId` TEXT, `isRemoved` INTEGER NOT NULL DEFAULT 0, `lastModifiedAt` INTEGER NOT NULL DEFAULT 0, `serverUpdatedAt` INTEGER, FOREIGN KEY(`noteId`) REFERENCES `Note`(`id`) ON UPDATE CASCADE ON DELETE SET NULL )",
         "fields": [
           {
             "fieldPath": "id",
@@ -196,6 +302,30 @@
             "fieldPath": "trackingMode",
             "columnName": "trackingMode",
             "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "syncId",
+            "columnName": "syncId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "isRemoved",
+            "columnName": "isRemoved",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "lastModifiedAt",
+            "columnName": "lastModifiedAt",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "serverUpdatedAt",
+            "columnName": "serverUpdatedAt",
+            "affinity": "INTEGER"
           }
         ],
         "primaryKey": {
@@ -205,6 +335,34 @@
           ]
         },
         "indices": [
+          {
+            "name": "index_Product_syncId",
+            "unique": true,
+            "columnNames": [
+              "syncId"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_Product_syncId` ON `${TABLE_NAME}` (`syncId`)"
+          },
+          {
+            "name": "index_Product_isRemoved_id",
+            "unique": false,
+            "columnNames": [
+              "isRemoved",
+              "id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Product_isRemoved_id` ON `${TABLE_NAME}` (`isRemoved`, `id`)"
+          },
+          {
+            "name": "index_Product_lastModifiedAt",
+            "unique": false,
+            "columnNames": [
+              "lastModifiedAt"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Product_lastModifiedAt` ON `${TABLE_NAME}` (`lastModifiedAt`)"
+          },
           {
             "name": "index_Product_noteId",
             "unique": false,
@@ -231,7 +389,7 @@
       },
       {
         "tableName": "AisleProduct",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `aisleId` INTEGER NOT NULL, `productId` INTEGER NOT NULL, `rank` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `aisleId` INTEGER NOT NULL, `productId` INTEGER NOT NULL, `rank` INTEGER NOT NULL, `syncId` TEXT, `isRemoved` INTEGER NOT NULL DEFAULT 0, `lastModifiedAt` INTEGER NOT NULL DEFAULT 0, `serverUpdatedAt` INTEGER)",
         "fields": [
           {
             "fieldPath": "id",
@@ -256,6 +414,30 @@
             "columnName": "rank",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "syncId",
+            "columnName": "syncId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "isRemoved",
+            "columnName": "isRemoved",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "lastModifiedAt",
+            "columnName": "lastModifiedAt",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "serverUpdatedAt",
+            "columnName": "serverUpdatedAt",
+            "affinity": "INTEGER"
           }
         ],
         "primaryKey": {
@@ -274,12 +456,40 @@
             ],
             "orders": [],
             "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_AisleProduct_aisleId_productId` ON `${TABLE_NAME}` (`aisleId`, `productId`)"
+          },
+          {
+            "name": "index_AisleProduct_syncId",
+            "unique": true,
+            "columnNames": [
+              "syncId"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_AisleProduct_syncId` ON `${TABLE_NAME}` (`syncId`)"
+          },
+          {
+            "name": "index_AisleProduct_isRemoved_id",
+            "unique": false,
+            "columnNames": [
+              "isRemoved",
+              "id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_AisleProduct_isRemoved_id` ON `${TABLE_NAME}` (`isRemoved`, `id`)"
+          },
+          {
+            "name": "index_AisleProduct_lastModifiedAt",
+            "unique": false,
+            "columnNames": [
+              "lastModifiedAt"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_AisleProduct_lastModifiedAt` ON `${TABLE_NAME}` (`lastModifiedAt`)"
           }
         ]
       },
       {
         "tableName": "LoyaltyCard",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `provider` TEXT NOT NULL, `intent` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `provider` TEXT NOT NULL, `intent` TEXT NOT NULL, `syncId` TEXT, `isRemoved` INTEGER NOT NULL DEFAULT 0, `lastModifiedAt` INTEGER NOT NULL DEFAULT 0, `serverUpdatedAt` INTEGER)",
         "fields": [
           {
             "fieldPath": "id",
@@ -304,6 +514,30 @@
             "columnName": "intent",
             "affinity": "TEXT",
             "notNull": true
+          },
+          {
+            "fieldPath": "syncId",
+            "columnName": "syncId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "isRemoved",
+            "columnName": "isRemoved",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "lastModifiedAt",
+            "columnName": "lastModifiedAt",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "serverUpdatedAt",
+            "columnName": "serverUpdatedAt",
+            "affinity": "INTEGER"
           }
         ],
         "primaryKey": {
@@ -311,11 +545,41 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [
+          {
+            "name": "index_LoyaltyCard_syncId",
+            "unique": true,
+            "columnNames": [
+              "syncId"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_LoyaltyCard_syncId` ON `${TABLE_NAME}` (`syncId`)"
+          },
+          {
+            "name": "index_LoyaltyCard_isRemoved_id",
+            "unique": false,
+            "columnNames": [
+              "isRemoved",
+              "id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_LoyaltyCard_isRemoved_id` ON `${TABLE_NAME}` (`isRemoved`, `id`)"
+          },
+          {
+            "name": "index_LoyaltyCard_lastModifiedAt",
+            "unique": false,
+            "columnNames": [
+              "lastModifiedAt"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_LoyaltyCard_lastModifiedAt` ON `${TABLE_NAME}` (`lastModifiedAt`)"
+          }
+        ]
       },
       {
         "tableName": "LocationLoyaltyCard",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`locationId` INTEGER NOT NULL, `loyaltyCardId` INTEGER NOT NULL, PRIMARY KEY(`locationId`), FOREIGN KEY(`locationId`) REFERENCES `Location`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`loyaltyCardId`) REFERENCES `LoyaltyCard`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`locationId` INTEGER NOT NULL, `loyaltyCardId` INTEGER NOT NULL, `syncId` TEXT, `isRemoved` INTEGER NOT NULL DEFAULT 0, `lastModifiedAt` INTEGER NOT NULL DEFAULT 0, `serverUpdatedAt` INTEGER, PRIMARY KEY(`locationId`), FOREIGN KEY(`locationId`) REFERENCES `Location`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`loyaltyCardId`) REFERENCES `LoyaltyCard`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "locationId",
@@ -328,6 +592,30 @@
             "columnName": "loyaltyCardId",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "syncId",
+            "columnName": "syncId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "isRemoved",
+            "columnName": "isRemoved",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "lastModifiedAt",
+            "columnName": "lastModifiedAt",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "serverUpdatedAt",
+            "columnName": "serverUpdatedAt",
+            "affinity": "INTEGER"
           }
         ],
         "primaryKey": {
@@ -345,6 +633,34 @@
             ],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_LocationLoyaltyCard_loyaltyCardId` ON `${TABLE_NAME}` (`loyaltyCardId`)"
+          },
+          {
+            "name": "index_LocationLoyaltyCard_syncId",
+            "unique": true,
+            "columnNames": [
+              "syncId"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_LocationLoyaltyCard_syncId` ON `${TABLE_NAME}` (`syncId`)"
+          },
+          {
+            "name": "index_LocationLoyaltyCard_isRemoved_locationId",
+            "unique": false,
+            "columnNames": [
+              "isRemoved",
+              "locationId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_LocationLoyaltyCard_isRemoved_locationId` ON `${TABLE_NAME}` (`isRemoved`, `locationId`)"
+          },
+          {
+            "name": "index_LocationLoyaltyCard_lastModifiedAt",
+            "unique": false,
+            "columnNames": [
+              "lastModifiedAt"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_LocationLoyaltyCard_lastModifiedAt` ON `${TABLE_NAME}` (`lastModifiedAt`)"
           }
         ],
         "foreignKeys": [
@@ -452,7 +768,7 @@
       },
       {
         "tableName": "ProductVariant",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `productId` INTEGER NOT NULL, `barcode` TEXT NOT NULL, `createdAt` INTEGER NOT NULL DEFAULT 0, FOREIGN KEY(`productId`) REFERENCES `Product`(`id`) ON UPDATE CASCADE ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `productId` INTEGER NOT NULL, `barcode` TEXT NOT NULL, `createdAt` INTEGER NOT NULL DEFAULT 0, `syncId` TEXT, `isRemoved` INTEGER NOT NULL DEFAULT 0, `lastModifiedAt` INTEGER NOT NULL DEFAULT 0, `serverUpdatedAt` INTEGER, FOREIGN KEY(`productId`) REFERENCES `Product`(`id`) ON UPDATE CASCADE ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -478,6 +794,30 @@
             "affinity": "INTEGER",
             "notNull": true,
             "defaultValue": "0"
+          },
+          {
+            "fieldPath": "syncId",
+            "columnName": "syncId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "isRemoved",
+            "columnName": "isRemoved",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "lastModifiedAt",
+            "columnName": "lastModifiedAt",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "serverUpdatedAt",
+            "columnName": "serverUpdatedAt",
+            "affinity": "INTEGER"
           }
         ],
         "primaryKey": {
@@ -504,6 +844,34 @@
             ],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_ProductVariant_productId` ON `${TABLE_NAME}` (`productId`)"
+          },
+          {
+            "name": "index_ProductVariant_syncId",
+            "unique": true,
+            "columnNames": [
+              "syncId"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_ProductVariant_syncId` ON `${TABLE_NAME}` (`syncId`)"
+          },
+          {
+            "name": "index_ProductVariant_isRemoved_id",
+            "unique": false,
+            "columnNames": [
+              "isRemoved",
+              "id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_ProductVariant_isRemoved_id` ON `${TABLE_NAME}` (`isRemoved`, `id`)"
+          },
+          {
+            "name": "index_ProductVariant_lastModifiedAt",
+            "unique": false,
+            "columnNames": [
+              "lastModifiedAt"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_ProductVariant_lastModifiedAt` ON `${TABLE_NAME}` (`lastModifiedAt`)"
           }
         ],
         "foreignKeys": [
@@ -523,7 +891,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '84ed47c48b735fdacad64db122972daa')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9e7392c452eb3faad2adb9afd3b86e3e')"
     ]
   }
 }

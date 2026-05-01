@@ -19,16 +19,9 @@ package com.aisleron.data.base
 
 interface Mapper<Entity : Any, Model : Any> {
     fun toModel(value: Entity): Model
-
-    // TODO: replace with fun fromModel(value: Model, toEntity: Entity?): Entity
-    fun fromModel(value: Model): Entity
+    fun fromModel(value: Model, syncMetadata: SyncEntity?): Entity
 
     fun toModelList(list: List<Entity>): List<Model> {
         return list.map { toModel(it) }
-    }
-
-    // TODO: Delete this method, it doesn't allow for mapping existing entities
-    fun fromModelList(list: List<Model>): List<Entity> {
-        return list.map { fromModel(it) }
     }
 }

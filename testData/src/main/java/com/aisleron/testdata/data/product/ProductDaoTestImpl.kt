@@ -19,16 +19,18 @@ package com.aisleron.testdata.data.product
 
 import com.aisleron.data.product.ProductDao
 import com.aisleron.data.product.ProductEntity
+import com.aisleron.testdata.data.aisleproduct.AisleProductDaoTestImpl
 
 class ProductDaoTestImpl : ProductDao {
-
     private val productList = mutableListOf<ProductEntity>()
+    private val activeItems: List<ProductEntity> get() = productList.filter { !it.isRemoved }
+
 
     override suspend fun upsert(vararg entity: ProductEntity): List<Long> {
         val result = mutableListOf<Long>()
         entity.forEach {
             val id: Int
-            val existingEntity = getProduct(it.id)
+            val existingEntity = getProduct(it.id, true)
             if (existingEntity == null) {
                 id = (productList.maxOfOrNull { e -> e.id } ?: 0) + 1
             } else {
@@ -57,15 +59,24 @@ class ProductDaoTestImpl : ProductDao {
         productList.removeIf { it in entity }
     }
 
-    override suspend fun getProduct(productId: Int): ProductEntity? {
-        return productList.find { it.id == productId }
+    override suspend fun getProduct(productId: Int, includeRemoved: Boolean): ProductEntity? {
+        return productList.find { it.id == productId && (!it.isRemoved || includeRemoved) }
     }
 
-    override suspend fun getProducts(): List<ProductEntity> {
-        return productList
-    }
+    override suspend fun getProducts(): List<ProductEntity> = activeItems
 
     override suspend fun getProductByName(name: String): ProductEntity? {
-        return productList.find { it.name.equals(name, ignoreCase = true) }
+        return activeItems.find { it.name.equals(name, ignoreCase = true) }
+    }
+
+    override suspend fun toggleAisleProductRemove(
+        productId: Int, isRemoved: Boolean, lastModifiedAt: Long
+    ) {
+        val aisleProductDao = AisleProductDaoTestImpl(this)
+        val entities = aisleProductDao.getAisleProductsByProduct(productId).map {
+            it.aisleProduct.copy(isRemoved = isRemoved, lastModifiedAt = lastModifiedAt)
+        }
+
+        aisleProductDao.upsert(*entities.toTypedArray())
     }
 }

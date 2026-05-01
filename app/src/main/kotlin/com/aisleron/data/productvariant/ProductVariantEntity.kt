@@ -22,6 +22,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.aisleron.data.base.SyncEntity
 import com.aisleron.data.product.ProductEntity
 
 @Entity(
@@ -37,12 +38,19 @@ import com.aisleron.data.product.ProductEntity
     ],
     indices = [
         Index(value = ["barcode"], unique = true),
-        Index(value = ["productId"])
+        Index(value = ["productId"]),
+        Index(value = ["syncId"], unique = true),
+        Index(value = ["isRemoved", "id"]),
+        Index(value = ["lastModifiedAt"])
     ]
 )
 data class ProductVariantEntity(
     @PrimaryKey(autoGenerate = true) val id: Int,
     val productId: Int,
     val barcode: String,
-    @ColumnInfo(defaultValue = "0") val createdAt: Long
-)
+    @ColumnInfo(defaultValue = "0") val createdAt: Long,
+    override val syncId: String? = null,
+    @ColumnInfo(defaultValue = "0") override val isRemoved: Boolean = false,
+    @ColumnInfo(defaultValue = "0") override val lastModifiedAt: Long = System.currentTimeMillis(),
+    override val serverUpdatedAt: Long? = null
+): SyncEntity

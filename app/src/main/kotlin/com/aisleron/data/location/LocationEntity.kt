@@ -20,7 +20,9 @@ package com.aisleron.data.location
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.aisleron.data.base.SyncEntity
 import com.aisleron.data.note.NoteEntity
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.LocationType
@@ -35,6 +37,11 @@ import com.aisleron.domain.location.LocationType
             onDelete = ForeignKey.SET_NULL,
             onUpdate = ForeignKey.CASCADE
         )
+    ],
+    indices = [
+        Index(value = ["syncId"], unique = true),
+        Index(value = ["isRemoved", "id"]),
+        Index(value = ["lastModifiedAt"])
     ]
 )
 
@@ -47,5 +54,9 @@ data class LocationEntity(
     @ColumnInfo(defaultValue = "1") val showDefaultAisle: Boolean,
     @ColumnInfo(index = true) val noteId: Int?,
     @ColumnInfo(defaultValue = "1") val expanded: Boolean,
-    val rank: Int
-)
+    val rank: Int,
+    override val syncId: String? = null,
+    @ColumnInfo(defaultValue = "0") override val isRemoved: Boolean = false,
+    @ColumnInfo(defaultValue = "0") override val lastModifiedAt: Long = System.currentTimeMillis(),
+    override val serverUpdatedAt: Long? = null
+) : SyncEntity

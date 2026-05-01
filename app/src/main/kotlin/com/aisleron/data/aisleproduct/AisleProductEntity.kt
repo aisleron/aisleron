@@ -17,17 +17,28 @@
 
 package com.aisleron.data.aisleproduct
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.aisleron.data.base.SyncEntity
 
 @Entity(
     tableName = "AisleProduct",
-    indices = [Index(value = ["aisleId", "productId"], unique = true)]
+    indices = [
+        Index(value = ["aisleId", "productId"], unique = true),
+        Index(value = ["syncId"], unique = true),
+        Index(value = ["isRemoved", "id"]),
+        Index(value = ["lastModifiedAt"])
+    ]
 )
 data class AisleProductEntity(
     @PrimaryKey(autoGenerate = true) val id: Int,
     val aisleId: Int,
     val productId: Int,
-    val rank: Int
-)
+    val rank: Int,
+    override val syncId: String? = null,
+    @ColumnInfo(defaultValue = "0") override val isRemoved: Boolean = false,
+    @ColumnInfo(defaultValue = "0") override val lastModifiedAt: Long = System.currentTimeMillis(),
+    override val serverUpdatedAt: Long? = null
+) : SyncEntity

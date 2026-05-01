@@ -28,14 +28,14 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 
 class LocationDaoTestImpl(private val aisleDao: AisleDaoTestImpl) : LocationDao {
-
     private val locationList = mutableListOf<LocationEntity>()
+    private val activeItems: List<LocationEntity> get() = locationList.filter { !it.isRemoved }
 
     override suspend fun upsert(vararg entity: LocationEntity): List<Long> {
         val result = mutableListOf<Long>()
         entity.forEach {
             val id: Int
-            val existingEntity = getLocation(it.id)
+            val existingEntity = getLocation(it.id, true)
             if (existingEntity == null) {
                 id = (locationList.maxOfOrNull { e -> e.id } ?: 0) + 1
             } else {
@@ -65,44 +65,44 @@ class LocationDaoTestImpl(private val aisleDao: AisleDaoTestImpl) : LocationDao 
         locationList.removeIf { it in entity }
     }
 
-    override suspend fun getLocation(locationId: Int): LocationEntity? {
-        return locationList.find { it.id == locationId }
+    override suspend fun getLocation(locationId: Int, includeRemoved: Boolean): LocationEntity? {
+        return locationList.find { it.id == locationId && (!it.isRemoved || includeRemoved) }
     }
 
-    override suspend fun getLocations(): List<LocationEntity> {
-        return locationList
-    }
+    override suspend fun getLocations(): List<LocationEntity> = activeItems
 
     override suspend fun getLocationByName(name: String): LocationEntity? {
-        return locationList.find { it.name.equals(name, ignoreCase = true) }
+        return activeItems.find { it.name.equals(name, ignoreCase = true) }
     }
 
     override suspend fun getMaxRank(): Int {
-        return locationList.maxOf { it.rank }
+        return activeItems.maxOf { it.rank }
     }
 
-    override suspend fun moveRanks(locationType: LocationType, fromRank: Int) {
-        val locations = locationList.filter { it.type == locationType && it.rank >= fromRank }
+    override suspend fun moveRanks(
+        locationType: LocationType, fromRank: Int, lastModifiedAt: Long
+    ) {
+        val locations = activeItems.filter { it.type == locationType && it.rank >= fromRank }
         locations.forEach {
-            val newLocation = it.copy(rank = it.rank + 1)
+            val newLocation = it.copy(rank = it.rank + 1, lastModifiedAt = lastModifiedAt)
             locationList.removeAt(locationList.indexOf(it))
             locationList.add(newLocation)
         }
     }
 
     override suspend fun getByType(locationType: LocationType): List<LocationEntity> {
-        return locationList.filter { it.type == locationType }.sortedBy { it.rank }
+        return activeItems.filter { it.type == locationType }.sortedBy { it.rank }
     }
 
     override suspend fun getLocationWithAisles(locationId: Int): LocationWithAisles {
         return LocationWithAisles(
-            location = getLocation(locationId)!!,
+            location = getLocation(locationId, false)!!,
             aisles = aisleDao.getAislesForLocation(locationId)
         )
     }
 
     override fun getLocationWithAislesWithProducts(locationId: Int): Flow<LocationWithAislesWithProducts?> {
-        val location = locationList.firstOrNull { it.id == locationId }
+        val location = activeItems.firstOrNull { it.id == locationId }
 
         var result: LocationWithAislesWithProducts? = null
 
@@ -118,7 +118,7 @@ class LocationDaoTestImpl(private val aisleDao: AisleDaoTestImpl) : LocationDao 
     }
 
     override fun getLocationsWithAislesWithProducts(locationType: LocationType): Flow<List<LocationWithAislesWithProducts>> {
-        val locations = locationList.filter { it.type == locationType }
+        val locations = activeItems.filter { it.type == locationType }
 
         val result = mutableListOf<LocationWithAislesWithProducts>()
         locations.forEach { location ->
@@ -137,14 +137,14 @@ class LocationDaoTestImpl(private val aisleDao: AisleDaoTestImpl) : LocationDao 
     }
 
     override fun getShops(): Flow<List<LocationEntity>> {
-        return flowOf(locationList.filter { it.type == LocationType.SHOP })
+        return flowOf(activeItems.filter { it.type == LocationType.SHOP })
     }
 
     override fun getPinnedShops(): Flow<List<LocationEntity>> {
-        return flowOf(locationList.filter { it.type == LocationType.SHOP && it.pinned })
+        return flowOf(activeItems.filter { it.type == LocationType.SHOP && it.pinned })
     }
 
     override suspend fun getHome(): LocationEntity {
-        return locationList.first { it.type == LocationType.HOME }
+        return activeItems.first { it.type == LocationType.HOME }
     }
 }

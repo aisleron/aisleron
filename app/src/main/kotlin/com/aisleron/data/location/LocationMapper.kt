@@ -18,6 +18,7 @@
 package com.aisleron.data.location
 
 import com.aisleron.data.base.Mapper
+import com.aisleron.data.base.SyncEntity
 import com.aisleron.domain.location.Location
 
 class LocationMapper : Mapper<LocationEntity, Location> {
@@ -34,7 +35,7 @@ class LocationMapper : Mapper<LocationEntity, Location> {
         rank = value.rank
     )
 
-    override fun fromModel(value: Location) = LocationEntity(
+    override fun fromModel(value: Location, syncMetadata: SyncEntity?) = LocationEntity(
         id = value.id,
         name = value.name.trim(),
         defaultFilter = value.defaultFilter,

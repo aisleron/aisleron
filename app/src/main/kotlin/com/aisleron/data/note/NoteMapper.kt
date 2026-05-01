@@ -27,12 +27,7 @@ class NoteMapper : Mapper<NoteEntity, Note> {
         noteText = value.noteText.trim()
     )
 
-    override fun fromModel(value: Note) = NoteEntity(
-        id = value.id,
-        noteText = value.noteText.trim()
-    )
-
-    fun fromModel(value: Note, syncMetadata: SyncEntity?) = NoteEntity(
+    override fun fromModel(value: Note, syncMetadata: SyncEntity?) = NoteEntity(
         id = value.id,
         noteText = value.noteText.trim(),
         syncId = syncMetadata?.syncId,

@@ -25,6 +25,6 @@ interface ProductVariantRepository : BaseRepository<ProductVariant> {
     fun getByBarcode(barcode: String): Flow<ProductVariant?>
     fun getByProductId(productId: Int): Flow<List<ProductVariant>>
     fun barcodeExists(barcode: String): Flow<Boolean>
-    suspend fun deleteByBarcode(barcode: String)
+    suspend fun removeByBarcode(barcode: String)
     fun getProductWithBarcode(barcode: String): Flow<ProductWithBarcode?>
 }

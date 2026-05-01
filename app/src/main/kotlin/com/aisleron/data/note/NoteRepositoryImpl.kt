@@ -42,27 +42,23 @@ class NoteRepositoryImpl(
         return upsertNotes(notes)
     }
 
-    private suspend fun mapExisting(item: Note, includeDeleted: Boolean = false): NoteEntity {
-        val currentEntity = noteDao.getNote(item.id, includeDeleted)
+    private suspend fun mapExisting(item: Note, includeRemoved: Boolean): NoteEntity {
+        val currentEntity = noteDao.getNote(item.id, includeRemoved)
         return noteMapper.fromModel(item, currentEntity)
     }
 
     override suspend fun update(item: Note) {
-        noteDao.upsert(mapExisting(item))
+        noteDao.upsert(mapExisting(item, false))
     }
 
     override suspend fun update(items: List<Note>) {
-        val notes = items.map { mapExisting(it) }
+        val notes = items.map { mapExisting(it, false) }
         upsertNotes(notes)
     }
 
     override suspend fun remove(item: Note) {
-        val removeEntity = mapExisting(item).copy(isRemoved = true)
+        val removeEntity = mapExisting(item, false).copy(isRemoved = true)
         noteDao.upsert(removeEntity)
-    }
-
-    override suspend fun hardDelete(item: Note) {
-        noteDao.delete(mapExisting(item, true))
     }
 
     private suspend fun upsertNotes(notes: List<NoteEntity>): List<Int> {
@@ -79,6 +75,19 @@ class NoteRepositoryImpl(
 
     override suspend fun getRemoved(id: Int): Note? =
         getNote(id, true)
+
+    override suspend fun restore(id: Int) {
+        val removedEntity = noteDao.getNote(id, true) ?: return
+
+        val note = noteMapper.toModel(removedEntity)
+        val restoreEntity = noteMapper.fromModel(note, removedEntity).copy(isRemoved = false)
+        noteDao.upsert(restoreEntity)
+    }
+
+    override suspend fun hardDelete(item: Note) {
+        val deleteEntity = mapExisting(item, true)
+        noteDao.delete(deleteEntity)
+    }
 
     private suspend fun getNote(id: Int, includeDeleted: Boolean): Note? {
         return noteDao.getNote(id, includeDeleted)?.let { noteMapper.toModel(it) }

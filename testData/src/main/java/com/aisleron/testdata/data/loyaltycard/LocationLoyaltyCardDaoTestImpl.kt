@@ -21,7 +21,6 @@ import com.aisleron.data.loyaltycard.LocationLoyaltyCardDao
 import com.aisleron.data.loyaltycard.LocationLoyaltyCardEntity
 
 class LocationLoyaltyCardDaoTestImpl : LocationLoyaltyCardDao {
-
     private val locationLoyaltyCardList = mutableListOf<LocationLoyaltyCardEntity>()
 
     fun getAll() = locationLoyaltyCardList
@@ -47,5 +46,11 @@ class LocationLoyaltyCardDaoTestImpl : LocationLoyaltyCardDao {
 
     override suspend fun delete(vararg entity: LocationLoyaltyCardEntity) {
         locationLoyaltyCardList.removeIf { it in entity }
+    }
+
+    override suspend fun getLocationLoyaltyCard(
+        locationId: Int, includeRemoved: Boolean
+    ): LocationLoyaltyCardEntity? {
+        return locationLoyaltyCardList.find { it.locationId == locationId && (!it.isRemoved || includeRemoved) }
     }
 }

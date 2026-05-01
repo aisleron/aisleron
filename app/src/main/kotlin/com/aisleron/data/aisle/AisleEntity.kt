@@ -19,14 +19,27 @@ package com.aisleron.data.aisle
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.aisleron.data.base.SyncEntity
 
-@Entity(tableName = "Aisle")
+@Entity(
+    tableName = "Aisle",
+    indices = [
+        Index(value = ["syncId"], unique = true),
+        Index(value = ["isRemoved", "id"]),
+        Index(value = ["lastModifiedAt"])
+    ]
+)
 data class AisleEntity(
     @PrimaryKey(autoGenerate = true) val id: Int,
     val name: String,
     val locationId: Int,
     val rank: Int,
     val isDefault: Boolean = false,
-    @ColumnInfo(defaultValue = "1") val expanded: Boolean
-)
+    @ColumnInfo(defaultValue = "1") val expanded: Boolean,
+    override val syncId: String? = null,
+    @ColumnInfo(defaultValue = "0") override val isRemoved: Boolean = false,
+    @ColumnInfo(defaultValue = "0") override val lastModifiedAt: Long = System.currentTimeMillis(),
+    override val serverUpdatedAt: Long? = null
+) : SyncEntity

@@ -18,6 +18,7 @@
 package com.aisleron.data.aisle
 
 import com.aisleron.data.base.Mapper
+import com.aisleron.data.base.SyncEntity
 import com.aisleron.domain.aisle.Aisle
 
 class AisleMapper : Mapper<AisleEntity, Aisle> {
@@ -31,7 +32,7 @@ class AisleMapper : Mapper<AisleEntity, Aisle> {
         expanded = value.expanded
     )
 
-    override fun fromModel(value: Aisle) = AisleEntity(
+    override fun fromModel(value: Aisle, syncMetadata: SyncEntity?) = AisleEntity(
         name = value.name.trim(),
         id = value.id,
         rank = value.rank,

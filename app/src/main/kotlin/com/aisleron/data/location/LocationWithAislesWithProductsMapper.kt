@@ -19,6 +19,7 @@ package com.aisleron.data.location
 
 import com.aisleron.data.aisle.AisleWithProductsMapper
 import com.aisleron.data.base.Mapper
+import com.aisleron.data.base.SyncEntity
 import com.aisleron.domain.location.Location
 
 class LocationWithAislesWithProductsMapper : Mapper<LocationWithAislesWithProducts, Location> {
@@ -27,8 +28,9 @@ class LocationWithAislesWithProductsMapper : Mapper<LocationWithAislesWithProduc
         return location.copy(aisles = AisleWithProductsMapper().toModelList(value.aisles))
     }
 
-    override fun fromModel(value: Location) = LocationWithAislesWithProducts(
-        location = LocationMapper().fromModel(value),
-        aisles = AisleWithProductsMapper().fromModelList(value.aisles)
-    )
+    override fun fromModel(value: Location, syncMetadata: SyncEntity?) =
+        LocationWithAislesWithProducts(
+            location = LocationMapper().fromModel(value, syncMetadata),
+            aisles = value.aisles.map { AisleWithProductsMapper().fromModel(it, null) }
+        )
 }
