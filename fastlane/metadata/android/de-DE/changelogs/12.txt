@@ -1,6 +1,6 @@
 Ausdehnungen:
 * Zugefügt Beachtet zu Produkte und Läden
-* Fügten zu eine Option zu auswählen die startend #wann Liste das #App öffnet
+* Fügten zu eine Option zu auswählen die startend als Liste das #App öffnet
 * #Zufügen eine Option zu expandieren oder einklappen sofort alle Gänge
 * Brachten herein eine Update Mitteilung Banner zu markieren neue Versionen
 * #Auf dem Laufenden Franzosen und schwedische Übersetzungen
