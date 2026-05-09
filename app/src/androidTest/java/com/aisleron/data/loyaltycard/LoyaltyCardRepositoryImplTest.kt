@@ -110,4 +110,16 @@ class LoyaltyCardRepositoryImplTest : RepositoryImplTest<LoyaltyCard>() {
         val result = loyaltyCardRepository.getForLocation(location.id)
         assertNull(result)
     }
+
+    @Test
+    fun hardDeleteFromLocation_ValidLocationAndCard_CardRemovedFromLocation() = runTest {
+        val cardId = addSingleItem()
+        val location = getLocation()
+        loyaltyCardRepository.addToLocation(location.id, cardId)
+
+        loyaltyCardRepository.hardDeleteFromLocation(location.id, cardId)
+
+        val result = loyaltyCardRepository.getForLocation(location.id)
+        assertNull(result)
+    }
 }

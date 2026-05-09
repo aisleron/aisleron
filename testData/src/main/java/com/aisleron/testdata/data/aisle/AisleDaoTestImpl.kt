@@ -25,25 +25,24 @@ import com.aisleron.testdata.data.aisleproduct.AisleProductDaoTestImpl
 class AisleDaoTestImpl(private val aisleProductDao: AisleProductDaoTestImpl) : AisleDao {
 
     private val aisleList = mutableListOf<AisleEntity>()
+    private val activeItems: List<AisleEntity> get() = aisleList.filter { !it.isRemoved }
 
     override suspend fun getAisle(aisleId: Int, includeRemoved: Boolean): AisleEntity? {
-        return aisleList.find { it.id == aisleId }
+        return aisleList.find { it.id == aisleId && (!it.isRemoved || includeRemoved) }
     }
 
-    override suspend fun getAisles(): List<AisleEntity> {
-        return aisleList
-    }
+    override suspend fun getAisles(): List<AisleEntity> = activeItems
 
     override suspend fun getAislesForLocation(locationId: Int): List<AisleEntity> {
-        return aisleList.filter { it.locationId == locationId }
+        return activeItems.filter { it.locationId == locationId }
     }
 
     override suspend fun getDefaultAisles(): List<AisleEntity> {
-        return aisleList.filter { it.isDefault }
+        return activeItems.filter { it.isDefault }
     }
 
     override suspend fun getDefaultAisleFor(locationId: Int): AisleEntity? {
-        return aisleList.find { it.locationId == locationId && it.isDefault }
+        return activeItems.find { it.locationId == locationId && it.isDefault }
     }
 
     override suspend fun getAisleWithProducts(aisleId: Int): AisleWithProducts {
@@ -55,7 +54,7 @@ class AisleDaoTestImpl(private val aisleProductDao: AisleProductDaoTestImpl) : A
     }
 
     override suspend fun getAislesWithProducts(): List<AisleWithProducts> {
-        return aisleList.map {
+        return activeItems.map {
             AisleWithProducts(
                 aisle = it,
                 products = aisleProductDao.getAisleProducts()
@@ -74,7 +73,7 @@ class AisleDaoTestImpl(private val aisleProductDao: AisleProductDaoTestImpl) : A
     }
 
     override suspend fun getMaxRank(locationId: Int): Int {
-        return aisleList.filter { it.locationId == locationId && !it.isDefault }
+        return activeItems.filter { it.locationId == locationId && !it.isDefault }
             .maxOfOrNull { it.rank } ?: 0
     }
 

@@ -232,6 +232,15 @@ abstract class RepositoryImplTest<T : AisleronItem> : KoinTest {
         repository.restore(itemId)
 
         val itemRestored = repository.get(itemId)
+        assertNotNull(itemRestored)
+    }
+
+    @Test
+    fun restore_InvalidItem_NoItemAdded() = runTest {
+        val invalidItem = getInvalidItem()
+        repository.restore(invalidItem.id)
+
+        val itemRestored = repository.get(invalidItem.id)
         assertNull(itemRestored)
     }
 }

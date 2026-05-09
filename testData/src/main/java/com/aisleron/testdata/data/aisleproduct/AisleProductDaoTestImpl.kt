@@ -25,6 +25,8 @@ import com.aisleron.testdata.data.product.ProductDaoTestImpl
 class AisleProductDaoTestImpl(private val productDao: ProductDaoTestImpl) : AisleProductDao {
 
     private val aisleProductList = mutableListOf<AisleProductEntity>()
+    private val activeItems: List<AisleProductEntity> get() = aisleProductList.filter { !it.isRemoved }
+
 
     override suspend fun getAisleProduct(
         aisleProductId: Int, includeRemoved: Boolean
@@ -43,7 +45,7 @@ class AisleProductDaoTestImpl(private val productDao: ProductDaoTestImpl) : Aisl
     }
 
     override suspend fun getAisleProductsByProduct(productId: Int): List<AisleProductRank> {
-        return aisleProductList.filter { it.productId == productId }.map {
+        return activeItems.filter { it.productId == productId }.map {
             AisleProductRank(
                 aisleProduct = it,
                 product = productDao.getProduct(it.productId, false)!!
@@ -52,7 +54,7 @@ class AisleProductDaoTestImpl(private val productDao: ProductDaoTestImpl) : Aisl
     }
 
     override suspend fun getAisleProducts(): List<AisleProductRank> {
-        return aisleProductList.map {
+        return activeItems.map {
             AisleProductRank(
                 aisleProduct = it,
                 product = productDao.getProduct(it.productId, false)!!

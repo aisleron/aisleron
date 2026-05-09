@@ -17,11 +17,12 @@
 
 package com.aisleron.domain.aisleproduct
 
+import com.aisleron.domain.base.AisleronItem
 import com.aisleron.domain.product.Product
 
 data class AisleProduct(
     val rank: Int,
     val aisleId: Int,
     val product: Product,
-    val id: Int
-)
+    override val id: Int
+) : AisleronItem
