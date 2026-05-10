@@ -1,5 +1,5 @@
 Améliorations :
-* Matériel mis en œuvre 3 design, Couleurs dynamiques et styles noirs purs.
-* Améliorez l'affichage de la liste des produits sur les petits dispositifs d'écran.
+* Implémentation du design Material 3, couleurs dynamiques et styles Pure Black.
+* Améliorez l'affichage de la liste des produits sur les dispositifs à petit écran.
 * Ajout de traductions italiennes et afrikaans.
 * Traductions actualisées.
