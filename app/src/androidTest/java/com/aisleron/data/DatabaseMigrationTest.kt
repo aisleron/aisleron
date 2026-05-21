@@ -50,15 +50,16 @@ class DatabaseMigrationTest {
         AisleronDatabase::class.java
     )
 
-    private fun populateV1Database(db: SupportSQLiteDatabase) {
+    private fun populateDatabase(db: SupportSQLiteDatabase, version: Int) {
+        // You can't use DAO classes because they expect the latest schema.
+
         val locationValues = ContentValues()
         locationValues.put("type", LocationType.HOME.toString())
         locationValues.put("defaultFilter", FilterType.NEEDED.toString())
         locationValues.put("name", "Home")
         locationValues.put("pinned", false)
+        if (version >= 7) locationValues.put("rank", 1)
 
-        // Database has schema version 1. Insert some data using SQL queries.
-        // You can't use DAO classes because they expect the latest schema.
         val locationId = db.insert(
             "Location", android.database.sqlite.SQLiteDatabase.CONFLICT_FAIL, locationValues
         )
@@ -74,6 +75,7 @@ class DatabaseMigrationTest {
         val productValues = ContentValues()
         productValues.put("name", "Migration Test Product")
         productValues.put("inStock", true)
+        if (version >= 5) productValues.put("qtyNeeded", 10)
 
         db.insert("Product", android.database.sqlite.SQLiteDatabase.CONFLICT_FAIL, productValues)
     }
@@ -82,7 +84,7 @@ class DatabaseMigrationTest {
     @Throws(IOException::class)
     fun migrate1to2() {
         helper.createDatabase(testDb, 1).apply {
-            populateV1Database(this)
+            populateDatabase(this, 1)
             close()
         }
 
@@ -108,7 +110,7 @@ class DatabaseMigrationTest {
     @Throws(IOException::class)
     fun migrate2to3() {
         helper.createDatabase(testDb, 2).apply {
-            populateV1Database(this)
+            populateDatabase(this, 2)
             close()
         }
 
@@ -127,7 +129,7 @@ class DatabaseMigrationTest {
     @Throws(IOException::class)
     fun migrate3to4() {
         helper.createDatabase(testDb, 3).apply {
-            populateV1Database(this)
+            populateDatabase(this, 3)
             close()
         }
 
@@ -149,7 +151,7 @@ class DatabaseMigrationTest {
     @Throws(IOException::class)
     fun migrate4to5() {
         helper.createDatabase(testDb, 4).apply {
-            populateV1Database(this)
+            populateDatabase(this, 4)
             close()
         }
 
@@ -175,27 +177,11 @@ class DatabaseMigrationTest {
         }
     }
 
-    private fun populateV5Database(db: SupportSQLiteDatabase) {
-        populateV1Database(db)
-
-        val productValues = ContentValues().apply {
-            put("qtyNeeded", 10)
-        }
-
-        db.update(
-            "Product",
-            android.database.sqlite.SQLiteDatabase.CONFLICT_FAIL,
-            productValues,
-            "name = ?",
-            arrayOf("Migration Test Product")
-        )
-    }
-
     @Test
     @Throws(IOException::class)
     fun migrate5to6() {
         helper.createDatabase(testDb, 5).apply {
-            populateV5Database(this)
+            populateDatabase(this, 5)
             close()
         }
 
@@ -232,7 +218,7 @@ class DatabaseMigrationTest {
     @Throws(IOException::class)
     fun migrate6to7() {
         helper.createDatabase(testDb, 6).apply {
-            populateV5Database(this)
+            populateDatabase(this, 6)
             close()
         }
 
@@ -256,36 +242,6 @@ class DatabaseMigrationTest {
 
             close()
         }
-    }
-
-    private fun populateV7Database(db: SupportSQLiteDatabase) {
-        // Version 7 schema has Location.rank as NOT NULL (no default)
-        // Must include rank in INSERT, unlike earlier versions
-        val locationValues = ContentValues()
-        locationValues.put("type", LocationType.HOME.toString())
-        locationValues.put("defaultFilter", FilterType.NEEDED.toString())
-        locationValues.put("name", "Home")
-        locationValues.put("pinned", false)
-        locationValues.put("rank", 1)  // Required in V7+
-
-        val locationId = db.insert(
-            "Location", android.database.sqlite.SQLiteDatabase.CONFLICT_FAIL, locationValues
-        )
-
-        val aisleValues = ContentValues()
-        aisleValues.put("name", "No Aisle")
-        aisleValues.put("locationId", locationId)
-        aisleValues.put("rank", 1)
-        aisleValues.put("isDefault", true)
-
-        db.insert("Aisle", android.database.sqlite.SQLiteDatabase.CONFLICT_FAIL, aisleValues)
-
-        val productValues = ContentValues()
-        productValues.put("name", "Migration Test Product")
-        productValues.put("inStock", true)
-        productValues.put("qtyNeeded", 10)
-
-        db.insert("Product", android.database.sqlite.SQLiteDatabase.CONFLICT_FAIL, productValues)
     }
 
     private fun validateV8SyncColumns(
@@ -322,7 +278,7 @@ class DatabaseMigrationTest {
     @Throws(IOException::class)
     fun migrate7to8() {
         helper.createDatabase(testDb, 7).apply {
-            populateV7Database(this)
+            populateDatabase(this, 7)
             close()
         }
 
@@ -358,7 +314,7 @@ class DatabaseMigrationTest {
     @Throws(IOException::class)
     fun migrateAll() = runTest {
         helper.createDatabase(testDb, 1).apply {
-            populateV1Database(this)
+            populateDatabase(this, 1)
             close()
         }
 
