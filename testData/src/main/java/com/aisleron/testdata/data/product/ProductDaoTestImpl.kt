@@ -17,14 +17,14 @@
 
 package com.aisleron.testdata.data.product
 
+import com.aisleron.data.aisleproduct.AisleProductDao
 import com.aisleron.data.product.ProductDao
 import com.aisleron.data.product.ProductEntity
-import com.aisleron.testdata.data.aisleproduct.AisleProductDaoTestImpl
 
 class ProductDaoTestImpl : ProductDao {
+    private var _aisleProductDao: AisleProductDao? = null
     private val productList = mutableListOf<ProductEntity>()
     private val activeItems: List<ProductEntity> get() = productList.filter { !it.isRemoved }
-
 
     override suspend fun upsert(vararg entity: ProductEntity): List<Long> {
         val result = mutableListOf<Long>()
@@ -46,7 +46,11 @@ class ProductDaoTestImpl : ProductDao {
                 noteId = it.noteId,
                 qtyIncrement = it.qtyIncrement,
                 trackingMode = it.trackingMode,
-                unitOfMeasure = it.unitOfMeasure
+                unitOfMeasure = it.unitOfMeasure,
+                lastModifiedAt = it.lastModifiedAt,
+                isRemoved = it.isRemoved,
+                syncId = it.syncId,
+                serverUpdatedAt = it.serverUpdatedAt
             )
 
             productList.add(newEntity)
@@ -72,11 +76,16 @@ class ProductDaoTestImpl : ProductDao {
     override suspend fun toggleAisleProductRemove(
         productId: Int, isRemoved: Boolean, lastModifiedAt: Long
     ) {
-        val aisleProductDao = AisleProductDaoTestImpl(this)
-        val entities = aisleProductDao.getAisleProductsByProduct(productId).map {
+        _aisleProductDao ?: return
+
+        val entities = _aisleProductDao!!.getAisleProductsByProduct(productId).map {
             it.aisleProduct.copy(isRemoved = isRemoved, lastModifiedAt = lastModifiedAt)
         }
 
-        aisleProductDao.upsert(*entities.toTypedArray())
+        _aisleProductDao?.upsert(*entities.toTypedArray())
+    }
+
+    fun setAisleProductDao(aisleProductDao: AisleProductDao) {
+        _aisleProductDao = aisleProductDao
     }
 }

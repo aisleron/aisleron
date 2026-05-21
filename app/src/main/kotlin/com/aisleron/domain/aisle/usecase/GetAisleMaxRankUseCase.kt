@@ -23,7 +23,7 @@ interface GetAisleMaxRankUseCase {
     suspend operator fun invoke(locationId: Int): Int
 }
 
-class GetAisleMaxRankUseCaseImpl(val aisleRepository: AisleRepository) : GetAisleMaxRankUseCase{
+class GetAisleMaxRankUseCaseImpl(private val aisleRepository: AisleRepository) : GetAisleMaxRankUseCase{
     override suspend fun invoke(locationId: Int): Int {
         return aisleRepository.getMaxRank(locationId)
     }

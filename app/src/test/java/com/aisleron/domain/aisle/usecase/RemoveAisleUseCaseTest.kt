@@ -32,7 +32,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
 class RemoveAisleUseCaseTest {
-
     private lateinit var dm: TestDependencyManager
     private lateinit var removeAisleUseCase: RemoveAisleUseCase
     private lateinit var existingAisle: Aisle
@@ -149,5 +148,30 @@ class RemoveAisleUseCaseTest {
 
         val countAfter = aisleRepository.getAll().count()
         assertEquals(countBefore - 1, countAfter)
+    }
+
+    @Test
+    fun removeAisle_WithValidId_AisleRemoved() = runTest {
+        val aisleRepository = dm.getRepository<AisleRepository>()
+        val countBefore = aisleRepository.getAll().count()
+
+        removeAisleUseCase(existingAisle.id)
+
+        val removedAisle = aisleRepository.get(existingAisle.id)
+        assertNull(removedAisle)
+
+        val countAfter = aisleRepository.getAll().count()
+        assertEquals(countBefore - 1, countAfter)
+    }
+
+    @Test
+    fun removeAisle_WithInvalidId_NoAisleRemoved() = runTest {
+        val aisleRepository = dm.getRepository<AisleRepository>()
+        val countBefore = aisleRepository.getAll().count()
+
+        removeAisleUseCase(-1)
+
+        val countAfter = aisleRepository.getAll().count()
+        assertEquals(countBefore, countAfter)
     }
 }

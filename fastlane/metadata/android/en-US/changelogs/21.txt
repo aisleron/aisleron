@@ -1,5 +1,5 @@
 Enhancements:
-*
+* Prepare data model for sync feature
 
 Bug Fixes:
 *

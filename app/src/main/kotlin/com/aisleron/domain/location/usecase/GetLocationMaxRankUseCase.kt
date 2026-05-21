@@ -24,7 +24,7 @@ interface GetLocationMaxRankUseCase {
 }
 
 class GetLocationMaxRankUseCaseImpl(
-    val locationRepository: LocationRepository
+    private val locationRepository: LocationRepository
 ) : GetLocationMaxRankUseCase {
     override suspend fun invoke(): Int {
         return locationRepository.getMaxRank()

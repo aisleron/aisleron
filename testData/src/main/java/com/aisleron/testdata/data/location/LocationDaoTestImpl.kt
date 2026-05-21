@@ -52,7 +52,11 @@ class LocationDaoTestImpl(private val aisleDao: AisleDaoTestImpl) : LocationDao 
                 showDefaultAisle = it.showDefaultAisle,
                 noteId = it.noteId,
                 expanded = it.expanded,
-                rank = it.rank
+                rank = it.rank,
+                lastModifiedAt = it.lastModifiedAt,
+                isRemoved = it.isRemoved,
+                syncId = it.syncId,
+                serverUpdatedAt = it.serverUpdatedAt
             )
 
             locationList.add(newEntity)

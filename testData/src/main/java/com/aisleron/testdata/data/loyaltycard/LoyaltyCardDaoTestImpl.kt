@@ -44,7 +44,7 @@ class LoyaltyCardDaoTestImpl(
     override suspend fun getLoyaltyCardForLocation(locationId: Int): LoyaltyCardEntity? {
         return activeItems.find {
             it.id == locationLoyaltyCardDao.getLocationLoyaltyCard(
-                locationId
+                locationId, false
             )?.loyaltyCardId
         }
     }
@@ -52,7 +52,7 @@ class LoyaltyCardDaoTestImpl(
     override suspend fun toggleLocationLoyaltyCardRemove(
         loyaltyCardId: Int, isRemoved: Boolean, lastModifiedAt: Long
     ) {
-        val entity = locationLoyaltyCardDao.getLocationLoyaltyCard(loyaltyCardId)?.copy(
+        val entity = locationLoyaltyCardDao.getLocationLoyaltyCard(loyaltyCardId, true)?.copy(
             isRemoved = isRemoved,
             lastModifiedAt = lastModifiedAt
         ) ?: return
@@ -73,7 +73,11 @@ class LoyaltyCardDaoTestImpl(
                 id = id,
                 name = it.name,
                 provider = it.provider,
-                intent = it.intent
+                intent = it.intent,
+                lastModifiedAt = it.lastModifiedAt,
+                isRemoved = it.isRemoved,
+                syncId = it.syncId,
+                serverUpdatedAt = it.serverUpdatedAt
             )
 
             loyaltyCardList.add(newEntity)
