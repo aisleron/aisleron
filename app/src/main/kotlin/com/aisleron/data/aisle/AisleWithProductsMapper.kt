@@ -28,7 +28,7 @@ class AisleWithProductsMapper : Mapper<AisleWithProducts, Aisle> {
         rank = value.aisle.rank,
         name = value.aisle.name.trim(),
         locationId = value.aisle.locationId,
-        products = AisleProductRankMapper().toModelList(value.products),
+        products = AisleProductRankMapper().toModelList(value.products.filter { !it.aisleProduct.isRemoved && !it.product.isRemoved }),
         isDefault = value.aisle.isDefault,
         expanded = value.aisle.expanded
     )

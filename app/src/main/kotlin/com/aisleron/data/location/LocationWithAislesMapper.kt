@@ -25,7 +25,7 @@ import com.aisleron.domain.location.Location
 class LocationWithAislesMapper : Mapper<LocationWithAisles, Location> {
     override fun toModel(value: LocationWithAisles): Location {
         val location = LocationMapper().toModel(value.location)
-        return location.copy(aisles = AisleMapper().toModelList(value.aisles))
+        return location.copy(aisles = AisleMapper().toModelList(value.aisles.filter { !it.isRemoved }))
     }
 
     override fun fromModel(value: Location, syncMetadata: SyncEntity?) = LocationWithAisles(
