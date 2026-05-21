@@ -20,11 +20,14 @@ package com.aisleron.data
 import android.content.ContentValues
 import android.database.Cursor
 import androidx.core.database.getIntOrNull
+import androidx.core.database.getLongOrNull
+import androidx.core.database.getStringOrNull
 import androidx.room.Room
 import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.db.SupportSQLiteQueryBuilder
 import androidx.test.platform.app.InstrumentationRegistry
+import com.aisleron.data.base.SyncEntity
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.LocationType
 import junit.framework.TestCase.assertNotNull
@@ -33,6 +36,8 @@ import org.junit.Rule
 import org.junit.Test
 import java.io.IOException
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotEquals
 import kotlin.test.assertNull
 
 
@@ -242,7 +247,7 @@ class DatabaseMigrationTest {
             val expanded = cursorLocation.getInt(cursorLocation.getColumnIndex("expanded"))
             assertEquals(1, expanded)
 
-            // Check migration sets initial rank equal to Id
+            // Check migration sets initial rank equal to id
             val id = cursorLocation.getInt(cursorLocation.getColumnIndex("id"))
             val rank = cursorLocation.getInt(cursorLocation.getColumnIndex("rank"))
             assertEquals(id, rank)
@@ -283,6 +288,36 @@ class DatabaseMigrationTest {
         db.insert("Product", android.database.sqlite.SQLiteDatabase.CONFLICT_FAIL, productValues)
     }
 
+    private fun validateV8SyncColumns(
+        tableName: String, db: SupportSQLiteDatabase, validateDefaults: Boolean
+    ) {
+        val querySyncEntity = SupportSQLiteQueryBuilder.builder(tableName)
+        val cursor: Cursor = db.query(querySyncEntity.create())
+
+        assertNotEquals(-1, cursor.getColumnIndex("syncId"))
+        assertNotEquals(-1, cursor.getColumnIndex("isRemoved"))
+        assertNotEquals(-1, cursor.getColumnIndex("lastModifiedAt"))
+        assertNotEquals(-1, cursor.getColumnIndex("serverUpdatedAt"))
+
+        if (validateDefaults) {
+            cursor.moveToFirst()
+
+            val syncId = cursor.getStringOrNull(cursor.getColumnIndex("syncId"))
+            assertNull(syncId)
+
+            val isRemoved = cursor.getInt(cursor.getColumnIndex("isRemoved"))
+            assertEquals(0, isRemoved)
+
+            val lastModifiedAt = cursor.getLong(cursor.getColumnIndex("lastModifiedAt"))
+            assertEquals(0, lastModifiedAt)
+
+            val serverUpdatedAt = cursor.getLongOrNull(cursor.getColumnIndex("syncId"))
+            assertNull(serverUpdatedAt)
+        }
+
+        cursor.close()
+    }
+
     @Test
     @Throws(IOException::class)
     fun migrate7to8() {
@@ -300,8 +335,23 @@ class DatabaseMigrationTest {
             assertEquals(0, cursorVariants.count)
             cursorVariants.close()
 
+            validateV8SyncColumns("Aisle", this, true)
+            validateV8SyncColumns("AisleProduct", this, false)
+            validateV8SyncColumns("Location", this, true)
+            validateV8SyncColumns("LoyaltyCard", this, false)
+            validateV8SyncColumns("Note", this, false)
+            validateV8SyncColumns("Product", this, true)
+            validateV8SyncColumns("ProductVariant", this, false)
+
             close()
         }
+    }
+
+    private fun validateV8SyncEntity(entity: SyncEntity) {
+        assertNull(entity.syncId)
+        assertFalse(entity.isRemoved)
+        assertEquals(0, entity.lastModifiedAt)
+        assertNull(entity.serverUpdatedAt)
     }
 
     @Test
@@ -347,6 +397,11 @@ class DatabaseMigrationTest {
         // ProductVariant introduced in V8
         val variants = db.productVariantDao().getByProductId(product.id)
         assertNotNull(variants)
+
+        // Sync Entity fields introduced in V8
+        validateV8SyncEntity(db.aisleDao().getAisles().first())
+        validateV8SyncEntity(db.locationDao().getLocations().first())
+        validateV8SyncEntity(db.productDao().getProducts().first())
 
         db.close()
     }
