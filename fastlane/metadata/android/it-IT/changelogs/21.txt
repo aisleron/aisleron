@@ -1,5 +1,5 @@
 Miglioramenti:
-#
+* Preparare il modello di dati per la funzione di sincronizzazione
 
 Correzioni di bug:
-#
+* Prodotto fisso Qty viene tagliato in cima quando si utilizzano grandi dimensioni del carattere.
