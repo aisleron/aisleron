@@ -1,5 +1,5 @@
 Mejoras:
-*
+* Preparar el modelo de datos para la función de sincronización
 
 Corrección de errores:
-*
+* Correr producto Qty siendo cortado en la parte superior al utilizar grandes tamaños de fuente.
