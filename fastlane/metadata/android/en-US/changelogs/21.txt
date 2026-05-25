@@ -2,4 +2,4 @@ Enhancements:
 * Prepare data model for sync feature
 
 Bug Fixes:
-*
+* Fix Product Qty being chopped off at the top when using large font sizes.
