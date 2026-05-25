@@ -17,27 +17,13 @@
 
 package com.aisleron.data.aisleproduct
 
-import com.aisleron.data.DbInitializer
-import com.aisleron.data.aisle.AisleDao
-import com.aisleron.data.location.LocationDao
-import com.aisleron.di.KoinTestRule
-import com.aisleron.di.daoModule
-import com.aisleron.di.inMemoryDatabaseTestModule
-import com.aisleron.di.repositoryModule
-import com.aisleron.di.useCaseModule
+import com.aisleron.data.RepositoryImplTest
 import com.aisleron.domain.aisleproduct.AisleProduct
+import com.aisleron.domain.aisleproduct.AisleProductRepository
+import com.aisleron.domain.base.BaseRepository
 import com.aisleron.domain.product.ProductRepository
-import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
-import org.koin.core.module.Module
-import org.koin.test.KoinTest
 import org.koin.test.get
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -45,44 +31,63 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-class AisleProductRepositoryImplTest : KoinTest {
-    private lateinit var repository: AisleProductRepositoryImpl
+class AisleProductRepositoryImplTest : RepositoryImplTest<AisleProduct>() {
+    val aisleProductRepository: AisleProductRepository get() = repository as AisleProductRepository
 
-    @get:Rule
-    val koinTestRule = KoinTestRule(
-        modules = getKoinModules()
+    override fun initRepository(): BaseRepository<AisleProduct> = AisleProductRepositoryImpl(
+        aisleProductDao = get<AisleProductDao>(),
+        aisleProductRankMapper = AisleProductRankMapper()
     )
 
-    private fun getKoinModules(): List<Module> = listOf(
-        daoModule, inMemoryDatabaseTestModule, repositoryModule, useCaseModule
-    )
+    override suspend fun getSingleNewItem(): AisleProduct {
+        val product = get<ProductRepository>().getAll().first()
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Before
-    fun setUp() {
-        DbInitializer(
-            get<LocationDao>(), get<AisleDao>(), TestScope(UnconfinedTestDispatcher())
-        ).invoke()
-
-        runBlocking {
-            get<CreateSampleDataUseCase>().invoke()
-        }
-
-        repository = AisleProductRepositoryImpl(
-            aisleProductDao = get<AisleProductDao>(),
-            aisleProductRankMapper = AisleProductRankMapper()
+        return AisleProduct(
+            id = -1,
+            rank = 999,
+            aisleId = 101,
+            product = product
         )
     }
 
-    @Test
-    fun add_SingleAisleProductProvided_AisleProductAdded() = runTest {
+    override suspend fun getMultipleNewItems(): List<AisleProduct> {
+        val product1 = get<ProductRepository>().getAll().first()
+        val product2 = get<ProductRepository>().getAll().last()
+
+        return listOf(
+            AisleProduct(
+                id = 0,
+                rank = 998,
+                aisleId = 101,
+                product = product1
+            ),
+
+            AisleProduct(
+                id = 0,
+                rank = 999,
+                aisleId = 101,
+                product = product2
+            )
+        )
+    }
+
+    override suspend fun getInvalidItem(): AisleProduct {
         val product = get<ProductRepository>().getAll().first()
-        val item = AisleProduct(
+
+        return AisleProduct(
             id = 0,
             rank = 999,
             aisleId = 101,
             product = product
         )
+    }
+
+    override fun getUpdatedItem(item: AisleProduct): AisleProduct =
+        item.copy(rank = item.rank + 1)
+
+    @Test
+    fun add_SingleAisleProductProvided_AisleProductAdded() = runTest {
+        val item = getSingleNewItem()
 
         val countBefore = repository.getAll().count()
 
@@ -109,14 +114,8 @@ class AisleProductRepositoryImplTest : KoinTest {
 
     @Test
     fun remove_InvalidAisleProductProvided_NoAisleProductRemoved() = runTest {
-        val product = get<ProductRepository>().getAll().first()
         val countBefore = repository.getAll().count()
-        val item = AisleProduct(
-            id = 999,
-            rank = 999,
-            aisleId = 101,
-            product = product
-        )
+        val item = getInvalidItem()
 
         repository.remove(item)
         val countAfter = repository.getAll().count()
@@ -127,14 +126,14 @@ class AisleProductRepositoryImplTest : KoinTest {
     @Test
     fun getProductAisles_ValidProduct_AislesReturned() = runTest {
         val product = get<ProductRepository>().getAll().first()
-        val aisleProducts = repository.getProductAisles(product.id)
+        val aisleProducts = aisleProductRepository.getProductAisles(product.id)
 
         assertTrue(aisleProducts.any())
     }
 
     @Test
     fun getProductAisles_InvalidProduct_NoAislesReturned() = runTest {
-        val aisleProducts = repository.getProductAisles(-100)
+        val aisleProducts = aisleProductRepository.getProductAisles(-100)
 
         assertFalse(aisleProducts.any())
     }
@@ -145,7 +144,7 @@ class AisleProductRepositoryImplTest : KoinTest {
         val aisleId = repository.getAll().first().aisleId
         val productCount = repository.getAll().count { it.aisleId == aisleId }
 
-        repository.removeProductsFromAisle(aisleId)
+        aisleProductRepository.removeProductsFromAisle(aisleId)
         val countAfter = repository.getAll().count()
 
         assertEquals(countBefore - productCount, countAfter)
@@ -155,9 +154,21 @@ class AisleProductRepositoryImplTest : KoinTest {
     fun removeProductsFromAisle_InvalidAisle_NoProductsRemoved() = runTest {
         val countBefore = repository.getAll().count()
 
-        repository.removeProductsFromAisle(-100)
+        aisleProductRepository.removeProductsFromAisle(-100)
         val countAfter = repository.getAll().count()
 
+        assertEquals(countBefore, countAfter)
+    }
+
+    @Test
+    fun restoreProductsToAisle_AisleHasRemovedProducts_ProductsRestored() = runTest {
+        val countBefore = repository.getAll().count()
+        val aisleId = repository.getAll().first().aisleId
+        aisleProductRepository.removeProductsFromAisle(aisleId)
+
+        aisleProductRepository.restoreProductsToAisle(aisleId)
+
+        val countAfter = repository.getAll().count()
         assertEquals(countBefore, countAfter)
     }
 

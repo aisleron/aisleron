@@ -17,10 +17,11 @@
 
 package com.aisleron.data.loyaltycard
 
-import com.aisleron.data.base.MapperBaseImpl
+import com.aisleron.data.base.Mapper
+import com.aisleron.data.base.SyncEntity
 import com.aisleron.domain.loyaltycard.LoyaltyCard
 
-class LoyaltyCardMapper : MapperBaseImpl<LoyaltyCardEntity, LoyaltyCard>() {
+class LoyaltyCardMapper : Mapper<LoyaltyCardEntity, LoyaltyCard> {
     override fun toModel(value: LoyaltyCardEntity) = LoyaltyCard(
         id = value.id,
         name = value.name.trim(),
@@ -28,7 +29,7 @@ class LoyaltyCardMapper : MapperBaseImpl<LoyaltyCardEntity, LoyaltyCard>() {
         intent = value.intent
     )
 
-    override fun fromModel(value: LoyaltyCard) = LoyaltyCardEntity(
+    override fun fromModel(value: LoyaltyCard, syncMetadata: SyncEntity?) = LoyaltyCardEntity(
         id = value.id,
         name = value.name.trim(),
         provider = value.provider,

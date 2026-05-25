@@ -42,7 +42,6 @@ class ProductVariantRepositoryImplTest : RepositoryImplTest<ProductVariant>() {
         ProductRepositoryImpl(
             productDao = get<ProductDao>(),
             aisleProductDao = get(),
-            productVariantDao = get<ProductVariantDao>(),
             productMapper = ProductMapper()
         )
     }
@@ -169,7 +168,7 @@ class ProductVariantRepositoryImplTest : RepositoryImplTest<ProductVariant>() {
         productVariantRepository.add(variant)
         val countBefore = productVariantRepository.getAll().count()
 
-        productVariantRepository.deleteByBarcode(variant.barcode)
+        productVariantRepository.removeByBarcode(variant.barcode)
 
         val countAfter = productVariantRepository.getAll().count()
         assertEquals(countBefore - 1, countAfter)

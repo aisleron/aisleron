@@ -19,23 +19,44 @@ package com.aisleron.data.loyaltycard
 
 import androidx.room.Dao
 import androidx.room.Query
+import androidx.room.Transaction
 import com.aisleron.data.base.BaseDao
 import com.aisleron.domain.loyaltycard.LoyaltyCardProviderType
 
 @Dao
 interface LoyaltyCardDao : BaseDao<LoyaltyCardEntity> {
-    @Query("SELECT * FROM LoyaltyCard WHERE id = :loyaltyCardId")
-    suspend fun getLoyaltyCard(loyaltyCardId: Int): LoyaltyCardEntity?
+    @Query("SELECT * FROM LoyaltyCard WHERE id = :loyaltyCardId AND (isRemoved = 0 OR :includeRemoved = 1)")
+    suspend fun getLoyaltyCard(loyaltyCardId: Int, includeRemoved: Boolean): LoyaltyCardEntity?
 
-    @Query("SELECT * FROM LoyaltyCard WHERE provider = :provider AND intent = :intent")
+    @Query("SELECT * FROM LoyaltyCard WHERE provider = :provider AND intent = :intent AND isRemoved = 0")
     suspend fun getProviderCard(
         provider: LoyaltyCardProviderType, intent: String
     ): LoyaltyCardEntity?
 
-    @Query("SELECT * FROM LoyaltyCard")
+    @Query("SELECT * FROM LoyaltyCard WHERE isRemoved = 0")
     suspend fun getLoyaltyCards(): List<LoyaltyCardEntity>
 
-    @Query("SELECT * FROM LoyaltyCard WHERE EXISTS (SELECT NULL FROM LocationLoyaltyCard WHERE locationId = :locationId AND id = loyaltyCardId)")
+    @Query(
+        "SELECT * FROM LoyaltyCard WHERE isRemoved = 0 AND EXISTS (" +
+                "SELECT NULL FROM LocationLoyaltyCard llc " +
+                "WHERE locationId = :locationId AND id = loyaltyCardId AND llc.isRemoved = 0)"
+    )
     suspend fun getLoyaltyCardForLocation(locationId: Int): LoyaltyCardEntity?
 
+    @Query(
+        "UPDATE LocationLoyaltyCard SET isRemoved = :isRemoved, lastModifiedAt = :lastModifiedAt " +
+                "WHERE loyaltyCardId = :loyaltyCardId"
+    )
+    suspend fun toggleLocationLoyaltyCardRemove(
+        loyaltyCardId: Int, isRemoved: Boolean, lastModifiedAt: Long
+    )
+
+    @Transaction
+    suspend fun updateLoyaltyCardRemovedState(loyaltyCard: LoyaltyCardEntity) {
+        toggleLocationLoyaltyCardRemove(
+            loyaltyCard.id, loyaltyCard.isRemoved, loyaltyCard.lastModifiedAt
+        )
+
+        upsert(loyaltyCard)
+    }
 }

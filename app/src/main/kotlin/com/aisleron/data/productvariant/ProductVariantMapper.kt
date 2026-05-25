@@ -17,10 +17,11 @@
 
 package com.aisleron.data.productvariant
 
-import com.aisleron.data.base.MapperBaseImpl
+import com.aisleron.data.base.Mapper
+import com.aisleron.data.base.SyncEntity
 import com.aisleron.domain.productvariant.ProductVariant
 
-class ProductVariantMapper : MapperBaseImpl<ProductVariantEntity, ProductVariant>() {
+class ProductVariantMapper : Mapper<ProductVariantEntity, ProductVariant> {
     override fun toModel(value: ProductVariantEntity) = ProductVariant(
         id = value.id,
         productId = value.productId,
@@ -28,7 +29,7 @@ class ProductVariantMapper : MapperBaseImpl<ProductVariantEntity, ProductVariant
         createdAt = value.createdAt
     )
 
-    override fun fromModel(value: ProductVariant) = ProductVariantEntity(
+    override fun fromModel(value: ProductVariant, syncMetadata: SyncEntity?) = ProductVariantEntity(
         id = value.id,
         productId = value.productId,
         barcode = value.barcode,

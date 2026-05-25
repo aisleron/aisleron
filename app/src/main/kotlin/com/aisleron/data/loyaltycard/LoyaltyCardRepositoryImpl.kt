@@ -26,9 +26,8 @@ class LoyaltyCardRepositoryImpl(
     private val locationLoyaltyCardDao: LocationLoyaltyCardDao,
     private val loyaltyCardMapper: LoyaltyCardMapper
 ) : LoyaltyCardRepository {
-    override suspend fun get(id: Int): LoyaltyCard? {
-        return loyaltyCardDao.getLoyaltyCard(id)?.let { loyaltyCardMapper.toModel(it) }
-    }
+    override suspend fun get(id: Int): LoyaltyCard? =
+        getLoyaltyCard(id, false)
 
     override suspend fun getProviderCard(
         provider: LoyaltyCardProviderType, intent: String
@@ -43,11 +42,34 @@ class LoyaltyCardRepositoryImpl(
     }
 
     override suspend fun addToLocation(locationId: Int, loyaltyCardId: Int) {
-        locationLoyaltyCardDao.upsert(LocationLoyaltyCardEntity(locationId, loyaltyCardId))
+        val locationLoyaltyCard = locationLoyaltyCardDao.getLocationLoyaltyCard(locationId, true)
+            ?: LocationLoyaltyCardEntity(locationId, loyaltyCardId)
+
+        val upsertEntry = locationLoyaltyCard.copy(
+            loyaltyCardId = loyaltyCardId,
+            isRemoved = false,
+            lastModifiedAt = System.currentTimeMillis()
+        )
+
+        locationLoyaltyCardDao.upsert(upsertEntry)
     }
 
     override suspend fun removeFromLocation(locationId: Int, loyaltyCardId: Int) {
-        locationLoyaltyCardDao.delete(LocationLoyaltyCardEntity(locationId, loyaltyCardId))
+        val removeEntity = locationLoyaltyCardDao.getLocationLoyaltyCard(locationId, false)?.copy(
+            isRemoved = true,
+            lastModifiedAt = System.currentTimeMillis()
+        )
+
+        if (removeEntity != null && removeEntity.loyaltyCardId == loyaltyCardId) {
+            locationLoyaltyCardDao.upsert(removeEntity)
+        }
+    }
+
+    override suspend fun hardDeleteFromLocation(locationId: Int, loyaltyCardId: Int) {
+        val deleteEntity = locationLoyaltyCardDao.getLocationLoyaltyCard(locationId, true)
+        if (deleteEntity != null && deleteEntity.loyaltyCardId == loyaltyCardId) {
+            locationLoyaltyCardDao.delete(deleteEntity)
+        }
     }
 
     override suspend fun getAll(): List<LoyaltyCard> {
@@ -55,29 +77,60 @@ class LoyaltyCardRepositoryImpl(
     }
 
     override suspend fun add(item: LoyaltyCard): Int {
-        return loyaltyCardDao.upsert(loyaltyCardMapper.fromModel(item)).single().toInt()
+        return loyaltyCardDao.upsert(loyaltyCardMapper.fromModel(item, null)).single().toInt()
     }
 
     override suspend fun add(items: List<LoyaltyCard>): List<Int> {
-        return upsertLoyaltyCards(items)
+        val loyaltyCards = items.map { loyaltyCardMapper.fromModel(it, null) }
+        return upsertLoyaltyCards(loyaltyCards)
+    }
+
+    private suspend fun mapExisting(item: LoyaltyCard, includeRemoved: Boolean): LoyaltyCardEntity {
+        val currentEntity = loyaltyCardDao.getLoyaltyCard(item.id, includeRemoved)
+        return loyaltyCardMapper.fromModel(item, currentEntity)
     }
 
     override suspend fun update(item: LoyaltyCard) {
-        loyaltyCardDao.upsert(loyaltyCardMapper.fromModel(item))
+        loyaltyCardDao.upsert(mapExisting(item, false))
     }
 
     override suspend fun update(items: List<LoyaltyCard>) {
-        upsertLoyaltyCards(items)
+        val loyaltyCards = items.map { mapExisting(it, false) }
+        upsertLoyaltyCards(loyaltyCards)
     }
 
     override suspend fun remove(item: LoyaltyCard) {
-        loyaltyCardDao.delete(loyaltyCardMapper.fromModel(item))
+        val removeEntity = mapExisting(item, false).copy(isRemoved = true)
+        loyaltyCardDao.updateLoyaltyCardRemovedState(removeEntity)
     }
 
-    private suspend fun upsertLoyaltyCards(loyaltyCards: List<LoyaltyCard>): List<Int> {
+    override suspend fun getRemoved(id: Int): LoyaltyCard? =
+        getLoyaltyCard(id, true)
+
+    override suspend fun restore(id: Int) {
+        val removedEntity = loyaltyCardDao.getLoyaltyCard(id, true) ?: return
+
+        val loyaltyCard = loyaltyCardMapper.toModel(removedEntity)
+        val restoreEntity = loyaltyCardMapper.fromModel(loyaltyCard, removedEntity)
+            .copy(isRemoved = false)
+
+        loyaltyCardDao.updateLoyaltyCardRemovedState(restoreEntity)
+    }
+
+    override suspend fun hardDelete(item: LoyaltyCard) {
+        val deleteEntity = mapExisting(item, true)
+        loyaltyCardDao.delete(deleteEntity)
+    }
+
+    private suspend fun upsertLoyaltyCards(loyaltyCards: List<LoyaltyCardEntity>): List<Int> {
         // '*' is a spread operator required to pass vararg down
         return loyaltyCardDao
-            .upsert(*loyaltyCardMapper.fromModelList(loyaltyCards).map { it }.toTypedArray())
+            .upsert(*loyaltyCards.toTypedArray())
             .map { it.toInt() }
+    }
+
+    private suspend fun getLoyaltyCard(id: Int, includeDeleted: Boolean): LoyaltyCard? {
+        return loyaltyCardDao.getLoyaltyCard(id, includeDeleted)
+            ?.let { loyaltyCardMapper.toModel(it) }
     }
 }

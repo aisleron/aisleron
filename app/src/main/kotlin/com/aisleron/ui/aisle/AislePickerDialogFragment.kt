@@ -19,7 +19,6 @@ package com.aisleron.ui.aisle
 
 import android.app.Dialog
 import android.os.Bundle
-import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.setFragmentResult
 import com.aisleron.R
@@ -40,11 +39,18 @@ class AislePickerDialogFragment : DialogFragment() {
             .setTitle(aislePickerBundle.title)
             .setNegativeButton(android.R.string.cancel, null)
             .setNeutralButton(R.string.new_aisle) { _, _ ->
-                setFragmentResult(requestKey, bundleOf(KEY_ADD_NEW_AISLE to true))
+                setFragmentResult(
+                    requestKey,
+                    Bundle().apply { putBoolean(KEY_ADD_NEW_AISLE, true) }
+                )
             }
             .setSingleChoiceItems(aisleNames, checkedItem) { dialog, which ->
                 val selectedAisleId = aisles[which].id
-                setFragmentResult(requestKey, bundleOf(KEY_SELECTED_AISLE_ID to selectedAisleId))
+                setFragmentResult(
+                    requestKey,
+                    Bundle().apply { putInt(KEY_SELECTED_AISLE_ID, selectedAisleId) }
+                )
+
                 dialog.dismiss()
             }
             .create()

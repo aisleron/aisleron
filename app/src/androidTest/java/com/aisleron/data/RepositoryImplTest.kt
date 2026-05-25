@@ -180,18 +180,21 @@ abstract class RepositoryImplTest<T : AisleronItem> : KoinTest {
     }
 
     @Test
-    fun remove_ValidItemProvided_RemoveItem() = runTest {
+    fun remove_ValidItemProvided_FlaggedAsRemoved() = runTest {
         val itemId = addMultipleItems().first()
         val itemBefore = repository.get(itemId)!!
         val countBefore = repository.getAll().count()
 
         repository.remove(itemBefore)
 
+        val countAfter = repository.getAll().count()
+        assertEquals(countBefore.dec(), countAfter)
+
         val itemAfter = repository.get(itemId)
         assertNull(itemAfter)
 
-        val countAfter = repository.getAll().count()
-        assertEquals(countBefore.dec(), countAfter)
+        val removedItem = repository.getRemoved(itemId)
+        assertNotNull(removedItem)
     }
 
     @Test
@@ -204,5 +207,40 @@ abstract class RepositoryImplTest<T : AisleronItem> : KoinTest {
 
         val countAfter = repository.getAll().count()
         assertEquals(countBefore, countAfter)
+    }
+
+    @Test
+    fun hardDelete_ValidItemProvided_ItemDeleted() = runTest {
+        val itemId = addMultipleItems().first()
+        val itemBefore = repository.get(itemId)!!
+
+        repository.hardDelete(itemBefore)
+
+        val itemAfter = repository.getRemoved(itemId)
+        assertNull(itemAfter)
+    }
+
+    @Test
+    fun restore_ItemWasRemoved_ItemIsRestored() = runTest {
+        val itemId = addMultipleItems().first()
+        val itemBefore = repository.get(itemId)!!
+
+        repository.remove(itemBefore)
+        val itemRemoved = repository.get(itemId)
+        assertNull(itemRemoved)
+
+        repository.restore(itemId)
+
+        val itemRestored = repository.get(itemId)
+        assertNotNull(itemRestored)
+    }
+
+    @Test
+    fun restore_InvalidItem_NoItemAdded() = runTest {
+        val invalidItem = getInvalidItem()
+        repository.restore(invalidItem.id)
+
+        val itemRestored = repository.get(invalidItem.id)
+        assertNull(itemRestored)
     }
 }

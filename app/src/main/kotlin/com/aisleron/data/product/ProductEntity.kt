@@ -20,7 +20,9 @@ package com.aisleron.data.product
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.aisleron.data.base.SyncEntity
 import com.aisleron.data.note.NoteEntity
 import com.aisleron.domain.preferences.TrackingMode
 
@@ -34,6 +36,11 @@ import com.aisleron.domain.preferences.TrackingMode
             onDelete = ForeignKey.SET_NULL,
             onUpdate = ForeignKey.CASCADE
         )
+    ],
+    indices = [
+        Index(value = ["syncId"], unique = true),
+        Index(value = ["isRemoved", "id"]),
+        Index(value = ["lastModifiedAt"])
     ]
 )
 data class ProductEntity(
@@ -44,5 +51,9 @@ data class ProductEntity(
     @ColumnInfo(index = true) val noteId: Int?,
     @ColumnInfo(defaultValue = "1") val qtyIncrement: Double,
     @ColumnInfo(defaultValue = "") val unitOfMeasure: String,
-    val trackingMode: TrackingMode?
-)
+    val trackingMode: TrackingMode?,
+    override val syncId: String? = null,
+    @ColumnInfo(defaultValue = "0") override val isRemoved: Boolean = false,
+    @ColumnInfo(defaultValue = "0") override val lastModifiedAt: Long = System.currentTimeMillis(),
+    override val serverUpdatedAt: Long? = null
+) : SyncEntity

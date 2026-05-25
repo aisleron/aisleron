@@ -21,31 +21,42 @@ import com.aisleron.data.loyaltycard.LocationLoyaltyCardDao
 import com.aisleron.data.loyaltycard.LocationLoyaltyCardEntity
 
 class LocationLoyaltyCardDaoTestImpl : LocationLoyaltyCardDao {
-
     private val locationLoyaltyCardList = mutableListOf<LocationLoyaltyCardEntity>()
+    private val activeItems: List<LocationLoyaltyCardEntity>
+        get() = locationLoyaltyCardList.filter { !it.isRemoved }
 
-    fun getAll() = locationLoyaltyCardList
-
-    fun getLocationLoyaltyCard(locationId: Int): LocationLoyaltyCardEntity? {
-        return locationLoyaltyCardList.find { it.locationId == locationId }
-    }
-
+    fun getAll() = activeItems
 
     override suspend fun upsert(vararg entity: LocationLoyaltyCardEntity): List<Long> {
         val result = mutableListOf<Long>()
         entity.forEach {
-            val existingEntity = getLocationLoyaltyCard(it.locationId)
+            val existingEntity = getLocationLoyaltyCard(it.locationId, true)
             existingEntity?.let {
                 locationLoyaltyCardList.removeAt(locationLoyaltyCardList.indexOf(existingEntity))
             }
 
-            locationLoyaltyCardList.add(it)
-            result.add(existingEntity?.let { -1 } ?: it.locationId.toLong())
+            val newEntity = LocationLoyaltyCardEntity(
+                locationId = it.locationId,
+                loyaltyCardId = it.loyaltyCardId,
+                syncId = it.syncId,
+                isRemoved = it.isRemoved,
+                lastModifiedAt = it.lastModifiedAt,
+                serverUpdatedAt = it.serverUpdatedAt
+            )
+
+            locationLoyaltyCardList.add(newEntity)
+            result.add(newEntity.locationId.toLong())
         }
         return result
     }
 
     override suspend fun delete(vararg entity: LocationLoyaltyCardEntity) {
         locationLoyaltyCardList.removeIf { it in entity }
+    }
+
+    override suspend fun getLocationLoyaltyCard(
+        locationId: Int, includeRemoved: Boolean
+    ): LocationLoyaltyCardEntity? {
+        return locationLoyaltyCardList.find { it.locationId == locationId && (!it.isRemoved || includeRemoved) }
     }
 }

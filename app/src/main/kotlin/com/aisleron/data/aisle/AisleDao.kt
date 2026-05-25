@@ -27,46 +27,41 @@ interface AisleDao : BaseDao<AisleEntity> {
     /**
      * Aisle
      */
-    @Transaction
-    @Query("SELECT * FROM Aisle WHERE id = :aisleId")
-    suspend fun getAisle(aisleId: Int): AisleEntity?
+    @Query("SELECT * FROM Aisle WHERE id = :aisleId AND (isRemoved = 0 OR :includeRemoved = 1)")
+    suspend fun getAisle(aisleId: Int, includeRemoved: Boolean): AisleEntity?
 
-    @Transaction
-    @Query("SELECT * FROM Aisle")
+    @Query("SELECT * FROM Aisle WHERE isRemoved = 0")
     suspend fun getAisles(): List<AisleEntity>
 
-    @Transaction
-    @Query("SELECT * FROM Aisle WHERE locationId = :locationId")
+    @Query("SELECT * FROM Aisle WHERE locationId = :locationId AND isRemoved = 0")
     suspend fun getAislesForLocation(locationId: Int): List<AisleEntity>
 
-    @Transaction
-    @Query("SELECT * FROM Aisle WHERE isDefault = 1")
+    @Query("SELECT * FROM Aisle WHERE isDefault = 1 AND isRemoved = 0")
     suspend fun getDefaultAisles(): List<AisleEntity>
 
-    @Transaction
-    @Query("SELECT * FROM Aisle WHERE isDefault = 1 AND locationId = :locationId")
+    @Query("SELECT * FROM Aisle WHERE isDefault = 1 AND locationId = :locationId AND isRemoved = 0")
     suspend fun getDefaultAisleFor(locationId: Int): AisleEntity?
+
+    @Transaction
+    suspend fun updateRank(aisle: AisleEntity) {
+        moveRanks(aisle.locationId, aisle.rank, aisle.lastModifiedAt)
+        upsert(aisle)
+    }
+
+    @Query("UPDATE Aisle SET rank = rank + 1, lastModifiedAt = :lastModifiedAt WHERE locationId = :locationId and rank >= :fromRank")
+    suspend fun moveRanks(locationId: Int, fromRank: Int, lastModifiedAt: Long)
+
+    @Query("SELECT COALESCE(MAX(rank), 0) FROM Aisle WHERE locationId = :locationId and isDefault = 0")
+    suspend fun getMaxRank(locationId: Int): Int
 
     /**
      * Aisle With Product
      */
     @Transaction
-    @Query("SELECT * FROM Aisle WHERE id = :aisleId")
+    @Query("SELECT * FROM Aisle WHERE id = :aisleId AND isRemoved = 0")
     suspend fun getAisleWithProducts(aisleId: Int): AisleWithProducts
 
     @Transaction
-    @Query("SELECT * FROM Aisle")
+    @Query("SELECT * FROM Aisle WHERE isRemoved = 0")
     suspend fun getAislesWithProducts(): List<AisleWithProducts>
-
-    @Transaction
-    suspend fun updateRank(aisle: AisleEntity) {
-        moveRanks(aisle.locationId, aisle.rank)
-        upsert(aisle)
-    }
-
-    @Query("UPDATE Aisle SET rank = rank + 1 WHERE locationId = :locationId and rank >= :fromRank")
-    suspend fun moveRanks(locationId: Int, fromRank: Int)
-
-    @Query("SELECT COALESCE(MAX(rank), 0) FROM Aisle WHERE locationId = :locationId and isDefault = 0")
-    suspend fun getMaxRank(locationId: Int): Int
 }

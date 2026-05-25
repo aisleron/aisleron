@@ -25,37 +25,36 @@ import com.aisleron.testdata.data.aisleproduct.AisleProductDaoTestImpl
 class AisleDaoTestImpl(private val aisleProductDao: AisleProductDaoTestImpl) : AisleDao {
 
     private val aisleList = mutableListOf<AisleEntity>()
+    private val activeItems: List<AisleEntity> get() = aisleList.filter { !it.isRemoved }
 
-    override suspend fun getAisle(aisleId: Int): AisleEntity? {
-        return aisleList.find { it.id == aisleId }
+    override suspend fun getAisle(aisleId: Int, includeRemoved: Boolean): AisleEntity? {
+        return aisleList.find { it.id == aisleId && (!it.isRemoved || includeRemoved) }
     }
 
-    override suspend fun getAisles(): List<AisleEntity> {
-        return aisleList
-    }
+    override suspend fun getAisles(): List<AisleEntity> = activeItems
 
     override suspend fun getAislesForLocation(locationId: Int): List<AisleEntity> {
-        return aisleList.filter { it.locationId == locationId }
+        return activeItems.filter { it.locationId == locationId }
     }
 
     override suspend fun getDefaultAisles(): List<AisleEntity> {
-        return aisleList.filter { it.isDefault }
+        return activeItems.filter { it.isDefault }
     }
 
     override suspend fun getDefaultAisleFor(locationId: Int): AisleEntity? {
-        return aisleList.find { it.locationId == locationId && it.isDefault }
+        return activeItems.find { it.locationId == locationId && it.isDefault }
     }
 
     override suspend fun getAisleWithProducts(aisleId: Int): AisleWithProducts {
         return AisleWithProducts(
-            aisle = getAisle(aisleId)!!,
+            aisle = getAisle(aisleId, false)!!,
             products = aisleProductDao.getAisleProducts()
                 .filter { ap -> ap.aisleProduct.aisleId == aisleId }
         )
     }
 
     override suspend fun getAislesWithProducts(): List<AisleWithProducts> {
-        return aisleList.map {
+        return activeItems.map {
             AisleWithProducts(
                 aisle = it,
                 products = aisleProductDao.getAisleProducts()
@@ -64,17 +63,17 @@ class AisleDaoTestImpl(private val aisleProductDao: AisleProductDaoTestImpl) : A
         }
     }
 
-    override suspend fun moveRanks(locationId: Int, fromRank: Int) {
+    override suspend fun moveRanks(locationId: Int, fromRank: Int, lastModifiedAt: Long) {
         val locationAisles = aisleList.filter { it.locationId == locationId && it.rank >= fromRank }
         locationAisles.forEach {
-            val newAisle = it.copy(rank = it.rank + 1)
+            val newAisle = it.copy(rank = it.rank + 1, lastModifiedAt = lastModifiedAt)
             aisleList.removeAt(aisleList.indexOf(it))
             aisleList.add(newAisle)
         }
     }
 
     override suspend fun getMaxRank(locationId: Int): Int {
-        return aisleList.filter { it.locationId == locationId && !it.isDefault }
+        return activeItems.filter { it.locationId == locationId && !it.isDefault }
             .maxOfOrNull { it.rank } ?: 0
     }
 
@@ -82,7 +81,7 @@ class AisleDaoTestImpl(private val aisleProductDao: AisleProductDaoTestImpl) : A
         val result = mutableListOf<Long>()
         entity.forEach {
             val id: Int
-            val existingEntity = getAisle(it.id)
+            val existingEntity = getAisle(it.id, true)
             if (existingEntity == null) {
                 id = (aisleList.maxOfOrNull { a -> a.id } ?: 0) + 1
             } else {
@@ -96,7 +95,11 @@ class AisleDaoTestImpl(private val aisleProductDao: AisleProductDaoTestImpl) : A
                 rank = it.rank,
                 locationId = it.locationId,
                 isDefault = it.isDefault,
-                expanded = it.expanded
+                expanded = it.expanded,
+                lastModifiedAt = it.lastModifiedAt,
+                isRemoved = it.isRemoved,
+                syncId = it.syncId,
+                serverUpdatedAt = it.serverUpdatedAt
             )
 
             aisleList.add(newEntity)

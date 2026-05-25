@@ -30,61 +30,61 @@ interface LocationDao : BaseDao<LocationEntity> {
     /**
      * Location
      */
-    @Query("SELECT * FROM Location WHERE id = :locationId")
-    suspend fun getLocation(locationId: Int): LocationEntity?
+    @Query("SELECT * FROM Location WHERE id = :locationId AND (isRemoved = 0 OR :includeRemoved = 1)")
+    suspend fun getLocation(locationId: Int, includeRemoved: Boolean): LocationEntity?
 
-    @Query("SELECT * FROM Location  ORDER BY type, rank")
+    @Query("SELECT * FROM Location WHERE isRemoved = 0 ORDER BY type, rank")
     suspend fun getLocations(): List<LocationEntity>
 
-    @Query("SELECT * FROM Location WHERE name = :name COLLATE NOCASE")
+    @Query("SELECT * FROM Location WHERE name = :name COLLATE NOCASE AND isRemoved = 0")
     suspend fun getLocationByName(name: String): LocationEntity?
 
-    @Query("SELECT COALESCE(MAX(rank), 0) FROM Location")
+    @Query("SELECT COALESCE(MAX(rank), 0) FROM Location WHERE isRemoved = 0")
     suspend fun getMaxRank(): Int
 
     @Transaction
     suspend fun updateRank(location: LocationEntity) {
-        moveRanks(location.type, location.rank)
+        moveRanks(location.type, location.rank, location.lastModifiedAt)
         upsert(location)
     }
 
-    @Query("UPDATE Location SET rank = rank + 1 WHERE type = :locationType and rank >= :fromRank")
-    suspend fun moveRanks(locationType: LocationType, fromRank: Int)
+    @Query("UPDATE Location SET rank = rank + 1, lastModifiedAt = :lastModifiedAt WHERE type = :locationType and rank >= :fromRank")
+    suspend fun moveRanks(locationType: LocationType, fromRank: Int, lastModifiedAt: Long)
 
-    @Query("SELECT * FROM Location WHERE type = :locationType ORDER BY rank")
+    @Query("SELECT * FROM Location WHERE type = :locationType AND isRemoved = 0 ORDER BY rank")
     suspend fun getByType(locationType: LocationType): List<LocationEntity>
 
     /**
      * Location With Aisles
      */
     @Transaction
-    @Query("SELECT * FROM Location WHERE id = :locationId")
+    @Query("SELECT * FROM Location WHERE id = :locationId AND isRemoved = 0")
     suspend fun getLocationWithAisles(locationId: Int): LocationWithAisles
 
     /**
      * Location With Aisles With Products
      */
     @Transaction
-    @Query("SELECT * FROM Location WHERE id = :locationId")
+    @Query("SELECT * FROM Location WHERE id = :locationId AND isRemoved = 0")
     fun getLocationWithAislesWithProducts(locationId: Int): Flow<LocationWithAislesWithProducts?>
 
 
     @Transaction
-    @Query("SELECT * FROM Location WHERE type = :locationType ORDER BY rank")
+    @Query("SELECT * FROM Location WHERE type = :locationType AND isRemoved = 0 ORDER BY rank")
     fun getLocationsWithAislesWithProducts(locationType: LocationType): Flow<List<LocationWithAislesWithProducts>>
 
     /**
      * Shop Specific Queries
      */
-    @Query("SELECT * FROM Location WHERE type = 'SHOP' ORDER BY rank")
+    @Query("SELECT * FROM Location WHERE type = 'SHOP' AND isRemoved = 0 ORDER BY rank")
     fun getShops(): Flow<List<LocationEntity>>
 
-    @Query("SELECT * FROM Location WHERE type = 'SHOP' AND pinned = 1 ORDER BY rank")
+    @Query("SELECT * FROM Location WHERE type = 'SHOP' AND pinned = 1 AND isRemoved = 0 ORDER BY rank")
     fun getPinnedShops(): Flow<List<LocationEntity>>
 
     /**
      * Home Specific Queries
      */
-    @Query("SELECT * FROM Location WHERE type = 'HOME'")
+    @Query("SELECT * FROM Location WHERE type = 'HOME' AND isRemoved = 0")
     suspend fun getHome(): LocationEntity
 }

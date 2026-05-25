@@ -109,4 +109,29 @@ class RemoveLocationUseCaseTest {
         val removedLocation = locationRepository.get(newLocation.id)
         assertNull(removedLocation)
     }
+
+    @Test
+    fun removeLocation_WithValidId_LocationRemoved() = runTest {
+        val locationRepository = dm.getRepository<LocationRepository>()
+        val countBefore = locationRepository.getAll().count()
+
+        removeLocationUseCase(existingLocation.id)
+
+        val removedLocation = locationRepository.get(existingLocation.id)
+        assertNull(removedLocation)
+
+        val countAfter = locationRepository.getAll().count()
+        assertEquals(countBefore - 1, countAfter)
+    }
+
+    @Test
+    fun removeLocation_WithInvalidId_NoLocationRemoved() = runTest {
+        val locationRepository = dm.getRepository<LocationRepository>()
+        val countBefore = locationRepository.getAll().count()
+
+        removeLocationUseCase(-1)
+
+        val countAfter = locationRepository.getAll().count()
+        assertEquals(countBefore, countAfter)
+    }
 }

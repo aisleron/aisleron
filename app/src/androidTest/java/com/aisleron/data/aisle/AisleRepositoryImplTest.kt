@@ -149,4 +149,15 @@ class AisleRepositoryImplTest : RepositoryImplTest<Aisle>() {
 
         assertEquals(maxAisleRankBefore + 1, maxAisleRankAfter)
     }
+
+    @Test
+    fun getMaxRank_ReturnMaxRank() = runTest {
+        val locationId = getLocation().id
+        val expected = aisleRepository.getAll()
+            .filter { it.locationId == locationId && !it.isDefault }.maxOf { it.rank }
+
+        val actual = aisleRepository.getMaxRank(locationId)
+
+        assertEquals(expected, actual)
+    }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025-2026 aisleron.com
+ * Copyright (C) 2026 aisleron.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -17,16 +17,20 @@
 
 package com.aisleron.data.base
 
-abstract class MapperBaseImpl<Entity : Any, Model : Any> : Mapper<Entity, Model> {
-    abstract override fun toModel(value: Entity): Model
+/**
+ * Base fields required by a cloud sync entity.
+ *
+ * Sync entities need the following indices added to in the Room annotations:
+ * indices = [
+ *         Index(value = ["syncId"], unique = true),
+ *         Index(value = ["isRemoved", "id"]),
+ *         Index(value = ["lastModifiedAt"])
+ *     ]
+ */
 
-    abstract override fun fromModel(value: Model): Entity
-
-    override fun toModelList(list: List<Entity>): List<Model> {
-        return list.map { toModel(it) }
-    }
-
-    override fun fromModelList(list: List<Model>): List<Entity> {
-        return list.map { fromModel(it) }
-    }
+interface SyncEntity {
+    val syncId: String?
+    val isRemoved: Boolean
+    val lastModifiedAt: Long
+    val serverUpdatedAt: Long?
 }

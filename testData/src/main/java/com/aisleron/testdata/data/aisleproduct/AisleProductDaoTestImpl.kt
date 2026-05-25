@@ -25,33 +25,39 @@ import com.aisleron.testdata.data.product.ProductDaoTestImpl
 class AisleProductDaoTestImpl(private val productDao: ProductDaoTestImpl) : AisleProductDao {
 
     private val aisleProductList = mutableListOf<AisleProductEntity>()
+    private val activeItems: List<AisleProductEntity> get() = aisleProductList.filter { !it.isRemoved }
 
-    override suspend fun getAisleProduct(aisleProductId: Int): AisleProductRank? {
-        val aisleProduct = aisleProductList.find { it.id == aisleProductId }
+
+    override suspend fun getAisleProduct(
+        aisleProductId: Int, includeRemoved: Boolean
+    ): AisleProductRank? {
+        val aisleProduct =
+            aisleProductList.find { it.id == aisleProductId && (!it.isRemoved || includeRemoved) }
+
         var result: AisleProductRank? = null
         aisleProduct?.let {
             result = AisleProductRank(
                 aisleProduct = aisleProduct,
-                product = productDao.getProduct(aisleProduct.productId)!!
+                product = productDao.getProduct(aisleProduct.productId, includeRemoved)!!
             )
         }
         return result
     }
 
     override suspend fun getAisleProductsByProduct(productId: Int): List<AisleProductRank> {
-        return aisleProductList.filter { it.productId == productId }.map {
+        return activeItems.filter { it.productId == productId }.map {
             AisleProductRank(
                 aisleProduct = it,
-                product = productDao.getProduct(it.productId)!!
+                product = productDao.getProduct(it.productId, false)!!
             )
         }
     }
 
     override suspend fun getAisleProducts(): List<AisleProductRank> {
-        return aisleProductList.map {
+        return activeItems.map {
             AisleProductRank(
                 aisleProduct = it,
-                product = productDao.getProduct(it.productId)!!
+                product = productDao.getProduct(it.productId, false)!!
             )
         }
     }
@@ -65,8 +71,17 @@ class AisleProductDaoTestImpl(private val productDao: ProductDaoTestImpl) : Aisl
         }
     }
 
-    override suspend fun removeProductsFromAisle(aisleId: Int) {
-        aisleProductList.removeIf { it.aisleId == aisleId }
+    override suspend fun toggleProductsOnAisleRemove(
+        aisleId: Int, isRemoved: Boolean, lastModifiedAt: Long
+    ) {
+        val entities = getAisleProducts().filter { it.aisleProduct.aisleId == aisleId }.map {
+            it.aisleProduct.copy(
+                isRemoved = isRemoved,
+                lastModifiedAt = lastModifiedAt
+            )
+        }
+
+        upsert(*entities.toTypedArray())
     }
 
     override suspend fun getMaxRank(aisleId: Int): Int {
@@ -89,7 +104,11 @@ class AisleProductDaoTestImpl(private val productDao: ProductDaoTestImpl) : Aisl
                 id = id,
                 rank = it.rank,
                 aisleId = it.aisleId,
-                productId = it.productId
+                productId = it.productId,
+                lastModifiedAt = it.lastModifiedAt,
+                isRemoved = it.isRemoved,
+                syncId = it.syncId,
+                serverUpdatedAt = it.serverUpdatedAt
             )
 
             aisleProductList.add(newEntity)

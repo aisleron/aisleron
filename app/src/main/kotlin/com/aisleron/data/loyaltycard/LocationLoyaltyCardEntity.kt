@@ -17,9 +17,11 @@
 
 package com.aisleron.data.loyaltycard
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
+import com.aisleron.data.base.SyncEntity
 import com.aisleron.data.location.LocationEntity
 
 @Entity(
@@ -40,10 +42,17 @@ import com.aisleron.data.location.LocationEntity
         )
     ],
     indices = [
-        Index(value = ["loyaltyCardId"])
+        Index(value = ["loyaltyCardId"]),
+        Index(value = ["syncId"], unique = true),
+        Index(value = ["isRemoved", "locationId"]),
+        Index(value = ["lastModifiedAt"])
     ]
 )
 data class LocationLoyaltyCardEntity(
     val locationId: Int,
-    val loyaltyCardId: Int
-)
+    val loyaltyCardId: Int,
+    override val syncId: String? = null,
+    @ColumnInfo(defaultValue = "0") override val isRemoved: Boolean = false,
+    @ColumnInfo(defaultValue = "0") override val lastModifiedAt: Long = System.currentTimeMillis(),
+    override val serverUpdatedAt: Long? = null
+) : SyncEntity

@@ -18,22 +18,23 @@
 package com.aisleron.data.aisle
 
 import com.aisleron.data.aisleproduct.AisleProductRankMapper
-import com.aisleron.data.base.MapperBaseImpl
+import com.aisleron.data.base.Mapper
+import com.aisleron.data.base.SyncEntity
 import com.aisleron.domain.aisle.Aisle
 
-class AisleWithProductsMapper : MapperBaseImpl<AisleWithProducts, Aisle>() {
+class AisleWithProductsMapper : Mapper<AisleWithProducts, Aisle> {
     override fun toModel(value: AisleWithProducts) = Aisle(
         id = value.aisle.id,
         rank = value.aisle.rank,
         name = value.aisle.name.trim(),
         locationId = value.aisle.locationId,
-        products = AisleProductRankMapper().toModelList(value.products),
+        products = AisleProductRankMapper().toModelList(value.products.filter { !it.aisleProduct.isRemoved && !it.product.isRemoved }),
         isDefault = value.aisle.isDefault,
         expanded = value.aisle.expanded
     )
 
-    override fun fromModel(value: Aisle) = AisleWithProducts(
-        aisle = AisleMapper().fromModel(value),
-        products = AisleProductRankMapper().fromModelList(value.products)
+    override fun fromModel(value: Aisle, syncMetadata: SyncEntity?) = AisleWithProducts(
+        aisle = AisleMapper().fromModel(value, syncMetadata),
+        products = value.products.map { AisleProductRankMapper().fromModel(it, null) }
     )
 }

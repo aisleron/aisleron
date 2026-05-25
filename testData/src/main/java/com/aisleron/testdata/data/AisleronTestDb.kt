@@ -56,7 +56,10 @@ class AisleronTestDb : AisleronDb {
 
     override fun locationDao(): LocationDao = _locationDao
 
-    override fun productDao(): ProductDao = _productDao
+    override fun productDao(): ProductDao {
+        _productDao.setAisleProductDao(_aisleProductDao)
+        return _productDao
+    }
 
     override fun productVariantDao(): ProductVariantDao = _productVariantDao
 

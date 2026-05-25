@@ -30,38 +30,64 @@ class ProductRepositoryImpl(
         return productDao.getProductByName(name.trim())?.let { productMapper.toModel(it) }
     }
 
-    override suspend fun get(id: Int): Product? {
-        return productDao.getProduct(id)?.let { productMapper.toModel(it) }
-    }
+    override suspend fun get(id: Int): Product? =
+        getProduct(id, false)
 
     override suspend fun getAll(): List<Product> {
         return productMapper.toModelList(productDao.getProducts())
     }
 
     override suspend fun add(item: Product): Int {
-        return productDao.upsert(productMapper.fromModel(item))[0].toInt()
+        return productDao.upsert(productMapper.fromModel(item, null)).single().toInt()
     }
 
     override suspend fun add(items: List<Product>): List<Int> {
-        return upsertProducts(items)
+        val products = items.map { productMapper.fromModel(it, null) }
+        return upsertProducts(products)
+    }
+
+    private suspend fun mapExisting(item: Product, includeDeleted: Boolean): ProductEntity {
+        val currentEntity = productDao.getProduct(item.id, includeDeleted)
+        return productMapper.fromModel(item, currentEntity)
     }
 
     override suspend fun update(item: Product) {
-        productDao.upsert(productMapper.fromModel(item))
+        productDao.upsert(mapExisting(item, false))
     }
 
     override suspend fun update(items: List<Product>) {
-        upsertProducts(items)
+        val products = items.map { mapExisting(it, false) }
+        upsertProducts(products)
     }
 
-    private suspend fun upsertProducts(products: List<Product>): List<Int> {
+    private suspend fun upsertProducts(products: List<ProductEntity>): List<Int> {
         // '*' is a spread operator required to pass vararg down
         return productDao
-            .upsert(*productMapper.fromModelList(products).map { it }.toTypedArray())
+            .upsert(*products.toTypedArray())
             .map { it.toInt() }
     }
 
     override suspend fun remove(item: Product) {
-        productDao.remove(productMapper.fromModel(item), aisleProductDao)
+        val removeEntity = mapExisting(item, false).copy(isRemoved = true)
+        productDao.updateProductRemovedState(removeEntity)
+    }
+
+    override suspend fun getRemoved(id: Int): Product? =
+        getProduct(id, true)
+
+    override suspend fun restore(id: Int) {
+        val removedEntity = productDao.getProduct(id, true) ?: return
+
+        val product = productMapper.toModel(removedEntity)
+        val restoreEntity = productMapper.fromModel(product, removedEntity).copy(isRemoved = false)
+        productDao.updateProductRemovedState(restoreEntity)
+    }
+
+    override suspend fun hardDelete(item: Product) {
+        productDao.delete(mapExisting(item, true), aisleProductDao)
+    }
+
+    private suspend fun getProduct(id: Int, includeDeleted: Boolean): Product? {
+        return productDao.getProduct(id, includeDeleted)?.let { productMapper.toModel(it) }
     }
 }

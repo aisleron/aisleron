@@ -24,24 +24,23 @@ import kotlinx.coroutines.flow.flowOf
 
 class NoteDaoTestImpl : NoteDao {
     private val noteList = mutableListOf<NoteEntity>()
+    private val activeItems: List<NoteEntity> get() = noteList.filter { !it.isRemoved }
 
-    override suspend fun getNote(noteId: Int): NoteEntity? {
-        return noteList.find { it.id == noteId }
+    override suspend fun getNote(noteId: Int, includeRemoved: Boolean): NoteEntity? {
+        return noteList.find { it.id == noteId && (!it.isRemoved || includeRemoved) }
     }
 
-    override suspend fun getNotes(): List<NoteEntity> {
-        return noteList
-    }
+    override suspend fun getNotes(): List<NoteEntity> = activeItems
 
     override fun getNotes(ids: List<Int>): Flow<List<NoteEntity>> {
-        val result = noteList.filter { note -> ids.contains(note.id) }
+        val result = activeItems.filter { note -> ids.contains(note.id) }
         return flowOf(result)
     }
 
     override suspend fun upsert(vararg entity: NoteEntity): List<Long> {
         val result = mutableListOf<Long>()
         entity.forEach {
-            val existingEntity = getNote(it.id)
+            val existingEntity = getNote(it.id, true)
             val id = existingEntity?.let {
                 noteList.removeAt(noteList.indexOf(existingEntity))
                 existingEntity.id
@@ -49,7 +48,11 @@ class NoteDaoTestImpl : NoteDao {
 
             val newEntity = NoteEntity(
                 id = id,
-                noteText = it.noteText
+                noteText = it.noteText,
+                syncId = it.syncId,
+                isRemoved = it.isRemoved,
+                lastModifiedAt = it.lastModifiedAt,
+                serverUpdatedAt = it.serverUpdatedAt
             )
 
             noteList.add(newEntity)
@@ -60,7 +63,7 @@ class NoteDaoTestImpl : NoteDao {
 
     override suspend fun delete(vararg entity: NoteEntity) {
         entity.forEach { e ->
-            noteList.removeIf { it.id == e.id}
+            noteList.removeIf { it.id == e.id }
         }
     }
 }

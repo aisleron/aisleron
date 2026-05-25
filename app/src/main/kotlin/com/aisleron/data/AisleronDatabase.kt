@@ -59,8 +59,8 @@ import com.aisleron.data.productvariant.ProductVariantEntity
         AutoMigration(from = 3, to = 4),
         AutoMigration(from = 4, to = 5),
         AutoMigration(from = 5, to = 6),
-        AutoMigration(from = 7, to = 8)
         /** Migration from 6 to 7 is done manually to set initial rank values [MIGRATION_6_7] */
+        AutoMigration(from = 7, to = 8)
     ]
 )
 abstract class AisleronDatabase : AisleronDb, RoomDatabase() {

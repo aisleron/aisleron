@@ -17,18 +17,20 @@
 
 package com.aisleron.testdata.data.product
 
+import com.aisleron.data.aisleproduct.AisleProductDao
 import com.aisleron.data.product.ProductDao
 import com.aisleron.data.product.ProductEntity
 
 class ProductDaoTestImpl : ProductDao {
-
+    private var _aisleProductDao: AisleProductDao? = null
     private val productList = mutableListOf<ProductEntity>()
+    private val activeItems: List<ProductEntity> get() = productList.filter { !it.isRemoved }
 
     override suspend fun upsert(vararg entity: ProductEntity): List<Long> {
         val result = mutableListOf<Long>()
         entity.forEach {
             val id: Int
-            val existingEntity = getProduct(it.id)
+            val existingEntity = getProduct(it.id, true)
             if (existingEntity == null) {
                 id = (productList.maxOfOrNull { e -> e.id } ?: 0) + 1
             } else {
@@ -44,7 +46,11 @@ class ProductDaoTestImpl : ProductDao {
                 noteId = it.noteId,
                 qtyIncrement = it.qtyIncrement,
                 trackingMode = it.trackingMode,
-                unitOfMeasure = it.unitOfMeasure
+                unitOfMeasure = it.unitOfMeasure,
+                lastModifiedAt = it.lastModifiedAt,
+                isRemoved = it.isRemoved,
+                syncId = it.syncId,
+                serverUpdatedAt = it.serverUpdatedAt
             )
 
             productList.add(newEntity)
@@ -57,15 +63,29 @@ class ProductDaoTestImpl : ProductDao {
         productList.removeIf { it in entity }
     }
 
-    override suspend fun getProduct(productId: Int): ProductEntity? {
-        return productList.find { it.id == productId }
+    override suspend fun getProduct(productId: Int, includeRemoved: Boolean): ProductEntity? {
+        return productList.find { it.id == productId && (!it.isRemoved || includeRemoved) }
     }
 
-    override suspend fun getProducts(): List<ProductEntity> {
-        return productList
-    }
+    override suspend fun getProducts(): List<ProductEntity> = activeItems
 
     override suspend fun getProductByName(name: String): ProductEntity? {
-        return productList.find { it.name.equals(name, ignoreCase = true) }
+        return activeItems.find { it.name.equals(name, ignoreCase = true) }
+    }
+
+    override suspend fun toggleAisleProductRemove(
+        productId: Int, isRemoved: Boolean, lastModifiedAt: Long
+    ) {
+        _aisleProductDao ?: return
+
+        val entities = _aisleProductDao!!.getAisleProductsByProduct(productId).map {
+            it.aisleProduct.copy(isRemoved = isRemoved, lastModifiedAt = lastModifiedAt)
+        }
+
+        _aisleProductDao?.upsert(*entities.toTypedArray())
+    }
+
+    fun setAisleProductDao(aisleProductDao: AisleProductDao) {
+        _aisleProductDao = aisleProductDao
     }
 }

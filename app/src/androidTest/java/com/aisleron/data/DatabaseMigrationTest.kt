@@ -20,11 +20,14 @@ package com.aisleron.data
 import android.content.ContentValues
 import android.database.Cursor
 import androidx.core.database.getIntOrNull
+import androidx.core.database.getLongOrNull
+import androidx.core.database.getStringOrNull
 import androidx.room.Room
 import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.db.SupportSQLiteQueryBuilder
 import androidx.test.platform.app.InstrumentationRegistry
+import com.aisleron.data.base.SyncEntity
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.LocationType
 import junit.framework.TestCase.assertNotNull
@@ -33,6 +36,8 @@ import org.junit.Rule
 import org.junit.Test
 import java.io.IOException
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotEquals
 import kotlin.test.assertNull
 
 
@@ -45,15 +50,16 @@ class DatabaseMigrationTest {
         AisleronDatabase::class.java
     )
 
-    private fun populateV1Database(db: SupportSQLiteDatabase) {
+    private fun populateDatabase(db: SupportSQLiteDatabase, version: Int) {
+        // You can't use DAO classes because they expect the latest schema.
+
         val locationValues = ContentValues()
         locationValues.put("type", LocationType.HOME.toString())
         locationValues.put("defaultFilter", FilterType.NEEDED.toString())
         locationValues.put("name", "Home")
         locationValues.put("pinned", false)
+        if (version >= 7) locationValues.put("rank", 1)
 
-        // Database has schema version 1. Insert some data using SQL queries.
-        // You can't use DAO classes because they expect the latest schema.
         val locationId = db.insert(
             "Location", android.database.sqlite.SQLiteDatabase.CONFLICT_FAIL, locationValues
         )
@@ -69,6 +75,7 @@ class DatabaseMigrationTest {
         val productValues = ContentValues()
         productValues.put("name", "Migration Test Product")
         productValues.put("inStock", true)
+        if (version >= 5) productValues.put("qtyNeeded", 10)
 
         db.insert("Product", android.database.sqlite.SQLiteDatabase.CONFLICT_FAIL, productValues)
     }
@@ -77,7 +84,7 @@ class DatabaseMigrationTest {
     @Throws(IOException::class)
     fun migrate1to2() {
         helper.createDatabase(testDb, 1).apply {
-            populateV1Database(this)
+            populateDatabase(this, 1)
             close()
         }
 
@@ -103,7 +110,7 @@ class DatabaseMigrationTest {
     @Throws(IOException::class)
     fun migrate2to3() {
         helper.createDatabase(testDb, 2).apply {
-            populateV1Database(this)
+            populateDatabase(this, 2)
             close()
         }
 
@@ -122,7 +129,7 @@ class DatabaseMigrationTest {
     @Throws(IOException::class)
     fun migrate3to4() {
         helper.createDatabase(testDb, 3).apply {
-            populateV1Database(this)
+            populateDatabase(this, 3)
             close()
         }
 
@@ -144,7 +151,7 @@ class DatabaseMigrationTest {
     @Throws(IOException::class)
     fun migrate4to5() {
         helper.createDatabase(testDb, 4).apply {
-            populateV1Database(this)
+            populateDatabase(this, 4)
             close()
         }
 
@@ -170,27 +177,11 @@ class DatabaseMigrationTest {
         }
     }
 
-    private fun populateV5Database(db: SupportSQLiteDatabase) {
-        populateV1Database(db)
-
-        val productValues = ContentValues().apply {
-            put("qtyNeeded", 10)
-        }
-
-        db.update(
-            "Product",
-            android.database.sqlite.SQLiteDatabase.CONFLICT_FAIL,
-            productValues,
-            "name = ?",
-            arrayOf("Migration Test Product")
-        )
-    }
-
     @Test
     @Throws(IOException::class)
     fun migrate5to6() {
         helper.createDatabase(testDb, 5).apply {
-            populateV5Database(this)
+            populateDatabase(this, 5)
             close()
         }
 
@@ -227,7 +218,7 @@ class DatabaseMigrationTest {
     @Throws(IOException::class)
     fun migrate6to7() {
         helper.createDatabase(testDb, 6).apply {
-            populateV5Database(this)
+            populateDatabase(this, 6)
             close()
         }
 
@@ -242,7 +233,7 @@ class DatabaseMigrationTest {
             val expanded = cursorLocation.getInt(cursorLocation.getColumnIndex("expanded"))
             assertEquals(1, expanded)
 
-            // Check migration sets initial rank equal to Id
+            // Check migration sets initial rank equal to id
             val id = cursorLocation.getInt(cursorLocation.getColumnIndex("id"))
             val rank = cursorLocation.getInt(cursorLocation.getColumnIndex("rank"))
             assertEquals(id, rank)
@@ -253,41 +244,41 @@ class DatabaseMigrationTest {
         }
     }
 
-    private fun populateV7Database(db: SupportSQLiteDatabase) {
-        // Version 7 schema has Location.rank as NOT NULL (no default)
-        // Must include rank in INSERT, unlike earlier versions
-        val locationValues = ContentValues()
-        locationValues.put("type", LocationType.HOME.toString())
-        locationValues.put("defaultFilter", FilterType.NEEDED.toString())
-        locationValues.put("name", "Home")
-        locationValues.put("pinned", false)
-        locationValues.put("rank", 1)  // Required in V7+
+    private fun validateV8SyncColumns(
+        tableName: String, db: SupportSQLiteDatabase, validateDefaults: Boolean
+    ) {
+        val querySyncEntity = SupportSQLiteQueryBuilder.builder(tableName)
+        val cursor: Cursor = db.query(querySyncEntity.create())
 
-        val locationId = db.insert(
-            "Location", android.database.sqlite.SQLiteDatabase.CONFLICT_FAIL, locationValues
-        )
+        assertNotEquals(-1, cursor.getColumnIndex("syncId"))
+        assertNotEquals(-1, cursor.getColumnIndex("isRemoved"))
+        assertNotEquals(-1, cursor.getColumnIndex("lastModifiedAt"))
+        assertNotEquals(-1, cursor.getColumnIndex("serverUpdatedAt"))
 
-        val aisleValues = ContentValues()
-        aisleValues.put("name", "No Aisle")
-        aisleValues.put("locationId", locationId)
-        aisleValues.put("rank", 1)
-        aisleValues.put("isDefault", true)
+        if (validateDefaults) {
+            cursor.moveToFirst()
 
-        db.insert("Aisle", android.database.sqlite.SQLiteDatabase.CONFLICT_FAIL, aisleValues)
+            val syncId = cursor.getStringOrNull(cursor.getColumnIndex("syncId"))
+            assertNull(syncId)
 
-        val productValues = ContentValues()
-        productValues.put("name", "Migration Test Product")
-        productValues.put("inStock", true)
-        productValues.put("qtyNeeded", 10)
+            val isRemoved = cursor.getInt(cursor.getColumnIndex("isRemoved"))
+            assertEquals(0, isRemoved)
 
-        db.insert("Product", android.database.sqlite.SQLiteDatabase.CONFLICT_FAIL, productValues)
+            val lastModifiedAt = cursor.getLong(cursor.getColumnIndex("lastModifiedAt"))
+            assertEquals(0, lastModifiedAt)
+
+            val serverUpdatedAt = cursor.getLongOrNull(cursor.getColumnIndex("syncId"))
+            assertNull(serverUpdatedAt)
+        }
+
+        cursor.close()
     }
 
     @Test
     @Throws(IOException::class)
     fun migrate7to8() {
         helper.createDatabase(testDb, 7).apply {
-            populateV7Database(this)
+            populateDatabase(this, 7)
             close()
         }
 
@@ -300,15 +291,30 @@ class DatabaseMigrationTest {
             assertEquals(0, cursorVariants.count)
             cursorVariants.close()
 
+            validateV8SyncColumns("Aisle", this, true)
+            validateV8SyncColumns("AisleProduct", this, false)
+            validateV8SyncColumns("Location", this, true)
+            validateV8SyncColumns("LoyaltyCard", this, false)
+            validateV8SyncColumns("Note", this, false)
+            validateV8SyncColumns("Product", this, true)
+            validateV8SyncColumns("ProductVariant", this, false)
+
             close()
         }
+    }
+
+    private fun validateV8SyncEntity(entity: SyncEntity) {
+        assertNull(entity.syncId)
+        assertFalse(entity.isRemoved)
+        assertEquals(0, entity.lastModifiedAt)
+        assertNull(entity.serverUpdatedAt)
     }
 
     @Test
     @Throws(IOException::class)
     fun migrateAll() = runTest {
         helper.createDatabase(testDb, 1).apply {
-            populateV1Database(this)
+            populateDatabase(this, 1)
             close()
         }
 
@@ -347,6 +353,11 @@ class DatabaseMigrationTest {
         // ProductVariant introduced in V8
         val variants = db.productVariantDao().getByProductId(product.id)
         assertNotNull(variants)
+
+        // Sync Entity fields introduced in V8
+        validateV8SyncEntity(db.aisleDao().getAisles().first())
+        validateV8SyncEntity(db.locationDao().getLocations().first())
+        validateV8SyncEntity(db.productDao().getProducts().first())
 
         db.close()
     }

@@ -58,7 +58,7 @@ class GetAisleMaxRankUseCaseImplTest {
         return dm.getRepository<LocationRepository>().get(locationId)!!
     }
 
-    private fun getAisle(name: String, locationId: Int, rank: Int) : Aisle = Aisle (
+    private fun getAisle(name: String, locationId: Int, rank: Int): Aisle = Aisle(
         name = name,
         products = emptyList(),
         locationId = locationId,

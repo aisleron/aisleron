@@ -22,7 +22,6 @@ import android.app.Dialog
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
-import androidx.core.os.bundleOf
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.setFragmentResult
@@ -129,7 +128,11 @@ class AisleDialogFragment : DialogFragment() {
 
     private fun closeDialog(aisleId: Int, requestKey: String) {
         if (!addMoreAisles) {
-            setFragmentResult(requestKey, bundleOf(KEY_AISLE_ID to aisleId))
+            setFragmentResult(
+                requestKey,
+                Bundle().apply { putInt(KEY_AISLE_ID, aisleId) }
+            )
+
             dismiss()
         } else {
             binding.edtAisleName.setText("")

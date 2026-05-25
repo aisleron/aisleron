@@ -17,11 +17,12 @@
 
 package com.aisleron.data.aisleproduct
 
-import com.aisleron.data.base.MapperBaseImpl
+import com.aisleron.data.base.Mapper
+import com.aisleron.data.base.SyncEntity
 import com.aisleron.data.product.ProductMapper
 import com.aisleron.domain.aisleproduct.AisleProduct
 
-class AisleProductRankMapper : MapperBaseImpl<AisleProductRank, AisleProduct>() {
+class AisleProductRankMapper : Mapper<AisleProductRank, AisleProduct> {
     override fun toModel(value: AisleProductRank) = AisleProduct(
         rank = value.aisleProduct.rank,
         aisleId = value.aisleProduct.aisleId,
@@ -29,13 +30,17 @@ class AisleProductRankMapper : MapperBaseImpl<AisleProductRank, AisleProduct>() 
         product = ProductMapper().toModel(value.product)
     )
 
-    override fun fromModel(value: AisleProduct) = AisleProductRank(
+    override fun fromModel(value: AisleProduct, syncMetadata: SyncEntity?) = AisleProductRank(
         aisleProduct = AisleProductEntity(
             aisleId = value.aisleId,
             rank = value.rank,
             productId = value.product.id,
-            id = value.id
+            id = value.id,
+            syncId = syncMetadata?.syncId,
+            isRemoved = syncMetadata?.isRemoved ?: false,
+            lastModifiedAt = System.currentTimeMillis(),
+            serverUpdatedAt = syncMetadata?.serverUpdatedAt
         ),
-        product = ProductMapper().fromModel(value.product)
+        product = ProductMapper().fromModel(value.product, null)
     )
 }

@@ -18,9 +18,16 @@
 package com.aisleron.data.loyaltycard
 
 import androidx.room.Dao
+import androidx.room.Query
 import com.aisleron.data.base.BaseDao
 
 @Dao
 interface LocationLoyaltyCardDao : BaseDao<LocationLoyaltyCardEntity> {
-
+    @Query(
+        "SELECT * FROM LocationLoyaltyCard " +
+                "WHERE locationId = :locationId AND (isRemoved = 0 OR :includeRemoved = 1)"
+    )
+    suspend fun getLocationLoyaltyCard(
+        locationId: Int, includeRemoved: Boolean
+    ): LocationLoyaltyCardEntity?
 }

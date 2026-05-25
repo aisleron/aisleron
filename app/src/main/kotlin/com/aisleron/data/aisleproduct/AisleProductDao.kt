@@ -24,17 +24,16 @@ import com.aisleron.data.base.BaseDao
 
 @Dao
 interface AisleProductDao : BaseDao<AisleProductEntity> {
+    @Transaction
+    @Query("SELECT * FROM AisleProduct WHERE id = :aisleProductId AND (isRemoved = 0 OR :includeRemoved = 1)")
+    suspend fun getAisleProduct(aisleProductId: Int, includeRemoved: Boolean): AisleProductRank?
 
     @Transaction
-    @Query("SELECT * FROM AisleProduct WHERE id = :aisleProductId")
-    suspend fun getAisleProduct(aisleProductId: Int): AisleProductRank?
-
-    @Transaction
-    @Query("SELECT * FROM AisleProduct WHERE productId = :productId")
+    @Query("SELECT * FROM AisleProduct WHERE productId = :productId AND isRemoved = 0")
     suspend fun getAisleProductsByProduct(productId: Int): List<AisleProductRank>
 
     @Transaction
-    @Query("SELECT * FROM AisleProduct")
+    @Query("SELECT * FROM AisleProduct WHERE isRemoved = 0")
     suspend fun getAisleProducts(): List<AisleProductRank>
 
     @Transaction
@@ -46,8 +45,13 @@ interface AisleProductDao : BaseDao<AisleProductEntity> {
     @Query("UPDATE AisleProduct SET rank = rank + 1 WHERE aisleId = :aisleId and rank >= :fromRank")
     suspend fun moveRanks(aisleId: Int, fromRank: Int)
 
-    @Query("DELETE FROM AisleProduct WHERE aisleId = :aisleId")
-    suspend fun removeProductsFromAisle(aisleId: Int)
+    @Query(
+        "UPDATE AisleProduct SET isRemoved = :isRemoved, lastModifiedAt = :lastModifiedAt " +
+                "WHERE aisleId = :aisleId"
+    )
+    suspend fun toggleProductsOnAisleRemove(
+        aisleId: Int, isRemoved: Boolean, lastModifiedAt: Long
+    )
 
     @Query("SELECT COALESCE(MAX(rank), 0) FROM AisleProduct WHERE aisleId = :aisleId")
     suspend fun getMaxRank(aisleId: Int): Int

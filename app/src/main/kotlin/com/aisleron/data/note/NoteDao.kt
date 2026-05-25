@@ -24,12 +24,12 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface NoteDao : BaseDao<NoteEntity> {
-    @Query("SELECT * FROM Note WHERE id = :noteId")
-    suspend fun getNote(noteId: Int): NoteEntity?
+    @Query("SELECT * FROM Note WHERE id = :noteId AND (isRemoved = 0 OR :includeRemoved = 1)")
+    suspend fun getNote(noteId: Int, includeRemoved: Boolean): NoteEntity?
 
-    @Query("SELECT * FROM Note")
+    @Query("SELECT * FROM Note WHERE isRemoved = 0")
     suspend fun getNotes(): List<NoteEntity>
 
-    @Query("SELECT * FROM Note WHERE id IN (:ids)")
+    @Query("SELECT * FROM Note WHERE id IN (:ids) AND isRemoved = 0")
     fun getNotes(ids: List<Int>): Flow<List<NoteEntity>>
 }
