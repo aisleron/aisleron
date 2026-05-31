@@ -1,5 +1,5 @@
 Améliorations :
-* Préparer le modèle de données pour la fonction sync
+* Préparer le modèle de données pour la fonction de synchronisation.
 
 Corrections de bug :
 * Fix Product Qty étant coupé en haut en utilisant de grandes tailles de police.
