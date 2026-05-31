@@ -31,14 +31,14 @@ plugins {
 apply(file("../gradle/jacoco.gradle.kts"))
 
 object Versions {
-    const val COROUTINES = "1.10.2"
-    const val JUNIT = "6.0.3"
+    const val COROUTINES = "1.11.0"
+    const val JUNIT = "6.1.0"
     const val ESPRESSO = "3.7.0"
     const val FRAGMENT = "1.8.9"
     const val LIFECYCLE = "2.10.0"
     const val ROOM = "2.8.4"
     const val KOIN = "4.2.1"
-    const val NAVIGATION = "2.9.7"
+    const val NAVIGATION = "2.9.8"
 }
 
 // Keep this list aligned with the values in the language_codes array in arrays.xml and with locale_config.xml
@@ -188,7 +188,7 @@ dependencies {
     implementation("androidx.core:core-ktx:1.18.0")
     implementation("androidx.activity:activity-ktx:1.13.0")
     implementation("androidx.appcompat:appcompat:1.7.1")
-    implementation("com.google.android.material:material:1.13.0")
+    implementation("com.google.android.material:material:1.14.0")
     implementation("androidx.recyclerview:recyclerview:1.4.0")
     implementation("androidx.collection:collection-ktx:1.6.0")
     implementation("androidx.cardview:cardview:1.0.0")
@@ -200,7 +200,7 @@ dependencies {
     implementation("androidx.documentfile:documentfile:1.1.0")
     implementation("androidx.preference:preference-ktx:1.2.1")
     implementation("androidx.viewpager2:viewpager2:1.1.0")
-    implementation("org.jetbrains.kotlin:kotlin-parcelize-runtime:2.3.20")
+    implementation("org.jetbrains.kotlin:kotlin-parcelize-runtime:2.3.21")
     implementation("androidx.fragment:fragment-ktx:${Versions.FRAGMENT}")
 
     // Lifecycle
