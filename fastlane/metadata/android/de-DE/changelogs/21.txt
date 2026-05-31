@@ -1,5 +1,5 @@
-Verbesserungen:
-* Datenmodell für Sync-Funktion vorbereiten.
+Ausdehnungen:
+* Bereite vor #Daten Model für synchronisieren Charakterzug.
 
-Fehler behoben:
-* Produkt reparieren Beim Einsatz großer Schriftgrößen wird die Menge an oben abgeschnitten.
+Käfer Klemmen:
+* Klemme Produkt Qty Wesen abgehackt ab #obenab #wann benutzend große Schrift Größen.
