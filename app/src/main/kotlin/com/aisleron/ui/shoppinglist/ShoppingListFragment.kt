@@ -41,6 +41,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.aisleron.R
+import com.aisleron.domain.FilterType
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.loyaltycard.LoyaltyCard
 import com.aisleron.ui.AisleronExceptionMap
@@ -88,6 +89,7 @@ class ShoppingListFragment(
     private var actionMode: ActionMode? = null
     private var loyaltyCardMenuItem: MenuItem? = null
     private var editShopMenuItem: MenuItem? = null
+    private var showAllItemsMenuItem: MenuItem? = null
 
     private val showEmptyAisles: Boolean
         get() = shoppingListPreferences.showEmptyAisles()
@@ -164,9 +166,10 @@ class ShoppingListFragment(
                                     updateTitle(it.title)
                                     setMenuItemVisibility()
 
-                                    (view.adapter as ShoppingListItemRecyclerViewAdapter).submitList(
-                                        it.shoppingList
-                                    )
+                                    (view.adapter as ShoppingListItemRecyclerViewAdapter).apply {
+                                        updateListFilter(shoppingListViewModel.productFilter)
+                                        submitList(it.shoppingList)
+                                    }
 
                                     initializeFab(it.manageAisles)
                                     initializeActionMode(
@@ -333,6 +336,7 @@ class ShoppingListFragment(
     override fun onDestroyView() {
         searchView?.removeOnAttachStateChangeListener(searchViewListener)
         searchView = null
+        showAllItemsMenuItem = null
         fabHandler.reset()
         super.onDestroyView()
     }
@@ -370,6 +374,11 @@ class ShoppingListFragment(
 
         editShopMenuItem?.isVisible = currentState?.showEditShop ?: false
         loyaltyCardMenuItem?.isVisible = currentState?.showLoyaltyCard ?: false
+        showAllItemsMenuItem?.apply {
+            isVisible =
+                (currentState?.showEditShop ?: false) && shoppingListViewModel.canShowAllItemsToggle
+            isChecked = shoppingListViewModel.productFilter == FilterType.ALL
+        }
     }
 
     private fun displayStatusChangeSnackBar(item: ProductShoppingListItem, inStock: Boolean) {
@@ -626,6 +635,9 @@ class ShoppingListFragment(
         searchView?.addOnAttachStateChangeListener(searchViewListener)
 
         menu.findItem(R.id.mnu_show_empty_aisles).apply { isChecked = showEmptyAisles }
+        showAllItemsMenuItem = menu.findItem(R.id.mnu_show_all_items).apply {
+            isChecked = shoppingListViewModel.productFilter == FilterType.ALL
+        }
 
         editShopMenuItem = menu.findItem(R.id.mnu_edit_shop)
         loyaltyCardMenuItem = menu.findItem(R.id.mnu_show_loyalty_card)
@@ -655,6 +667,13 @@ class ShoppingListFragment(
                 shoppingListPreferences.setShowEmptyAisles(newValue)
                 menuItem.isChecked = newValue
                 shoppingListViewModel.setShowEmptyAisles(newValue)
+                true
+            }
+
+            R.id.mnu_show_all_items -> {
+                val newValue = shoppingListViewModel.productFilter != FilterType.ALL
+                menuItem.isChecked = newValue
+                shoppingListViewModel.setShowAllItems(newValue)
                 true
             }
 

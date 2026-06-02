@@ -59,7 +59,7 @@ class ShoppingListItemRecyclerViewAdapter(
     private val listener: ShoppingListItemListener,
     private val defaultTrackingMode: TrackingMode,
     private val defaultUnitOfMeasure: String,
-    private val listFilter: FilterType,
+    private var listFilter: FilterType,
     private val noteHint: NoteHint
 ) : ListAdapter<ShoppingListItem, ViewHolder>(ShoppingListItemDiffCallback()),
     ShoppingListItemMoveCallbackListener.Listener {
@@ -68,6 +68,13 @@ class ShoppingListItemRecyclerViewAdapter(
     private var longClicked = false
     private var dragStarted = false
     private var itemMoved: Boolean = false
+
+    fun updateListFilter(listFilter: FilterType) {
+        if (this.listFilter == listFilter) return
+
+        this.listFilter = listFilter
+        notifyItemRangeChanged(0, itemCount)
+    }
 
     class ShoppingListItemDiffCallback : DiffUtil.ItemCallback<ShoppingListItem>() {
         override fun areItemsTheSame(

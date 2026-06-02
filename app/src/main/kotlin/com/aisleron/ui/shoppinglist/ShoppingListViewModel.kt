@@ -61,8 +61,11 @@ class ShoppingListViewModel(
     private val coroutineScope = coroutineScopeProvider ?: this.viewModelScope
     private var hydrated = false
     private var _showEmptyAisles: Boolean = true
+    private var baseProductFilter: FilterType = FilterType.NEEDED
     val productFilter: FilterType
         get() = _shoppingListFilters.value?.productFilter ?: FilterType.NEEDED
+    val canShowAllItemsToggle: Boolean
+        get() = baseProductFilter != FilterType.ALL
 
     private val _aislesForLocation = MutableStateFlow<List<AisleListEntry>>(emptyList())
     val aislesForLocation: StateFlow<List<AisleListEntry>> = _aislesForLocation
@@ -157,6 +160,7 @@ class ShoppingListViewModel(
 
         shoppingListCoordinator = shoppingListStreamProviderFactory.create(listGrouping)
         _showEmptyAisles = showEmptyAisles
+        baseProductFilter = productFilter
 
         _shoppingListFilters.value = ShoppingListFilter(
             productFilter = productFilter,
@@ -222,6 +226,14 @@ class ShoppingListViewModel(
 
         _showEmptyAisles = showEmptyAisles
         _shoppingListFilters.update { it?.copy(showEmptyAisles = _showEmptyAisles) }
+    }
+
+    fun setShowAllItems(showAllItems: Boolean) {
+        if (!canShowAllItemsToggle) return
+        val newFilter = if (showAllItems) FilterType.ALL else baseProductFilter
+        if (productFilter == newFilter) return
+
+        _shoppingListFilters.update { it?.copy(productFilter = newFilter) }
     }
 
     fun requestListRefresh(returnDefaultList: Boolean) {
