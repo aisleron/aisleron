@@ -379,6 +379,36 @@ class ShoppingListViewModelTest : KoinTest {
     }
 
     @Test
+    fun setShowAllItems_BaseFilterIsNeeded_TogglesFilterWithoutResetOnRefresh() = runTest {
+        val locationId = get<LocationRepository>().getAll().first { it.type == LocationType.SHOP }.id
+
+        shoppingListViewModel.hydrate(getAisleGrouping(locationId), FilterType.NEEDED, false)
+
+        shoppingListViewModel.setShowAllItems(true)
+        assertEquals(FilterType.ALL, shoppingListViewModel.productFilter)
+
+        shoppingListViewModel.submitProductSearch("Ap")
+        shoppingListViewModel.requestListRefresh(true)
+
+        assertEquals(FilterType.ALL, shoppingListViewModel.productFilter)
+    }
+
+    @Test
+    fun setShowAllItems_BaseFilterIsAll_FilterDoesNotChange() = runTest {
+        val locationId = get<LocationRepository>().getAll().first { it.type == LocationType.SHOP }.id
+
+        shoppingListViewModel.hydrate(getAisleGrouping(locationId), FilterType.ALL, false)
+
+        assertFalse(shoppingListViewModel.canShowAllItemsToggle)
+
+        shoppingListViewModel.setShowAllItems(false)
+        assertEquals(FilterType.ALL, shoppingListViewModel.productFilter)
+
+        shoppingListViewModel.setShowAllItems(true)
+        assertEquals(FilterType.ALL, shoppingListViewModel.productFilter)
+    }
+
+    @Test
     fun constructor_NoCoroutineScopeProvided_ShoppingListViewModelReturned() {
         val vm = ShoppingListViewModel(
             shoppingListStreamProviderFactory = get<ShoppingListCoordinatorFactory>()
