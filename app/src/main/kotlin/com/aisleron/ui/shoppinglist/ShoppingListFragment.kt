@@ -41,7 +41,6 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.aisleron.R
-import com.aisleron.domain.FilterType
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.loyaltycard.LoyaltyCard
 import com.aisleron.ui.AisleronExceptionMap
@@ -166,10 +165,9 @@ class ShoppingListFragment(
                                     updateTitle(it.title)
                                     setMenuItemVisibility()
 
-                                    (view.adapter as ShoppingListItemRecyclerViewAdapter).apply {
-                                        updateListFilter(shoppingListViewModel.productFilter)
-                                        submitList(it.shoppingList)
-                                    }
+                                    (view.adapter as ShoppingListItemRecyclerViewAdapter).submitList(
+                                        it.shoppingList
+                                    )
 
                                     initializeFab(it.manageAisles)
                                     initializeActionMode(
@@ -375,9 +373,8 @@ class ShoppingListFragment(
         editShopMenuItem?.isVisible = currentState?.showEditShop ?: false
         loyaltyCardMenuItem?.isVisible = currentState?.showLoyaltyCard ?: false
         showAllItemsMenuItem?.apply {
-            isVisible =
-                (currentState?.showEditShop ?: false) && shoppingListViewModel.canShowAllItemsToggle
-            isChecked = shoppingListViewModel.productFilter == FilterType.ALL
+            isVisible = currentState?.showAllItemsToggle ?: false
+            isChecked = currentState?.showAllItemsChecked ?: false
         }
     }
 
@@ -635,9 +632,7 @@ class ShoppingListFragment(
         searchView?.addOnAttachStateChangeListener(searchViewListener)
 
         menu.findItem(R.id.mnu_show_empty_aisles).apply { isChecked = showEmptyAisles }
-        showAllItemsMenuItem = menu.findItem(R.id.mnu_show_all_items).apply {
-            isChecked = shoppingListViewModel.productFilter == FilterType.ALL
-        }
+        showAllItemsMenuItem = menu.findItem(R.id.mnu_show_all_items)
 
         editShopMenuItem = menu.findItem(R.id.mnu_edit_shop)
         loyaltyCardMenuItem = menu.findItem(R.id.mnu_show_loyalty_card)
@@ -671,7 +666,7 @@ class ShoppingListFragment(
             }
 
             R.id.mnu_show_all_items -> {
-                val newValue = shoppingListViewModel.productFilter != FilterType.ALL
+                val newValue = !menuItem.isChecked
                 menuItem.isChecked = newValue
                 shoppingListViewModel.setShowAllItems(newValue)
                 true

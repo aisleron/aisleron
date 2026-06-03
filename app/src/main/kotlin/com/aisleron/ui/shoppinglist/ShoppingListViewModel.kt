@@ -45,6 +45,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
@@ -108,6 +109,17 @@ class ShoppingListViewModel(
 
             shoppingListCoordinator?.let {
                 it.getShoppingListState(combinedFilter, selections)
+                    .map { state ->
+                        when (state) {
+                            is ShoppingListUiState.Updated -> state.copy(
+                                showAllItemsToggle =
+                                    state.showEditShop && baseProductFilter != FilterType.ALL,
+                                showAllItemsChecked = filters.productFilter == FilterType.ALL
+                            )
+
+                            else -> state
+                        }
+                    }
                     .onStart { emit(ShoppingListUiState.Loading) }
                     .catch { e ->
                         emit(mapToErrorState(e))
@@ -412,7 +424,9 @@ class ShoppingListViewModel(
             val title: ListTitle,
             val showEditShop: Boolean,
             val manageAisles: Boolean,
-            val showLoyaltyCard: Boolean
+            val showLoyaltyCard: Boolean,
+            val showAllItemsToggle: Boolean = false,
+            val showAllItemsChecked: Boolean = false
         ) : ShoppingListUiState()
     }
 
