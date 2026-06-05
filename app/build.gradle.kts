@@ -68,6 +68,7 @@ android {
             }
         }
     }
+
     namespace = "com.aisleron"
     compileSdk = 36
 
@@ -84,6 +85,19 @@ android {
         testInstrumentationRunnerArguments["notPackage"] = "com.aisleron.screenshots"
     }
 
+    val backendProperties = Properties()
+    val backendPropertiesFile = rootProject.file("backend.properties")
+
+    if (backendPropertiesFile.exists()) {
+        FileInputStream(backendPropertiesFile).use { stream ->
+            backendProperties.load(stream)
+        }
+    }
+
+    fun getBackendProperty(key: String, defaultValue: String = ""): String {
+        return backendProperties.getProperty(key) ?: defaultValue
+    }
+
     buildTypes {
         release {
             isDebuggable = false
@@ -94,6 +108,18 @@ android {
                 "proguard-rules.pro"
             )
             signingConfig = signingConfigs.findByName("release")
+
+            buildConfigField(
+                "String",
+                "SUPABASE_URL",
+                getBackendProperty("RELEASE_SUPABASE_URL")
+            )
+
+            buildConfigField(
+                "String",
+                "SUPABASE_ANON_KEY",
+                getBackendProperty("RELEASE_SUPABASE_ANON_KEY")
+            )
         }
 
         debug {
@@ -102,6 +128,18 @@ android {
             enableUnitTestCoverage = true
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-DEBUG"
+
+            buildConfigField(
+                "String",
+                "SUPABASE_URL",
+                getBackendProperty("DEBUG_SUPABASE_URL", "http://10.0.2.2:54321")
+            )
+
+            buildConfigField(
+                "String",
+                "SUPABASE_ANON_KEY",
+                getBackendProperty("DEBUG_SUPABASE_ANON_KEY", "missing_debug_key")
+            )
         }
     }
 

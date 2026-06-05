@@ -17,6 +17,8 @@
 
 package com.aisleron.di
 
+import com.aisleron.data.preferences.SyncPreferencesImpl
+import com.aisleron.domain.preferences.SyncPreferences
 import com.aisleron.ui.settings.DisplayPreferences
 import com.aisleron.ui.settings.DisplayPreferencesImpl
 import com.aisleron.ui.settings.ProductPreferences
@@ -35,4 +37,5 @@ val preferenceModule = module {
     factory<DisplayPreferences> { DisplayPreferencesImpl(get()) }
     factory<ProductPreferences> { ProductPreferencesImpl(get()) }
     factory<ShopPreferences> { ShopPreferencesImpl(get()) }
+    factory<SyncPreferences> { SyncPreferencesImpl(get()) }
 }

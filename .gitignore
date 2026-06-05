@@ -27,6 +27,7 @@ replay_pid*
 # Specific Files #
 keystore.properties
 local.properties
+backend.properties
 
 # fastlane files
 /fastlane/README.md
@@ -37,6 +38,7 @@ local.properties
 # Android Studio IDE files
 .idea/
 .gradle/
+/gradle/gradle-daemon-jvm.properties
 
 # Build outputs
 /build
