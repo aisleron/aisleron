@@ -82,6 +82,7 @@ import org.junit.Test
 import org.koin.test.KoinTest
 import org.koin.test.get
 import org.koin.test.mock.declare
+import java.lang.Thread.sleep
 import java.util.Calendar
 import java.util.Locale
 import kotlin.test.assertEquals
@@ -158,6 +159,9 @@ class SettingsFragmentTest : KoinTest {
                 Matchers.allOf(withContentDescription("Navigate up"), isDisplayed())
             )
             backAction.perform(click())
+
+            // Add sleep to try and prevent test failure when running multiple tests
+            sleep(100)
 
             assertEquals(startDestination, navController?.currentDestination)
         }

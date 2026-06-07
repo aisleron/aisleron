@@ -59,6 +59,7 @@ import org.junit.Test
 import org.koin.test.KoinTest
 import org.koin.test.get
 import org.koin.test.mock.declare
+import java.lang.Thread.sleep
 
 class SearchBoxTest : KoinTest {
 
@@ -171,7 +172,7 @@ class SearchBoxTest : KoinTest {
             Matchers.allOf(withContentDescription("Collapse"), isDisplayed())
         )
         backAction.perform(click())
-        Thread.sleep(500)
+        sleep(500)
 
         getSearchTextBox().check(doesNotExist())
     }
@@ -188,7 +189,12 @@ class SearchBoxTest : KoinTest {
         onView(withId(R.id.fab)).perform(click())
         onView(withId(R.id.fab_add_product)).perform(click())
         Espresso.closeSoftKeyboard()
-        Espresso.pressBack()
+
+        val backAction = onView(
+            Matchers.allOf(withContentDescription("Collapse"), isDisplayed())
+        )
+        backAction.perform(click())
+        sleep(100)
 
         getSearchTextBox().check(doesNotExist())
 

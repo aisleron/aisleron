@@ -1,5 +1,5 @@
 Enhancements:
-* Register and login to the Aisleron cloud backend.
+* Added Portuguese translations.
 
 Bug Fixes:
-*
+* Fix crash on app resume in Android 13.

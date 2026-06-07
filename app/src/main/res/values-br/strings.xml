@@ -175,4 +175,27 @@
     <string name="save_changes_message">Bez ho peus cheñchamantoù ha n\'int ket enrollet. Ha c\'hoant ho pefe da enrollañ anezho a-raok mont kuit?</string>
     <string name="about_contribute_financial_title">Road Lakaet gant an Arc’hant</string>
     <string name="about_contribute_financial_summary">Harpait Aisleron gant ur road lakaet gant an arc’hant</string>
+    <string name="sort_confirm_message">Renkañ dre anv a cheñcho urzh al listenn hervez an urzh alfabek hag a gemero lec\'h hoc\'h urzh renkañ a-vremañ. Ha fellout a ra deoc\'h kenderc\'hel?</string>
+    <string name="decrement">Digreskiñ</string>
+    <string name="increment">Kreskiñ</string>
+    <string name="qty_increments">Kreskoù ar c\'hementadoù</string>
+    <string name="loyalty_card_provider_missing_message">Rekis eo &lt;b&gt;&lt;i&gt;%1$s&lt;/i&gt;&lt;/b&gt; evit diskouez ar c\'hartennoù fealded. Ha fellout a ra deoc\'h digeriñ o lec\'hienn evit gouzout muioc\'h?</string>
+
+    <string name="empty_list_reasons">
+        - N\'eus ezhomm eus tra ebet evit poent
+        \n- N\'eus bet ouzhpennet produst pe trepas ebet c\'hoazh
+        \n- Traoù a zo met n\'int ket bet lakaet en un trepas hewel
+    </string>
+
+    <string name="empty_list_instructions">
+        Gallout a rit ouzhpennañ produioù ha trepasoù gant ar bouton Ouzhpennañ en traoñ a-zehou,
+        pe implijout ar barrenn glask e krec\'h ar skramm evit kavout produioù ha hizivaat
+        o statud pe o zrepas.
+    </string>
+
+    <string name="welcome_message">Laouen omp d\'ho skoazellañ da aesaat ha da urzhiañ ho pourchasadennoù. Evit kregiñ ganti, dibabit unan eus an dibarzhioù-mañ :</string>
+    <string name="welcome_add_own_product">&lt;h3&gt;Ouzhpennañ ho produioù deoc\'h-c\'hwi&lt;/h3&gt; Krogit da sevel ul listenn bersonelaet adalek netra en ur ouzhpennañ Stalioù, Trepasoù ha Produioù</string>
+    <string name="welcome_load_sample_items">&lt;h3&gt;Kargañ skouerioù traoù&lt;/h3&gt; Klaskit un listenn rak-leuniet evit gwelet penaos ez a an arload en-dro</string>
+    <string name="welcome_import_db">&lt;h3&gt;Enporzhiañ ur stravandead roadennoù a-vremañ&lt;/h3&gt; Degasit ul listenn burchasadennoù eus ur restr-gwareziñ goshoc\'h en ur enporzhiañ anezhi adalek pajenn ar Reizhadurioù</string>
+    <string name="welcome_documentation">&lt;h3&gt;Gwelet an teuliadur&lt;/h3&gt; Sellit ouzh teuliadur Aisleron enlinenn evit gouzout muioc\'h diwar-benn perzhioù an arload</string>
 </resources>
