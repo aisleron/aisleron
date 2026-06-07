@@ -1,0 +1,5 @@
+Enhancements:
+* Added Portuguese translations.
+
+Bug Fixes:
+* Fix crash on app resume in Android 13.

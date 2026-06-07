@@ -30,7 +30,7 @@ import com.aisleron.ui.shoppinglist.ShoppingListGrouping
 class Bundler {
 
     private fun <T> getParcelableBundle(bundle: Bundle?, key: String, clazz: Class<T>): T? {
-        val result = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        val result = if (Build.VERSION.SDK_INT > Build.VERSION_CODES.TIRAMISU) {
             bundle?.getParcelable(key, clazz)
         } else {
             @Suppress("DEPRECATION")
@@ -123,7 +123,7 @@ class Bundler {
         if (result == null) {
             val locationId = bundle?.getInt(ARG_LOCATION_ID, 1)
             val filterType =
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.TIRAMISU) {
                     bundle?.getSerializable(ARG_FILTER_TYPE, FilterType::class.java)
                 } else {
                     @Suppress("DEPRECATION")
