@@ -45,7 +45,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
@@ -62,11 +61,11 @@ class ShoppingListViewModel(
     private val coroutineScope = coroutineScopeProvider ?: this.viewModelScope
     private var hydrated = false
     private var _showEmptyAisles: Boolean = true
-    private var baseProductFilter: FilterType = FilterType.NEEDED
+    private var initialProductFilter: FilterType = FilterType.NEEDED
     val productFilter: FilterType
         get() = _shoppingListFilters.value?.productFilter ?: FilterType.NEEDED
     val canShowAllItemsToggle: Boolean
-        get() = baseProductFilter != FilterType.ALL
+        get() = _shoppingListFilters.value?.allowAllItemsToggle ?: true
 
     private val _aislesForLocation = MutableStateFlow<List<AisleListEntry>>(emptyList())
     val aislesForLocation: StateFlow<List<AisleListEntry>> = _aislesForLocation
@@ -109,17 +108,6 @@ class ShoppingListViewModel(
 
             shoppingListCoordinator?.let {
                 it.getShoppingListState(combinedFilter, selections)
-                    .map { state ->
-                        when (state) {
-                            is ShoppingListUiState.Updated -> state.copy(
-                                allowAllItemsToggle =
-                                    state.showEditShop && baseProductFilter != FilterType.ALL,
-                                showAllItemsChecked = filters.productFilter == FilterType.ALL
-                            )
-
-                            else -> state
-                        }
-                    }
                     .onStart { emit(ShoppingListUiState.Loading) }
                     .catch { e ->
                         emit(mapToErrorState(e))
@@ -172,11 +160,12 @@ class ShoppingListViewModel(
 
         shoppingListCoordinator = shoppingListStreamProviderFactory.create(listGrouping)
         _showEmptyAisles = showEmptyAisles
-        baseProductFilter = productFilter
+        initialProductFilter = productFilter
 
         _shoppingListFilters.value = ShoppingListFilter(
             productFilter = productFilter,
-            showEmptyAisles = _showEmptyAisles
+            showEmptyAisles = _showEmptyAisles,
+            allowAllItemsToggle = productFilter != FilterType.ALL
         )
 
         hydrated = true
@@ -242,7 +231,7 @@ class ShoppingListViewModel(
 
     fun setShowAllItems(showAllItems: Boolean) {
         if (!canShowAllItemsToggle) return
-        val newFilter = if (showAllItems) FilterType.ALL else baseProductFilter
+        val newFilter = if (showAllItems) FilterType.ALL else initialProductFilter
         if (productFilter == newFilter) return
 
         _shoppingListFilters.update { it?.copy(productFilter = newFilter) }

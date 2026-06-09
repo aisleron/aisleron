@@ -22,5 +22,6 @@ import com.aisleron.domain.FilterType
 data class ShoppingListFilter(
     val productFilter: FilterType,
     val productNameQuery: String = "",
-    val showEmptyAisles: Boolean = false
+    val showEmptyAisles: Boolean = false,
+    val allowAllItemsToggle: Boolean = false
 )
