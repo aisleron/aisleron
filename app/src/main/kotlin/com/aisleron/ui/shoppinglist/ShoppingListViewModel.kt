@@ -112,7 +112,7 @@ class ShoppingListViewModel(
                     .map { state ->
                         when (state) {
                             is ShoppingListUiState.Updated -> state.copy(
-                                showAllItemsToggle =
+                                allowAllItemsToggle =
                                     state.showEditShop && baseProductFilter != FilterType.ALL,
                                 showAllItemsChecked = filters.productFilter == FilterType.ALL
                             )
@@ -425,7 +425,7 @@ class ShoppingListViewModel(
             val showEditShop: Boolean,
             val manageAisles: Boolean,
             val showLoyaltyCard: Boolean,
-            val showAllItemsToggle: Boolean = false,
+            val allowAllItemsToggle: Boolean = false,
             val showAllItemsChecked: Boolean = false
         ) : ShoppingListUiState()
     }

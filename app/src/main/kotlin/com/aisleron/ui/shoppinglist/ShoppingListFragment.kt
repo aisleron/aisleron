@@ -373,7 +373,7 @@ class ShoppingListFragment(
         editShopMenuItem?.isVisible = currentState?.showEditShop ?: false
         loyaltyCardMenuItem?.isVisible = currentState?.showLoyaltyCard ?: false
         showAllItemsMenuItem?.apply {
-            isVisible = currentState?.showAllItemsToggle ?: false
+            isVisible = currentState?.allowAllItemsToggle ?: false
             isChecked = currentState?.showAllItemsChecked ?: false
         }
     }
