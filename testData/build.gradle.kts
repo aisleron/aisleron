@@ -18,9 +18,8 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    id("com.android.library")
-
-    id("com.autonomousapps.dependency-analysis")
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.dependency.analysis)
 }
 android {
     namespace = "com.aisleron.testdata"
@@ -44,5 +43,5 @@ android {
 
 dependencies {
     compileOnly(project(":app"))
-    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+    api(libs.kotlinx.coroutines.core)
 }

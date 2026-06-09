@@ -1,0 +1,108 @@
+# Copyright (C) 2026 aisleron.com
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+[versions]
+activityKtx = "1.13.0"
+annotation = "1.10.0"
+appcompat = "1.7.1"
+supabase = "3.6.0"
+cardview = "1.0.0"
+collectionKtx = "1.6.0"
+constraintlayout = "2.2.1"
+coordinatorlayout = "1.3.0"
+coreKtx = "1.18.0" # 1.19.0 requires Android 37
+sqliteKtx = "2.6.2"
+testCoreKtx = "1.7.0"
+customview = "1.2.0"
+documentfile = "1.1.0"
+drawerlayout = "1.2.0"
+espresso = "3.7.0"
+fragmentKtx = "1.8.9"
+hamcrest = "3.0"
+junit = "1.3.0"
+junit5 = "6.1.0"
+koin = "4.2.1"
+coroutines = "1.11.0"
+lifecycleKtx = "2.10.0"
+material = "1.14.0"
+navigationKtx = "2.9.8"
+preferenceKtx = "1.2.1"
+recyclerview = "1.4.0"
+room = "2.8.4"
+screengrab = "2.1.1"
+uiautomator = "2.3.0"
+viewpager2 = "1.1.0"
+androidGradlePlugin = "9.2.1"
+ksp = "2.3.6"
+kotlin = "2.3.21" # 2.4.0 breaks dependency analysis 3.14.1
+dependencyAnalysis = "3.14.1"
+
+[libraries]
+activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activityKtx" }
+annotation = { module = "androidx.annotation:annotation", version.ref = "annotation" }
+appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
+supabase-auth-kt = { module = "io.github.jan-tennert.supabase:auth-kt", version.ref = "supabase" }
+cardview = { module = "androidx.cardview:cardview", version.ref = "cardview" }
+collection-ktx = { module = "androidx.collection:collection-ktx", version.ref = "collectionKtx" }
+constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintlayout" }
+coordinatorlayout = { module = "androidx.coordinatorlayout:coordinatorlayout", version.ref = "coordinatorlayout" }
+core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
+customview = { module = "androidx.customview:customview", version.ref = "customview" }
+documentfile = { module = "androidx.documentfile:documentfile", version.ref = "documentfile" }
+drawerlayout = { module = "androidx.drawerlayout:drawerlayout", version.ref = "drawerlayout" }
+espresso-contrib = { module = "androidx.test.espresso:espresso-contrib", version.ref = "espresso" }
+espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espresso" }
+espresso-intents = { module = "androidx.test.espresso:espresso-intents", version.ref = "espresso" }
+fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragmentKtx" }
+fragment-testing = { module = "androidx.fragment:fragment-testing", version.ref = "fragmentKtx" }
+hamcrest = { module = "org.hamcrest:hamcrest", version.ref = "hamcrest" }
+junit = { module = "androidx.test.ext:junit", version.ref = "junit" }
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit5" }
+junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit5" }
+junit-jupiter-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit5" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit5" }
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
+koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
+koin-core-viewmodel = { module = "io.insert-koin:koin-core-viewmodel", version.ref = "koin" }
+koin-test = { module = "io.insert-koin:koin-test", version.ref = "koin" }
+kotlin-parcelize-runtime = { module = "org.jetbrains.kotlin:kotlin-parcelize-runtime", version.ref = "kotlin" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
+lifecycle-common = { module = "androidx.lifecycle:lifecycle-common", version.ref = "lifecycleKtx" }
+lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleKtx" }
+material = { module = "com.google.android.material:material", version.ref = "material" }
+navigation-common-ktx = { module = "androidx.navigation:navigation-common-ktx", version.ref = "navigationKtx" }
+navigation-fragment-ktx = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigationKtx" }
+navigation-runtime-ktx = { module = "androidx.navigation:navigation-runtime-ktx", version.ref = "navigationKtx" }
+navigation-testing = { module = "androidx.navigation:navigation-testing", version.ref = "navigationKtx" }
+navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navigationKtx" }
+preference-ktx = { module = "androidx.preference:preference-ktx", version.ref = "preferenceKtx" }
+recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "recyclerview" }
+room-common = { module = "androidx.room:room-common", version.ref = "room" }
+room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+room-testing-android = { module = "androidx.room:room-testing-android", version.ref = "room" }
+screengrab = { module = "tools.fastlane:screengrab", version.ref = "screengrab" }
+sqlite-ktx = { module = "androidx.sqlite:sqlite-ktx", version.ref = "sqliteKtx" }
+test-core-ktx = { module = "androidx.test:core-ktx", version.ref = "testCoreKtx" }
+uiautomator = { module = "androidx.test.uiautomator:uiautomator", version.ref = "uiautomator" }
+viewpager2 = { module = "androidx.viewpager2:viewpager2", version.ref = "viewpager2" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
+android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
+dependency-analysis = { id = "com.autonomousapps.dependency-analysis", version.ref = "dependencyAnalysis" }
