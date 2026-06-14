@@ -17,6 +17,8 @@
 
 package com.aisleron.di
 
+import com.aisleron.data.sync.SupabaseClientFactory
+import com.aisleron.data.sync.SupabaseClientFactoryImpl
 import com.aisleron.ui.shoppinglist.ShoppingListItemViewModelFactory
 import com.aisleron.ui.shoppinglist.coordinator.ShoppingListCoordinatorFactory
 import org.koin.dsl.module
@@ -51,4 +53,6 @@ val factoryModule = module {
             sortLocationTypeByNameUseCase = get()
         )
     }
+
+    factory<SupabaseClientFactory> { SupabaseClientFactoryImpl() }
 }

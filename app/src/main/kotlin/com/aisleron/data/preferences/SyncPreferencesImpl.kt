@@ -23,38 +23,27 @@ import com.aisleron.BuildConfig
 import com.aisleron.domain.preferences.SyncPreferences
 
 class SyncPreferencesImpl(context: Context) : SyncPreferences {
-    // TODO: Need to encrypt the access and refresh tokens, maybe using DataStore or AccountManager
     private val prefs = PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
-    override fun useDefault(): Boolean =
-        prefs.getBoolean(USE_DEFAULT, true)
+    override fun useDefaultBackEnd(): Boolean =
+        prefs.getBoolean(USE_DEFAULT_BACKEND, true)
 
     override fun getBackendUrl(): String {
-        return if (useDefault())
+        return if (useDefaultBackEnd())
             BuildConfig.SUPABASE_URL
         else
-            prefs.getString(CUSTOM_BACKEND_URL, "") ?: ""
+            prefs.getString(CUSTOM_BACKEND_URL, "").orEmpty()
     }
 
     override fun getBackendKey(): String {
-        return if (useDefault())
+        return if (useDefaultBackEnd())
             BuildConfig.SUPABASE_ANON_KEY
         else
-            prefs.getString(CUSTOM_BACKEND_KEY, "") ?: ""
-    }
-
-    override fun getAccessToken(): String? {
-        return prefs.getString(ACCESS_TOKEN, null)
-    }
-
-    override fun getRefreshToken(): String? {
-        return prefs.getString(REFRESH_TOKEN, null)
+            prefs.getString(CUSTOM_BACKEND_KEY, "").orEmpty()
     }
 
     companion object {
-        private const val USE_DEFAULT = "use_default"
+        private const val USE_DEFAULT_BACKEND = "use_default_backend"
         private const val CUSTOM_BACKEND_URL = "custom_backend_url"
         private const val CUSTOM_BACKEND_KEY = "custom_backend_key"
-        private const val ACCESS_TOKEN = "access_token"
-        private const val REFRESH_TOKEN = "refresh_token"
     }
 }

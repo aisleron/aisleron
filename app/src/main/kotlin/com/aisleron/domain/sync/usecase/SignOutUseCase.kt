@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025-2026 aisleron.com
+ * Copyright (C) 2026 aisleron.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,34 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+package com.aisleron.domain.sync.usecase
 
-plugins {
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.dependency.analysis)
-}
-android {
-    namespace = "com.aisleron.testdata"
-    compileSdk = 36
+import com.aisleron.domain.sync.SyncSessionManager
 
-    defaultConfig {
-        minSdk = 24
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-
-    kotlin {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_17)
-        }
-    }
-}
-
-dependencies {
-    compileOnly(project(":app"))
-    api(libs.kotlinx.coroutines.core)
-    api(libs.supabase.kt)
+class SignOutUseCase(private val sessionManager: SyncSessionManager) {
+    suspend operator fun invoke(): Result<Unit> =
+        sessionManager.signOut()
 }

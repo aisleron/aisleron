@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025-2026 aisleron.com
+ * Copyright (C) 2026 aisleron.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,34 +15,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+package com.aisleron.data.sync
 
-plugins {
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.dependency.analysis)
-}
-android {
-    namespace = "com.aisleron.testdata"
-    compileSdk = 36
+import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.createSupabaseClient
 
-    defaultConfig {
-        minSdk = 24
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-
-    kotlin {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_17)
-        }
-    }
+interface SupabaseClientFactory {
+    fun create(url: String, key: String): SupabaseClient
 }
 
-dependencies {
-    compileOnly(project(":app"))
-    api(libs.kotlinx.coroutines.core)
-    api(libs.supabase.kt)
+// The real implementation that holds the inline logic
+class SupabaseClientFactoryImpl : SupabaseClientFactory {
+    override fun create(url: String, key: String): SupabaseClient {
+        return createSupabaseClient(url, key) { install(Auth) }
+    }
 }

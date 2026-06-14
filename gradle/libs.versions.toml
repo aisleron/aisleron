@@ -17,6 +17,9 @@
 activityKtx = "1.13.0"
 annotation = "1.10.0"
 appcompat = "1.7.1"
+ktor = "3.5.0"
+mockk = "1.14.11"
+slf4jNop = "2.0.18"
 supabase = "3.6.0"
 cardview = "1.0.0"
 collectionKtx = "1.6.0"
@@ -53,6 +56,12 @@ dependencyAnalysis = "3.14.1"
 activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activityKtx" }
 annotation = { module = "androidx.annotation:annotation", version.ref = "annotation" }
 appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+mockk-agent = { module = "io.mockk:mockk-agent", version.ref = "mockk" }
+mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockk" }
+slf4j-nop = { module = "org.slf4j:slf4j-nop", version.ref = "slf4jNop" }
 supabase-auth-kt = { module = "io.github.jan-tennert.supabase:auth-kt", version.ref = "supabase" }
 cardview = { module = "androidx.cardview:cardview", version.ref = "cardview" }
 collection-ktx = { module = "androidx.collection:collection-ktx", version.ref = "collectionKtx" }
@@ -96,6 +105,7 @@ room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 room-testing-android = { module = "androidx.room:room-testing-android", version.ref = "room" }
 screengrab = { module = "tools.fastlane:screengrab", version.ref = "screengrab" }
 sqlite-ktx = { module = "androidx.sqlite:sqlite-ktx", version.ref = "sqliteKtx" }
+supabase-kt = { module = "io.github.jan-tennert.supabase:supabase-kt", version.ref = "supabase" }
 test-core-ktx = { module = "androidx.test:core-ktx", version.ref = "testCoreKtx" }
 uiautomator = { module = "androidx.test.uiautomator:uiautomator", version.ref = "uiautomator" }
 viewpager2 = { module = "androidx.viewpager2:viewpager2", version.ref = "viewpager2" }

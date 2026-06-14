@@ -18,9 +18,7 @@
 package com.aisleron.domain.preferences
 
 interface SyncPreferences {
-    fun useDefault(): Boolean
+    fun useDefaultBackEnd(): Boolean
     fun getBackendUrl(): String
     fun getBackendKey(): String
-    fun getAccessToken(): String?
-    fun getRefreshToken(): String?
 }

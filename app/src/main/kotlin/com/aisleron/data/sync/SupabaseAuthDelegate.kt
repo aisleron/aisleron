@@ -17,7 +17,24 @@
 
 package com.aisleron.data.sync
 
-import com.aisleron.domain.sync.AuthRepository
+import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.providers.builtin.Email
 
-class AuthRepositoryImpl : AuthRepository {
+interface SupabaseAuthDelegate {
+    suspend fun signInWithEmail(client: SupabaseClient, email: String, password: String)
+    suspend fun signOut(client: SupabaseClient)
+}
+
+class SupabaseAuthDelegateImpl : SupabaseAuthDelegate {
+    override suspend fun signInWithEmail(client: SupabaseClient, email: String, password: String) {
+        client.auth.signInWith(Email) {
+            this.email = email
+            this.password = password
+        }
+    }
+
+    override suspend fun signOut(client: SupabaseClient) {
+        client.auth.signOut()
+    }
 }

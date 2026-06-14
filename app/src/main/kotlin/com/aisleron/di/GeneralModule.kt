@@ -17,6 +17,11 @@
 
 package com.aisleron.di
 
+import com.aisleron.data.sync.SupabaseAuthDelegate
+import com.aisleron.data.sync.SupabaseAuthDelegateImpl
+import com.aisleron.data.sync.SupabaseClientProvider
+import com.aisleron.data.sync.SupabaseSessionManagerImpl
+import com.aisleron.domain.sync.SyncSessionManager
 import com.aisleron.ui.AddEditFragmentListener
 import com.aisleron.ui.AddEditFragmentListenerImpl
 import com.aisleron.ui.ApplicationTitleUpdateListener
@@ -31,6 +36,7 @@ import com.aisleron.ui.navigation.Navigator
 import com.aisleron.ui.navigation.NavigatorImpl
 import com.aisleron.ui.resourceprovider.ResourceProvider
 import com.aisleron.ui.resourceprovider.ResourceProviderImpl
+import org.koin.dsl.binds
 import org.koin.dsl.module
 
 val generalModule = module {
@@ -40,4 +46,16 @@ val generalModule = module {
     factory<ApplicationTitleUpdateListener> { ApplicationTitleUpdateListenerImpl() }
     factory<AddEditFragmentListener> { AddEditFragmentListenerImpl() }
     factory<LoyaltyCardProvider> { CatimaCardProvider(PackageCheckerImpl()) }
+    factory<SupabaseAuthDelegate> { SupabaseAuthDelegateImpl() }
+
+    single {
+        SupabaseSessionManagerImpl(
+            syncPreferences = get(),
+            clientFactory = get(),
+            authDelegate = get()
+        )
+    } binds arrayOf(
+        SyncSessionManager::class,
+        SupabaseClientProvider::class
+    )
 }

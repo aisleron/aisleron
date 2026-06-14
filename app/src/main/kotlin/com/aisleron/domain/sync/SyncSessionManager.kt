@@ -17,5 +17,7 @@
 
 package com.aisleron.domain.sync
 
-interface AuthRepository {
+interface SyncSessionManager {
+    suspend fun signInWithEmail(email: String, password: String): Result<Unit>
+    suspend fun signOut(): Result<Unit>
 }

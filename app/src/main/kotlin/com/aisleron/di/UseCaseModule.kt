@@ -124,6 +124,8 @@ import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCaseImpl
 import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCase
 import com.aisleron.domain.shoppinglist.usecase.GetShoppingListUseCaseImpl
+import com.aisleron.domain.sync.usecase.SignInWithEmailUseCase
+import com.aisleron.domain.sync.usecase.SignOutUseCase
 import org.koin.android.ext.koin.androidApplication
 import org.koin.dsl.module
 
@@ -452,4 +454,11 @@ val useCaseModule = module {
             getNoteUseCase = get()
         )
     }
+
+    /**
+     * Sync Use Cases
+     */
+    factory<SignInWithEmailUseCase> { SignInWithEmailUseCase(sessionManager = get()) }
+    factory<SignOutUseCase> { SignOutUseCase(sessionManager = get()) }
+
 }

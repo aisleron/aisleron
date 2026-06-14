@@ -63,8 +63,8 @@ android {
         applicationId = "com.aisleron"
         minSdk = 24
         targetSdk = 36
-        versionCode = 22
-        versionName = "2026.4.1"
+        versionCode = 24
+        versionName = "2026.6.0"
         base.archivesName = "$applicationId-$versionName"
 
         testInstrumentationRunner = "com.aisleron.di.KoinInstrumentationTestRunner"
@@ -156,7 +156,6 @@ android {
     }
 
     configurations.all {
-        // Targets only the Android Test configurations
         resolutionStrategy {
             // 1. Force 3.0 to break the "strictly 2.2" consistent resolution constraint
             force("org.hamcrest:hamcrest:3.0")
@@ -167,6 +166,15 @@ android {
                     .using(module("org.hamcrest:hamcrest:3.0"))
                 substitute(module("org.hamcrest:hamcrest-library"))
                     .using(module("org.hamcrest:hamcrest:3.0"))
+            }
+        }
+    }
+
+    // Added to resolve issues with MockK agent (v1.14.11). Remove if issue is resolved.
+    testOptions {
+        packaging {
+            jniLibs {
+                useLegacyPackaging = true
             }
         }
     }
@@ -200,6 +208,7 @@ ksp {
 
 tasks.withType<Test> {
     useJUnitPlatform() // Make all tests use JUnit 5
+    jvmArgs("-XX:+EnableDynamicAgentLoading")
 }
 
 java {
@@ -260,7 +269,12 @@ dependencies {
     androidTestImplementation(libs.kotlinx.coroutines.test)
 
     // Supabase
+    implementation(libs.supabase.kt)
     implementation(libs.supabase.auth.kt)
+
+    // Ktor
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.cio)
 
     // Testing
     testRuntimeOnly(libs.junit.platform.launcher)
@@ -268,6 +282,8 @@ dependencies {
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.junit.jupiter.api)
     testImplementation(libs.junit.jupiter.params)
+    testImplementation(libs.mockk)
+    testImplementation(libs.slf4j.nop)
 
     // Android Testing
     androidTestImplementation(project(":testData"))
@@ -275,6 +291,8 @@ dependencies {
     androidTestImplementation(libs.test.core.ktx)
     androidTestImplementation(libs.uiautomator)
     androidTestImplementation(libs.screengrab)
+    androidTestImplementation(libs.mockk.android)
+    androidTestImplementation(libs.mockk.agent)
 
     debugImplementation(libs.espresso.contrib)
     androidTestImplementation(libs.espresso.core)

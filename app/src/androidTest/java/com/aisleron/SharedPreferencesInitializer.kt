@@ -143,6 +143,18 @@ class SharedPreferencesInitializer {
         setPreferenceValue(PRODUCT_LAST_SELECTED_TAB, position)
     }
 
+    fun setUseDefaultBackend(value: Boolean) {
+        setPreferenceValue(PREF_USE_DEFAULT_BACKEND, value)
+    }
+
+    fun setCustomBackendUrl(value: String) {
+        setPreferenceValue(PREF_CUSTOM_BACKEND_URL, value)
+    }
+
+    fun setCustomBackendKey(value: String) {
+        setPreferenceValue(PREF_CUSTOM_BACKEND_KEY, value)
+    }
+
     companion object {
         private const val IS_INITIALIZED = "is_initialised"
         private const val APPLICATION_THEME = "application_theme"
@@ -160,5 +172,8 @@ class SharedPreferencesInitializer {
         private const val PREF_LAST_UPDATE_CODE = "last_update_code"
         private const val PREF_LAST_UPDATE_NAME = "last_update_name"
         private const val PRODUCT_LAST_SELECTED_TAB = "product_last_selected_tab"
+        private const val PREF_USE_DEFAULT_BACKEND = "use_default_backend"
+        private const val PREF_CUSTOM_BACKEND_URL = "custom_backend_url"
+        private const val PREF_CUSTOM_BACKEND_KEY = "custom_backend_key"
     }
 }
