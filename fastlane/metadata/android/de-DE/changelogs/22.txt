@@ -1,0 +1,5 @@
+Ausdehnungen:
+* Zugefügt portugiesische Übersetzungen.
+
+Käfer Klemmen:
+* Klemme Krachen auf #App fährt fort in Androiden 13.

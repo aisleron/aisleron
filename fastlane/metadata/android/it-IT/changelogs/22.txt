@@ -1,0 +1,5 @@
+Miglioramenti:
+* Aggiunte traduzioni in portoghese.
+
+Correzioni di bug:
+* Fix crash sul curriculum app in Android 13.

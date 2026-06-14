@@ -1,0 +1,5 @@
+Mejoras:
+* Traducciones portuguesas agregadas.
+
+Corrección de errores:
+* Arreglar fallo en la aplicación curriculum vitae en Android 13.
