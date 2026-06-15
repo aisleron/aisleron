@@ -380,7 +380,8 @@ class ShoppingListViewModelTest : KoinTest {
 
     @Test
     fun setShowAllItems_BaseFilterIsNeeded_TogglesFilterWithoutResetOnRefresh() = runTest {
-        val locationId = get<LocationRepository>().getAll().first { it.type == LocationType.SHOP }.id
+        val locationId =
+            get<LocationRepository>().getAll().first { it.type == LocationType.SHOP }.id
 
         shoppingListViewModel.hydrate(getAisleGrouping(locationId), FilterType.NEEDED, false)
         val initialState = awaitUiStateUpdated(shoppingListViewModel)
@@ -390,8 +391,7 @@ class ShoppingListViewModelTest : KoinTest {
         shoppingListViewModel.setShowAllItems(true)
         assertEquals(FilterType.ALL, shoppingListViewModel.productFilter)
         val toggledState = shoppingListViewModel.shoppingListUiState.first {
-            it is ShoppingListViewModel.ShoppingListUiState.Updated &&
-                it.showAllItemsChecked
+            it is ShoppingListViewModel.ShoppingListUiState.Updated && it.showAllItemsChecked
         } as ShoppingListViewModel.ShoppingListUiState.Updated
         assertTrue(toggledState.allowAllItemsToggle)
 
@@ -403,7 +403,8 @@ class ShoppingListViewModelTest : KoinTest {
 
     @Test
     fun setShowAllItems_BaseFilterIsAll_FilterDoesNotChange() = runTest {
-        val locationId = get<LocationRepository>().getAll().first { it.type == LocationType.SHOP }.id
+        val locationId =
+            get<LocationRepository>().getAll().first { it.type == LocationType.SHOP }.id
 
         shoppingListViewModel.hydrate(getAisleGrouping(locationId), FilterType.ALL, false)
         val initialState = awaitUiStateUpdated(shoppingListViewModel)

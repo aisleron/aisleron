@@ -1,0 +1,6 @@
+Enhancements:
+* Add an 'All Items' toggle to the shopping list menu (thanks to @SivanTechDev).
+* Updated About page and secondary activity to Jetpack Compose.
+
+Bug Fixes:
+* Add Portuguese to language selection.
