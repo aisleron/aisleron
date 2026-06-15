@@ -28,6 +28,7 @@
     <locale android:name="fr" />
     <locale android:name="it" />
     <locale android:name="pl" />
+    <locale android:name="pt" />
     <locale android:name="ru" />
     <locale android:name="sv" />
     <locale android:name="tr" />

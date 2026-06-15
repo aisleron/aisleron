@@ -82,6 +82,7 @@
     <string name="language_german_de" translatable="false">Deutsch</string>
     <string name="language_italian_it" translatable="false">Italiano</string>
     <string name="language_polish_pl" translatable="false">Polski</string>
+    <string name="language_portuguese_pt" translatable="false">Português</string>
     <string name="language_russian_ru" translatable="false">Русский</string>
     <string name="language_spanish_es" translatable="false">Español</string>
     <string name="language_swedish_sv" translatable="false">Svenska</string>

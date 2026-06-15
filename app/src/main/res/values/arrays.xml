@@ -67,6 +67,7 @@
         <item>@string/language_french_fr</item>
         <item>@string/language_italian_it</item>
         <item>@string/language_polish_pl</item>
+        <item>@string/language_portuguese_pt</item>
         <item>@string/language_russian_ru</item>
         <item>@string/language_swedish_sv</item>
         <item>@string/language_turkish_tr</item>
@@ -85,6 +86,7 @@
         <item>fr</item>
         <item>it</item>
         <item>pl</item>
+        <item>pt</item>
         <item>ru</item>
         <item>sv</item>
         <item>tr</item>

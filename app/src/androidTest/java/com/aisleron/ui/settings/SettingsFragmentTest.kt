@@ -443,6 +443,7 @@ class SettingsFragmentTest : KoinTest {
             Pair(R.string.language_french_fr, "fr"),
             Pair(R.string.language_italian_it, "it"),
             Pair(R.string.language_polish_pl, "pl"),
+            Pair(R.string.language_portuguese_pt, "pt"),
             Pair(R.string.language_russian_ru, "ru"),
             Pair(R.string.language_swedish_sv, "sv"),
             Pair(R.string.language_turkish_tr, "tr"),
