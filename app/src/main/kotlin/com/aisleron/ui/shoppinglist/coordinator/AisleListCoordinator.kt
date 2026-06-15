@@ -57,7 +57,10 @@ class AisleListCoordinator(
                 title = getListTitle(collectedLocation, filters.productFilter),
                 showEditShop = collectedLocation?.type == LocationType.SHOP,
                 manageAisles = true,
-                showLoyaltyCard = getLoyaltyCardForLocationUseCase(locationId) != null
+                showLoyaltyCard = getLoyaltyCardForLocationUseCase(locationId) != null,
+                allowAllItemsToggle = filters.allowAllItemsToggle &&
+                        collectedLocation?.type == LocationType.SHOP,
+                showAllItemsChecked = filters.productFilter == FilterType.ALL
             )
 
             state

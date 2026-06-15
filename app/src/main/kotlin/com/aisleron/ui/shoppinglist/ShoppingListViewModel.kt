@@ -61,8 +61,11 @@ class ShoppingListViewModel(
     private val coroutineScope = coroutineScopeProvider ?: this.viewModelScope
     private var hydrated = false
     private var _showEmptyAisles: Boolean = true
+    private var initialProductFilter: FilterType = FilterType.NEEDED
     val productFilter: FilterType
         get() = _shoppingListFilters.value?.productFilter ?: FilterType.NEEDED
+    val canShowAllItemsToggle: Boolean
+        get() = _shoppingListFilters.value?.allowAllItemsToggle ?: true
 
     private val _aislesForLocation = MutableStateFlow<List<AisleListEntry>>(emptyList())
     val aislesForLocation: StateFlow<List<AisleListEntry>> = _aislesForLocation
@@ -157,10 +160,12 @@ class ShoppingListViewModel(
 
         shoppingListCoordinator = shoppingListStreamProviderFactory.create(listGrouping)
         _showEmptyAisles = showEmptyAisles
+        initialProductFilter = productFilter
 
         _shoppingListFilters.value = ShoppingListFilter(
             productFilter = productFilter,
-            showEmptyAisles = _showEmptyAisles
+            showEmptyAisles = _showEmptyAisles,
+            allowAllItemsToggle = productFilter != FilterType.ALL
         )
 
         hydrated = true
@@ -222,6 +227,14 @@ class ShoppingListViewModel(
 
         _showEmptyAisles = showEmptyAisles
         _shoppingListFilters.update { it?.copy(showEmptyAisles = _showEmptyAisles) }
+    }
+
+    fun setShowAllItems(showAllItems: Boolean) {
+        if (!canShowAllItemsToggle) return
+        val newFilter = if (showAllItems) FilterType.ALL else initialProductFilter
+        if (productFilter == newFilter) return
+
+        _shoppingListFilters.update { it?.copy(productFilter = newFilter) }
     }
 
     fun requestListRefresh(returnDefaultList: Boolean) {
@@ -400,7 +413,9 @@ class ShoppingListViewModel(
             val title: ListTitle,
             val showEditShop: Boolean,
             val manageAisles: Boolean,
-            val showLoyaltyCard: Boolean
+            val showLoyaltyCard: Boolean,
+            val allowAllItemsToggle: Boolean = false,
+            val showAllItemsChecked: Boolean = false
         ) : ShoppingListUiState()
     }
 
