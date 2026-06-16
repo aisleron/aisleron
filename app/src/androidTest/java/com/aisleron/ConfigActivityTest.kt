@@ -31,7 +31,7 @@ import com.aisleron.di.viewModelTestModule
 import org.junit.Rule
 import org.junit.Test
 
-class AboutActivityTest {
+class ConfigActivityTest {
     @get:Rule
     val koinTestRule = KoinTestRule(
         modules = listOf(
@@ -41,7 +41,7 @@ class AboutActivityTest {
 
     @Test
     fun aboutActivity_OnStart_ShowsAbout() {
-        val scenario = ActivityScenario.launch(AboutActivity::class.java)
+        val scenario = ActivityScenario.launch(ConfigActivity::class.java)
         scenario.use {
             onView(withText(R.string.about_support_header)).check(matches(isDisplayed()))
         }

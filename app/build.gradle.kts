@@ -23,6 +23,7 @@ plugins {
     id("com.android.application")
     id("com.google.devtools.ksp")
     id("org.jetbrains.kotlin.plugin.parcelize")
+    id("org.jetbrains.kotlin.plugin.compose")
     // id("androidx.navigation.safeargs.kotlin")
 
     id("com.autonomousapps.dependency-analysis")
@@ -200,8 +201,16 @@ dependencies {
     implementation("androidx.documentfile:documentfile:1.1.0")
     implementation("androidx.preference:preference-ktx:1.2.1")
     implementation("androidx.viewpager2:viewpager2:1.1.0")
-    implementation("org.jetbrains.kotlin:kotlin-parcelize-runtime:2.3.21")
+    implementation("org.jetbrains.kotlin:kotlin-parcelize-runtime:2.3.0")
     implementation("androidx.fragment:fragment-ktx:${Versions.FRAGMENT}")
+
+    // Jetpack Compose
+    implementation("androidx.navigation:navigation-compose:2.9.8")
+    implementation("androidx.compose.runtime:runtime:1.11.2")
+    implementation("androidx.compose.material3:material3:1.4.0")
+    implementation("androidx.compose.ui:ui-tooling-preview:1.11.2")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.11.2")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.11.2")
 
     // Lifecycle
     implementation("androidx.lifecycle:lifecycle-common:${Versions.LIFECYCLE}")
@@ -219,12 +228,14 @@ dependencies {
     implementation("androidx.room:room-ktx:${Versions.ROOM}")
     implementation("androidx.room:room-runtime:${Versions.ROOM}")
     implementation("androidx.room:room-common:${Versions.ROOM}")
+    debugImplementation("androidx.compose.ui:ui-tooling:1.11.2")
     ksp("androidx.room:room-compiler:${Versions.ROOM}")
 
     // Dependency Injection
     implementation("io.insert-koin:koin-core:${Versions.KOIN}")
     implementation("io.insert-koin:koin-android:${Versions.KOIN}")
     implementation("io.insert-koin:koin-core-viewmodel:${Versions.KOIN}")
+    implementation("io.insert-koin:koin-androidx-compose:${Versions.KOIN}")
 
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.COROUTINES}")

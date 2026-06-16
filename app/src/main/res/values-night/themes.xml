@@ -73,6 +73,7 @@
         <item name="materialCardViewStyle">@style/Widget.Aisleron.CardView</item>
         <item name="snackbarStyle">@style/Widget.Aisleron.Snackbar</item>
         <item name="preferenceTheme">@style/Overlay.Aisleron.Preferences</item>
+        <item name="toolbarStyle">@style/Widget.Aisleron.Toolbar</item>
     </style>
 
     <style name="AisleronPureBlack" />

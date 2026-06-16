@@ -119,7 +119,7 @@
     </fragment>
     <activity
         android:id="@+id/nav_about"
-        android:name="com.aisleron.AboutActivity"
+        android:name="com.aisleron.ConfigActivity"
         android:label="@string/title_activity_about"
         tools:layout="@layout/activity_about" />
     <fragment
