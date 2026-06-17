@@ -172,11 +172,11 @@
     <string name="loyalty_card_provider_missing_exception">HATA: Müşteri kartı sağlayıcısı kurulu değil ya da etkinlik bulunamadı</string>
     <string name="about_contribute_translate_title">Çevirin</string>
     <string name="about_contribute_translate_summary">Aisleron\'un başka dillerde çalışmasına yardımcı olun</string>
-    <string name="empty_list_instructions">Sağ alttaki \"ekle\" düğmesini kullanarak ürünler ve reyonlar ekleyebilirsiniz ya da ekranın tepesindeki arama çubuğunu kullanarak ürünler bulabilir ve durumlarını veya reyon atamalarını değiştirebilirsiniz.</string>
+    <string name="empty_list_instructions">Sağ alttaki \"ekle\" düğmesini kullanarak ürün ve reyon ekleyebilir ya da ekranın tepesindeki arama çubuğunu kullanarak ürünler bulup durumlarını veya reyon atamalarını değiştirebilirsiniz.</string>
     <string name="loyalty_card_provider_missing_message">Müşteri kartlarını görüntülemek için <b><i>%1$s</i></b> gereklidir. Daha fazla bilgi almak üzere web sitelerini açmak ister misiniz?</string>
     <string name="menu_all_items">Tüm maddeler</string>
     <string name="welcome_load_sample_items"><h3>Örnek maddeler yükle</h3> Uygulamanın nasıl çalıştığıyla ilgili bir fikir edinmek için örnek bir listeyle başla</string>
-    <string name="empty_list_reasons">- Şu anda gereken hiçbir madde yoktur \n- Henüz hiçbir ürün ya da reyon eklenmemiştir \n- Maddeler vardır ama görünür bir reyona atanmamışlardır</string>
+    <string name="empty_list_reasons">- Şu anda alınacak hiçbir şey yoktur \n- Henüz hiçbir ürün ya da reyon eklenmemiştir \n- Alınacak şeyler vardır ama görünür bir reyona atanmamışlardır</string>
     <string name="tracking_none">Yok (yalnızca kaydırma)</string>
     <string name="status_change_confirmation">%1$s %2$s yerine taşındı</string>
     <string name="aisle_expand">Reyon dökümünü aç</string>
