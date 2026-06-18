@@ -187,4 +187,5 @@
     <string name="show_location_list">%1$s Göster</string>
     <string name="search">Ara</string>
     <string name="search_fab">Ara FAB</string>
+    <string name="back">Geri dön</string>
 </resources>
