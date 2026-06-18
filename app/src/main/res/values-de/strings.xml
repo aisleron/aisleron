@@ -202,4 +202,5 @@
     <string name="show_location_list">%1$s anzeigen</string>
     <string name="search">Suche</string>
     <string name="search_fab">Suche-FAB</string>
+    <string name="back">Zurück</string>
 </resources>
