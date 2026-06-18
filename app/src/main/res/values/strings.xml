@@ -160,6 +160,11 @@
     <string name="aisleron_version_history_url" translatable="false">https://aisleron.com/docs/version-history</string>
     <string name="aisleron_translate_url" translatable="false">https://aisleron.com/docs/contribute/translate</string>
     <string name="aisleron_financial_contribution_url" translatable="false">https://aisleron.com/docs/contribute/financial_contributions</string>
+    <string name="aisleron_reporting_issues_url" translatable="false">https://aisleron.com/docs/reporting-issues</string>
+    <string name="aisleron_sourcecode_url" translatable="false">https://github.com/aisleron/aisleron</string>
+    <string name="aisleron_license_url" translatable="false">https://aisleron.com/docs/licenses-policies/aisleron-license</string>
+    <string name="aisleron_privacy_policy_url" translatable="false">https://aisleron.com/docs/licenses-policies/aisleron-privacy-policy</string>
+    <string name="aisleron_3rd_party_licenses_url" translatable="false">https://aisleron.com/docs/licenses-policies/3rd-party-licenses</string>
 
     <!-- Loyalty cards -->
     <string name="shop_loyalty_card_name">Loyalty Card</string>
@@ -255,4 +260,5 @@
     <string name="save_changes_message">You have unsaved changes. Do you want to save them before leaving?</string>
     <string name="keep_editing">Keep Editing</string>
     <string name="show_location_list">Show %1$s</string>
+    <string name="back">Back</string>
 </resources>

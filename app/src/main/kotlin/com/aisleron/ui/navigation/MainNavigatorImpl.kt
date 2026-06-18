@@ -17,17 +17,21 @@
 
 package com.aisleron.ui.navigation
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import androidx.annotation.IdRes
 import androidx.navigation.NavController
+import com.aisleron.ConfigActivity
 import com.aisleron.R
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.LocationType
 import com.aisleron.ui.bundles.Bundler
+import com.aisleron.ui.navigation.IntentExtras.EXTRA_DESTINATION
 import com.aisleron.ui.shoppinglist.ShoppingListGrouping
 import java.lang.ref.WeakReference
 
-class NavigatorImpl(private val bundler: Bundler) : Navigator {
+class MainNavigatorImpl(private val bundler: Bundler) : MainNavigator {
     private var navControllerRef: WeakReference<NavController>? = null
     private val navController: NavController? get() = navControllerRef?.get()
 
@@ -90,5 +94,21 @@ class NavigatorImpl(private val bundler: Bundler) : Navigator {
 
     override fun navigateToWelcome() {
         navigate(R.id.nav_welcome)
+    }
+
+    override fun navigateToAbout() {
+        navigateToActivity(Destination.About, ConfigActivity::class.java)
+    }
+
+    private fun navigateToActivity(
+        destination: Destination, activityClass: Class<out Activity>
+    ) {
+        navController?.context?.let { context ->
+            val intent = Intent(context, activityClass).apply {
+                putExtra(EXTRA_DESTINATION, destination)
+            }
+
+            context.startActivity(intent)
+        }
     }
 }

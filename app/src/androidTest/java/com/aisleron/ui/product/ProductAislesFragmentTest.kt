@@ -52,7 +52,7 @@ import com.aisleron.ui.AddEditFragmentListenerTestImpl
 import com.aisleron.ui.ApplicationTitleUpdateListenerTestImpl
 import com.aisleron.ui.FabHandlerTestImpl
 import com.aisleron.ui.bundles.Bundler
-import com.aisleron.ui.navigation.NavigatorTestImpl
+import com.aisleron.ui.navigation.MainNavigatorTestImpl
 import com.aisleron.ui.settings.ProductPreferencesTestImpl
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -101,7 +101,7 @@ class ProductAislesFragmentTest : KoinTest {
                     },
 
                     FabHandlerTestImpl(),
-                    NavigatorTestImpl(bundler)
+                    MainNavigatorTestImpl(bundler)
                 )
             }
         )

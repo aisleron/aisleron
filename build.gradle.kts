@@ -19,12 +19,14 @@
 plugins {
     id("com.android.application") version "9.2.1" apply false
     id("com.google.devtools.ksp") version "2.3.6" apply false
-    id("org.jetbrains.kotlin.plugin.parcelize") version "2.3.21" apply false
+    id("org.jetbrains.kotlin.plugin.parcelize") version "2.3.0" apply false
     id("com.android.library") version "9.2.1" apply false
-    id("org.jetbrains.kotlin.jvm") version "2.3.21" apply false
+    id("org.jetbrains.kotlin.jvm") version "2.3.0" apply false
+    id("org.jetbrains.kotlin.plugin.compose") version "2.3.0" apply false
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.3.0" apply false
     // id("androidx.navigation.safeargs.kotlin") version "2.9.6" apply false
 
-    id("com.autonomousapps.dependency-analysis") version "3.14.0"
+    id("com.autonomousapps.dependency-analysis") version "3.15.0"
     // To check dependencies, run: ./gradlew buildHealth
 }
 

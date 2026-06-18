@@ -28,14 +28,14 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.aisleron.R
-import com.aisleron.ui.navigation.Navigator
+import com.aisleron.ui.navigation.MainNavigator
 import com.aisleron.ui.shoplist.ShopListItemViewModel
 import com.aisleron.ui.shoplist.ShopListViewModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ShopMenuFragment(
-    private val navigator: Navigator
+    private val navigator: MainNavigator
 ) : Fragment(), ShopMenuRecyclerViewAdapter.ShopMenuItemListener {
     private val shopListViewModel: ShopListViewModel by viewModel()
 

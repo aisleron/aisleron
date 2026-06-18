@@ -37,8 +37,8 @@ import com.aisleron.di.viewModelTestModule
 import com.aisleron.domain.location.LocationRepository
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import com.aisleron.ui.bundles.Bundler
-import com.aisleron.ui.navigation.Navigator
-import com.aisleron.ui.navigation.NavigatorTestImpl
+import com.aisleron.ui.navigation.MainNavigator
+import com.aisleron.ui.navigation.MainNavigatorTestImpl
 import com.aisleron.ui.shoppinglist.ShoppingListGrouping
 import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.runBlocking
@@ -52,7 +52,7 @@ import org.koin.test.get
 
 class ShopMenuFragmentTest : KoinTest {
     private lateinit var bundler: Bundler
-    private lateinit var navigator: NavigatorTestImpl
+    private lateinit var navigator: MainNavigatorTestImpl
 
     @get:Rule
     val koinTestRule = KoinTestRule(
@@ -91,7 +91,7 @@ class ShopMenuFragmentTest : KoinTest {
     @Before
     fun setUp() {
         bundler = Bundler()
-        navigator = get<Navigator>() as NavigatorTestImpl
+        navigator = get<MainNavigator>() as MainNavigatorTestImpl
         runBlocking { get<CreateSampleDataUseCase>().invoke() }
     }
 

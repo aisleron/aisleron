@@ -69,8 +69,8 @@ import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import com.aisleron.ui.ApplicationTitleUpdateListener
 import com.aisleron.ui.ApplicationTitleUpdateListenerImpl
 import com.aisleron.ui.bundles.Bundler
-import com.aisleron.ui.navigation.Navigator
-import com.aisleron.ui.navigation.NavigatorImpl
+import com.aisleron.ui.navigation.MainNavigator
+import com.aisleron.ui.navigation.MainNavigatorImpl
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.Matchers.allOf
@@ -574,7 +574,7 @@ class MainActivityTest : KoinTest {
     @Test
     fun onActionMode_NavigateToDifferentPage_ActionModeEnded() = runTest {
         // Load the standard navigator implementation for navigation-dependent test
-        declare<Navigator> { NavigatorImpl(Bundler()) }
+        declare<MainNavigator> { MainNavigatorImpl(Bundler()) }
 
         var actionBar: ActionBar? = null
         val scenario = launchWithShoppingList()

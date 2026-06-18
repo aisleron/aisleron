@@ -57,7 +57,7 @@ import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.copyentity.CopyEntityDialogFragment
 import com.aisleron.ui.copyentity.CopyEntityType
 import com.aisleron.ui.loyaltycard.LoyaltyCardProvider
-import com.aisleron.ui.navigation.Navigator
+import com.aisleron.ui.navigation.MainNavigator
 import com.aisleron.ui.note.NoteDialogFragment
 import com.aisleron.ui.note.NoteParentRef
 import com.aisleron.ui.settings.ShoppingListPreferences
@@ -72,7 +72,7 @@ class ShoppingListFragment(
     private val fabHandler: FabHandler,
     private val shoppingListPreferences: ShoppingListPreferences,
     private val loyaltyCardProvider: LoyaltyCardProvider,
-    private val navigator: Navigator
+    private val navigator: MainNavigator
 ) : Fragment(), SearchView.OnQueryTextListener, ActionMode.Callback, FabClickedCallBack,
     MenuProvider, AisleronFragment {
 

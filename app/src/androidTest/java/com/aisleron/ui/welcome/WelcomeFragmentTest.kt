@@ -59,9 +59,9 @@ import com.aisleron.domain.preferences.TrackingMode
 import com.aisleron.domain.sampledata.usecase.CreateSampleDataUseCase
 import com.aisleron.ui.FabHandlerTestImpl
 import com.aisleron.ui.bundles.Bundler
-import com.aisleron.ui.navigation.Navigator
-import com.aisleron.ui.navigation.NavigatorImpl
-import com.aisleron.ui.navigation.NavigatorTestImpl
+import com.aisleron.ui.navigation.MainNavigator
+import com.aisleron.ui.navigation.MainNavigatorImpl
+import com.aisleron.ui.navigation.MainNavigatorTestImpl
 import com.aisleron.ui.settings.WelcomePreferencesTestImpl
 import com.aisleron.utils.SystemIds
 import kotlinx.coroutines.runBlocking
@@ -83,7 +83,7 @@ import kotlin.test.assertTrue
 
 class WelcomeFragmentTest : KoinTest {
     private lateinit var fabHandler: FabHandlerTestImpl
-    private lateinit var navigator: NavigatorTestImpl
+    private lateinit var navigator: MainNavigatorTestImpl
 
     @get:Rule
     val koinTestRule = KoinTestRule(
@@ -108,7 +108,7 @@ class WelcomeFragmentTest : KoinTest {
     @Before
     fun setUp() {
         fabHandler = FabHandlerTestImpl()
-        navigator = get<Navigator>() as NavigatorTestImpl
+        navigator = get<MainNavigator>() as MainNavigatorTestImpl
         SharedPreferencesInitializer().clearPreferences()
     }
 
@@ -123,7 +123,7 @@ class WelcomeFragmentTest : KoinTest {
             )
         )
 
-        declare<Navigator> { NavigatorImpl(Bundler()) }
+        declare<MainNavigator> { MainNavigatorImpl(Bundler()) }
 
         SharedPreferencesInitializer().setIsInitialized(false)
         val scenario = ActivityScenario.launch(MainActivity::class.java)
@@ -271,7 +271,7 @@ class WelcomeFragmentTest : KoinTest {
             )
         )
 
-        declare<Navigator> { NavigatorImpl(Bundler()) }
+        declare<MainNavigator> { MainNavigatorImpl(Bundler()) }
 
         SharedPreferencesInitializer().setIsInitialized(false)
         val scenario = ActivityScenario.launch(MainActivity::class.java)

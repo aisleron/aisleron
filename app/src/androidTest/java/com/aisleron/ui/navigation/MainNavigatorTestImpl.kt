@@ -24,7 +24,7 @@ import com.aisleron.domain.location.LocationType
 import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.shoppinglist.ShoppingListGrouping
 
-class NavigatorTestImpl(private val bundler: Bundler) : Navigator {
+class MainNavigatorTestImpl(private val bundler: Bundler) : MainNavigator {
     private var _bundle: Bundle? = null
     val bundle: Bundle? get() = _bundle
 
@@ -87,5 +87,10 @@ class NavigatorTestImpl(private val bundler: Bundler) : Navigator {
     override fun navigateToWelcome() {
         _bundle = null
         _destination = R.id.nav_welcome
+    }
+
+    override fun navigateToAbout() {
+        _bundle = null
+        _destination = R.id.nav_about
     }
 }

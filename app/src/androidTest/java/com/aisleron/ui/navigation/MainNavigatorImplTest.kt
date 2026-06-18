@@ -17,59 +17,76 @@
 
 package com.aisleron.ui.navigation
 
+import android.app.Activity
+import android.app.Instrumentation
 import androidx.navigation.testing.TestNavHostController
-import androidx.test.core.app.ApplicationProvider
-import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.espresso.intent.Intents
+import androidx.test.espresso.intent.Intents.intended
+import androidx.test.espresso.intent.Intents.intending
+import androidx.test.espresso.intent.matcher.IntentMatchers.anyIntent
+import androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent
+import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtra
+import androidx.test.ext.junit.rules.ActivityScenarioRule
+import com.aisleron.AppCompatActivityTestImpl
+import com.aisleron.ConfigActivity
 import com.aisleron.R
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.LocationType
 import com.aisleron.ui.bundles.AddEditLocationBundle
 import com.aisleron.ui.bundles.AddEditProductBundle
 import com.aisleron.ui.bundles.Bundler
+import com.aisleron.ui.navigation.IntentExtras.EXTRA_DESTINATION
 import com.aisleron.ui.shoppinglist.ShoppingListGrouping
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
+import org.hamcrest.CoreMatchers.allOf
+import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
-class NavigatorImplTest {
+class MainNavigatorImplTest {
     private lateinit var bundler: Bundler
-    private lateinit var navigator: NavigatorImpl
+    private lateinit var navigator: MainNavigatorImpl
     private lateinit var navController: TestNavHostController
 
-    private fun onMain(action: () -> Unit) {
-        InstrumentationRegistry.getInstrumentation().runOnMainSync(action)
-    }
+    @get:Rule
+    val activityRule = ActivityScenarioRule(AppCompatActivityTestImpl::class.java)
 
     @Before
     fun setUp() {
-        bundler = Bundler()
-        navController = TestNavHostController(ApplicationProvider.getApplicationContext())
-        navigator = NavigatorImpl(bundler)
+        Intents.init()
 
-        onMain {
+        bundler = Bundler()
+        activityRule.scenario.onActivity { activity ->
+            navController = TestNavHostController(activity)
             navController.setGraph(R.navigation.mobile_navigation)
+            navigator = MainNavigatorImpl(bundler)
             navigator.attach(navController)
         }
     }
 
+    @After
+    fun tearDown() {
+        Intents.release()
+    }
+
     @Test
     fun navigateToAddShop_NavigatesToAddShop() {
-        onMain { navigator.navigateToAddShop() }
+        activityRule.scenario.onActivity { navigator.navigateToAddShop() }
 
         assertEquals(R.id.nav_add_shop, navController.currentDestination?.id)
 
         val bundle = navController.backStack.last().arguments
         val addEditShopBundle = bundler.getAddEditLocationBundle(bundle)
         assertEquals(AddEditLocationBundle.LocationAction.ADD, addEditShopBundle.actionType)
-
     }
 
     @Test
     fun navigateToEditShop_NavigatesToEditShop() = runTest {
         val id = 101
 
-        onMain { navigator.navigateToEditShop(id) }
+        activityRule.scenario.onActivity { navigator.navigateToEditShop(id) }
 
         assertEquals(R.id.nav_add_shop, navController.currentDestination?.id)
 
@@ -85,7 +102,7 @@ class NavigatorImplTest {
         val name = ""
         val aisleId: Int? = null
 
-        onMain { navigator.navigateToAddProduct(filter) }
+        activityRule.scenario.onActivity { navigator.navigateToAddProduct(filter) }
 
         assertEquals(R.id.nav_add_product, navController.currentDestination?.id)
 
@@ -103,7 +120,7 @@ class NavigatorImplTest {
         val name = "Test Name"
         val aisleId = 1
 
-        onMain { navigator.navigateToAddProduct(filter, name, aisleId) }
+        activityRule.scenario.onActivity { navigator.navigateToAddProduct(filter, name, aisleId) }
 
         assertEquals(R.id.nav_add_product, navController.currentDestination?.id)
 
@@ -119,7 +136,7 @@ class NavigatorImplTest {
     fun navigateToEditProduct_NavigatesToEditProduct() {
         val id = 202
 
-        onMain { navigator.navigateToEditProduct(id) }
+        activityRule.scenario.onActivity { navigator.navigateToEditProduct(id) }
 
         assertEquals(R.id.nav_add_product, navController.currentDestination?.id)
 
@@ -134,7 +151,7 @@ class NavigatorImplTest {
         val id = 303
         val filter = FilterType.NEEDED
 
-        onMain { navigator.navigateToAisleGroupedProductList(id, filter) }
+        activityRule.scenario.onActivity { navigator.navigateToAisleGroupedProductList(id, filter) }
 
         assertEquals(R.id.nav_shopping_list, navController.currentDestination?.id)
 
@@ -152,7 +169,9 @@ class NavigatorImplTest {
         val locationType = LocationType.SHOP
         val filter = FilterType.NEEDED
 
-        onMain { navigator.navigateToLocationGroupedProductList(locationType, filter) }
+        activityRule.scenario.onActivity {
+            navigator.navigateToLocationGroupedProductList(locationType, filter)
+        }
 
         assertEquals(R.id.nav_shopping_list, navController.currentDestination?.id)
 
@@ -168,27 +187,44 @@ class NavigatorImplTest {
     @Test
     fun navigateToDefaultRoute_NavigatesToSpecifiedRoute() {
         val route1 = R.id.nav_needed
-        onMain { navigator.navigateToDefaultRoute(route1) }
+        activityRule.scenario.onActivity { navigator.navigateToDefaultRoute(route1) }
         assertEquals(route1, navController.currentDestination?.id)
 
         val route2 = R.id.nav_in_stock
-        onMain { navigator.navigateToDefaultRoute(route2) }
+        activityRule.scenario.onActivity { navigator.navigateToDefaultRoute(route2) }
         assertEquals(route2, navController.currentDestination?.id)
     }
 
     @Test
     fun navigateToWelcome_NavigatesToWelcome() {
         val route1 = R.id.nav_welcome
-        onMain { navigator.navigateToWelcome() }
+        activityRule.scenario.onActivity { navigator.navigateToWelcome() }
         assertEquals(route1, navController.currentDestination?.id)
     }
 
     @Test
     fun navigate_NavControllerIsNull_NoNavigation() {
-        val nav = NavigatorImpl(bundler)
+        val nav = MainNavigatorImpl(bundler)
 
         nav.navigateToAddShop()
         nav.navigateToWelcome()
         nav.navigateToEditProduct(123)
+    }
+
+    @Test
+    fun navigateToAbout_FiresIntentToConfigActivityWithAboutExtra() {
+        val dummyResult = Instrumentation.ActivityResult(Activity.RESULT_OK, null)
+        intending(anyIntent()).respondWith(dummyResult)
+
+        activityRule.scenario.onActivity { navigator.navigateToAbout() }
+
+        // 2. Match that an intent was broadcast matching both the destination class and the extra bundle keys
+        intended(
+            allOf(
+                hasComponent(ConfigActivity::class.java.name),
+                hasExtra(EXTRA_DESTINATION, Destination.About)
+            )
+        )
+
     }
 }

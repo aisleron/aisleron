@@ -74,6 +74,7 @@
         <item name="materialCardViewStyle">@style/Widget.Aisleron.CardView</item>
         <item name="snackbarStyle">@style/Widget.Aisleron.Snackbar</item>
         <item name="preferenceTheme">@style/Overlay.Aisleron.Preferences</item>
+        <item name="toolbarStyle">@style/Widget.Aisleron.Toolbar</item>
     </style>
 
     <style name="Theme.Aisleron.NavigationDrawer" parent="Theme.Aisleron">
@@ -118,6 +119,11 @@
 
     <style name="Overlay.Aisleron.Preferences" parent="PreferenceThemeOverlay">
         <item name="switchPreferenceCompatStyle">@style/Widget.Aisleron.SwitchPreferenceCompat</item>
+    </style>
+
+    <style name="Widget.Aisleron.Toolbar" parent="Widget.Material3.Toolbar">
+        <item name="titleTextColor">?attr/colorOnSurface</item>
+        <item name="navigationIcon">?attr/colorOnSurface</item>
     </style>
 </resources>
 
