@@ -35,7 +35,7 @@ import com.aisleron.databinding.FragmentWelcomeBinding
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.ui.AisleronExceptionMap
 import com.aisleron.ui.AisleronFragment
-import com.aisleron.ui.navigation.Navigator
+import com.aisleron.ui.navigation.MainNavigator
 import com.aisleron.ui.settings.WelcomePreferences
 import com.aisleron.ui.widgets.ErrorSnackBar
 import com.google.android.material.snackbar.Snackbar
@@ -45,7 +45,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class WelcomeFragment(
     private val welcomePreferences: WelcomePreferences,
-    private val navigator: Navigator
+    private val navigator: MainNavigator
 ) : Fragment(), AisleronFragment {
 
     private val viewModel: WelcomeViewModel by viewModel()

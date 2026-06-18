@@ -58,8 +58,8 @@ import com.aisleron.ui.FabHandler
 import com.aisleron.ui.FabHandlerTestImpl
 import com.aisleron.ui.bundles.AddEditLocationBundle
 import com.aisleron.ui.bundles.Bundler
-import com.aisleron.ui.navigation.Navigator
-import com.aisleron.ui.navigation.NavigatorTestImpl
+import com.aisleron.ui.navigation.MainNavigator
+import com.aisleron.ui.navigation.MainNavigatorTestImpl
 import com.aisleron.ui.shoppinglist.ShoppingListGrouping
 import com.aisleron.utils.SystemIds
 import kotlinx.coroutines.runBlocking
@@ -81,7 +81,7 @@ class ShopListFragmentTest : KoinTest {
     private lateinit var bundler: Bundler
     private lateinit var fabHandler: FabHandlerTestImpl
     private lateinit var activityFragment: ShopListFragment
-    private lateinit var navigator: NavigatorTestImpl
+    private lateinit var navigator: MainNavigatorTestImpl
 
     @get:Rule
     val koinTestRule = KoinTestRule(
@@ -94,7 +94,7 @@ class ShopListFragmentTest : KoinTest {
     fun setUp() {
         bundler = Bundler()
         fabHandler = FabHandlerTestImpl()
-        navigator = get<Navigator>() as NavigatorTestImpl
+        navigator = get<MainNavigator>() as MainNavigatorTestImpl
         runBlocking { get<CreateSampleDataUseCase>().invoke() }
     }
 

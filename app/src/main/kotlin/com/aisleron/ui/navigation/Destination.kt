@@ -17,17 +17,17 @@
 
 package com.aisleron.ui.navigation
 
-import androidx.annotation.IdRes
-import com.aisleron.domain.FilterType
-import com.aisleron.domain.location.LocationType
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 
-interface Navigator {
-    fun navigateToAddShop()
-    fun navigateToEditShop(locationId: Int)
-    fun navigateToAddProduct(filterType: FilterType, name: String = "", aisleId: Int? = null)
-    fun navigateToEditProduct(productId: Int)
-    fun navigateToAisleGroupedProductList(locationId: Int, productFilter: FilterType)
-    fun navigateToLocationGroupedProductList(locationType: LocationType, productFilter: FilterType)
-    fun navigateToDefaultRoute(@IdRes destinationId: Int)
-    fun navigateToWelcome()
+@Serializable
+sealed class Destination : Parcelable {
+    @Parcelize
+    @Serializable
+    data object About : Destination()
+}
+
+object IntentExtras {
+    const val EXTRA_DESTINATION = "destination"
 }

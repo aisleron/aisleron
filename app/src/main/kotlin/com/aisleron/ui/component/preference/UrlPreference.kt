@@ -17,6 +17,7 @@
 
 package com.aisleron.ui.component.preference
 
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
@@ -32,7 +33,7 @@ fun UrlPreference(
     @StringRes urlResId: Int,
     onUrlClick: (String) -> Unit,
     modifier: Modifier = Modifier,
-    icon: @Composable (() -> Unit)? = null
+    @DrawableRes iconResId: Int? = null
 ) {
     val url = stringResource(urlResId)
 
@@ -41,7 +42,7 @@ fun UrlPreference(
         summary = summary,
         onClick = { onUrlClick(url) },
         modifier = modifier,
-        icon = icon,
+        iconResId = iconResId,
         control = {
             Icon(
                 painter = painterResource(R.drawable.baseline_launch_24),

@@ -18,9 +18,14 @@
 import org.gradle.testing.jacoco.tasks.JacocoReport
 
 val coverageExcludes = listOf(
-        "**/R.class", "**/R$*.class", "**/BuildConfig.*", "**/Manifest$*.*",
-        "**/airbnb/**/*.*", "**/*Screen*", "**/Showkase*",
-        "**/theme/Theme*", "**/theme/Type*"
+    "**/R.class",
+    "**/R$*.class",
+    "**/BuildConfig.*",
+    "**/Manifest$*.*",
+    "**/theme/Theme*",
+    "**/theme/Type*",
+    "**/*Preview*.*",
+    "**/*ComposableSingletons*.*"
 )
 
 fun JacocoReport.configureReport() {

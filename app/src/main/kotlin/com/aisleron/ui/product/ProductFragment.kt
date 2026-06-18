@@ -48,7 +48,7 @@ import com.aisleron.ui.ApplicationTitleUpdateListener
 import com.aisleron.ui.FabHandler
 import com.aisleron.ui.bundles.AddEditProductBundle
 import com.aisleron.ui.bundles.Bundler
-import com.aisleron.ui.navigation.Navigator
+import com.aisleron.ui.navigation.MainNavigator
 import com.aisleron.ui.settings.ProductPreferences
 import com.aisleron.ui.widgets.ErrorSnackBar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -62,7 +62,7 @@ class ProductFragment(
     private val applicationTitleUpdateListener: ApplicationTitleUpdateListener,
     private val productPreferences: ProductPreferences,
     private val fabHandler: FabHandler,
-    private val navigator: Navigator
+    private val navigator: MainNavigator
 ) : Fragment(), MenuProvider, AisleronFragment, FabHandler.FabClickedCallBack {
 
     private var showAddShopFab: Boolean = false

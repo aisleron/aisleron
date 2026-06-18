@@ -29,8 +29,8 @@ import com.aisleron.di.generalTestModule
 import com.aisleron.di.repositoryModule
 import com.aisleron.di.useCaseModule
 import com.aisleron.di.viewModelTestModule
-import com.aisleron.ui.navigation.Navigator
-import com.aisleron.ui.navigation.NavigatorTestImpl
+import com.aisleron.ui.navigation.MainNavigator
+import com.aisleron.ui.navigation.MainNavigatorTestImpl
 import com.aisleron.ui.shopmenu.ShopMenuFragment
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
@@ -48,7 +48,7 @@ class NavigationDrawerFragmentTest(
     private val textViewId: Int,
     private val navTargetId: Int
 ) : KoinTest {
-    private lateinit var navigator: NavigatorTestImpl
+    private lateinit var navigator: MainNavigatorTestImpl
 
     @get:Rule
     val koinTestRule = KoinTestRule(
@@ -59,7 +59,7 @@ class NavigationDrawerFragmentTest(
 
     @Before
     fun setUp() {
-        navigator = get<Navigator>() as NavigatorTestImpl
+        navigator = get<MainNavigator>() as MainNavigatorTestImpl
     }
 
     private fun getFragmentScenario(): FragmentScenario<NavigationDrawerFragment> {
@@ -103,7 +103,8 @@ class NavigationDrawerFragmentTest(
                 arrayOf("navAllItems", R.id.nav_all_items, R.id.nav_all_items),
                 arrayOf("navAllShops", R.id.nav_all_shops, R.id.nav_shopping_list),
                 arrayOf("navSettings", R.id.nav_settings, R.id.nav_settings),
-                arrayOf("navAllLists", R.id.nav_all_lists, R.id.nav_all_lists)
+                arrayOf("navAllLists", R.id.nav_all_lists, R.id.nav_all_lists),
+                arrayOf("navAbout", R.id.nav_about, R.id.nav_about)
             )
         }
     }

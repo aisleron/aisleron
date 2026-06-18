@@ -17,33 +17,60 @@
 
 package com.aisleron
 
+import android.content.Context
+import android.content.Intent
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.junit4.v2.createEmptyComposeRule
+import androidx.compose.ui.test.onNodeWithText
 import androidx.test.core.app.ActivityScenario
-import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
-import androidx.test.espresso.matcher.ViewMatchers.withText
+import androidx.test.core.app.ApplicationProvider
 import com.aisleron.di.KoinTestRule
-import com.aisleron.di.daoTestModule
-import com.aisleron.di.fragmentModule
-import com.aisleron.di.repositoryModule
-import com.aisleron.di.useCaseModule
+import com.aisleron.di.preferenceTestModule
 import com.aisleron.di.viewModelTestModule
+import com.aisleron.ui.navigation.Destination
+import com.aisleron.ui.navigation.IntentExtras.EXTRA_DESTINATION
 import org.junit.Rule
 import org.junit.Test
 
+
 class ConfigActivityTest {
+    @get:Rule
+    val composeTestRule = createEmptyComposeRule()
+
     @get:Rule
     val koinTestRule = KoinTestRule(
         modules = listOf(
-            daoTestModule, fragmentModule, viewModelTestModule, repositoryModule, useCaseModule
+            preferenceTestModule, viewModelTestModule
         )
     )
 
     @Test
-    fun aboutActivity_OnStart_ShowsAbout() {
-        val scenario = ActivityScenario.launch(ConfigActivity::class.java)
-        scenario.use {
-            onView(withText(R.string.about_support_header)).check(matches(isDisplayed()))
+    fun configActivity_NoBundleProvided_DefaultsToAboutScreen() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val intent = Intent(context, ConfigActivity::class.java)
+
+        ActivityScenario.launch<ConfigActivity>(intent).use {
+            val expectedText = context.getString(R.string.about_support_header)
+
+            composeTestRule
+                .onNodeWithText(expectedText)
+                .assertIsDisplayed()
+        }
+    }
+
+    @Test
+    fun configActivity_AboutDestinationProvided_ShowsAboutScreen() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val intent = Intent(context, ConfigActivity::class.java).apply {
+            putExtra(EXTRA_DESTINATION, Destination.About)
+        }
+
+        ActivityScenario.launch<ConfigActivity>(intent).use {
+            val expectedText = context.getString(R.string.about_support_header)
+
+            composeTestRule
+                .onNodeWithText(expectedText)
+                .assertIsDisplayed()
         }
     }
 }

@@ -92,8 +92,8 @@ import com.aisleron.ui.bundles.AddEditProductBundle
 import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.loyaltycard.LoyaltyCardProvider
 import com.aisleron.ui.loyaltycard.LoyaltyCardProviderTestImpl
-import com.aisleron.ui.navigation.Navigator
-import com.aisleron.ui.navigation.NavigatorTestImpl
+import com.aisleron.ui.navigation.MainNavigator
+import com.aisleron.ui.navigation.MainNavigatorTestImpl
 import com.aisleron.ui.settings.ShoppingListPreferencesTestImpl
 import com.aisleron.utils.SystemIds
 import kotlinx.coroutines.flow.first
@@ -123,7 +123,7 @@ class ShoppingListFragmentTest : KoinTest {
     private lateinit var applicationTitleUpdateListener: ApplicationTitleUpdateListenerTestImpl
     private lateinit var fabHandler: FabHandlerTestImpl
     private lateinit var activityFragment: ShoppingListFragment
-    private lateinit var navigator: NavigatorTestImpl
+    private lateinit var navigator: MainNavigatorTestImpl
 
     @get:Rule
     val koinTestRule = KoinTestRule(
@@ -214,7 +214,7 @@ class ShoppingListFragmentTest : KoinTest {
         bundler = Bundler()
         applicationTitleUpdateListener = ApplicationTitleUpdateListenerTestImpl()
         fabHandler = FabHandlerTestImpl()
-        navigator = get<Navigator>() as NavigatorTestImpl
+        navigator = get<MainNavigator>() as MainNavigatorTestImpl
         runBlocking { get<CreateSampleDataUseCase>().invoke() }
     }
 

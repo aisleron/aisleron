@@ -17,6 +17,8 @@
 
 package com.aisleron.ui.component.preference
 
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -26,15 +28,21 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.LocalContentColor
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+
+private fun setColor(baseColor: Color, enabled: Boolean): Color =
+    if (enabled) baseColor else baseColor.copy(alpha = 0.38f)
 
 @Composable
 fun Preference(
@@ -44,61 +52,50 @@ fun Preference(
     onClick: (() -> Unit)? = null,
     enabled: Boolean = true,
     // Slot for an optional leading icon
-    icon: @Composable (() -> Unit)? = null,
+    @DrawableRes iconResId: Int? = null,
+    @StringRes iconContentDescriptionResId: Int? = null,
     // Slot for interactive widgets like Checkboxes, Switches, or Action Icons
     control: @Composable (() -> Unit)? = null
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .clip(MaterialTheme.shapes.extraSmall)
             .background(MaterialTheme.colorScheme.surfaceContainerHigh)
             .then(
                 if (onClick != null) Modifier.clickable(enabled = enabled, onClick = onClick)
                 else Modifier
             )
-            .padding(
-                top = 16.dp,
-                bottom = 16.dp,
-                start = if (icon != null) 8.dp else 16.dp,
-                end = 16.dp
-            ),
+            .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Left Side Slot: Optional Icon Bounding Box
-        if (icon != null) {
-            Box(
+        if (iconResId != null) {
+            Icon(
+                painter = painterResource(iconResId),
+                contentDescription = iconContentDescriptionResId?.let { stringResource(it) },
                 modifier = Modifier
-                    .width(56.dp) // Fixed standard Material frame width
-                    .padding(end = 8.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                // Automatically style the icon with a muted color role
-                CompositionLocalProvider(
-                    LocalContentColor provides if (enabled) MaterialTheme.colorScheme.onSurfaceVariant
-                    else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f)
-                ) {
-                    icon()
-                }
-            }
+                    .padding(end = 16.dp)
+                    .size(24.dp),
+                tint = setColor(MaterialTheme.colorScheme.onSurfaceVariant, enabled)
+            )
         }
 
-        // Center Column: Text Information
+        // Centre Column: Text Information
         Column(
             modifier = Modifier.weight(1f)
         ) {
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleMedium,
-                color = if (enabled) MaterialTheme.colorScheme.onSurface
-                else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                color = setColor(MaterialTheme.colorScheme.onSurfaceVariant, enabled)
             )
             if (summary != null) {
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(
                     text = summary,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = if (enabled) MaterialTheme.colorScheme.onSurfaceVariant
-                    else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f)
+                    color = setColor(MaterialTheme.colorScheme.onSurfaceVariant, enabled)
                 )
             }
         }

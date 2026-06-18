@@ -24,6 +24,7 @@ plugins {
     id("com.google.devtools.ksp")
     id("org.jetbrains.kotlin.plugin.parcelize")
     id("org.jetbrains.kotlin.plugin.compose")
+    id("org.jetbrains.kotlin.plugin.serialization")
     // id("androidx.navigation.safeargs.kotlin")
 
     id("com.autonomousapps.dependency-analysis")
@@ -203,12 +204,21 @@ dependencies {
     implementation("androidx.viewpager2:viewpager2:1.1.0")
     implementation("org.jetbrains.kotlin:kotlin-parcelize-runtime:2.3.0")
     implementation("androidx.fragment:fragment-ktx:${Versions.FRAGMENT}")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.8.1")
 
     // Jetpack Compose
     implementation("androidx.navigation:navigation-compose:2.9.8")
     implementation("androidx.compose.runtime:runtime:1.11.2")
     implementation("androidx.compose.material3:material3:1.4.0")
     implementation("androidx.compose.ui:ui-tooling-preview:1.11.2")
+    implementation("androidx.activity:activity-compose:1.13.0")
+    implementation("androidx.compose.animation:animation:1.10.4")
+    implementation("androidx.compose.foundation:foundation-layout:1.10.4")
+    implementation("androidx.compose.foundation:foundation:1.10.4")
+    implementation("androidx.compose.ui:ui-graphics:1.11.2")
+    implementation("androidx.compose.ui:ui-text:1.11.2")
+    implementation("androidx.compose.ui:ui-unit:1.11.2")
+    implementation("androidx.compose.ui:ui:1.11.2")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.11.2")
     debugImplementation("androidx.compose.ui:ui-test-manifest:1.11.2")
 
@@ -216,6 +226,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-common:${Versions.LIFECYCLE}")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:${Versions.LIFECYCLE}")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:${Versions.LIFECYCLE}")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:${Versions.LIFECYCLE}")
 
     // Navigation
     implementation("androidx.navigation:navigation-ui-ktx:${Versions.NAVIGATION}")
@@ -236,6 +247,7 @@ dependencies {
     implementation("io.insert-koin:koin-android:${Versions.KOIN}")
     implementation("io.insert-koin:koin-core-viewmodel:${Versions.KOIN}")
     implementation("io.insert-koin:koin-androidx-compose:${Versions.KOIN}")
+    implementation("io.insert-koin:koin-compose:${Versions.KOIN}")
 
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.COROUTINES}")

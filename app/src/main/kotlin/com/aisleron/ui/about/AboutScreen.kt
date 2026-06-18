@@ -159,11 +159,6 @@ fun AboutScreenContent(
     uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES,
     name = "About Screen Dark Mode"
 )
-@Preview(
-    showSystemUi = true,
-    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES,
-    name = "About Screen Dark Mode"
-)
 @Composable
 fun AboutScreenContentPreview() {
     AisleronTheme {

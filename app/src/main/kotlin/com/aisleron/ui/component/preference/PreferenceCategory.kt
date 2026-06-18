@@ -53,7 +53,7 @@ fun PreferenceCategory(
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 4.dp)
                 .clip(MaterialTheme.shapes.medium),
-            verticalArrangement = Arrangement.spacedBy(0.5.dp)
+            verticalArrangement = Arrangement.spacedBy(2.dp)
         ) {
             content()
         }

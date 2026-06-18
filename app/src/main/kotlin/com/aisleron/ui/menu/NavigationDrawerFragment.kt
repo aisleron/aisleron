@@ -25,9 +25,9 @@ import androidx.fragment.app.Fragment
 import com.aisleron.databinding.FragmentNavigationDrawerBinding
 import com.aisleron.domain.FilterType
 import com.aisleron.domain.location.LocationType
-import com.aisleron.ui.navigation.Navigator
+import com.aisleron.ui.navigation.MainNavigator
 
-class NavigationDrawerFragment(private val navigator: Navigator) : Fragment() {
+class NavigationDrawerFragment(private val navigator: MainNavigator) : Fragment() {
 
     private var _binding: FragmentNavigationDrawerBinding? = null
     private val binding get() = _binding!!
@@ -42,7 +42,7 @@ class NavigationDrawerFragment(private val navigator: Navigator) : Fragment() {
         with(binding) {
             //Set onclick listener for views that navigate based on their Id matching a navigation graph destination
             val navButtons =
-                setOf(navInStock, navNeeded, navAllItems, navSettings, navAllLists, navAbout)
+                setOf(navInStock, navNeeded, navAllItems, navSettings, navAllLists)
 
             for (view in navButtons) {
                 view.setOnClickListener {
@@ -52,6 +52,10 @@ class NavigationDrawerFragment(private val navigator: Navigator) : Fragment() {
 
             navAllShops.setOnClickListener {
                 navigator.navigateToLocationGroupedProductList(LocationType.SHOP, FilterType.NEEDED)
+            }
+
+            navAbout.setOnClickListener {
+                navigator.navigateToAbout()
             }
         }
 

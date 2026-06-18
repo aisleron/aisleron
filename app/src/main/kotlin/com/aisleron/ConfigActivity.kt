@@ -25,29 +25,49 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.aisleron.ui.about.AboutScreen
-import com.aisleron.ui.settings.DisplayPreferencesImpl
+import com.aisleron.ui.navigation.Destination
+import com.aisleron.ui.navigation.IntentExtras.EXTRA_DESTINATION
+import com.aisleron.ui.navigation.getDestinationExtra
+import com.aisleron.ui.settings.DisplayPreferences
 import com.aisleron.ui.theme.AisleronTheme
+import org.koin.android.ext.android.inject
 
 
 class ConfigActivity : AppCompatActivity() {
+    private val displayPreferences: DisplayPreferences by inject()
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge(statusBarStyle = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT))
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT)
+        )
 
         super.onCreate(savedInstanceState)
 
+        val destination = intent.getDestinationExtra(EXTRA_DESTINATION) ?: Destination.About
+
         setContent {
-            val displayPreferences = DisplayPreferencesImpl(this)
+            val navController = rememberNavController()
 
             AisleronTheme(
                 dynamicColor = displayPreferences.dynamicColor(),
                 pureBlackStyle = displayPreferences.pureBlackStyle(),
                 applicationTheme = displayPreferences.applicationTheme()
             ) {
-                AboutScreen(
-                    onBackPressed = { finish() },
-                    onUrlClick = { url -> onUrlClick(url) }
-                )
+                NavHost(
+                    navController = navController,
+                    startDestination = destination
+                ) {
+                    composable<Destination.About> {
+                        AboutScreen(
+                            onBackPressed = { finish() },
+                            onUrlClick = { url -> onUrlClick(url) }
+                        )
+                    }
+                }
             }
         }
     }
