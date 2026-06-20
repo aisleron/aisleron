@@ -1,0 +1,6 @@
+Mejoras:
+* Agregue un "Todos los artículos" a la lista de compras menú (gracias a @SivanTechDev).
+* Actualizado Sobre la página y actividad secundaria a Jetpack Compose.
+
+Corrección de errores:
+* Añadir portugués a la selección de idiomas.
