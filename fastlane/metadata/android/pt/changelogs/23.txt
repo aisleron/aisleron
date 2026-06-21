@@ -1,6 +1,0 @@
-Melhorias:
-* Adicione um toggle 'All Items' ao menu da lista de compras (graças a @SivanTechDev).
-* Atualizado Sobre página e atividade secundária para Jetpack Compose.
-
-Correções de bugs:
-* Adicionar Português à seleção de idiomas.
