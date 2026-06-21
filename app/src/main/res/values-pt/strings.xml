@@ -204,5 +204,5 @@
     <string name="navigation_drawer_close">Fechar menu de navegação</string>
     <string name="nav_header_subtitle">Navegar pelas lojas!</string>
     <string name="nav_header_desc">Título de navegação</string>
-    <string name="back">Voltar</string>
+    <string name="back">Recuar</string>
 </resources>
