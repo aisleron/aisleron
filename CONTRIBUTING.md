@@ -27,7 +27,7 @@ All Pull Requests must meet the following standards before they can be merged:
 * **Documentation:** If a change impacts functionality or user interface, you must submit a corresponding Pull Request to the [documentation repository](https://github.com/aisleron/aisleron.docs) to update the relevant guides. Please link the documentation PR within the description of your code PR.
 * **Code Quality:** Ensure code adheres to the project's existing style and architecture.
 * **Localization and Translations:** All new or modified string values must be fully translated into all supported languages. 
-    * The use of AI tools for translation is permitted and encouraged to expedite this process. 
+    * The use of AI tools for translation is permitted to expedite this process. 
     * Contributors are responsible for ensuring that AI-generated translations are contextually accurate and correctly formatted according to the project's localization files (e.g., preserving placeholders or keys).
  
 ## Build System and Dependencies
