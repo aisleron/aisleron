@@ -213,4 +213,5 @@
     <string name="show_location_list">Wys %1$s</string>
     <string name="search">Soek</string>
     <string name="search_fab">Soek-FAB</string>
+    <string name="back">Terug</string>
 </resources>

@@ -60,6 +60,7 @@
         <item>@string/system_default</item>
         <item>@string/language_english_en</item>
         <item>@string/language_afrikaans_af</item>
+        <item>@string/language_arabic_ar</item>
         <item>@string/language_bulgarian_bg</item>
         <item>@string/language_breton_br</item>
         <item>@string/language_german_de</item>
@@ -70,6 +71,7 @@
         <item>@string/language_portuguese_pt</item>
         <item>@string/language_russian_ru</item>
         <item>@string/language_swedish_sv</item>
+        <item>@string/language_tamil_ta</item>
         <item>@string/language_turkish_tr</item>
         <item>@string/language_ukrainian_uk</item>
     </string-array>
@@ -79,6 +81,7 @@
         <item />
         <item>en</item>
         <item>af</item>
+        <item>ar</item>
         <item>bg</item>
         <item>br</item>
         <item>de</item>
@@ -89,6 +92,7 @@
         <item>pt</item>
         <item>ru</item>
         <item>sv</item>
+        <item>ta</item>
         <item>tr</item>
         <item>uk</item>
     </string-array>

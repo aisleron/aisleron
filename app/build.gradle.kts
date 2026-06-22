@@ -22,10 +22,9 @@ import java.util.Properties
 plugins {
     id("com.android.application")
     id("com.google.devtools.ksp")
-    id("org.jetbrains.kotlin.plugin.parcelize")
     id("org.jetbrains.kotlin.plugin.compose")
+    id("org.jetbrains.kotlin.plugin.parcelize")
     id("org.jetbrains.kotlin.plugin.serialization")
-    // id("androidx.navigation.safeargs.kotlin")
 
     id("com.autonomousapps.dependency-analysis")
 }
@@ -37,15 +36,34 @@ object Versions {
     const val JUNIT = "6.1.0"
     const val ESPRESSO = "3.7.0"
     const val FRAGMENT = "1.8.9"
-    const val LIFECYCLE = "2.10.0"
+    const val LIFECYCLE = "2.10.0" // 2.11.0 requires android 17
     const val ROOM = "2.8.4"
     const val KOIN = "4.2.1"
     const val NAVIGATION = "2.9.8"
+    const val COMPOSE = "1.11.3"
+    // const val NAVIGATION3 = "1.1.3"
 }
 
 // Keep this list aligned with the values in the language_codes array in arrays.xml and with locale_config.xml
 val supportedLocales =
-    listOf("en", "af", "bg", "br", "de", "es", "fr", "it", "pl", "pt", "ru", "sv", "tr", "uk")
+    listOf(
+        "en",
+        "af",
+        "ar",
+        "bg",
+        "br",
+        "de",
+        "es",
+        "fr",
+        "it",
+        "pl",
+        "pt",
+        "ru",
+        "sv",
+        "ta",
+        "tr",
+        "uk"
+    )
 
 android {
     dependenciesInfo {
@@ -187,12 +205,13 @@ java {
 
 dependencies {
     // Implementation
-    implementation("androidx.core:core-ktx:1.18.0")
-    implementation("androidx.activity:activity-ktx:1.13.0")
+    implementation("androidx.core:core-ktx:1.18.0") // 1.19.0 Requires Android 17, and moves to non-ktx
+    implementation("androidx.activity:activity:1.13.0")
+    implementation("androidx.activity:activity-compose:1.13.0")
     implementation("androidx.appcompat:appcompat:1.7.1")
     implementation("com.google.android.material:material:1.14.0")
     implementation("androidx.recyclerview:recyclerview:1.4.0")
-    implementation("androidx.collection:collection-ktx:1.6.0")
+    implementation("androidx.collection:collection:1.6.0")
     implementation("androidx.cardview:cardview:1.0.0")
     implementation("androidx.drawerlayout:drawerlayout:1.2.0")
     implementation("androidx.constraintlayout:constraintlayout:2.2.1")
@@ -202,55 +221,67 @@ dependencies {
     implementation("androidx.documentfile:documentfile:1.1.0")
     implementation("androidx.preference:preference-ktx:1.2.1")
     implementation("androidx.viewpager2:viewpager2:1.1.0")
-    implementation("org.jetbrains.kotlin:kotlin-parcelize-runtime:2.3.0")
-    implementation("androidx.fragment:fragment-ktx:${Versions.FRAGMENT}")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.8.1")
+    implementation("org.jetbrains.kotlin:kotlin-parcelize-runtime:2.3.0") // Dependency analysis requires 2.3.0
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.11.0")
+
+    // Fragment
+    implementation("androidx.fragment:fragment-ktx:${Versions.FRAGMENT}") // 1.9.0 moves to non-ktx
+    debugImplementation("androidx.fragment:fragment-testing:${Versions.FRAGMENT}")
 
     // Jetpack Compose
-    implementation("androidx.navigation:navigation-compose:2.9.8")
-    implementation("androidx.compose.runtime:runtime:1.11.2")
     implementation("androidx.compose.material3:material3:1.4.0")
-    implementation("androidx.compose.ui:ui-tooling-preview:1.11.2")
-    implementation("androidx.activity:activity-compose:1.13.0")
-    implementation("androidx.compose.animation:animation:1.10.4")
-    implementation("androidx.compose.foundation:foundation-layout:1.10.4")
-    implementation("androidx.compose.foundation:foundation:1.10.4")
-    implementation("androidx.compose.ui:ui-graphics:1.11.2")
-    implementation("androidx.compose.ui:ui-text:1.11.2")
-    implementation("androidx.compose.ui:ui-unit:1.11.2")
-    implementation("androidx.compose.ui:ui:1.11.2")
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.11.2")
-    debugImplementation("androidx.compose.ui:ui-test-manifest:1.11.2")
+    implementation("androidx.compose.animation:animation:${Versions.COMPOSE}")
+    implementation("androidx.compose.foundation:foundation:${Versions.COMPOSE}")
+    implementation("androidx.compose.foundation:foundation-layout:${Versions.COMPOSE}")
+    implementation("androidx.compose.ui:ui:${Versions.COMPOSE}")
+    implementation("androidx.compose.ui:ui-graphics:${Versions.COMPOSE}")
+    implementation("androidx.compose.ui:ui-text:${Versions.COMPOSE}")
+    implementation("androidx.compose.ui:ui-tooling-preview:${Versions.COMPOSE}")
+    implementation("androidx.compose.ui:ui-unit:${Versions.COMPOSE}")
+    implementation("androidx.compose.runtime:runtime:${Versions.COMPOSE}")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:${Versions.COMPOSE}")
+    debugImplementation("androidx.compose.ui:ui-tooling:${Versions.COMPOSE}")
+    androidTestImplementation("androidx.compose.ui:ui-test:${Versions.COMPOSE}")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:${Versions.COMPOSE}")
+
 
     // Lifecycle
     implementation("androidx.lifecycle:lifecycle-common:${Versions.LIFECYCLE}")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:${Versions.LIFECYCLE}")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:${Versions.LIFECYCLE}")
+    implementation("androidx.lifecycle:lifecycle-runtime:${Versions.LIFECYCLE}")
+    implementation("androidx.lifecycle:lifecycle-viewmodel:${Versions.LIFECYCLE}")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:${Versions.LIFECYCLE}")
 
     // Navigation
-    implementation("androidx.navigation:navigation-ui-ktx:${Versions.NAVIGATION}")
-    implementation("androidx.navigation:navigation-common-ktx:${Versions.NAVIGATION}")
-    implementation("androidx.navigation:navigation-runtime-ktx:${Versions.NAVIGATION}")
-    implementation("androidx.navigation:navigation-fragment-ktx:${Versions.NAVIGATION}")
+    implementation("androidx.navigation:navigation-fragment:${Versions.NAVIGATION}")
+    implementation("androidx.navigation:navigation-common:${Versions.NAVIGATION}")
+    implementation("androidx.navigation:navigation-compose:${Versions.NAVIGATION}")
+    implementation("androidx.navigation:navigation-runtime:${Versions.NAVIGATION}")
+    implementation("androidx.navigation:navigation-ui:${Versions.NAVIGATION}")
+    androidTestImplementation("androidx.navigation:navigation-testing:${Versions.NAVIGATION}")
+
+    // Consider moving to navigation3 once it matures
+    // implementation("androidx.navigation3:navigation3-runtime:${Versions.NAVIGATION3}")
+    // implementation("androidx.navigation3:navigation3-ui:${Versions.NAVIGATION3}")
 
     // Database
-    implementation("androidx.sqlite:sqlite-ktx:2.6.2")
-    implementation("androidx.room:room-ktx:${Versions.ROOM}")
-    implementation("androidx.room:room-runtime:${Versions.ROOM}")
-    implementation("androidx.room:room-common:${Versions.ROOM}")
-    debugImplementation("androidx.compose.ui:ui-tooling:1.11.2")
     ksp("androidx.room:room-compiler:${Versions.ROOM}")
+    implementation("androidx.room:room-common:${Versions.ROOM}")
+    implementation("androidx.room:room-runtime:${Versions.ROOM}")
+    debugImplementation("androidx.room:room-testing-android:${Versions.ROOM}")
+    implementation("androidx.sqlite:sqlite:2.6.2")
 
     // Dependency Injection
-    implementation("io.insert-koin:koin-core:${Versions.KOIN}")
     implementation("io.insert-koin:koin-android:${Versions.KOIN}")
-    implementation("io.insert-koin:koin-core-viewmodel:${Versions.KOIN}")
     implementation("io.insert-koin:koin-androidx-compose:${Versions.KOIN}")
     implementation("io.insert-koin:koin-compose:${Versions.KOIN}")
+    implementation("io.insert-koin:koin-core:${Versions.KOIN}")
+    implementation("io.insert-koin:koin-core-viewmodel:${Versions.KOIN}")
+    androidTestImplementation("io.insert-koin:koin-test:${Versions.KOIN}")
 
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.COROUTINES}")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.COROUTINES}")
+    androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.COROUTINES}")
 
     // Testing
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
@@ -258,7 +289,6 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:${Versions.JUNIT}")
     testImplementation("org.junit.jupiter:junit-jupiter-api:${Versions.JUNIT}")
     testImplementation("org.junit.jupiter:junit-jupiter-params:${Versions.JUNIT}")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.COROUTINES}")
 
     // Android Testing
     androidTestImplementation(project(":testData"))
@@ -267,15 +297,8 @@ dependencies {
     androidTestImplementation("androidx.test.uiautomator:uiautomator:2.3.0")
     androidTestImplementation("tools.fastlane:screengrab:2.1.1")
 
-    debugImplementation("androidx.room:room-testing-android:${Versions.ROOM}")
-    debugImplementation("androidx.fragment:fragment-testing:${Versions.FRAGMENT}")
-    androidTestImplementation("io.insert-koin:koin-test:${Versions.KOIN}")
-    androidTestImplementation("androidx.navigation:navigation-testing:${Versions.NAVIGATION}")
-    androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.COROUTINES}")
-
     debugImplementation("androidx.test.espresso:espresso-contrib:${Versions.ESPRESSO}")
     androidTestImplementation("androidx.test.espresso:espresso-core:${Versions.ESPRESSO}")
     androidTestImplementation("androidx.test.espresso:espresso-intents:${Versions.ESPRESSO}")
-
     androidTestImplementation("org.hamcrest:hamcrest:3.0")
 }

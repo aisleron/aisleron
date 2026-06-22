@@ -1,4 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (C) 2026 aisleron.com
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as
+  ~ published by the Free Software Foundation, either version 3 of the
+  ~ License, or (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
 <resources>
     <string name="navigation_drawer_open">Digeriñ al lañser</string>
     <string name="navigation_drawer_close">Serriñ al lañser merdeiñ</string>
@@ -198,4 +215,5 @@
     <string name="welcome_load_sample_items">&lt;h3&gt;Kargañ skouerioù traoù&lt;/h3&gt; Klaskit un listenn rak-leuniet evit gwelet penaos ez a an arload en-dro</string>
     <string name="welcome_import_db">&lt;h3&gt;Enporzhiañ ur stravandead roadennoù a-vremañ&lt;/h3&gt; Degasit ul listenn burchasadennoù eus ur restr-gwareziñ goshoc\'h en ur enporzhiañ anezhi adalek pajenn ar Reizhadurioù</string>
     <string name="welcome_documentation">&lt;h3&gt;Gwelet an teuliadur&lt;/h3&gt; Sellit ouzh teuliadur Aisleron enlinenn evit gouzout muioc\'h diwar-benn perzhioù an arload</string>
+    <string name="back">Distreiñ</string>
 </resources>

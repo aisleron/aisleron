@@ -437,6 +437,7 @@ class SettingsFragmentTest : KoinTest {
         val languages = listOf(
             Pair(R.string.language_english_en, "en"),
             Pair(R.string.language_afrikaans_af, "af"),
+            Pair(R.string.language_arabic_ar, "ar"),
             Pair(R.string.language_bulgarian_bg, "bg"),
             Pair(R.string.language_german_de, "de"),
             Pair(R.string.language_spanish_es, "es"),
@@ -446,6 +447,7 @@ class SettingsFragmentTest : KoinTest {
             Pair(R.string.language_portuguese_pt, "pt"),
             Pair(R.string.language_russian_ru, "ru"),
             Pair(R.string.language_swedish_sv, "sv"),
+            Pair(R.string.language_tamil_ta, "ta"),
             Pair(R.string.language_turkish_tr, "tr"),
             Pair(R.string.language_ukrainian_uk, "uk")
         )
