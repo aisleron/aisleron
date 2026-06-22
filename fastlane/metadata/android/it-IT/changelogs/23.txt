@@ -1,6 +1,7 @@
 Miglioramenti:
 * Aggiungi un'opzione 'Tutti gli elementi' al menu della lista della spesa (grazie a @SivanTechDev).
 * Aggiornato sulla pagina e attività secondaria a Jetpack Compose.
+* Aggiunte traduzioni arabo e tamil.
 
 Correzioni di bug:
 * Aggiungi portoghese alla selezione della lingua.
