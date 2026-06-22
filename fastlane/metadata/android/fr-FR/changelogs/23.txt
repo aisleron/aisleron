@@ -1,6 +1,7 @@
 Améliorations :
 * Ajouter un « Tous les articles » à la liste des achats (merci @SivanTechDev).
 * Actualisé A propos de la page et de l'activité secondaire à Jetpack Compose.
+* Ajout de traductions en arabe et en tamoul.
 
 Corrections de bug :
 * Ajouter le portugais à la sélection de langues.
