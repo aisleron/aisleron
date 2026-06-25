@@ -1,7 +1,7 @@
-Ausdehnungen:
-* Füg zu ein 'Alle StückeUmschalter zu die Einkaufen Liste Speisekarte (aufgrund von @SivanTechDev).
-* Verbessert Von Seite und sekundäre Aktivität zu Jetpack Fasst ab.
-* Zugefügt arabisch und Tamil Übersetzungen.
+Verbesserungen:
+* Hinzugefügt ein 'All Items' toggle in die Einkaufsliste Menü (dank @SivanTechDev).
+* Aktualisierte Über Seite und Sekundäraktivität zu Jetpack Compose.
+* Hinzugefügt Arabisch und Tamil Übersetzungen.
 
-Käfer Klemmen:
-* Füg zu portugiesisch zu Sprache Auslese.
+Fehler behoben:
+* Hinzugefügt Portugiesisch zur Sprachauswahl.
