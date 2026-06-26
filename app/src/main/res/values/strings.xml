@@ -75,6 +75,7 @@
 
     <!-- Language names (non-translatable) -->
     <string name="language_afrikaans_af" translatable="false">Afrikaans</string>
+    <string name="language_arabic_ar" translatable="false">العربية</string>
     <string name="language_bulgarian_bg" translatable="false">Български</string>
     <string name="language_breton_br" translatable="false">Brezhoneg</string>
     <string name="language_english_en" translatable="false">English</string>
@@ -82,9 +83,11 @@
     <string name="language_german_de" translatable="false">Deutsch</string>
     <string name="language_italian_it" translatable="false">Italiano</string>
     <string name="language_polish_pl" translatable="false">Polski</string>
+    <string name="language_portuguese_pt" translatable="false">Português</string>
     <string name="language_russian_ru" translatable="false">Русский</string>
     <string name="language_spanish_es" translatable="false">Español</string>
     <string name="language_swedish_sv" translatable="false">Svenska</string>
+    <string name="language_tamil_ta" translatable="false">தமிழ்</string>
     <string name="language_turkish_tr" translatable="false">Türkçe</string>
     <string name="language_ukrainian_uk" translatable="false">Українська</string>
 
@@ -159,6 +162,11 @@
     <string name="aisleron_version_history_url" translatable="false">https://aisleron.com/docs/version-history</string>
     <string name="aisleron_translate_url" translatable="false">https://aisleron.com/docs/contribute/translate</string>
     <string name="aisleron_financial_contribution_url" translatable="false">https://aisleron.com/docs/contribute/financial_contributions</string>
+    <string name="aisleron_reporting_issues_url" translatable="false">https://aisleron.com/docs/reporting-issues</string>
+    <string name="aisleron_sourcecode_url" translatable="false">https://github.com/aisleron/aisleron</string>
+    <string name="aisleron_license_url" translatable="false">https://aisleron.com/docs/licenses-policies/aisleron-license</string>
+    <string name="aisleron_privacy_policy_url" translatable="false">https://aisleron.com/docs/licenses-policies/aisleron-privacy-policy</string>
+    <string name="aisleron_3rd_party_licenses_url" translatable="false">https://aisleron.com/docs/licenses-policies/3rd-party-licenses</string>
 
     <!-- Loyalty cards -->
     <string name="shop_loyalty_card_name">Loyalty Card</string>
@@ -254,4 +262,5 @@
     <string name="save_changes_message">You have unsaved changes. Do you want to save them before leaving?</string>
     <string name="keep_editing">Keep Editing</string>
     <string name="show_location_list">Show %1$s</string>
+    <string name="back">Back</string>
 </resources>

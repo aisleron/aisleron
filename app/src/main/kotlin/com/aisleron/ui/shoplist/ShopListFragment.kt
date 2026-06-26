@@ -43,7 +43,7 @@ import com.aisleron.ui.FabHandler
 import com.aisleron.ui.FabHandler.FabClickedCallBack
 import com.aisleron.ui.copyentity.CopyEntityDialogFragment
 import com.aisleron.ui.copyentity.CopyEntityType
-import com.aisleron.ui.navigation.Navigator
+import com.aisleron.ui.navigation.MainNavigator
 import com.aisleron.ui.note.NoteDialogFragment
 import com.aisleron.ui.note.NoteParentRef
 import com.aisleron.ui.widgets.ErrorSnackBar
@@ -53,7 +53,7 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ShopListFragment(
-    private val fabHandler: FabHandler, private val navigator: Navigator
+    private val fabHandler: FabHandler, private val navigator: MainNavigator
 ) : Fragment(), ActionMode.Callback,
     ShopListItemRecyclerViewAdapter.ShopListItemListener, FabClickedCallBack, AisleronFragment {
 

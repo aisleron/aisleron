@@ -379,6 +379,48 @@ class ShoppingListViewModelTest : KoinTest {
     }
 
     @Test
+    fun setShowAllItems_BaseFilterIsNeeded_TogglesFilterWithoutResetOnRefresh() = runTest {
+        val locationId =
+            get<LocationRepository>().getAll().first { it.type == LocationType.SHOP }.id
+
+        shoppingListViewModel.hydrate(getAisleGrouping(locationId), FilterType.NEEDED, false)
+        val initialState = awaitUiStateUpdated(shoppingListViewModel)
+        assertTrue(initialState.allowAllItemsToggle)
+        assertFalse(initialState.showAllItemsChecked)
+
+        shoppingListViewModel.setShowAllItems(true)
+        assertEquals(FilterType.ALL, shoppingListViewModel.productFilter)
+        val toggledState = shoppingListViewModel.shoppingListUiState.first {
+            it is ShoppingListViewModel.ShoppingListUiState.Updated && it.showAllItemsChecked
+        } as ShoppingListViewModel.ShoppingListUiState.Updated
+        assertTrue(toggledState.allowAllItemsToggle)
+
+        shoppingListViewModel.submitProductSearch("Ap")
+        shoppingListViewModel.requestListRefresh(true)
+
+        assertEquals(FilterType.ALL, shoppingListViewModel.productFilter)
+    }
+
+    @Test
+    fun setShowAllItems_BaseFilterIsAll_FilterDoesNotChange() = runTest {
+        val locationId =
+            get<LocationRepository>().getAll().first { it.type == LocationType.SHOP }.id
+
+        shoppingListViewModel.hydrate(getAisleGrouping(locationId), FilterType.ALL, false)
+        val initialState = awaitUiStateUpdated(shoppingListViewModel)
+
+        assertFalse(shoppingListViewModel.canShowAllItemsToggle)
+        assertFalse(initialState.allowAllItemsToggle)
+        assertTrue(initialState.showAllItemsChecked)
+
+        shoppingListViewModel.setShowAllItems(false)
+        assertEquals(FilterType.ALL, shoppingListViewModel.productFilter)
+
+        shoppingListViewModel.setShowAllItems(true)
+        assertEquals(FilterType.ALL, shoppingListViewModel.productFilter)
+    }
+
+    @Test
     fun constructor_NoCoroutineScopeProvided_ShoppingListViewModelReturned() {
         val vm = ShoppingListViewModel(
             shoppingListStreamProviderFactory = get<ShoppingListCoordinatorFactory>()

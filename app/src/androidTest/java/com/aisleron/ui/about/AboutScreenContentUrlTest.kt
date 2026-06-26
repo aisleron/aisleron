@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025-2026 aisleron.com
+ * Copyright (C) 2026 aisleron.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -17,38 +17,20 @@
 
 package com.aisleron.ui.about
 
-import android.app.Instrumentation
-import android.content.Intent
-import androidx.fragment.app.testing.FragmentScenario
-import androidx.fragment.app.testing.launchFragmentInContainer
-import androidx.recyclerview.widget.RecyclerView
-import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.contrib.RecyclerViewActions
-import androidx.test.espresso.intent.Intents
-import androidx.test.espresso.intent.Intents.intended
-import androidx.test.espresso.intent.Intents.intending
-import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
-import androidx.test.espresso.intent.matcher.IntentMatchers.hasData
-import androidx.test.espresso.matcher.ViewMatchers.hasDescendant
-import androidx.test.espresso.matcher.ViewMatchers.withId
-import androidx.test.espresso.matcher.ViewMatchers.withText
+import androidx.compose.ui.test.junit4.v2.createComposeRule
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
+import androidx.test.platform.app.InstrumentationRegistry
 import com.aisleron.R
-import com.aisleron.di.KoinTestRule
-import com.aisleron.di.viewModelTestModule
-import com.aisleron.utils.SystemIds
-import org.hamcrest.Matchers
-import org.junit.After
-import org.junit.Before
+import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
-import org.koin.test.KoinTest
-
 
 @RunWith(value = Parameterized::class)
-class AboutIntentsTest(private val resourceId: Int, private val expectedUri: String) : KoinTest {
+class AboutScreenContentUrlTest(private val labelResId: Int, private val expectedUri: String) {
 
     companion object {
         @JvmStatic
@@ -96,41 +78,29 @@ class AboutIntentsTest(private val resourceId: Int, private val expectedUri: Str
     }
 
     @get:Rule
-    val koinTestRule = KoinTestRule(
-        modules = listOf(viewModelTestModule)
-    )
-
-    @Before
-    fun setUp() {
-        Intents.init()
-    }
-
-    @After
-    fun tearDown() {
-        Intents.release()
-    }
-
-    private fun getFragmentScenario(): FragmentScenario<AboutFragment> =
-        launchFragmentInContainer<AboutFragment>(
-            themeResId = R.style.Theme_Aisleron,
-            instantiate = { AboutFragment() }
-        )
+    val composeTestRule = createComposeRule()
 
     @Test
-    fun onAboutEntryClick_OnLaunchIntent_OpensCorrectUri() {
-        getFragmentScenario()
+    fun onAboutEntryClick_InvokesCallbackWithCorrectUrl() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val expectedLabelString = context.getString(labelResId)
+        var capturedUrl: String? = null
 
-        val expectedIntent = Matchers.allOf(hasAction(Intent.ACTION_VIEW), hasData(expectedUri))
-        intending(expectedIntent).respondWith(Instrumentation.ActivityResult(0, null))
-
-        onView(withId(SystemIds.PREFERENCE_RECYCLER_VIEW))
-            .perform(
-                RecyclerViewActions.scrollTo<RecyclerView.ViewHolder>(
-                    hasDescendant(withText(resourceId))
-                )
+        // 2. Launch the stateless UI component in isolation
+        composeTestRule.setContent {
+            AboutScreenContent(
+                versionName = "2.4.1",
+                onBackPressed = {},
+                onUrlClick = { url -> capturedUrl = url } // Trap the URL string in our test hook
             )
+        }
 
-        onView(withText(resourceId)).perform(click())
-        intended(expectedIntent)
+        // 3. Find, Scroll to, and Click the item using semantic text matchers
+        composeTestRule.onNodeWithText(expectedLabelString)
+            .performScrollTo()
+            .performClick()
+
+        // 4. Verify the UI passed the correct string payload back up to the parent layer
+        assertEquals(expectedUri, capturedUrl)
     }
 }

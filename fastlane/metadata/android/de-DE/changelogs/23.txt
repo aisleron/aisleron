@@ -1,0 +1,7 @@
+Ausdehnungen:
+* Füg zu ein 'Alle StückeUmschalter zu die Einkaufen Liste Speisekarte (aufgrund von @SivanTechDev).
+* Verbessert Von Seite und sekundäre Aktivität zu Jetpack Fasst ab.
+* Zugefügt arabisch und Tamil Übersetzungen.
+
+Käfer Klemmen:
+* Füg zu portugiesisch zu Sprache Auslese.

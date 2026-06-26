@@ -55,6 +55,12 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/mnu_show_all_items"
+        android:title="@string/menu_all_items"
+        android:checkable="true"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/mnu_expand_collapse_aisles"
         android:title="@string/expand_collapse_aisles"
         app:showAsAction="never" />

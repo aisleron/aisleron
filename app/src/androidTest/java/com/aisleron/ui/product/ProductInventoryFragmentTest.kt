@@ -44,7 +44,7 @@ import com.aisleron.ui.AddEditFragmentListenerTestImpl
 import com.aisleron.ui.ApplicationTitleUpdateListenerTestImpl
 import com.aisleron.ui.FabHandlerTestImpl
 import com.aisleron.ui.bundles.Bundler
-import com.aisleron.ui.navigation.NavigatorTestImpl
+import com.aisleron.ui.navigation.MainNavigatorTestImpl
 import com.aisleron.ui.settings.ProductPreferencesTestImpl
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -212,7 +212,7 @@ class ProductInventoryFragmentTest : KoinTest {
                             it.setShowExtraOptions(true)
                         },
                         FabHandlerTestImpl(),
-                        NavigatorTestImpl(bundler)
+                        MainNavigatorTestImpl(bundler)
                     )
                 }
             )

@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (C) 2026 aisleron.com
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as
+  ~ published by the Free Software Foundation, either version 3 of the
+  ~ License, or (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<resources>
+    <string name="navigation_drawer_open">வழிசெலுத்தல் அலமாரியைத் திறக்கவும்</string>
+    <string name="navigation_drawer_close">வழிசெலுத்தல் டிராயரை மூடு</string>
+    <string name="nav_header_subtitle">கடைகள் வழியாக பறக்க!</string>
+    <string name="nav_header_desc">வழிசெலுத்தல் தலைப்பு</string>
+    <string name="action_search">தேடல்</string>
+    <string name="menu_in_stock">வீட்டுப் பங்கு</string>
+    <string name="menu_needed">தேவை</string>
+    <string name="menu_all_items">அனைத்து பொருட்கள்</string>
+    <string name="menu_settings">அமைப்புகள்</string>
+    <string name="menu_all_shops">அனைத்து கடைகள்</string>
+    <string name="menu_shops">கடைகள்</string>
+    <string name="menu_about">பற்றி</string>
+    <string name="menu_all_lists">அனைத்து பட்டியல்கள்</string>
+    <string name="home">வீடு</string>
+    <string name="display_options_header">காட்சி விருப்பங்கள்</string>
+    <string name="show_on_lock_screen">பூட்டுத் திரையில் காட்டு</string>
+    <string name="system_theme">கணினி கருப்பொருள்</string>
+    <string name="light_theme">ஒளி கருப்பொருள்</string>
+    <string name="dark_theme">இருண்ட கருப்பொருள்</string>
+    <string name="theme">கருப்பொருள்</string>
+    <string name="backup_restore_title">காப்பு/மீட்டமை</string>
+    <string name="backup_database">காப்பு தரவுத்தளம்</string>
+    <string name="restore_database">தரவுத்தளத்தை மீட்டமை</string>
+    <string name="backup_folder">காப்பு கோப்புறை</string>
+    <string name="last_backup">கடைசி காப்புப்பிரதி:</string>
+    <string name="last_restore">கடைசி மீட்டமைப்பு:</string>
+    <string name="never">ஒருபோதும்</string>
+    <string name="db_backup_processing">காப்புப்பிரதி செயலில் உள்ளது…</string>
+    <string name="db_backup_success">காப்புப்பிரதி முடிந்தது</string>
+    <string name="db_restore_processing">மீட்டெடுப்பு செயலில் உள்ளது…</string>
+    <string name="db_restore_success">மீட்டெடுப்பு முடிந்தது</string>
+    <string name="db_restore_confirmation">உங்கள் தற்போதைய தரவுத்தளத்தை காப்புப் பிரதி %1$s உடன் மாற்ற விரும்புகிறீர்களா?</string>
+    <string name="db_restore_confirmation_title">தரவுத்தள மீட்டமைப்பை உறுதிப்படுத்தவும்</string>
+    <string name="backup_folder_success">காப்பு கோப்புறை அமைக்கப்பட்டது</string>
+    <string name="keep_screen_on">திரையை இயக்கவும்</string>
+    <string name="keep_screen_on_summary">பட்டியலைப் பார்க்கும்போது திரை அணைக்கப்படுவதைத் தடுக்கவும்</string>
+    <string name="starting_list">தொடக்க பட்டியல்</string>
+    <string name="use_dynamic_color">மாறும் நிறம்</string>
+    <string name="use_dynamic_color_summary">தற்போதைய வால்பேப்பரிலிருந்து பெறப்பட்ட கணினி வண்ணங்களைப் பயன்படுத்தவும்</string>
+    <string name="pure_black_default">கருப்பொருள் இயல்புநிலை</string>
+    <string name="pure_black_economy">பொருளாதாரம்</string>
+    <string name="pure_black_business_class">வணிக வகுப்பு</string>
+    <string name="pure_black_first_class">முதல் வகுப்பு</string>
+    <string name="pure_black_style">தூய கருப்பு பாணி</string>
+    <string name="language">மொழி</string>
+    <string name="system_default">கணினி இயல்புநிலை</string>
+    <string name="note_hint">உரை குறிப்பு</string>
+    <string name="note_hint_button">பொத்தான்</string>
+    <string name="note_hint_summary">சுருக்கம்</string>
+    <string name="note_hint_indicator">காட்டி (*)</string>
+    <string name="preference_none">எதுவுமில்லை</string>
+    <string name="generic_error">பிழை: %1$s</string>
+    <string name="delete_default_aisle_exception">பிழை: இயல்புநிலை இடைகழியை அகற்ற முடியாது</string>
+    <string name="duplicate_product_name_exception">பிழை: தயாரிப்பின் பெயர் தனிப்பட்டதாக இருக்க வேண்டும்</string>
+    <string name="duplicate_location_name_exception">பிழை: இருப்பிடத்தின் பெயர் தனிப்பட்டதாக இருக்க வேண்டும்</string>
+    <string name="duplicate_aisle_name_exception">பிழை: ஒரு பட்டியலுக்கு இடைகழியின் பெயர் தனிப்பட்டதாக இருக்க வேண்டும்</string>
+    <string name="invalid_location_exception">பிழை: தவறான இருப்பிட அடையாளம் வழங்கப்பட்டது</string>
+    <string name="invalid_product_exception">பிழை: தவறான தயாரிப்பு அடையாளம் வழங்கப்பட்டது</string>
+    <string name="invalid_db_name_exception">பிழை: தரவுத்தளப் பெயரைக் கண்டறிய முடியவில்லை</string>
+    <string name="invalid_db_backup_file_exception">பிழை: தவறான காப்புப் பிரதி இலக்கு</string>
+    <string name="invalid_db_restore_file_exception">பிழை: தவறான மீட்டெடுப்பு சான்று</string>
+    <string name="duplicate_product_exception">பிழை: ஏற்கனவே உள்ள தயாரிப்பின் நகலைச் சேர்க்க முடியாது</string>
+    <string name="duplicate_location_exception">பிழை: ஏற்கனவே உள்ள இருப்பிடத்தின் நகலைச் சேர்க்க முடியாது</string>
+    <string name="sample_data_creation_exception">பிழை: ஏற்கனவே உள்ள தரவுத்தளத்தில் மாதிரித் தரவை ஏற்ற முடியாது</string>
+    <string name="loyalty_card_provider_missing_exception">பிழை: லாயல்டி அட்டை வழங்குநர் நிறுவப்படவில்லை அல்லது செயல்பாடு இல்லை</string>
+    <string name="aisle_move_exception">பிழை: இடைகழி நகர்வு அதே இடத்திற்குள் இருக்க வேண்டும்</string>
+    <string name="loyalty_card_not_found_exception">பிழை: லாயல்டி அட்டை கிடைக்கவில்லை</string>
+    <string name="about_support_header">உதவி</string>
+    <string name="about_legal_header">உரிமங்கள் &amp; கொள்கைகள்</string>
+    <string name="about_support_version_title">பதிப்பு வரலாறு</string>
+    <string name="about_support_report_issue_title">சிக்கலைப் புகாரளிக்கவும்</string>
+    <string name="about_support_sourcecode_title">மூலக் குறியீடு</string>
+    <string name="about_legal_license_title">ஐச்லெரான் உரிமம்</string>
+    <string name="about_legal_privacy_title">Aisleron தனியுரிமைக் கொள்கை</string>
+    <string name="about_support_version_summary">தற்போதைய பதிப்பு: %1$s</string>
+    <string name="about_support_report_issue_summary">ஒரு பிழை அல்லது அம்ச கோரிக்கையை பதிவு செய்யவும்</string>
+    <string name="about_support_sourcecode_summary">GitHub இல் மூலக் குறியீட்டைப் பார்க்கவும்</string>
+    <string name="about_legal_license_summary">GNU Affero பொது Public உரிமம் (AGPL) பதிப்பு 3</string>
+    <string name="about_legal_privacy_summary">தனியுரிமைக் கொள்கையை ஆன்லைனில் பார்க்கவும்</string>
+    <string name="about_support_documentation_title">ஆவணப்படுத்துதல்</string>
+    <string name="about_support_documentation_summary">ஆவணங்களை ஆன்லைனில் பார்க்கவும்</string>
+    <string name="about_legal_3rdparty_title">மூன்றாம் தரப்பு உரிமங்கள்</string>
+    <string name="about_legal_3rdparty_summary">மூன்றாம் தரப்பு உரிமங்களை ஆன்லைனில் பார்க்கவும்</string>
+    <string name="about_contribute_header">பங்களிப்பு</string>
+    <string name="about_contribute_translate_title">மொழிபெயர்த்திடு</string>
+    <string name="about_contribute_translate_summary">ஐச்லெரானை அதிக மொழிகளில் கிடைக்க உதவுங்கள்</string>
+    <string name="about_contribute_financial_title">பொருள் பங்களிப்பு</string>
+    <string name="about_contribute_financial_summary">Aisleron ஐ பொருள் பங்களிப்புடன் ஆதரிக்கவும்</string>
+    <string name="welcome_app_title">தொடங்குதல்</string>
+    <string name="welcome_message">உங்கள் சாப்பிங் அனுபவத்தை எளிதாகவும் மேலும் ஒழுங்கமைக்கவும் உதவுவதில் நாங்கள் மகிழ்ச்சியடைகிறோம். தொடங்குவதற்கு, பின்வரும் விருப்பங்களில் ஒன்றைத் தேர்ந்தெடுக்கவும்:</string>
+    <string name="welcome_add_own_product">&lt;h3&gt;உங்கள் சொந்த தயாரிப்புகளைச் சேர்க்கவும்&lt;/h3&gt; கடைகள், இடைகழிகள் மற்றும் தயாரிப்புகளைச் சேர்ப்பதன் மூலம் புதிதாக தனிப்பயனாக்கப்பட்ட சாப்பிங் பட்டியலை உருவாக்கத் தொடங்குங்கள்</string>
+    <string name="welcome_load_sample_items">&lt;h3&gt;மாதிரி உருப்படிகளை ஏற்றவும்&lt;/h3&gt; ஆப்ச் எவ்வாறு செயல்படுகிறது என்பதை உணர, முன்பே நிரப்பப்பட்ட பட்டியலை முயற்சிக்கவும்</string>
+    <string name="welcome_import_db">&lt;h3&gt;ஏற்கனவே இருக்கும் தரவுத்தளத்தை இறக்குமதி வெற்றி&lt;/h3&gt;</string>
+    <string name="welcome_documentation">&lt;h3&gt;ஆவணத்தைப் பார்க்கவும்&lt;/h3&gt; ஆப்சின் அம்சங்களைப் பற்றி மேலும் அறிய Aisleron ஆவணங்களை ஆன்லைனில் பார்க்கவும்</string>
+    <string name="welcome_title">ஐச்லெரோனுக்கு வரவேற்கிறோம்</string>
+    <string name="empty_list_title">இந்தப் பட்டியல் தற்போது காலியாக உள்ளது</string>
+    <string name="empty_list_description">இது காரணமாக இருக்கலாம்:</string>
+    <string name="empty_list_reasons">- தற்போது எந்த பொருட்களும் தேவையில்லை \n- தயாரிப்புகள் அல்லது இடைகழிகள் எதுவும் இதுவரை சேர்க்கப்படவில்லை \n- உருப்படிகள் உள்ளன ஆனால் அவை காணக்கூடிய இடைகழிக்கு ஒதுக்கப்படவில்லை</string>
+    <string name="empty_list_instructions">கீழ் வலதுபுறத்தில் உள்ள சேர் பொத்தானைப் பயன்படுத்தி தயாரிப்புகள் மற்றும் இடைகழிகளைச் சேர்க்கலாம் அல்லது தயாரிப்புகளைக் கண்டறிந்து அவற்றின் நிலை அல்லது இடைகழி ஒதுக்கீட்டைப் புதுப்பிக்க திரையின் மேற்புறத்தில் உள்ள தேடல் பட்டியைப் பயன்படுத்தலாம்.</string>
+    <string name="shop_loyalty_card_name">விசுவாச அட்டை</string>
+    <string name="loyalty_card">விசுவாச அட்டை</string>
+    <string name="delete_loyalty_card">லாயல்டி கார்டை நீக்கு</string>
+    <string name="get_loyalty_card">லாயல்டி கார்டைத் தேடுங்கள்</string>
+    <string name="loyalty_card_provider_catima">கேடிமா - லாயல்டி அட்டை வாலட்</string>
+    <string name="loyalty_card_provider_missing_title">லாயல்டி அட்டை வழங்குநர் நிறுவப்படவில்லை</string>
+    <string name="loyalty_card_provider_missing_message">லாயல்டி கார்டுகளைக் காட்ட &lt;b&gt;&lt;i&gt;%1$s&lt;/i&gt;&lt;/b&gt; தேவை. அதைப் பற்றி மேலும் அறிய அவர்களின் இணையதளத்தைத் திறக்க விரும்புகிறீர்களா?</string>
+    <string name="invalid_loyalty_card_exception">பிழை: தவறான லாயல்டி அட்டை அடையாளம் வழங்கப்பட்டது</string>
+    <string name="tracking_mode">கண்காணிப்பு முறை</string>
+    <string name="tracking_checkbox">தேர்வுப்பெட்டி</string>
+    <string name="tracking_quantity">அளவு</string>
+    <string name="tracking_checkbox_quantity">தேர்வுப்பெட்டி மற்றும் அளவு</string>
+    <string name="tracking_none">எதுவும் இல்லை (ச்வைப் மட்டும்)</string>
+    <string name="tracking_default">இயல்புநிலை</string>
+    <string name="aisle">இடைகழி</string>
+    <string name="product">தயாரிப்பு</string>
+    <string name="add_product">தயாரிப்பு சேர்க்கவும்</string>
+    <string name="search">தேடல்</string>
+    <string name="product_name">தயாரிப்பு பெயர்</string>
+    <string name="save">சேமி</string>
+    <string name="shop_name">கடையின் பெயர்</string>
+    <string name="add_location">கடையைச் சேர்</string>
+    <string name="edit_product">தயாரிப்பைத் திருத்தவும்</string>
+    <string name="pin_shop">சாப்பை டிராயரில் பின் செய்யவும்</string>
+    <string name="show_unmapped_products">\'இல்லை இடைகழி\' பிரிவில் தயாரிப்புகளைக் காட்டு</string>
+    <string name="add_aisle">இடைகழி சேர்க்கவும்</string>
+    <string name="new_aisle">புதிய இடைகழி</string>
+    <string name="add_another">இன்னொன்றைச் சேர்க்கவும்</string>
+    <string name="aisle_name">இடைகழி பெயர்</string>
+    <string name="done">முடிந்தது</string>
+    <string name="search_product_hint">தயாரிப்புகளைத் தேடுங்கள்…</string>
+    <string name="edit">தொகு</string>
+    <string name="delete">நீக்கு</string>
+    <string name="delete_confirmation">%1$sஐ நீக்கவா?</string>
+    <string name="edit_aisle">இடைகழியை திருத்தவும்</string>
+    <string name="edit_location">திருத்து கடை</string>
+    <string name="main_fab">முக்கிய FAB</string>
+    <string name="add_shop_fab">கடை FAB ஐச் சேர்க்கவும்</string>
+    <string name="add_aisle_fab">இடைகழி FAB ஐச் சேர்க்கவும்</string>
+    <string name="add_product_fab">தயாரிப்பு FAB ஐச் சேர்க்கவும்</string>
+    <string name="search_fab">தேடு FAB</string>
+    <string name="title_activity_about">ஐச்லெரோன் பற்றி</string>
+    <string name="shopping_list_options_header">சாப்பிங் பட்டியல் விருப்பங்கள்</string>
+    <string name="hide_status_change_snack_bar">நிலை மாற்றம் செய்தியை மறை</string>
+    <string name="status_change_confirmation">%1$s %2$sக்கு நகர்த்தப்பட்டது</string>
+    <string name="undo">செயல்தவிர்</string>
+    <string name="aisleron_logo">ஐச்லெரான் லோகோ</string>
+    <string name="in_stock_at_home">வீட்டில் இருப்பு உள்ளதா?</string>
+    <string name="shop_logo">கடை லோகோ</string>
+    <string name="aisle_expand">இடைகழி விரிவடைகிறது</string>
+    <string name="show_empty_aisles">வெற்று இடைகழிகளைக் காட்டு</string>
+    <string name="mnu_edit_location">திருத்து கடை</string>
+    <string name="mnu_sort_list_by_name">பெயரால் வரிசைப்படுத்தவும்</string>
+    <string name="sort_confirm_title">வரிசைப்படுத்துவதை உறுதிப்படுத்தவும்</string>
+    <string name="sort_confirm_message">பெயரின்படி வரிசைப்படுத்துவது பட்டியலை அகர வரிசைப்படி மறுசீரமைக்கும் மற்றும் உங்கள் தற்போதைய வரிசை வரிசையை மேலெழுதும். தொடர வேண்டுமா?</string>
+    <string name="new_entity_name">புதிய நிறுவனத்தின் பெயர்</string>
+    <string name="new_location_name">புதிய இடத்தின் பெயர்</string>
+    <string name="new_product_name">புதிய தயாரிப்பு பெயர்</string>
+    <string name="copy_entity_title">%1$sஐ நகலெடு</string>
+    <string name="entity_copied">%1$s நகலெடுக்கப்பட்டது</string>
+    <string name="entity_name_required">பெயர் காலியாக இருக்கக்கூடாது</string>
+    <string name="decrement">குறைப்பு</string>
+    <string name="increment">அதிகரிப்பு</string>
+    <string name="qty">அளவு</string>
+    <string name="expand_collapse_aisles">இடைகழிகளை விரிவுபடுத்தவும்/விழவும்</string>
+    <string name="extra_options">கூடுதல் விருப்பங்கள்</string>
+    <string name="tab_notes">குறிப்புகள்</string>
+    <string name="product_tab_aisles">இடைகழிகள்</string>
+    <string name="product_tab_barcodes">பார்கோடுகள்</string>
+    <string name="product_tab_inventory">சரக்கு</string>
+    <string name="notes_hint">குறிப்புகளை இங்கே உள்ளிடவும்…</string>
+    <string name="show_note">குறிப்பைக் காட்டு</string>
+    <string name="note_dialog_title">%1$s க்கான குறிப்பு</string>
+    <string name="loading">ஏற்றுகிறது…</string>
+    <string name="dismiss">நிராகரி</string>
+    <string name="view_changes">மாற்றங்களைக் காண்க</string>
+    <string name="updated_notification">Aisleron %1$s இலிருந்து %2$s ஆக புதுப்பிக்கப்பட்டது.</string>
+    <string name="aisle_picker">இடைகழி பிக்கர்</string>
+    <string name="qty_increments">அளவு அதிகரிப்பு</string>
+    <string name="unit_of_measure">அளவீட்டு அலகு</string>
+    <string name="aisles_selected">%1$d இடைகழிகள்</string>
+    <string name="products_selected">%1$d தயாரிப்புகள்</string>
+    <string name="items_selected">%1$d உருப்படிகள்</string>
+    <string name="discard">நிராகரிக்கவும்</string>
+    <string name="save_changes_title">மாற்றங்களைச் சேமிக்கவா?</string>
+    <string name="save_changes_message">உங்களிடம் சேமிக்கப்படாத மாற்றங்கள் உள்ளன. புறப்படுவதற்கு முன் அவர்களைக் காப்பாற்ற வேண்டுமா?</string>
+    <string name="keep_editing">தொடர்ந்து திருத்தவும்</string>
+    <string name="show_location_list">%1$sஐக் காட்டு</string>
+    <string name="back">பின்</string>
+</resources>

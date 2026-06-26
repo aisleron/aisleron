@@ -1,0 +1,5 @@
+Améliorations :
+* Ajout de traductions portugaises.
+
+Corrections de bug :
+* Correction de crash sur l'application CV dans Android 13.

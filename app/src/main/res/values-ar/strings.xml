@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright (C) 2026 aisleron.com
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as
+  ~ published by the Free Software Foundation, either version 3 of the
+  ~ License, or (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<resources>
+    <string name="navigation_drawer_open">فتح درج الملاحة</string>
+    <string name="navigation_drawer_close">إغلاق درج الملاحة</string>
+    <string name="nav_header_subtitle">حلق عبر المتاجر!</string>
+    <string name="nav_header_desc">رأس الملاحة</string>
+    <string name="action_search">بحث</string>
+    <string name="menu_in_stock">مخزون المنزل</string>
+    <string name="menu_needed">مطلوب</string>
+    <string name="menu_all_items">جميع البنود</string>
+    <string name="menu_settings">الإعدادات</string>
+    <string name="menu_all_shops">جميع المتاجر</string>
+    <string name="menu_shops">المتاجر</string>
+    <string name="menu_about">حول التطبيق</string>
+    <string name="menu_all_lists">جميع القوائم</string>
+    <string name="home">الرئيسية</string>
+    <string name="display_options_header">خيارات العرض</string>
+    <string name="show_on_lock_screen">عرض على شاشة القفل</string>
+    <string name="system_theme">مظهر النظام</string>
+    <string name="light_theme">المظهر الفاتح</string>
+    <string name="dark_theme">المظهر الداكن</string>
+    <string name="theme">المظهر</string>
+    <string name="backup_restore_title">النسخ الاحتياطي/الاستعادة</string>
+    <string name="backup_database">نسخ احتياطي لقاعدة البيانات</string>
+    <string name="restore_database">استعادة قاعدة البيانات</string>
+    <string name="backup_folder">مجلد النسخ الاحتياطي</string>
+    <string name="last_backup">آخر نسخ احتياطي:</string>
+    <string name="last_restore">آخر استعادة:</string>
+    <string name="never">أبدًا</string>
+    <string name="db_backup_processing">جاري النسخ الاحتياطي…</string>
+    <string name="db_backup_success">اكتمل النسخ الاحتياطي</string>
+    <string name="db_restore_processing">جاري الاستعادة…</string>
+    <string name="db_restore_success">اكتملت الاستعادة</string>
+    <string name="db_restore_confirmation">هل أنت متأكد أنك تريد استبدال قاعدة بياناتك الحالية بالنسخة الاحتياطية <![CDATA[%1$s]]>؟</string>
+    <string name="db_restore_confirmation_title">تأكيد استعادة قاعدة البيانات</string>
+    <string name="backup_folder_success">تم تعيين مجلد النسخ الاحتياطي</string>
+    <string name="keep_screen_on">إبقاء الشاشة تعمل</string>
+    <string name="keep_screen_on_summary">منع الشاشة من الانطفاء أثناء عرض القائمة</string>
+    <string name="starting_list">قائمة البداية</string>
+    <string name="use_dynamic_color">ألوان ديناميكية</string>
+    <string name="use_dynamic_color_summary">استخدام ألوان النظام المستمدة من خلفية الشاشة الحالية</string>
+    <string name="pure_black_default">المظهر الافتراضي</string>
+    <string name="pure_black_economy">الاقتصادية</string>
+    <string name="pure_black_business_class">درجة الأعمال</string>
+    <string name="pure_black_first_class">الدرجة الأولى</string>
+    <string name="pure_black_style">نمط الأسود النقي</string>
+    <string name="language">اللغة</string>
+    <string name="system_default">افتراضي النظام</string>
+    <string name="note_hint">تلميح الملاحظة</string>
+    <string name="note_hint_button">زر</string>
+    <string name="note_hint_summary">ملخص</string>
+    <string name="note_hint_indicator">مؤشر (*)</string>
+    <string name="preference_none">بلا</string>
+    <string name="generic_error">خطأ: <![CDATA[%1$s]]></string>
+    <string name="delete_default_aisle_exception">خطأ: لا يمكن إزالة الممر الافتراضي</string>
+    <string name="duplicate_product_name_exception">خطأ: يجب أن يكون اسم المنتج فريدًا</string>
+    <string name="duplicate_location_name_exception">خطأ: يجب أن يكون اسم المتجر فريدًا</string>
+    <string name="duplicate_aisle_name_exception">خطأ: يجب أن يكون اسم الممر فريدًا لكل قائمة</string>
+    <string name="invalid_location_exception">خطأ: تم توفير معرف متجر غير صالح</string>
+    <string name="invalid_product_exception">خطأ: تم توفير معرف منتج غير صالح</string>
+    <string name="invalid_db_name_exception">خطأ: تعذر تحديد اسم قاعدة البيانات</string>
+    <string name="invalid_db_backup_file_exception">خطأ: وجهة النسخ الاحتياطي غير صالحة</string>
+    <string name="invalid_db_restore_file_exception">خطأ: مصدر الاستعادة غير صالح</string>
+    <string name="duplicate_product_exception">خطأ: لا يمكن إضافة تكرار لمنتج موجود بالفعل</string>
+    <string name="duplicate_location_exception">خطأ: لا يمكن إضافة تكرار لمتجر موجود بالفعل</string>
+    <string name="sample_data_creation_exception">خطأ: لا يمكن تحميل البيانات التجريبية في قاعدة بيانات موجودة بالفعل</string>
+    <string name="loyalty_card_provider_missing_exception">خطأ: موفر بطاقات الولاء غير مثبت أو تعذر العثور على النشاط</string>
+    <string name="aisle_move_exception">خطأ: يجب أن يكون نقل الممر داخل نفس المتجر</string>
+    <string name="loyalty_card_not_found_exception">خطأ: لم يتم العثور على بطاقة الولاء</string>
+    <string name="about_support_header">الدعم</string>
+    <string name="about_legal_header">التراخيص والسياسات</string>
+    <string name="about_support_version_title">سجل الإصدارات</string>
+    <string name="about_support_report_issue_title">الإبلاغ عن مشكلة</string>
+    <string name="about_support_sourcecode_title">رمز المصدر</string>
+    <string name="about_legal_license_title">رخصة Aisleron</string>
+    <string name="about_legal_privacy_title">سياسة خصوصية Aisleron</string>
+    <string name="about_support_version_summary">الإصدار الحالي: <![CDATA[%1$s]]></string>
+    <string name="about_support_report_issue_summary">تسجيل خطأ برمجى أو طلب ميزة</string>
+    <string name="about_support_sourcecode_summary">عرض رمز المصدر على GitHub</string>
+    <string name="about_legal_license_summary">رخصة أفيرو العمومية المفتوحة (AGPL) الإصدار 3</string>
+    <string name="about_legal_privacy_summary">عرض سياسة الخصوصية عبر الإنترنت</string>
+    <string name="about_support_documentation_title">الوثائق والتعليمات</string>
+    <string name="about_support_documentation_summary">عرض الوثائق والتعليمات عبر الإنترنت</string>
+    <string name="about_legal_3rdparty_title">تراخيص الطرف الثالث</string>
+    <string name="about_legal_3rdparty_summary">عرض تراخيص الطرف الثالث عبر الإنترنت</string>
+    <string name="about_contribute_header">المساهمة</string>
+    <string name="about_contribute_translate_title">الترجمة</string>
+    <string name="about_contribute_translate_summary">ساعد في جعل Aisleron متاحًا بمزيد من اللغات</string>
+    <string name="about_contribute_financial_title">المساهمة المالية</string>
+    <string name="about_contribute_financial_summary">دعم Aisleron بمساهمة مالية</string>
+    <string name="welcome_app_title">البدء</string>
+    <string name="welcome_message">نحن متحمسون لمساعدتك في جعل تجربة التسوق أسهل وأكثر تنظيماً. للبدء، اختر أحد الخيارات التالية:</string>
+    <string name="welcome_add_own_product">&lt;h3&gt;أضف منتجاتك الخاصة&lt;/h3&gt; ابدأ في بناء قائمة تسوق مخصصة من الصفر عن طريق إضافة المتاجر، الممرات، والمنتجات</string>
+    <string name="welcome_load_sample_items">&lt;h3&gt;تحميل عينات من العناصر&lt;/h3&gt; جرب قائمة معبأة مسبقًا للتعرف على كيفية عمل التطبيق</string>
+    <string name="welcome_import_db">&lt;h3&gt;استيراد قاعدة بيانات موجودة&lt;/h3&gt; جلب قائمة تسوق من نسخة احتياطية سابقة عن طريق استيرادها من صفحة الإعدادات</string>
+    <string name="welcome_documentation">&lt;h3&gt;عرض الوثائق والتعليمات&lt;/h3&gt; عرض وثائق Aisleron عبر الإنترنت لمعرفة المزيد عن ميزات التطبيق</string>
+    <string name="welcome_title">مرحبًا بك في Aisleron</string>
+    <string name="empty_list_title">هذه القائمة فارغة حاليًا</string>
+    <string name="empty_list_description">يمكن أن يكون ذلك بسبب:</string>
+    <string name="empty_list_reasons">
+        - لا توجد عناصر مطلوبة في الوقت الحالي
+        \n- لم يتم إضافة أي منتجات أو ممرات بعد
+        \n- العناصر موجودة ولكنها غير مخصصة لممر مرئي
+    </string>
+    <string name="empty_list_instructions">
+        يمكنك إضافة منتجات وممرات باستخدام زر الإضافة في أسفل اليمين،
+        أو استخدام شريط البحث في أعلى الشاشة للعثور على المنتجات وتحديث
+        حالتها أو تعيين الممر الخاص بها.
+    </string>
+    <string name="shop_loyalty_card_name">بطاقة الولاء</string>
+    <string name="loyalty_card">بطاقة الولاء</string>
+    <string name="delete_loyalty_card">حذف بطاقة الولاء</string>
+    <string name="get_loyalty_card">البحث عن بطاقة الولاء</string>
+    <string name="loyalty_card_provider_catima">Catima — محفظة بطاقات الولاء</string>
+    <string name="loyalty_card_provider_missing_title">موفّر بطاقات الولاء غير مثبت</string>
+    <string name="loyalty_card_provider_missing_message">&lt;b&gt;&lt;i&gt;<![CDATA[%1$s]]>&lt;/i&gt;&lt;/b&gt; مطلوب لعرض بطاقات الولاء. هل ترغب في فتح موقعهم الإلكتروني لمعرفة المزيد عنه؟</string>
+    <string name="invalid_loyalty_card_exception">خطأ: تم توفير معرف بطاقة ولاء غير صالح</string>
+    <string name="tracking_mode">وضع التتبع</string>
+    <string name="tracking_checkbox">مربع اختيار</string>
+    <string name="tracking_quantity">الكمية</string>
+    <string name="tracking_checkbox_quantity">مربع الاختيار والكمية</string>
+    <string name="tracking_none">بلا (سحب فقط)</string>
+    <string name="tracking_default">الافتراضي</string>
+    <string name="aisle">الممر</string>
+    <string name="product">المنتج</string>
+    <string name="add_product">إضافة منتج</string>
+    <string name="search">بحث</string>
+    <string name="product_name">اسم المنتج</string>
+    <string name="save">حفظ</string>
+    <string name="shop_name">اسم المتجر</string>
+    <string name="add_location">إضافة متجر</string>
+    <string name="edit_product">تعديل المنتج</string>
+    <string name="pin_shop">تثبيت المتجر في الدرج</string>
+    <string name="show_unmapped_products">عرض المنتجات في قسم \"بلا ممر\"</string>
+    <string name="add_aisle">إضافة ممر</string>
+    <string name="new_aisle">ممر جديد</string>
+    <string name="add_another">إضافة آخر</string>
+    <string name="aisle_name">اسم الممر</string>
+    <string name="done">تم</string>
+    <string name="search_product_hint">البحث عن المنتجات…</string>
+    <string name="edit">تعديل</string>
+    <string name="delete">حذف</string>
+    <string name="delete_confirmation">حذف <![CDATA[%1$s]]>؟</string>
+    <string name="edit_aisle">تعديل الممر</string>
+    <string name="edit_location">تعديل المتجر</string>
+    <string name="main_fab">زر الإجراء العائم الرئيسي</string>
+    <string name="add_shop_fab">زر إضافة متجر عائم</string>
+    <string name="add_aisle_fab">زر إضافة ممر عائم</string>
+    <string name="add_product_fab">زر إضافة منتج عائم</string>
+    <string name="search_fab">زر البحث العائم</string>
+    <string name="title_activity_about">حول Aisleron</string>
+    <string name="shopping_list_options_header">خيارات قائمة التسوق</string>
+    <string name="hide_status_change_snack_bar">إخفاء رسالة تغيير الحالة</string>
+    <string name="status_change_confirmation">تم نقل <![CDATA[%1$s]]> إلى <![CDATA[%2$s]]></string>
+    <string name="undo">تراجع</string>
+    <string name="aisleron_logo">شعار Aisleron</string>
+    <string name="in_stock_at_home">متوفر في المنزل؟</string>
+    <string name="shop_logo">شعار المتجر</string>
+    <string name="aisle_expand">توسيع الممر</string>
+    <string name="show_empty_aisles">عرض الممرات الفارغة</string>
+    <string name="mnu_edit_location">تعديل المتجر</string>
+    <string name="mnu_sort_list_by_name">ترتيب حسب الاسم</string>
+    <string name="sort_confirm_title">تأكيد الترتيب</string>
+    <string name="sort_confirm_message">الترتيب حسب الاسم سيعيد تنظيم القائمة أبجديًا وسيحل محل ترتيبك الحالي. هل تريد الاستمرار؟</string>
+    <string name="new_entity_name">اسم الكيان الجديد</string>
+    <string name="new_location_name">اسم المتجر الجديد</string>
+    <string name="new_product_name">اسم المنتج الجديد</string>
+    <string name="copy_entity_title">نسخ <![CDATA[%1$s]]></string>
+    <string name="entity_copied">تم نسخ <![CDATA[%1$s]]></string>
+    <string name="entity_name_required">لا يمكن أن يكون الاسم فارغًا</string>
+    <string name="decrement">إنقاص</string>
+    <string name="increment">زيادة</string>
+    <string name="qty">الكمية</string>
+    <string name="expand_collapse_aisles">توسيع/طي الممرات</string>
+    <string name="extra_options">خيارات إضافية</string>
+    <string name="tab_notes">ملاحظات</string>
+    <string name="product_tab_aisles">الممرات</string>
+    <string name="product_tab_barcodes">الباركود</string>
+    <string name="product_tab_inventory">المخزون</string>
+    <string name="notes_hint">أدخل الملاحظات هنا…</string>
+    <string name="show_note">عرض الملاحظة</string>
+    <string name="note_dialog_title">ملاحظة لـ <![CDATA[%1$s]]></string>
+    <string name="loading">جاري التحميل…</string>
+    <string name="dismiss">تجاهل</string>
+    <string name="view_changes">عرض التغييرات</string>
+    <string name="updated_notification">تم تحديث Aisleron من <![CDATA[%1$s]]> إلى <![CDATA[%2$s]]>.</string>
+    <string name="aisle_picker">منتقي الممرات</string>
+    <string name="qty_increments">زيادات الكمية</string>
+    <string name="unit_of_measure">وحدة القياس</string>
+    <string name="aisles_selected"><![CDATA[%1$d]]> من الممرات محددة</string>
+    <string name="products_selected"><![CDATA[%1$d]]> من المنتجات محددة</string>
+    <string name="items_selected"><![CDATA[%1$d]]> من العناصر محددة</string>
+    <string name="discard">تجاهل</string>
+    <string name="save_changes_title">حفظ التغييرات؟</string>
+    <string name="save_changes_message">لديك تغييرات غير محفوظة. هل تريد حفظها قبل المغادرة؟</string>
+    <string name="keep_editing">متابعة التعديل</string>
+    <string name="show_location_list">عرض <![CDATA[%1$s]]></string>
+    <string name="back">رجوع</string>
+</resources>

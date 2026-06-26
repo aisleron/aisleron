@@ -34,7 +34,7 @@
         tools:targetApi="33"
         android:localeConfig="@xml/locale_config">
         <activity
-            android:name=".AboutActivity"
+            android:name=".ConfigActivity"
             android:exported="false"
             android:label="@string/title_activity_about"
             android:parentActivityName=".MainActivity"

@@ -32,8 +32,8 @@ import com.aisleron.ui.bundles.Bundler
 import com.aisleron.ui.loyaltycard.CatimaCardProvider
 import com.aisleron.ui.loyaltycard.LoyaltyCardProvider
 import com.aisleron.ui.loyaltycard.PackageCheckerImpl
-import com.aisleron.ui.navigation.Navigator
-import com.aisleron.ui.navigation.NavigatorImpl
+import com.aisleron.ui.navigation.MainNavigator
+import com.aisleron.ui.navigation.MainNavigatorImpl
 import com.aisleron.ui.resourceprovider.ResourceProvider
 import com.aisleron.ui.resourceprovider.ResourceProviderImpl
 import org.koin.dsl.binds
@@ -42,7 +42,7 @@ import org.koin.dsl.module
 val generalModule = module {
     single<FabHandler> { FabHandlerImpl(get()) }
     single<ResourceProvider> { ResourceProviderImpl() }
-    single<Navigator> { NavigatorImpl(Bundler()) }
+    single<MainNavigator> { MainNavigatorImpl(Bundler()) }
     factory<ApplicationTitleUpdateListener> { ApplicationTitleUpdateListenerImpl() }
     factory<AddEditFragmentListener> { AddEditFragmentListenerImpl() }
     factory<LoyaltyCardProvider> { CatimaCardProvider(PackageCheckerImpl()) }
