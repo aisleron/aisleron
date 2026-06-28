@@ -21,8 +21,10 @@ import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.parcelize)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.ksp)
     alias(libs.plugins.dependency.analysis)
 }
 
@@ -30,7 +32,24 @@ apply(file("../gradle/jacoco.gradle.kts"))
 
 // Keep this list aligned with the values in the language_codes array in arrays.xml and with locale_config.xml
 val supportedLocales =
-    listOf("en", "af", "bg", "br", "de", "es", "fr", "it", "pl", "ru", "sv", "tr", "uk")
+    listOf(
+        "en",
+        "af",
+        "ar",
+        "bg",
+        "br",
+        "de",
+        "es",
+        "fr",
+        "it",
+        "pl",
+        "pt",
+        "ru",
+        "sv",
+        "ta",
+        "tr",
+        "uk"
+    )
 
 android {
     dependenciesInfo {
@@ -218,65 +237,102 @@ java {
 }
 dependencies {
     // Implementation
-    implementation(libs.core.ktx)
-    implementation(libs.activity.ktx)
+    implementation(libs.activity)
+    implementation(libs.activity.compose)
+    implementation(libs.annotation)
     implementation(libs.appcompat)
-    implementation(libs.material)
-    implementation(libs.recyclerview)
-    implementation(libs.collection.ktx)
     implementation(libs.cardview)
-    implementation(libs.drawerlayout)
+    implementation(libs.collection)
     implementation(libs.constraintlayout)
     implementation(libs.coordinatorlayout)
+    implementation(libs.core.ktx) // 1.19.0 Requires Android 17, and moves to non-ktx
     implementation(libs.customview)
-    implementation(libs.annotation)
     implementation(libs.documentfile)
-    implementation(libs.preference.ktx)
-    implementation(libs.viewpager2)
+    implementation(libs.drawerlayout)
+    implementation(libs.jetbrains.kotlinx.serialization.core)
     implementation(libs.kotlin.parcelize.runtime)
+    implementation(libs.material)
+    implementation(libs.preference.ktx)
+    implementation(libs.recyclerview)
+    implementation(libs.viewpager2)
 
     // Fragment
-    implementation(libs.fragment.ktx)
+    implementation(libs.fragment.ktx) // 1.9.0 moves to non-ktx
     debugImplementation(libs.fragment.testing)
+
+    // Jetpack Compose
+    implementation(platform(libs.compose.bom))
+    implementation(libs.compose.animation)
+    implementation(libs.compose.foundation)
+    implementation(libs.compose.foundation.layout)
+    implementation(libs.compose.runtime)
+    implementation(libs.compose.ui)
+    implementation(libs.compose.ui.graphics)
+    implementation(libs.compose.ui.text)
+    implementation(libs.compose.ui.tooling.preview)
+    implementation(libs.compose.ui.unit)
+    implementation(libs.material3)
+    debugImplementation(libs.compose.ui.test.manifest)
+    debugImplementation(libs.compose.ui.tooling)
+    androidTestImplementation(platform(libs.compose.bom))
+    androidTestImplementation(libs.compose.ui.test)
+    androidTestImplementation(libs.compose.ui.test.junit4)
 
     // Lifecycle
     implementation(libs.lifecycle.common)
-    implementation(libs.lifecycle.runtime.ktx)
+    implementation(libs.lifecycle.runtime)
+    implementation(libs.lifecycle.viewmodel)
+    implementation(libs.lifecycle.viewmodel.compose)
 
     // Navigation
-    implementation(libs.navigation.ui.ktx)
-    implementation(libs.navigation.common.ktx)
-    implementation(libs.navigation.runtime.ktx)
-    implementation(libs.navigation.fragment.ktx)
+    implementation(libs.navigation.common)
+    implementation(libs.navigation.compose)
+    implementation(libs.navigation.fragment)
+    implementation(libs.navigation.runtime)
+    implementation(libs.navigation.ui)
     androidTestImplementation(libs.navigation.testing)
+
+    // Consider moving to navigation3 once it matures
+    // implementation("androidx.navigation3:navigation3-runtime:1.1.3")
+    // implementation("androidx.navigation3:navigation3-ui:1.1.3")
 
     // Database
     ksp(libs.room.compiler)
-    implementation(libs.sqlite.ktx)
-    implementation(libs.room.runtime)
     implementation(libs.room.common)
+    implementation(libs.room.runtime)
+    implementation(libs.sqlite)
     debugImplementation(libs.room.testing.android)
 
     // Dependency Injection
-    implementation(libs.koin.core)
+    implementation(platform(libs.koin.bom))
     implementation(libs.koin.android)
+    implementation(libs.koin.androidx.compose)
+    implementation(libs.koin.compose)
+    implementation(libs.koin.core)
     implementation(libs.koin.core.viewmodel)
+    androidTestImplementation(platform(libs.koin.bom))
     androidTestImplementation(libs.koin.test)
 
     // Coroutines
+    implementation(platform(libs.kotlinx.coroutines.bom))
     implementation(libs.kotlinx.coroutines.core)
+    testImplementation(platform(libs.kotlinx.coroutines.bom))
     testImplementation(libs.kotlinx.coroutines.test)
+    androidTestImplementation(platform(libs.kotlinx.coroutines.bom))
     androidTestImplementation(libs.kotlinx.coroutines.test)
 
     // Supabase
+    implementation(platform(libs.supabase.bom))
     implementation(libs.supabase.kt)
     implementation(libs.supabase.auth.kt)
 
     // Ktor
-    implementation(libs.ktor.client.core)
+    implementation(platform(libs.ktor.bom))
     implementation(libs.ktor.client.cio)
+    implementation(libs.ktor.client.core)
 
     // Testing
+    testImplementation(platform(libs.junit.bom))
     testRuntimeOnly(libs.junit.platform.launcher)
     testImplementation(project(":testData"))
     testImplementation(libs.junit.jupiter)
@@ -288,11 +344,11 @@ dependencies {
     // Android Testing
     androidTestImplementation(project(":testData"))
     androidTestImplementation(libs.junit)
+    androidTestImplementation(libs.mockk.agent)
+    androidTestImplementation(libs.mockk.android)
+    androidTestImplementation(libs.screengrab)
     androidTestImplementation(libs.test.core.ktx)
     androidTestImplementation(libs.uiautomator)
-    androidTestImplementation(libs.screengrab)
-    androidTestImplementation(libs.mockk.android)
-    androidTestImplementation(libs.mockk.agent)
 
     debugImplementation(libs.espresso.contrib)
     androidTestImplementation(libs.espresso.core)
