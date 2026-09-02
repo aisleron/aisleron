@@ -221,4 +221,16 @@ class SyncManagerTest : KoinTest {
         assertEquals(1, dao.getNotes().size)
         assertEquals(1, api.remoteDtoList.size)
     }
+
+    @Test
+    fun syncAll_InitialSyncWithZeroLastModifiedDate_ReconcileExistingRecords() = runTest {
+        syncPreferencesRepository.setRemoteLastSyncedAt(-1L)
+        addNoteEntity(lastModifiedAt = 0L)
+
+        syncManager.syncAll()
+
+        assertEquals(1, api.pushCallCount)
+        assertEquals(1, dao.getNotes().size)
+        assertEquals(1, api.remoteDtoList.size)
+    }
 }

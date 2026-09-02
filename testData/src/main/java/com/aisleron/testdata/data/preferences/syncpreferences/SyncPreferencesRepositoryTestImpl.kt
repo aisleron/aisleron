@@ -102,7 +102,7 @@ class SyncPreferencesRepositoryTestImpl : SyncPreferencesRepository {
         syncOnMobileData = false,
         lastSyncedAt = 0L,
         lastSyncStatus = SyncStatusPreference.NONE,
-        remoteLastSyncedAt = 0L
+        remoteLastSyncedAt = -1L
     )
 
     fun resetSyncPreferences() {

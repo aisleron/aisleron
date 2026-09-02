@@ -18,7 +18,9 @@
 package com.aisleron.data.aisleproduct
 
 import com.aisleron.data.aisle.AisleDao
+import com.aisleron.data.aisle.AisleEntity
 import com.aisleron.data.product.ProductDao
+import com.aisleron.data.product.ProductEntity
 import com.aisleron.data.sync.DtoMapper
 import kotlin.time.Instant
 
@@ -47,22 +49,22 @@ class AisleProductDtoMapper(
         )
     }
 
-    private suspend fun getLocalAisleId(dto: AisleProductDto): Int {
-        return checkNotNull(aisleDao.getBySyncId(dto.aisleId)?.id) {
+    private suspend fun getLocalAisle(dto: AisleProductDto): AisleEntity {
+        return checkNotNull(aisleDao.getBySyncId(dto.aisleId)) {
             "Local aisle not found for syncId ${dto.aisleId}"
         }
     }
 
-    private suspend fun getLocalProductId(dto: AisleProductDto): Int {
-        return checkNotNull(productDao.getBySyncId(dto.productId)?.id) {
+    private suspend fun getLocalProduct(dto: AisleProductDto): ProductEntity {
+        return checkNotNull(productDao.getBySyncId(dto.productId)) {
             "Local product not found for syncId ${dto.productId}"
         }
     }
 
     override suspend fun fromDto(dto: AisleProductDto): AisleProductEntity {
         val existing = lookupEntityFromDto(dto)
-        val localAisleId = getLocalAisleId(dto)
-        val localProductId = getLocalProductId(dto)
+        val localAisleId = getLocalAisle(dto).id
+        val localProductId = getLocalProduct(dto).id
 
         return AisleProductEntity(
             id = existing?.id ?: 0,
@@ -79,8 +81,10 @@ class AisleProductDtoMapper(
     override suspend fun lookupEntityFromDto(dto: AisleProductDto): AisleProductEntity? {
         aisleProductDao.getBySyncId(dto.id)?.let { return it }
 
-        val localAisleId = getLocalAisleId(dto)
-        val localProductId = getLocalProductId(dto)
-        return aisleProductDao.getByNaturalKey(localAisleId, localProductId).firstOrNull()
+        val localLocationId = getLocalAisle(dto).locationId
+        val localProductId = getLocalProduct(dto).id
+        val entityList = aisleProductDao.getByNaturalKey(localLocationId, localProductId)
+
+        return entityList.firstOrNull { !it.isRemoved } ?: entityList.firstOrNull()
     }
 }

@@ -32,6 +32,7 @@ import org.junit.Test
 import org.koin.test.get
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
 class AisleProductSyncTest : SyncTest<AisleProductEntity, AisleProductDto>() {
@@ -288,5 +289,39 @@ class AisleProductSyncTest : SyncTest<AisleProductEntity, AisleProductDto>() {
         val lookupEntity = mapper.lookupEntityFromDto(dto)
 
         assertNull(lookupEntity)
+    }
+
+    @Test
+    fun pull_HasDuplicateEntity_EntityReplaced() = runTest {
+        // This test validates that the AisleProduct unique constraint is handled correctly by the
+        // custom Dao upsert, since standard room upsert doesn't cater for unique keys
+
+        val ap1 = addAisleProductEntity(0, 0, isRemoved = false)
+        val ap2 = addAisleProductEntity(0, 0, isRemoved = false)
+
+        assertEquals(2, aisleProductDao.getAisleProducts().size)
+
+        val lastSyncIso = "2026-08-18T00:00:00Z"
+
+        // Use sync id from ap1, and aisle & product details from ap2 to force a unique key violation
+        val id = ap1.syncId
+        val dto = addDto(id, "2026-08-18T05:00:00Z", "2026-08-17T05:00:00Z").copy(
+            aisleId = get<AisleDao>().getAisle(ap2.id, false)!!.syncId!!,
+            productId = get<ProductDao>().getProduct(ap2.id, false)!!.syncId!!,
+        )
+
+        syncApi.push(listOf(dto))
+
+        repository.pull(lastSyncIso)
+
+        // Assert that the clash has been resolved by replacing the conflicting record
+        assertEquals(1, aisleProductDao.getAisleProducts().size)
+
+        // Validate that the remaining entry matches the expected values
+        val updatedEntity = aisleProductDao.getBySyncId(id)
+        assertNotNull(updatedEntity)
+        assertEquals(ap1.id, updatedEntity.id)
+        assertEquals(ap2.aisleId, updatedEntity.aisleId)
+        assertEquals(ap2.productId, updatedEntity.productId)
     }
 }

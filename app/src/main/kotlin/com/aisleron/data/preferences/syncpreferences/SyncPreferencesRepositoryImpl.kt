@@ -71,7 +71,8 @@ class SyncPreferencesRepositoryImpl(
     }
 
     private fun getRemoteLastSyncedAt(): Long =
-        sharedPreferences.getLong(SyncPreferenceKey.REMOTE_LAST_SYNCED_AT.keyName, 0)
+        // Default to -1 so initial push takes into account records with modified date = 0
+        sharedPreferences.getLong(SyncPreferenceKey.REMOTE_LAST_SYNCED_AT.keyName, -1L)
 
 
     override fun getSyncPreferences(): SyncPreferences =
