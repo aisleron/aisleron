@@ -40,7 +40,7 @@ class AisleProductDtoMapper(
         }
 
         return AisleProductDto(
-            id = entity.syncId,
+            id = entity.syncId.orEmpty(),
             isDeleted = entity.isRemoved,
             clientUpdatedAt = Instant.fromEpochMilliseconds(entity.lastModifiedAt).toString(),
             aisleId = aisleSyncId,
@@ -84,6 +84,7 @@ class AisleProductDtoMapper(
         val localLocationId = getLocalAisle(dto).locationId
         val localProductId = getLocalProduct(dto).id
         val entityList = aisleProductDao.getByNaturalKey(localLocationId, localProductId)
+            .filter { it.syncId == null }
 
         return entityList.firstOrNull { !it.isRemoved } ?: entityList.firstOrNull()
     }

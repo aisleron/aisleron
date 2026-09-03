@@ -28,7 +28,7 @@ class ProductDtoMapper(
         val noteSyncId = entity.noteId?.let { localId -> noteDao.getNote(localId, true)?.syncId }
 
         return ProductDto(
-            id = checkNotNull(entity.syncId) { "syncId must be generated prior to push" },
+            id = entity.syncId.orEmpty(),
             name = entity.name,
             inStock = entity.inStock,
             qtyNeeded = entity.qtyNeeded,
@@ -63,6 +63,10 @@ class ProductDtoMapper(
 
     override suspend fun lookupEntityFromDto(dto: ProductDto): ProductEntity? {
         productDao.getBySyncId(dto.id)?.let { return it }
-        return productDao.getByNaturalKey(dto.name).firstOrNull()
+
+        val entityList = productDao.getByNaturalKey(dto.name)
+            .filter { it.syncId == null }
+
+        return entityList.firstOrNull { !it.isRemoved } ?: entityList.firstOrNull()
     }
 }

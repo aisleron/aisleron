@@ -39,7 +39,7 @@ class LocationLoyaltyCardDtoMapper(
             }
 
         return LocationLoyaltyCardDto(
-            id = checkNotNull(entity.syncId) { "syncId must be generated prior to push" },
+            id = entity.syncId.orEmpty(),
             isDeleted = entity.isRemoved,
             clientUpdatedAt = Instant.fromEpochMilliseconds(entity.lastModifiedAt).toString(),
             locationId = locationSyncId,
@@ -78,7 +78,9 @@ class LocationLoyaltyCardDtoMapper(
 
         val localLocationId = getLocalLocationId(dto)
         val localLoyaltyCardId = getLocalLoyaltyCardId(dto)
-        return locationLoyaltyCardDao.getByNaturalKey(localLocationId, localLoyaltyCardId)
-            .firstOrNull()
+        val entityList = locationLoyaltyCardDao.getByNaturalKey(localLocationId, localLoyaltyCardId)
+            .filter { it.syncId == null }
+
+        return entityList.firstOrNull { !it.isRemoved } ?: entityList.firstOrNull()
     }
 }

@@ -54,7 +54,8 @@ abstract class SyncTest<Entity : SyncEntity, Dto : SyncDto> : KoinTest {
     protected abstract suspend fun addEntity(
         lastModifiedAt: Long = 0,
         serverUpdatedAt: Long? = null,
-        isRemoved: Boolean = false
+        isRemoved: Boolean = false,
+        syncId: String? = null
     ): Entity
 
     protected abstract suspend fun addDto(
@@ -124,7 +125,9 @@ abstract class SyncTest<Entity : SyncEntity, Dto : SyncDto> : KoinTest {
     @Test
     fun purgeRemoved_PurgeToDateProvided_CallsDaoPurgeRemoved() = runTest {
         val purgeToDate = 5000L
-        val entity = addEntity(lastModifiedAt = 5000L, isRemoved = true)
+        val entity = addEntity(
+            lastModifiedAt = 5000L, isRemoved = true, syncId = SyncEntity.generateSyncId()
+        )
         val syncId = entity.syncId!!
 
         assertNotNull(dao.getBySyncId(syncId))

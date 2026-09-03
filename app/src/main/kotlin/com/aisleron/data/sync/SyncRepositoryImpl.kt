@@ -31,6 +31,8 @@ class SyncRepositoryImpl<Entity : SyncEntity, Dto : SyncDto>(
 
     override suspend fun push(modifiedAfterDate: Long) {
         val modifiedLocal = dao.getModified(modifiedAfterDate)
+            .filterNot { it.syncId == null && it.isRemoved }
+
         if (modifiedLocal.isEmpty()) return
 
         val dto = modifiedLocal.map { dtoMapper.toDto(it) }

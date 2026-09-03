@@ -37,7 +37,7 @@ data class LoyaltyCardEntity(
     val name: String,
     val provider: LoyaltyCardProviderType,
     val intent: String,
-    override val syncId: String? = SyncEntity.generateSyncId(),
+    override val syncId: String? = null,
     @ColumnInfo(defaultValue = "0") override val isRemoved: Boolean = false,
     @ColumnInfo(defaultValue = "0") override val lastModifiedAt: Long = System.currentTimeMillis(),
     override val serverUpdatedAt: Long? = null

@@ -19,77 +19,8 @@ package com.aisleron.data.migration
 
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.aisleron.data.base.SyncEntity
 
 class Migration8To9 : Migration(8, 9) {
-
-    private fun setSyncId(
-        db: SupportSQLiteDatabase, selectSql: String, updateSql: String
-    ) {
-        db.query(selectSql).use { cursor ->
-            db.compileStatement(updateSql).use { statement ->
-                while (cursor.moveToNext()) {
-                    val id = cursor.getLong(0)
-                    val syncId = SyncEntity.generateSyncId()
-
-                    statement.bindString(1, syncId)
-                    statement.bindLong(2, id)
-                    statement.executeUpdateDelete()
-                    statement.clearBindings()
-                }
-            }
-        }
-    }
-
-    private fun setMissingSyncIds(db: SupportSQLiteDatabase) {
-        setSyncId(
-            db,
-            "SELECT id FROM Note WHERE syncId IS NULL OR syncId = ''",
-            "UPDATE Note SET syncId = ? WHERE id = ?"
-        )
-
-        setSyncId(
-            db,
-            "SELECT id FROM Product WHERE syncId IS NULL OR syncId = ''",
-            "UPDATE Product SET syncId = ? WHERE id = ?"
-        )
-
-        setSyncId(
-            db,
-            "SELECT id FROM Location WHERE syncId IS NULL OR syncId = ''",
-            "UPDATE Location SET syncId = ? WHERE id = ?"
-        )
-
-        setSyncId(
-            db,
-            "SELECT id FROM Aisle WHERE syncId IS NULL OR syncId = ''",
-            "UPDATE Aisle SET syncId = ? WHERE id = ?"
-        )
-
-        setSyncId(
-            db,
-            "SELECT id FROM AisleProduct WHERE syncId IS NULL OR syncId = ''",
-            "UPDATE AisleProduct SET syncId = ? WHERE id = ?"
-        )
-
-        setSyncId(
-            db,
-            "SELECT id FROM LoyaltyCard WHERE syncId IS NULL OR syncId = ''",
-            "UPDATE LoyaltyCard SET syncId = ? WHERE id = ?"
-        )
-
-        setSyncId(
-            db,
-            "SELECT locationId FROM LocationLoyaltyCard WHERE syncId IS NULL OR syncId = ''",
-            "UPDATE LocationLoyaltyCard SET syncId = ? WHERE locationId = ?"
-        )
-
-        setSyncId(
-            db,
-            "SELECT id FROM ProductVariant WHERE syncId IS NULL OR syncId = ''",
-            "UPDATE ProductVariant SET syncId = ? WHERE id = ?"
-        )
-    }
 
     private fun cleanAisleProductOrphans(db: SupportSQLiteDatabase) {
         db.execSQL(
@@ -110,7 +41,7 @@ class Migration8To9 : Migration(8, 9) {
                     `aisleId` INTEGER NOT NULL, 
                     `productId` INTEGER NOT NULL, 
                     `rank` INTEGER NOT NULL, 
-                    `syncId` TEXT  NOT NULL, 
+                    `syncId` TEXT, 
                     `isRemoved` INTEGER NOT NULL DEFAULT 0, 
                     `lastModifiedAt` INTEGER NOT NULL DEFAULT 0, 
                     `serverUpdatedAt` INTEGER, 
@@ -146,8 +77,18 @@ class Migration8To9 : Migration(8, 9) {
         recreateAisleProductTable(db)
     }
 
+    private fun addNoteCreatedAtColumn(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            "ALTER TABLE `Note` ADD COLUMN `createdAt` INTEGER NOT NULL DEFAULT 0"
+        )
+
+        db.execSQL(
+            "UPDATE `Note` SET `createdAt` = `id` WHERE `createdAt` = 0"
+        )
+    }
+
     override fun migrate(db: SupportSQLiteDatabase) {
-        setMissingSyncIds(db)
         addAisleProductForeignKeys(db)
+        addNoteCreatedAtColumn(db)
     }
 }

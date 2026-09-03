@@ -35,8 +35,8 @@ class NoteDaoTestImpl : BaseSyncTestDao<NoteEntity>(), NoteDao {
         return flowOf(result)
     }
 
-    override fun getByNaturalKey(noteText: String): List<NoteEntity> {
-        return activeItems.filter { note -> note.noteText == noteText }
+    override fun getByNaturalKey(noteText: String, createdAt: Long): List<NoteEntity> {
+        return activeItems.filter { note -> note.noteText == noteText && note.createdAt == createdAt }
     }
 
     override suspend fun upsert(vararg entity: NoteEntity): List<Long> {

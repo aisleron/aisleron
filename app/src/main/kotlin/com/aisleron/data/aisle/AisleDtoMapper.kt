@@ -33,7 +33,7 @@ class AisleDtoMapper(
             }
 
         return AisleDto(
-            id = checkNotNull(entity.syncId) { "syncId must be generated prior to push" },
+            id = entity.syncId.orEmpty(),
             isDeleted = entity.isRemoved,
             clientUpdatedAt = Instant.fromEpochMilliseconds(entity.lastModifiedAt).toString(),
             name = entity.name,
@@ -71,6 +71,9 @@ class AisleDtoMapper(
         aisleDao.getBySyncId(dto.id)?.let { return it }
 
         val localLocationId = getLocalLocationId(dto)
-        return aisleDao.getByNaturalKey(dto.name, localLocationId).firstOrNull()
+        val entityList = aisleDao.getByNaturalKey(dto.name, localLocationId)
+            .filter { it.syncId == null }
+
+        return entityList.firstOrNull { !it.isRemoved } ?: entityList.firstOrNull()
     }
 }

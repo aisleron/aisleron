@@ -32,7 +32,7 @@ class ProductVariantDtoMapper(
         }
 
         return ProductVariantDto(
-            id = checkNotNull(entity.syncId) { "syncId must be generated prior to push" },
+            id = entity.syncId.orEmpty(),
             isDeleted = entity.isRemoved,
             clientUpdatedAt = Instant.fromEpochMilliseconds(entity.lastModifiedAt).toString(),
             productId = productSyncId,
@@ -65,7 +65,10 @@ class ProductVariantDtoMapper(
 
     override suspend fun lookupEntityFromDto(dto: ProductVariantDto): ProductVariantEntity? {
         productVariantDao.getBySyncId(dto.id)?.let { return it }
-        return productVariantDao.getByNaturalKey(dto.barcode).firstOrNull()
 
+        val entityList = productVariantDao.getByNaturalKey(dto.barcode)
+            .filter { it.syncId == null }
+
+        return entityList.firstOrNull { !it.isRemoved } ?: entityList.firstOrNull()
     }
 }

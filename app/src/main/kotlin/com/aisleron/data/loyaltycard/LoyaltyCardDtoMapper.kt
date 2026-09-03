@@ -26,7 +26,7 @@ class LoyaltyCardDtoMapper(
 ) : DtoMapper<LoyaltyCardEntity, LoyaltyCardDto> {
 
     override suspend fun toDto(entity: LoyaltyCardEntity): LoyaltyCardDto = LoyaltyCardDto(
-        id = checkNotNull(entity.syncId) { "syncId must be generated prior to push" },
+        id = entity.syncId.orEmpty(),
         isDeleted = entity.isRemoved,
         clientUpdatedAt = Instant.fromEpochMilliseconds(entity.lastModifiedAt).toString(),
         name = entity.name,
@@ -51,8 +51,11 @@ class LoyaltyCardDtoMapper(
 
     override suspend fun lookupEntityFromDto(dto: LoyaltyCardDto): LoyaltyCardEntity? {
         loyaltyCardDao.getBySyncId(dto.id)?.let { return it }
-        return loyaltyCardDao.getByNaturalKey(
+
+        val entityList = loyaltyCardDao.getByNaturalKey(
             LoyaltyCardProviderType.valueOf(dto.provider), dto.intent
-        ).firstOrNull()
+        ).filter { it.syncId == null }
+
+        return entityList.firstOrNull { !it.isRemoved } ?: entityList.firstOrNull()
     }
 }

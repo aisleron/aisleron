@@ -48,14 +48,15 @@ class AisleSyncTest : SyncTest<AisleEntity, AisleDto>() {
     override suspend fun addEntity(
         lastModifiedAt: Long,
         serverUpdatedAt: Long?,
-        isRemoved: Boolean
-    ): AisleEntity = addAisleEntity(lastModifiedAt, serverUpdatedAt, isRemoved)
+        isRemoved: Boolean,
+        syncId: String?
+    ): AisleEntity = addAisleEntity(lastModifiedAt, serverUpdatedAt, isRemoved, syncId)
 
     private suspend fun addAisleEntity(
         lastModifiedAt: Long,
         serverUpdatedAt: Long?,
         isRemoved: Boolean,
-        syncId: String? = SyncEntity.generateSyncId(),
+        syncId: String? = null,
         withLocation: Boolean = true
     ): AisleEntity {
         val locationId = if (withLocation)
@@ -230,7 +231,6 @@ class AisleSyncTest : SyncTest<AisleEntity, AisleDto>() {
             serverUpdatedAt = 0,
             isRemoved = false
         ).copy(
-            syncId = SyncEntity.generateSyncId(),
             name = dto.name,
             locationId = get<LocationDao>().getBySyncId(dto.locationId)!!.id
         )

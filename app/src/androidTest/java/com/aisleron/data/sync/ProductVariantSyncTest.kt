@@ -47,16 +47,18 @@ class ProductVariantSyncTest : SyncTest<ProductVariantEntity, ProductVariantDto>
     override suspend fun addEntity(
         lastModifiedAt: Long,
         serverUpdatedAt: Long?,
-        isRemoved: Boolean
-    ): ProductVariantEntity = addProductVariantEntity(lastModifiedAt, serverUpdatedAt, isRemoved)
+        isRemoved: Boolean,
+        syncId: String?
+    ): ProductVariantEntity =
+        addProductVariantEntity(lastModifiedAt, serverUpdatedAt, isRemoved, syncId)
 
     private suspend fun addProductVariantEntity(
         lastModifiedAt: Long,
         serverUpdatedAt: Long?,
         isRemoved: Boolean,
-        syncId: String = SyncEntity.generateSyncId()
+        syncId: String? = null
     ): ProductVariantEntity {
-        val productId = addProductEntity().id
+        val productId = addProductEntity(SyncEntity.generateSyncId()).id
 
         val entity = ProductVariantEntity(
             id = 0,
@@ -87,7 +89,7 @@ class ProductVariantSyncTest : SyncTest<ProductVariantEntity, ProductVariantDto>
         clientUpdatedAt: String,
         isDeleted: Boolean
     ): ProductVariantDto {
-        val productId = addProductEntity().syncId!!
+        val productId = addProductEntity(SyncEntity.generateSyncId()).syncId!!
 
         val dto = ProductVariantDto(
             id = id,
@@ -114,7 +116,7 @@ class ProductVariantSyncTest : SyncTest<ProductVariantEntity, ProductVariantDto>
         return expectedEntity == compareEntity
     }
 
-    private suspend fun addProductEntity(syncId: String? = SyncEntity.generateSyncId()): ProductEntity {
+    private suspend fun addProductEntity(syncId: String? = null): ProductEntity {
         val entity = ProductEntity(
             id = 0,
             name = "Product for Sync Test",
@@ -213,8 +215,7 @@ class ProductVariantSyncTest : SyncTest<ProductVariantEntity, ProductVariantDto>
             serverUpdatedAt = 0,
             isRemoved = false
         ).copy(
-            syncId = SyncEntity.generateSyncId(),
-            barcode = dto.barcode,
+            barcode = dto.barcode
         )
 
         productVariantDao.upsert(entity)

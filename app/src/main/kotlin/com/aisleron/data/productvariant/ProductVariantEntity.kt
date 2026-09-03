@@ -49,7 +49,7 @@ data class ProductVariantEntity(
     val productId: Int,
     val barcode: String,
     @ColumnInfo(defaultValue = "0") val createdAt: Long,
-    override val syncId: String? = SyncEntity.generateSyncId(),
+    override val syncId: String? = null,
     @ColumnInfo(defaultValue = "0") override val isRemoved: Boolean = false,
     @ColumnInfo(defaultValue = "0") override val lastModifiedAt: Long = System.currentTimeMillis(),
     override val serverUpdatedAt: Long? = null

@@ -47,15 +47,17 @@ class LocationSyncTest : SyncTest<LocationEntity, LocationDto>() {
     override suspend fun addEntity(
         lastModifiedAt: Long,
         serverUpdatedAt: Long?,
-        isRemoved: Boolean
+        isRemoved: Boolean,
+        syncId: String?
     ): LocationEntity = addLocationEntity(
-        lastModifiedAt, serverUpdatedAt, isRemoved, false
+        lastModifiedAt, serverUpdatedAt, isRemoved, false, syncId
     )
 
     private suspend fun addNoteEntity(): NoteEntity {
         val entity = NoteEntity(
             id = 0,
-            noteText = "Test Note for Location Sync"
+            noteText = "Test Note for Location Sync",
+            syncId = SyncEntity.generateSyncId()
         )
 
         val id = get<NoteDao>().upsert(entity).first().toInt()
@@ -67,7 +69,7 @@ class LocationSyncTest : SyncTest<LocationEntity, LocationDto>() {
         serverUpdatedAt: Long?,
         isRemoved: Boolean,
         withNote: Boolean,
-        syncId: String? = SyncEntity.generateSyncId()
+        syncId: String? = null
     ): LocationEntity {
         val noteId = if (withNote) addNoteEntity().id else null
         val entity = LocationEntity(
@@ -224,7 +226,6 @@ class LocationSyncTest : SyncTest<LocationEntity, LocationDto>() {
             isRemoved = false,
             withNote = false,
         ).copy(
-            syncId = SyncEntity.generateSyncId(),
             name = dto.name
         )
 

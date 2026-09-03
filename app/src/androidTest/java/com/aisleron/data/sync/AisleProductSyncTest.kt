@@ -50,14 +50,16 @@ class AisleProductSyncTest : SyncTest<AisleProductEntity, AisleProductDto>() {
     override suspend fun addEntity(
         lastModifiedAt: Long,
         serverUpdatedAt: Long?,
-        isRemoved: Boolean
-    ): AisleProductEntity = addAisleProductEntity(lastModifiedAt, serverUpdatedAt, isRemoved)
+        isRemoved: Boolean,
+        syncId: String?
+    ): AisleProductEntity =
+        addAisleProductEntity(lastModifiedAt, serverUpdatedAt, isRemoved, syncId)
 
     private suspend fun addAisleProductEntity(
         lastModifiedAt: Long,
         serverUpdatedAt: Long?,
         isRemoved: Boolean,
-        syncId: String = SyncEntity.generateSyncId()
+        syncId: String? = null
     ): AisleProductEntity {
         val aisleId = addAisleEntity().id
         val productId = addProductEntity().id
@@ -255,7 +257,6 @@ class AisleProductSyncTest : SyncTest<AisleProductEntity, AisleProductDto>() {
             serverUpdatedAt = 0,
             isRemoved = false
         ).copy(
-            syncId = SyncEntity.generateSyncId(),
             aisleId = get<AisleDao>().getBySyncId(dto.aisleId)!!.id,
             productId = get<ProductDao>().getBySyncId(dto.productId)!!.id
         )
@@ -295,16 +296,18 @@ class AisleProductSyncTest : SyncTest<AisleProductEntity, AisleProductDto>() {
     fun pull_HasDuplicateEntity_EntityReplaced() = runTest {
         // This test validates that the AisleProduct unique constraint is handled correctly by the
         // custom Dao upsert, since standard room upsert doesn't cater for unique keys
+        val ap1 =
+            addAisleProductEntity(0, 0, isRemoved = false, syncId = SyncEntity.generateSyncId())
 
-        val ap1 = addAisleProductEntity(0, 0, isRemoved = false)
-        val ap2 = addAisleProductEntity(0, 0, isRemoved = false)
+        val ap2 =
+            addAisleProductEntity(0, 0, isRemoved = false, syncId = SyncEntity.generateSyncId())
 
         assertEquals(2, aisleProductDao.getAisleProducts().size)
 
         val lastSyncIso = "2026-08-18T00:00:00Z"
 
         // Use sync id from ap1, and aisle & product details from ap2 to force a unique key violation
-        val id = ap1.syncId
+        val id = ap1.syncId!!
         val dto = addDto(id, "2026-08-18T05:00:00Z", "2026-08-17T05:00:00Z").copy(
             aisleId = get<AisleDao>().getAisle(ap2.id, false)!!.syncId!!,
             productId = get<ProductDao>().getProduct(ap2.id, false)!!.syncId!!,

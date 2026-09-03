@@ -55,7 +55,7 @@ data class LocationEntity(
     @ColumnInfo(index = true) val noteId: Int?,
     @ColumnInfo(defaultValue = "1") val expanded: Boolean,
     val rank: Int,
-    override val syncId: String? = SyncEntity.generateSyncId(),
+    override val syncId: String? = null,
     @ColumnInfo(defaultValue = "0") override val isRemoved: Boolean = false,
     @ColumnInfo(defaultValue = "0") override val lastModifiedAt: Long = System.currentTimeMillis(),
     override val serverUpdatedAt: Long? = null

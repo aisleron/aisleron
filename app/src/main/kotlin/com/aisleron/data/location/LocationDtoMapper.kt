@@ -31,7 +31,7 @@ class LocationDtoMapper(
         val noteSyncId = entity.noteId?.let { localId -> noteDao.getNote(localId, true)?.syncId }
 
         return LocationDto(
-            id = checkNotNull(entity.syncId) { "syncId must be generated prior to push" },
+            id = entity.syncId.orEmpty(),
             isDeleted = entity.isRemoved,
             clientUpdatedAt = Instant.fromEpochMilliseconds(entity.lastModifiedAt).toString(),
             type = entity.type.name,
@@ -66,6 +66,10 @@ class LocationDtoMapper(
 
     override suspend fun lookupEntityFromDto(dto: LocationDto): LocationEntity? {
         locationDao.getBySyncId(dto.id)?.let { return it }
-        return locationDao.getByNaturalKey(dto.name, LocationType.valueOf(dto.type)).firstOrNull()
+
+        val entityList = locationDao.getByNaturalKey(dto.name, LocationType.valueOf(dto.type))
+            .filter { it.syncId == null }
+
+        return entityList.firstOrNull { !it.isRemoved } ?: entityList.firstOrNull()
     }
 }

@@ -53,15 +53,16 @@ class LocationLoyaltyCardSyncTest : SyncTest<LocationLoyaltyCardEntity, Location
     override suspend fun addEntity(
         lastModifiedAt: Long,
         serverUpdatedAt: Long?,
-        isRemoved: Boolean
+        isRemoved: Boolean,
+        syncId: String?
     ): LocationLoyaltyCardEntity =
-        addLocationLoyaltyCardEntity(lastModifiedAt, serverUpdatedAt, isRemoved)
+        addLocationLoyaltyCardEntity(lastModifiedAt, serverUpdatedAt, isRemoved, syncId)
 
     private suspend fun addLocationLoyaltyCardEntity(
         lastModifiedAt: Long,
         serverUpdatedAt: Long?,
         isRemoved: Boolean,
-        syncId: String? = SyncEntity.generateSyncId()
+        syncId: String? = null
     ): LocationLoyaltyCardEntity {
         val locationId = addLocationEntity().id
         val loyaltyCardId = addLoyaltyCardEntity().id
@@ -201,12 +202,12 @@ class LocationLoyaltyCardSyncTest : SyncTest<LocationLoyaltyCardEntity, Location
     }
 
     @Test
-    fun toDto_SyncIdNull_throwsException() = runTest {
+    fun toDto_SyncIdNull_DtoIdIsEMpty() = runTest {
         val entity = addLocationLoyaltyCardEntity(0, 0, isRemoved = false, syncId = null)
 
-        assertFailsWith<IllegalStateException> {
-            mapper.toDto(entity)
-        }
+        val dto = mapper.toDto(entity)
+
+        assertEquals("", dto.id)
     }
 
     @Test
@@ -247,7 +248,6 @@ class LocationLoyaltyCardSyncTest : SyncTest<LocationLoyaltyCardEntity, Location
             serverUpdatedAt = 0,
             isRemoved = false
         ).copy(
-            syncId = SyncEntity.generateSyncId(),
             locationId = get<LocationDao>().getBySyncId(dto.locationId)!!.id,
             loyaltyCardId = get<LoyaltyCardDao>().getBySyncId(dto.loyaltyCardId)!!.id
         )
