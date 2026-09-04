@@ -17,7 +17,6 @@
 
 package com.aisleron.data.sync
 
-import com.aisleron.data.base.SyncEntity
 import com.aisleron.data.note.NoteDao
 import com.aisleron.data.note.NoteDto
 import com.aisleron.data.note.NoteEntity
@@ -37,6 +36,7 @@ import org.junit.Test
 import org.koin.core.qualifier.named
 import org.koin.test.KoinTest
 import org.koin.test.get
+import java.util.UUID
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
@@ -94,7 +94,7 @@ class SyncManagerTest : KoinTest {
     fun syncAll_WhenServicePreferenceIsNotNone_ExecutesPushPullAndPurge() = runTest {
         syncPreferencesRepository.setRemoteLastSyncedAt(100L)
         val removedId = addNoteEntity(
-            lastModifiedAt = 1000L, isRemoved = true, syncId = SyncEntity.generateSyncId()
+            lastModifiedAt = 1000L, isRemoved = true, syncId = UUID.randomUUID().toString()
         ).id
 
         assertNotNull(dao.getNote(removedId, true))

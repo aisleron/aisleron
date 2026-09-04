@@ -23,7 +23,6 @@ import com.aisleron.data.aisleproduct.AisleProductDao
 import com.aisleron.data.aisleproduct.AisleProductDto
 import com.aisleron.data.aisleproduct.AisleProductDtoMapper
 import com.aisleron.data.aisleproduct.AisleProductEntity
-import com.aisleron.data.base.SyncEntity
 import com.aisleron.data.product.ProductDao
 import com.aisleron.data.product.ProductEntity
 import com.aisleron.domain.preferences.TrackingMode
@@ -121,7 +120,7 @@ class AisleProductSyncTest : SyncTest<AisleProductEntity, AisleProductDto>() {
         return expectedEntity == compareEntity
     }
 
-    private suspend fun addAisleEntity(syncId: String? = SyncEntity.generateSyncId()): AisleEntity {
+    private suspend fun addAisleEntity(syncId: String? = generateSyncId()): AisleEntity {
         val entity = AisleEntity(
             id = 0,
             name = "Aisle for Sync Test",
@@ -137,7 +136,7 @@ class AisleProductSyncTest : SyncTest<AisleProductEntity, AisleProductDto>() {
         return entity.copy(id = id)
     }
 
-    private suspend fun addProductEntity(syncId: String? = SyncEntity.generateSyncId()): ProductEntity {
+    private suspend fun addProductEntity(syncId: String? = generateSyncId()): ProductEntity {
         val entity = ProductEntity(
             id = 0,
             name = "Product for Sync Test",
@@ -178,9 +177,9 @@ class AisleProductSyncTest : SyncTest<AisleProductEntity, AisleProductDto>() {
     @Test
     fun fromDto_aisleNotFound_ThrowsException() = runTest {
         val dto = addAisleProductDto(
-            SyncEntity.generateSyncId(), "", "",
+            generateSyncId(), "", "",
             isDeleted = false
-        ).copy(aisleId = SyncEntity.generateSyncId())
+        ).copy(aisleId = generateSyncId())
 
         assertFailsWith<IllegalStateException> {
             mapper.fromDto(dto)
@@ -190,9 +189,9 @@ class AisleProductSyncTest : SyncTest<AisleProductEntity, AisleProductDto>() {
     @Test
     fun fromDto_productNotFound_ThrowsException() = runTest {
         val dto = addAisleProductDto(
-            SyncEntity.generateSyncId(), "", "",
+            generateSyncId(), "", "",
             isDeleted = false
-        ).copy(productId = SyncEntity.generateSyncId())
+        ).copy(productId = generateSyncId())
 
         assertFailsWith<IllegalStateException> {
             mapper.fromDto(dto)
@@ -201,7 +200,7 @@ class AisleProductSyncTest : SyncTest<AisleProductEntity, AisleProductDto>() {
 
     @Test
     fun fromDto_ExistingEntityProvided_EntityUpdated() = runTest {
-        val syncId = SyncEntity.generateSyncId()
+        val syncId = generateSyncId()
         val existingEntity = addAisleProductEntity(
             lastModifiedAt = 100L,
             serverUpdatedAt = null,
@@ -222,7 +221,7 @@ class AisleProductSyncTest : SyncTest<AisleProductEntity, AisleProductDto>() {
     @Test
     fun lookupEntityFromDto_EntityMatchesOnSyncId_ReturnsEntity() = runTest {
         val dto = addDto(
-            SyncEntity.generateSyncId(),
+            generateSyncId(),
             "2026-08-18T05:00:00Z",
             "2026-08-18T05:00:00Z",
             false
@@ -246,7 +245,7 @@ class AisleProductSyncTest : SyncTest<AisleProductEntity, AisleProductDto>() {
     @Test
     fun lookupEntityFromDto_EntityMatchesOnNaturalKey_ReturnsEntity() = runTest {
         val dto = addDto(
-            SyncEntity.generateSyncId(),
+            generateSyncId(),
             "2026-08-18T05:00:00Z",
             "2026-08-18T05:00:00Z",
             false
@@ -271,7 +270,7 @@ class AisleProductSyncTest : SyncTest<AisleProductEntity, AisleProductDto>() {
     @Test
     fun lookupEntityFromDto_NoEntityMatch_ReturnsNull() = runTest {
         val dto = addDto(
-            SyncEntity.generateSyncId(),
+            generateSyncId(),
             "2026-08-18T05:00:00Z",
             "2026-08-18T05:00:00Z",
             false
@@ -282,7 +281,7 @@ class AisleProductSyncTest : SyncTest<AisleProductEntity, AisleProductDto>() {
             serverUpdatedAt = 0,
             isRemoved = false,
         ).copy(
-            syncId = SyncEntity.generateSyncId()
+            syncId = generateSyncId()
         )
 
         aisleProductDao.upsert(entity)
@@ -297,10 +296,10 @@ class AisleProductSyncTest : SyncTest<AisleProductEntity, AisleProductDto>() {
         // This test validates that the AisleProduct unique constraint is handled correctly by the
         // custom Dao upsert, since standard room upsert doesn't cater for unique keys
         val ap1 =
-            addAisleProductEntity(0, 0, isRemoved = false, syncId = SyncEntity.generateSyncId())
+            addAisleProductEntity(0, 0, isRemoved = false, syncId = generateSyncId())
 
         val ap2 =
-            addAisleProductEntity(0, 0, isRemoved = false, syncId = SyncEntity.generateSyncId())
+            addAisleProductEntity(0, 0, isRemoved = false, syncId = generateSyncId())
 
         assertEquals(2, aisleProductDao.getAisleProducts().size)
 

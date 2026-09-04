@@ -17,7 +17,6 @@
 
 package com.aisleron.data.sync
 
-import com.aisleron.data.base.SyncEntity
 import com.aisleron.data.loyaltycard.LoyaltyCardDao
 import com.aisleron.data.loyaltycard.LoyaltyCardDto
 import com.aisleron.data.loyaltycard.LoyaltyCardDtoMapper
@@ -112,7 +111,7 @@ class LoyaltyCardSyncTest : SyncTest<LoyaltyCardEntity, LoyaltyCardDto>() {
 
     @Test
     fun fromDto_ExistingEntityProvided_EntityUpdated() = runTest {
-        val syncId = SyncEntity.generateSyncId()
+        val syncId = generateSyncId()
         val existingEntity = addLoyaltyCardEntity(
             lastModifiedAt = 100L,
             serverUpdatedAt = null,
@@ -147,7 +146,7 @@ class LoyaltyCardSyncTest : SyncTest<LoyaltyCardEntity, LoyaltyCardDto>() {
     @Test
     fun lookupEntityFromDto_EntityMatchesOnSyncId_ReturnsEntity() = runTest {
         val dto = addDto(
-            SyncEntity.generateSyncId(),
+            generateSyncId(),
             "2026-08-18T05:00:00Z",
             "2026-08-18T05:00:00Z",
             false
@@ -172,7 +171,7 @@ class LoyaltyCardSyncTest : SyncTest<LoyaltyCardEntity, LoyaltyCardDto>() {
     @Test
     fun lookupEntityFromDto_EntityMatchesOnNaturalKey_ReturnsEntity() = runTest {
         val dto = addDto(
-            SyncEntity.generateSyncId(),
+            generateSyncId(),
             "2026-08-18T05:00:00Z",
             "2026-08-18T05:00:00Z",
             false
@@ -197,7 +196,7 @@ class LoyaltyCardSyncTest : SyncTest<LoyaltyCardEntity, LoyaltyCardDto>() {
     @Test
     fun lookupEntityFromDto_NoEntityMatch_ReturnsNull() = runTest {
         val dto = addDto(
-            SyncEntity.generateSyncId(),
+            generateSyncId(),
             "2026-08-18T05:00:00Z",
             "2026-08-18T05:00:00Z",
             false
@@ -208,7 +207,7 @@ class LoyaltyCardSyncTest : SyncTest<LoyaltyCardEntity, LoyaltyCardDto>() {
             serverUpdatedAt = 0,
             isRemoved = false
         ).copy(
-            syncId = SyncEntity.generateSyncId(),
+            syncId = generateSyncId(),
             intent = "Not the Same as Dto"
         )
 

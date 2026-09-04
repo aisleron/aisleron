@@ -17,7 +17,6 @@
 
 package com.aisleron.data.sync
 
-import com.aisleron.data.base.SyncEntity
 import com.aisleron.data.location.LocationDao
 import com.aisleron.data.location.LocationEntity
 import com.aisleron.data.loyaltycard.LocationLoyaltyCardDao
@@ -122,7 +121,7 @@ class LocationLoyaltyCardSyncTest : SyncTest<LocationLoyaltyCardEntity, Location
         return expectedEntity == compareEntity
     }
 
-    private suspend fun addLocationEntity(syncId: String? = SyncEntity.generateSyncId()): LocationEntity {
+    private suspend fun addLocationEntity(syncId: String? = generateSyncId()): LocationEntity {
         val entity = LocationEntity(
             id = 0,
             name = "Location for Sync Test",
@@ -142,7 +141,7 @@ class LocationLoyaltyCardSyncTest : SyncTest<LocationLoyaltyCardEntity, Location
         return entity.copy(id = id)
     }
 
-    private suspend fun addLoyaltyCardEntity(syncId: String? = SyncEntity.generateSyncId()): LoyaltyCardEntity {
+    private suspend fun addLoyaltyCardEntity(syncId: String? = generateSyncId()): LoyaltyCardEntity {
         val entity = LoyaltyCardEntity(
             id = 0,
             name = "Loyalty Card for Sync Test",
@@ -180,9 +179,9 @@ class LocationLoyaltyCardSyncTest : SyncTest<LocationLoyaltyCardEntity, Location
     @Test
     fun fromDto_LocationNotFound_ThrowsException() = runTest {
         val dto = addLocationLoyaltyCardDto(
-            SyncEntity.generateSyncId(), "", "",
+            generateSyncId(), "", "",
             isDeleted = false
-        ).copy(locationId = SyncEntity.generateSyncId())
+        ).copy(locationId = generateSyncId())
 
         assertFailsWith<IllegalStateException> {
             mapper.fromDto(dto)
@@ -192,9 +191,9 @@ class LocationLoyaltyCardSyncTest : SyncTest<LocationLoyaltyCardEntity, Location
     @Test
     fun fromDto_LoyaltyCardNotFound_ThrowsException() = runTest {
         val dto = addLocationLoyaltyCardDto(
-            SyncEntity.generateSyncId(), "", "",
+            generateSyncId(), "", "",
             isDeleted = false
-        ).copy(loyaltyCardId = SyncEntity.generateSyncId())
+        ).copy(loyaltyCardId = generateSyncId())
 
         assertFailsWith<IllegalStateException> {
             mapper.fromDto(dto)
@@ -213,7 +212,7 @@ class LocationLoyaltyCardSyncTest : SyncTest<LocationLoyaltyCardEntity, Location
     @Test
     fun lookupEntityFromDto_EntityMatchesOnSyncId_ReturnsEntity() = runTest {
         val dto = addDto(
-            SyncEntity.generateSyncId(),
+            generateSyncId(),
             "2026-08-18T05:00:00Z",
             "2026-08-18T05:00:00Z",
             false
@@ -237,7 +236,7 @@ class LocationLoyaltyCardSyncTest : SyncTest<LocationLoyaltyCardEntity, Location
     @Test
     fun lookupEntityFromDto_EntityMatchesOnNaturalKey_ReturnsEntity() = runTest {
         val dto = addDto(
-            SyncEntity.generateSyncId(),
+            generateSyncId(),
             "2026-08-18T05:00:00Z",
             "2026-08-18T05:00:00Z",
             false
@@ -262,7 +261,7 @@ class LocationLoyaltyCardSyncTest : SyncTest<LocationLoyaltyCardEntity, Location
     @Test
     fun lookupEntityFromDto_NoEntityMatch_ReturnsNull() = runTest {
         val dto = addDto(
-            SyncEntity.generateSyncId(),
+            generateSyncId(),
             "2026-08-18T05:00:00Z",
             "2026-08-18T05:00:00Z",
             false
@@ -273,7 +272,7 @@ class LocationLoyaltyCardSyncTest : SyncTest<LocationLoyaltyCardEntity, Location
             serverUpdatedAt = 0,
             isRemoved = false,
         ).copy(
-            syncId = SyncEntity.generateSyncId()
+            syncId = generateSyncId()
         )
 
         locationLoyaltyCardDao.upsert(entity)

@@ -34,7 +34,7 @@ class LoyaltyCardMapper : Mapper<LoyaltyCardEntity, LoyaltyCard> {
         name = value.name.trim(),
         provider = value.provider,
         intent = value.intent,
-        syncId = syncMetadata?.syncId ?: SyncEntity.generateSyncId(),
+        syncId = syncMetadata?.syncId,
         isRemoved = syncMetadata?.isRemoved ?: false,
         lastModifiedAt = System.currentTimeMillis(),
         serverUpdatedAt = syncMetadata?.serverUpdatedAt

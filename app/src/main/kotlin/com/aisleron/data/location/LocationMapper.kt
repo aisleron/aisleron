@@ -45,7 +45,7 @@ class LocationMapper : Mapper<LocationEntity, Location> {
         noteId = value.noteId,
         expanded = value.expanded,
         rank = value.rank,
-        syncId = syncMetadata?.syncId ?: SyncEntity.generateSyncId(),
+        syncId = syncMetadata?.syncId,
         isRemoved = syncMetadata?.isRemoved ?: false,
         lastModifiedAt = System.currentTimeMillis(),
         serverUpdatedAt = syncMetadata?.serverUpdatedAt

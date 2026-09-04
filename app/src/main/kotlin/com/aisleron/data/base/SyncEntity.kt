@@ -17,8 +17,6 @@
 
 package com.aisleron.data.base
 
-import java.util.UUID
-
 /**
  * Base fields required by a cloud sync entity.
  *
@@ -35,8 +33,4 @@ interface SyncEntity {
     val isRemoved: Boolean
     val lastModifiedAt: Long
     val serverUpdatedAt: Long?
-
-    companion object {
-        fun generateSyncId(): String = UUID.randomUUID().toString()
-    }
 }

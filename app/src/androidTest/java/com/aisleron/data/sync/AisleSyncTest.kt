@@ -21,7 +21,6 @@ import com.aisleron.data.aisle.AisleDao
 import com.aisleron.data.aisle.AisleDto
 import com.aisleron.data.aisle.AisleDtoMapper
 import com.aisleron.data.aisle.AisleEntity
-import com.aisleron.data.base.SyncEntity
 import com.aisleron.data.location.LocationDao
 import com.aisleron.data.location.LocationEntity
 import com.aisleron.domain.FilterType
@@ -141,7 +140,7 @@ class AisleSyncTest : SyncTest<AisleEntity, AisleDto>() {
             isRemoved = false,
             lastModifiedAt = 0,
             serverUpdatedAt = 0,
-            syncId = SyncEntity.generateSyncId()
+            syncId = generateSyncId()
         )
 
         val id = get<LocationDao>().upsert(entity).first().toInt()
@@ -161,7 +160,7 @@ class AisleSyncTest : SyncTest<AisleEntity, AisleDto>() {
     @Test
     fun fromDto_LocationNotFound_ThrowsException() = runTest {
         val dto = addAisleDto(
-            SyncEntity.generateSyncId(), "", "",
+            generateSyncId(), "", "",
             isDeleted = false,
             withLocation = false
         )
@@ -173,7 +172,7 @@ class AisleSyncTest : SyncTest<AisleEntity, AisleDto>() {
 
     @Test
     fun fromDto_ExistingEntityProvided_EntityUpdated() = runTest {
-        val syncId = SyncEntity.generateSyncId()
+        val syncId = generateSyncId()
         val existingEntity = addAisleEntity(
             lastModifiedAt = 100L,
             serverUpdatedAt = null,
@@ -194,7 +193,7 @@ class AisleSyncTest : SyncTest<AisleEntity, AisleDto>() {
     @Test
     fun lookupEntityFromDto_EntityMatchesOnSyncId_ReturnsEntity() = runTest {
         val dto = addAisleDto(
-            SyncEntity.generateSyncId(),
+            generateSyncId(),
             "2026-08-18T05:00:00Z",
             "2026-08-18T05:00:00Z",
             false
@@ -219,7 +218,7 @@ class AisleSyncTest : SyncTest<AisleEntity, AisleDto>() {
     @Test
     fun lookupEntityFromDto_EntityMatchesOnNaturalKey_ReturnsEntity() = runTest {
         val dto = addAisleDto(
-            SyncEntity.generateSyncId(),
+            generateSyncId(),
             "2026-08-18T05:00:00Z",
             "2026-08-18T05:00:00Z",
             false,
@@ -245,7 +244,7 @@ class AisleSyncTest : SyncTest<AisleEntity, AisleDto>() {
     @Test
     fun lookupEntityFromDto_NoEntityMatch_ReturnsNull() = runTest {
         val dto = addAisleDto(
-            SyncEntity.generateSyncId(),
+            generateSyncId(),
             "2026-08-18T05:00:00Z",
             "2026-08-18T05:00:00Z",
             false
@@ -256,7 +255,7 @@ class AisleSyncTest : SyncTest<AisleEntity, AisleDto>() {
             serverUpdatedAt = 0,
             isRemoved = false
         ).copy(
-            syncId = SyncEntity.generateSyncId(),
+            syncId = generateSyncId(),
             name = "Not the Same as Dto"
         )
 

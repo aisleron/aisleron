@@ -17,7 +17,6 @@
 
 package com.aisleron.data.sync
 
-import com.aisleron.data.base.SyncEntity
 import com.aisleron.data.note.NoteDao
 import com.aisleron.data.note.NoteEntity
 import com.aisleron.data.product.ProductDao
@@ -52,7 +51,7 @@ class ProductSyncTest : SyncTest<ProductEntity, ProductDto>() {
         lastModifiedAt, serverUpdatedAt, isRemoved, false, syncId
     )
 
-    private suspend fun addNoteEntity(syncId: String? = SyncEntity.generateSyncId()): NoteEntity {
+    private suspend fun addNoteEntity(syncId: String? = generateSyncId()): NoteEntity {
         val entity = NoteEntity(
             id = 0,
             noteText = "Test Note for Location Sync",
@@ -149,7 +148,7 @@ class ProductSyncTest : SyncTest<ProductEntity, ProductDto>() {
     @Test
     fun fromDto_DtoHasNote_EntityHasNote() = runTest {
         val dto = addProductDto(
-            SyncEntity.generateSyncId(), "2026-08-18T00:00:00Z", "2026-08-18T05:00:00Z",
+            generateSyncId(), "2026-08-18T00:00:00Z", "2026-08-18T05:00:00Z",
             isDeleted = false,
             withNote = true
         )
@@ -162,7 +161,7 @@ class ProductSyncTest : SyncTest<ProductEntity, ProductDto>() {
 
     @Test
     fun fromDto_ExistingEntityProvided_EntityUpdated() = runTest {
-        val syncId = SyncEntity.generateSyncId()
+        val syncId = generateSyncId()
         val existingEntity = addProductEntity(
             lastModifiedAt = 100L,
             serverUpdatedAt = null,
@@ -185,7 +184,7 @@ class ProductSyncTest : SyncTest<ProductEntity, ProductDto>() {
     @Test
     fun lookupEntityFromDto_EntityMatchesOnSyncId_ReturnsEntity() = runTest {
         val dto = addDto(
-            SyncEntity.generateSyncId(),
+            generateSyncId(),
             "2026-08-18T05:00:00Z",
             "2026-08-18T05:00:00Z",
             false
@@ -211,7 +210,7 @@ class ProductSyncTest : SyncTest<ProductEntity, ProductDto>() {
     @Test
     fun lookupEntityFromDto_EntityMatchesOnNaturalKey_ReturnsEntity() = runTest {
         val dto = addDto(
-            SyncEntity.generateSyncId(),
+            generateSyncId(),
             "2026-08-18T05:00:00Z",
             "2026-08-18T05:00:00Z",
             false
@@ -236,7 +235,7 @@ class ProductSyncTest : SyncTest<ProductEntity, ProductDto>() {
     @Test
     fun lookupEntityFromDto_NoEntityMatch_ReturnsNull() = runTest {
         val dto = addDto(
-            SyncEntity.generateSyncId(),
+            generateSyncId(),
             "2026-08-18T05:00:00Z",
             "2026-08-18T05:00:00Z",
             false
@@ -248,7 +247,7 @@ class ProductSyncTest : SyncTest<ProductEntity, ProductDto>() {
             isRemoved = false,
             withNote = false,
         ).copy(
-            syncId = SyncEntity.generateSyncId(),
+            syncId = generateSyncId(),
             name = "Not the Same as Dto"
         )
 

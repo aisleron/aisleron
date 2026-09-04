@@ -17,7 +17,6 @@
 
 package com.aisleron.data.sync
 
-import com.aisleron.data.base.SyncEntity
 import com.aisleron.data.note.NoteDao
 import com.aisleron.data.note.NoteDto
 import com.aisleron.data.note.NoteDtoMapper
@@ -126,7 +125,7 @@ class SyncRepositoryImplTest : SyncTest<NoteEntity, NoteDto>() {
     fun push_LocalTombstoneEntitiesExistWithSyncId_PushesDeleteDtoToApi() = runTest {
         val lastSyncTimestamp = 1000L
         val localEntity = addNoteEntity(
-            lastModifiedAt = 1500L, isRemoved = true, syncId = SyncEntity.generateSyncId()
+            lastModifiedAt = 1500L, isRemoved = true, syncId = generateSyncId()
         )
 
         val expectedDto = mapper.toDto(localEntity)
