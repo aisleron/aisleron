@@ -37,7 +37,7 @@ class AisleRepositoryImpl(
     }
 
     override suspend fun updateAisleRank(aisle: Aisle) {
-        aisleDao.updateRank(mapExisting(aisle, false))
+        aisleDao.updateRank(mapExisting(aisle))
     }
 
     override suspend fun getWithProducts(aisleId: Int): Aisle {
@@ -64,26 +64,26 @@ class AisleRepositoryImpl(
     }
 
     override suspend fun add(items: List<Aisle>): List<Int> {
-        val aisles = items.map { mapExisting(it, false) }
+        val aisles = items.map { aisleMapper.fromModel(it, null) }
         return upsertAisles(aisles)
     }
 
-    private suspend fun mapExisting(item: Aisle, includeRemoved: Boolean): AisleEntity {
-        val currentEntity = aisleDao.getAisle(item.id, includeRemoved)
+    private suspend fun mapExisting(item: Aisle): AisleEntity {
+        val currentEntity = aisleDao.getAisle(item.id, true)
         return aisleMapper.fromModel(item, currentEntity)
     }
 
     override suspend fun update(item: Aisle) {
-        aisleDao.upsert(mapExisting(item, false))
+        aisleDao.upsert(mapExisting(item))
     }
 
     override suspend fun update(items: List<Aisle>) {
-        val aisles = items.map { mapExisting(it, false) }
+        val aisles = items.map { mapExisting(it) }
         upsertAisles(aisles)
     }
 
     override suspend fun remove(item: Aisle) {
-        val removeEntity = mapExisting(item, false).copy(isRemoved = true)
+        val removeEntity = mapExisting(item).copy(isRemoved = true)
         aisleDao.upsert(removeEntity)
     }
 
@@ -102,7 +102,7 @@ class AisleRepositoryImpl(
     }
 
     override suspend fun hardDelete(item: Aisle) {
-        aisleDao.delete(mapExisting(item, true))
+        aisleDao.delete(mapExisting(item))
     }
 
     private suspend fun upsertAisles(aisles: List<AisleEntity>): List<Int> {

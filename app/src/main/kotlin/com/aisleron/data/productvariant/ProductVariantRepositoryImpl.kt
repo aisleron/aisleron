@@ -57,24 +57,22 @@ class ProductVariantRepositoryImpl(
         return upsertProductVariants(productVariants)
     }
 
-    private suspend fun mapExisting(
-        item: ProductVariant, includeRemoved: Boolean
-    ): ProductVariantEntity {
-        val currentEntity = productVariantDao.getById(item.id, includeRemoved)
+    private suspend fun mapExisting(item: ProductVariant): ProductVariantEntity {
+        val currentEntity = productVariantDao.getById(item.id, true)
         return productVariantMapper.fromModel(item, currentEntity)
     }
 
     override suspend fun update(item: ProductVariant) {
-        productVariantDao.upsert(mapExisting(item, false))
+        productVariantDao.upsert(mapExisting(item))
     }
 
     override suspend fun update(items: List<ProductVariant>) {
-        val productVariants = items.map { mapExisting(it, false) }
+        val productVariants = items.map { mapExisting(it) }
         upsertProductVariants(productVariants)
     }
 
     override suspend fun remove(item: ProductVariant) {
-        val removeEntity = mapExisting(item, false).copy(isRemoved = true)
+        val removeEntity = mapExisting(item).copy(isRemoved = true)
         productVariantDao.upsert(removeEntity)
     }
 
@@ -92,7 +90,7 @@ class ProductVariantRepositoryImpl(
     }
 
     override suspend fun hardDelete(item: ProductVariant) {
-        val deletedEntity = mapExisting(item, true)
+        val deletedEntity = mapExisting(item)
         productVariantDao.delete(deletedEntity)
     }
 
@@ -114,7 +112,7 @@ class ProductVariantRepositoryImpl(
 
     override suspend fun removeByBarcode(barcode: String) {
         val removeVariant = getByBarcode(barcode).first() ?: return
-        val removeEntity = mapExisting(removeVariant, false).copy(isRemoved = true)
+        val removeEntity = mapExisting(removeVariant).copy(isRemoved = true)
         productVariantDao.upsert(removeEntity)
     }
 }
