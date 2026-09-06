@@ -30,7 +30,6 @@ class Migration8To9 : Migration(8, 9) {
               OR NOT EXISTS (SELECT 1 FROM Product p WHERE p.id = AisleProduct.productId)
             """.trimIndent()
         )
-
     }
 
     private fun recreateAisleProductTable(db: SupportSQLiteDatabase) {
@@ -72,23 +71,14 @@ class Migration8To9 : Migration(8, 9) {
         db.execSQL("CREATE INDEX IF NOT EXISTS `index_AisleProduct_lastModifiedAt` ON `AisleProduct` (`lastModifiedAt`)")
     }
 
-    private fun addAisleProductForeignKeys(db: SupportSQLiteDatabase) {
-        cleanAisleProductOrphans(db)
-        recreateAisleProductTable(db)
-    }
-
     private fun addNoteCreatedAtColumn(db: SupportSQLiteDatabase) {
-        db.execSQL(
-            "ALTER TABLE `Note` ADD COLUMN `createdAt` INTEGER NOT NULL DEFAULT 0"
-        )
-
-        db.execSQL(
-            "UPDATE `Note` SET `createdAt` = `id` WHERE `createdAt` = 0"
-        )
+        db.execSQL("ALTER TABLE `Note` ADD COLUMN `createdAt` INTEGER NOT NULL DEFAULT 0")
+        db.execSQL("UPDATE `Note` SET `createdAt` = `id` WHERE `createdAt` = 0")
     }
 
     override fun migrate(db: SupportSQLiteDatabase) {
-        addAisleProductForeignKeys(db)
+        cleanAisleProductOrphans(db)
+        recreateAisleProductTable(db)
         addNoteCreatedAtColumn(db)
     }
 }

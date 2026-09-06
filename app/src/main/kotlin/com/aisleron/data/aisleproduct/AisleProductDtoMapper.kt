@@ -19,6 +19,7 @@ package com.aisleron.data.aisleproduct
 
 import com.aisleron.data.aisle.AisleDao
 import com.aisleron.data.aisle.AisleEntity
+import com.aisleron.data.location.LocationDao
 import com.aisleron.data.product.ProductDao
 import com.aisleron.data.product.ProductEntity
 import com.aisleron.data.sync.DtoMapper
@@ -27,12 +28,18 @@ import kotlin.time.Instant
 class AisleProductDtoMapper(
     private val aisleProductDao: AisleProductDao,
     private val aisleDao: AisleDao,
-    private val productDao: ProductDao
+    private val productDao: ProductDao,
+    private val locationDao: LocationDao
 ) : DtoMapper<AisleProductEntity, AisleProductDto> {
 
     override suspend fun toDto(entity: AisleProductEntity): AisleProductDto {
-        val aisleSyncId = checkNotNull(aisleDao.getAisle(entity.aisleId, true)?.syncId) {
+        val aisle = aisleDao.getAisle(entity.aisleId, true)
+        val aisleSyncId = checkNotNull(aisle?.syncId) {
             "Aisle syncId not found for aisle ${entity.aisleId}"
+        }
+
+        val locationSyncId = checkNotNull(locationDao.getLocation(aisle.locationId, true)?.syncId) {
+            "Location syncId not found for location ${aisle.locationId}"
         }
 
         val productSyncId = checkNotNull(productDao.getProduct(entity.productId, true)?.syncId) {
@@ -43,8 +50,9 @@ class AisleProductDtoMapper(
             id = entity.syncId.orEmpty(),
             isDeleted = entity.isRemoved,
             clientUpdatedAt = Instant.fromEpochMilliseconds(entity.lastModifiedAt).toString(),
-            aisleId = aisleSyncId,
+            locationId = locationSyncId,
             productId = productSyncId,
+            aisleId = aisleSyncId,
             rank = entity.rank
         )
     }
