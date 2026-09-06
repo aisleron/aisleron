@@ -1,6 +1,6 @@
 Ausdehnungen:
 * Bring fertig Produkt Gänge während zufügen/Bearbeitung.
-* Unterstützung für dezimal Mengen & Einheiten von Messt ab.
+* Unterstützung für dezimal Mengen & Einheiten von Maßnahme.
 * Multi-#Ausgewählt Fähigkeit in Produkt Listen.
 * Per-Produkt #rückverfolgen Verfahren Optionen.
 * Speicher #wann #Eingabeaufforderung #hinausgehen Produkt Seiten.
