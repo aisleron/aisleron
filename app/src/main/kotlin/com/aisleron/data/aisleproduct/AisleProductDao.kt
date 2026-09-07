@@ -18,8 +18,6 @@
 package com.aisleron.data.aisleproduct
 
 import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import com.aisleron.data.base.BaseDao
@@ -75,8 +73,10 @@ interface AisleProductDao : BaseDao<AisleProductEntity>, SyncDao<AisleProductEnt
         "SELECT * FROM AisleProduct WHERE productId = :productId " +
                 "AND EXISTS (SELECT NULL FROM Aisle WHERE Aisle.id = AisleProduct.aisleId AND Aisle.locationId = :locationId)"
     )
-    fun getByNaturalKey(locationId: Int, productId: Int): List<AisleProductEntity>
+    suspend fun getByLocationNaturalKey(locationId: Int, productId: Int): List<AisleProductEntity>
 
+    /* Check if this is still needed now that there's no longe a unique index on the entity.
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     override suspend fun upsert(entities: List<AisleProductEntity>)
+    */
 }

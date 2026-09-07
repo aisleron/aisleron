@@ -64,8 +64,8 @@ class Migration8To9 : Migration(8, 9) {
 
         db.execSQL("DROP TABLE `AisleProduct`")
         db.execSQL("ALTER TABLE `AisleProduct_new` RENAME TO `AisleProduct`")
-        db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_AisleProduct_aisleId_productId` ON `AisleProduct` (`aisleId`, `productId`)")
         db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_AisleProduct_syncId` ON `AisleProduct` (`syncId`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_AisleProduct_aisleId_productId` ON `AisleProduct` (`aisleId`, `productId`)")
         db.execSQL("CREATE INDEX IF NOT EXISTS `index_AisleProduct_productId` ON `AisleProduct` (`productId`)")
         db.execSQL("CREATE INDEX IF NOT EXISTS `index_AisleProduct_isRemoved_id` ON `AisleProduct` (`isRemoved`, `id`)")
         db.execSQL("CREATE INDEX IF NOT EXISTS `index_AisleProduct_lastModifiedAt` ON `AisleProduct` (`lastModifiedAt`)")

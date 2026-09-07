@@ -43,8 +43,8 @@ import com.aisleron.data.product.ProductEntity
         )
     ],
     indices = [
-        Index(value = ["aisleId", "productId"], unique = true),
         Index(value = ["syncId"], unique = true),
+        Index(value = ["aisleId", "productId"]),
         Index(value = ["productId"]),
         Index(value = ["isRemoved", "id"]),
         Index(value = ["lastModifiedAt"])

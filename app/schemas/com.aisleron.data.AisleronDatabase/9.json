@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 9,
-    "identityHash": "ef20bb156a3d97643b71d944d2532d57",
+    "identityHash": "394fd0de47927afd6c318730e0635d8c",
     "entities": [
       {
         "tableName": "Aisle",
@@ -465,6 +465,15 @@
             ],
             "orders": [],
             "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_AisleProduct_syncId` ON `${TABLE_NAME}` (`syncId`)"
+          },
+          {
+            "name": "index_AisleProduct_aisleId",
+            "unique": false,
+            "columnNames": [
+              "aisleId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_AisleProduct_aisleId` ON `${TABLE_NAME}` (`aisleId`)"
           },
           {
             "name": "index_AisleProduct_productId",
@@ -931,7 +940,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ef20bb156a3d97643b71d944d2532d57')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '394fd0de47927afd6c318730e0635d8c')"
     ]
   }
 }

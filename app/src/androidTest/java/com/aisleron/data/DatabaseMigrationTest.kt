@@ -148,133 +148,96 @@ class DatabaseMigrationTest {
     @Test
     @Throws(IOException::class)
     fun migrate1to2() {
-        helper.createDatabase(testDb, 1).apply {
-            populateDatabase(this, 1)
-            close()
-        }
+        helper.createDatabase(testDb, 1).use { db -> populateDatabase(db, 1) }
 
-        // Re-open the database with version 2
-        val db = helper.runMigrationsAndValidate(testDb, 2, true)
-
-        // MigrationTestHelper automatically verifies the schema changes,
-        // but you need to validate that the data was migrated properly.
-        var showDefaultAisle: Int
-        db.apply {
+        helper.runMigrationsAndValidate(testDb, 2, true).use { db ->
             val queryBuilder = SupportSQLiteQueryBuilder.builder("Location")
-            val cursor: Cursor = query(queryBuilder.create())
-            cursor.moveToFirst()
-            showDefaultAisle = cursor.getInt(cursor.getColumnIndex("showDefaultAisle"))
-            cursor.close()
-            close()
+            val showDefaultAisle = db.query(queryBuilder.create()).use { cursor ->
+                cursor.moveToFirst()
+                cursor.getInt(cursor.getColumnIndex("showDefaultAisle"))
+            }
+
+            assertEquals(1, showDefaultAisle)
         }
 
-        assertEquals(1, showDefaultAisle)
     }
 
     @Test
     @Throws(IOException::class)
     fun migrate2to3() {
-        helper.createDatabase(testDb, 2).apply {
-            populateDatabase(this, 2)
-            close()
-        }
+        helper.createDatabase(testDb, 2).use { db -> populateDatabase(db, 2) }
 
-        val db = helper.runMigrationsAndValidate(testDb, 3, true)
-
-        db.apply {
+        helper.runMigrationsAndValidate(testDb, 3, true).use { db ->
             val queryBuilder = SupportSQLiteQueryBuilder.builder("LoyaltyCard")
-            val cursor: Cursor = query(queryBuilder.create())
-            assertEquals(0, cursor.count)
-            cursor.close()
-            close()
+            db.query(queryBuilder.create()).use { cursor ->
+                assertEquals(0, cursor.count)
+            }
         }
     }
 
     @Test
     @Throws(IOException::class)
     fun migrate3to4() {
-        helper.createDatabase(testDb, 3).apply {
-            populateDatabase(this, 3)
-            close()
-        }
+        helper.createDatabase(testDb, 3).use { db -> populateDatabase(db, 3) }
 
-        val db = helper.runMigrationsAndValidate(testDb, 4, true)
-        var qtyNeeded = -1
-
-        db.apply {
+        helper.runMigrationsAndValidate(testDb, 4, true).use { db ->
             val queryBuilder = SupportSQLiteQueryBuilder.builder("Product")
-            val cursor: Cursor = query(queryBuilder.create())
-            cursor.moveToFirst()
-            qtyNeeded = cursor.getInt(cursor.getColumnIndex("qtyNeeded"))
-            cursor.close()
-            close()
+            val qtyNeeded = db.query(queryBuilder.create()).use { cursor ->
+                cursor.moveToFirst()
+                cursor.getInt(cursor.getColumnIndex("qtyNeeded"))
+            }
+
+            assertEquals(0, qtyNeeded)
         }
-        assertEquals(0, qtyNeeded)
     }
 
     @Test
     @Throws(IOException::class)
     fun migrate4to5() {
-        helper.createDatabase(testDb, 4).apply {
-            populateDatabase(this, 4)
-            close()
-        }
+        helper.createDatabase(testDb, 4).use { db -> populateDatabase(db, 4) }
 
-        val db = helper.runMigrationsAndValidate(testDb, 5, true)
-
-        db.apply {
+        helper.runMigrationsAndValidate(testDb, 5, true).use { db ->
             // Check noteId exists on Product
             val queryProduct = SupportSQLiteQueryBuilder.builder("Product")
-            val cursorProduct: Cursor = query(queryProduct.create())
-            cursorProduct.moveToFirst()
-            val noteId = cursorProduct.getIntOrNull(cursorProduct.getColumnIndex("noteId"))
-            cursorProduct.close()
+            val noteId = db.query(queryProduct.create()).use { cursor ->
+                cursor.moveToFirst()
+                cursor.getIntOrNull(cursor.getColumnIndex("noteId"))
+            }
 
             assertNull(noteId)
 
             // Check Note table exists
             val queryNote = SupportSQLiteQueryBuilder.builder("Note")
-            val cursorNote: Cursor = query(queryNote.create())
-            assertEquals(0, cursorNote.count)
-            cursorNote.close()
-
-            close()
+            db.query(queryNote.create()).use { cursor ->
+                assertEquals(0, cursor.count)
+            }
         }
     }
 
     @Test
     @Throws(IOException::class)
     fun migrate5to6() {
-        helper.createDatabase(testDb, 5).apply {
-            populateDatabase(this, 5)
-            close()
-        }
+        helper.createDatabase(testDb, 5).use { db -> populateDatabase(db, 5) }
 
-        val db = helper.runMigrationsAndValidate(testDb, 6, true)
-
-        db.apply {
+        helper.runMigrationsAndValidate(testDb, 6, true).use { db ->
             // Check noteId exists on Product
             val queryProduct = SupportSQLiteQueryBuilder.builder("Product")
-            val cursorProduct: Cursor = query(queryProduct.create())
-            cursorProduct.moveToFirst()
+            db.query(queryProduct.create()).use { cursor ->
+                cursor.moveToFirst()
 
-            val qtyNeeded = cursorProduct.getDouble(cursorProduct.getColumnIndex("qtyNeeded"))
-            assertNotNull(qtyNeeded)
+                val qtyNeeded = cursor.getDouble(cursor.getColumnIndex("qtyNeeded"))
+                assertNotNull(qtyNeeded)
 
-            val qtyIncrement = cursorProduct.getDouble(cursorProduct.getColumnIndex("qtyIncrement"))
-            assertEquals(1.0, qtyIncrement)
+                val qtyIncrement = cursor.getDouble(cursor.getColumnIndex("qtyIncrement"))
+                assertEquals(1.0, qtyIncrement)
 
-            val unitOfMeasure =
-                cursorProduct.getString(cursorProduct.getColumnIndex("unitOfMeasure"))
+                val unitOfMeasure = cursor.getString(cursor.getColumnIndex("unitOfMeasure"))
+                assertEquals("", unitOfMeasure)
 
-            assertEquals("", unitOfMeasure)
+                val trackingMode = cursor.getString(cursor.getColumnIndex("trackingMode"))
+                assertNull(trackingMode)
 
-            val trackingMode = cursorProduct.getString(cursorProduct.getColumnIndex("trackingMode"))
-            assertNull(trackingMode)
-
-            cursorProduct.close()
-
-            close()
+            }
         }
     }
 
@@ -282,9 +245,7 @@ class DatabaseMigrationTest {
     @Test
     @Throws(IOException::class)
     fun migrate6to7() {
-        helper.createDatabase(testDb, 6).use { db ->
-            populateDatabase(db, 6)
-        }
+        helper.createDatabase(testDb, 6).use { db -> populateDatabase(db, 6) }
 
         helper.runMigrationsAndValidate(
             testDb, 7, true, Migration6To7()
@@ -339,54 +300,55 @@ class DatabaseMigrationTest {
     @Test
     @Throws(IOException::class)
     fun migrate7to8() {
-        helper.createDatabase(testDb, 7).apply {
-            populateDatabase(this, 7)
-            close()
-        }
+        helper.createDatabase(testDb, 7).use { db -> populateDatabase(db, 7) }
 
-        val db = helper.runMigrationsAndValidate(testDb, 8, true)
-
-        db.apply {
+        helper.runMigrationsAndValidate(testDb, 8, true).use { db ->
             // Check ProductVariant table exists and has correct schema
             val queryVariants = SupportSQLiteQueryBuilder.builder("ProductVariant")
-            val cursorVariants: Cursor = query(queryVariants.create())
+            val cursorVariants: Cursor = db.query(queryVariants.create())
             assertEquals(0, cursorVariants.count)
             cursorVariants.close()
 
-            validateV8SyncColumns("Aisle", this, true)
-            validateV8SyncColumns("AisleProduct", this, false)
-            validateV8SyncColumns("Location", this, true)
-            validateV8SyncColumns("LoyaltyCard", this, false)
-            validateV8SyncColumns("Note", this, false)
-            validateV8SyncColumns("Product", this, true)
-            validateV8SyncColumns("ProductVariant", this, false)
-
-            close()
+            validateV8SyncColumns("Aisle", db, true)
+            validateV8SyncColumns("AisleProduct", db, false)
+            validateV8SyncColumns("Location", db, true)
+            validateV8SyncColumns("LoyaltyCard", db, false)
+            validateV8SyncColumns("Note", db, false)
+            validateV8SyncColumns("Product", db, true)
+            validateV8SyncColumns("ProductVariant", db, false)
         }
-    }
-
-    private fun assertAisleProductForeignKeysExistV9(db: SupportSQLiteDatabase) {
-        val foreignKeys = mutableListOf<String>()
-
-        db.query("PRAGMA foreign_key_list('AisleProduct')").use { cursor ->
-            val tableIndex = cursor.getColumnIndex("table")
-            val fromIndex = cursor.getColumnIndex("from")
-
-            while (cursor.moveToNext()) {
-                val parentTable = cursor.getString(tableIndex)
-                val childColumn = cursor.getString(fromIndex)
-                foreignKeys.add("$childColumn -> $parentTable")
-            }
-        }
-
-        // Assert both foreign keys exist
-        assertTrue(foreignKeys.contains("aisleId -> Aisle"))
-        assertTrue(foreignKeys.contains("productId -> Product"))
     }
 
     @Test
     @Throws(IOException::class)
-    fun migrate8to9() {
+    fun migrate8to9_AisleProductMigrated_AisleProductForeignKeysCreated() {
+        helper.createDatabase(testDb, 8).use { db -> populateDatabase(db, 8) }
+
+        helper.runMigrationsAndValidate(
+            testDb, 9, true, Migration8To9()
+        ).use { db ->
+            val foreignKeys = mutableListOf<String>()
+
+            db.query("PRAGMA foreign_key_list('AisleProduct')").use { cursor ->
+                val tableIndex = cursor.getColumnIndex("table")
+                val fromIndex = cursor.getColumnIndex("from")
+
+                while (cursor.moveToNext()) {
+                    val parentTable = cursor.getString(tableIndex)
+                    val childColumn = cursor.getString(fromIndex)
+                    foreignKeys.add("$childColumn -> $parentTable")
+                }
+            }
+
+            // Assert both foreign keys exist
+            assertTrue(foreignKeys.contains("aisleId -> Aisle"))
+            assertTrue(foreignKeys.contains("productId -> Product"))
+        }
+    }
+
+    @Test
+    @Throws(IOException::class)
+    fun migrate8to9_AisleProductMigrated_OrphanRecordsRemoved() {
         helper.createDatabase(testDb, 8).use { db ->
             populateDatabase(db, 8)
 
@@ -408,9 +370,17 @@ class DatabaseMigrationTest {
             ).simpleQueryForLong()
 
             assertEquals(0L, count)
+        }
+    }
 
-            assertAisleProductForeignKeysExistV9(db)
+    @Test
+    @Throws(IOException::class)
+    fun migrate8to9_NoteMigrated_CreatedAtAdded() {
+        helper.createDatabase(testDb, 8).use { db -> populateDatabase(db, 8) }
 
+        helper.runMigrationsAndValidate(
+            testDb, 9, true, Migration8To9()
+        ).use { db ->
             val queryNote = SupportSQLiteQueryBuilder.builder("Note")
             db.query(queryNote.create()).use { cursor ->
                 cursor.moveToFirst()
@@ -419,7 +389,7 @@ class DatabaseMigrationTest {
                 val expanded = cursor.getInt(cursor.getColumnIndex("createdAt"))
                 assertEquals(1, expanded)
 
-                // Check migration sets initial rank equal to id
+                // Check migration sets initial create date equal to id
                 val id = cursor.getInt(cursor.getColumnIndex("id"))
                 val createdAt = cursor.getLong(cursor.getColumnIndex("createdAt"))
                 assertTrue(createdAt > 0)
@@ -438,9 +408,7 @@ class DatabaseMigrationTest {
     @Test
     @Throws(IOException::class)
     fun migrateAll() = runTest {
-        helper.createDatabase(testDb, 1).use { db ->
-            populateDatabase(db, 1)
-        }
+        helper.createDatabase(testDb, 1).use { db -> populateDatabase(db, 1) }
 
         val db = Room.databaseBuilder(
             InstrumentationRegistry.getInstrumentation().targetContext,

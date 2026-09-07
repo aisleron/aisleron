@@ -91,7 +91,7 @@ class AisleProductDtoMapper(
 
         val localLocationId = getLocalAisle(dto).locationId
         val localProductId = getLocalProduct(dto).id
-        val entityList = aisleProductDao.getByNaturalKey(localLocationId, localProductId)
+        val entityList = aisleProductDao.getByLocationNaturalKey(localLocationId, localProductId)
             .filter { it.syncId == null }
 
         return entityList.firstOrNull { !it.isRemoved } ?: entityList.firstOrNull()
