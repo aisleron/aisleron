@@ -2,4 +2,4 @@ Ausdehnungen:
 * Bereite vor #Daten Model für synchronisieren Charakterzug.
 
 Käfer Klemmen:
-* Klemme Produkt Qty Wesen abgehackt ab #obenab #wann benutzend große Schrift Größen.
+* Klemme Produkt Qty seiend abgehackt ab #obenab #wann benutzend große Schrift Größen.

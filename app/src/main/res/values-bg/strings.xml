@@ -213,7 +213,7 @@
     <string name="account">Акаунт</string>
     <string name="account_sync">Акаунт и синхронизация</string>
     <string name="sync_settings">Настройки за синхронизация</string>
-    <string name="sync_service">Услуга за синхронизация</string>
+    <string name="sync_service">Услуга за синхронизиране</string>
     <string name="sync_service_title">Услуга за синхронизация</string>
     <string name="sign_in">Вход</string>
     <string name="sign_in_title">Вход</string>
