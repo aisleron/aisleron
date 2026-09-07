@@ -240,6 +240,6 @@
     <string name="manual_sync_scheduled">Manuell synkronisering planerad</string>
     <string name="sync_status_success">Slutfört</string>
     <string name="sync_status_running">Körs</string>
-    <string name="sync_status_failed">Misslyckades</string>
+    <string name="sync_status_failed">Misslyckades: %1$s</string>
     <string name="help">Hjälp</string>
 </resources>

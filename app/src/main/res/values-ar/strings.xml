@@ -251,6 +251,6 @@
     <string name="manual_sync_scheduled">تمت جدولة المزامنة اليدوية</string>
     <string name="sync_status_success">نجاح</string>
     <string name="sync_status_running">قيد التشغيل</string>
-    <string name="sync_status_failed">فشل</string>
+    <string name="sync_status_failed">فشل: <![CDATA[%1$s]]></string>
     <string name="help">مساعدة</string>
 </resources>

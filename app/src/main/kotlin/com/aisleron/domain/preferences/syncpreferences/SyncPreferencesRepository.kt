@@ -29,6 +29,7 @@ interface SyncPreferencesRepository {
     fun setSyncService(value: SyncServicePreference)
     fun setSyncStatus(lastSyncedAt: Long, status: SyncStatusPreference)
     fun setSyncStatus(status: SyncStatusPreference)
+    fun setLastFailedReason(value: String?)
     fun getRemoteEntityLastUpdatedIso(entityName: String): String
     fun setRemoteEntityLastUpdatedIso(entityName: String, serverLastUpdatedAtIso: String)
     fun setRemoteLastSyncedAt(remoteLastSyncedAt: Long)

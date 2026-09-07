@@ -240,6 +240,6 @@
     <string name="manual_sync_scheduled">Synchronisation manuelle planifiée</string>
     <string name="sync_status_success">Succès</string>
     <string name="sync_status_running">En cours</string>
-    <string name="sync_status_failed">Échec</string>
+    <string name="sync_status_failed">Échec: %1$s</string>
     <string name="help">Aide</string>
 </resources>

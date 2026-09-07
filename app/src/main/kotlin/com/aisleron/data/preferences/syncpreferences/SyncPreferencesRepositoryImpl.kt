@@ -70,6 +70,9 @@ class SyncPreferencesRepositoryImpl(
         return SyncStatusPreference.fromValue(value)
     }
 
+    private fun getLastFailedReason(): String =
+        sharedPreferences.getString(SyncPreferenceKey.LAST_FAILED_REASON.keyName, "").orEmpty()
+
     private fun getRemoteLastSyncedAt(): Long =
         // Default to -1 so initial push takes into account records with modified date = 0
         sharedPreferences.getLong(SyncPreferenceKey.REMOTE_LAST_SYNCED_AT.keyName, -1L)
@@ -83,6 +86,7 @@ class SyncPreferencesRepositoryImpl(
             syncOnMobileData = getSyncOnMobileData(),
             lastSyncedAt = getLastSyncedAt(),
             lastSyncStatus = getLastSyncSuccess(),
+            lastFailedReason = getLastFailedReason(),
             remoteLastSyncedAt = getRemoteLastSyncedAt()
         )
 
@@ -134,6 +138,12 @@ class SyncPreferencesRepositoryImpl(
         }
     }
 
+    override fun setLastFailedReason(value: String?) {
+        sharedPreferences.edit {
+            putString(SyncPreferenceKey.LAST_FAILED_REASON.keyName, value)
+        }
+    }
+
     private fun remoteEntityLastUpdatedKeyName(entityName: String): String =
         REMOTE_ENTITY_LAST_UPDATED_FORMAT.format(entityName)
 
@@ -161,6 +171,7 @@ enum class SyncPreferenceKey(val keyName: String) {
     SYNC_ON_MOBILE_DATA("sync_on_mobile_data"),
     LAST_SYNCED_AT("last_synced_at"),
     LAST_SYNC_SUCCESS("last_sync_success"),
+    LAST_FAILED_REASON("last_failed_reason"),
     REMOTE_LAST_SYNCED_AT("last_remote_synced_at");
 
     companion object {

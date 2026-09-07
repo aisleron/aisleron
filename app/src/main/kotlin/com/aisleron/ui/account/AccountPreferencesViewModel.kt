@@ -88,6 +88,7 @@ class AccountPreferencesViewModel(
             syncServicePreference = preferences.syncServicePreference,
             lastSyncDate = preferences.lastSyncedAt,
             lastSyncStatus = preferences.lastSyncStatus,
+            lastFailedReason = preferences.lastFailedReason,
             isLoading = loading,
             sessionStatus = status
         )
@@ -102,6 +103,7 @@ class AccountPreferencesViewModel(
                 syncServicePreference = initialPrefs.syncServicePreference,
                 lastSyncDate = initialPrefs.lastSyncedAt,
                 lastSyncStatus = initialPrefs.lastSyncStatus,
+                lastFailedReason = initialPrefs.lastFailedReason
             )
         }
     )
@@ -158,5 +160,6 @@ data class AccountPreferencesUiState(
     val isLoading: Boolean = false,
     val sessionStatus: SyncSessionStatus = SyncSessionStatus.NotConfigured,
     val lastSyncDate: Long = 0,
-    val lastSyncStatus: SyncStatusPreference = SyncStatusPreference.NONE
+    val lastSyncStatus: SyncStatusPreference = SyncStatusPreference.NONE,
+    val lastFailedReason: String = ""
 )

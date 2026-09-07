@@ -27,7 +27,7 @@ data class AisleProductDto(
     @SerialName("is_deleted") override val isDeleted: Boolean,
     @SerialName("client_updated_at") override val clientUpdatedAt: String,
     @SerialName("server_updated_at") override val serverUpdatedAt: String? = null,
-    @SerialName("location_id") val locationId: String,
+    @SerialName("location_id") val locationId: String? = null, // TODO: Remove default once pull functions can return location
     @SerialName("product_id") val productId: String,
     @SerialName("aisle_id") val aisleId: String,
     @SerialName("rank") val rank: Int

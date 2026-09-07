@@ -196,6 +196,12 @@ class SharedPreferencesInitializer {
         )
     }
 
+    fun setLastFailedReason(value: String) {
+        setPreferenceValue(
+            SyncPreferenceKey.LAST_FAILED_REASON.keyName, value
+        )
+    }
+
     companion object {
         private const val IS_INITIALIZED = "is_initialised"
         private const val APPLICATION_THEME = "application_theme"

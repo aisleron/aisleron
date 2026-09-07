@@ -156,6 +156,7 @@ class SyncManagerTest : KoinTest {
         val prefs = syncPreferencesRepository.getSyncPreferences()
         assertEquals(SyncStatusPreference.FAILURE, prefs.lastSyncStatus)
         assertEquals(expectedRemoteLastSyncedAt, prefs.remoteLastSyncedAt)
+        assertEquals(exceptionMessage, prefs.lastFailedReason)
     }
 
     @Test

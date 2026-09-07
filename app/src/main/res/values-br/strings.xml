@@ -253,6 +253,6 @@
     <string name="manual_sync_scheduled">Goubredañ dre zorn steuñvaet</string>
     <string name="sync_status_success">Berzh</string>
     <string name="sync_status_running">O erlec\'hiañ</string>
-    <string name="sync_status_failed">C\'hwitet</string>
+    <string name="sync_status_failed">C\'hwitet: %1$s</string>
     <string name="help">Skoazell</string>
 </resources>

@@ -306,13 +306,24 @@ class SyncPreferencesRepositoryImplTest {
     }
 
     @Test
-    fun setRemoteLastSyncedAt_ValueProvided_SetRemoteLastSyncedAtPreferenceSet() {
+    fun setRemoteLastSyncedAt_ValueProvided_RemoteLastSyncedAtPreferenceSet() {
         sharedPreferencesInitializer.setRemoteLastSyncedAt(0)
         val newValue = 1000L
 
         syncPreferencesRepository.setRemoteLastSyncedAt(newValue)
 
         val valueAfter = syncPreferencesRepository.getSyncPreferences().remoteLastSyncedAt
+        assertEquals(newValue, valueAfter)
+    }
+
+    @Test
+    fun setLastFailedReason_ValueProvided_LastFailedReasonPreferenceSet() {
+        sharedPreferencesInitializer.setLastFailedReason("")
+        val newValue = "Sync Failed For Reasons"
+
+        syncPreferencesRepository.setLastFailedReason(newValue)
+
+        val valueAfter = syncPreferencesRepository.getSyncPreferences().lastFailedReason
         assertEquals(newValue, valueAfter)
     }
 }

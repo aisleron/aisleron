@@ -39,6 +39,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 
 private fun setColor(baseColor: Color, enabled: Boolean): Color =
@@ -49,13 +50,14 @@ fun Preference(
     title: String,
     modifier: Modifier = Modifier,
     summary: String? = null,
+    summaryMaxLines: Int = 1,
     onClick: (() -> Unit)? = null,
     enabled: Boolean = true,
     // Slot for an optional leading icon
     @DrawableRes iconResId: Int? = null,
     @StringRes iconContentDescriptionResId: Int? = null,
     // Slot for interactive widgets like Checkboxes, Switches, or Action Icons
-    control: @Composable (() -> Unit)? = null
+    control: @Composable (() -> Unit)? = null,
 ) {
     Row(
         modifier = modifier
@@ -94,6 +96,8 @@ fun Preference(
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(
                     text = summary,
+                    maxLines = summaryMaxLines,
+                    overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.bodyMedium,
                     color = setColor(MaterialTheme.colorScheme.onSurfaceVariant, enabled)
                 )
