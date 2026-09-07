@@ -30,6 +30,7 @@ class SyncPreferencesTest {
         syncOnMobileData = false,
         lastSyncedAt = 0L,
         lastSyncStatus = SyncStatusPreference.NONE,
+        lastFailedReason = "",
         remoteLastSyncedAt = 0L
     )
 

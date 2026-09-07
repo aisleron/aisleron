@@ -22,13 +22,15 @@ import io.github.jan.supabase.postgrest.rpc
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
+import kotlin.time.Instant
 
 class SupabaseSyncApi<Dto : SyncDto>(
     private val clientProvider: SupabaseClientProvider,
     private val serializer: KSerializer<Dto>,
     private val json: Json = Json { ignoreUnknownKeys = true },
     override val entityName: String,
-    private val pushFunctionName: String = "push_$entityName"
+    private val pushFunctionName: String = "push_$entityName",
+    private val pullFunctionName: String = "pull_$entityName"
 ) : SyncApi<Dto> {
     override suspend fun push(dto: List<Dto>) {
         if (dto.isEmpty()) return
@@ -51,14 +53,13 @@ class SupabaseSyncApi<Dto : SyncDto>(
         val client = clientProvider.getClientOrNull()
             ?: throw IllegalStateException("Supabase client unavailable (unauthenticated or offline)")
 
-        // Uses wildcard select() to avoid failing on column differences between schema versions
-        val response = client.postgrest[entityName].select {
-            filter {
-                if (!lastUpdatedDateIso.isBlank()) {
-                    gt("server_updated_at", lastUpdatedDateIso)
-                }
-            }
-        }
+        val pSinceTimestamp =
+            lastUpdatedDateIso.ifBlank { Instant.fromEpochMilliseconds(-1).toString() }
+
+        val response = client.postgrest.rpc(
+            function = pullFunctionName,
+            parameters = mapOf("p_since_timestamp" to pSinceTimestamp)
+        )
 
         return json.decodeFromString(
             deserializer = ListSerializer(serializer),
