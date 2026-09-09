@@ -1,0 +1,8 @@
+Melhorias
+* Adicionado suporte para acompanhamento de cartões de fidelidade via Catima – Loyalty Card Wallet.
+* Suporte de idioma russo introduzido.
+* SDK alvo atualizado para Android 15 (API nível 35) para melhor compatibilidade.
+
+Correções de bugs
+* Resolveu um problema onde a caixa de seleção do item da lista inferior foi obscurecida pelo botão de ação flutuante (FAB).
+* Corrigido um problema impedindo arquivos de backup .sqlite de abrir no Android 15.

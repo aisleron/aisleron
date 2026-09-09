@@ -1,0 +1,2 @@
+Melhorias
+* Atualização para o Google Play teste build
