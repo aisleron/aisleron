@@ -1,0 +1,2 @@
+Miglioramenti
+# Aggiunta la capacità di mantenere le liste di spesa fino ad oggi attraverso più dispositivi utilizzando un servizio di sincronizzazione autogestito. Per ulteriori informazioni, consultare la documentazione di Aisleron Sync Service.

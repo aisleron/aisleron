@@ -1,0 +1,2 @@
+Mejoras
+* Agregó la capacidad de mantener listas de compras hasta la fecha en varios dispositivos utilizando un servicio de sincronización autogestionado. Consulte la documentación de Aisleron Sync Service para obtener más información.
