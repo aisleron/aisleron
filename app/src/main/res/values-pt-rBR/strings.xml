@@ -225,6 +225,6 @@
     <string name="sync_service_custom">Serviço de sincronização personalizado</string>
     <string name="manual_sync_scheduled">Sincronização manual</string>
     <string name="sync_status_success">Sucesso</string>
+    <string name="sync_status_failed">Falhado: %1$s</string>
     <string name="sync_status_running">Em andamento</string>
-    <string name="sync_status_failed">Falhou</string>
 </resources>
