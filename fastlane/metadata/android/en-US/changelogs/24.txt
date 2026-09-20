@@ -1,2 +1,3 @@
 Enhancements
 * Added the ability to keep shopping lists up to date across multiple devices using a self-managed sync service. See the Aisleron Sync Service documentation for details.
+* Added Portuguese - Brazil translations.
