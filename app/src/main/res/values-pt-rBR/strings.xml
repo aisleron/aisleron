@@ -226,5 +226,5 @@
     <string name="manual_sync_scheduled">Sincronização manual</string>
     <string name="sync_status_success">Sucesso</string>
     <string name="sync_status_running">Correr</string>
-    <string name="sync_status_failed">Falhado</string>
+    <string name="sync_status_failed">Falhado: %1$s</string>
 </resources>
