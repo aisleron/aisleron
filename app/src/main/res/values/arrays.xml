@@ -69,6 +69,7 @@
         <item>@string/language_italian_it</item>
         <item>@string/language_polish_pl</item>
         <item>@string/language_portuguese_pt</item>
+        <item>@string/language_portuguese_pt_br</item>
         <item>@string/language_russian_ru</item>
         <item>@string/language_swedish_sv</item>
         <item>@string/language_tamil_ta</item>
@@ -90,6 +91,7 @@
         <item>it</item>
         <item>pl</item>
         <item>pt</item>
+        <item>pt-BR</item>
         <item>ru</item>
         <item>sv</item>
         <item>ta</item>
