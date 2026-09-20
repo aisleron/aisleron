@@ -45,7 +45,7 @@ val supportedLocales =
         "it",
         "pl",
         "pt",
-        "pt-BR",
+        "pt-rBR",
         "ru",
         "sv",
         "ta",
