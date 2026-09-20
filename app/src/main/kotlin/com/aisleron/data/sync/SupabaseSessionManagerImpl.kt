@@ -22,8 +22,8 @@ import com.aisleron.domain.base.extension.recoverCatchingUnlessCancelled
 import com.aisleron.domain.base.extension.runCatchingUnlessCancelled
 import com.aisleron.domain.log.Logger
 import com.aisleron.domain.preferences.syncpreferences.SyncPreferencesRepository
-import com.aisleron.domain.sync.SyncSessionStatus
 import com.aisleron.domain.sync.SyncSessionManager
+import com.aisleron.domain.sync.SyncSessionStatus
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.exception.AuthErrorCode
 import io.github.jan.supabase.auth.exception.AuthRestException
@@ -35,6 +35,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withTimeoutOrNull
+import kotlin.time.Duration
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SupabaseSessionManagerImpl(
@@ -80,7 +82,7 @@ class SupabaseSessionManagerImpl(
                     client.close()
                 }.onFailure { throwable ->
                     logger.e(
-                        tag = "SupabaseSessionManager",
+                        tag = TAG,
                         message = "Error closing old client configuration",
                         throwable = throwable
                     )
@@ -93,16 +95,31 @@ class SupabaseSessionManagerImpl(
 
         if (savedUrl.isNotBlank() && savedKey.isNotBlank()) {
             runCatchingUnlessCancelled {
-                logger.d("SupabaseSessionManager", "Provisioning client on demand...")
+                logger.d(TAG, "Provisioning client on demand...")
                 clientFactory.create(savedUrl, savedKey)
             }.onSuccess { newClient ->
                 activeClient = newClient
             }.onFailure { throwable ->
-                logger.e("SupabaseSessionManager", "Failed to build Supabase client", throwable)
+                logger.e(TAG, "Failed to build Supabase client", throwable)
             }
         }
 
         return activeClient
+    }
+
+    override suspend fun getConnectedClientOrNull(timeout: Duration): SupabaseClient? {
+        val client = getClientOrNull() ?: return null
+
+        logger.d(TAG, "Awaiting Auth initialization...")
+
+        withTimeoutOrNull(timeout) {
+            authDelegate.awaitInitialization(client)
+            logger.d(TAG, "Auth initialization completed.")
+        } ?: logger.w(
+            TAG, "Auth initialization timed out after $timeout. Returning client as-is."
+        )
+
+        return client
     }
 
     private fun mapException(throwable: Throwable): Throwable {
@@ -174,4 +191,8 @@ class SupabaseSessionManagerImpl(
                 cause = throwable
             )
         }
+
+    companion object {
+        const val TAG = "SupabaseSessionManager"
+    }
 }

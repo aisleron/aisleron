@@ -27,6 +27,7 @@ interface SupabaseAuthDelegate {
     suspend fun signInWithEmail(client: SupabaseClient, email: String, password: String)
     suspend fun signOut(client: SupabaseClient)
     fun getSessionStatusFlow(client: SupabaseClient): Flow<SessionStatus>
+    suspend fun awaitInitialization(client: SupabaseClient)
 }
 
 class SupabaseAuthDelegateImpl : SupabaseAuthDelegate {
@@ -43,4 +44,8 @@ class SupabaseAuthDelegateImpl : SupabaseAuthDelegate {
 
     override fun getSessionStatusFlow(client: SupabaseClient): Flow<SessionStatus> =
         client.auth.sessionStatus
+
+    override suspend fun awaitInitialization(client: SupabaseClient) {
+        client.auth.awaitInitialization()
+    }
 }

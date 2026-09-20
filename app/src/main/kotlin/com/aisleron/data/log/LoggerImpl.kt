@@ -28,4 +28,8 @@ class LoggerImpl : Logger {
     override fun e(tag: String, message: String, throwable: Throwable?) {
         Log.e(tag, message, throwable)
     }
+
+    override fun w(tag: String, message: String, throwable: Throwable?) {
+        Log.w(tag, message, throwable)
+    }
 }

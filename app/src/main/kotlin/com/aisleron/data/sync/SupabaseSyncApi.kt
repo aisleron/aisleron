@@ -35,7 +35,7 @@ class SupabaseSyncApi<Dto : SyncDto>(
     override suspend fun push(dto: List<Dto>) {
         if (dto.isEmpty()) return
 
-        val client = clientProvider.getClientOrNull()
+        val client = clientProvider.getConnectedClientOrNull()
             ?: throw IllegalStateException("Supabase client unavailable (unauthenticated or offline)")
 
         val jsonRecords = Json.encodeToJsonElement(
@@ -50,7 +50,7 @@ class SupabaseSyncApi<Dto : SyncDto>(
     }
 
     override suspend fun fetchSince(lastUpdatedDateIso: String): List<Dto> {
-        val client = clientProvider.getClientOrNull()
+        val client = clientProvider.getConnectedClientOrNull()
             ?: throw IllegalStateException("Supabase client unavailable (unauthenticated or offline)")
 
         val pSinceTimestamp =

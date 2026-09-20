@@ -46,4 +46,9 @@ dependencies {
     api(platform(libs.kotlinx.coroutines.bom))
     api(libs.kotlinx.coroutines.core)
     api(libs.sqlite)
+
+    // Supabase
+    api(platform(libs.supabase.bom))
+    api(libs.supabase.kt)
+    api(libs.supabase.auth.kt)
 }
