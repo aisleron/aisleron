@@ -34,8 +34,9 @@ import com.aisleron.data.base.SyncEntity
 data class NoteEntity(
     @PrimaryKey(autoGenerate = true) val id: Int,
     val noteText: String,
-    override val syncId: String? = SyncEntity.generateSyncId(),
+    override val syncId: String? = null,
     @ColumnInfo(defaultValue = "0") override val isRemoved: Boolean = false,
     @ColumnInfo(defaultValue = "0") override val lastModifiedAt: Long = System.currentTimeMillis(),
-    override val serverUpdatedAt: Long? = null
+    override val serverUpdatedAt: Long? = null,
+    @ColumnInfo(defaultValue = "0") val createdAt: Long = System.currentTimeMillis()
 ) : SyncEntity

@@ -43,7 +43,7 @@ class ProductMapper : Mapper<ProductEntity, Product> {
         qtyIncrement = value.qtyIncrement,
         unitOfMeasure = value.unitOfMeasure,
         trackingMode = value.trackingMode,
-        syncId = syncMetadata?.syncId ?: SyncEntity.generateSyncId(),
+        syncId = syncMetadata?.syncId,
         isRemoved = syncMetadata?.isRemoved ?: false,
         lastModifiedAt = System.currentTimeMillis(),
         serverUpdatedAt = syncMetadata?.serverUpdatedAt

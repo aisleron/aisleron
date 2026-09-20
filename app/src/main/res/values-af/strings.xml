@@ -251,6 +251,6 @@
     <string name="manual_sync_scheduled">Handmatige sinchronisasie geskeduleer</string>
     <string name="sync_status_success">Sukses</string>
     <string name="sync_status_running">Besig om te loop</string>
-    <string name="sync_status_failed">Misluk</string>
+    <string name="sync_status_failed">Misluk: %1$s</string>
     <string name="help">Hulp</string>
 </resources>

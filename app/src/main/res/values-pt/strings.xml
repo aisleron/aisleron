@@ -242,6 +242,6 @@
     <string name="manual_sync_scheduled">Sincronização manual agendada</string>
     <string name="sync_status_success">Sucesso</string>
     <string name="sync_status_running">Em execução</string>
-    <string name="sync_status_failed">Falhou</string>
+    <string name="sync_status_failed">Falhou: %1$s</string>
     <string name="help">Ajuda</string>
 </resources>

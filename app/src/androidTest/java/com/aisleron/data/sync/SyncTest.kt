@@ -27,6 +27,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.koin.core.module.Module
 import org.koin.test.KoinTest
+import java.util.UUID
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -54,7 +55,8 @@ abstract class SyncTest<Entity : SyncEntity, Dto : SyncDto> : KoinTest {
     protected abstract suspend fun addEntity(
         lastModifiedAt: Long = 0,
         serverUpdatedAt: Long? = null,
-        isRemoved: Boolean = false
+        isRemoved: Boolean = false,
+        syncId: String? = null
     ): Entity
 
     protected abstract suspend fun addDto(
@@ -104,6 +106,8 @@ abstract class SyncTest<Entity : SyncEntity, Dto : SyncDto> : KoinTest {
         return compareEntity
     }
 
+    protected fun generateSyncId(): String = UUID.randomUUID().toString()
+
     @Test
     fun push_LocalNewOrModifiedEntityExist_PushesMappedDtoToApi() = runTest {
         val lastSyncTimestamp = 1000L
@@ -124,7 +128,9 @@ abstract class SyncTest<Entity : SyncEntity, Dto : SyncDto> : KoinTest {
     @Test
     fun purgeRemoved_PurgeToDateProvided_CallsDaoPurgeRemoved() = runTest {
         val purgeToDate = 5000L
-        val entity = addEntity(lastModifiedAt = 5000L, isRemoved = true)
+        val entity = addEntity(
+            lastModifiedAt = 5000L, isRemoved = true, syncId = generateSyncId()
+        )
         val syncId = entity.syncId!!
 
         assertNotNull(dao.getBySyncId(syncId))
@@ -132,6 +138,5 @@ abstract class SyncTest<Entity : SyncEntity, Dto : SyncDto> : KoinTest {
         repository.purgeRemoved(purgeToDate)
 
         assertNull(dao.getBySyncId(syncId))
-
     }
 }

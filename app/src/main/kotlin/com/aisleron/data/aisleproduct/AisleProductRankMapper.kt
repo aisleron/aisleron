@@ -36,7 +36,7 @@ class AisleProductRankMapper : Mapper<AisleProductRank, AisleProduct> {
             rank = value.rank,
             productId = value.product.id,
             id = value.id,
-            syncId = syncMetadata?.syncId ?: SyncEntity.generateSyncId(),
+            syncId = syncMetadata?.syncId,
             isRemoved = syncMetadata?.isRemoved ?: false,
             lastModifiedAt = System.currentTimeMillis(),
             serverUpdatedAt = syncMetadata?.serverUpdatedAt

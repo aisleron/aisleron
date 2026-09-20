@@ -242,6 +242,6 @@
     <string name="manual_sync_scheduled">கைமுறை ஒத்திசைவு திட்டமிடப்பட்டது</string>
     <string name="sync_status_success">வெற்றி</string>
     <string name="sync_status_running">இயங்குகிறது</string>
-    <string name="sync_status_failed">தோல்வியடைந்தது</string>
+    <string name="sync_status_failed">தோல்வியடைந்தது: %1$s</string>
     <string name="help">உதவி</string>
 </resources>

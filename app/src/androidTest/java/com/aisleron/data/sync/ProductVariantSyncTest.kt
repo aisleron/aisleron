@@ -17,7 +17,6 @@
 
 package com.aisleron.data.sync
 
-import com.aisleron.data.base.SyncEntity
 import com.aisleron.data.product.ProductDao
 import com.aisleron.data.product.ProductEntity
 import com.aisleron.data.productvariant.ProductVariantDao
@@ -47,16 +46,18 @@ class ProductVariantSyncTest : SyncTest<ProductVariantEntity, ProductVariantDto>
     override suspend fun addEntity(
         lastModifiedAt: Long,
         serverUpdatedAt: Long?,
-        isRemoved: Boolean
-    ): ProductVariantEntity = addProductVariantEntity(lastModifiedAt, serverUpdatedAt, isRemoved)
+        isRemoved: Boolean,
+        syncId: String?
+    ): ProductVariantEntity =
+        addProductVariantEntity(lastModifiedAt, serverUpdatedAt, isRemoved, syncId)
 
     private suspend fun addProductVariantEntity(
         lastModifiedAt: Long,
         serverUpdatedAt: Long?,
         isRemoved: Boolean,
-        syncId: String = SyncEntity.generateSyncId()
+        syncId: String? = null
     ): ProductVariantEntity {
-        val productId = addProductEntity().id
+        val productId = addProductEntity(generateSyncId()).id
 
         val entity = ProductVariantEntity(
             id = 0,
@@ -87,7 +88,7 @@ class ProductVariantSyncTest : SyncTest<ProductVariantEntity, ProductVariantDto>
         clientUpdatedAt: String,
         isDeleted: Boolean
     ): ProductVariantDto {
-        val productId = addProductEntity().syncId!!
+        val productId = addProductEntity(generateSyncId()).syncId!!
 
         val dto = ProductVariantDto(
             id = id,
@@ -114,7 +115,7 @@ class ProductVariantSyncTest : SyncTest<ProductVariantEntity, ProductVariantDto>
         return expectedEntity == compareEntity
     }
 
-    private suspend fun addProductEntity(syncId: String? = SyncEntity.generateSyncId()): ProductEntity {
+    private suspend fun addProductEntity(syncId: String? = null): ProductEntity {
         val entity = ProductEntity(
             id = 0,
             name = "Product for Sync Test",
@@ -145,9 +146,9 @@ class ProductVariantSyncTest : SyncTest<ProductVariantEntity, ProductVariantDto>
     @Test
     fun fromDto_productNotFound_ThrowsException() = runTest {
         val dto = addProductVariantDto(
-            SyncEntity.generateSyncId(), "", "",
+            generateSyncId(), "", "",
             isDeleted = false
-        ).copy(productId = SyncEntity.generateSyncId())
+        ).copy(productId = generateSyncId())
 
         assertFailsWith<IllegalStateException> {
             mapper.fromDto(dto)
@@ -156,7 +157,7 @@ class ProductVariantSyncTest : SyncTest<ProductVariantEntity, ProductVariantDto>
 
     @Test
     fun fromDto_ExistingEntityProvided_EntityUpdated() = runTest {
-        val syncId = SyncEntity.generateSyncId()
+        val syncId = generateSyncId()
         val existingEntity = addProductVariantEntity(
             lastModifiedAt = 100L,
             serverUpdatedAt = null,
@@ -177,7 +178,7 @@ class ProductVariantSyncTest : SyncTest<ProductVariantEntity, ProductVariantDto>
     @Test
     fun lookupEntityFromDto_EntityMatchesOnSyncId_ReturnsEntity() = runTest {
         val dto = addProductVariantDto(
-            SyncEntity.generateSyncId(),
+            generateSyncId(),
             "2026-08-18T05:00:00Z",
             "2026-08-18T05:00:00Z",
             false
@@ -202,7 +203,7 @@ class ProductVariantSyncTest : SyncTest<ProductVariantEntity, ProductVariantDto>
     @Test
     fun lookupEntityFromDto_EntityMatchesOnNaturalKey_ReturnsEntity() = runTest {
         val dto = addProductVariantDto(
-            SyncEntity.generateSyncId(),
+            generateSyncId(),
             "2026-08-18T05:00:00Z",
             "2026-08-18T05:00:00Z",
             false,
@@ -213,8 +214,7 @@ class ProductVariantSyncTest : SyncTest<ProductVariantEntity, ProductVariantDto>
             serverUpdatedAt = 0,
             isRemoved = false
         ).copy(
-            syncId = SyncEntity.generateSyncId(),
-            barcode = dto.barcode,
+            barcode = dto.barcode
         )
 
         productVariantDao.upsert(entity)
@@ -227,7 +227,7 @@ class ProductVariantSyncTest : SyncTest<ProductVariantEntity, ProductVariantDto>
     @Test
     fun lookupEntityFromDto_NoEntityMatch_ReturnsNull() = runTest {
         val dto = addProductVariantDto(
-            SyncEntity.generateSyncId(),
+            generateSyncId(),
             "2026-08-18T05:00:00Z",
             "2026-08-18T05:00:00Z",
             false
@@ -238,7 +238,7 @@ class ProductVariantSyncTest : SyncTest<ProductVariantEntity, ProductVariantDto>
             serverUpdatedAt = 0,
             isRemoved = false
         ).copy(
-            syncId = SyncEntity.generateSyncId(),
+            syncId = generateSyncId(),
             barcode = "Not the Same as Dto"
         )
 

@@ -41,8 +41,8 @@ abstract class ComposeScreenTest : KoinTest {
 
     fun getContext() = context
 
-    fun getString(@IdRes resId: Int) =
-        getContext().getString(resId)
+    fun getString(@IdRes resId: Int, vararg formatArgs: Any) =
+        getContext().getString(resId, *formatArgs)
 
     protected fun runKoinComposeUiTest(
         block: suspend ComposeUiTest.() -> Unit

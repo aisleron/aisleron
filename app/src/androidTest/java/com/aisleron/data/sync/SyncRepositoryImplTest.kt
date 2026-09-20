@@ -29,6 +29,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import kotlin.time.Clock
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SyncRepositoryImplTest : SyncTest<NoteEntity, NoteDto>() {
@@ -46,8 +47,9 @@ class SyncRepositoryImplTest : SyncTest<NoteEntity, NoteDto>() {
     override suspend fun addEntity(
         lastModifiedAt: Long,
         serverUpdatedAt: Long?,
-        isRemoved: Boolean
-    ): NoteEntity = addNoteEntity(lastModifiedAt, serverUpdatedAt, isRemoved)
+        isRemoved: Boolean,
+        syncId: String?
+    ): NoteEntity = addNoteEntity(lastModifiedAt, serverUpdatedAt, isRemoved, syncId)
 
     override suspend fun addDto(
         id: String,
@@ -61,6 +63,7 @@ class SyncRepositoryImplTest : SyncTest<NoteEntity, NoteDto>() {
             clientUpdatedAt = clientUpdatedAt,
             serverUpdatedAt = serverUpdatedAt,
             noteText = "Note for Sync Test",
+            createdAt = Clock.System.now().toString()
         )
 
         syncApi.push(listOf(dto))
@@ -79,7 +82,10 @@ class SyncRepositoryImplTest : SyncTest<NoteEntity, NoteDto>() {
     }
 
     private suspend fun addNoteEntity(
-        lastModifiedAt: Long = 0, serverUpdatedAt: Long? = null, isRemoved: Boolean = false
+        lastModifiedAt: Long = 0,
+        serverUpdatedAt: Long? = null,
+        isRemoved: Boolean = false,
+        syncId: String? = null
     ): NoteEntity {
         val noteText = "Note to test Sync"
         val noteEntity = NoteEntity(
@@ -87,7 +93,8 @@ class SyncRepositoryImplTest : SyncTest<NoteEntity, NoteDto>() {
             noteText = noteText,
             lastModifiedAt = lastModifiedAt,
             serverUpdatedAt = serverUpdatedAt,
-            isRemoved = isRemoved
+            isRemoved = isRemoved,
+            syncId = syncId
         )
 
         val id = noteDao.upsert(noteEntity).first().toInt()
@@ -115,14 +122,27 @@ class SyncRepositoryImplTest : SyncTest<NoteEntity, NoteDto>() {
     }
 
     @Test
-    fun push_LocalTombstoneEntitiesExist_PushesDeleteDtoToApi() = runTest {
+    fun push_LocalTombstoneEntitiesExistWithSyncId_PushesDeleteDtoToApi() = runTest {
         val lastSyncTimestamp = 1000L
-        val localEntity = addNoteEntity(lastModifiedAt = 1500L, isRemoved = true)
+        val localEntity = addNoteEntity(
+            lastModifiedAt = 1500L, isRemoved = true, syncId = generateSyncId()
+        )
+
         val expectedDto = mapper.toDto(localEntity)
 
         repository.push(lastSyncTimestamp)
 
         assertEquals(listOf(expectedDto), syncApi.remoteDtoList)
+    }
+
+    @Test
+    fun push_LocalTombstoneEntitiesExistWithOutSyncId_DoNotPushDeleteDtoToApi() = runTest {
+        val lastSyncTimestamp = 1000L
+        addNoteEntity(lastModifiedAt = 1500L, isRemoved = true)
+
+        repository.push(lastSyncTimestamp)
+
+        assertTrue(syncApi.remoteDtoList.isEmpty())
     }
 
     /**
@@ -137,7 +157,8 @@ class SyncRepositoryImplTest : SyncTest<NoteEntity, NoteDto>() {
             serverUpdatedAt = "2026-08-18T05:00:00Z",
             noteText = "Remote Note 1 - to be returned",
             isDeleted = false,
-            clientUpdatedAt = "2026-08-17T05:00:00Z"
+            clientUpdatedAt = "2026-08-17T05:00:00Z",
+            createdAt = "2026-08-16T05:00:00Z"
         )
 
         val remoteDto2 = NoteDto(
@@ -145,7 +166,8 @@ class SyncRepositoryImplTest : SyncTest<NoteEntity, NoteDto>() {
             serverUpdatedAt = "2026-08-18T10:00:00Z",
             noteText = "Remote Note 2 - to be returned",
             isDeleted = false,
-            clientUpdatedAt = "2026-08-17T10:00:00Z"
+            clientUpdatedAt = "2026-08-17T10:00:00Z",
+            createdAt = "2026-08-16T05:00:00Z"
         )
 
         val remoteDto3 = NoteDto(
@@ -153,7 +175,8 @@ class SyncRepositoryImplTest : SyncTest<NoteEntity, NoteDto>() {
             serverUpdatedAt = "2026-08-17T10:00:00Z",
             noteText = "Remote Note 3 - not to be returned",
             isDeleted = false,
-            clientUpdatedAt = "2026-08-16T10:00:00Z"
+            clientUpdatedAt = "2026-08-16T10:00:00Z",
+            createdAt = "2026-08-15T05:00:00Z"
         )
 
         syncApi.push(listOf(remoteDto1, remoteDto2, remoteDto3))
@@ -178,7 +201,8 @@ class SyncRepositoryImplTest : SyncTest<NoteEntity, NoteDto>() {
             serverUpdatedAt = "2026-08-17T05:00:00Z",
             noteText = "Remote Note 1 - not to be returned",
             isDeleted = false,
-            clientUpdatedAt = "2026-08-17T05:00:00Z"
+            clientUpdatedAt = "2026-08-17T05:00:00Z",
+            createdAt = "2026-08-16T05:00:00Z"
         )
 
         val remoteDto2 = NoteDto(
@@ -186,7 +210,8 @@ class SyncRepositoryImplTest : SyncTest<NoteEntity, NoteDto>() {
             serverUpdatedAt = "2026-08-17T10:00:00Z",
             noteText = "Remote Note 2 - not to be returned",
             isDeleted = false,
-            clientUpdatedAt = "2026-08-17T10:00:00Z"
+            clientUpdatedAt = "2026-08-17T10:00:00Z",
+            createdAt = "2026-08-16T05:00:00Z"
         )
 
         val remoteDto3 = NoteDto(
@@ -194,7 +219,8 @@ class SyncRepositoryImplTest : SyncTest<NoteEntity, NoteDto>() {
             serverUpdatedAt = "2026-08-17T10:00:00Z",
             noteText = "Remote Note 3 - not to be returned",
             isDeleted = false,
-            clientUpdatedAt = "2026-08-16T10:00:00Z"
+            clientUpdatedAt = "2026-08-16T10:00:00Z",
+            createdAt = "2026-08-15T05:00:00Z"
         )
 
         syncApi.push(listOf(remoteDto1, remoteDto2, remoteDto3))
@@ -215,7 +241,8 @@ class SyncRepositoryImplTest : SyncTest<NoteEntity, NoteDto>() {
             serverUpdatedAt = null,
             noteText = "Remote Note 1 - not to be returned",
             isDeleted = false,
-            clientUpdatedAt = "2026-08-17T05:00:00Z"
+            clientUpdatedAt = "2026-08-17T05:00:00Z",
+            createdAt = "2026-08-16T05:00:00Z"
         )
 
         syncApi.allowNullDates(true)

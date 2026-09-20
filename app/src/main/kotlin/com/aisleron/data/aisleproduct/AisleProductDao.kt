@@ -69,6 +69,14 @@ interface AisleProductDao : BaseDao<AisleProductEntity>, SyncDao<AisleProductEnt
     @Query("DELETE FROM AisleProduct WHERE isRemoved = 1 AND lastModifiedAt <= :purgeToDate")
     override suspend fun purgeRemoved(purgeToDate: Long)
 
-    @Query("SELECT * FROM AisleProduct WHERE aisleId = :aisleId AND productId = :productId")
-    fun getByNaturalKey(aisleId: Int, productId: Int): List<AisleProductEntity>
+    @Query(
+        "SELECT * FROM AisleProduct WHERE productId = :productId " +
+                "AND EXISTS (SELECT NULL FROM Aisle WHERE Aisle.id = AisleProduct.aisleId AND Aisle.locationId = :locationId)"
+    )
+    suspend fun getByLocationNaturalKey(locationId: Int, productId: Int): List<AisleProductEntity>
+
+    /* Check if this is still needed now that there's no longe a unique index on the entity.
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    override suspend fun upsert(entities: List<AisleProductEntity>)
+    */
 }

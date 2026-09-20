@@ -240,6 +240,6 @@
     <string name="manual_sync_scheduled">Заплановано ручну синхронізацію</string>
     <string name="sync_status_success">Успішно</string>
     <string name="sync_status_running">Виконується</string>
-    <string name="sync_status_failed">Помилка</string>
+    <string name="sync_status_failed">Помилка: %1$s</string>
     <string name="help">Довідка</string>
 </resources>

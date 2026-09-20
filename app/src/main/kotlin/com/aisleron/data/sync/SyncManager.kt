@@ -42,21 +42,14 @@ class SyncManager(
             if (prefs.syncServicePreference != SyncServicePreference.NONE) {
                 val lastSyncedAt = prefs.remoteLastSyncedAt
 
-                if (lastSyncedAt == 0L) {
-                    // Do an initial clean-up and pull if this is the first sync on the device.
-                    // Otherwise, duplicate entries could be created.
-                    sortedRepositories.forEach {
-                        it.purgeRemoved(syncStartTime)
-                        it.pull("")
-                    }
-                }
-
-                sortedRepositories.forEach { it.push(lastSyncedAt) }
-
                 sortedRepositories.forEach {
+                    logger.d(TAG, "Pushing ${it.remoteEntityName}")
+                    it.push(lastSyncedAt)
+
                     val lastServerUpdatedDate =
                         syncPreferencesRepository.getRemoteEntityLastUpdatedIso(it.remoteEntityName)
 
+                    logger.d(TAG, "Pulling ${it.remoteEntityName}")
                     val updatedServerUpdatedDate = it.pull(lastServerUpdatedDate)
                     syncPreferencesRepository.setRemoteEntityLastUpdatedIso(
                         it.remoteEntityName, updatedServerUpdatedDate
@@ -66,10 +59,15 @@ class SyncManager(
                 syncPreferencesRepository.setRemoteLastSyncedAt(syncStartTime)
             }
 
-            sortedRepositories.forEach { it.purgeRemoved(syncStartTime) }
+            sortedRepositories.forEach {
+                logger.d(TAG, "Purging ${it.remoteEntityName}")
+                it.purgeRemoved(syncStartTime)
+            }
             syncPreferencesRepository.setSyncStatus(syncStartTime, SyncStatusPreference.SUCCESS)
         }.onFailure { throwable ->
-            logger.e(TAG, throwable.message ?: "Sync operation failed", throwable.cause)
+            val failedMessage = throwable.message ?: "Sync operation failed"
+            logger.e(TAG, failedMessage, throwable.cause)
+            syncPreferencesRepository.setLastFailedReason(failedMessage)
             syncPreferencesRepository.setSyncStatus(syncStartTime, SyncStatusPreference.FAILURE)
         }
     }

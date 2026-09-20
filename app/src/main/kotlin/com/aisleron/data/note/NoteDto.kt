@@ -27,5 +27,6 @@ data class NoteDto(
     @SerialName("is_deleted") override val isDeleted: Boolean,
     @SerialName("client_updated_at") override val clientUpdatedAt: String,
     @SerialName("server_updated_at") override val serverUpdatedAt: String? = null,
-    @SerialName("note_text") val noteText: String
+    @SerialName("note_text") val noteText: String,
+    @SerialName("created_at") val createdAt: String
 ) : SyncDto

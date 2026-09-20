@@ -187,11 +187,16 @@ fun AccountPreferencesScreenContent(
                             context,
                             state.lastSyncDate,
                             DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_TIME
-                        ) + " - ${stringResource(state.lastSyncStatus.labelRes)}"
+                        ) + " - ${
+                            stringResource(
+                                state.lastSyncStatus.labelRes, state.lastFailedReason
+                            )
+                        }"
 
                     Preference(
                         title = stringResource(R.string.last_sync),
                         summary = lastSyncSummary,
+                        summaryMaxLines = 3,
                         onClick = { onSyncStatusPressed() },
                         control = {
                             Icon(

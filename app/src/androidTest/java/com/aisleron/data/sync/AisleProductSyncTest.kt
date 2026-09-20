@@ -23,15 +23,19 @@ import com.aisleron.data.aisleproduct.AisleProductDao
 import com.aisleron.data.aisleproduct.AisleProductDto
 import com.aisleron.data.aisleproduct.AisleProductDtoMapper
 import com.aisleron.data.aisleproduct.AisleProductEntity
-import com.aisleron.data.base.SyncEntity
+import com.aisleron.data.location.LocationDao
+import com.aisleron.data.location.LocationEntity
 import com.aisleron.data.product.ProductDao
 import com.aisleron.data.product.ProductEntity
+import com.aisleron.domain.FilterType
+import com.aisleron.domain.location.LocationType
 import com.aisleron.domain.preferences.TrackingMode
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.koin.test.get
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
 class AisleProductSyncTest : SyncTest<AisleProductEntity, AisleProductDto>() {
@@ -41,7 +45,12 @@ class AisleProductSyncTest : SyncTest<AisleProductEntity, AisleProductDto>() {
         SyncApiTestImpl("aisle_products")
 
     override fun initMapper(): DtoMapper<AisleProductEntity, AisleProductDto> =
-        AisleProductDtoMapper(aisleProductDao, get<AisleDao>(), get<ProductDao>())
+        AisleProductDtoMapper(
+            aisleProductDao,
+            get<AisleDao>(),
+            get<ProductDao>(),
+            get<LocationDao>()
+        )
 
     override fun initDao(): SyncDao<AisleProductEntity> =
         get<AisleProductDao>()
@@ -49,17 +58,20 @@ class AisleProductSyncTest : SyncTest<AisleProductEntity, AisleProductDto>() {
     override suspend fun addEntity(
         lastModifiedAt: Long,
         serverUpdatedAt: Long?,
-        isRemoved: Boolean
-    ): AisleProductEntity = addAisleProductEntity(lastModifiedAt, serverUpdatedAt, isRemoved)
+        isRemoved: Boolean,
+        syncId: String?
+    ): AisleProductEntity =
+        addAisleProductEntity(lastModifiedAt, serverUpdatedAt, isRemoved, syncId)
 
     private suspend fun addAisleProductEntity(
         lastModifiedAt: Long,
         serverUpdatedAt: Long?,
         isRemoved: Boolean,
-        syncId: String = SyncEntity.generateSyncId()
+        syncId: String? = null
     ): AisleProductEntity {
-        val aisleId = addAisleEntity().id
+        val location = addLocationEntity()
         val productId = addProductEntity().id
+        val aisleId = addAisleEntity(location.id).id
 
         val entity = AisleProductEntity(
             id = 0,
@@ -90,8 +102,9 @@ class AisleProductSyncTest : SyncTest<AisleProductEntity, AisleProductDto>() {
         clientUpdatedAt: String,
         isDeleted: Boolean
     ): AisleProductDto {
-        val aisleId = addAisleEntity().syncId!!
+        val location = addLocationEntity()
         val productId = addProductEntity().syncId!!
+        val aisleId = addAisleEntity(location.id).syncId!!
 
         val dto = AisleProductDto(
             id = id,
@@ -99,8 +112,9 @@ class AisleProductSyncTest : SyncTest<AisleProductEntity, AisleProductDto>() {
             clientUpdatedAt = clientUpdatedAt,
             serverUpdatedAt = serverUpdatedAt,
             rank = 1,
-            aisleId = aisleId,
+            locationId = location.syncId!!,
             productId = productId,
+            aisleId = aisleId
         )
 
         syncApi.push(listOf(dto))
@@ -118,11 +132,13 @@ class AisleProductSyncTest : SyncTest<AisleProductEntity, AisleProductDto>() {
         return expectedEntity == compareEntity
     }
 
-    private suspend fun addAisleEntity(syncId: String? = SyncEntity.generateSyncId()): AisleEntity {
+    private suspend fun addAisleEntity(
+        locationId: Int, syncId: String? = generateSyncId()
+    ): AisleEntity {
         val entity = AisleEntity(
             id = 0,
             name = "Aisle for Sync Test",
-            locationId = 1,
+            locationId = locationId,
             rank = 1,
             isDefault = false,
             expanded = true,
@@ -134,7 +150,7 @@ class AisleProductSyncTest : SyncTest<AisleProductEntity, AisleProductDto>() {
         return entity.copy(id = id)
     }
 
-    private suspend fun addProductEntity(syncId: String? = SyncEntity.generateSyncId()): ProductEntity {
+    private suspend fun addProductEntity(syncId: String? = generateSyncId()): ProductEntity {
         val entity = ProductEntity(
             id = 0,
             name = "Product for Sync Test",
@@ -148,6 +164,25 @@ class AisleProductSyncTest : SyncTest<AisleProductEntity, AisleProductDto>() {
         )
 
         val id = get<ProductDao>().upsert(entity).first().toInt()
+
+        return entity.copy(id = id)
+    }
+
+    private suspend fun addLocationEntity(syncId: String? = generateSyncId()): LocationEntity {
+        val entity = LocationEntity(
+            id = 0,
+            name = "Location for Sync Test",
+            syncId = syncId,
+            noteId = null,
+            type = LocationType.SHOP,
+            defaultFilter = FilterType.NEEDED,
+            pinned = false,
+            showDefaultAisle = true,
+            expanded = true,
+            rank = 1
+        )
+
+        val id = get<LocationDao>().upsert(entity).first().toInt()
 
         return entity.copy(id = id)
     }
@@ -173,11 +208,22 @@ class AisleProductSyncTest : SyncTest<AisleProductEntity, AisleProductDto>() {
     }
 
     @Test
-    fun fromDto_aisleNotFound_ThrowsException() = runTest {
+    fun toDto_LocationNotFound_ThrowsException() = runTest {
+        val aisle = addAisleEntity(-1)
+        val entity = addAisleProductEntity(0, 0, isRemoved = false)
+            .copy(aisleId = aisle.id)
+
+        assertFailsWith<IllegalStateException> {
+            mapper.toDto(entity)
+        }
+    }
+
+    @Test
+    fun fromDto_AisleNotFound_ThrowsException() = runTest {
         val dto = addAisleProductDto(
-            SyncEntity.generateSyncId(), "", "",
+            generateSyncId(), "", "",
             isDeleted = false
-        ).copy(aisleId = SyncEntity.generateSyncId())
+        ).copy(aisleId = generateSyncId())
 
         assertFailsWith<IllegalStateException> {
             mapper.fromDto(dto)
@@ -185,11 +231,11 @@ class AisleProductSyncTest : SyncTest<AisleProductEntity, AisleProductDto>() {
     }
 
     @Test
-    fun fromDto_productNotFound_ThrowsException() = runTest {
+    fun fromDto_ProductNotFound_ThrowsException() = runTest {
         val dto = addAisleProductDto(
-            SyncEntity.generateSyncId(), "", "",
+            generateSyncId(), "", "",
             isDeleted = false
-        ).copy(productId = SyncEntity.generateSyncId())
+        ).copy(productId = generateSyncId())
 
         assertFailsWith<IllegalStateException> {
             mapper.fromDto(dto)
@@ -198,7 +244,7 @@ class AisleProductSyncTest : SyncTest<AisleProductEntity, AisleProductDto>() {
 
     @Test
     fun fromDto_ExistingEntityProvided_EntityUpdated() = runTest {
-        val syncId = SyncEntity.generateSyncId()
+        val syncId = generateSyncId()
         val existingEntity = addAisleProductEntity(
             lastModifiedAt = 100L,
             serverUpdatedAt = null,
@@ -219,7 +265,7 @@ class AisleProductSyncTest : SyncTest<AisleProductEntity, AisleProductDto>() {
     @Test
     fun lookupEntityFromDto_EntityMatchesOnSyncId_ReturnsEntity() = runTest {
         val dto = addDto(
-            SyncEntity.generateSyncId(),
+            generateSyncId(),
             "2026-08-18T05:00:00Z",
             "2026-08-18T05:00:00Z",
             false
@@ -243,7 +289,7 @@ class AisleProductSyncTest : SyncTest<AisleProductEntity, AisleProductDto>() {
     @Test
     fun lookupEntityFromDto_EntityMatchesOnNaturalKey_ReturnsEntity() = runTest {
         val dto = addDto(
-            SyncEntity.generateSyncId(),
+            generateSyncId(),
             "2026-08-18T05:00:00Z",
             "2026-08-18T05:00:00Z",
             false
@@ -254,7 +300,6 @@ class AisleProductSyncTest : SyncTest<AisleProductEntity, AisleProductDto>() {
             serverUpdatedAt = 0,
             isRemoved = false
         ).copy(
-            syncId = SyncEntity.generateSyncId(),
             aisleId = get<AisleDao>().getBySyncId(dto.aisleId)!!.id,
             productId = get<ProductDao>().getBySyncId(dto.productId)!!.id
         )
@@ -269,7 +314,7 @@ class AisleProductSyncTest : SyncTest<AisleProductEntity, AisleProductDto>() {
     @Test
     fun lookupEntityFromDto_NoEntityMatch_ReturnsNull() = runTest {
         val dto = addDto(
-            SyncEntity.generateSyncId(),
+            generateSyncId(),
             "2026-08-18T05:00:00Z",
             "2026-08-18T05:00:00Z",
             false
@@ -280,7 +325,7 @@ class AisleProductSyncTest : SyncTest<AisleProductEntity, AisleProductDto>() {
             serverUpdatedAt = 0,
             isRemoved = false,
         ).copy(
-            syncId = SyncEntity.generateSyncId()
+            syncId = generateSyncId()
         )
 
         aisleProductDao.upsert(entity)
@@ -288,5 +333,41 @@ class AisleProductSyncTest : SyncTest<AisleProductEntity, AisleProductDto>() {
         val lookupEntity = mapper.lookupEntityFromDto(dto)
 
         assertNull(lookupEntity)
+    }
+
+    @Test
+    fun pull_HasDuplicateEntity_EntityReplaced() = runTest {
+        // This test validates that the AisleProduct unique constraint is handled correctly by the
+        // custom Dao upsert, since standard room upsert doesn't cater for unique keys
+        val ap1 =
+            addAisleProductEntity(0, 0, isRemoved = false, syncId = generateSyncId())
+
+        val ap2 =
+            addAisleProductEntity(0, 0, isRemoved = false, syncId = generateSyncId())
+
+        assertEquals(2, aisleProductDao.getAisleProducts().size)
+
+        val lastSyncIso = "2026-08-18T00:00:00Z"
+
+        // Use sync id from ap1, and aisle & product details from ap2 to force a unique key violation
+        val id = ap1.syncId!!
+        val dto = addDto(id, "2026-08-18T05:00:00Z", "2026-08-17T05:00:00Z").copy(
+            aisleId = get<AisleDao>().getAisle(ap2.id, false)!!.syncId!!,
+            productId = get<ProductDao>().getProduct(ap2.id, false)!!.syncId!!,
+        )
+
+        syncApi.push(listOf(dto))
+
+        repository.pull(lastSyncIso)
+
+        // Assert that the clash has been resolved by replacing the conflicting record
+        assertEquals(1, aisleProductDao.getAisleProducts().size)
+
+        // Validate that the remaining entry matches the expected values
+        val updatedEntity = aisleProductDao.getBySyncId(id)
+        assertNotNull(updatedEntity)
+        assertEquals(ap1.id, updatedEntity.id)
+        assertEquals(ap2.aisleId, updatedEntity.aisleId)
+        assertEquals(ap2.productId, updatedEntity.productId)
     }
 }

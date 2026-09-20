@@ -305,5 +305,5 @@
     <string name="manual_sync_scheduled">Manual sync scheduled</string>
     <string name="sync_status_success">Success</string>
     <string name="sync_status_running">Running</string>
-    <string name="sync_status_failed">Failed</string>
+    <string name="sync_status_failed">Failed: %1$s</string>
 </resources>

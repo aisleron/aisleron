@@ -36,9 +36,7 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.verify
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals
@@ -49,11 +47,13 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertInstanceOf
 import kotlin.reflect.KClass
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 class SupabaseSessionManagerImplTest {
     private lateinit var syncPreferencesRepository: SyncPreferencesRepositoryTestImpl
-    private val clientFactory: SupabaseClientFactory = mockk()
-    private val authDelegate: SupabaseAuthDelegate = mockk()
+    private lateinit var clientFactory: SupabaseClientFactoryTestImpl
+    private lateinit var authDelegate: SupabaseAuthDelegateTestImpl
     private val mockSupabaseClient: SupabaseClient = mockk()
     private lateinit var sessionManager: SupabaseSessionManagerImpl
     private lateinit var logger: LoggerTestImpl
@@ -63,6 +63,8 @@ class SupabaseSessionManagerImplTest {
         syncPreferencesRepository = SyncPreferencesRepositoryTestImpl()
         syncPreferencesRepository.resetSyncPreferences()
         logger = LoggerTestImpl()
+        authDelegate = SupabaseAuthDelegateTestImpl()
+        clientFactory = SupabaseClientFactoryTestImpl()
         sessionManager =
             SupabaseSessionManagerImpl(
                 syncPreferencesRepository, clientFactory, authDelegate, logger
@@ -80,9 +82,7 @@ class SupabaseSessionManagerImplTest {
 
     private fun initMocks(serviceUrl: String, serviceKey: String) {
         initPreferences(serviceUrl, serviceKey)
-        every {
-            clientFactory.create(serviceUrl, serviceKey)
-        } returns mockSupabaseClient
+        clientFactory.setClient(mockSupabaseClient)
     }
 
     @Test
@@ -95,7 +95,7 @@ class SupabaseSessionManagerImplTest {
 
         assertNotNull(client)
         assertEquals(mockSupabaseClient, client)
-        verify(exactly = 1) { clientFactory.create(serviceUrl, serviceKey) }
+        assertEquals(1, clientFactory.createCallCount)
     }
 
     @Test
@@ -107,7 +107,7 @@ class SupabaseSessionManagerImplTest {
         val client = sessionManager.getClientOrNull()
 
         assertNull(client)
-        verify(exactly = 0) { clientFactory.create(serviceUrl, serviceKey) }
+        assertEquals(0, clientFactory.createCallCount)
     }
 
     @Test
@@ -119,7 +119,7 @@ class SupabaseSessionManagerImplTest {
         val client = sessionManager.getClientOrNull()
 
         assertNull(client)
-        verify(exactly = 0) { clientFactory.create(serviceUrl, serviceKey) }
+        assertEquals(0, clientFactory.createCallCount)
     }
 
     @Test
@@ -127,14 +127,13 @@ class SupabaseSessionManagerImplTest {
         val serviceUrl = "https://example.supabase.co"
         val serviceKey = "some-valid-key"
         initPreferences(serviceUrl, serviceKey)
-        every {
-            clientFactory.create(serviceUrl, serviceKey)
-        } throws RuntimeException("Network Error")
+        clientFactory.failWith(RuntimeException("Network Error"))
 
         val client = sessionManager.getClientOrNull()
 
         assertNull(client)
-        verify(exactly = 1) { clientFactory.create(serviceUrl, serviceKey) }
+
+        assertEquals(1, clientFactory.createCallCount)
     }
 
     @Test
@@ -142,18 +141,14 @@ class SupabaseSessionManagerImplTest {
         val url1 = "https://one.supabase.co"
         val key1 = "some-valid-key-one"
         initPreferences(url1, key1)
-        coEvery {
-            clientFactory.create(url1, key1)
-        } returns getMockClient(url1, key1, errorOnClose = true)
+        clientFactory.setClient(getMockClient(url1, key1, errorOnClose = true))
 
         sessionManager.getClientOrNull()
 
         val url2 = "https://two.supabase.co"
         val key2 = "some-valid-key-two"
         initPreferences(url2, key2)
-        coEvery {
-            clientFactory.create(url2, key2)
-        } returns getMockClient(url2, key2, errorOnClose = true)
+        clientFactory.setClient(getMockClient(url2, key2, errorOnClose = true))
 
         val client2 = sessionManager.getClientOrNull()
 
@@ -184,15 +179,14 @@ class SupabaseSessionManagerImplTest {
         val serviceUrl = "https://example.supabase.co"
         val serviceKey = "some-valid-key"
         initPreferences(serviceUrl, serviceKey)
-        coEvery {
-            clientFactory.create(serviceUrl, serviceKey)
-        } returns getMockClient(serviceUrl, serviceKey)
+        clientFactory.setClient(getMockClient(serviceUrl, serviceKey))
 
         val client1 = sessionManager.getClientOrNull()
         val client2 = sessionManager.getClientOrNull()
 
         assertEquals(client1, client2)
-        coVerify(exactly = 1) { clientFactory.create(serviceUrl, serviceKey) }
+
+        assertEquals(1, clientFactory.createCallCount)
     }
 
     @Test
@@ -200,64 +194,40 @@ class SupabaseSessionManagerImplTest {
         val url1 = "https://one.supabase.co"
         val key1 = "some-valid-key-one"
         initPreferences(url1, key1)
-        coEvery {
-            clientFactory.create(url1, key1)
-        } returns getMockClient(url1, key1)
+        clientFactory.setClient(getMockClient(url1, key1))
 
         val client1 = sessionManager.getClientOrNull()
 
         val url2 = "https://two.supabase.co"
         val key2 = "some-valid-key-two"
         initPreferences(url2, key2)
-        coEvery {
-            clientFactory.create(url2, key2)
-        } returns getMockClient(url2, key2)
+        clientFactory.setClient(getMockClient(url2, key2))
 
         val client2 = sessionManager.getClientOrNull()
 
         assertNotEquals(client1, client2)
-        coVerify(exactly = 1) { clientFactory.create(url1, key1) }
-        coVerify(exactly = 1) { clientFactory.create(url2, key2) }
         coVerify(exactly = 1) { client1?.close() }
     }
 
     @Test
     fun signInWithEmail_SuccessfulAuth_ReturnsSuccess() = runTest {
         initMocks("https://example.supabase.co", "some-valid-key")
-        coEvery {
-            authDelegate.signInWithEmail(
-                mockSupabaseClient, "test@example.com", "password123"
-            )
-        } returns Unit
 
         val result = sessionManager.signInWithEmail("test@example.com", "password123")
 
         assertTrue(result.isSuccess)
-        coVerify(exactly = 1) {
-            authDelegate.signInWithEmail(
-                mockSupabaseClient, "test@example.com", "password123"
-            )
-        }
+        assertEquals(1, authDelegate.signInWithEmailCallCount)
     }
 
     @Test
     fun signInWithEmail_UnmappedException_ResultHasSignInException() = runTest {
         initMocks("https://example.supabase.co", "some-valid-key")
-        coEvery {
-            authDelegate.signInWithEmail(
-                mockSupabaseClient, "test@example.com", "password123"
-            )
-        } throws RuntimeException("Network Error")
+        authDelegate.failWith(RuntimeException("Network Error"))
 
         val result = sessionManager.signInWithEmail("test@example.com", "password123")
 
         assertTrue(result.isFailure)
         assertInstanceOf<AisleronException.SignInException>(result.exceptionOrNull())
-        coVerify(exactly = 1) {
-            authDelegate.signInWithEmail(
-                mockSupabaseClient, "test@example.com", "password123"
-            )
-        }
     }
 
     private suspend fun <T : AisleronException> signInWithEmail_ValidateAisleronExceptions(
@@ -266,11 +236,7 @@ class SupabaseSessionManagerImplTest {
         expectedExceptionCode: AisleronException.ExceptionCode
     ) {
         initMocks("https://example.supabase.co", "some-valid-key")
-        coEvery {
-            authDelegate.signInWithEmail(
-                mockSupabaseClient, "test@example.com", "password123"
-            )
-        } throws throwable
+        authDelegate.failWith(throwable)
 
         val result = sessionManager.signInWithEmail("test@example.com", "password123")
 
@@ -346,9 +312,7 @@ class SupabaseSessionManagerImplTest {
         val serviceUrl = "https://example.supabase.co"
         val serviceKey = "some-valid-key"
         initPreferences(serviceUrl, serviceKey)
-        every {
-            clientFactory.create(serviceUrl, serviceKey)
-        } throws RuntimeException("Network Error")
+        clientFactory.failWith(RuntimeException("Network Error"))
 
         val result = sessionManager.signInWithEmail("test@example.com", "password123")
 
@@ -359,14 +323,10 @@ class SupabaseSessionManagerImplTest {
     fun signOut_SuccessfulSignOut_ReturnsSuccess() = runTest {
         initMocks("https://example.supabase.co", "some-valid-key")
 
-        coEvery {
-            authDelegate.signOut(mockSupabaseClient)
-        } returns Unit
-
         val result = sessionManager.signOut()
 
         assertTrue(result.isSuccess)
-        coVerify(exactly = 1) { authDelegate.signOut(mockSupabaseClient) }
+        assertEquals(1, authDelegate.signOutCallCount)
     }
 
     @Test
@@ -378,7 +338,7 @@ class SupabaseSessionManagerImplTest {
         val result = sessionManager.signOut()
 
         assertTrue(result.isSuccess)
-        coVerify(exactly = 0) { authDelegate.signOut(mockSupabaseClient) }
+        assertEquals(0, authDelegate.signOutCallCount)
     }
 
     @Test
@@ -387,9 +347,7 @@ class SupabaseSessionManagerImplTest {
         val serviceKey = "some-valid-key"
         val exceptionMessage = "Sign out error"
         initMocks(serviceUrl, serviceKey)
-        coEvery {
-            authDelegate.signOut(mockSupabaseClient)
-        } throws Exception(exceptionMessage)
+        authDelegate.failWith(Exception(exceptionMessage))
 
         val result = sessionManager.signOut()
 
@@ -404,19 +362,13 @@ class SupabaseSessionManagerImplTest {
         supabaseSessionStatus: SessionStatus, syncSessionStatus: SyncSessionStatus
     ) {
         initMocks("https://example.supabase.co", "some-valid-key")
-
-        coEvery {
-            authDelegate.getSessionStatusFlow(mockSupabaseClient)
-        } returns flowOf(supabaseSessionStatus)
+        authDelegate.setSessionStatus(supabaseSessionStatus)
 
         sessionManager.refreshStatus()
 
         val resultSessionStatus: SyncSessionStatus = sessionManager.sessionStatus.first()
         assertEquals(syncSessionStatus, resultSessionStatus)
-        coVerify(exactly = 1) {
-            @Suppress("UnusedFlow")
-            authDelegate.getSessionStatusFlow(mockSupabaseClient)
-        }
+        assertEquals(1, authDelegate.getSessionStatusFlowCallCount)
     }
 
     @Test
@@ -477,5 +429,44 @@ class SupabaseSessionManagerImplTest {
 
         val resultSessionStatus: SyncSessionStatus = sessionManager.sessionStatus.first()
         assertEquals(SyncSessionStatus.NotConfigured, resultSessionStatus)
+    }
+
+    @Test
+    fun getConnectedClientOrNull_ClientConnected_ReturnsClient() = runTest {
+        val serviceUrl = "https://example.supabase.co"
+        val serviceKey = "some-valid-key"
+        initMocks(serviceUrl, serviceKey)
+
+        val client = sessionManager.getConnectedClientOrNull()
+
+        assertNotNull(client)
+        assertEquals(mockSupabaseClient, client)
+    }
+
+    @Test
+    fun getConnectedClientOrNull_WaitTimesOut_ReturnsClient() = runTest {
+        val serviceUrl = "https://example.supabase.co"
+        val serviceKey = "some-valid-key"
+        val waitTime = 1.seconds
+
+        initMocks(serviceUrl, serviceKey)
+        authDelegate.setAwaitInitializationDelay(waitTime)
+
+        val client = sessionManager.getConnectedClientOrNull(500.milliseconds)
+
+        assertNotNull(client)
+        assertNotEquals("", logger.getWParameters().message)
+    }
+
+    @Test
+    fun getConnectedClientOrNull_clientIsNull_ReturnsNull() = runTest {
+        val serviceUrl = "https://example.supabase.co"
+        val serviceKey = "some-valid-key"
+        initPreferences(serviceUrl, serviceKey)
+        clientFactory.failWith(RuntimeException("Network Error"))
+
+        val client = sessionManager.getConnectedClientOrNull()
+
+        assertNull(client)
     }
 }

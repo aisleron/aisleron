@@ -94,6 +94,7 @@ class AccountPreferencesScreenContentTest : ComposeScreenTest() {
         syncOnMobileData = false,
         lastSyncedAt = 0L,
         lastSyncStatus = SyncStatusPreference.NONE,
+        lastFailedReason = "",
         remoteLastSyncedAt = 0L
     )
 
@@ -488,6 +489,29 @@ class AccountPreferencesScreenContentTest : ComposeScreenTest() {
         val state = AccountPreferencesUiState(
             lastSyncDate = lastSyncDate,
             lastSyncStatus = SyncStatusPreference.SUCCESS
+        )
+
+        setContent {
+            SetAccountPreferencesScreenContent(state = state)
+        }
+
+        onNodeWithText(statusText, substring = true).assertIsDisplayed()
+    }
+
+    @Test
+    fun accountPreferencesContent_LastSyncFailed_ShowFailReason() = runComposeUiTest {
+        val lastSyncDate = System.currentTimeMillis()
+        val errorReason = "Big Error"
+        val statusText = DateUtils.formatDateTime(
+            getInstrumentation().targetContext,
+            lastSyncDate,
+            DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_TIME
+        ) + " - ${getString(SyncStatusPreference.FAILURE.labelRes, errorReason)}"
+
+        val state = AccountPreferencesUiState(
+            lastSyncDate = lastSyncDate,
+            lastSyncStatus = SyncStatusPreference.FAILURE,
+            lastFailedReason = errorReason
         )
 
         setContent {

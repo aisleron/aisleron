@@ -240,6 +240,6 @@
     <string name="manual_sync_scheduled">Manuel senkronizasyon planlandı</string>
     <string name="sync_status_success">Başarılı</string>
     <string name="sync_status_running">Çalışıyor</string>
-    <string name="sync_status_failed">Başarısız</string>
+    <string name="sync_status_failed">Başarısız: %1$s</string>
     <string name="help">Yardım</string>
 </resources>

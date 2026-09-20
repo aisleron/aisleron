@@ -20,11 +20,12 @@ package com.aisleron.testdata.data.aisleproduct
 import com.aisleron.data.aisleproduct.AisleProductDao
 import com.aisleron.data.aisleproduct.AisleProductEntity
 import com.aisleron.data.aisleproduct.AisleProductRank
+import com.aisleron.testdata.data.aisle.AisleDaoTestImpl
 import com.aisleron.testdata.data.base.BaseSyncTestDao
 import com.aisleron.testdata.data.product.ProductDaoTestImpl
 
 class AisleProductDaoTestImpl(
-    private val productDao: ProductDaoTestImpl
+    private val productDao: ProductDaoTestImpl,
 ) : BaseSyncTestDao<AisleProductEntity>(), AisleProductDao {
 
     override suspend fun getAisleProduct(
@@ -87,8 +88,12 @@ class AisleProductDaoTestImpl(
         return entityList.filter { it.aisleId == aisleId }.maxOfOrNull { it.rank } ?: 0
     }
 
-    override fun getByNaturalKey(aisleId: Int, productId: Int): List<AisleProductEntity> {
-        return entityList.filter { it.aisleId == aisleId && it.productId == productId }
+    override suspend fun getByLocationNaturalKey(
+        locationId: Int, productId: Int
+    ): List<AisleProductEntity> {
+        val aisleDao = AisleDaoTestImpl(this)
+        val aisleIds = aisleDao.getAislesForLocation(locationId).mapTo(HashSet()) { it.id }
+        return entityList.filter { it.productId == productId && it.aisleId in aisleIds }
     }
 
     override suspend fun upsert(vararg entity: AisleProductEntity): List<Long> {

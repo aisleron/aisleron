@@ -44,17 +44,17 @@ class ProductRepositoryImpl(
         return upsertProducts(products)
     }
 
-    private suspend fun mapExisting(item: Product, includeDeleted: Boolean): ProductEntity {
-        val currentEntity = productDao.getProduct(item.id, includeDeleted)
+    private suspend fun mapExisting(item: Product): ProductEntity {
+        val currentEntity = productDao.getProduct(item.id, true)
         return productMapper.fromModel(item, currentEntity)
     }
 
     override suspend fun update(item: Product) {
-        productDao.upsert(mapExisting(item, false))
+        productDao.upsert(mapExisting(item))
     }
 
     override suspend fun update(items: List<Product>) {
-        val products = items.map { mapExisting(it, false) }
+        val products = items.map { mapExisting(it) }
         upsertProducts(products)
     }
 
@@ -66,7 +66,7 @@ class ProductRepositoryImpl(
     }
 
     override suspend fun remove(item: Product) {
-        val removeEntity = mapExisting(item, false).copy(isRemoved = true)
+        val removeEntity = mapExisting(item).copy(isRemoved = true)
         productDao.updateProductRemovedState(removeEntity)
     }
 
@@ -82,7 +82,7 @@ class ProductRepositoryImpl(
     }
 
     override suspend fun hardDelete(item: Product) {
-        productDao.delete(mapExisting(item, true))
+        productDao.delete(mapExisting(item))
     }
 
     private suspend fun getProduct(id: Int, includeDeleted: Boolean): Product? {

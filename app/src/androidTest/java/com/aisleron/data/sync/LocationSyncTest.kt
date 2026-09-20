@@ -17,7 +17,6 @@
 
 package com.aisleron.data.sync
 
-import com.aisleron.data.base.SyncEntity
 import com.aisleron.data.location.LocationDao
 import com.aisleron.data.location.LocationDto
 import com.aisleron.data.location.LocationDtoMapper
@@ -47,15 +46,17 @@ class LocationSyncTest : SyncTest<LocationEntity, LocationDto>() {
     override suspend fun addEntity(
         lastModifiedAt: Long,
         serverUpdatedAt: Long?,
-        isRemoved: Boolean
+        isRemoved: Boolean,
+        syncId: String?
     ): LocationEntity = addLocationEntity(
-        lastModifiedAt, serverUpdatedAt, isRemoved, false
+        lastModifiedAt, serverUpdatedAt, isRemoved, false, syncId
     )
 
     private suspend fun addNoteEntity(): NoteEntity {
         val entity = NoteEntity(
             id = 0,
-            noteText = "Test Note for Location Sync"
+            noteText = "Test Note for Location Sync",
+            syncId = generateSyncId()
         )
 
         val id = get<NoteDao>().upsert(entity).first().toInt()
@@ -67,7 +68,7 @@ class LocationSyncTest : SyncTest<LocationEntity, LocationDto>() {
         serverUpdatedAt: Long?,
         isRemoved: Boolean,
         withNote: Boolean,
-        syncId: String? = SyncEntity.generateSyncId()
+        syncId: String? = null
     ): LocationEntity {
         val noteId = if (withNote) addNoteEntity().id else null
         val entity = LocationEntity(
@@ -150,7 +151,7 @@ class LocationSyncTest : SyncTest<LocationEntity, LocationDto>() {
     @Test
     fun fromDto_DtoHasNote_EntityHasNote() = runTest {
         val dto = addLocationDto(
-            SyncEntity.generateSyncId(), "2026-08-18T00:00:00Z", "2026-08-18T05:00:00Z",
+            generateSyncId(), "2026-08-18T00:00:00Z", "2026-08-18T05:00:00Z",
             isDeleted = false,
             withNote = true
         )
@@ -163,7 +164,7 @@ class LocationSyncTest : SyncTest<LocationEntity, LocationDto>() {
 
     @Test
     fun fromDto_ExistingEntityProvided_EntityUpdated() = runTest {
-        val syncId = SyncEntity.generateSyncId()
+        val syncId = generateSyncId()
         val existingEntity = addLocationEntity(
             lastModifiedAt = 100L,
             serverUpdatedAt = null,
@@ -186,7 +187,7 @@ class LocationSyncTest : SyncTest<LocationEntity, LocationDto>() {
     @Test
     fun lookupEntityFromDto_EntityMatchesOnSyncId_ReturnsEntity() = runTest {
         val dto = addDto(
-            SyncEntity.generateSyncId(),
+            generateSyncId(),
             "2026-08-18T05:00:00Z",
             "2026-08-18T05:00:00Z",
             false
@@ -212,7 +213,7 @@ class LocationSyncTest : SyncTest<LocationEntity, LocationDto>() {
     @Test
     fun lookupEntityFromDto_EntityMatchesOnNaturalKey_ReturnsEntity() = runTest {
         val dto = addDto(
-            SyncEntity.generateSyncId(),
+            generateSyncId(),
             "2026-08-18T05:00:00Z",
             "2026-08-18T05:00:00Z",
             false
@@ -224,7 +225,6 @@ class LocationSyncTest : SyncTest<LocationEntity, LocationDto>() {
             isRemoved = false,
             withNote = false,
         ).copy(
-            syncId = SyncEntity.generateSyncId(),
             name = dto.name
         )
 
@@ -238,7 +238,7 @@ class LocationSyncTest : SyncTest<LocationEntity, LocationDto>() {
     @Test
     fun lookupEntityFromDto_NoEntityMatch_ReturnsNull() = runTest {
         val dto = addDto(
-            SyncEntity.generateSyncId(),
+            generateSyncId(),
             "2026-08-18T05:00:00Z",
             "2026-08-18T05:00:00Z",
             false
@@ -250,7 +250,7 @@ class LocationSyncTest : SyncTest<LocationEntity, LocationDto>() {
             isRemoved = false,
             withNote = false,
         ).copy(
-            syncId = SyncEntity.generateSyncId(),
+            syncId = generateSyncId(),
             name = "Not the Same as Dto"
         )
 

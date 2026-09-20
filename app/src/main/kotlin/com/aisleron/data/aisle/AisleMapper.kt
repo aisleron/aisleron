@@ -39,7 +39,7 @@ class AisleMapper : Mapper<AisleEntity, Aisle> {
         locationId = value.locationId,
         isDefault = value.isDefault,
         expanded = value.expanded,
-        syncId = syncMetadata?.syncId ?: SyncEntity.generateSyncId(),
+        syncId = syncMetadata?.syncId,
         isRemoved = syncMetadata?.isRemoved ?: false,
         lastModifiedAt = System.currentTimeMillis(),
         serverUpdatedAt = syncMetadata?.serverUpdatedAt

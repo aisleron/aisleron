@@ -38,7 +38,7 @@ data class AisleEntity(
     val rank: Int,
     val isDefault: Boolean = false,
     @ColumnInfo(defaultValue = "1") val expanded: Boolean,
-    override val syncId: String? = SyncEntity.generateSyncId(),
+    override val syncId: String? = null,
     @ColumnInfo(defaultValue = "0") override val isRemoved: Boolean = false,
     @ColumnInfo(defaultValue = "0") override val lastModifiedAt: Long = System.currentTimeMillis(),
     override val serverUpdatedAt: Long? = null

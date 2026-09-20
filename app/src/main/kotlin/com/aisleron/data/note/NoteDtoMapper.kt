@@ -22,10 +22,11 @@ import kotlin.time.Instant
 
 class NoteDtoMapper(private val noteDao: NoteDao) : DtoMapper<NoteEntity, NoteDto> {
     override suspend fun toDto(entity: NoteEntity): NoteDto = NoteDto(
-        id = checkNotNull(entity.syncId) { "syncId must be generated prior to push" },
+        id = entity.syncId.orEmpty(),
         isDeleted = entity.isRemoved,
         clientUpdatedAt = Instant.fromEpochMilliseconds(entity.lastModifiedAt).toString(),
-        noteText = entity.noteText
+        noteText = entity.noteText,
+        createdAt = Instant.fromEpochMilliseconds(entity.createdAt).toString()
     )
 
     override suspend fun fromDto(dto: NoteDto): NoteEntity {
@@ -37,12 +38,18 @@ class NoteDtoMapper(private val noteDao: NoteDao) : DtoMapper<NoteEntity, NoteDt
             syncId = dto.id,
             isRemoved = dto.isDeleted,
             lastModifiedAt = Instant.parse(dto.clientUpdatedAt).toEpochMilliseconds(),
-            serverUpdatedAt = dto.serverUpdatedAt?.let { Instant.parse(it).toEpochMilliseconds() }
+            serverUpdatedAt = dto.serverUpdatedAt?.let { Instant.parse(it).toEpochMilliseconds() },
+            createdAt = Instant.parse(dto.createdAt).toEpochMilliseconds()
         )
     }
 
     override suspend fun lookupEntityFromDto(dto: NoteDto): NoteEntity? {
         noteDao.getBySyncId(dto.id)?.let { return it }
-        return noteDao.getByNaturalKey(dto.noteText).firstOrNull()
+
+        val createdAt = Instant.parse(dto.createdAt).toEpochMilliseconds()
+        val entityList = noteDao.getByNaturalKey(dto.noteText, createdAt)
+            .filter { it.syncId == null }
+
+        return entityList.firstOrNull { !it.isRemoved } ?: entityList.firstOrNull()
     }
 }

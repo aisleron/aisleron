@@ -22,10 +22,14 @@ import com.aisleron.domain.log.Logger
 class LoggerTestImpl : Logger {
     private var dParameters = LogParameters()
     private var eParameters = LogParameters()
+    private var wParameters = LogParameters()
 
     fun getDParameters(): LogParameters = dParameters
 
     fun getEParameters(): LogParameters = eParameters
+
+    fun getWParameters(): LogParameters = wParameters
+
 
     override fun d(tag: String, message: String) {
         dParameters = LogParameters(
@@ -36,6 +40,14 @@ class LoggerTestImpl : Logger {
 
     override fun e(tag: String, message: String, throwable: Throwable?) {
         eParameters = LogParameters(
+            tag = tag,
+            message = message,
+            throwable = throwable
+        )
+    }
+
+    override fun w(tag: String, message: String, throwable: Throwable?) {
+        wParameters = LogParameters(
             tag = tag,
             message = message,
             throwable = throwable

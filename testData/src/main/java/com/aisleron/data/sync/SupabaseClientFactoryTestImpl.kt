@@ -18,10 +18,27 @@
 package com.aisleron.data.sync
 
 import io.github.jan.supabase.SupabaseClient
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
 
-interface SupabaseClientProvider {
-    suspend fun getClientOrNull(): SupabaseClient?
-    suspend fun getConnectedClientOrNull(timeout: Duration = 5.seconds): SupabaseClient?
+class SupabaseClientFactoryTestImpl : SupabaseClientFactory {
+    private lateinit var _client: SupabaseClient
+
+    private var _createCallCount: Int = 0
+    val createCallCount: Int get() = _createCallCount
+
+    private var _failWithException: Throwable? = null
+
+    override fun create(url: String, key: String): SupabaseClient {
+        _createCallCount += 1
+        _failWithException?.let { throw it }
+
+        return _client
+    }
+
+    fun setClient(client: SupabaseClient) {
+        _client = client
+    }
+
+    fun failWith(throwable: Throwable?) {
+        _failWithException = throwable
+    }
 }

@@ -17,7 +17,6 @@
 
 package com.aisleron.data.sync
 
-import com.aisleron.data.base.SyncEntity
 import com.aisleron.data.note.NoteDao
 import com.aisleron.data.note.NoteDto
 import com.aisleron.data.note.NoteDtoMapper
@@ -28,6 +27,8 @@ import org.junit.Test
 import org.koin.test.get
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class NoteSyncTest : SyncTest<NoteEntity, NoteDto>() {
@@ -45,8 +46,9 @@ class NoteSyncTest : SyncTest<NoteEntity, NoteDto>() {
     override suspend fun addEntity(
         lastModifiedAt: Long,
         serverUpdatedAt: Long?,
-        isRemoved: Boolean
-    ): NoteEntity = addNoteEntity(lastModifiedAt, serverUpdatedAt, isRemoved)
+        isRemoved: Boolean,
+        syncId: String?
+    ): NoteEntity = addNoteEntity(lastModifiedAt, serverUpdatedAt, isRemoved, syncId)
 
     override suspend fun addDto(
         id: String,
@@ -60,6 +62,7 @@ class NoteSyncTest : SyncTest<NoteEntity, NoteDto>() {
             clientUpdatedAt = clientUpdatedAt,
             serverUpdatedAt = serverUpdatedAt,
             noteText = "Note for Sync Test",
+            createdAt = Clock.System.now().toString()
         )
 
         syncApi.push(listOf(dto))
@@ -78,7 +81,10 @@ class NoteSyncTest : SyncTest<NoteEntity, NoteDto>() {
     }
 
     private suspend fun addNoteEntity(
-        lastModifiedAt: Long = 0, serverUpdatedAt: Long? = null, isRemoved: Boolean = false
+        lastModifiedAt: Long = 0,
+        serverUpdatedAt: Long? = null,
+        isRemoved: Boolean = false,
+        syncId: String? = null
     ): NoteEntity {
         val noteText = "Note to test Sync"
         val noteEntity = NoteEntity(
@@ -86,7 +92,8 @@ class NoteSyncTest : SyncTest<NoteEntity, NoteDto>() {
             noteText = noteText,
             lastModifiedAt = lastModifiedAt,
             serverUpdatedAt = serverUpdatedAt,
-            isRemoved = isRemoved
+            isRemoved = isRemoved,
+            syncId = syncId
         )
 
         val id = noteDao.upsert(noteEntity).first().toInt()
@@ -97,7 +104,7 @@ class NoteSyncTest : SyncTest<NoteEntity, NoteDto>() {
     @Test
     fun lookupEntityFromDto_EntityMatchesOnSyncId_ReturnsEntity() = runTest {
         val dto = addDto(
-            SyncEntity.generateSyncId(),
+            generateSyncId(),
             "2026-08-18T05:00:00Z",
             "2026-08-18T05:00:00Z",
             false
@@ -118,15 +125,15 @@ class NoteSyncTest : SyncTest<NoteEntity, NoteDto>() {
     @Test
     fun lookupEntityFromDto_EntityMatchesOnNaturalKey_ReturnsEntity() = runTest {
         val dto = addDto(
-            SyncEntity.generateSyncId(),
+            generateSyncId(),
             "2026-08-18T05:00:00Z",
             "2026-08-18T05:00:00Z",
             false
         )
 
         val entity = addNoteEntity().copy(
-            syncId = SyncEntity.generateSyncId(),
-            noteText = dto.noteText
+            noteText = dto.noteText,
+            createdAt = Instant.parse(dto.createdAt).toEpochMilliseconds()
         )
 
         noteDao.upsert(entity)
@@ -139,14 +146,13 @@ class NoteSyncTest : SyncTest<NoteEntity, NoteDto>() {
     @Test
     fun lookupEntityFromDto_NoEntityMatch_ReturnsNull() = runTest {
         val dto = addDto(
-            SyncEntity.generateSyncId(),
+            generateSyncId(),
             "2026-08-18T05:00:00Z",
             "2026-08-18T05:00:00Z",
             false
         )
 
         val entity = addNoteEntity().copy(
-            syncId = SyncEntity.generateSyncId(),
             noteText = "Not the Same text as Dto"
         )
 

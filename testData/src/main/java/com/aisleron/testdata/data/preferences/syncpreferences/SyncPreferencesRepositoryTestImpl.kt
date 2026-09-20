@@ -72,6 +72,12 @@ class SyncPreferencesRepositoryTestImpl : SyncPreferencesRepository {
         }
     }
 
+    override fun setLastFailedReason(value: String?) {
+        _syncPreferences.update {
+            it.copy(lastFailedReason = value.orEmpty())
+        }
+    }
+
     override fun getRemoteEntityLastUpdatedIso(entityName: String): String {
         val keyName = REMOTE_ENTITY_LAST_UPDATED_FORMAT.format(entityName)
         return _remoteEntityUpdated[keyName] ?: ""
@@ -102,7 +108,8 @@ class SyncPreferencesRepositoryTestImpl : SyncPreferencesRepository {
         syncOnMobileData = false,
         lastSyncedAt = 0L,
         lastSyncStatus = SyncStatusPreference.NONE,
-        remoteLastSyncedAt = 0L
+        lastFailedReason = "",
+        remoteLastSyncedAt = -1L
     )
 
     fun resetSyncPreferences() {

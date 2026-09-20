@@ -43,8 +43,8 @@ import com.aisleron.data.product.ProductEntity
         )
     ],
     indices = [
-        Index(value = ["aisleId", "productId"], unique = true),
         Index(value = ["syncId"], unique = true),
+        Index(value = ["aisleId", "productId"]),
         Index(value = ["productId"]),
         Index(value = ["isRemoved", "id"]),
         Index(value = ["lastModifiedAt"])
@@ -55,7 +55,7 @@ data class AisleProductEntity(
     val aisleId: Int,
     val productId: Int,
     val rank: Int,
-    override val syncId: String = SyncEntity.generateSyncId(),
+    override val syncId: String? = null,
     @ColumnInfo(defaultValue = "0") override val isRemoved: Boolean = false,
     @ColumnInfo(defaultValue = "0") override val lastModifiedAt: Long = System.currentTimeMillis(),
     override val serverUpdatedAt: Long? = null

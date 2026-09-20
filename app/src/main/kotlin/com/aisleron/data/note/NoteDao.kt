@@ -44,6 +44,6 @@ interface NoteDao : BaseDao<NoteEntity>, SyncDao<NoteEntity> {
     @Query("DELETE FROM Note WHERE isRemoved = 1 AND lastModifiedAt <= :purgeToDate")
     override suspend fun purgeRemoved(purgeToDate: Long)
 
-    @Query("SELECT * FROM Note WHERE noteText = :noteText COLLATE NOCASE")
-    fun getByNaturalKey(noteText: String): List<NoteEntity>
+    @Query("SELECT * FROM Note WHERE noteText = :noteText COLLATE NOCASE AND createdAt = :createdAt")
+    fun getByNaturalKey(noteText: String, createdAt: Long): List<NoteEntity>
 }

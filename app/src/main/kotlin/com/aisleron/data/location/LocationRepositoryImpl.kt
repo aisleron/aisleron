@@ -67,15 +67,13 @@ class LocationRepositoryImpl(
         return locationDao.getMaxRank()
     }
 
-    private suspend fun mapExisting(
-        item: Location, includeDeleted: Boolean
-    ): LocationEntity {
-        val currentEntity = locationDao.getLocation(item.id, includeDeleted)
+    private suspend fun mapExisting(item: Location): LocationEntity {
+        val currentEntity = locationDao.getLocation(item.id, true)
         return locationMapper.fromModel(item, currentEntity)
     }
 
     override suspend fun updateLocationRank(location: Location) {
-        locationDao.updateRank(mapExisting(location, false))
+        locationDao.updateRank(mapExisting(location))
     }
 
     override suspend fun get(id: Int): Location? =
@@ -95,11 +93,11 @@ class LocationRepositoryImpl(
     }
 
     override suspend fun update(item: Location) {
-        locationDao.upsert(mapExisting(item, false))
+        locationDao.upsert(mapExisting(item))
     }
 
     override suspend fun update(items: List<Location>) {
-        val locations = items.map { mapExisting(it, false) }
+        val locations = items.map { mapExisting(it) }
         upsertLocations(locations)
     }
 
@@ -111,7 +109,7 @@ class LocationRepositoryImpl(
     }
 
     override suspend fun remove(item: Location) {
-        val removeEntity = mapExisting(item, false).copy(isRemoved = true)
+        val removeEntity = mapExisting(item).copy(isRemoved = true)
         locationDao.upsert(removeEntity)
     }
 
@@ -134,7 +132,7 @@ class LocationRepositoryImpl(
     }
 
     override suspend fun hardDelete(item: Location) {
-        locationDao.delete(mapExisting(item, true))
+        locationDao.delete(mapExisting(item))
     }
 }
 
