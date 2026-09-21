@@ -74,9 +74,4 @@ interface AisleProductDao : BaseDao<AisleProductEntity>, SyncDao<AisleProductEnt
                 "AND EXISTS (SELECT NULL FROM Aisle WHERE Aisle.id = AisleProduct.aisleId AND Aisle.locationId = :locationId)"
     )
     suspend fun getByLocationNaturalKey(locationId: Int, productId: Int): List<AisleProductEntity>
-
-    /* Check if this is still needed now that there's no longe a unique index on the entity.
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    override suspend fun upsert(entities: List<AisleProductEntity>)
-    */
 }
