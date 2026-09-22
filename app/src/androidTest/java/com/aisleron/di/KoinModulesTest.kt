@@ -17,6 +17,10 @@
 
 package com.aisleron.di
 
+import android.content.Context
+import androidx.work.WorkerParameters
+import com.aisleron.data.sync.DtoMapper
+import com.aisleron.data.sync.SyncDao
 import kotlinx.coroutines.CoroutineScope
 import org.junit.Test
 import org.koin.core.annotation.KoinExperimentalAPI
@@ -27,6 +31,14 @@ import org.koin.test.verify.verify
 class KoinModulesTest : KoinTest {
     @Test
     fun checkAppModules() {
-        appModules.verify(extraTypes = listOf(CoroutineScope::class))
+        appModules.verify(
+            extraTypes = listOf(
+                CoroutineScope::class,
+                Context::class,
+                WorkerParameters::class,
+                SyncDao::class,
+                DtoMapper::class
+            )
+        )
     }
 }
