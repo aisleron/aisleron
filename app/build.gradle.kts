@@ -84,8 +84,8 @@ android {
         applicationId = "com.aisleron"
         minSdk = 24
         targetSdk = 36
-        versionCode = 25
-        versionName = "2026.6.1"
+        versionCode = 26
+        versionName = "2026.6.2"
         base.archivesName = "$applicationId-$versionName"
 
         testInstrumentationRunner = "com.aisleron.di.KoinInstrumentationTestRunner"
@@ -224,11 +224,18 @@ tasks.withType<Test> {
     jvmArgs("-XX:+EnableDynamicAgentLoading")
 }
 
+tasks.configureEach {
+    if (name.contains("ArtProfile", ignoreCase = true)) {
+        enabled = false
+    }
+}
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
     }
 }
+
 dependencies {
     // Implementation
     implementation(libs.activity)
