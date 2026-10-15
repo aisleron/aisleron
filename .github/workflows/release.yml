@@ -40,7 +40,7 @@ jobs:
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
-          printf "storeFile=release.jks\n" > keystore.properties
+          printf "storeFile=../release.jks\n" > keystore.properties
           printf "storePassword=%s\n" "$STORE_PASSWORD" >> keystore.properties
           printf "keyAlias=%s\n" "$KEY_ALIAS" >> keystore.properties
           printf "keyPassword=%s\n" "$KEY_PASSWORD" >> keystore.properties
