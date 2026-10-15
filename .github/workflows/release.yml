@@ -40,29 +40,21 @@ jobs:
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |         
-          printf "storeFile=../release.jks\n" > keystore.properties
+          printf "storeFile=../release.jks\n" > keystore.properties        
+          printf "keyAlias=%s\n" "$KEY_ALIAS" >> keystore.properties
+          printf "storePassword=%s\n" "$STORE_PASSWORD" >> keystore.properties
+          printf "keyPassword=%s\n" "$KEY_PASSWORD" >> keystore.properties
 
-          printf "storePassword=%s\n" "1234" >> keystore.properties
-          printf "keyAlias=%s\n" "5678" >> keystore.properties
-          printf "keyPassword=%s\n" "91011" >> keystore.properties
+      - name: Build APK and App Bundle
+        run: ./gradlew assembleRelease bundleRelease
 
-          cat keystore.properties
-          
-
-#          printf "storePassword=%s\n" "$STORE_PASSWORD" >> keystore.properties
-#          printf "keyAlias=%s\n" "$KEY_ALIAS" >> keystore.properties
-#          printf "keyPassword=%s\n" "$KEY_PASSWORD" >> keystore.properties
-
-#      - name: Build APK and App Bundle
-#        run: ./gradlew assembleRelease bundleRelease
-
-#      - name: Upload Internal Build Artifacts
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: release-artifacts
-#          path: |
-#            app/build/outputs/apk/release/
-#            app/build/outputs/bundle/release/
+      - name: Upload Internal Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-artifacts
+          path: |
+            app/build/outputs/apk/release/
+            app/build/outputs/bundle/release/
 
 #      - name: Publish GitHub Release
 #        uses: softprops/action-gh-release@v2
