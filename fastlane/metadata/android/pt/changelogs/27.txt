@@ -1,0 +1,3 @@
+Melhorias
+* Adicionado a capacidade de manter as listas de compras atualizadas em vários dispositivos usando um serviço de sincronização auto-gerenciado. Consulte a documentação do Serviço de Sincronização Aisleron para obter detalhes.
+* Adicionado Português - Brasil traduções.
