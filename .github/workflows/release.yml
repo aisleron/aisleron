@@ -36,10 +36,10 @@ jobs:
 
       - name: Create keystore.properties
         run: |
-          echo "storeFile=release.jks" > keystore.properties
-          echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> keystore.properties
-          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> keystore.properties
-          echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" >> keystore.properties
+          printf "storeFile=release.jks\n" > keystore.properties
+          printf "keyAlias=%s\n" "${{ secrets.KEY_ALIAS }}" >> keystore.properties
+          printf "storePassword=%s\n" "${{ secrets.KEYSTORE_PASSWORD }}" >> keystore.properties
+          printf "keyPassword=%s\n" "${{ secrets.KEY_PASSWORD }}" >> keystore.properties
 
       - name: Build APK and App Bundle
         run: ./gradlew assembleRelease bundleRelease
