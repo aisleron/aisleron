@@ -43,7 +43,7 @@ jobs:
 
           if [ -z "${{ secrets.KEY_ALIAS }}" ]; then echo "KEY_ALIAS secret is empty or missing"; else echo "KEY_ALIAS secret is set"; fi
           if [ -z "$KEY_ALIAS" ]; then echo "KEY_ALIAS env is empty or missing"; else echo "KEY_ALIAS env is set"; fi
-          echo "$KEY_ALIAS"
+          echo "KEY_ALIAS length: ${#KEY_ALIAS}"
           
           printf "storeFile=../release.jks\n" > keystore.properties
           printf "storePassword=%s\n" "$STORE_PASSWORD" >> keystore.properties
