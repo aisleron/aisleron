@@ -1,0 +1,5 @@
+İyileştirmeler:
+* Portekizce çeviriler eklendi.
+
+Hata düzeltmeleri:
+* Android 13'de uygulamaya dönüşte oluşan çökme düzeltildi.
