@@ -239,7 +239,7 @@ class ShopFragment(
             edtLocationName.requestFocus()
             val imm =
                 ContextCompat.getSystemService(requireContext(), InputMethodManager::class.java)
-            imm?.showSoftInput(edtLocationName, InputMethodManager.SHOW_IMPLICIT)
+            imm?.showSoftInput(edtLocationName, 0)
         }
     }
 

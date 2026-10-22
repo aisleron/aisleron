@@ -19,6 +19,7 @@ package com.aisleron.ui.navigation
 
 import android.app.Activity
 import android.app.Instrumentation
+import androidx.navigation.NavController
 import androidx.navigation.testing.TestNavHostController
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intended
@@ -217,7 +218,11 @@ class MainNavigatorImplTest {
         val dummyResult = Instrumentation.ActivityResult(Activity.RESULT_OK, null)
         intending(anyIntent()).respondWith(dummyResult)
 
-        activityRule.scenario.onActivity { navigator.navigateToAbout() }
+        activityRule.scenario.onActivity { activity ->
+            val activityNavController = object : NavController(activity) {}
+            navigator.attach(activityNavController)
+            navigator.navigateToAbout()
+        }
 
         intended(
             allOf(
@@ -232,7 +237,11 @@ class MainNavigatorImplTest {
         val dummyResult = Instrumentation.ActivityResult(Activity.RESULT_OK, null)
         intending(anyIntent()).respondWith(dummyResult)
 
-        activityRule.scenario.onActivity { navigator.navigateToAccountPreferences() }
+        activityRule.scenario.onActivity { activity ->
+            val activityNavController = object : NavController(activity) {}
+            navigator.attach(activityNavController)
+            navigator.navigateToAccountPreferences()
+        }
 
         intended(
             allOf(

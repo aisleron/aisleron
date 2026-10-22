@@ -280,7 +280,7 @@ class ProductFragment(
             edtProductName.requestFocus()
             val imm =
                 ContextCompat.getSystemService(requireContext(), InputMethodManager::class.java)
-            imm?.showSoftInput(edtProductName, InputMethodManager.SHOW_IMPLICIT)
+            imm?.showSoftInput(edtProductName, 0)
         }
     }
 

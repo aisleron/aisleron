@@ -108,11 +108,13 @@ class SettingsFragmentTest : KoinTest {
     private fun clickOption(viewTextResourceId: Int) {
         onView(withId(SystemIds.PREFERENCE_RECYCLER_VIEW))
             .perform(
-                RecyclerViewActions.actionOnItem<RecyclerView.ViewHolder>(
-                    hasDescendant(withText(viewTextResourceId)),
-                    click()
+                RecyclerViewActions.scrollTo<RecyclerView.ViewHolder>(
+                    hasDescendant(withText(viewTextResourceId))
                 )
             )
+
+        onView(withText(viewTextResourceId))
+            .perform(click())
     }
 
     private fun getFragmentScenario(): FragmentScenario<SettingsFragment> =
@@ -126,11 +128,12 @@ class SettingsFragmentTest : KoinTest {
     fun onBackupFolderClick_OnLaunchIntent_IsOpenDocumentTree() {
         getFragmentScenario()
         Intents.init()
-
-        clickOption(R.string.backup_folder)
-        intended(hasAction(Intent.ACTION_OPEN_DOCUMENT_TREE))
-
-        Intents.release()
+        try {
+            clickOption(R.string.backup_folder)
+            intended(hasAction(Intent.ACTION_OPEN_DOCUMENT_TREE))
+        } finally {
+            Intents.release()
+        }
     }
 
     @Test
@@ -159,20 +162,24 @@ class SettingsFragmentTest : KoinTest {
             Instrumentation.ActivityResult(Activity.RESULT_OK, intent)
 
         Intents.init()
-        intending(hasAction(intentAction)).respondWith(result)
-        clickOption(viewTextResourceId)
-        Intents.release()
+        try {
+            intending(hasAction(intentAction)).respondWith(result)
+            clickOption(viewTextResourceId)
+        } finally {
+            Intents.release()
+        }
     }
 
     @Test
     fun onBackupDatabaseClick_OnLaunchIntent_IsOpenDocumentTree() {
         getFragmentScenario()
         Intents.init()
-
-        clickOption(R.string.backup_database)
-        intended(hasAction(Intent.ACTION_OPEN_DOCUMENT_TREE))
-
-        Intents.release()
+        try {
+            clickOption(R.string.backup_database)
+            intended(hasAction(Intent.ACTION_OPEN_DOCUMENT_TREE))
+        } finally {
+            Intents.release()
+        }
     }
 
     @Test
@@ -199,12 +206,12 @@ class SettingsFragmentTest : KoinTest {
     fun onRestoreDatabaseClick_OnLaunchIntent_IsOpenDocumentTree() {
         getFragmentScenario()
         Intents.init()
-
-        clickOption(R.string.restore_database)
-
-        intended(hasAction(Intent.ACTION_OPEN_DOCUMENT))
-
-        Intents.release()
+        try {
+            clickOption(R.string.restore_database)
+            intended(hasAction(Intent.ACTION_OPEN_DOCUMENT))
+        } finally {
+            Intents.release()
+        }
     }
 
     @Test
@@ -340,11 +347,13 @@ class SettingsFragmentTest : KoinTest {
 
         onView(withId(SystemIds.PREFERENCE_RECYCLER_VIEW))
             .perform(
-                RecyclerViewActions.actionOnItem<RecyclerView.ViewHolder>(
-                    hasDescendant(withText("Test Edit Text")),
-                    click()
+                RecyclerViewActions.scrollTo<RecyclerView.ViewHolder>(
+                    hasDescendant(withText("Test Edit Text"))
                 )
             )
+
+        onView(withText("Test Edit Text"))
+            .perform(click())
 
         onView(withId(android.R.id.edit))
             .inRoot(isDialog())
