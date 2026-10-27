@@ -60,7 +60,7 @@ coroutinesBom = "1.11.0"
 junitBom = "6.1.3"
 koinBom = "4.2.2"
 ktorBom = "3.6.0"
-serializationBom = "1.11.0"
+serializationBom = "1.12.0"
 supabaseBom = "3.8.0"
 
 [libraries]
