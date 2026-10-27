@@ -1,0 +1,3 @@
+İyileştirmeler
+* Kullanıcının kendi yönetimindeki bir senkronizasyon hizmeti üzerinden alışveriş listelerinin farklı aygıtlar arasında güncel tutulabilmesi yeteneği eklendi. Ayrıntılar için Aisleron Senkronizasyon Hizmeti dokümantasyonuna başvurun.
+* Portekizce - Brezilya çevirileri eklendi.
