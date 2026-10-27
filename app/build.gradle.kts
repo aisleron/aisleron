@@ -78,12 +78,12 @@ android {
     }
 
     namespace = "com.aisleron"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.aisleron"
         minSdk = 24
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 27
         versionName = "2026.6.3"
         base.archivesName = "$applicationId-$versionName"
@@ -201,7 +201,7 @@ gradle.taskGraph.whenReady {
 
     if (isReleaseTask) {
         val releaseConfig = android.signingConfigs.findByName("release")
-        if (releaseConfig == null || releaseConfig.storeFile == null) {
+        if (releaseConfig?.storeFile == null) {
             throw GradleException(
                 "CRITICAL ERROR: You are attempting a Release build without a signing key.\n" +
                         "Production binaries must be signed. Check your keystore.properties file."
@@ -246,7 +246,7 @@ dependencies {
     implementation(libs.collection)
     implementation(libs.constraintlayout)
     implementation(libs.coordinatorlayout)
-    implementation(libs.core.ktx) // 1.19.0 Requires Android 17, and moves to non-ktx
+    implementation(libs.core)
     implementation(libs.customview)
     implementation(libs.documentfile)
     implementation(libs.drawerlayout)

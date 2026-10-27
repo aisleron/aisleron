@@ -293,24 +293,26 @@ class MainActivityTest : KoinTest {
             }
 
             Intents.init()
-            intending(
-                allOf(hasAction(Intent.ACTION_VIEW), hasData(uri!!))
-            ).respondWith(
-                Instrumentation.ActivityResult(Activity.RESULT_OK, null)
-            )
+            try {
+                intending(
+                    allOf(hasAction(Intent.ACTION_VIEW), hasData(uri!!))
+                ).respondWith(
+                    Instrumentation.ActivityResult(Activity.RESULT_OK, null)
+                )
 
-            // Action
-            onView(withId(R.id.btn_update_view_changes)).perform(click())
+                // Action
+                onView(withId(R.id.btn_update_view_changes)).perform(click())
 
-            // Assertions
-            // 1. Intent was sent
-            intended(allOf(hasAction(Intent.ACTION_VIEW), hasData(uri)))
-            // 2. Banner is gone
-            onView(withId(R.id.update_banner)).check(
-                matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE))
-            )
-
-            Intents.release()
+                // Assertions
+                // 1. Intent was sent
+                intended(allOf(hasAction(Intent.ACTION_VIEW), hasData(uri)))
+                // 2. Banner is gone
+                onView(withId(R.id.update_banner)).check(
+                    matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE))
+                )
+            } finally {
+                Intents.release()
+            }
         }
 
         // 3. Preferences are updated

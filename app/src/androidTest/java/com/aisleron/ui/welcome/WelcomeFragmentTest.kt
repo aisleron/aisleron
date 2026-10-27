@@ -299,21 +299,23 @@ class WelcomeFragmentTest : KoinTest {
     fun welcomePage_SelectViewDocumentation_OpensDocumentationUrl() {
         getFragmentScenario()
         Intents.init()
+        try {
+            var documentsUri = ""
 
-        var documentsUri = ""
+            getFragmentScenario().onFragment { fragment ->
+                documentsUri = fragment.getString(R.string.aisleron_documentation_url)
+            }
 
-        getFragmentScenario().onFragment { fragment ->
-            documentsUri = fragment.getString(R.string.aisleron_documentation_url)
+            val expectedIntent =
+                Matchers.allOf(hasAction(Intent.ACTION_VIEW), hasData(documentsUri))
+            intending(expectedIntent).respondWith(Instrumentation.ActivityResult(0, null))
+
+            val welcomeOption = onView(withId(R.id.txt_welcome_documentation))
+            welcomeOption.perform(click())
+            intended(expectedIntent)
+        } finally {
+            Intents.release()
         }
-
-        val expectedIntent = Matchers.allOf(hasAction(Intent.ACTION_VIEW), hasData(documentsUri))
-        intending(expectedIntent).respondWith(Instrumentation.ActivityResult(0, null))
-
-        val welcomeOption = onView(withId(R.id.txt_welcome_documentation))
-        welcomeOption.perform(click())
-        intended(expectedIntent)
-
-        Intents.release()
     }
 
     @Test
@@ -354,13 +356,13 @@ class WelcomeFragmentTest : KoinTest {
         welcomeOption.perform(click())
 
         assertEquals(
-            welcomePreferences.getLastUpdateVersionCode(),
-            BuildConfig.VERSION_CODE
+            BuildConfig.VERSION_CODE,
+            welcomePreferences.getLastUpdateVersionCode()
         )
 
         assertEquals(
-            welcomePreferences.getLastUpdateVersionName(),
-            BuildConfig.VERSION_NAME
+            BuildConfig.VERSION_NAME,
+            welcomePreferences.getLastUpdateVersionName()
         )
     }
 }

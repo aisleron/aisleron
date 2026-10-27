@@ -23,7 +23,7 @@ plugins {
 }
 android {
     namespace = "com.aisleron.testdata"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         minSdk = 24

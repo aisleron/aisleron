@@ -686,17 +686,19 @@ class CaptureScreenshots : KoinTest {
             Instrumentation.ActivityResult(Activity.RESULT_OK, intent)
 
         Intents.init()
-        intending(hasAction(Intent.ACTION_OPEN_DOCUMENT)).respondWith(result)
+        try {
+            intending(hasAction(Intent.ACTION_OPEN_DOCUMENT)).respondWith(result)
 
-        onView(withId(SystemIds.PREFERENCE_RECYCLER_VIEW))
-            .perform(
-                RecyclerViewActions.actionOnItem<RecyclerView.ViewHolder>(
-                    hasDescendant(withText(R.string.restore_database)),
-                    click()
+            onView(withId(SystemIds.PREFERENCE_RECYCLER_VIEW))
+                .perform(
+                    RecyclerViewActions.actionOnItem<RecyclerView.ViewHolder>(
+                        hasDescendant(withText(R.string.restore_database)),
+                        click()
+                    )
                 )
-            )
-
-        Intents.release()
+        } finally {
+            Intents.release()
+        }
     }
 
     @Test
