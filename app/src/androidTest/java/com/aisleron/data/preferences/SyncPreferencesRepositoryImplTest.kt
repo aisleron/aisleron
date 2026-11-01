@@ -88,13 +88,12 @@ class SyncPreferencesRepositoryImplTest {
         }
     }
 
-    /* TODO: re-enable TRUE path once Aisleron Default sync is configured
     @Test
     fun getSyncPreferences_UseDefaultService_ReturnsDefaultServiceUrl() {
         val customServiceUrl = "https://a.custom.url"
         val customServiceKey = "123abc"
 
-        sharedPreferencesInitializer.setUseDefaultSyncService(true)
+        sharedPreferencesInitializer.setSyncService(SyncServicePreference.DEFAULT_SERVICE)
         sharedPreferencesInitializer.setCustomSyncServiceUrl(customServiceUrl)
         sharedPreferencesInitializer.setCustomSyncServiceKey(customServiceKey)
 
@@ -103,7 +102,6 @@ class SyncPreferencesRepositoryImplTest {
         assertEquals(defaultUrl, syncPreferences.serviceUrl)
         assertEquals(defaultKey, syncPreferences.serviceKey)
     }
-    */
 
     @Test
     fun getSyncPreferences_UseCustomService_ReturnsCustomServiceUrl() {

@@ -302,6 +302,7 @@
     <string name="sync_service_connecting_to">Connecting to</string>
     <string name="sync_service_sign_up_message">Sign in to the Aisleron Sync service to keep your shopping lists up to date across all your devices.</string>
     <string name="aisleron_sync_subtitle">Sync through the shops!</string>
+    <string name="sync_service_default">Aisleron sync service</string>
     <string name="sync_service_custom">Custom sync service</string>
     <string name="manual_sync_scheduled">Manual sync scheduled</string>
     <string name="sync_status_success">Success</string>

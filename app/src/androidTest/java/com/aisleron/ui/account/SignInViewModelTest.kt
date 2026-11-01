@@ -22,6 +22,7 @@ import com.aisleron.di.generalTestModule
 import com.aisleron.di.preferenceTestModule
 import com.aisleron.di.useCaseModule
 import com.aisleron.di.viewModelTestModule
+import com.aisleron.domain.preferences.SyncServicePreference
 import com.aisleron.domain.preferences.syncpreferences.SyncPreferencesRepository
 import com.aisleron.domain.sync.SyncSessionManager
 import com.aisleron.testdata.data.sync.SyncSessionManagerTestImpl
@@ -133,5 +134,16 @@ class SignInViewModelTest : KoinTest {
         val syncServiceUrl = viewModel.syncServiceUrl
 
         assertEquals(url, syncServiceUrl)
+    }
+
+    @Test
+    fun syncServicePreference_get_ReturnsFromPreferences() {
+        val service = SyncServicePreference.DEFAULT_SERVICE
+        val syncPreferencesRepository = get<SyncPreferencesRepository>()
+        syncPreferencesRepository.setSyncService(service)
+
+        val syncServicePreference = viewModel.syncServicePreference
+
+        assertEquals(service, syncServicePreference)
     }
 }

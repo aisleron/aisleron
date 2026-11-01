@@ -441,6 +441,20 @@ class AccountPreferencesScreenContentTest : ComposeScreenTest() {
     }
 
     @Test
+    fun accountPreferencesContent_SyncServiceIsDefault_HideSyncServiceAddress() = runComposeUiTest {
+        val syncServiceAddressText = getString(R.string.sync_service_address)
+        val state = AccountPreferencesUiState(
+            syncServicePreference = SyncServicePreference.DEFAULT_SERVICE
+        )
+
+        setContent {
+            SetAccountPreferencesScreenContent(state = state)
+        }
+
+        onNodeWithText(syncServiceAddressText).assertDoesNotExist()
+    }
+
+    @Test
     fun accountPreferencesContent_SyncServiceIsCustom_ShowSyncServiceAddress() = runComposeUiTest {
         val syncServiceAddressText = getString(R.string.sync_service_address)
         val state = AccountPreferencesUiState(

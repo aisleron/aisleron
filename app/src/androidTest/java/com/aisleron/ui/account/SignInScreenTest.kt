@@ -32,6 +32,7 @@ import com.aisleron.di.preferenceTestModule
 import com.aisleron.di.useCaseModule
 import com.aisleron.di.viewModelTestModule
 import com.aisleron.domain.base.AisleronException
+import com.aisleron.domain.preferences.SyncServicePreference
 import com.aisleron.domain.sync.SyncSessionManager
 import com.aisleron.testdata.data.sync.SyncSessionManagerTestImpl
 import com.aisleron.ui.AisleronExceptionMap
@@ -99,6 +100,7 @@ class SignInScreenTest : ComposeScreenTest() {
         setContent {
             SignInScreenContent(
                 onSignInWithEmail = { _, _ -> },
+                syncServicePreference = SyncServicePreference.CUSTOM_SERVICE,
                 syncServiceUrl = testUrl,
                 snackbarHostState = null,
                 isLoading = false
@@ -116,6 +118,7 @@ class SignInScreenTest : ComposeScreenTest() {
         setContent {
             SignInScreenContent(
                 onSignInWithEmail = { _, _ -> },
+                syncServicePreference = SyncServicePreference.CUSTOM_SERVICE,
                 syncServiceUrl = "https://sync.aisleron.com",
                 snackbarHostState = null,
                 isLoading = true
@@ -144,6 +147,7 @@ class SignInScreenTest : ComposeScreenTest() {
                     actualEmail = email
                     actualPassword = password
                 },
+                syncServicePreference = SyncServicePreference.CUSTOM_SERVICE,
                 syncServiceUrl = "https://sync.aisleron.com",
                 snackbarHostState = null,
                 isLoading = false
@@ -157,5 +161,29 @@ class SignInScreenTest : ComposeScreenTest() {
 
         assertEquals(inputEmail, actualEmail)
         assertEquals(inputPassword, actualPassword)
+    }
+
+    @Test
+    fun signInContent_IsDefaultSyncService_DisplaysDefaultSyncServiceText() = runComposeUiTest {
+        val testUrl = "https://sync.aisleron.com"
+        val connectingToText = getString(R.string.sync_service_connecting_to)
+        val emailLabel = getString(R.string.email)
+        val signInButtonText = getString(R.string.sign_in)
+        val expectedConnectedTo = getString(R.string.sync_service_default)
+
+        setContent {
+            SignInScreenContent(
+                onSignInWithEmail = { _, _ -> },
+                syncServicePreference = SyncServicePreference.DEFAULT_SERVICE,
+                syncServiceUrl = testUrl,
+                snackbarHostState = null,
+                isLoading = false
+            )
+        }
+
+        onNodeWithText(connectingToText).assertIsDisplayed()
+        onNodeWithText(expectedConnectedTo).assertIsDisplayed()
+        onNodeWithText(emailLabel).assertIsDisplayed()
+        onNodeWithText(signInButtonText).assertIsDisplayed()
     }
 }

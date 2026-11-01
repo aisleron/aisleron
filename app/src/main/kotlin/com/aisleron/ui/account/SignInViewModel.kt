@@ -22,6 +22,7 @@ import androidx.lifecycle.viewModelScope
 import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.base.exceptionCode
 import com.aisleron.domain.log.Logger
+import com.aisleron.domain.preferences.SyncServicePreference
 import com.aisleron.domain.preferences.syncpreferences.usecase.GetSyncPreferencesUseCase
 import com.aisleron.domain.sync.usecase.SignInWithEmailUseCase
 import com.aisleron.ui.base.UiEvent
@@ -40,6 +41,7 @@ class SignInViewModel(
     private val coroutineScope = coroutineScopeProvider ?: this.viewModelScope
 
     val syncServiceUrl: String get() = getSyncPreferencesUseCase().serviceUrl
+    val syncServicePreference: SyncServicePreference get() = getSyncPreferencesUseCase().syncServicePreference
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()

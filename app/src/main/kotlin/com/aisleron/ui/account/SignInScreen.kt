@@ -49,11 +49,13 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.aisleron.R
+import com.aisleron.domain.preferences.SyncServicePreference
 import com.aisleron.ui.AisleronExceptionMap
 import com.aisleron.ui.component.AisleronHeader
 import com.aisleron.ui.component.AisleronScreen
 import com.aisleron.ui.component.FullScreenProgressIndicator
 import com.aisleron.ui.component.PasswordTextField
+import com.aisleron.ui.component.preference.labelRes
 import com.aisleron.ui.theme.AisleronTheme
 import org.koin.androidx.compose.koinViewModel
 
@@ -93,6 +95,7 @@ fun SignInScreen(
             )
         },
 
+        syncServicePreference = viewModel.syncServicePreference,
         syncServiceUrl = viewModel.syncServiceUrl,
         snackbarHostState = snackbarHostState,
         isLoading = isLoading
@@ -103,6 +106,7 @@ fun SignInScreen(
 @Composable
 fun SignInScreenContent(
     onSignInWithEmail: (email: String, password: String) -> Unit,
+    syncServicePreference: SyncServicePreference,
     syncServiceUrl: String,
     snackbarHostState: SnackbarHostState?,
     isLoading: Boolean
@@ -145,7 +149,11 @@ fun SignInScreenContent(
                 )
 
                 Text(
-                    text = syncServiceUrl
+                    text = if (syncServicePreference == SyncServicePreference.CUSTOM_SERVICE)
+                        syncServiceUrl
+                    else
+                        stringResource(syncServicePreference.labelRes)
+
                 )
             }
 
@@ -196,6 +204,7 @@ fun SignInScreenContentPreview() {
     AisleronTheme {
         SignInScreenContent(
             onSignInWithEmail = { _, _ -> },
+            syncServicePreference = SyncServicePreference.CUSTOM_SERVICE,
             syncServiceUrl = "https://aisleron.syncservice.com",
             snackbarHostState = null,
             isLoading = false

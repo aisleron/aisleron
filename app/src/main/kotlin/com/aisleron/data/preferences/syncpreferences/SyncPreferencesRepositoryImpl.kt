@@ -42,6 +42,7 @@ class SyncPreferencesRepositoryImpl(
     private fun getServiceUrl(): String {
         return when (getSyncService()) {
             SyncServicePreference.NONE -> ""
+            SyncServicePreference.DEFAULT_SERVICE -> defaultUrl
             SyncServicePreference.CUSTOM_SERVICE ->
                 sharedPreferences.getString(
                     SyncPreferenceKey.CUSTOM_SERVICE_URL.keyName, ""
@@ -52,6 +53,7 @@ class SyncPreferencesRepositoryImpl(
     private fun getServiceKey(): String {
         return when (getSyncService()) {
             SyncServicePreference.NONE -> ""
+            SyncServicePreference.DEFAULT_SERVICE -> defaultKey
             SyncServicePreference.CUSTOM_SERVICE ->
                 sharedPreferences.getString(
                     SyncPreferenceKey.CUSTOM_SERVICE_KEY.keyName, ""
@@ -148,7 +150,7 @@ class SyncPreferencesRepositoryImpl(
         REMOTE_ENTITY_LAST_UPDATED_FORMAT.format(entityName)
 
     override fun getRemoteEntityLastUpdatedIso(entityName: String): String =
-        sharedPreferences.getString(remoteEntityLastUpdatedKeyName(entityName), "") ?: ""
+        sharedPreferences.getString(remoteEntityLastUpdatedKeyName(entityName), "").orEmpty()
 
 
     override fun setRemoteEntityLastUpdatedIso(entityName: String, serverLastUpdatedAtIso: String) {

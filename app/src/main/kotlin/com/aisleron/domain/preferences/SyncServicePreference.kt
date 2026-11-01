@@ -19,6 +19,7 @@ package com.aisleron.domain.preferences
 
 enum class SyncServicePreference(override val value: String) : PreferenceEnum {
     NONE("none"),
+    DEFAULT_SERVICE("default_service"),
     CUSTOM_SERVICE("custom_service");
 
     companion object : PreferenceEnum.Factory<SyncServicePreference> {
