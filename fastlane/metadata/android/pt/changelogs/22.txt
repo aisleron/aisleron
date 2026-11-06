@@ -1,0 +1,5 @@
+Melhorias:
+* Adicionado traduções portuguesas.
+
+Correções de bugs:
+* Fix crash no app currículo no Android 13.

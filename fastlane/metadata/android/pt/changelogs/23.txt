@@ -1,5 +1,5 @@
 Melhorias:
-* Adicionado um toggle 'All Items' para o menu lista de compras (graças para @SivanTechDev).
+* Adicionado um toggle 'All Items' ao menu lista de compras (graças a @SivanTechDev).
 * Atualizado Sobre página e atividade secundária para Jetpack Compose.
 * Adicionado árabe e Tamil traduções.
 
