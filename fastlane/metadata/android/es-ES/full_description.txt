@@ -1,14 +1,14 @@
-Agilice sus compras con esta aplicación de lista de compras intuitiva y fácil de usar. Ya sea que te estés preparando para una carrera semanal o para comprar una ocasión especial, esta aplicación te ayuda a mantenerte organizado y eficiente.
+Agilice sus compras con esta aplicación de lista de compras intuitiva y fácil de usar. Ya sea que se esté preparando para una carrera semanal o para comprar para una ocasión especial, esta aplicación le ayuda a mantenerse organizado y eficiente.
 
 Características clave
-* Crear Tiendas personalizadas & pasillos: Agregue sus tiendas favoritas, categorice los elementos por pasillos, y organice fácilmente su lista de compras basada en su diseño local.
-* Smart Product Management: Añadir productos a su lista y asignarlos al área apropiada en su casa. Rearrange products by aisle within each store to match your shopping route.
+* Crear Tiendas personalizadas & pasillos: Agregue sus tiendas favoritas, categorice los elementos por pasillos y organice fácilmente su lista de compras sobre la base de su diseño local.
+* Gestión inteligente de productos: Agregue productos a su lista y asignárselos al área apropiada en su casa. Rearrange products by aisle within each store to match your shopping route.
 * Swipe-to-Track: Realice un seguimiento de su progreso de compras con un simple giro. Gire a la izquierda o a la derecha para marcar los elementos como "neced" o "In Stock".
 * Mostrar en la pantalla de bloqueo: No es necesario desbloquear la pantalla al final de cada pasillo. Su lista de compras se mostrará en la pantalla de bloqueo para mayor comodidad.
 * Easy Editing: Larga la impresión de cualquier artículo para editarlo o eliminarlo.
 * Tarjetas de lealtad: Integre con Catima — Loyalty Card Wallet para abrir rápidamente su tarjeta de fidelidad de la tienda.
-* Vistas: Vea su lista de compras en casa, por tienda o en todas las tiendas.
-* Múltiples dispositivos: Mantenga listas de compras actualizadas en múltiples dispositivos utilizando un servicio de sincronización autogestionado.
+* Múltiples vistas: Vea su lista de compras en casa, por tienda o en todas las tiendas.
+* Múltiples dispositivos: Mantenga listas de compras actualizadas en varios dispositivos utilizando un servicio de sincronización autogestionado.
 
 ¿Por qué te encantará?
 * Gratis, sin anuncios.
