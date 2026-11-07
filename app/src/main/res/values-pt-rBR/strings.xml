@@ -219,7 +219,7 @@
     <string name="password">Senha</string>
     <string name="show_password">Mostrar senha</string>
     <string name="hide_password">Ocultar senha</string>
-    <string name="sync_service_connecting_to">Conectando a</string>
+    <string name="sync_service_connecting_to">Ligação a</string>
     <string name="sync_service_sign_up_message">Cadastre-se no serviço Aisleron Sync para manter suas listas de compras atualizadas em todos os seus dispositivos.</string>
     <string name="aisleron_sync_subtitle">Sincronize entre suas lojas!</string>
     <string name="sync_service_custom">Serviço de sincronização personalizado</string>
