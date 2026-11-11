@@ -21,7 +21,8 @@ enum class SyncStatusPreference(override val value: String) : PreferenceEnum {
     NONE("none"),
     SUCCESS("success"),
     RUNNING("running"),
-    FAILURE("failure");
+    FAILURE("failure"),
+    NOT_SUBSCRIBED("not_subscribed");
 
     companion object : PreferenceEnum.Factory<SyncStatusPreference> {
         override val defaultValue = NONE

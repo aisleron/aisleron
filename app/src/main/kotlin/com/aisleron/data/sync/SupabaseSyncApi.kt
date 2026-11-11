@@ -17,6 +17,8 @@
 
 package com.aisleron.data.sync
 
+import com.aisleron.domain.base.AisleronException
+import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.postgrest.rpc
 import kotlinx.serialization.KSerializer
@@ -37,6 +39,11 @@ class SupabaseSyncApi<Dto : SyncDto>(
 
         val client = clientProvider.getConnectedClientOrNull()
             ?: throw IllegalStateException("Supabase client unavailable (unauthenticated or offline)")
+
+        val accessToken = client.auth.currentAccessTokenOrNull().orEmpty()
+        val appMetadata = AppMetadata.fromAccessToken(accessToken)
+        if (!appMetadata.isSubscribed)
+            throw AisleronException.NoSubscriptionException()
 
         val jsonRecords = Json.encodeToJsonElement(
             ListSerializer(serializer),

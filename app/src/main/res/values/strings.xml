@@ -117,6 +117,7 @@
     <string name="unconfirmed_email_exception">ERROR: Email address not confirmed</string>
     <string name="auth_exception">ERROR: Authentication failed</string>
     <string name="network_exception">ERROR: Unable to connect to sync service</string>
+    <string name="no_subscription_exception">ERROR: No active subscription</string>
 
     <!-- About Preferences -->
     <string name="about_support_header">Support</string>
@@ -308,4 +309,5 @@
     <string name="sync_status_success">Success</string>
     <string name="sync_status_running">Running</string>
     <string name="sync_status_failed">Failed: %1$s</string>
+    <string name="sync_status_not_subscribed">No active subscription</string>
 </resources>

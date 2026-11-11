@@ -17,6 +17,7 @@
 
 package com.aisleron.data.sync
 
+import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.base.extension.runCatchingUnlessCancelled
 import com.aisleron.domain.log.Logger
 import com.aisleron.domain.preferences.SyncServicePreference
@@ -67,8 +68,16 @@ class SyncManager(
         }.onFailure { throwable ->
             val failedMessage = throwable.message ?: "Sync operation failed"
             logger.e(TAG, failedMessage, throwable.cause)
-            syncPreferencesRepository.setLastFailedReason(failedMessage)
-            syncPreferencesRepository.setSyncStatus(syncStartTime, SyncStatusPreference.FAILURE)
+
+            val failedReason = when (throwable) {
+                is AisleronException.NoSubscriptionException -> SyncStatusPreference.NOT_SUBSCRIBED
+                else -> {
+                    syncPreferencesRepository.setLastFailedReason(failedMessage)
+                    SyncStatusPreference.FAILURE
+                }
+            }
+
+            syncPreferencesRepository.setSyncStatus(syncStartTime, failedReason)
         }
     }
 

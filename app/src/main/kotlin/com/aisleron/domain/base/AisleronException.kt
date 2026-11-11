@@ -87,6 +87,9 @@ sealed class AisleronException(
         exceptionCode: ExceptionCode, message: String? = null, cause: Throwable? = null
     ) : AisleronException(exceptionCode, message, cause)
 
+    class NoSubscriptionException(message: String? = null, cause: Throwable? = null) :
+        AisleronException(ExceptionCode.NO_SUBSCRIPTION_EXCEPTION, message, cause)
+
     enum class ExceptionCode {
         GENERIC_EXCEPTION,
         DELETE_DEFAULT_AISLE_EXCEPTION,
@@ -111,7 +114,8 @@ sealed class AisleronException(
         INVALID_CREDENTIAL_EXCEPTION,
         UNCONFIRMED_EMAIL_EXCEPTION,
         AUTH_EXCEPTION,
-        NETWORK_EXCEPTION
+        NETWORK_EXCEPTION,
+        NO_SUBSCRIPTION_EXCEPTION
     }
 }
 

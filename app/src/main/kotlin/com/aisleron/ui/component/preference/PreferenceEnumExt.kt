@@ -41,6 +41,7 @@ val PreferenceEnum.labelRes: Int
             SyncStatusPreference.SUCCESS -> R.string.sync_status_success
             SyncStatusPreference.RUNNING -> R.string.sync_status_running
             SyncStatusPreference.FAILURE -> R.string.sync_status_failed
+            SyncStatusPreference.NOT_SUBSCRIBED -> R.string.sync_status_not_subscribed
         }
 
         is PureBlackStyle -> when (this) {

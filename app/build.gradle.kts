@@ -355,7 +355,7 @@ dependencies {
     androidTestImplementation(libs.junit)
     androidTestImplementation(libs.kotlin.test)
     androidTestImplementation(libs.screengrab)
-    androidTestImplementation(libs.test.core.ktx)
+    androidTestImplementation(libs.test.core)
     androidTestImplementation(libs.uiautomator)
     androidTestImplementation(libs.work.testing)
 

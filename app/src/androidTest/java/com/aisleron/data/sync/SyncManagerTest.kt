@@ -25,6 +25,7 @@ import com.aisleron.di.daoTestModule
 import com.aisleron.di.generalTestModule
 import com.aisleron.di.preferenceTestModule
 import com.aisleron.di.syncTestModule
+import com.aisleron.domain.base.AisleronException
 import com.aisleron.domain.preferences.SyncServicePreference
 import com.aisleron.domain.preferences.SyncStatusPreference
 import com.aisleron.domain.preferences.syncpreferences.SyncPreferencesRepository
@@ -38,6 +39,7 @@ import org.koin.test.KoinTest
 import org.koin.test.get
 import java.util.UUID
 import kotlin.test.assertEquals
+import kotlin.test.assertIs
 import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -157,6 +159,22 @@ class SyncManagerTest : KoinTest {
         assertEquals(SyncStatusPreference.FAILURE, prefs.lastSyncStatus)
         assertEquals(expectedRemoteLastSyncedAt, prefs.remoteLastSyncedAt)
         assertEquals(exceptionMessage, prefs.lastFailedReason)
+    }
+
+    @Test
+    fun syncAll_OnMissingSubscription_ReturnsNoSubscriptionFailure() = runTest {
+        val expectedRemoteLastSyncedAt = 1700000000L
+        syncPreferencesRepository.setRemoteLastSyncedAt(expectedRemoteLastSyncedAt)
+        api.failWith(AisleronException.NoSubscriptionException())
+
+        val result = syncManager.syncAll()
+
+        assertTrue(result.isFailure)
+        assertIs<AisleronException>(result.exceptionOrNull())
+
+        val prefs = syncPreferencesRepository.getSyncPreferences()
+        assertEquals(SyncStatusPreference.NOT_SUBSCRIBED, prefs.lastSyncStatus)
+        assertEquals(expectedRemoteLastSyncedAt, prefs.remoteLastSyncedAt)
     }
 
     @Test

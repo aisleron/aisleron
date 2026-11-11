@@ -47,6 +47,7 @@ class AisleronExceptionMap {
             ExceptionCode.UNCONFIRMED_EMAIL_EXCEPTION -> R.string.unconfirmed_email_exception
             ExceptionCode.AUTH_EXCEPTION -> R.string.auth_exception
             ExceptionCode.NETWORK_EXCEPTION -> R.string.network_exception
+            ExceptionCode.NO_SUBSCRIPTION_EXCEPTION -> R.string.no_subscription_exception
         }
     }
 }

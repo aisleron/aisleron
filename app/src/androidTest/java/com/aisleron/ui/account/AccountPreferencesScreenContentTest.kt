@@ -536,6 +536,27 @@ class AccountPreferencesScreenContentTest : ComposeScreenTest() {
     }
 
     @Test
+    fun accountPreferencesContent_NoSubscription_ShowNoSubscriptionSyncStatus() = runComposeUiTest {
+        val lastSyncDate = System.currentTimeMillis()
+        val statusText = DateUtils.formatDateTime(
+            getInstrumentation().targetContext,
+            lastSyncDate,
+            DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_TIME
+        ) + " - ${getString(SyncStatusPreference.NOT_SUBSCRIBED.labelRes)}"
+
+        val state = AccountPreferencesUiState(
+            lastSyncDate = lastSyncDate,
+            lastSyncStatus = SyncStatusPreference.NOT_SUBSCRIBED
+        )
+
+        setContent {
+            SetAccountPreferencesScreenContent(state = state)
+        }
+
+        onNodeWithText(statusText, substring = true).assertIsDisplayed()
+    }
+
+    @Test
     fun accountPreferencesContent_PressHelp_InvokesCallbackWithCorrectUrl() = runComposeUiTest {
         val helpLabelString = getString(R.string.help)
         var capturedUrl: String? = null

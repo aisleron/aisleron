@@ -26,6 +26,8 @@ plugins {
 
     alias(libs.plugins.dependency.analysis)
     // To check dependencies, run: ./gradlew buildHealth
+
+    java
 }
 
 dependencyAnalysis {

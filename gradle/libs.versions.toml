@@ -26,7 +26,7 @@ constraintlayout = "2.2.2"
 coordinatorlayout = "1.3.0"
 core = "1.19.1"
 customview = "1.2.0"
-dependencyAnalysis = "3.19.2"
+dependencyAnalysis = "3.20.0"
 documentfile = "1.1.0"
 drawerlayout = "1.2.0"
 espresso = "3.7.0"
@@ -49,7 +49,7 @@ savedstate = "1.5.0"
 screengrab = "2.1.1"
 slf4jNop = "2.0.20"
 sqlite = "2.7.1"
-testCoreKtx = "1.7.0"
+testCore = "1.7.0"
 uiautomator = "2.4.0"
 viewpager2 = "1.1.0"
 work-runtime = "2.12.0"
@@ -59,7 +59,7 @@ composeBom = "2026.09.00"
 coroutinesBom = "1.11.0"
 junitBom = "6.1.3"
 koinBom = "4.2.2"
-ktorBom = "3.6.0"
+ktorBom = "3.6.1"
 serializationBom = "1.12.0"
 supabaseBom = "3.8.0"
 
@@ -113,7 +113,7 @@ savedstate = { module = "androidx.savedstate:savedstate", version.ref = "savedst
 screengrab = { module = "tools.fastlane:screengrab", version.ref = "screengrab" }
 slf4j-nop = { module = "org.slf4j:slf4j-nop", version.ref = "slf4jNop" }
 sqlite = { module = "androidx.sqlite:sqlite", version.ref = "sqlite" }
-test-core-ktx = { module = "androidx.test:core-ktx", version.ref = "testCoreKtx" }
+test-core = { module = "androidx.test:core", version.ref = "testCore" }
 uiautomator = { module = "androidx.test.uiautomator:uiautomator", version.ref = "uiautomator" }
 viewpager2 = { module = "androidx.viewpager2:viewpager2", version.ref = "viewpager2" }
 work-runtime = { module = "androidx.work:work-runtime", version.ref = "work-runtime" }
