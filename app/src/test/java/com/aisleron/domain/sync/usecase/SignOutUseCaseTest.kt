@@ -23,7 +23,6 @@ import com.aisleron.testdata.data.sync.SyncSessionManagerTestImpl
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
@@ -57,13 +56,16 @@ class SignOutUseCaseTest {
 
     @Test
     fun invoke_IsValidLogout_ReturnsSuccessResult() = runTest {
-        sessionManager.setSignedIn(true)
+        sessionManager.setSignedInProvider(SyncSessionManagerTestImpl.SignedInProvider.EMAIL)
 
         val result = signOutUseCase()
 
         assertTrue(result.isSuccess)
         assertNull(result.exceptionOrNull())
-        assertFalse(sessionManager.signedIn)
+        assertEquals(
+            SyncSessionManagerTestImpl.SignedInProvider.NONE,
+            sessionManager.signedInProvider
+        )
     }
 
     @Test

@@ -34,6 +34,9 @@ class SupabaseAuthDelegateTestImpl : SupabaseAuthDelegate {
     private var _signInWithEmailCallCount: Int = 0
     val signInWithEmailCallCount: Int get() = _signInWithEmailCallCount
 
+    private var _signInWithGithubCallCount: Int = 0
+    val signInWithGithubCallCount: Int get() = _signInWithGithubCallCount
+
     private var _getSessionStatusFlowCallCount: Int = 0
     val getSessionStatusFlowCallCount: Int get() = _getSessionStatusFlowCallCount
 
@@ -44,6 +47,11 @@ class SupabaseAuthDelegateTestImpl : SupabaseAuthDelegate {
         client: SupabaseClient, email: String, password: String
     ) {
         _signInWithEmailCallCount += 1
+        _failWithException?.let { throw it }
+    }
+
+    override suspend fun signInWithGithub(client: SupabaseClient) {
+        _signInWithGithubCallCount += 1
         _failWithException?.let { throw it }
     }
 

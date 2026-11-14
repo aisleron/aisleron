@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.Flow
 interface SyncSessionManager {
     val sessionStatus: Flow<SyncSessionStatus>
     suspend fun signInWithEmail(email: String, password: String): Result<Unit>
+    suspend fun signInWithGithub(): Result<Unit>
     suspend fun signOut(): Result<Unit>
     fun refreshStatus()
 }

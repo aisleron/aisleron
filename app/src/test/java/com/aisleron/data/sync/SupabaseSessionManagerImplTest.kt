@@ -320,6 +320,27 @@ class SupabaseSessionManagerImplTest {
     }
 
     @Test
+    fun signInWithGithub_SuccessfulAuth_ReturnsSuccess() = runTest {
+        initMocks("https://example.supabase.co", "some-valid-key")
+
+        val result = sessionManager.signInWithGithub()
+
+        assertTrue(result.isSuccess)
+        assertEquals(1, authDelegate.signInWithGithubCallCount)
+    }
+
+    @Test
+    fun signInWithGithub_UnmappedException_ResultHasSignInException() = runTest {
+        initMocks("https://example.supabase.co", "some-valid-key")
+        authDelegate.failWith(RuntimeException("Network Error"))
+
+        val result = sessionManager.signInWithGithub()
+
+        assertTrue(result.isFailure)
+        assertInstanceOf<AisleronException.SignInException>(result.exceptionOrNull())
+    }
+
+    @Test
     fun signOut_SuccessfulSignOut_ReturnsSuccess() = runTest {
         initMocks("https://example.supabase.co", "some-valid-key")
 

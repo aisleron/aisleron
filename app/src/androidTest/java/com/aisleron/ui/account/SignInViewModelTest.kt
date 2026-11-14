@@ -38,7 +38,6 @@ import kotlin.test.assertFalse
 import kotlin.test.assertIs
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
-import kotlin.test.assertTrue
 
 class SignInViewModelTest : KoinTest {
     private lateinit var viewModel: SignInViewModel
@@ -61,11 +60,14 @@ class SignInViewModelTest : KoinTest {
     @Test
     fun signInWithEmail_UseCaseResultIsSuccess_SignInSuccessEmitted() = runTest {
         val sessionManager = getSyncSessionManager()
-        sessionManager.setSignedIn(false)
+        sessionManager.setSignedInProvider(SyncSessionManagerTestImpl.SignedInProvider.NONE)
 
         viewModel.signInWithEmail("email", "password")
 
-        assertTrue(sessionManager.signedIn)
+        assertEquals(
+            SyncSessionManagerTestImpl.SignedInProvider.EMAIL,
+            sessionManager.signedInProvider
+        )
 
         val isLoading = viewModel.isLoading
         assertFalse(isLoading.value)
@@ -80,12 +82,15 @@ class SignInViewModelTest : KoinTest {
     @Test
     fun signInWithEmail_UseCaseResultIsFailure_SignInFailureEmitted() = runTest {
         val sessionManager = getSyncSessionManager()
-        sessionManager.setSignedIn(false)
+        sessionManager.setSignedInProvider(SyncSessionManagerTestImpl.SignedInProvider.NONE)
         sessionManager.failWith(Exception())
 
         viewModel.signInWithEmail("email", "password")
 
-        assertFalse(sessionManager.signedIn)
+        assertEquals(
+            SyncSessionManagerTestImpl.SignedInProvider.NONE,
+            sessionManager.signedInProvider
+        )
 
         val isLoading = viewModel.isLoading
         assertFalse(isLoading.value)
@@ -100,12 +105,15 @@ class SignInViewModelTest : KoinTest {
     @Test
     fun signInWithEmail_CancellationException_SignOutFailsWithNoError() = runTest {
         val sessionManager = getSyncSessionManager()
-        sessionManager.setSignedIn(false)
+        sessionManager.setSignedInProvider(SyncSessionManagerTestImpl.SignedInProvider.NONE)
         sessionManager.failWith(CancellationException())
 
         viewModel.signInWithEmail("email", "password")
 
-        assertFalse(sessionManager.signedIn)
+        assertEquals(
+            SyncSessionManagerTestImpl.SignedInProvider.NONE,
+            sessionManager.signedInProvider
+        )
 
         val event = viewModel.signInEvent.value?.consumeEvent()
         assertNull(event)
@@ -115,9 +123,32 @@ class SignInViewModelTest : KoinTest {
     }
 
     @Test
+    fun signInWithGithub_UseCaseResultIsSuccess_SignInSuccessEmitted() = runTest {
+        val sessionManager = getSyncSessionManager()
+        sessionManager.setSignedInProvider(SyncSessionManagerTestImpl.SignedInProvider.NONE)
+
+        viewModel.signInWithGithub()
+
+        assertEquals(
+            SyncSessionManagerTestImpl.SignedInProvider.GITHUB,
+            sessionManager.signedInProvider
+        )
+
+        val isLoading = viewModel.isLoading
+        assertFalse(isLoading.value)
+
+        val event = viewModel.signInEvent.value?.consumeEvent()
+        assertIs<SignInViewModel.UiEffect.SignInSuccess>(event)
+
+        val reconsumedEvent = viewModel.signInEvent.value?.consumeEvent()
+        assertNull(reconsumedEvent)
+    }
+
+    @Test
     fun constructor_WithDefaultParameters_SignInViewModelReturned() {
         val vm = SignInViewModel(
             signInWithEmailUseCase = get(),
+            signInWithGithubUseCase = get(),
             getSyncPreferencesUseCase = get(),
             logger = get()
         )

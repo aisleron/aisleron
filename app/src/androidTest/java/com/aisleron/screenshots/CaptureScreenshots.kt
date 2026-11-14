@@ -930,7 +930,7 @@ class CaptureScreenshots : KoinTest {
         prefsRepo.setSyncStatus(1787814089000, SyncStatusPreference.SUCCESS)
 
         val syncSessionManager = get<SyncSessionManager>() as SyncSessionManagerTestImpl
-        syncSessionManager.setSignedIn(true)
+        syncSessionManager.setSignedInProvider(SyncSessionManagerTestImpl.SignedInProvider.EMAIL)
         syncSessionManager.setFutureStatus(SyncSessionStatus.Authenticated("user@example.com"))
         syncSessionManager.refreshStatus()
 

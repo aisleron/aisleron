@@ -35,8 +35,8 @@ class SyncSessionManagerTestImpl(initialStatus: SyncSessionStatus) : SyncSession
     private var _password: String = ""
     val password: String get() = _password
 
-    private var _signedIn: Boolean = false
-    val signedIn: Boolean get() = _signedIn
+    private var _signedInProvider: SignedInProvider = SignedInProvider.NONE
+    val signedInProvider: SignedInProvider get() = _signedInProvider
 
     private var _failWithException: Exception? = null
 
@@ -47,7 +47,16 @@ class SyncSessionManagerTestImpl(initialStatus: SyncSessionStatus) : SyncSession
 
         _email = email
         _password = password
-        _signedIn = true
+        _signedInProvider = SignedInProvider.EMAIL
+        return Result.success(Unit)
+    }
+
+    override suspend fun signInWithGithub(): Result<Unit> {
+        _failWithException?.let {
+            return runCatchingUnlessCancelled { throw it }
+        }
+
+        _signedInProvider = SignedInProvider.GITHUB
         return Result.success(Unit)
     }
 
@@ -56,7 +65,7 @@ class SyncSessionManagerTestImpl(initialStatus: SyncSessionStatus) : SyncSession
             return runCatchingUnlessCancelled { throw it }
         }
 
-        _signedIn = false
+        _signedInProvider = SignedInProvider.NONE
         return Result.success(Unit)
     }
 
@@ -74,7 +83,13 @@ class SyncSessionManagerTestImpl(initialStatus: SyncSessionStatus) : SyncSession
         _failWithException = e
     }
 
-    fun setSignedIn(signedIn: Boolean) {
-        _signedIn = signedIn
+    fun setSignedInProvider(provider: SignedInProvider) {
+        _signedInProvider = provider
+    }
+
+    enum class SignedInProvider {
+        NONE,
+        EMAIL,
+        GITHUB
     }
 }

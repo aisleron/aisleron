@@ -138,6 +138,7 @@ val viewModelTestModule = module {
     viewModel {
         SignInViewModel(
             signInWithEmailUseCase = get(),
+            signInWithGithubUseCase = get(),
             getSyncPreferencesUseCase = get(),
             logger = get(),
             TestScope(UnconfinedTestDispatcher())

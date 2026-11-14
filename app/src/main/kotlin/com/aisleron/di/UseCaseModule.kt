@@ -135,6 +135,7 @@ import com.aisleron.domain.sync.usecase.ScheduleAdhocSyncUseCase
 import com.aisleron.domain.sync.usecase.ScheduleForceSyncUseCase
 import com.aisleron.domain.sync.usecase.SchedulePeriodicSyncUseCase
 import com.aisleron.domain.sync.usecase.SignInWithEmailUseCase
+import com.aisleron.domain.sync.usecase.SignInWithGithubUseCase
 import com.aisleron.domain.sync.usecase.SignOutUseCase
 import org.koin.android.ext.koin.androidApplication
 import org.koin.dsl.bind
@@ -468,6 +469,7 @@ val useCaseModule = module {
     }
 
     factory<SignInWithEmailUseCase> { SignInWithEmailUseCase(sessionManager = get()) }
+    factory<SignInWithGithubUseCase> { SignInWithGithubUseCase(sessionManager = get()) }
     factory<SignOutUseCase> { SignOutUseCase(sessionManager = get()) }
     factory<GetSessionStatusUseCase> { GetSessionStatusUseCase(sessionManager = get()) }
     factory<RefreshSessionStatusUseCase> { RefreshSessionStatusUseCase(sessionManager = get()) }

@@ -167,18 +167,24 @@ class SupabaseSessionManagerImpl(
         }
     }
 
-    override suspend fun signInWithEmail(email: String, password: String): Result<Unit> {
+    private suspend fun signInWith(block: suspend (SupabaseClient) -> Unit): Result<Unit> {
         return runCatchingUnlessCancelled {
             val client = getClientOrNull()
                 ?: throw IllegalStateException("Failed to acquire client")
 
-            authDelegate.signInWithEmail(client, email, password)
+            block(client)
         }.also {
             refreshStatus()
         }.recoverCatchingUnlessCancelled { throwable ->
             throw mapException(throwable)
         }
     }
+
+    override suspend fun signInWithEmail(email: String, password: String): Result<Unit> =
+        signInWith { client -> authDelegate.signInWithEmail(client, email, password) }
+
+    override suspend fun signInWithGithub(): Result<Unit> =
+        signInWith { client -> authDelegate.signInWithGithub(client) }
 
     override suspend fun signOut(): Result<Unit> =
         runCatchingUnlessCancelled {

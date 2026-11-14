@@ -25,6 +25,7 @@ import com.aisleron.domain.log.Logger
 import com.aisleron.domain.preferences.SyncServicePreference
 import com.aisleron.domain.preferences.syncpreferences.usecase.GetSyncPreferencesUseCase
 import com.aisleron.domain.sync.usecase.SignInWithEmailUseCase
+import com.aisleron.domain.sync.usecase.SignInWithGithubUseCase
 import com.aisleron.ui.base.UiEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,6 +35,7 @@ import kotlinx.coroutines.launch
 
 class SignInViewModel(
     private val signInWithEmailUseCase: SignInWithEmailUseCase,
+    private val signInWithGithubUseCase: SignInWithGithubUseCase,
     private val getSyncPreferencesUseCase: GetSyncPreferencesUseCase,
     private val logger: Logger,
     coroutineScopeProvider: CoroutineScope? = null
@@ -49,11 +51,11 @@ class SignInViewModel(
     private val _signInEvent = MutableStateFlow<UiEvent<UiEffect>?>(null)
     val signInEvent: StateFlow<UiEvent<UiEffect>?> = _signInEvent.asStateFlow()
 
-    fun signInWithEmail(email: String, password: String) {
+    private fun signInWith(block: suspend () -> Result<Unit>) {
         coroutineScope.launch {
             try {
                 _isLoading.value = true
-                signInWithEmailUseCase(email, password)
+                block()
                     .onSuccess {
                         _signInEvent.value = UiEvent(UiEffect.SignInSuccess)
                     }.onFailure { throwable ->
@@ -66,6 +68,14 @@ class SignInViewModel(
                 _isLoading.value = false
             }
         }
+    }
+
+    fun signInWithEmail(email: String, password: String) {
+        signInWith { signInWithEmailUseCase(email, password) }
+    }
+
+    fun signInWithGithub() {
+        signInWith { signInWithGithubUseCase() }
     }
 
     companion object {

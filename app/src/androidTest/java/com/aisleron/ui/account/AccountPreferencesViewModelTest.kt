@@ -30,7 +30,6 @@ import com.aisleron.domain.sync.SyncSessionManager
 import com.aisleron.domain.sync.SyncSessionStatus
 import com.aisleron.testdata.data.sync.SyncSessionManagerTestImpl
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -45,7 +44,6 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class AccountPreferencesViewModelTest : KoinTest {
     private lateinit var viewModel: AccountPreferencesViewModel
 
@@ -68,11 +66,14 @@ class AccountPreferencesViewModelTest : KoinTest {
     @Test
     fun signOut_UseCaseResultIsSuccess_SessionSignedOut() = runTest {
         val sessionManager = getSyncSessionManager()
-        sessionManager.setSignedIn(true)
+        sessionManager.setSignedInProvider(SyncSessionManagerTestImpl.SignedInProvider.EMAIL)
 
         viewModel.signOut()
 
-        assertFalse(sessionManager.signedIn)
+        assertEquals(
+            SyncSessionManagerTestImpl.SignedInProvider.NONE,
+            sessionManager.signedInProvider
+        )
 
         val uiState = viewModel.uiState
         assertFalse(uiState.value.isLoading)
@@ -81,12 +82,15 @@ class AccountPreferencesViewModelTest : KoinTest {
     @Test
     fun signOut_UseCaseResultIsFailure_AisleronErrorCodeEmitted() = runTest {
         val sessionManager = getSyncSessionManager()
-        sessionManager.setSignedIn(true)
+        sessionManager.setSignedInProvider(SyncSessionManagerTestImpl.SignedInProvider.EMAIL)
         sessionManager.failWith(Exception())
 
         viewModel.signOut()
 
-        assertTrue(sessionManager.signedIn)
+        assertEquals(
+            SyncSessionManagerTestImpl.SignedInProvider.EMAIL,
+            sessionManager.signedInProvider
+        )
 
         val uiState = viewModel.uiState
         assertFalse(uiState.value.isLoading)
@@ -101,12 +105,15 @@ class AccountPreferencesViewModelTest : KoinTest {
     @Test
     fun signOut_CancellationException_SignOutFailsWithNoError() = runTest {
         val sessionManager = getSyncSessionManager()
-        sessionManager.setSignedIn(true)
+        sessionManager.setSignedInProvider(SyncSessionManagerTestImpl.SignedInProvider.EMAIL)
         sessionManager.failWith(CancellationException())
 
         viewModel.signOut()
 
-        assertTrue(sessionManager.signedIn)
+        assertEquals(
+            SyncSessionManagerTestImpl.SignedInProvider.EMAIL,
+            sessionManager.signedInProvider
+        )
 
         val errorState = viewModel.uiEvent
         assertNull(errorState.value)

@@ -19,12 +19,14 @@ package com.aisleron.data.sync
 
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.providers.Github
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.status.SessionStatus
 import kotlinx.coroutines.flow.Flow
 
 interface SupabaseAuthDelegate {
     suspend fun signInWithEmail(client: SupabaseClient, email: String, password: String)
+    suspend fun signInWithGithub(client: SupabaseClient)
     suspend fun signOut(client: SupabaseClient)
     fun getSessionStatusFlow(client: SupabaseClient): Flow<SessionStatus>
     suspend fun awaitInitialization(client: SupabaseClient)
@@ -36,6 +38,10 @@ class SupabaseAuthDelegateImpl : SupabaseAuthDelegate {
             this.email = email
             this.password = password
         }
+    }
+
+    override suspend fun signInWithGithub(client: SupabaseClient) {
+        client.auth.signInWith(Github)
     }
 
     override suspend fun signOut(client: SupabaseClient) {

@@ -124,6 +124,7 @@ val viewModelModule = module {
     viewModel {
         SignInViewModel(
             signInWithEmailUseCase = get(),
+            signInWithGithubUseCase = get(),
             getSyncPreferencesUseCase = get(),
             logger = get()
         )
